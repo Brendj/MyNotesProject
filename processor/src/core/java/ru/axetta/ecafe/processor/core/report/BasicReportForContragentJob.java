@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -64,6 +65,8 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                         allContragentCriteria.add(Restrictions.eq("classId", getContragentSelectClass()));
                     }
                     allContragentCriteria.addOrder(Order.asc("idOfContragent"));
+                    allContragentCriteria.setCacheMode(CacheMode.NORMAL);
+                    allContragentCriteria.setCacheable(true);
                     List allContragents = allContragentCriteria.list();
                     for (Object object: allContragents){
                         Contragent contragent = (Contragent) object;

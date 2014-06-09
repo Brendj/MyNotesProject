@@ -22,32 +22,8 @@ import javax.persistence.PersistenceContext;
  * Time: 13:36
  * To change this template use File | Settings | File Templates.
  */
-//@Repository
 public class DOVersionRepository {
 
-    //@PersistenceContext(unitName = "reportsPU")
-    //private EntityManager entityManager;
-
-    //createNewClassVersion
-
-    //@Transactional
-    //public Long updateClassVersion(String doClass) {
-    //    Long version;Criteria criteria = persistenceSession.createCriteria(DOVersion.class);
-    //    criteria.add(Restrictions.eq("distributedObjectClassName", doClass).ignoreCase());
-    //    criteria.setMaxResults(1);
-    //    DOVersion doVersion = (DOVersion) criteria.uniqueResult();
-    //    if(doVersion == null){
-    //        doVersion = new DOVersion();
-    //        doVersion.setDistributedObjectClassName(doClass);
-    //        version = 0L;
-    //    } else {
-    //        version = doVersion.getCurrentVersion() + 1;
-    //    }
-    //    doVersion.setCurrentVersion(version);
-    //    persistenceSession.save(doVersion);
-    //    return version;
-    //}
-    //
     public static Long updateClassVersion(String doClass, Session persistenceSession) {
         Long version;Criteria criteria = persistenceSession.createCriteria(DOVersion.class);
         criteria.add(Restrictions.eq("distributedObjectClassName", doClass).ignoreCase());

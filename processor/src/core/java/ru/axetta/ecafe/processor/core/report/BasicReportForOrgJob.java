@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
@@ -55,6 +56,8 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                     transaction.begin();
                     Criteria allOrgCriteria = session.createCriteria(Org.class);
                     allOrgCriteria.addOrder(Order.asc("idOfOrg"));
+                    allOrgCriteria.setCacheMode(CacheMode.NORMAL);
+                    allOrgCriteria.setCacheable(true);
                     List allOrgs = allOrgCriteria.list();
 
                     for (Object object : allOrgs) {

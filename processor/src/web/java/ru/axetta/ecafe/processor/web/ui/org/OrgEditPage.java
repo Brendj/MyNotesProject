@@ -156,6 +156,10 @@ public class OrgEditPage extends BasicWorkspacePage
                 for (Org o : selectOrg) {
                     ClientManager.updateClientVersion(session, o.getClients());
                     o.setFriendlyOrg(selectOrg);
+                    //session.evict(o); // убираем из кеша
+                    //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
+                    //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
+
                 }
             }
         }

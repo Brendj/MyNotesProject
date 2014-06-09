@@ -121,23 +121,6 @@ public class ContragentSelectPage extends BasicPage {
         this.items = items;
     }
 
-    /*public void fill(Session session, Long idOfContragent) throws HibernateException {
-        List<Item> items = new LinkedList<Item>();
-        List contragents = retrieveContragents(session);
-        for (Object object : contragents) {
-            Contragent contragent = (Contragent) object;
-            Item item = new Item(contragent);
-            items.add(item);
-        }
-        Item selectedItem = new Item();
-        if (null != idOfContragent) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            selectedItem = new Item(contragent);
-        }
-        this.items = items;
-        this.selectedItem = selectedItem;
-    }*/
-
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
         this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
@@ -146,6 +129,7 @@ public class ContragentSelectPage extends BasicPage {
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
             ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
         } catch (Exception e) {
+
         }
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));

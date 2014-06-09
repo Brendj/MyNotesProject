@@ -95,7 +95,6 @@ import java.util.concurrent.TimeUnit;
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
 
-
     public static FinancialOpsManager getFinancialOpsManager() {
         return getAppContext().getBean(FinancialOpsManager.class);
     }
@@ -193,6 +192,35 @@ public class RuntimeContext implements ApplicationContextAware {
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
     private AcquiropaySystemConfig acquiropaySystemConfig;
+    static SessionFactory sessionFactory;
+    static SessionFactory reportsSessionFactory;
+    boolean criticalErrors;
+    Properties configProperties;
+    SchemaVersionInfo currentSchemaVersionInfo;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private DBUpdater updater;
+    public final static int TYPE_S = 0, TYPE_P = 1, TYPE_B = 2;
+    public static int permittedCountS, permittedCountP, permittedCountB;
+    public static HashSet<Long> orgS = new HashSet<Long>(), orgP = new HashSet<Long>(), orgB = new HashSet<Long>();
+    HashMap<Integer, String> optionsValues;
+    private static String base64crt = "MIICMTCCAZqgAwIBAgIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQFADAi\n"
+            + "MSAwHgYDVQQDExdsaWNlbnNlLm5vdmF5YXNoa29sYS5ydTAeFw0xMjA4MDMwNjAz\n"
+            + "MDBaFw0zNTEyMzEyMDAwMDBaMCIxIDAeBgNVBAMTF2xpY2Vuc2Uubm92YXlhc2hr\n"
+            + "b2xhLnJ1MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9pdRyozu+dRELgRpb\n"
+            + "kDrIc9RHRiNAj4LS1HQjZmGPbtjdRyC8AcdaeO3M1fGUe+iiON/9ldZLwsCB6hTh\n"
+            + "VkJijZ+6gsqLEiMxN/Wo5THFXYGDSYvq6t1dlgt/K5/ctXR86carj1beZ3eCPE5G\n"
+            + "rZ6eUbIaDHU0NgMd8p8L4H0aRQIDAQABo2gwZjAPBgNVHRMBAf8EBTADAQH/MFMG\n"
+            + "A1UdAQRMMEqAEJvi89wDT2YruumkBLTUaaehJDAiMSAwHgYDVQQDExdsaWNlbnNl\n"
+            + "Lm5vdmF5YXNoa29sYS5ydYIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQF\n"
+            + "AAOBgQBJxDdetDvHdUrzztZoHhfJwDOGYx/bp1zNtd75RVfvM/+Gwu4AiW6CQfLB\n"
+            + "qc085KjxxnQZ2Si7FoDhwJ3gCEEERs5YrA/O/Lde+kdUPT15GlZcguJHB5Jk83Ir\n"
+            + "GmtI6Yxjlvzt1zcqpq4MZM3HTLdz4gibDBPGG3cd692TYkHeFg==";
+    private static X509Certificate rtCert = null; // корневой сертификат
+
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
@@ -390,10 +418,6 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-    public static SessionFactory sessionFactory;
-
-    public static SessionFactory reportsSessionFactory;
-
     public static void setSessionFactory(SessionFactory sessionFactory) {
         RuntimeContext.sessionFactory = sessionFactory;
     }
@@ -401,10 +425,6 @@ public class RuntimeContext implements ApplicationContextAware {
     public static void setReportsSessionFactory(SessionFactory reportsSessionFactory) {
         RuntimeContext.reportsSessionFactory = reportsSessionFactory;
     }
-
-    boolean criticalErrors;
-
-    Properties configProperties;
 
     @PostConstruct
     public void init() throws Exception {
@@ -586,22 +606,9 @@ public class RuntimeContext implements ApplicationContextAware {
         */
     }
 
-    SchemaVersionInfo currentSchemaVersionInfo;
-
     public SchemaVersionInfo getCurrentDBSchemaVersion() {
         return currentSchemaVersionInfo;
     }
-
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
-
-    @Autowired
-    private DAOService daoService;
-
-    @Autowired
-    private DBUpdater updater;
-
-
 
     @Transactional
     public void initDB() throws Exception {
@@ -1160,7 +1167,6 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         RuntimeContext.applicationContext = applicationContext;
@@ -1184,8 +1190,6 @@ public class RuntimeContext implements ApplicationContextAware {
     public int getPropertiesValue(String name, int defaultValue) {
         return Integer.parseInt(configProperties.getProperty(name, "" + defaultValue));
     }
-
-    HashMap<Integer, String> optionsValues;
 
     public void loadOptionValues() {
         optionsValues = new HashMap<Integer, String>();
@@ -1272,10 +1276,6 @@ public class RuntimeContext implements ApplicationContextAware {
         return criticalErrors;
     }
 
-    public final static int TYPE_S = 0, TYPE_P = 1, TYPE_B = 2;
-    public static int permittedCountS, permittedCountP, permittedCountB;
-    public static HashSet<Long> orgS = new HashSet<Long>(), orgP = new HashSet<Long>(), orgB = new HashSet<Long>();
-
     public boolean isPermitted(long orgId, int type) {
         if (type == TYPE_S) {
             orgS.add(orgId);
@@ -1306,20 +1306,6 @@ public class RuntimeContext implements ApplicationContextAware {
             }
         }
     }
-
-    private static String base64crt = "MIICMTCCAZqgAwIBAgIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQFADAi\n"
-            + "MSAwHgYDVQQDExdsaWNlbnNlLm5vdmF5YXNoa29sYS5ydTAeFw0xMjA4MDMwNjAz\n"
-            + "MDBaFw0zNTEyMzEyMDAwMDBaMCIxIDAeBgNVBAMTF2xpY2Vuc2Uubm92YXlhc2hr\n"
-            + "b2xhLnJ1MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9pdRyozu+dRELgRpb\n"
-            + "kDrIc9RHRiNAj4LS1HQjZmGPbtjdRyC8AcdaeO3M1fGUe+iiON/9ldZLwsCB6hTh\n"
-            + "VkJijZ+6gsqLEiMxN/Wo5THFXYGDSYvq6t1dlgt/K5/ctXR86carj1beZ3eCPE5G\n"
-            + "rZ6eUbIaDHU0NgMd8p8L4H0aRQIDAQABo2gwZjAPBgNVHRMBAf8EBTADAQH/MFMG\n"
-            + "A1UdAQRMMEqAEJvi89wDT2YruumkBLTUaaehJDAiMSAwHgYDVQQDExdsaWNlbnNl\n"
-            + "Lm5vdmF5YXNoa29sYS5ydYIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQF\n"
-            + "AAOBgQBJxDdetDvHdUrzztZoHhfJwDOGYx/bp1zNtd75RVfvM/+Gwu4AiW6CQfLB\n"
-            + "qc085KjxxnQZ2Si7FoDhwJ3gCEEERs5YrA/O/Lde+kdUPT15GlZcguJHB5Jk83Ir\n"
-            + "GmtI6Yxjlvzt1zcqpq4MZM3HTLdz4gibDBPGG3cd692TYkHeFg==";
-    private static X509Certificate rtCert = null; // корневой сертификат
 
     private static X509Certificate getRootCert() throws Exception {
         if (rtCert == null) {

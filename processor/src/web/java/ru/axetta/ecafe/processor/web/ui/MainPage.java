@@ -1459,7 +1459,7 @@ public class MainPage {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession, idOfContragentOrgList);
                 persistenceTransaction.commit();
@@ -1509,7 +1509,7 @@ public class MainPage {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setFilter("");
@@ -5448,55 +5448,6 @@ public class MainPage {
         return null;
     }
 
-    //public Object buildDiscrepanciesDataOnOrdersAndPaymentReport() {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    RuntimeContext runtimeContext = null;
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        runtimeContext = RuntimeContext.getInstance();
-    //        persistenceSession = runtimeContext.createReportPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //        //discrepanciesDataOnOrdersAndPaymentReportPage.buildReport(persistenceSession);
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-    //    } catch (Exception e) {
-    //        logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return null;
-    //}
-
-    //public void exportDiscrepanciesDataOnOrdersAndPaymentReport(javax.faces.event.ActionEvent event) {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    RuntimeContext runtimeContext = null;
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        runtimeContext = RuntimeContext.getInstance();
-    //        persistenceSession = runtimeContext.createReportPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //        //discrepanciesDataOnOrdersAndPaymentReportPage.export(persistenceSession);
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-    //    } catch (Exception e) {
-    //        logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //}
-
     public Object showContragentPaymentsReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5762,31 +5713,6 @@ public class MainPage {
         updateSelectedMainMenu();
         return null;
     }
-
-    //public Object buildClientBalanceByDayReport() {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    RuntimeContext runtimeContext = null;
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        runtimeContext = RuntimeContext.getInstance();
-    //        persistenceSession = runtimeContext.createReportPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //        clientBalanceByDayReportPage.buildReport(persistenceSession);
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-    //    } catch (Exception e) {
-    //        logger.error("Failed to build client report", e);
-    //        facesContext.addMessage(null,
-    //                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return null;
-    //}
 
     public ClientReportPage getClientReportPage() {
         return clientReportPage;

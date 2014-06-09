@@ -7,6 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Person" table="CF_Persons">
+        <!--<cache usage="transactional"/>-->
         <id name="idOfPerson" column="IdOfPerson" type="long">
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
@@ -27,6 +28,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
         </set>
         <set name="clientsInternal" inverse="true" cascade="all">
+            <!--<cache usage="transactional"/>-->
             <key column="IdOfPerson"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>
         </set>
@@ -35,6 +37,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Visitor"/>
         </set>
         <set name="contractClientsInternal" inverse="true" cascade="all">
+
             <key column="IdOfContractPerson"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>
         </set>

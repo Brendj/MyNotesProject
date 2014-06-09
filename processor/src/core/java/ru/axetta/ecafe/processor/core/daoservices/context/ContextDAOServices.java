@@ -15,6 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,6 +41,8 @@ import java.util.*;
 @Transactional
 public class ContextDAOServices {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContextDAOServices.class);
+
     @PersistenceContext(unitName = "processorPU")
     //@PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -56,6 +60,7 @@ public class ContextDAOServices {
             }
             return str.toString();
         } catch (Exception e) {
+            logger.error("getContragentsListForTooltip error: ", e);
             return "";
         }
     }
@@ -65,18 +70,19 @@ public class ContextDAOServices {
         return RuntimeContext.getAppContext().getBean(ContextDAOServices.class);
     }
 
-
-
-
     /*
                             ОГРАНИЧЕНИЯ    ДЛЯ   ОРГАНИЗАЦИЙ
      */
     public void buildOrgRestriction (long idOfUser, Criteria criteria) {
-        buildOrgRestriction(idOfUser, "idOfOrg", criteria);
+        try {
+            buildOrgRestriction(idOfUser, "idOfOrg", criteria);
+        } catch (Exception e) {
+            logger.error("Error buildOrgRestriction: ", e);
+        }
     }
 
     public void buildOrgOrContragentRestriction(long idOfUser, String fieldOrg, String fieldContragent,
-            Criteria criteria) {
+            Criteria criteria) throws Exception {
         List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
         Set<Contragent> contragents = getRestictedContragents(idOfUser);
         if ((orgIds == null || orgIds.isEmpty()) &&
@@ -105,7 +111,7 @@ public class ContextDAOServices {
         }
     }
 
-    public void buildOrgRestriction(long idOfUser, String field, Criteria criteria) {
+    public void buildOrgRestriction(long idOfUser, String field, Criteria criteria) throws Exception {
         List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);     //  Ограничение по контрагенту
         if (!orgIds.isEmpty()) {
             criteria.add(Restrictions.in(field, orgIds));
@@ -113,7 +119,7 @@ public class ContextDAOServices {
         buildRegionsRestriction(idOfUser, "district", criteria);        //  Ограничение по региону
     }
 
-    public String buildOrgRestriction(long idOfUser, String field) {
+    public String buildOrgRestriction(long idOfUser, String field) throws Exception {
         List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
         if (orgIds.isEmpty()) {
             return "";
@@ -137,10 +143,14 @@ public class ContextDAOServices {
                            ОГРАНИЧЕНИЯ    ДЛЯ   КОНТРАГЕНТОВ
     */
     public void buildContragentRestriction(long idOfUser, Criteria criteria) {
-        buildContragentRestriction(idOfUser, "idOfContragent", criteria);
+        try {
+            buildContragentRestriction(idOfUser, "idOfContragent", criteria);
+        } catch (Exception e) {
+            logger.error("buildContragentRestriction", e);
+        }
     }
 
-    public void buildContragentRestriction(long idOfUser, String field, Criteria criteria) {
+    public void buildContragentRestriction(long idOfUser, String field, Criteria criteria) throws Exception {
         Set<Contragent> contragents = getRestictedContragents(idOfUser);
         if (contragents.isEmpty()) {
             return;
@@ -173,7 +183,7 @@ public class ContextDAOServices {
                 criteria.add(Restrictions.eq(field, user.getRegion()));
             }
         } catch (Exception e) {
-
+            logger.error("buildRegionsRestriction error: ", e);
         }
     }
 
@@ -189,7 +199,7 @@ public class ContextDAOServices {
                            ПОИСКИ    ОБЪЕКТОВ
     */
     @Transactional
-    public Set<Contragent> getRestictedContragents(long idOfUser) {
+    public Set<Contragent> getRestictedContragents(long idOfUser) throws Exception{
         Session persistenceSession = (Session) entityManager.getDelegate();
         Set<Contragent> contragents;
         try {
@@ -203,14 +213,14 @@ public class ContextDAOServices {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @SuppressWarnings("unchecked")
-    public List<Long> findOrgOwnersByContragentSet(Long idOfUser) {
+    public List<Long> findOrgOwnersByContragentSet(Long idOfUser) throws Exception {
         Query query = entityManager.createQuery(
                 "select distinct o.idOfOrg from Contragent c join c.orgsInternal o join c.usersInternal u where u.idOfUser = :idOfUser")
                 .setParameter("idOfUser", idOfUser);
         return (List<Long>) query.getResultList();
     }
 
-    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser) {
+    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser) throws Exception {
         Query contragentTypedQuery = entityManager.createQuery("select u.contragents from User u where u.idOfUser=:idOfUser");
         contragentTypedQuery.setParameter("idOfUser", idOfUser);
         List list = contragentTypedQuery.getResultList();
@@ -230,7 +240,7 @@ public class ContextDAOServices {
         }
     }
 
-    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser, String filter) {
+    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser, String filter) throws Exception {
         Query contragentTypedQuery = entityManager.createQuery("select u.contragents from User u where u.idOfUser=:idOfUser");
         contragentTypedQuery.setParameter("idOfUser", idOfUser);
         List list = contragentTypedQuery.getResultList();

@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -274,7 +275,8 @@ public class OrgListSelectPage extends BasicPage {
                 .add(Projections.property("officialName"),"officialName")
                 .add(Projections.property("address"),"address")
         );
-
+        criteria.setCacheMode(CacheMode.NORMAL);
+        criteria.setCacheable(true);
         criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
 
         return (List<OrgShortItem>) criteria.list();

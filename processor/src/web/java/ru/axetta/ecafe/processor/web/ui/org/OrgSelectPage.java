@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -106,12 +107,11 @@ public class OrgSelectPage extends BasicPage {
 
             Criteria criteria = session.createCriteria(Org.class);
             criteria.add(Restrictions.eq("idOfOrg",idOfOrg));
-            criteria.setProjection(Projections.projectionList()
-                    .add(Projections.property("idOfOrg"),"idOfOrg")
-                    .add(Projections.property("shortName"),"shortName")
-                    .add(Projections.property("officialName"),"officialName")
-            );
-
+            criteria.setProjection(Projections.projectionList().add(Projections.property("idOfOrg"), "idOfOrg")
+                    .add(Projections.property("shortName"), "shortName")
+                    .add(Projections.property("officialName"), "officialName"));
+            criteria.setCacheMode(CacheMode.NORMAL);
+            criteria.setCacheable(true);
             criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
             selectedItem = (OrgShortItem) criteria.uniqueResult();
         }
@@ -168,7 +168,8 @@ public class OrgSelectPage extends BasicPage {
                 .add(Projections.property("officialName"),"officialName")
                 .add(Projections.property("address"),"address")
         );
-
+        criteria.setCacheMode(CacheMode.NORMAL);
+        criteria.setCacheable(true);
         criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
         criteria.addOrder(Order.asc("idOfOrg"));
         return (List<OrgShortItem>) criteria.list();
