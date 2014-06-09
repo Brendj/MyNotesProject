@@ -117,13 +117,13 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
 
         protected Map<Long, TransactionsReportItem> getEvents(Session session, Date start, Date end,
                                                               Map<Long, TransactionsReportItem> items) {
-            String sql = "select o.idoforg, o.shortname, o.address, o.district, count(ee.idofenterevent) as event "
+            String sql = "select distinct ee.idofclient, o.idoforg, o.shortname, o.address, o.district, count(ee.idofenterevent) as event "
                     + "from cf_orgs as o "
                     + "left join cf_enterevents as ee on o.idoforg=ee.idoforg and (ee.passdirection=0 or ee.passdirection=1) and "
                     + "          ee.evtdatetime >= :startDate and "
                     + "          ee.evtdatetime < :endDate "
                     + "where o.state<>0 "
-                    + "group by o.idoforg, o.shortname, o.address, o.district "
+                    + "group by o.idoforg, o.shortname, o.address, o.district, ee.idofclient "
                     + "order by o.shortname ";
 
             Query query = session.createSQLQuery(sql);
@@ -154,7 +154,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
             String sql =
                         "select idoforg, shortname, address, district, count(*), isPaid, isComplex "
                       + "from ( "
-                      + "      select o.idoforg, o.shortname, 0, o.address, o.district, "
+                      + "      select distinct oo.idoforder, o.idoforg, o.shortname, 0, o.address, o.district, "
                       + "             case when oo.rsum<>0 then 1 "
                       + "                  when oo.socdiscount<>0 then 0 "
                       + "                  else null end as isPaid, "
@@ -162,10 +162,10 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
                       + "                  when od.menutype<50 or od.menutype>99 then 0 "
                       + "                  else null end as isComplex "
                       + "      from cf_orgs as o "
-                      + "      left join cf_orders as oo on o.idoforg=oo.idoforg and "
+                      + "      join cf_orders as oo on o.idoforg=oo.idoforg and "
                       + "                oo.createddate >= :startDate and "
                       + "                oo.createddate < :endDate "
-                      + "      left join cf_orderdetails as od on od.idoforder=oo.idoforder "
+                      + "      join cf_orderdetails as od on od.idoforder=oo.idoforder "
                       + "      where o.state<>0 "
                       + "      order by o.shortname "
                       + "      ) as data "
