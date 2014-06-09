@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -99,6 +100,25 @@ public class Instance extends LibraryDistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        InventoryBook ib = DAOUtils.findDistributedObjectByRefGUID(InventoryBook.class, session, guidInventaryBook);
+        if(ib!=null){
+            setInventoryBook(ib);
+        }
+
+        if(ib!=null && invNumber!=null) {
+            Criteria criteria = session.createCriteria(Instance.class);
+            criteria.add(Restrictions.eq("inventoryBook", ib));
+            criteria.add(Restrictions.eq("invNumber", invNumber));
+            Instance instance = (Instance) criteria.uniqueResult();
+            session.clear();
+            if(instance!=null){
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Instance DATA_EXIST_VALUE inventoryBook and invNumber equals");
+                distributedObjectException.setData(instance.getGuid());
+                throw  distributedObjectException;
+            }
+        }
+
+
         Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
         if(p==null) {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
@@ -111,11 +131,6 @@ public class Instance extends LibraryDistributedObject {
         Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
         if(f!=null) {
             setFund(f);
-        }
-
-        InventoryBook ib = DAOUtils.findDistributedObjectByRefGUID(InventoryBook.class, session, guidInventaryBook);
-        if(ib!=null){
-            setInventoryBook(ib);
         }
 
         Ksu1Record ksu1 = DAOUtils.findDistributedObjectByRefGUID(Ksu1Record.class, session, guidKsu1Record);
