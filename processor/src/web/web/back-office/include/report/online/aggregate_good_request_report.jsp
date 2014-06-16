@@ -95,7 +95,7 @@
     <h:panelGrid styleClass="borderless-div">
         <rich:dataTable id="detailedGoodRequestTable" var="items"
                         value="#{mainPage.detailedGoodRequestReportPage.detailedGoodRequestReportItems}"
-                        footerClass="data-table-footer">
+                        footerClass="data-table-footer" rows="20">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column rowspan="2">
