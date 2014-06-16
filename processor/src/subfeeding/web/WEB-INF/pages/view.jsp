@@ -181,6 +181,9 @@
             <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
                 Перевод средств
             </button>
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+                История операций
+            </button>
         </c:when>
     </c:choose>
 </c:when>
@@ -213,6 +216,9 @@
                 onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
             Перевод средств
         </button>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+            История операций
+        </button>
     </p>
     <%-- Подписка ожидается приостановки --%>
     <% } else {%>
@@ -225,6 +231,9 @@
     </button>
     <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
         Перевод средств
+    </button>
+    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+        История операций
     </button>
     <% } %>
 </c:when>
@@ -262,136 +271,7 @@
 </c:choose>
 </div>
 </div>
-<div id="history">
-    <div style="font-weight: bold;">История операций</div>
-    <div style="margin-top: 20px;">
-        <form method="post" enctype="application/x-www-form-urlencoded"
-              action="${pageContext.request.contextPath}/sub-feeding/view">
-            <span style="padding-right: 10px;">Начальная дата:</span>
-            <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
-                   id="datepickerBegin" maxlength="10" required />
-            <span style="padding: 10px;">Конечная дата:</span>
-            <input type="text" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>" id="datepickerEnd"
-                   maxlength="10" required />
-            <button type="submit">Показать</button>
-        </form>
-    </div>
-    <div id="purchases">
-        <div style="font-weight: bold;">Покупки</div>
-        <div style="line-height: 3em;">
-            <span><%=!purchasesExist ? " За данный период по субсчету АП покупок не было." : ""%></span>
-        </div>
-        <%if (purchasesExist) {%>
-        <div class="simpleTable purchaseTable">
-            <div class="simpleTableHeader purchaseRow">
-                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                <div class="simpleCell purchaseHeaderCell">Сумма покупки</div>
-                <div class="simpleCell purchaseHeaderCell">Торговая скидка</div>
-                <div class="simpleCell purchaseHeaderCell">Наличными</div>
-                <div class="simpleCell purchaseHeaderCell">По карте</div>
-                <div class="simpleCell purchaseHeaderCell wideCell">Состав</div>
-            </div>
-            <%for (PurchaseExt purchase : purchases.purchaseList.getP()) {
-                String date = tf.format(purchase.getTime().toGregorianCalendar().getTime());
-                String sum = CurrencyStringUtils.copecksToRubles(purchase.getSum());
-                String tradeDiscount = CurrencyStringUtils.copecksToRubles(purchase.getTrdDiscount());
-                String sumByCash = CurrencyStringUtils.copecksToRubles(purchase.getByCash());
-                String sumByCard = CurrencyStringUtils.copecksToRubles(purchase.getByCard());
-                OrderDetailViewInfo viewInfo = new OrderDetailViewInfo();
-                for (PurchaseElementExt pe : purchase.getE()) {
-                    int type = pe.getType();
-                    if (type == 1) {
-                        viewInfo.createComplexViewInfo(pe.getMenuType(), pe.getName(), pe.getSum(), true);
-                    } else if (type == 2) {
-                        int complexMenuType = pe.getMenuType() - 100;
-                        OrderDetailViewInfo.ComplexViewInfo cvi = viewInfo.complexesByType.get(complexMenuType);
-                        if (cvi == null) {
-                            cvi = viewInfo.createComplexViewInfo(complexMenuType, "", 0L, false);
-                        }
-                        cvi.addComplexDetail(pe.getName());
-                    } else if (type == 0) {
-                        viewInfo.createSeparateDish(pe.getName(), pe.getSum(), pe.getAmount());
-                    }
-                }
-                String consistence = viewInfo.toString();%>
-            <div class="simpleRow purchaseRow">
-                <div class="purchaseCell simpleCell"><%=date%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=sum%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=tradeDiscount%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=sumByCash%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=sumByCard%>
-                </div>
-                <div class="purchaseCell simpleCell complexName"><%=consistence%>
-                </div>
-            </div>
-            <%}%>
-        </div>
-        <%}%>
-    </div>
-    <div id="payments">
-        <div style="font-weight: bold;">Платежи</div>
-        <div style="line-height: 3em;">
-            <span><%=!paymentsExist ? " За данный период по субсчету АП платежей не было." : ""%></span>
-        </div>
-        <%if (paymentsExist) {%>
-        <div class="simpleTable purchaseTable">
-            <div class="simpleTableHeader purchaseRow">
-                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                <div class="simpleCell purchaseHeaderCell">Сумма</div>
-                <div class="simpleCell purchaseHeaderCell wideCell">Информация о платеже</div>
-            </div>
-            <%for (Payment payment : payments.paymentList.getP()) {
-                String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
-                String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());%>
-            <div class="simpleRow purchaseRow">
-                <div class="purchaseCell simpleCell"><%=date%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=sum%>
-                </div>
-                <div class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%>
-                </div>
-            </div>
-            <%}%>
-        </div>
-        <%}%>
-    </div>
 
-    <div id="transfers">
-        <div style="font-weight: bold;">Переводы</div>
-        <div style="line-height: 3em;">
-            <span><%=!transferExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
-        </div>
-        <%if (transferExist) {%>
-        <div class="simpleTable purchaseTable">
-            <div class="simpleTableHeader purchaseRow">
-                <div class="simpleCell purchaseHeaderCell wideCell">Номер счета списания</div>
-                <div class="simpleCell purchaseHeaderCell wideCell">Номер счета пополнения</div>
-                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                <div class="simpleCell purchaseHeaderCell">Сумма</div>
-            </div>
-            <%for (TransferSubBalanceExt transferSubBalanceExt : transfers.transferSubBalanceListExt.getT()) {
-                String date = tf.format(transferSubBalanceExt.getCreateTime());
-                String sum = CurrencyStringUtils.copecksToRubles(transferSubBalanceExt.getTransferSum());%>
-            <div class="simpleRow purchaseRow">
-                <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBenefactor()%>
-                </div>
-                <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBeneficiary()%>
-                </div>
-                <div class="purchaseCell simpleCell"><%=date%>
-                </div>
-                <div class="purchaseCell simpleCell sum"><%=sum%>
-                </div>
-            </div>
-            <%}%>
-        </div>
-        <%}%>
-    </div>
-
-</div>
 </div>
 </div>
 </body>

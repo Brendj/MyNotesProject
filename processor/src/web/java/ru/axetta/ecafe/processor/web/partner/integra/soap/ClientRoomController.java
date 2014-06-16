@@ -280,10 +280,23 @@ public interface ClientRoomController {
     SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "getSubscriptionFeedingList")
-    SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDay") Date currentDay);
+    SubscriptionFeedingListResult getSubscriptionFeedingList(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "currentDay") Date currentDay
+    );
+
+    @WebMethod(operationName = "getSubscriptionFeedingHistoryList")
+    SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate
+    );
 
     @WebMethod(operationName = "suspendSubscriptionFeedingToDay")
-    Result suspendSubscriptionFeedingToDay(@WebParam(name = "contractId") Long contractId, @WebParam(name = "endPauseDate") Date endPauseDate);
+    Result suspendSubscriptionFeedingToDay(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "endPauseDate") Date endPauseDate
+    );
 
     @WebMethod(operationName = "reopenSubscriptionFeedingToDay")
     Result reopenSubscriptionFeedingToDay(@WebParam(name = "contractId") Long contractId, @WebParam(name = "endReopenDate") Date endReopenDate);
@@ -293,6 +306,13 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getCurrentCycleDiagramList")
     CycleDiagramList getCurrentCycleDiagramList(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "getCycleDiagramList")
+    CycleDiagramList getCycleDiagramList(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate
+    );
 
     @WebMethod(operationName = "getNextCycleDiagramList")
     CycleDiagramList getNextCycleDiagramList(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") Date currentDate);

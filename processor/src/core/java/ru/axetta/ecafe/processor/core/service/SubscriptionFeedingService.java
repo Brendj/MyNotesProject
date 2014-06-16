@@ -283,6 +283,20 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<SubscriptionFeeding> findSubscriptionFeedingByClient(Client c, Date startDate, Date endDate) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.or(
+                Restrictions.between("createdDate", startDate, endDate),
+                Restrictions.between("lastUpdate", startDate, endDate)
+        ));
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму питания, актуальную на текущий день.
     public CycleDiagram findClientCycleDiagram(Client c) {
         Session session = entityManager.unwrap(Session.class);
@@ -341,6 +355,21 @@ public class SubscriptionFeedingService {
             criteria.add(Subqueries.propertyEq("dateActivationDiagram", subQuery));
             return (CycleDiagram) criteria.uniqueResult();
         } else return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Date startDate, Date endDate) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.or(
+                Restrictions.between("createdDate", startDate, endDate),
+                Restrictions.between("lastUpdate", startDate, endDate)
+        ));
+        return criteria.list();
     }
 
     @SuppressWarnings("unchecked")

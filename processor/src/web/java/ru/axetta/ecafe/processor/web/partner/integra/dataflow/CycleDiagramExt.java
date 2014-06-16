@@ -51,6 +51,9 @@ public class CycleDiagramExt {
     private Long saturdayPrice;
     @XmlElement(name = "SundayPrice")
     private Long sundayPrice;
+    @XmlElement(name = "UpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    private Date updateDate;
 
     public CycleDiagramExt(CycleDiagram diagram) {
         this.globalId = diagram.getGlobalId();
@@ -70,6 +73,11 @@ public class CycleDiagramExt {
         this.fridayPrice = diagram.getFridayPrice();
         this.saturdayPrice = diagram.getSaturdayPrice();
         this.sundayPrice = diagram.getSundayPrice();
+        if(diagram.getLastUpdate()==null){
+            this.updateDate = diagram.getCreatedDate();
+        } else {
+            this.updateDate = diagram.getLastUpdate();
+        }
     }
 
     public CycleDiagramExt() {}
@@ -208,5 +216,13 @@ public class CycleDiagramExt {
 
     public void setSundayPrice(Long sundayPrice) {
         this.sundayPrice = sundayPrice;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

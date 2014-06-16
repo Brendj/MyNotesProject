@@ -31,6 +31,9 @@ public class SubscriptionFeedingExt {
     @XmlElement(name = "DateDeactivate")
     @XmlSchemaType(name = "dateTime")
     private Date dateDeactivate;
+    @XmlElement(name = "UpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    private Date updateDate;
     @XmlElement(name = "Suspended")
     private Boolean suspended;
 
@@ -42,6 +45,11 @@ public class SubscriptionFeedingExt {
         this.lastDatePause = subscriptionFeeding.getLastDatePauseService();
         this.dateDeactivate = subscriptionFeeding.getDateDeactivateService();
         this.suspended = subscriptionFeeding.getWasSuspended();
+        if(subscriptionFeeding.getLastUpdate()==null){
+            this.updateDate = subscriptionFeeding.getCreatedDate();
+        } else {
+            this.updateDate = subscriptionFeeding.getLastUpdate();
+        }
     }
 
     public Long getIdOfSubscriptionFeeding() {
@@ -98,6 +106,14 @@ public class SubscriptionFeedingExt {
 
     public void setSuspended(Boolean suspended) {
         this.suspended = suspended;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     public SubscriptionFeedingExt() {

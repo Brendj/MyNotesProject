@@ -711,6 +711,42 @@ public class RuntimeContext implements ApplicationContextAware {
                         entityManager.merge(complexRole);
                     }
                 }
+
+                //Session session = entityManager.unwrap(Session.class);
+                //List<Long> ids = Arrays.asList(
+                //        1796869828L,
+                //        2146113332L,
+                //        3826388676L,
+                //        1809454900L,
+                //        737086916L,
+                //        3526823620L,
+                //        2563708724L,
+                //        177739572L,
+                //        3301054260L,
+                //        3812101828L,
+                //        51058740L,
+                //        1160452148L,
+                //        2502105140L,
+                //        2686127812L,
+                //        116850884L,
+                //        2335903428L,
+                //        126578765L,
+                //        1209473076L
+                //);
+                //Criteria criteria = session.createCriteria(Card.class);
+                //criteria.add(Restrictions.in("cardNo", ids));
+                //List list = criteria.list();
+                //for (Object obj: list){
+                //    Card card = (Card) obj;
+                //    session.delete(card);
+                //}
+                //Criteria criteriat = session.createCriteria(CardTemp.class);
+                //criteriat.add(Restrictions.in("cardNo", ids));
+                //List list1 = criteriat.list();
+                //for (Object obj: list1){
+                //    CardTemp card = (CardTemp) obj;
+                //    session.delete(card);
+                //}
             }
         } catch (Exception e) {
             logger.error("Failed to init application.", e);

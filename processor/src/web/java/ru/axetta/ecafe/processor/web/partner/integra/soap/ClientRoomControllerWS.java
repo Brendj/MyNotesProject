@@ -4605,8 +4605,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "currentDay") Date currentDay) {
+    public SubscriptionFeedingListResult getSubscriptionFeedingList(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "currentDay") Date currentDay
+    )
+    {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
@@ -4642,8 +4645,52 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result suspendSubscriptionFeedingToDay(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "endPauseDate") Date endPauseDate) {
+    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate
+    )
+    {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        SubscriptionFeedingListResult result = new SubscriptionFeedingListResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            SubscriptionFeedingService subscriptionFeedingService = SubscriptionFeedingService.getInstance();
+            List<SubscriptionFeeding> subscriptionFeedings =
+                    subscriptionFeedingService.findSubscriptionFeedingByClient(client, startDate, endDate);
+            for (SubscriptionFeeding subscriptionFeeding: subscriptionFeedings){
+                result.subscriptionFeedingListExt.getS().add(new SubscriptionFeedingExt(subscriptionFeeding));
+            }
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Result suspendSubscriptionFeedingToDay(
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "endPauseDate") Date endPauseDate
+    )
+    {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
@@ -4753,6 +4800,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
             CycleDiagram cycleDiagram = service.findCycleDiagramByClient(client);
             if(cycleDiagram != null){
+                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        CycleDiagramList result = new CycleDiagramList();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
+            List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, startDate, endDate);
+            for (CycleDiagram cycleDiagram: cycleDiagrams){
                 result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
             }
             result.resultCode = RC_OK;

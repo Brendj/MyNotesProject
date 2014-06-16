@@ -108,12 +108,13 @@ public class SubFeedingServlet extends HttpServlet {
             } else if (path.equals("/plan")) {
                 showSubscriptionFeedingPlan(req, resp);
             } else if (path.equals("/edit")) {
-                //editSubscriptionFeedingPlan(req, resp);
                 editCycleDiagramPlan(req, resp);
             } else if (path.equals("/logout")) {
                 logout(req, resp);
             } else if (path.equals("/transfer")) {
                 processBalanceTransfer(req, resp);
+            } else if (path.equals("/histories")) {
+                showHistories(req, resp);
             } else {
                 sendRedirect(req, resp, "/index");
             }
@@ -147,6 +148,119 @@ public class SubFeedingServlet extends HttpServlet {
         }
     }
 
+    private void showHistories(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+        final Date currentDay = new Date();
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        ClientSummaryResult client = clientRoomController.getSummary(contractId);
+        req.setAttribute("client", client.clientSummary);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
+                : parseDate(req.getParameter("startDate"), df);
+        Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
+                : parseDate(req.getParameter("endDate"), df);
+        if (startDate == null || endDate == null) {
+            Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
+            startDate = week[0];
+            endDate = week[1];
+        }
+        String historyType = req.getParameter("historyType");
+        if(StringUtils.isNotEmpty(historyType)){
+            Long subBalanceNumber = Long.parseLong(contractId + "01");
+            if(historyType.equalsIgnoreCase("payment")) {
+                final PaymentListResult payments = getPayments(startDate, endDate, subBalanceNumber);
+                boolean paymentsExist = isPaymentsExist(payments);
+                req.setAttribute("paymentsExist", paymentsExist);
+                req.setAttribute("payments", payments);
+            }
+            if(historyType.equalsIgnoreCase("purchase")) {
+                final PurchaseListResult purchases = getPurchases(startDate, endDate, subBalanceNumber);
+                boolean purchasesExist = isPurchasesExist(purchases);
+                req.setAttribute("purchasesExist", purchasesExist);
+                req.setAttribute("purchases", purchases);
+            }
+            if(historyType.equalsIgnoreCase("transfer")) {
+                final TransferSubBalanceListResult transfers = getTransfers(contractId, startDate, endDate);
+                boolean transfersExist = isTransfersExist(transfers);
+                req.setAttribute("transfersExist", transfersExist);
+                req.setAttribute("transfers", transfers);
+            }
+            if(historyType.equalsIgnoreCase("subfeeding")) {
+                final SubscriptionFeedingListResult subfeedings = getSubFeeding(contractId, startDate, endDate);
+                boolean subfeedingExist = isSubscriptionFeedingExist(subfeedings);
+                List<SubscriptionFeeding> subscriptionFeedings = new ArrayList<SubscriptionFeeding>();
+                if(subfeedingExist){
+                    for (SubscriptionFeedingExt subscriptionFeedingExt : subfeedings.subscriptionFeedingListExt.getS()){
+                        subscriptionFeedings.add(new SubscriptionFeeding(subscriptionFeedingExt));
+                    }
+                    Collections.sort(subscriptionFeedings, SubscriptionFeeding.buildUpdateDateComparator());
+                }
+                req.setAttribute("subfeedingExist", subfeedingExist);
+                req.setAttribute("subfeedings", subscriptionFeedings);
+            }
+            if(historyType.equalsIgnoreCase("clientdiagram")) {
+                final CycleDiagramList cycleDiagrams = getCycleDiagram(contractId, startDate, endDate);
+                boolean clientdiagramExist = isCycleDiagramExist(cycleDiagrams);
+                List<CycleDiagram> cycleDiagramList = new ArrayList<CycleDiagram>();
+                if(clientdiagramExist){
+                    for (CycleDiagramExt cycleDiagramExt : cycleDiagrams.cycleDiagramListExt.getC()){
+                        cycleDiagramList.add(new CycleDiagram(cycleDiagramExt));
+                        //subscriptionFeedings.add(new SubscriptionFeeding(subscriptionFeedingExt));
+                    }
+                    Collections.sort(cycleDiagramList, CycleDiagram.buildUpdateDateComparator());
+                }
+                req.setAttribute("clientdiagramExist", clientdiagramExist);
+                req.setAttribute("clientdiagrams", cycleDiagramList);
+            }
+            req.setAttribute("historyType", historyType);
+        } else {
+            req.setAttribute("historyType", "purchase");
+        }
+        req.setAttribute("startDate", df.format(startDate));
+        req.setAttribute("endDate", df.format(endDate));
+        outputPage("histories", req, resp);
+    }
+
+    private boolean isCycleDiagramExist(CycleDiagramList cd) {
+        return cd != null && cd.cycleDiagramListExt != null && !cd.cycleDiagramListExt.getC().isEmpty();
+    }
+
+    private boolean isSubscriptionFeedingExist(SubscriptionFeedingListResult s) {
+        return s != null && s.subscriptionFeedingListExt != null && !s.subscriptionFeedingListExt.getS().isEmpty();
+    }
+
+    private boolean isTransfersExist(TransferSubBalanceListResult t) {
+        return t != null && t.transferSubBalanceListExt != null && !t.transferSubBalanceListExt.getT().isEmpty();
+    }
+
+    private boolean isPurchasesExist(PurchaseListResult purchases) {
+        return purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
+    }
+
+    private boolean isPaymentsExist(PaymentListResult payments) {
+        return payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
+    }
+
+    private CycleDiagramList getCycleDiagram(Long contractId, Date startDate, Date endDate) {
+        return clientRoomController.getCycleDiagramList(contractId, startDate, endDate);
+    }
+
+    private SubscriptionFeedingListResult getSubFeeding(Long contractId, Date startDate, Date endDate) {
+        return clientRoomController.getSubscriptionFeedingHistoryList(contractId, startDate, endDate);
+    }
+
+    private TransferSubBalanceListResult getTransfers(Long contractId, Date startDate, Date endDate) {
+        return clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate);
+    }
+
+    private PurchaseListResult getPurchases(Date startDate, Date endDate, Long subBalanceNumber) {
+        return clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate);
+    }
+
+    private PaymentListResult getPayments(Date startDate, Date endDate, Long subBalanceNumber) {
+        return clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate);
+    }
+
     private void showSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
@@ -166,22 +280,6 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("subscriptionFeeding", subscriptionFeeding);
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-        Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
-                : parseDate(req.getParameter("startDate"), df);
-        Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-                : parseDate(req.getParameter("endDate"), df);
-        if (startDate == null || endDate == null) {
-            Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
-            startDate = week[0];
-            endDate = week[1];
-        }
-        Long subBalanceNumber = Long.parseLong(contractId + "01");
-        req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
-        req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
-        req.setAttribute("transfers", clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate));
-        req.setAttribute("startDate", df.format(startDate));
-        req.setAttribute("endDate", df.format(endDate));
-
         Date activationDate = addDays(currentDay, 1);
         if(subscriptionFeeding!=null && subscriptionFeeding.getDateActivate()!=null){
             SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
