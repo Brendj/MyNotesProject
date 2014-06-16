@@ -63,6 +63,8 @@ public class MenuItemExt {
     protected Double minMg;
     @XmlAttribute(name = "MinFe")
     protected Double minFe;
+    @XmlAttribute(name = "IdOfProhibition")
+    protected Long idOfProhibition;
 
     /**
      * Gets the value of the group property.
@@ -352,4 +354,21 @@ public class MenuItemExt {
         this.minFe = value;
     }
 
+    /**
+     * Gets the value of the idOfProhibition property.
+     *
+     * @return possible object is
+     *         {@link Long}
+     */
+    public Long getIdOfProhibition() {
+        return idOfProhibition;
+    }
+
+    /**
+     * @param value allowed object is
+     *              {@link Long}
+     */
+    public void setIdOfProhibition(Long value) {
+        this.idOfProhibition = value;
+    }
 }

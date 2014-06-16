@@ -19,7 +19,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
@@ -40,6 +39,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.ProhibitionsResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
@@ -55,7 +55,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -2000,6 +1999,102 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         complexListResult.resultCode = data.getResultCode();
         complexListResult.description = data.getDescription();
         return complexListResult;
+    }
+
+    private void processMenuListWithProhibitions(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Date startDate, Date endDate) throws DatatypeConfigurationException {
+
+        Map<String, Long> ProhibitByFilter = new HashMap<String, Long>();
+        Map<String, Long> ProhibitByName = new HashMap<String, Long>();
+        Map<String, Long> ProhibitByGroup = new HashMap<String, Long>();
+
+        Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+        prohibitionsCriteria.add(Restrictions.eq("client", client));
+        prohibitionsCriteria.add(Restrictions.eq("deletedState", false));
+
+        List prohibitions = prohibitionsCriteria.list();
+        for (Object prohibitObj : prohibitions) {
+            Prohibitions prohibition = (Prohibitions) prohibitObj;
+
+            switch (prohibition.getProhibitionFilterType()) {
+                case PROHIBITION_BY_FILTER:
+                    ProhibitByFilter.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GOODS_NAME:
+                    ProhibitByName.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GROUP_NAME:
+                    ProhibitByGroup.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+            }
+        }
+
+        Criteria menuCriteria = session.createCriteria(Menu.class);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuCriteria.add(Restrictions.eq("org", client.getOrg()));
+        menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+
+        List menus = menuCriteria.list();
+        MenuListExt menuListExt = objectFactory.createMenuListExt();
+        int nRecs = 0;
+        for (Object currObject : menus) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+
+            Menu menu = (Menu) currObject;
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
+
+            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
+            menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
+            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
+            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
+            List menuDetails = menuDetailCriteria.list();
+            for (Object o : menuDetails) {
+                MenuDetail menuDetail = (MenuDetail) o;
+
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(menuDetail.getGroupName());
+                menuItemExt.setName(menuDetail.getMenuDetailName());
+                menuItemExt.setPrice(menuDetail.getPrice());
+                menuItemExt.setCalories(menuDetail.getCalories());
+                menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitC(menuDetail.getVitC());
+                menuItemExt.setVitA(menuDetail.getVitA());
+                menuItemExt.setVitE(menuDetail.getVitE());
+                menuItemExt.setMinCa(menuDetail.getMinCa());
+                menuItemExt.setMinP(menuDetail.getMinP());
+                menuItemExt.setMinMg(menuDetail.getMinMg());
+                menuItemExt.setMinFe(menuDetail.getMinFe());
+
+                if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
+                    menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
+                } else {
+                    if (ProhibitByName.containsKey(menuDetail.getMenuDetailName())) {
+                        menuItemExt.setIdOfProhibition(ProhibitByName.get(menuDetail.getMenuDetailName()));
+                    } else {
+                        //пробегаться в цикле.
+                        for (String filter: ProhibitByFilter.keySet()){
+                            if (menuDetail.getMenuDetailName().indexOf(filter) != -1) {
+                                menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            }
+                        }
+                    }
+                }
+                menuDateItemExt.getE().add(menuItemExt);
+            }
+            menuListExt.getM().add(menuDateItemExt);
+        }
+        data.setMenuListExt(menuListExt);
     }
 
     private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
@@ -4773,6 +4868,135 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
             HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public MenuListWithProhibitionsResult getMenuListWithProhibitions(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
+                    Transaction transaction) throws Exception {
+                       processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                   }
+                });
+        MenuListWithProhibitionsResult menuListWithProhibitionsResult = new MenuListWithProhibitionsResult();
+        menuListWithProhibitionsResult.menuList = data.getMenuListExt();
+        menuListWithProhibitionsResult.resultCode = data.getResultCode();
+        menuListWithProhibitionsResult.description = data.getDescription();
+        return menuListWithProhibitionsResult;
+    }
+
+    //возврат id
+    //ProhibitionResult
+    @Override
+    public ProhibitionsResult addProhibition(Long contractId, String filterText, Integer filterType) {
+        Session session = null;
+        Transaction transaction = null;
+        ProhibitionsResult result = new ProhibitionsResult();
+        try {
+            try {
+                Date currentDate = new Date();
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+
+                Prohibitions prohibitions = null;
+
+                Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+                prohibitionsCriteria.add(Restrictions.eq("client", client));
+                prohibitionsCriteria.add(Restrictions.eq("filterText", filterText));
+                prohibitionsCriteria.add(
+                        Restrictions.eq("prohibitionFilterType", ProhibitionFilterType.getTypeBuId(filterType)));
+                prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
+
+                if (prohibitions != null) {
+                    if (prohibitions.getDeletedState() == true) {
+                        prohibitions.setDeletedState(false);
+                        prohibitions.setUpdateDate(new Date());
+                        result.prohibitionId = prohibitions.getIdOfProhibitions();
+                        session.update(prohibitions);
+                    }
+                } else {
+                    prohibitions = new Prohibitions();
+                    prohibitions.setClient(client);
+                    prohibitions.setCreateDate(currentDate);
+                    prohibitions.setFilterText(filterText);
+                    prohibitions.setProhibitionFilterType(ProhibitionFilterType.getTypeBuId(filterType));
+                    prohibitions.setDeletedState(false);
+                    session.save(prohibitions);
+                    result.prohibitionId = prohibitions.getIdOfProhibitions();
+                }
+                transaction.commit();
+                transaction = null;
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    //возврат result
+    @Override
+    public ProhibitionsResult removeProhibition(Long contractId, Long prohibitionId) {
+        Session session = null;
+        Transaction transaction = null;
+        ProhibitionsResult result = new ProhibitionsResult();
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+
+                Prohibitions prohibitions = null;
+
+                if (prohibitionId != null) {
+                    Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+                    prohibitionsCriteria.add(Restrictions.eq("idOfProhibitions", prohibitionId));
+                    prohibitionsCriteria.add(Restrictions.eq("client", client));
+                    prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
+
+                    if (prohibitions != null) {
+                        prohibitions.setDeletedState(true);
+                        prohibitions.setUpdateDate(new Date());
+                        session.update(prohibitions);
+                        transaction.commit();
+                        transaction = null;
+                    } else {
+                        result.resultCode = RC_INTERNAL_ERROR;
+                        result.description = RC_INTERNAL_ERROR_DESC;
+                        return result;
+                    }
+                }
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
         }
         return result;
     }
