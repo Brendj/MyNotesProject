@@ -105,7 +105,7 @@ public class Instance extends LibraryDistributedObject {
             setInventoryBook(ib);
         }
 
-        if(ib!=null && invNumber!=null) {
+        if(ib!=null && invNumber!=null  && !getTagName().equalsIgnoreCase("m")) {
             Criteria criteria = session.createCriteria(Instance.class);
             criteria.add(Restrictions.eq("inventoryBook", ib));
             criteria.add(Restrictions.eq("invNumber", invNumber));
