@@ -107,6 +107,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_SUBSCRIPTION_FEEDING_DUPLICATE = 190L;
     private static final Long RC_LACK_OF_SUBBALANCE1 = 200L;
     private static final Long RC_ERROR_CREATE_SUBSCRIPTION_FEEDING = 210L;
+    private static final Long RC_PROHIBIT_EXIST = 300L;
+    private static final Long RC_PROHIBIT_NOT_FOUND = 310L;
+    private static final Long RC_PROHIBIT_REMOVED = 320L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -120,6 +123,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
     private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
     private static final String RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC = "Не верная дата активация циклограммы";
+    private static final String RC_PROHIBIT_EXIST_DESC = "Запрет с данными параметрами уже существует";
+    private static final String RC_PROHIBIT_REMOVED_DESC = "Запрет с данными параметрами был удален";
+    private static final String RC_PROHIBIT_NOT_FOUND_DESC = "Запрет с данными параметрами не найден";
     private static final int MAX_RECS = 50;
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
@@ -4995,8 +5001,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
                 prohibitionsCriteria.add(Restrictions.eq("client", client));
                 prohibitionsCriteria.add(Restrictions.eq("filterText", filterText));
-                prohibitionsCriteria.add(
-                        Restrictions.eq("prohibitionFilterType", ProhibitionFilterType.getTypeBuId(filterType)));
+                prohibitionsCriteria.add(Restrictions.eq("prohibitionFilterType", ProhibitionFilterType.getTypeBuId(filterType)));
                 prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
 
                 if (prohibitions != null) {
@@ -5005,6 +5010,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         prohibitions.setUpdateDate(new Date());
                         result.prohibitionId = prohibitions.getIdOfProhibitions();
                         session.update(prohibitions);
+                    } else {
+                        result.resultCode = RC_PROHIBIT_EXIST;
+                        result.description = RC_PROHIBIT_EXIST_DESC;
+                        return result;
                     }
                 } else {
                     prohibitions = new Prohibitions();
@@ -5058,17 +5067,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
 
                     if (prohibitions != null) {
+                        if (prohibitions.getDeletedState()) {
+                            result.resultCode = RC_PROHIBIT_REMOVED;
+                            result.description = RC_PROHIBIT_REMOVED_DESC;
+                            return result;
+                        }
                         prohibitions.setDeletedState(true);
                         prohibitions.setUpdateDate(new Date());
                         session.update(prohibitions);
-                        transaction.commit();
-                        transaction = null;
                     } else {
-                        result.resultCode = RC_INTERNAL_ERROR;
-                        result.description = RC_INTERNAL_ERROR_DESC;
+                        result.resultCode = RC_PROHIBIT_NOT_FOUND;
+                        result.description = RC_PROHIBIT_NOT_FOUND_DESC;
                         return result;
                     }
+                } else {
+                    result.resultCode = RC_PROHIBIT_NOT_FOUND;
+                    result.description = RC_PROHIBIT_NOT_FOUND_DESC;
+                    return result;
                 }
+                transaction.commit();
+                transaction = null;
             } finally {
                 HibernateUtils.rollback(transaction, logger);
                 HibernateUtils.close(session, logger);
