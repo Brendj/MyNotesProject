@@ -97,6 +97,10 @@ public class CycleDiagram implements Serializable{
         }
     }
 
+    public String getDiagramNumber(){
+        return String.format("Циклограмма_%d", globalId);
+    }
+
     public CycleDiagram(CycleDiagramExt cycleDiagramExt) {
         this.globalId = cycleDiagramExt.getGlobalId();
         this.monday = cycleDiagramExt.getMonday();
@@ -110,7 +114,7 @@ public class CycleDiagram implements Serializable{
         switch (cycleDiagramExt.getStateDiagram()){
             case 0:  this.stateDiagram = "Заблокирована"; break;
             case 1:  this.stateDiagram = "Ожидает активации"; break;
-            case 2:  this.stateDiagram = "Заблокирована"; break;
+            case 2:  this.stateDiagram = "Активная"; break;
             default: this.stateDiagram = "";
         }
         this.mondayPrice = cycleDiagramExt.getMondayPrice();
