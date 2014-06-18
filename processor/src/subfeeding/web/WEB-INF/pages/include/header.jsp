@@ -8,3 +8,4 @@
 <script src="${pageContext.request.contextPath}/resources/scripts/jquery-1.10.2.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/scripts/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/scripts/jquery.ui.datepicker-ru.js"></script>
+<script src="${pageContext.request.contextPath}/resources/scripts/jquery.dataTables.js"></script>

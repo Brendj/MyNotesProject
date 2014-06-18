@@ -160,6 +160,9 @@
     <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
         Перевод средств
     </button>
+    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+        История операций
+    </button>
 </c:when>
 <c:otherwise>
 <c:choose>
@@ -171,6 +174,9 @@
             <div class="errorMessage">Недостаточно средств на счете, пополните баланс перводом</div>
             <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
                 Перевод средств
+            </button>
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+                История операций
             </button>
         </c:when>
         <%-- У клиента не активных циклограм --%>
@@ -263,6 +269,9 @@
         <button type="button"
                 onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
             Перевод средств
+        </button>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+            История операций
         </button>
     </p>
 </c:otherwise>

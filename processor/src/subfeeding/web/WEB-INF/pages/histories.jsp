@@ -37,6 +37,7 @@
     <title>Абонементное питание</title>
     <jsp:include page="include/header.jsp" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/view.css" />
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/dataTables.jqueryui.css" />
     <script>
         $(function () {
             $('button').button();
@@ -52,6 +53,20 @@
             });
             var datepickerEnd = $("#datepickerEnd").datepicker();
             datepickerEnd.datepicker("option", "minDate", datepickerBegin.datepicker("getDate"));
+            $("#diagram").dataTable({
+                "sPaginationType": "full_numbers",
+                "iDisplayLength": 10,
+                "sDom": '<"top"i>rt<"bottom"flp<"clear">',
+                "oLanguage": { "sUrl": "${pageContext.request.contextPath}/resources/ru_RU.txt"},
+                "bJQueryUI": true,
+                "bRetrieve": true,
+                "bFilter": false,
+                "bSortClasses": false,
+                "bLengthChange": false,
+                "bPaginate": true,
+                "bInfo": false,
+                "bAutoWidth": true
+            });
         });
     </script>
 </head>
@@ -103,15 +118,19 @@
                             <span><%=!purchasesExist ? " За данный период по субсчету АП покупок не было." : ""%></span>
                         </div>
                         <%if (purchasesExist) {%>
-                        <div class="simpleTable purchaseTable">
-                            <div class="simpleTableHeader purchaseRow">
-                                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                                <div class="simpleCell purchaseHeaderCell">Сумма покупки</div>
-                                <div class="simpleCell purchaseHeaderCell">Торговая скидка</div>
-                                <div class="simpleCell purchaseHeaderCell">Наличными</div>
-                                <div class="simpleCell purchaseHeaderCell">По карте</div>
-                                <div class="simpleCell purchaseHeaderCell wideCell">Состав</div>
-                            </div>
+                        </br>
+                        <table id="diagram" class="simpleTable purchaseTable">
+                            <thead>
+                            <tr class="simpleTableHeader purchaseRow">
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Дата</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Сумма покупки</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Торговая скидка</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Наличными</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">По карте</th>
+                                <th class="simpleCell purchaseHeaderCell wideCell simpleTableHeader">Состав</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <%for (PurchaseExt purchase : purchases.purchaseList.getP()) {
                                 String date = tf.format(purchase.getTime().toGregorianCalendar().getTime());
                                 String sum = CurrencyStringUtils.copecksToRubles(purchase.getSum());
@@ -135,22 +154,23 @@
                                     }
                                 }
                                 String consistence = viewInfo.toString();%>
-                            <div class="simpleRow purchaseRow">
-                                <div class="purchaseCell simpleCell"><%=date%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=sum%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=tradeDiscount%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=sumByCash%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=sumByCard%>
-                                </div>
-                                <div class="purchaseCell simpleCell complexName"><%=consistence%>
-                                </div>
-                            </div>
+                            <tr class="simpleRow purchaseRow">
+                                <td class="purchaseCell simpleCell"><%=date%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=sum%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=tradeDiscount%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=sumByCash%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=sumByCard%>
+                                </td>
+                                <td class="purchaseCell simpleCell complexName"><%=consistence%>
+                                </td>
+                            </tr>
                             <%}%>
-                        </div>
+                            </tbody>
+                        </table>
                         <%}%>
                     </div>
                 </c:when>
@@ -160,25 +180,30 @@
                             <span><%=!paymentsExist ? " За данный период по субсчету АП платежей не было." : ""%></span>
                         </div>
                         <%if (paymentsExist) {%>
-                        <div class="simpleTable purchaseTable">
-                            <div class="simpleTableHeader purchaseRow">
-                                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                                <div class="simpleCell purchaseHeaderCell">Сумма</div>
-                                <div class="simpleCell purchaseHeaderCell wideCell">Информация о платеже</div>
-                            </div>
+                        </br>
+                        <table id="diagram" class="simpleTable purchaseTable">
+                            <thead>
+                            <tr class="simpleTableHeader purchaseRow">
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Дата</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Сумма</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Информация о платеже</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <%for (Payment payment : payments.paymentList.getP()) {
                                 String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
                                 String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());%>
-                            <div class="simpleRow purchaseRow">
-                                <div class="purchaseCell simpleCell"><%=date%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=sum%>
-                                </div>
-                                <div class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%>
-                                </div>
-                            </div>
+                            <tr class="simpleRow purchaseRow">
+                                <td class="purchaseCell simpleCell"><%=date%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=sum%>
+                                </td>
+                                <td class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%>
+                                </td>
+                            </tr>
                             <%}%>
-                        </div>
+                            </tbody>
+                        </table>
                         <%}%>
                     </div>
                 </c:when>
@@ -188,28 +213,33 @@
                             <span><%=!transfersExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
                         </div>
                         <%if (transfersExist) {%>
-                        <div class="simpleTable purchaseTable">
-                            <div class="simpleTableHeader purchaseRow">
-                                <div class="simpleCell purchaseHeaderCell wideCell">Номер счета списания</div>
-                                <div class="simpleCell purchaseHeaderCell wideCell">Номер счета пополнения</div>
-                                <div class="simpleCell purchaseHeaderCell">Дата</div>
-                                <div class="simpleCell purchaseHeaderCell">Сумма</div>
-                            </div>
+                        </br>
+                        <table id="diagram" class="simpleTable purchaseTable">
+                            <thead>
+                            <tr class="simpleTableHeader purchaseRow">
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Номер счета списания</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Номер счета пополнения</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Дата</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Сумма</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <%for (TransferSubBalanceExt transferSubBalanceExt : transfers.transferSubBalanceListExt.getT()) {
                                 String date = tf.format(transferSubBalanceExt.getCreateTime());
                                 String sum = CurrencyStringUtils.copecksToRubles(transferSubBalanceExt.getTransferSum());%>
-                            <div class="simpleRow purchaseRow">
-                                <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBenefactor()%>
-                                </div>
-                                <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBeneficiary()%>
-                                </div>
-                                <div class="purchaseCell simpleCell"><%=date%>
-                                </div>
-                                <div class="purchaseCell simpleCell sum"><%=sum%>
-                                </div>
-                            </div>
+                            <tr class="simpleRow purchaseRow">
+                                <td class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBenefactor()%>
+                                </td>
+                                <td class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBeneficiary()%>
+                                </td>
+                                <td class="purchaseCell simpleCell"><%=date%>
+                                </td>
+                                <td class="purchaseCell simpleCell sum"><%=sum%>
+                                </td>
+                            </tr>
                             <%}%>
-                        </div>
+                            </tbody>
+                        </table>
                         <%}%>
                     </div>
                 </c:when>
@@ -219,35 +249,39 @@
                             <span><%=!subfeedingExist ? "За период не зарегестрированно ни одной подписки." : ""%></span>
                         </div>
                         <%if (subfeedingExist) {%>
-                        <div class="simpleTable purchaseTable">
-                            <div class="simpleTableHeader purchaseRow">
-                                <div class="simpleCell purchaseHeaderCell wideCell">Дата и время внесения изменений</div>
-                                <div class="simpleCell purchaseHeaderCell wideCell">Место внесения изменений</div>
-                                <div class="simpleCell purchaseHeaderCell">Действия пользователя</div>
-                                <div class="simpleCell purchaseHeaderCell">Дата вступления изменений в силу</div>
-                                <div class="simpleCell purchaseHeaderCell">Состояние услуги</div>
-                            </div>
-
+                        </br>
+                        <table id="diagram" class="simpleTable purchaseTable">
+                            <thead>
+                            <tr class="simpleTableHeader purchaseRow">
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Дата и время внесения изменений</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Место внесения изменений</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Действия пользователя</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Дата вступления изменений в силу</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Состояние услуги</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <c:forEach items="${requestScope.subfeedings}" var="subfeeding">
-                                <div class="simpleRow purchaseRow">
-                                    <div class="simpleCell purchaseHeaderCell wideCell">
+                                <tr class="simpleRow purchaseRow">
+                                    <td class="simpleCell purchaseHeaderCell wideCell">
                                         <fmt:formatDate pattern="dd.MM.yyyy HH:mm"
                                                         value="${subfeeding.updateDate}" />
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell wideCell"></div>
-                                    <div class="simpleCell purchaseHeaderCell">
+                                    </td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell"></td>
+                                    <td class="simpleCell purchaseHeaderCell">
                                         <c:out value="${subfeeding.subscriptionAction}"/>
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell">
-                                        <fmt:formatDate pattern="dd.MM.yyyy HH:mm"
+                                    </td>
+                                    <td class="simpleCell purchaseHeaderCell">
+                                        <fmt:formatDate pattern="dd.MM.yyyy"
                                                         value="${subfeeding.subscriptionActionDate}" />
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell">
+                                    </td>
+                                    <td class="simpleCell purchaseHeaderCell">
                                         <c:out value="${subfeeding.subscriptionState}"/>
-                                    </div>
-                                </div>
+                                    </td>
+                                </tr>
                             </c:forEach>
-                        </div>
+                            </tbody>
+                        </table>
                         <%}%>
                     </div>
                 </c:when>
@@ -257,36 +291,34 @@
                             <span><%=!clientdiagramExist ? "За период не зарегестрированно ни одной Циклограммы" : ""%></span>
                         </div>
                         <%if (clientdiagramExist) {%>
-                        <div class="simpleTable purchaseTable">
-                            <div class="simpleTableHeader purchaseRow">
-                                <div class="simpleCell purchaseHeaderCell wideCell">Номер циклограммы</div>
-                                <div class="simpleCell purchaseHeaderCell wideCell">Дата и время внесения изменений</div>
-                                <div class="simpleCell purchaseHeaderCell">Место внесения изменений</div>
-                                <div class="simpleCell purchaseHeaderCell">Дата вступления изменений в силу</div>
-                                <div class="simpleCell purchaseHeaderCell">Состояние циклограммы</div>
-                            </div>
+                        </br>
+                        <table id="diagram" class="simpleTable purchaseTable">
+                            <thead>
+                            <tr class="simpleRow simpleTableHeader purchaseRow">
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Номер циклограммы</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader wideCell">Дата и время внесения изменений</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Место внесения изменений</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Дата вступления изменений в силу</th>
+                                <th class="simpleCell purchaseHeaderCell simpleTableHeader">Состояние циклограммы</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             <c:forEach items="${requestScope.clientdiagrams}" var="clientdiagram">
-                                <div class="simpleRow purchaseRow">
-                                    <div class="simpleCell purchaseHeaderCell wideCell">
-                                         ?
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell wideCell">
-                                        <fmt:formatDate pattern="dd.MM.yyyy HH:mm"
-                                                        value="${clientdiagram.updateDate}" />
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell">
-                                        ?
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell">
-                                        <fmt:formatDate pattern="dd.MM.yyyy HH:mm"
-                                                        value="${clientdiagram.dateActivationDiagram}" />
-                                    </div>
-                                    <div class="simpleCell purchaseHeaderCell">
-                                        <c:out value="${clientdiagram.stateDiagram}"/>
-                                    </div>
-                                </div>
+                                <tr class="simpleRow purchaseRow">
+                                    <td class="simpleCell purchaseHeaderCell wideCell"><c:out
+                                            value="${clientdiagram.diagramNumber}" /></td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell"><fmt:formatDate
+                                            pattern="dd.MM.yyyy HH:mm" value="${clientdiagram.updateDate}" /></td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell"><c:out
+                                            value="${clientdiagram.changesPlace}" /></td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell"><fmt:formatDate
+                                            pattern="dd.MM.yyyy" value="${clientdiagram.dateActivationDiagram}" /></td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell"><c:out
+                                            value="${clientdiagram.stateDiagram}" /></td>
+                                </tr>
                             </c:forEach>
-                        </div>
+                            </tbody>
+                        </table>
                         <%}%>
                     </div>
                 </c:when>
