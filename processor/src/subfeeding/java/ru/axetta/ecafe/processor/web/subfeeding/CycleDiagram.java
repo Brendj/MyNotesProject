@@ -49,6 +49,7 @@ public class CycleDiagram implements Serializable{
     private Long saturdayPrice;
     private Long sundayPrice;
     private Date updateDate;
+    private String changesPlace;
 
     public String getDayValue(int dayNumber) {
         switch (dayNumber) {
@@ -125,6 +126,7 @@ public class CycleDiagram implements Serializable{
         this.saturdayPrice = cycleDiagramExt.getSaturdayPrice();
         this.sundayPrice = cycleDiagramExt.getSundayPrice();
         this.updateDate = cycleDiagramExt.getUpdateDate();
+        this.changesPlace = cycleDiagramExt.getChangesPlace();
     }
 
     public Long getGlobalId() {
@@ -197,5 +199,13 @@ public class CycleDiagram implements Serializable{
 
     public Date getUpdateDate() {
         return updateDate;
+    }
+
+    public String getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(String changesPlace) {
+        this.changesPlace = changesPlace;
     }
 }

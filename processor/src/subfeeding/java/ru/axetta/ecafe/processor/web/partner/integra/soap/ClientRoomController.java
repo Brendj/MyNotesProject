@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.subfeeding.ProhibitionsResult;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -405,4 +406,12 @@ public interface ClientRoomController {
     @WebMethod(operationName = "editCycleDiagramPlan")
     CycleDiagramResult editCycleDiagramPlan(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
+    @WebMethod(operationName = "getMenuListWithProhibitions")
+    MenuListWithProhibitionsResult getMenuListWithProhibitions(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+
+    @WebMethod(operationName = "addProhibition")
+    ProhibitionsResult addProhibition(@WebParam(name = "contractId") Long contractId, @WebParam(name = "filterText") String filterText, @WebParam(name = "filterType") Integer filterType);
+
+    @WebMethod(operationName = "removeProhibition")
+    ProhibitionsResult removeProhibition(@WebParam(name="contractId") Long contractId, @WebParam(name = "prohibitionId") Long prohibitionId);
 }
