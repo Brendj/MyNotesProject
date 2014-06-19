@@ -4,11 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.subfeeding;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ComplexInfoExt;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CycleDiagramExt;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,18 +23,6 @@ import java.util.Date;
  */
 public class CycleDiagram implements Serializable{
 
-    static class CycleDiagramCompareByUpdateDate implements Comparator<CycleDiagram> {
-
-        @Override
-        public int compare(CycleDiagram o1, CycleDiagram o2) {
-            return o1.updateDate.compareTo(o2.updateDate);
-        }
-    }
-
-    public static CycleDiagramCompareByUpdateDate buildUpdateDateComparator(){
-        return new CycleDiagramCompareByUpdateDate();
-    }
-
     private Long globalId;
     private String monday;
     private String tuesday;
@@ -40,6 +32,7 @@ public class CycleDiagram implements Serializable{
     private String saturday;
     private String sunday;
     private Date dateActivationDiagram;
+    private Date dateDeactivationDiagram;
     private String stateDiagram;
     private Long mondayPrice;
     private Long tuesdayPrice;
@@ -49,7 +42,56 @@ public class CycleDiagram implements Serializable{
     private Long saturdayPrice;
     private Long sundayPrice;
     private Date updateDate;
+    private Boolean onChange = false;
     private String changesPlace;
+
+    public String getActivePeriod(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(CalendarUtils.dateShortToString(dateActivationDiagram));
+        if(dateDeactivationDiagram!=null){
+            builder.append(" &mdash; ");
+            builder.append(CalendarUtils.dateShortToString(dateDeactivationDiagram));
+        }
+        return builder.toString();
+    }
+
+    public Date getDateDeactivationDiagram() {
+        return dateDeactivationDiagram;
+    }
+
+    public void setDateDeactivationDiagram(Date dateDeactivationDiagram) {
+        this.dateDeactivationDiagram = dateDeactivationDiagram;
+    }
+
+    private Long totalSum = 0L;
+
+    public Long getTotalSum() {
+        return totalSum;
+    }
+
+    public void addTotalSum(Long sum) {
+        this.totalSum += sum;
+    }
+
+    public Map<Integer, List<String>> splitPlanComplexes() {
+        Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
+        activeComplexes.put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(monday), ';')));
+        activeComplexes.put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(tuesday), ';')));
+        activeComplexes.put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(wednesday), ';')));
+        activeComplexes.put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(thursday), ';')));
+        activeComplexes.put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(friday), ';')));
+        activeComplexes.put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(saturday), ';')));
+        activeComplexes.put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(sunday), ';')));
+        return activeComplexes;
+    }
+
+    public String getWeekPrices(){
+        return CurrencyStringUtils.copecksToRubles(totalSum);
+    }
+
+    public String getMonthPrices(){
+        return CurrencyStringUtils.copecksToRubles(totalSum*4);
+    }
 
     public String getDayValue(int dayNumber) {
         switch (dayNumber) {
@@ -207,5 +249,13 @@ public class CycleDiagram implements Serializable{
 
     public void setChangesPlace(String changesPlace) {
         this.changesPlace = changesPlace;
+    }
+
+    public Boolean getOnChange() {
+        return onChange;
+    }
+
+    public void setOnChange(Boolean onChange) {
+        this.onChange = onChange;
     }
 }

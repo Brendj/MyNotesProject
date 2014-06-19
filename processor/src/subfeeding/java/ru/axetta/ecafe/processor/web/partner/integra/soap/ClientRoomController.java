@@ -390,12 +390,17 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getCurrentCycleDiagramList")
     CycleDiagramList getCurrentCycleDiagramList(@WebParam(name = "contractId") Long contractId);
 
-    @WebMethod(operationName = "getCycleDiagramList")
-    CycleDiagramList getCycleDiagramList(
-            @WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "startDate") Date startDate,
-            @WebParam(name = "endDate") Date endDate
-    );
+    @WebMethod(operationName = "getCycleDiagramList") CycleDiagramList getCycleDiagramList(
+          @WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "getCycleDiagramHistoryList")
+    CycleDiagramList getCycleDiagramHistoryList(
+          @WebParam(name = "contractId")
+          Long contractId,
+          @WebParam(name = "startDate")
+          Date startDate,
+          @WebParam(name = "endDate")
+          Date endDate);
 
     @WebMethod(operationName = "getNextCycleDiagramList")
     CycleDiagramList getNextCycleDiagramList(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") Date currentDate);
@@ -405,6 +410,12 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "editCycleDiagramPlan")
     CycleDiagramResult editCycleDiagramPlan(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+
+    @WebMethod(operationName = "putCycleDiagram") CycleDiagramEditResult putCycleDiagram(
+          @WebParam(name = "contractId")
+          Long contractId,
+          @WebParam(name = "cycleDiagram")
+          CycleDiagramExt cycleDiagram);
 
     @WebMethod(operationName = "getMenuListWithProhibitions")
     MenuListWithProhibitionsResult getMenuListWithProhibitions(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);

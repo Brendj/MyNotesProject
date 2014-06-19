@@ -59,7 +59,7 @@ public class SubscriptionFeedingService {
         return RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
     }
 
-    private Calendar localCalendar;
+    //private Calendar localCalendar;
     private DateFormat dateFormat;
 
     @PostConstruct
@@ -69,11 +69,11 @@ public class SubscriptionFeedingService {
         } catch (Exception e) {
             dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         }
-        try {
-            localCalendar = RuntimeContext.getInstance().getLocalCalendar(null);
-        } catch (Exception e) {
-            localCalendar = Calendar.getInstance();
-        }
+        //try {
+        //    localCalendar = RuntimeContext.getInstance().getLocalCalendar(null);
+        //} catch (Exception e) {
+        //    localCalendar = Calendar.getInstance();
+        //}
     }
 
     @PersistenceContext(unitName = "processorPU")
@@ -360,11 +360,23 @@ public class SubscriptionFeedingService {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму, действующую в определенный день.
-    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Date startDate, Date endDate) {
+    public List<CycleDiagram> findCycleDiagramsByClient(Client client) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(CycleDiagram.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}));
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Date startDate, Date endDate) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", client));
+        //criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.or(
                 Restrictions.between("createdDate", startDate, endDate),
                 Restrictions.between("lastUpdate", startDate, endDate)
@@ -465,6 +477,7 @@ public class SubscriptionFeedingService {
         sf.setIdOfClient(client.getIdOfClient());
         sf.setDateActivateService(endReopenDate);
         sf.setDateCreateService(lassf.getDateCreateService());
+        sf.setDateDeactivateService(lassf.getDateDeactivateService());
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
         sf.setWasSuspended(false);
@@ -585,6 +598,8 @@ public class SubscriptionFeedingService {
         return cd;
     }
 
+
+
     @Transactional(rollbackFor = Exception.class)
     // Создает новую циклограмму. Если на дату ее активации уже есть цилкограмма, то переводит ее в удаленные.
     // Если есть циклограмма на эту дату то ее редактируем
@@ -651,7 +666,7 @@ public class SubscriptionFeedingService {
     }
 
     // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
-    private Long getPriceOfDay(String dayComplexes, List<ComplexInfo> availableComplexes) {
+    public Long getPriceOfDay(String dayComplexes, List<ComplexInfo> availableComplexes) {
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
         }

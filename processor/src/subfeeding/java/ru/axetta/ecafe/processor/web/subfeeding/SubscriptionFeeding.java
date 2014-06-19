@@ -19,18 +19,6 @@ import java.util.Date;
  */
 public class SubscriptionFeeding implements Serializable {
 
-    static class SubscriptionFeedingCompareByUpdateDate implements Comparator<SubscriptionFeeding> {
-
-        @Override
-        public int compare(SubscriptionFeeding o1, SubscriptionFeeding o2) {
-            return o1.updateDate.compareTo(o2.updateDate);
-        }
-    }
-
-    public static SubscriptionFeedingCompareByUpdateDate buildUpdateDateComparator(){
-        return new SubscriptionFeedingCompareByUpdateDate();
-    }
-
     private Long idOfSubscriptionFeeding;
     private String guid;
     private Date dateCreateService;

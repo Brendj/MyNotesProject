@@ -10,29 +10,20 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
+<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding" %>
 <%
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     @SuppressWarnings("unchecked")
-    SubscriptionFeedingExt sf = (SubscriptionFeedingExt) request.getAttribute("subscriptionFeeding");
+    SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) request.getAttribute("subscriptionFeeding");
     Date activationDate = (Date) request.getAttribute("activationDate");
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
     String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
     String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
-    boolean wasSuspended = sf != null && sf.getSuspended() != null && sf.getSuspended();
-    String startDate = (String) request.getAttribute("startDate");
-    String endDate = (String) request.getAttribute("endDate");
-    PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
-    PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
-    TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
-    boolean purchasesExist =
-            purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
-    boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
-    boolean transferExist =
-            transfers != null && transfers.transferSubBalanceListExt != null && !transfers.transferSubBalanceListExt
-                    .getT().isEmpty();%>
+    boolean wasSuspended = wasSuspended(subscriptionFeeding);
+    %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -93,7 +84,7 @@
     <c:if test="${requestScope.subscriptionFeeding!=null}">
         <div class="colRow">
             <div class="leftcol">Дата создания услуги АП:</div>
-            <div class="rightcol"><%=df.format(sf.getDateCreateService())%>
+            <div class="rightcol"><%=df.format(subscriptionFeeding.getDateCreateService())%>
             </div>
         </div>
         <c:if test="${requestScope.subscriptionFeeding.dateActivate==null}">
@@ -105,24 +96,24 @@
         <c:if test="${requestScope.subscriptionFeeding.dateActivate!=null}">
             <div class="colRow">
                 <div class="leftcol">Дата начала подписки на услугу АП:</div>
-                <div class="rightcol"><%=df.format(sf.getDateActivate())%>
+                <div class="rightcol"><%=df.format(subscriptionFeeding.getDateActivate())%>
                 </div>
             </div>
             <div class="colRow">
                 <div class="leftcol">Дата отключения услуги:</div>
-                <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
-                        : df.format(sf.getDateDeactivate())%>
+                <div class="rightcol"><%=subscriptionFeeding.getDateDeactivate() == null ? "услуга бессрочная"
+                        : df.format(subscriptionFeeding.getDateDeactivate())%>
                 </div>
             </div>
             <div class="colRow">
                 <div class="leftcol">Состояние услуги:</div>
                 <div class="rightcol">
                     <%String status = "услуга активна";
-                        if (wasSuspended && sf.getLastDatePause() != null) {
-                            boolean reallySuspended = sf.getLastDatePause().after(new Date());
+                        if (wasSuspended && subscriptionFeeding.getLastDatePause() != null) {
+                            boolean reallySuspended = subscriptionFeeding.getLastDatePause().after(new Date());
                             status =
                                     "услуга " + (reallySuspended ? "приостанавливается" : "приостановлена") + " с " + df
-                                            .format(sf.getLastDatePause());
+                                            .format(subscriptionFeeding.getLastDatePause());
                         }
                         out.print(status);%>
                 </div>
@@ -195,7 +186,7 @@
 </c:when>
 <%-- Подпика приостановлена --%>
 <c:when test="${requestScope.subscriptionFeeding.lastDatePause!=null}">
-    <% if (sf.getLastDatePause().before(new Date())) { %>
+    <% if (subscriptionFeeding.getLastDatePause().before(new Date())) { %>
     <form method="post" enctype="application/x-www-form-urlencoded"
           action="${pageContext.request.contextPath}/sub-feeding/reopen">
         <script>
@@ -280,8 +271,13 @@
 </c:choose>
 </div>
 </div>
-
 </div>
 </div>
 </body>
 </html>
+<%!
+    private boolean wasSuspended(SubscriptionFeeding subscriptionFeeding) {
+        return subscriptionFeeding != null && subscriptionFeeding.getSuspended() != null && subscriptionFeeding
+                .getSuspended();
+    }
+%>

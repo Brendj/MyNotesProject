@@ -4,11 +4,11 @@
     border: 1px solid #CCD0D3;
 }
 
-#cycleDiagram {
+.cycleDiagram {
     background: #ffffff;
 }
 
-#infoHeader {
+.infoHeader {
     background: linear-gradient(to bottom, #fafbfc 0, #e6ecef 100%);
     font-family: 'Whitney SSm A', 'Whitney SSm B', Helvetica, Arial, serif;
     line-height: 1.6em;

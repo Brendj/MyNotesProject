@@ -12,7 +12,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * To change this template use File | Settings | File Templates.
  */
 public class CycleDiagramResult extends Result{
-    public CycleDiagramExt cycleDiagramExt;
+    public CycleDiagramExt cycleDiagramExt = new CycleDiagramExt();
 
     public CycleDiagramResult(CycleDiagramExt cycleDiagramExt, Long resultCode, String description) {
         super(resultCode, description);
