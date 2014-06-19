@@ -61,12 +61,12 @@
             //console.log("num: "+num);
             totals[cycleDiagramid] += choice.checked?num:-num;
             updateTotalValue(cycleDiagramid, totals[cycleDiagramid]);
-            var $header = $('.' + cycleDiagramid + ' .active-period');
-            var index = $header.html().indexOf("*");
+            //var $header = $('.' + cycleDiagramid + ' .active-period');
+            //var index = $header.html().indexOf("*");
             //console.log("index: "+index);
-            if(index<=0){
-                $header.css({"color":"red"}).append("*");
-            }
+            //if(index<=0){
+            //    $header.css({"color":"red"}).append("*");
+            //}
             //$('input:hidden.'+cycleDiagramid).val(1); // Ставим метку что объект изменен
             //console.log("after: "+totals[cycleDiagramid]);
         }
@@ -275,12 +275,37 @@
                     for (CycleDiagram cycleDiagram: cycleDiagrams){
                 %>
                 <li class="<%=cycleDiagram.getGlobalId()%>">
-                        <div style="text-align: center; margin-top: -14px;">
-                            <span class="slider-prev" style="float: left"></span>
-                            <span class="active-period" style="line-height: 32px;">
-                                <%=cycleDiagram.getGlobalId()%>:<%=cycleDiagram.getActivePeriod()%>
-                            </span>
-                            <span class="slider-next" style="float: right; margin-right: 0;"></span>
+                        <div style="text-align: center;">
+                            <div class="active-period"  style="margin-top: -15px;">
+                                <table style="width: 100%;">
+                                    <tr style="border-collapse:collapse;border-spacing:0;">
+                                        <td rowspan="2" style="text-align: left; width: 140px; padding: 0">
+                                            <div class="slider-prev" style="float: left;"></div>
+                                        </td>
+                                        <td rowspan="2" style="text-align: left; padding: 0">
+                                            <b>Циклограмм_<%=cycleDiagram.getGlobalId()%></b>
+                                        </td>
+                                        <td style="text-align: left; padding: 0">
+                                            <b>Дата начала действия циклограммы:</b>
+                                        </td>
+                                        <td style="text-align: left; padding: 0">
+                                            <b><%=cycleDiagram.getStartDate()%></b>
+                                        </td>
+                                        <td rowspan="2" style="text-align: left; width: 140px; padding: 0">
+                                            <div class="slider-next" style="float: right; margin-right: 0;"></div>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-collapse:collapse;border-spacing:0;">
+                                        <td style="text-align: left; padding: 0">
+                                            <b>Дата окончания действия циклограммы:</b>
+                                        </td>
+                                        <td style="text-align: left; padding: 0">
+                                            <b><%=cycleDiagram.getEndDate()%></b>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
                         </div>
                         <div class="simpleTable" style="clear: both">
                             <div class="simpleRow simpleTableHeader">

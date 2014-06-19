@@ -24,6 +24,7 @@ public class CalendarUtils {
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
+    private final static SimpleDateFormat dateShortFullYearFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
     public final static Date AFTER_DATE = getAfterDate();
 
@@ -125,6 +126,10 @@ public class CalendarUtils {
 
     public static String dateShortToString(Date date) {
         return dateShortFormat.format(date);
+    }
+
+    public static String dateShortFullYearToString(Date date) {
+        return dateShortFullYearFormat.format(date);
     }
 
 

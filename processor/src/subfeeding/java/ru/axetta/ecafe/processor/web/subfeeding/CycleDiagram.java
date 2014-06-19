@@ -45,6 +45,14 @@ public class CycleDiagram implements Serializable{
     private Boolean onChange = false;
     private String changesPlace;
 
+    public String getStartDate(){
+        return dateActivationDiagram==null?"":CalendarUtils.dateShortFullYearToString(dateActivationDiagram);
+    }
+
+    public String getEndDate(){
+        return dateDeactivationDiagram==null?"":CalendarUtils.dateShortFullYearToString(dateDeactivationDiagram);
+    }
+
     public String getActivePeriod(){
         StringBuilder builder = new StringBuilder();
         builder.append(CalendarUtils.dateShortToString(dateActivationDiagram));
