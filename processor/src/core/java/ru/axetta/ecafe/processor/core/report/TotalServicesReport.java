@@ -38,9 +38,9 @@ public class TotalServicesReport extends BasicReport {
             String orgCondition = "";
             if (!idOfOrgList.isEmpty()) {
                 for (Long idOfOrg : idOfOrgList) {
-                    orgCondition = orgCondition.concat("o.idOfOrg = " + idOfOrg + " or ");
+                    orgCondition = orgCondition.concat("cf_orgs.idOfOrg = " + idOfOrg + " or ");
                 }
-                orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ") ";
+                orgCondition = " (" + orgCondition.substring(0, orgCondition.length() - 4) + ") ";
             }
 
             String preparedQuery =
@@ -72,6 +72,7 @@ public class TotalServicesReport extends BasicReport {
                                       + "left join cf_clients on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                                       + "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
                                       + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
+                                      + " AND " + orgCondition
                                       + "group by cf_orgs.idoforg "
                                       + "order by cf_orgs.idoforg ");
             loadValue(entries, "currentClientsCount", session,
@@ -80,7 +81,8 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_clients on cf_enterevents.idofclient=cf_enterevents.idofclient " +
                             "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " +
                             "where cf_orgs.state=1 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined
-                            .CLIENT_EMPLOYEES.getValue() + " and " +
+                            .CLIENT_EMPLOYEES.getValue()
+                            + " AND " + orgCondition + " and " +
                             " cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
@@ -91,7 +93,8 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
                             "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + " AND " + orgCondition + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
@@ -103,7 +106,8 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
                             "where cf_orgs.state=1 and cf_orders.socdiscount<>0  and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + " AND " + orgCondition + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
@@ -115,7 +119,8 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
                             "where cf_orgs.state=1  and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + " AND " + orgCondition + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)
                             + "') * 1000 AND " +
