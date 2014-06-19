@@ -8,7 +8,7 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Contragent" table="CF_Contragents"
            optimistic-lock="version">
-        <!--<cache usage="transactional"/>-->
+        <cache usage="transactional"/>
         <id name="idOfContragent" column="IdOfContragent" type="long">
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
@@ -93,6 +93,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
         </set>
         <set name="orgsInternal" inverse="true" cascade="all">
+            <cache usage="transactional"/>
             <key column="defaultsupplier"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Org"/>
         </set>
