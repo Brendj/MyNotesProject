@@ -699,6 +699,13 @@ public class DAOUtils {
         q.executeUpdate();
     }
 
+    /**
+     *
+     * @param session
+     * @param idOfClient
+     * @param sum
+     * @param addOrNew
+     */
     // TODO: при добавленее нового поля субсчета необходио добавлять в логику
     public static void changeClientSubBalance1(Session session, Long idOfClient, long sum, boolean addOrNew) {
         final String queryAddString = "UPDATE Client SET subBalance1=subBalance1+? WHERE idOfClient=?";

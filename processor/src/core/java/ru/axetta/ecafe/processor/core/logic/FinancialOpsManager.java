@@ -6,11 +6,9 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.Date;
 
 @Component
@@ -119,18 +116,55 @@ public class FinancialOpsManager {
             //persistenceSession.update(client);
 
             // зарегистрировать транзакцию и провести по балансу
-            if(payment.getOrderType()==null || !payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+            if(payment.getOrderType()==null){
+                // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
-                        -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-                        AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                      -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
+                      AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
             } else {
-                // регистрируем оплату только с первого субсчета
-                orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card, -payment.getSumByCard(),
-                        "" + idOfOrg + "/" + payment.getIdOfOrder(), AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date(), 1); // processSubBalance1AccountTransaction();
-                SubscriptionFee subscriptionFee = new SubscriptionFee(payment.getTime().getYear(), payment.getTime().getMonth(), orderTransaction,
-                        payment.getSumByCard(), payment.getTime(), SubscriptionFee.TYPE_FEEDING_SERVICE);
-                session.save(subscriptionFee);
+                if(payment.getOrderType()==OrderTypeEnumType.PAY_PLAN ||
+                      payment.getOrderType()==OrderTypeEnumType.SUBSCRIPTION_FEEDING ){
+                    orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
+                          client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
+                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                } else {
+                    orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
+                          -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
+                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                }
+                //switch (payment.getOrderType()){
+                //    case PAY_PLAN:{
+                //        // Логика плана платного питания
+                //        orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
+                //              client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
+                //              AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                //    } break;
+                //    case SUBSCRIPTION_FEEDING:{
+                //        // Логика плана абониментного питания питания
+                //        orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
+                //              client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
+                //              AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date()); // processSubBalance1AccountTransaction();
+                //    } break;
+                //    default: {
+                //        orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
+                //              -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
+                //              AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                //    }
+                //}
             }
+
+            //if(payment.getOrderType()==null || !payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+            //    orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
+            //            -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
+            //            AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+            //} else {
+            //    // регистрируем оплату только с первого субсчета
+            //    orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card, -payment.getSumByCard(),
+            //            "" + idOfOrg + "/" + payment.getIdOfOrder(), AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date(), 1); // processSubBalance1AccountTransaction();
+            //    SubscriptionFee subscriptionFee = new SubscriptionFee(payment.getTime().getYear(), payment.getTime().getMonth(), orderTransaction,
+            //            payment.getSumByCard(), payment.getTime(), SubscriptionFee.TYPE_FEEDING_SERVICE);
+            //    session.save(subscriptionFee);
+            //}
         }
 
         POS pos = null;
@@ -191,11 +225,24 @@ public class FinancialOpsManager {
         if(0!=order.getSumByCard()){
             AccountTransaction transaction = order.getTransaction();
             canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
-            if(order.getOrderType()!=null && order.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
-                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date(), 1);
-            } else {
-                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            }
+            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            //if(order.getOrderType()==null){
+            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            //} else {
+            //    switch (order.getOrderType()){
+            //        case PAY_PLAN:{
+            //            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            //        } break;
+            //        case SUBSCRIPTION_FEEDING:{
+            //            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            //        } break;
+            //    }
+            //}
+            //if(order.getOrderType()!=null && order.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date(), 1);
+            //} else {
+            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            //}
         }
 
         session.save(canceledOrder);

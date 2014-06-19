@@ -15,6 +15,53 @@ import java.util.Date;
 
 public class ClientAccountManager {
 
+
+    /**
+     * списание средств при получении заказа АП и заказа платного плана
+     * (списание должно проходить сначала с субсчета АП, в случае если сумма на счете АП не достаточна -
+     * то списывать суб счет до 0, не достающий остаток списывать с основного счета)
+     *
+     * @param session
+     * @param client
+     * @param card
+     * @param transactionSum
+     * @param source
+     * @param sourceType
+     * @param transactionTime
+     * @return
+     */
+
+    public static AccountTransaction checkBalanceAndProcessAccountTransaction(Session session, Client client, Card card,
+          long transactionSum, String source, int sourceType, Date transactionTime) throws Exception {
+        AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
+              sourceType, transactionTime);
+        accountTransaction.setOrg(client.getOrg());
+        final Long sum = client.getSubBalance(1);
+        // смотрм будущий остаток на счете
+        final long diff = sum+transactionSum;
+        if(diff<=0){
+            // если субсчет уходит в минус то загоняем его в 0
+            // остальное списываем с основоного
+            accountTransaction.setSubBalance1BeforeTransaction(sum);
+            accountTransaction.setTransactionSubBalance1Sum(transactionSum-diff);
+            session.save(accountTransaction);
+            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+            client.addBalanceNotForSave(transactionSum);
+            DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum-diff, 1, client.getSubBalanceIsNull(1));
+            client.addSubBalanceNotForSave(transactionSum-diff, 1);
+        } else {
+            // на субсчете хватает средства списываем с АП
+            accountTransaction.setSubBalance1BeforeTransaction(sum);
+            accountTransaction.setTransactionSubBalance1Sum(transactionSum);
+            session.save(accountTransaction);
+            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+            client.addBalanceNotForSave(transactionSum);
+            DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, 1, client.getSubBalanceIsNull(1));
+            client.addSubBalanceNotForSave(transactionSum, 1);
+        }
+        return accountTransaction;
+    }
+
     public static AccountTransaction processAccountTransaction(Session session, Client client, Card card, long transactionSum,
             String source, int sourceType, Date transactionTime) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
@@ -52,11 +99,18 @@ public class ClientAccountManager {
             Date transactionTime) throws Exception {
         final Client client = transaction.getClient();
         AccountTransaction cancelTransaction = new AccountTransaction(client, null, client.getContractId(),
-                -transaction.getTransactionSum(), ""+transaction.getIdOfTransaction(),
+                -transaction.getTransactionSum(), Long.toString(transaction.getIdOfTransaction()),
                 AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, transactionTime);
         cancelTransaction.setOrg(transaction.getOrg());
+        if(transaction.getTransactionSubBalance1Sum()!=null){
+            cancelTransaction.setSubBalance1BeforeTransaction(client.getSubBalance(1));
+            cancelTransaction.setTransactionSubBalance1Sum(-transaction.getTransactionSubBalance1Sum());
+        }
         session.save(cancelTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum());
+        if(transaction.getTransactionSubBalance1Sum()!=null){
+            DAOUtils.changeClientSubBalance1(session, client.getIdOfClient(), -transaction.getTransactionSubBalance1Sum(), false);
+        }
         return cancelTransaction;
     }
 
