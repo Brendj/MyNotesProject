@@ -548,6 +548,7 @@ public class SubFeedingServlet extends HttpServlet {
                 int dayNumber = Integer.parseInt(ids[3]);
                 String prevValue = cycle.getDayValue(dayNumber);
                 cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + ";" + complexId));
+
             }
         }
         return cycle;

@@ -176,7 +176,7 @@ public class CycleDiagram implements Serializable{
         this.saturdayPrice = cycleDiagramExt.getSaturdayPrice();
         this.sundayPrice = cycleDiagramExt.getSundayPrice();
         this.updateDate = cycleDiagramExt.getUpdateDate();
-        this.changesPlace = cycleDiagramExt.getChangesPlace();
+        this.changesPlace = cycleDiagramExt.getChangesPlace() ? "АРМ Администратора" : "Личный кабинет";
     }
 
     public Long getGlobalId() {

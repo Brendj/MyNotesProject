@@ -5228,6 +5228,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                         diagram.setSunday("");
                         diagram.setSundayPrice(0L);
+                        diagram.setStaff(null);
                         session.save(diagram);
                     } else {
                         // изменяем те что есть
@@ -5265,6 +5266,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                             diagram.setSunday("");
                             diagram.setSundayPrice(0L);
+                            diagram.setStaff(null);
                             session.save(diagram);
                         }
                     }

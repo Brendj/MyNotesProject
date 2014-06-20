@@ -32,6 +32,8 @@ public class SubscriptionFeedingExt {
     private Date updateDate;
     @XmlElement(name = "Suspended")
     private Boolean suspended;
+    @XmlElement(name = "ChangesPlace")
+    private Boolean changesPlace;
 
     public Long getIdOfSubscriptionFeeding() {
         return idOfSubscriptionFeeding;
@@ -95,6 +97,14 @@ public class SubscriptionFeedingExt {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Boolean getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(Boolean changesPlace) {
+        this.changesPlace = changesPlace;
     }
 
     public SubscriptionFeedingExt() {

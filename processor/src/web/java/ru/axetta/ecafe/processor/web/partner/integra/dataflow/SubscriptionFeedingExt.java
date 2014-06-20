@@ -36,6 +36,8 @@ public class SubscriptionFeedingExt {
     private Date updateDate;
     @XmlElement(name = "Suspended")
     private Boolean suspended;
+    @XmlElement(name = "ChangesPlace")
+    private Boolean changesPlace;
 
     public SubscriptionFeedingExt(SubscriptionFeeding subscriptionFeeding) {
         this.idOfSubscriptionFeeding = subscriptionFeeding.getGlobalId();
@@ -49,6 +51,12 @@ public class SubscriptionFeedingExt {
             this.updateDate = subscriptionFeeding.getCreatedDate();
         } else {
             this.updateDate = subscriptionFeeding.getLastUpdate();
+        }
+
+        if (subscriptionFeeding.getStaff() == null) {
+            this.changesPlace = false;
+        } else {
+            this.changesPlace = true;
         }
     }
 
@@ -114,6 +122,14 @@ public class SubscriptionFeedingExt {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Boolean getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(Boolean changesPlace) {
+        this.changesPlace = changesPlace;
     }
 
     public SubscriptionFeedingExt() {

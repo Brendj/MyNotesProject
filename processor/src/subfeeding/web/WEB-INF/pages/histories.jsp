@@ -267,7 +267,9 @@
                                         <fmt:formatDate pattern="dd.MM.yyyy HH:mm"
                                                         value="${subfeeding.updateDate}" />
                                     </td>
-                                    <td class="simpleCell purchaseHeaderCell wideCell"></td>
+                                    <td class="simpleCell purchaseHeaderCell wideCell">
+                                        <c:out value="${subfeeding.changesPlace}"/>
+                                    </td>
                                     <td class="simpleCell purchaseHeaderCell">
                                         <c:out value="${subfeeding.subscriptionAction}"/>
                                     </td>

@@ -27,6 +27,7 @@ public class SubscriptionFeeding implements Serializable {
     private Date dateDeactivate;
     private Date updateDate;
     private Boolean suspended;
+    private String changesPlace;
 
     public SubscriptionFeeding(SubscriptionFeedingExt subscriptionFeedingExt) {
         this.idOfSubscriptionFeeding = subscriptionFeedingExt.getIdOfSubscriptionFeeding();
@@ -37,6 +38,7 @@ public class SubscriptionFeeding implements Serializable {
         this.dateDeactivate = subscriptionFeedingExt.getDateDeactivate();
         this.updateDate = subscriptionFeedingExt.getUpdateDate();
         this.suspended = subscriptionFeedingExt.getSuspended();
+        this.changesPlace = subscriptionFeedingExt.getChangesPlace() ? "АРМ Администратора" : "Личный кабинет";
     }
 
     public Date getSubscriptionActionDate(){
@@ -101,5 +103,13 @@ public class SubscriptionFeeding implements Serializable {
 
     public Boolean getSuspended() {
         return suspended;
+    }
+
+    public String getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(String changesPlace) {
+        this.changesPlace = changesPlace;
     }
 }

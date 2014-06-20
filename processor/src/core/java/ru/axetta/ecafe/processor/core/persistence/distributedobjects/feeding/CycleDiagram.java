@@ -5,6 +5,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -15,6 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -49,10 +51,13 @@ public class CycleDiagram extends DistributedObject{
     private Long saturdayPrice;
     private String sunday;
     private Long sundayPrice;
+    private Staff staff;
+    private String guidOfStaff;
 
     @Override
     public void createProjections(Criteria criteria) {
         criteria.createAlias("client", "cl", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("staff", "s", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
@@ -76,11 +81,15 @@ public class CycleDiagram extends DistributedObject{
         projectionList.add(Projections.property("fridayPrice"), "fridayPrice");
         projectionList.add(Projections.property("saturdayPrice"), "saturdayPrice");
         projectionList.add(Projections.property("sundayPrice"), "sundayPrice");
+        projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
     }
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        Staff st = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfStaff);
+        /*if (st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");*/
+        setStaff(st);
         Boolean enableSubscriptionFeeding = RuntimeContext.getInstance()
                 .getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
         if (!enableSubscriptionFeeding) {
@@ -91,6 +100,23 @@ public class CycleDiagram extends DistributedObject{
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
+/*
+        // проверить бросить искл если idкл совпал и даты совпали гуид различается DATA_EXIST_VALUE
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", this.client));
+        criteria.add(Restrictions.eq("dateActivationDiagram", this.dateActivationDiagram));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        CycleDiagram cDiagram = (CycleDiagram) criteria.uniqueResult();
+        session.clear();
+
+        if (cDiagram != null && cDiagram.getClient().equals(client) && cDiagram.getDateActivationDiagram()
+                .equals(dateActivationDiagram) && !cDiagram.getGuid().equals(guid)) {
+            DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
+            doe.setData(cDiagram.getGuid());
+            throw doe;
+        }*/
+
         /* При синхронизации пришла активная циклограмма */
         if(isActual()){
             /* проверяем, есть ли на текущую дату активная циклограмма */
@@ -130,6 +156,10 @@ public class CycleDiagram extends DistributedObject{
         XMLUtils.setAttributeIfNotNull(element, "Friday", friday);
         XMLUtils.setAttributeIfNotNull(element, "Saturday", saturday);
         XMLUtils.setAttributeIfNotNull(element, "Sunday", sunday);
+
+        if (guidOfStaff != null) {
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
+        }
     }
 
     @Override
@@ -175,6 +205,7 @@ public class CycleDiagram extends DistributedObject{
         setSaturdayPrice(XMLUtils.getLongAttributeValue(node, "SaturdayPrice"));
         setSunday(XMLUtils.getStringAttributeValue(node, "Sunday", 255));
         setSundayPrice(XMLUtils.getLongAttributeValue(node, "SundayPrice"));
+        guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
@@ -192,6 +223,8 @@ public class CycleDiagram extends DistributedObject{
         setFriday(((CycleDiagram) distributedObject).getFriday());
         setSaturday(((CycleDiagram) distributedObject).getSaturday());
         setSunday(((CycleDiagram) distributedObject).getSunday());
+        setStaff(((CycleDiagram) distributedObject).getStaff());
+        setGuidOfStaff(((CycleDiagram) distributedObject).getGuidOfStaff());
     }
 
 
@@ -350,5 +383,21 @@ public class CycleDiagram extends DistributedObject{
 
     public Long getMonthPrice(){
         return getWeekPrice()*4;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
+
+    public String getGuidOfStaff() {
+        return guidOfStaff;
+    }
+
+    public void setGuidOfStaff(String guidOfStaff) {
+        this.guidOfStaff = guidOfStaff;
     }
 }

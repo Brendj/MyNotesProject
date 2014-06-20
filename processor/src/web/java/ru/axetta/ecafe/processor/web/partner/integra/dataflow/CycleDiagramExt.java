@@ -54,6 +54,8 @@ public class CycleDiagramExt {
     @XmlElement(name = "UpdateDate")
     @XmlSchemaType(name = "dateTime")
     private Date updateDate;
+    @XmlElement(name = "ChangesPlace")
+    private Boolean changesPlace;
 
     public CycleDiagramExt(CycleDiagram diagram) {
         this.globalId = diagram.getGlobalId();
@@ -77,6 +79,12 @@ public class CycleDiagramExt {
             this.updateDate = diagram.getCreatedDate();
         } else {
             this.updateDate = diagram.getLastUpdate();
+        }
+
+        if (diagram.getStaff() == null) {
+            this.changesPlace = false;
+        } else {
+            this.changesPlace = true;
         }
     }
 
@@ -224,5 +232,13 @@ public class CycleDiagramExt {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Boolean getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(Boolean changesPlace) {
+        this.changesPlace = changesPlace;
     }
 }

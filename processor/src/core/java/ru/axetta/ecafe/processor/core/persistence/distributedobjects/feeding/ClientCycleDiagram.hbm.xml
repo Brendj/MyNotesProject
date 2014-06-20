@@ -57,5 +57,9 @@
         <property name="sunday" column="sunday" type="string" length="255" />
         <property name="sundayPrice" column="sundayPrice" type="long" />
 
+        <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+            <column name="idOfStaff" not-null="false" />
+        </many-to-one>
+
     </class>
 </hibernate-mapping>

@@ -23,3 +23,9 @@ CREATE TABLE cf_Prohibitions
 
 CREATE INDEX cf_Prohibitions_idOfClient_idx on cf_Prohibitions USING btree (IdOfClient);
 --CREATE INDEX cf_ProhibitionsOrg_fk_idx on cf_Prohibitions USING btree (IdOfOrg);
+
+ALTER TABLE cf_subscriber_feeding ADD column IdOfStaff bigint;
+ALTER TABLE cf_subscriber_feeding ADD constraint cf_service_subscriber_feeding_staff_fk FOREIGN KEY (IdOfStaff) REFERENCES cf_staffs (IdOfStaff);
+
+ALTER TABLE cf_clients_cycle_diagrams ADD column idOfStaff bigint;
+ALTER TABLE cf_clients_cycle_diagrams ADD constraint cf_clients_cycle_diagrams_staff_fk FOREIGN KEY (IdOfStaff) REFERENCES cf_staffs (IdOfStaff);

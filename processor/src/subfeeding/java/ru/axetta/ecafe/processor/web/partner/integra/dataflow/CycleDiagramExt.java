@@ -57,7 +57,7 @@ public class CycleDiagramExt {
     @XmlSchemaType(name = "dateTime")
     private Date updateDate;
     @XmlElement(name = "ChangesPlace")
-    private String changesPlace;
+    private Boolean changesPlace;
 
     public String getDayValue(int dayNumber) {
         switch (dayNumber) {
@@ -252,11 +252,11 @@ public class CycleDiagramExt {
         this.updateDate = updateDate;
     }
 
-    public String getChangesPlace() {
+    public Boolean getChangesPlace() {
         return changesPlace;
     }
 
-    public void setChangesPlace(String changesPlace) {
+    public void setChangesPlace(Boolean changesPlace) {
         this.changesPlace = changesPlace;
     }
 }

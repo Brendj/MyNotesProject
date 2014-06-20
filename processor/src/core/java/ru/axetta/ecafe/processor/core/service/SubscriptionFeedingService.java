@@ -528,6 +528,7 @@ public class SubscriptionFeedingService {
         Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
         sf.setGlobalVersionOnCreate(version);
         sf.setGlobalVersion(version);
+        sf.setStaff(null);
         entityManager.persist(sf);
         CycleDiagram cd = findClientCycleDiagram(client);
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
@@ -552,6 +553,7 @@ public class SubscriptionFeedingService {
         Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
         sf.setGlobalVersionOnCreate(version);
         sf.setGlobalVersion(version);
+        sf.setStaff(null);
         entityManager.persist(sf);
         return createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dateActivationDiagram, true);
 
@@ -594,6 +596,7 @@ public class SubscriptionFeedingService {
         cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
         cd.setSunday("");
         cd.setSundayPrice(0L);
+        cd.setStaff(null);
         entityManager.persist(cd);
         return cd;
     }
@@ -633,6 +636,8 @@ public class SubscriptionFeedingService {
             }
         }
 
+        cd.setStaff(null);
+
         //if (cd != null) {
         //    cd.setDeletedState(true);
         //    cd.setStateDiagram(StateDiagram.BLOCK);
@@ -663,6 +668,7 @@ public class SubscriptionFeedingService {
         cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
         cd.setSunday("");
         cd.setSundayPrice(0L);
+        cd.setStaff(null);
     }
 
     // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.

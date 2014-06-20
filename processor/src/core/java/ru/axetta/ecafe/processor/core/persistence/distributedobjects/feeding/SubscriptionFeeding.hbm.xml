@@ -51,6 +51,10 @@
         <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
         <property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>
 
+        <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+            <column name="idOfStaff" not-null="false" />
+        </many-to-one>
+
 
     </class>
 </hibernate-mapping>

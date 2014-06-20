@@ -7,6 +7,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -46,11 +47,13 @@ public class SubscriptionFeeding extends DistributedObject{
     private Date dateCreateService;
     /* коментарии причина отказа */
     private String reasonWasSuspended;
+    private Staff staff;
+    private String guidOfStaff;
 
     @Override
     public void createProjections(Criteria criteria) {
         criteria.createAlias("client", "cl", JoinType.LEFT_OUTER_JOIN);
-
+        criteria.createAlias("staff", "s", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
@@ -61,11 +64,15 @@ public class SubscriptionFeeding extends DistributedObject{
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
         projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
         //projectionList.add(Projections.property("reasonWasSuspended"), "reasonWasSuspended");
+        projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
     }
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        Staff st = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfStaff);
+        //if (st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
+        setStaff(st);
         Boolean enableSubscriptionFeeding = RuntimeContext.getInstance()
                 .getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
         if (!enableSubscriptionFeeding) {
@@ -119,6 +126,9 @@ public class SubscriptionFeeding extends DistributedObject{
         //if (reasonWasSuspended != null) {
         //    XMLUtils.setAttributeIfNotNull(element, "ReasonWasSuspended", df.format(reasonWasSuspended));
         //}
+        if (guidOfStaff != null) {
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
+        }
     }
 
     @Override
@@ -175,6 +185,8 @@ public class SubscriptionFeeding extends DistributedObject{
         //    setReasonWasSuspended(reasonWasSuspended);
         //}
 
+        guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
+
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
@@ -190,6 +202,8 @@ public class SubscriptionFeeding extends DistributedObject{
         setWasSuspended(((SubscriptionFeeding) distributedObject).getWasSuspended());
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
         //setReasonWasSuspended(((SubscriptionFeeding) distributedObject).getReasonWasSuspended());
+        setStaff(((SubscriptionFeeding) distributedObject).getStaff());
+        setGuidOfStaff(((SubscriptionFeeding) distributedObject).getGuidOfStaff());
     }
 
     // Проверка подписки на актуальность.
@@ -260,6 +274,22 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setReasonWasSuspended(String reasonWasSuspended) {
         this.reasonWasSuspended = reasonWasSuspended;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
+    }
+
+    public String getGuidOfStaff() {
+        return guidOfStaff;
+    }
+
+    public void setGuidOfStaff(String guidOfStaff) {
+        this.guidOfStaff = guidOfStaff;
     }
 
     @Override
