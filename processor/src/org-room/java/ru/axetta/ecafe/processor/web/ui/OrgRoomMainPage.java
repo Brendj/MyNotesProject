@@ -31,16 +31,16 @@ import javax.servlet.http.HttpSession;
  * Time: 13:54
  * To change this template use File | Settings | File Templates.
  */
-public class MainPage {
-    private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
+public class OrgRoomMainPage {
+    private static final Logger logger = LoggerFactory.getLogger(OrgRoomMainPage.class);
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
 
 
-    public static MainPage getSessionInstance() {
+    public static OrgRoomMainPage getSessionInstance() {
         FacesContext context = FacesContext.getCurrentInstance();
-        return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
+        return (OrgRoomMainPage) context.getApplication().createValueBinding("#{orgRoomMainPage}").getValue(context);
     }
 
     public BasicWorkspacePage getCurrentWorkspacePage() {
