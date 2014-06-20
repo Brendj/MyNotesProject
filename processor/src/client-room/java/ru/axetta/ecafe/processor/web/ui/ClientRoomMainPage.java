@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
  * Time: 14:49:47
  * To change this template use File | Settings | File Templates.
  */
-public class MainPage {
+public class ClientRoomMainPage {
 
     private Long removedIdOfUser;
     private Long removedIdOfCity;
@@ -48,7 +48,7 @@ public class MainPage {
 
     private final SelectedUserGroupPage selectedUserGroupPage = new SelectedUserGroupPage();
     private final SelectedCityGroupPage selectedCityGroupPage = new SelectedCityGroupPage();
-    private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(ClientRoomMainPage.class);
     private final UserListPage userListPage = new UserListPage();
     private final CityListPage cityListPage = new CityListPage();
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
@@ -366,9 +366,9 @@ public class MainPage {
         return currentWorkspacePage;
     }
 
-    public static MainPage getSessionInstance() throws Exception {
+    public static ClientRoomMainPage getSessionInstance() throws Exception {
         FacesContext context = FacesContext.getCurrentInstance();
-        return (MainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
+        return (ClientRoomMainPage) context.getApplication().createValueBinding("#{mainPage}").getValue(context);
     }
 
     public void setCurrentWorkspacePage(BasicWorkspacePage page) {
