@@ -25,9 +25,9 @@
     </application>
 
     <managed-bean>
-        <display-name>mainPage</display-name>
-        <managed-bean-name>mainPage</managed-bean-name>
-        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.MainPage</managed-bean-class>
+        <display-name>orgRoomMainPage</display-name>
+        <managed-bean-name>orgRoomMainPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.OrgRoomMainPage</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
 
