@@ -7,9 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import com.google.common.collect.Lists;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
@@ -18,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -41,6 +40,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.setDayOfMonth;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
 /**
@@ -215,6 +215,54 @@ public class SubscriptionFeedingService {
             endDate = CalendarUtils.addDays(endDate, 1);
             res = query.setParameter("org", org).setParameter("startDate", beginDate).setParameter("endDate", endDate)
                     .getResultList();
+            dayCount++;
+        }
+        return res;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает комплексы, участвующие в АП, для данной орг-ии.
+    // isParant при ложном занчении вернет комплексы только для детей
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParant) {
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date tomorrow = CalendarUtils.addOneDay(today);
+        Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
+        for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
+            idOfComplex.add(i);
+        }
+        if(!isParant){
+            Session session = entityManager.unwrap(Session.class);
+            Criteria criteria = session.createCriteria(ComplexRole.class);
+            String arrayOfFilterText = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
+            for (String filter : arrayOfFilterText.split(";")){
+                criteria.add(Restrictions.ilike("extendRoleName", filter, MatchMode.ANYWHERE));
+            }
+            //criteria.add(Restrictions.ilike("extendRoleName", "сотрудник", MatchMode.ANYWHERE));
+            criteria.setProjection(Projections.property("idOfRole"));
+            List list = criteria.list();
+            for (Object obj: list){
+                idOfComplex.remove(Integer.valueOf(obj.toString()));
+            }
+        }
+        final String sql;
+        sql = "select distinct ci from ComplexInfo ci "
+              + " where ci.org = :org and usedSubscriptionFeeding = 1 "
+              + " and menuDate >= :startDate and menuDate < :endDate "
+              + " and ci.idOfComplex in :idOfComplex";
+        TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
+              ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
+              .setParameter("endDate", tomorrow).setParameter("idOfComplex", idOfComplex);
+        List<ComplexInfo> res = query.getResultList();
+        // Если комплексов на сегодня нет, то ищем их на каждый день в течение недели.
+        int dayCount = 1;
+        Date beginDate;
+        Date endDate = tomorrow;
+        while (res.isEmpty() && dayCount < 8) {
+            beginDate = endDate;
+            endDate = CalendarUtils.addDays(endDate, 1);
+            res = query.setParameter("org", org).setParameter("startDate", beginDate).setParameter("endDate", endDate)
+                  .setParameter("idOfComplex", idOfComplex).getResultList();
             dayCount++;
         }
         return res;

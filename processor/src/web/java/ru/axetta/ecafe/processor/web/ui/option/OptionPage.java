@@ -99,6 +99,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer maxNumDaysNotificationGoodRequestChange;
     private String frontControllerRequestIpMask;
     private Boolean synchCleanup;
+    private String arrayOfFilterText;
 
     private List<BankOptionItem> banks;
 
@@ -613,6 +614,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.synchCleanup = synchCleanup;
     }
 
+    public String getArrayOfFilterText() {
+        return arrayOfFilterText;
+    }
+
+    public void setArrayOfFilterText(String arrayOfFilterText) {
+        this.arrayOfFilterText = arrayOfFilterText;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -682,6 +691,8 @@ public class OptionPage extends BasicWorkspacePage {
         enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
+        arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
+
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
         lastBIDataUpdate = biDataDateFormat.format(cal.getTime());
@@ -814,6 +825,7 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK, frontControllerRequestIpMask);
             runtimeContext.setOptionValue(Option.OPTION_SYNCH_CLEANUP_ON, synchCleanup);
+            runtimeContext.setOptionValue(Option.OPTION_ARRAY_OF_FILTER_TEXT, arrayOfFilterText);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

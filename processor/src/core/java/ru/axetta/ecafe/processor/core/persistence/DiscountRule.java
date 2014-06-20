@@ -82,9 +82,11 @@ public class DiscountRule {
         this.complexesMap = complexesMap;
     }
 
+    public static final Integer COMPLEX_COUNT = 50;
+
     public static class ComplexBuilder{
 
-        private HashMap<Integer, Integer> map = new HashMap<Integer, Integer>(50);
+        private HashMap<Integer, Integer> map = new HashMap<Integer, Integer>(COMPLEX_COUNT);
 
         public ComplexBuilder(String value) {
             String[] values = value.split(";");
@@ -97,7 +99,7 @@ public class DiscountRule {
         }
 
         public ComplexBuilder(List<Integer> checkedList) {
-            for (int i=0;i<50;i++){
+            for (int i=0;i<COMPLEX_COUNT;i++){
                 map.put(i,0);
             }
             for (Integer i: checkedList){
@@ -112,7 +114,7 @@ public class DiscountRule {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            for (int i=0;i<50;i++){
+            for (int i=0;i<COMPLEX_COUNT;i++){
                 sb.append(i).append("=").append(map.get(i)).append(";");
             }
             return sb.toString();

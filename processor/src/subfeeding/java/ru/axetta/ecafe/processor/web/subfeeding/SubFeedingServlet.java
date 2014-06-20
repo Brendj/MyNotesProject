@@ -249,6 +249,9 @@ public class SubFeedingServlet extends HttpServlet {
         if(subscriptionFeedingExt!=null){
             req.setAttribute("subscriptionFeeding", new SubscriptionFeeding(subscriptionFeedingExt));
         }
+        if(result.resultCode!=0){
+            req.setAttribute(ERROR_MESSAGE, result.description);
+        }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         Date activationDate = addDays(currentDay, 1);
@@ -395,7 +398,6 @@ public class SubFeedingServlet extends HttpServlet {
                   : parseDate(req.getParameter("activateDate"), df);
             cycle.setDateActivationDiagram(activateDate);
             CycleDiagramEditResult result = clientRoomController.putCycleDiagram(contractId, cycle);
-            //CycleDiagramResult res = clientRoomController.editCycleDiagramPlan(contractId, cycle);
             if (result.resultCode == 0) {
                 String stringDate = df.format(cycle.getDateActivationDiagram());
                 String message = "Изменения циклограммы успешно сохранены. Изменения вступят в силу " + stringDate;

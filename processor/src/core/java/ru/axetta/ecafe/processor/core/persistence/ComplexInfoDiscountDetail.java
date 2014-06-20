@@ -15,9 +15,7 @@ public class ComplexInfoDiscountDetail {
     private ClientGroup clientGroup;
     private Org org;
 
-    protected ComplexInfoDiscountDetail() {
-
-    }
+    protected ComplexInfoDiscountDetail() {}
 
     public ComplexInfoDiscountDetail(Double size, int allGroups) {
         this.size = size;

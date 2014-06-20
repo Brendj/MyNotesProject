@@ -26,9 +26,7 @@ public class ComplexInfo {
     private Good good;
     private Integer usedSubscriptionFeeding;
 
-    protected ComplexInfo() {
-
-    }
+    protected ComplexInfo() {}
 
     public ComplexInfo(int idOfComplex, Org org, Date menuDate, int modeFree, int modeGrant, int modeOfAdd,
             String complexName) {

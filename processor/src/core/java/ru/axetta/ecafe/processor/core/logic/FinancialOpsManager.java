@@ -101,21 +101,6 @@ public class FinancialOpsManager {
         AccountTransaction orderTransaction = null;
         // If "card part" of payment is specified...
         if (0 != payment.getSumByCard()) {
-            // Check card balance and overdraft limit to be enough for payment registration
-            //if (card.getBalance() + card.getLimit() < payment.getSumByCard()) {
-            //    registerLimitOverflow(session, syncHistory, organization, card);
-            //    transaction.commit(); transaction = null;
-            //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 260, String.format(
-            //            "There is not enough sum at the card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s",
-            //            idOfOrg, payment.getIdOfOrder(), payment.getCardNo()));
-            //}
-            // Update client balance...
-            //DAOUtils.changeClientBalance(persistenceSession, client.getIdOfClient(), -payment.getSumByCard());
-            //client.addBalance(-payment.getSumByCard());
-            //client.setUpdateTime(new Date());
-            //persistenceSession.update(client);
-
-            // зарегистрировать транзакцию и провести по балансу
             if(payment.getOrderType()==null){
                 // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
@@ -132,39 +117,7 @@ public class FinancialOpsManager {
                           -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
                           AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
                 }
-                //switch (payment.getOrderType()){
-                //    case PAY_PLAN:{
-                //        // Логика плана платного питания
-                //        orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
-                //              client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
-                //              AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
-                //    } break;
-                //    case SUBSCRIPTION_FEEDING:{
-                //        // Логика плана абониментного питания питания
-                //        orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
-                //              client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
-                //              AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date()); // processSubBalance1AccountTransaction();
-                //    } break;
-                //    default: {
-                //        orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
-                //              -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-                //              AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
-                //    }
-                //}
             }
-
-            //if(payment.getOrderType()==null || !payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
-            //    orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
-            //            -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-            //            AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
-            //} else {
-            //    // регистрируем оплату только с первого субсчета
-            //    orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card, -payment.getSumByCard(),
-            //            "" + idOfOrg + "/" + payment.getIdOfOrder(), AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date(), 1); // processSubBalance1AccountTransaction();
-            //    SubscriptionFee subscriptionFee = new SubscriptionFee(payment.getTime().getYear(), payment.getTime().getMonth(), orderTransaction,
-            //            payment.getSumByCard(), payment.getTime(), SubscriptionFee.TYPE_FEEDING_SERVICE);
-            //    session.save(subscriptionFee);
-            //}
         }
 
         POS pos = null;
@@ -226,23 +179,6 @@ public class FinancialOpsManager {
             AccountTransaction transaction = order.getTransaction();
             canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
             ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            //if(order.getOrderType()==null){
-            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            //} else {
-            //    switch (order.getOrderType()){
-            //        case PAY_PLAN:{
-            //            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            //        } break;
-            //        case SUBSCRIPTION_FEEDING:{
-            //            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            //        } break;
-            //    }
-            //}
-            //if(order.getOrderType()!=null && order.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
-            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date(), 1);
-            //} else {
-            //    ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-            //}
         }
 
         session.save(canceledOrder);
@@ -261,20 +197,6 @@ public class FinancialOpsManager {
                 client.getSan(), client.getContractId(), client.getClientGroupTypeAsString(), financialAmount, order.getCreateTime());
         session.save(transactionJournal);
     }
-
-   /* public void createClientPayment(Session session, Client client, Integer paymentMethod, Long paySum, Integer payType,
-            Date createTime, String idOfPayment, Contragent contragent,
-            String addPaymentMethod, String addIdOfPayment)
-            throws Exception {
-        // регистрируем транзакцию и проводим по балансу
-        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, paySum, idOfPayment,
-                AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
-        // регистрируем платеж клиента
-        ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, payType, createTime,
-                idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
-        registerClientPayment(session, clientPayment, client);
-    }*/
 
     public void createClientPayment(Session session, Client client, Contragent contragent, Integer paymentMethod, Long paySum,
             Date createTime, String idOfPayment, String addPaymentMethod, String addIdOfPayment, Integer subScribeNum)
@@ -475,15 +397,6 @@ public class FinancialOpsManager {
         }
         checkBalance(fromBalanceLong, fromSubBalance, sum);
         Date dt = new Date();
-        //if(fromBalance==1){
-        //    final String qlString = "from CycleDiagram where stateDiagram=0 and client=:client";
-        //    TypedQuery<CycleDiagram> query = em.createQuery(qlString, CycleDiagram.class);
-        //    query.setParameter("client", client);
-        //    query.setMaxResults(1);
-        //    CycleDiagram cycleDiagram = query.getSingleResult();
-        //    Long limit = cycleDiagram.getWeekPrice();
-        //    checkBalance(fromBalanceLong, fromSubBalance - limit, sum);
-        //}
 
         // регистрируем транзакцию на исходящем счете клиента
         AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, client,

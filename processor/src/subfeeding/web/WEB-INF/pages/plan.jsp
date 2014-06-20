@@ -111,7 +111,11 @@
                 e.preventDefault();
                 return false;
             }).hide();
-            var activateDate = $("#activateDate").datepicker();
+            var activateDate = $("#activateDate").datepicker({
+                onSelect: function (selected) {
+                    $("#createFirstCycle").text(selected);
+                }
+            });
             activateDate.datepicker("option", "minDate", minActivateDate);
             // прячем сообщения об ошибках и увидомлений
             $(".successMessage").show().delay(5000).fadeOut();
@@ -142,6 +146,10 @@
               action="${pageContext.request.contextPath}/sub-feeding/<%=action%>">
             <%
                 if(cycleDiagrams.size()<2){
+                    CycleDiagram cycleDiagram = null;
+                    if(!cycleDiagrams.isEmpty()){
+                        cycleDiagram = cycleDiagrams.get(0);
+                    }
             %>
             <div class="infoHeader">
                 <h1>Активировать подписку абонементного питания?</h1>
@@ -166,6 +174,41 @@
 
             </div>
             <div class="cycleDiagram">
+                <div style="text-align: center;">
+                    <div style="margin-top: -15px;">
+                        <table style="width: 100%;">
+                            <tr style="border-collapse:collapse;border-spacing:0;">
+                                <td style="text-align: left; width: 140px; padding: 0"></td>
+                                <td style="text-align: left; padding: 0">
+                                    <%
+                                        if(cycleDiagram!=null){
+                                    %>
+                                    <b>Циклограмма_<%=cycleDiagram.getGlobalId()%></b>
+                                    <%
+                                        }
+                                    %>
+                                </td>
+                                <td style="text-align: left; padding: 0">
+                                    <b>Дата начала действия циклограммы:</b>
+                                </td>
+                                <td style="text-align: left; padding: 0">
+                                    <%
+                                        if(cycleDiagram!=null){
+                                    %>
+                                    <b><%=cycleDiagram.getStartDate()%></b>
+                                    <%
+                                        } else {
+                                    %>
+                                    <b id="createFirstCycle"><%=StringEscapeUtils.escapeHtml(activateDate)%></b>
+                                    <%
+                                        }
+                                    %>
+                                </td>
+                                <td style="text-align: left; width: 140px; padding: 0"> </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
                 <div class="simpleTable">
                     <div class="simpleRow simpleTableHeader">
                         <div class="simpleCell wideCell">Комплекс</div>
@@ -219,7 +262,6 @@
                                 </div>
                             </div>
                         </fieldset>
-
                         <c:if test="${requestScope.subscriptionFeeding==null}">
                             <button id="disableButton">Активировать</button>
                             <div style="font-size: 0.8em;">
@@ -276,14 +318,14 @@
                 %>
                 <li class="<%=cycleDiagram.getGlobalId()%>">
                         <div style="text-align: center;">
-                            <div class="active-period"  style="margin-top: -15px;">
+                            <div style="margin-top: -15px;">
                                 <table style="width: 100%;">
                                     <tr style="border-collapse:collapse;border-spacing:0;">
                                         <td rowspan="2" style="text-align: left; width: 140px; padding: 0">
                                             <div class="slider-prev" style="float: left;"></div>
                                         </td>
                                         <td rowspan="2" style="text-align: left; padding: 0">
-                                            <b>Циклограмм_<%=cycleDiagram.getGlobalId()%></b>
+                                            <b>Циклограмма_<%=cycleDiagram.getGlobalId()%></b>
                                         </td>
                                         <td style="text-align: left; padding: 0">
                                             <b>Дата начала действия циклограммы:</b>
@@ -325,7 +367,7 @@
                             %>
                             <div class="simpleRow">
                                 <div class="simpleCell complexName">
-                                    <%=complex.getIdOfComplex()%>:<%=complex.getComplexName() + " &mdash; " + CurrencyStringUtils.copecksToRubles(complex.getCurrentPrice()) + " руб"%>
+                                    <%=complex.getComplexName() + " &mdash; " + CurrencyStringUtils.copecksToRubles(complex.getCurrentPrice()) + " руб"%>
                                 </div>
                                 <%
                                     for (int i = 1; i <= 6; i++) {

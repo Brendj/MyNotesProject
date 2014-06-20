@@ -387,8 +387,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "cancelSubscriptionFeeding")
     Result cancelSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
-    @WebMethod(operationName = "getCurrentCycleDiagramList")
-    CycleDiagramList getCurrentCycleDiagramList(@WebParam(name = "contractId") Long contractId);
+    //@WebMethod(operationName = "getCurrentCycleDiagramList")
+    //CycleDiagramList getCurrentCycleDiagramList(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getCycleDiagramList") CycleDiagramList getCycleDiagramList(
           @WebParam(name = "contractId") Long contractId);
@@ -408,8 +408,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "createNewSubscriptionFeeding")
     CycleDiagramResult createNewSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,@WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
-    @WebMethod(operationName = "editCycleDiagramPlan")
-    CycleDiagramResult editCycleDiagramPlan(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+    //@WebMethod(operationName = "editCycleDiagramPlan")
+    //CycleDiagramResult editCycleDiagramPlan(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
     @WebMethod(operationName = "putCycleDiagram") CycleDiagramEditResult putCycleDiagram(
           @WebParam(name = "contractId")

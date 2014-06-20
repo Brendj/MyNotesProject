@@ -361,6 +361,10 @@
                 <a4j:support event="onchange" reRender="thresholdValues,autoRefillValues" />
             </h:selectBooleanCheckbox>
         </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Список выражений по фильтраций комплексов АП*" styleClass="output-text" />
+            <h:inputText value="#{optionPage.arrayOfFilterText}" styleClass="output-text" />
+        </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid" columns="1">
             <h:outputText escape="true" value="Настройки автопополнения баланса:" styleClass="output-text" />
             <h:panelGrid style="margin-left: 15px;" columns="2">

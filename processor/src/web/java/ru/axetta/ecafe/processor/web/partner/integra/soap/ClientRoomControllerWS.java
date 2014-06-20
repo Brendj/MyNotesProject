@@ -4489,7 +4489,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction.commit();
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                   .getBean(SubscriptionFeedingService.class);
-            List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org);
+            //List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org);
+            List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org, client.getIdOfClientGroup()>=ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
             for (ComplexInfo ci : complexInfoList) {
@@ -4960,41 +4961,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public CycleDiagramList getCurrentCycleDiagramList(
-          @WebParam(name = "contractId")
-          Long contractId) {
-        authenticateRequest(contractId);
-        Session session = null;
-        Transaction transaction = null;
-        CycleDiagramList result = new CycleDiagramList();
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
-            if (client == null) {
-                result.resultCode = RC_CLIENT_NOT_FOUND;
-                result.description = RC_CLIENT_NOT_FOUND_DESC;
-                return result;
-            }
-
-            SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
-            CycleDiagram cycleDiagram = service.findCycleDiagramByClient(client);
-            if (cycleDiagram != null) {
-                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
-            }
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage(), ex);
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = RC_INTERNAL_ERROR_DESC;
-        } finally {
-            HibernateUtils.close(session, logger);
-        }
-        return result;
-    }
+    //@Override
+    //public CycleDiagramList getCurrentCycleDiagramList(
+    //      @WebParam(name = "contractId")
+    //      Long contractId) {
+    //    authenticateRequest(contractId);
+    //    Session session = null;
+    //    Transaction transaction = null;
+    //    CycleDiagramList result = new CycleDiagramList();
+    //    try {
+    //        session = RuntimeContext.getInstance().createPersistenceSession();
+    //        transaction = session.beginTransaction();
+    //        Client client = findClient(session, contractId, null, result);
+    //        if (client == null) {
+    //            result.resultCode = RC_CLIENT_NOT_FOUND;
+    //            result.description = RC_CLIENT_NOT_FOUND_DESC;
+    //            return result;
+    //        }
+    //
+    //        SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
+    //        CycleDiagram cycleDiagram = service.findCycleDiagramByClient(client);
+    //        if (cycleDiagram != null) {
+    //            result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+    //        }
+    //        result.resultCode = RC_OK;
+    //        result.description = RC_OK_DESC;
+    //    } catch (Exception ex) {
+    //        HibernateUtils.rollback(transaction, logger);
+    //        logger.error(ex.getMessage(), ex);
+    //        result.resultCode = RC_INTERNAL_ERROR;
+    //        result.description = RC_INTERNAL_ERROR_DESC;
+    //    } finally {
+    //        HibernateUtils.close(session, logger);
+    //    }
+    //    return result;
+    //}
 
 
     @Override
@@ -5266,7 +5267,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                             diagram.setSunday("");
                             diagram.setSundayPrice(0L);
-                            diagram.setStaff(null);
                             session.save(diagram);
                         }
                     }
@@ -5286,41 +5286,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public CycleDiagramResult editCycleDiagramPlan(
-          @WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram)
-    {
-        Session session = null;
-        Transaction transaction = null;
-        CycleDiagramResult result = new CycleDiagramResult();
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
-            if (client == null) {
-                return result;
-            }
-            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
-                  .getBean(SubscriptionFeedingService.class);
-            CycleDiagram cd = sfService
-                  .editCycleDiagram(client, client.getOrg(), cycleDiagram.getMonday(), cycleDiagram.getTuesday(),
-                        cycleDiagram.getWednesday(), cycleDiagram.getThursday(), cycleDiagram.getFriday(),
-                        cycleDiagram.getSaturday(), cycleDiagram.getDateActivationDiagram());
-            result.cycleDiagramExt = new CycleDiagramExt(cd);
-            transaction.commit();
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage(), ex);
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = RC_INTERNAL_ERROR_DESC;
-        } finally {
-            HibernateUtils.close(session, logger);
-        }
-        return result;
-    }
+    //@Override
+    //public CycleDiagramResult editCycleDiagramPlan(
+    //      @WebParam(name = "contractId") Long contractId,
+    //      @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram)
+    //{
+    //    Session session = null;
+    //    Transaction transaction = null;
+    //    CycleDiagramResult result = new CycleDiagramResult();
+    //    try {
+    //        session = RuntimeContext.getInstance().createPersistenceSession();
+    //        transaction = session.beginTransaction();
+    //        Client client = findClient(session, contractId, null, result);
+    //        if (client == null) {
+    //            return result;
+    //        }
+    //        SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+    //              .getBean(SubscriptionFeedingService.class);
+    //        CycleDiagram cd = sfService
+    //              .editCycleDiagram(client, client.getOrg(), cycleDiagram.getMonday(), cycleDiagram.getTuesday(),
+    //                    cycleDiagram.getWednesday(), cycleDiagram.getThursday(), cycleDiagram.getFriday(),
+    //                    cycleDiagram.getSaturday(), cycleDiagram.getDateActivationDiagram());
+    //        result.cycleDiagramExt = new CycleDiagramExt(cd);
+    //        transaction.commit();
+    //        result.resultCode = RC_OK;
+    //        result.description = RC_OK_DESC;
+    //    } catch (Exception ex) {
+    //        HibernateUtils.rollback(transaction, logger);
+    //        logger.error(ex.getMessage(), ex);
+    //        result.resultCode = RC_INTERNAL_ERROR;
+    //        result.description = RC_INTERNAL_ERROR_DESC;
+    //    } finally {
+    //        HibernateUtils.close(session, logger);
+    //    }
+    //    return result;
+    //}
 
     @Override
     public MenuListWithProhibitionsResult getMenuListWithProhibitions(Long contractId, final Date startDate,
@@ -5375,6 +5375,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         result.prohibitionId = prohibitions.getIdOfProhibitions();
                         session.update(prohibitions);
                     } else {
+                        result.prohibitionId = prohibitions.getIdOfProhibitions();
                         result.resultCode = RC_PROHIBIT_EXIST;
                         result.description = RC_PROHIBIT_EXIST_DESC;
                         return result;
