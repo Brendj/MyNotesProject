@@ -161,7 +161,7 @@ public class ContextDAOServices {
         }
         Disjunction disjunction = Restrictions.disjunction();
         disjunction.add(Restrictions.in(field, orgIds));
-        disjunction.add(Restrictions.eq("classId", Contragent.PAY_AGENT));
+        //disjunction.add(Restrictions.eq(field.substring(0, field.lastIndexOf(".")) + ".classId", Contragent.PAY_AGENT));
         criteria.add(disjunction);
     }
 
