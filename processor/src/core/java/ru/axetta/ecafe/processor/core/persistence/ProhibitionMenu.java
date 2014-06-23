@@ -9,7 +9,7 @@ import java.util.Date;
  * Time: 15:43
  */
 
-public class Prohibitions {
+public class ProhibitionMenu {
     private Long idOfProhibitions;
     private Client client;
     private String filterText;
@@ -19,8 +19,8 @@ public class Prohibitions {
     private Long version;
     private Boolean deletedState;
 
-    public Prohibitions(Long idOfProhibitions, Client client, String filterText,
-            ProhibitionFilterType prohibitionFilterType, Date createDate, Date updateDate, Boolean deletedState) {
+    public ProhibitionMenu(Long idOfProhibitions, Client client, String filterText,
+          ProhibitionFilterType prohibitionFilterType, Date createDate, Date updateDate, Boolean deletedState) {
         this.idOfProhibitions = idOfProhibitions;
         this.client = client;
         this.filterText = filterText;
@@ -30,7 +30,7 @@ public class Prohibitions {
         this.deletedState = deletedState;
     }
 
-    public Prohibitions() {
+    public ProhibitionMenu() {
     }
 
     public Long getIdOfProhibitions() {

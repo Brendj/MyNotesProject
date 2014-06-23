@@ -647,12 +647,6 @@ public interface ClientRoomController {
           @WebParam(name = "cycleDiagram")
           CycleDiagramExt cycleDiagram);
 
-    //@WebMethod(operationName = "editCycleDiagramPlan") CycleDiagramResult editCycleDiagramPlan(
-    //      @WebParam(name = "contractId")
-    //      Long contractId,
-    //      @WebParam(name = "cycleDiagram")
-    //      CycleDiagramExt cycleDiagram);
-
     @WebMethod(operationName = "putCycleDiagram") CycleDiagramEditResult putCycleDiagram(
           @WebParam(name = "contractId")
           Long contractId,

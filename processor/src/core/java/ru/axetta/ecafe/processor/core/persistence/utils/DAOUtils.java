@@ -822,7 +822,6 @@ public class DAOUtils {
      * @param org ссылка на организацию
      * @param fromDateTime время с которого учитывается >
      * @param toDateTime время до которого учитывается <=
-     * @param sourceType список типов транзакций если путо не будет учитываться в криетрии
      * @return возвращается список транзакций клиентов
      */
     @SuppressWarnings("unchecked")
@@ -1723,5 +1722,27 @@ public class DAOUtils {
         TechnologicalMapGroup technologicalMapGroup = technologicalMap.getTechnologicalMapGroup();
         technologicalMapGroup.getNameOfGroup();
         return technologicalMapGroup;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<ProhibitionMenu> getProhibitionMenuForOrgSinceVersion(Session session, Org org, long version){
+        Criteria criteria = session.createCriteria(ProhibitionMenu.class);
+        if(org.getFriendlyOrg().isEmpty()){
+            criteria.createCriteria("client").add(Restrictions.eq("org", org));
+        } else {
+            criteria.createCriteria("client").add(Restrictions.in("org", org.getFriendlyOrg()));
+        }
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static long nextVersionByProhibitionsMenu(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select max(proh.version) from cf_Prohibitions as proh");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
     }
 }

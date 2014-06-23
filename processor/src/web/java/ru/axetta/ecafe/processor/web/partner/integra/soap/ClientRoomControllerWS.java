@@ -47,6 +47,7 @@ import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
@@ -2042,13 +2043,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Map<String, Long> ProhibitByName = new HashMap<String, Long>();
         Map<String, Long> ProhibitByGroup = new HashMap<String, Long>();
 
-        Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+        Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
         prohibitionsCriteria.add(Restrictions.eq("client", client));
         prohibitionsCriteria.add(Restrictions.eq("deletedState", false));
 
         List prohibitions = prohibitionsCriteria.list();
         for (Object prohibitObj : prohibitions) {
-            Prohibitions prohibition = (Prohibitions) prohibitObj;
+            ProhibitionMenu prohibition = (ProhibitionMenu) prohibitObj;
 
             switch (prohibition.getProhibitionFilterType()) {
                 case PROHIBITION_BY_FILTER:
@@ -5286,42 +5287,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    //@Override
-    //public CycleDiagramResult editCycleDiagramPlan(
-    //      @WebParam(name = "contractId") Long contractId,
-    //      @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram)
-    //{
-    //    Session session = null;
-    //    Transaction transaction = null;
-    //    CycleDiagramResult result = new CycleDiagramResult();
-    //    try {
-    //        session = RuntimeContext.getInstance().createPersistenceSession();
-    //        transaction = session.beginTransaction();
-    //        Client client = findClient(session, contractId, null, result);
-    //        if (client == null) {
-    //            return result;
-    //        }
-    //        SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
-    //              .getBean(SubscriptionFeedingService.class);
-    //        CycleDiagram cd = sfService
-    //              .editCycleDiagram(client, client.getOrg(), cycleDiagram.getMonday(), cycleDiagram.getTuesday(),
-    //                    cycleDiagram.getWednesday(), cycleDiagram.getThursday(), cycleDiagram.getFriday(),
-    //                    cycleDiagram.getSaturday(), cycleDiagram.getDateActivationDiagram());
-    //        result.cycleDiagramExt = new CycleDiagramExt(cd);
-    //        transaction.commit();
-    //        result.resultCode = RC_OK;
-    //        result.description = RC_OK_DESC;
-    //    } catch (Exception ex) {
-    //        HibernateUtils.rollback(transaction, logger);
-    //        logger.error(ex.getMessage(), ex);
-    //        result.resultCode = RC_INTERNAL_ERROR;
-    //        result.description = RC_INTERNAL_ERROR_DESC;
-    //    } finally {
-    //        HibernateUtils.close(session, logger);
-    //    }
-    //    return result;
-    //}
-
     @Override
     public MenuListWithProhibitionsResult getMenuListWithProhibitions(Long contractId, final Date startDate,
           final Date endDate) {
@@ -5359,36 +5324,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
 
-                Prohibitions prohibitions = null;
+                long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
 
-                Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+                ProhibitionMenu prohibitionMenu = null;
+
+                Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
                 prohibitionsCriteria.add(Restrictions.eq("client", client));
                 prohibitionsCriteria.add(Restrictions.eq("filterText", filterText));
-                prohibitionsCriteria
-                      .add(Restrictions.eq("prohibitionFilterType", ProhibitionFilterType.getTypeBuId(filterType)));
-                prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
+                final ProhibitionFilterType typeBuId = ProhibitionFilterType.getTypeBuId(filterType);
+                prohibitionsCriteria.add(Restrictions.eq("prohibitionFilterType", typeBuId));
+                prohibitionMenu = (ProhibitionMenu) prohibitionsCriteria.uniqueResult();
 
-                if (prohibitions != null) {
-                    if (prohibitions.getDeletedState()) {
-                        prohibitions.setDeletedState(false);
-                        prohibitions.setUpdateDate(new Date());
-                        result.prohibitionId = prohibitions.getIdOfProhibitions();
-                        session.update(prohibitions);
+                if (prohibitionMenu != null) {
+                    if (prohibitionMenu.getDeletedState()) {
+                        prohibitionMenu.setDeletedState(false);
+                        prohibitionMenu.setVersion(maxVersion);
+                        prohibitionMenu.setUpdateDate(new Date());
+                        result.prohibitionId = prohibitionMenu.getIdOfProhibitions();
+                        session.update(prohibitionMenu);
                     } else {
-                        result.prohibitionId = prohibitions.getIdOfProhibitions();
+                        result.prohibitionId = prohibitionMenu.getIdOfProhibitions();
                         result.resultCode = RC_PROHIBIT_EXIST;
                         result.description = RC_PROHIBIT_EXIST_DESC;
                         return result;
                     }
                 } else {
-                    prohibitions = new Prohibitions();
-                    prohibitions.setClient(client);
-                    prohibitions.setCreateDate(currentDate);
-                    prohibitions.setFilterText(filterText);
-                    prohibitions.setProhibitionFilterType(ProhibitionFilterType.getTypeBuId(filterType));
-                    prohibitions.setDeletedState(false);
-                    session.save(prohibitions);
-                    result.prohibitionId = prohibitions.getIdOfProhibitions();
+                    prohibitionMenu = new ProhibitionMenu();
+                    prohibitionMenu.setVersion(maxVersion);
+                    prohibitionMenu.setClient(client);
+                    prohibitionMenu.setCreateDate(currentDate);
+                    prohibitionMenu.setFilterText(filterText);
+                    prohibitionMenu.setProhibitionFilterType(typeBuId);
+                    prohibitionMenu.setDeletedState(false);
+                    session.save(prohibitionMenu);
+                    result.prohibitionId = prohibitionMenu.getIdOfProhibitions();
                 }
                 transaction.commit();
                 transaction = null;
@@ -5422,24 +5391,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_CLIENT_NOT_FOUND_DESC;
                     return result;
                 }
-
-                Prohibitions prohibitions = null;
+                long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
+                ProhibitionMenu prohibitionMenu = null;
 
                 if (prohibitionId != null) {
-                    Criteria prohibitionsCriteria = session.createCriteria(Prohibitions.class);
+                    Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
                     prohibitionsCriteria.add(Restrictions.eq("idOfProhibitions", prohibitionId));
                     prohibitionsCriteria.add(Restrictions.eq("client", client));
-                    prohibitions = (Prohibitions) prohibitionsCriteria.uniqueResult();
+                    prohibitionMenu = (ProhibitionMenu) prohibitionsCriteria.uniqueResult();
 
-                    if (prohibitions != null) {
-                        if (prohibitions.getDeletedState()) {
+                    if (prohibitionMenu != null) {
+                        if (prohibitionMenu.getDeletedState()) {
                             result.resultCode = RC_PROHIBIT_REMOVED;
                             result.description = RC_PROHIBIT_REMOVED_DESC;
                             return result;
                         }
-                        prohibitions.setDeletedState(true);
-                        prohibitions.setUpdateDate(new Date());
-                        session.update(prohibitions);
+                        prohibitionMenu.setVersion(maxVersion);
+                        prohibitionMenu.setDeletedState(true);
+                        prohibitionMenu.setUpdateDate(new Date());
+                        session.update(prohibitionMenu);
                     } else {
                         result.resultCode = RC_PROHIBIT_NOT_FOUND;
                         result.description = RC_PROHIBIT_NOT_FOUND_DESC;

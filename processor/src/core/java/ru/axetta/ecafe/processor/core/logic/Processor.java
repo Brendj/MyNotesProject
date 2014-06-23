@@ -56,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,7 +89,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
+            Contragent contragent = findContragent(persistenceSession, idOfContragent);
             if (null == contragent) {
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
@@ -96,7 +97,7 @@ public class Processor implements SyncProcessor,
                                 PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId()), null);
             }
-            if (DAOUtils.existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
+            if (existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
                     logger.warn(String.format("Payment request with duplicated attributes IdOfContragent == %s, payment == %s",
                             idOfContragent,
                             payment.toString()));
@@ -233,8 +234,8 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            ClientPaymentOrder clientPaymentOrder = DAOUtils
-                    .getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
+            ClientPaymentOrder clientPaymentOrder = getClientPaymentOrderReference(persistenceSession,
+                  idOfClientPaymentOrder);
             if (!idOfContragent.equals(clientPaymentOrder.getContragent().getIdOfContragent())) {
                 throw new IllegalArgumentException(String.format(
                         "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
@@ -366,8 +367,8 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
-            Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
+            Contragent contragent = findContragent(persistenceSession, idOfContragent);
+            Client client = getClientReference(persistenceSession, idOfClient);
             ClientPaymentOrder clientPaymentOrder = new ClientPaymentOrder(contragent, client, paymentMethod, sum,
                     contragentSum, new Date());
             persistenceSession.save(clientPaymentOrder);
@@ -396,9 +397,9 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            ClientPaymentOrder clientPaymentOrder = DAOUtils
-                    .getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
-            Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
+            ClientPaymentOrder clientPaymentOrder = getClientPaymentOrderReference(persistenceSession,
+                  idOfClientPaymentOrder);
+            Client client = getClientReference(persistenceSession, idOfClient);
             if (!client.getIdOfClient().equals(clientPaymentOrder.getClient().getIdOfClient())) {
                 throw new IllegalArgumentException("Client does't own this order");
             }
@@ -432,17 +433,17 @@ public class Processor implements SyncProcessor,
         }
 
         logger.debug("check exist client");
-        Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
+        Client client = getClientReference(persistenceSession, idOfClient);
         if (client == null) {
             throw new Exception("Клиент не найден: " + idOfClient);
         }
         logger.debug("check exist card");
-        Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+        Card c = findCardByCardNo(persistenceSession, cardNo);
         if (c != null) {
             throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
         }
         logger.debug("check exist temp card");
-        CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+        CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
         if (ct != null) {
             if(ct.getClient()!=null){
                 throw new Exception(String.format(
@@ -528,8 +529,8 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client newCardOwner = DAOUtils.getClientReference(persistenceSession, idOfClient);
-            Card updatedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
+            Client newCardOwner = getClientReference(persistenceSession, idOfClient);
+            Card updatedCard = getCardReference(persistenceSession, idOfCard);
 
             if (state == Card.ACTIVE_STATE) {
                 Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
@@ -591,12 +592,12 @@ public class Processor implements SyncProcessor,
                 throw new Exception("Не верно введена дата");
             }
 
-            Client newCardOwner = DAOUtils.getClientReference(persistenceSession, idOfClient);
+            Client newCardOwner = getClientReference(persistenceSession, idOfClient);
             if(newCardOwner == null) {
                 throw new Exception("Клиент не найден: "+idOfClient);
             }
 
-            CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
             if(ct!=null){
                 if(ct.getClient()!=null){
                     final String format = "Карта с таким номером уже зарегистрирована как временная на клиента: %d";
@@ -616,7 +617,7 @@ public class Processor implements SyncProcessor,
             }
 
             //Card updatedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
-            Card updatedCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            Card updatedCard = findCardByCardNo(persistenceSession, cardNo);
             if(updatedCard==null){
                 throw new Exception("Неизвестная карта: "+cardNo);
             }
@@ -672,7 +673,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Order order = DAOUtils.findOrder(persistenceSession, compositeIdOfOrder);
+            Order order = findOrder(persistenceSession, compositeIdOfOrder);
             if (null != order) {
                 // Update client balance
                 Client client = order.getClient();
@@ -698,7 +699,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            client = DAOUtils.findClientByContractId(persistenceSession, idOfContract);
+            client = findClientByContractId(persistenceSession, idOfContract);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -737,6 +738,7 @@ public class Processor implements SyncProcessor,
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
 
         boolean bError = false;
 
@@ -773,20 +775,28 @@ public class Processor implements SyncProcessor,
             logger.error(message, e);
         }
 
-        ClientGuardianRequest clientGuardianRequest = request.getClientGuardianRequest();
-        if(clientGuardianRequest!=null){
-            final List<ClientGuardianItem> clientGuardianResponseElement
-                    = clientGuardianRequest.getClientGuardianResponseElement();
-            if(clientGuardianResponseElement !=null) {
-                resultClientGuardian = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
-                        syncHistory);
+        // Process ClientGuardianRequest
+        try {
+            ClientGuardianRequest clientGuardianRequest = request.getClientGuardianRequest();
+            if(clientGuardianRequest!=null){
+                final List<ClientGuardianItem> clientGuardianResponseElement
+                      = clientGuardianRequest.getClientGuardianResponseElement();
+                if(clientGuardianResponseElement !=null) {
+                    resultClientGuardian = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
+                          syncHistory);
+                }
+                final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
+                if(responseClientGuardian!=null) {
+                    clientGuardianData = processClientGuardianData(request.getIdOfOrg(), syncHistory,
+                          responseClientGuardian);
+                }
             }
-            final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
-            if(responseClientGuardian!=null) {
-                clientGuardianData = processClientGuardianData(request.getIdOfOrg(), syncHistory,
-                        responseClientGuardian);
-            }
+        } catch (Exception e) {
+            String message = String.format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            logger.error(message, e);
         }
+
 
         // Process OrgStructure
         try {
@@ -804,8 +814,7 @@ public class Processor implements SyncProcessor,
 
         // Build client registry
         try {
-            clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                    request.getClientRegistryRequest(), errorClientIds);
+            clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(), errorClientIds);
         } catch (Exception e) {
             String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistory(request.getIdOfOrg(),syncHistory, message);
@@ -837,6 +846,18 @@ public class Processor implements SyncProcessor,
             logger.error(message, e);
         }
 
+        // Process prohibitions menu from Org
+        try {
+            final ProhibitionMenuRequest prohibitionMenuRequest = request.getProhibitionMenuRequest();
+            if(prohibitionMenuRequest !=null){
+                prohibitionsMenu = getProhibitionsMenuData(request.getOrg(), prohibitionMenuRequest.getMaxVersion());
+            }
+        } catch (Exception e){
+            String message = String.format("Failed to build prohibitions menu, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            prohibitionsMenu = new ProhibitionsMenu(100, String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
 
         // Build AccRegistry
         try {
@@ -851,7 +872,9 @@ public class Processor implements SyncProcessor,
 
         // Process ReqDiary
         try {
-            resDiary = processSyncDiary(request.getIdOfOrg(), request.getReqDiary());
+            if(request.getReqDiary()!=null){
+                resDiary = processSyncDiary(request.getIdOfOrg(), request.getReqDiary());
+            }
         } catch (Exception e) {
             resDiary = new SyncResponse.ResDiary(1, "Unexpected error");
             String message = "SyncResponse.ResDiary: Unexpected error";
@@ -872,8 +895,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
             }
         } catch (Exception e) {
-            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
-                    e);
+            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),e);
             bError = true;
         }
 
@@ -976,7 +998,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
     /* Do process full synchronization */
@@ -1007,6 +1029,7 @@ public class Processor implements SyncProcessor,
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
 
         boolean bError = false;
 
@@ -1055,7 +1078,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1087,6 +1110,7 @@ public class Processor implements SyncProcessor,
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1150,7 +1174,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1181,6 +1205,7 @@ public class Processor implements SyncProcessor,
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1228,7 +1253,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1258,6 +1283,7 @@ public class Processor implements SyncProcessor,
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
 
         boolean bError = false;
 
@@ -1346,7 +1372,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
     private void createSyncHistory(long idOfOrg, SyncHistory syncHistory, String s) {
@@ -1373,7 +1399,7 @@ public class Processor implements SyncProcessor,
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.falseFullSyncByOrg(persistenceSession, idOfOrg);
+            falseFullSyncByOrg(persistenceSession, idOfOrg);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -1406,7 +1432,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            User user = DAOUtils.findUser(persistenceSession, idOfUser);
+            User user = findUser(persistenceSession, idOfUser);
             if (null == user) {
                 throw new AccessDiniedException();
             }
@@ -1698,7 +1724,7 @@ public class Processor implements SyncProcessor,
 
             //SyncHistory syncHistory = (SyncHistory) persistenceSession.load(SyncHistory.class, idOfSync);
             //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
-            Long idOfOrganization = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
+            Long idOfOrganization = getIdOfOrg(persistenceSession, idOfOrg);
             if (null == idOfOrganization) {
                 return new ResPaymentRegistryItem(payment.getIdOfOrder(), 130,
                         String.format("Organization no found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
@@ -1706,7 +1732,7 @@ public class Processor implements SyncProcessor,
             }
 
             CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder());
-            Order order = DAOUtils.findOrder(persistenceSession, compositeIdOfOrder);
+            Order order = findOrder(persistenceSession, compositeIdOfOrder);
 
             if(payment.isCommit()){
 
@@ -1738,7 +1764,7 @@ public class Processor implements SyncProcessor,
                 Card card = null;
                 Long cardNo = payment.getCardNo();
                 if (null != cardNo) {
-                    card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                    card = findCardByCardNo(persistenceSession, cardNo);
                     if (null == card) {
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
                                 String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
@@ -1749,7 +1775,7 @@ public class Processor implements SyncProcessor,
                 Client client = null;
                 Long idOfClient = payment.getIdOfClient();
                 if (null != idOfClient) {
-                    client = DAOUtils.findClient(persistenceSession, idOfClient);
+                    client = findClient(persistenceSession, idOfClient);
                     // Check client existance
 
                     if (null == client) {
@@ -1784,7 +1810,7 @@ public class Processor implements SyncProcessor,
                 }
                 // If client is specified - check if client is registered for the specified organization
                 // or for one of friendly organizations of specified one
-                Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, idOfOrg);
+                Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, idOfOrg);
                 if (null != client) {
                     Org clientOrg = client.getOrg();
                     if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
@@ -1838,8 +1864,8 @@ public class Processor implements SyncProcessor,
                 long totalPurchaseRSum = 0;
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
-                    if (null != DAOUtils.findOrderDetail(persistenceSession,
-                            new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
+                    if (null != findOrderDetail(persistenceSession,
+                          new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 120, String.format(
                                 "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
                                 idOfOrg, payment.getIdOfOrder(), purchase.getIdOfOrderDetail()));
@@ -1861,7 +1887,7 @@ public class Processor implements SyncProcessor,
                         orderDetail.setIdOfRule(purchase.getIdOfRule());
                     }
                     if (purchase.getGuidOfGoods() != null) {
-                        Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
+                        Good good = findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
                         if (good != null) {
                             orderDetail.setGood(good);
                         }
@@ -1930,20 +1956,20 @@ public class Processor implements SyncProcessor,
     private static Client findPaymentClient(Session persistenceSession, Contragent contragent, Long contractId,
             Long clientId) throws Exception {
         if (clientId != null) {
-            return DAOUtils.findClient(persistenceSession, clientId);
+            return findClient(persistenceSession, clientId);
         }
         // Извлекаем из модели данных клиента, на карту которого необходимо перевести платеж
         // Если необходимо преобразовать номер счета, то делаем это
         if (contragent.getNeedAccountTranslate()) {
-            ContragentClientAccount contragentClientAccount = DAOUtils.findContragentClientAccount(persistenceSession,
-                    new CompositeIdOfContragentClientAccount(contragent.getIdOfContragent(), contractId));
+            ContragentClientAccount contragentClientAccount = findContragentClientAccount(persistenceSession,
+                  new CompositeIdOfContragentClientAccount(contragent.getIdOfContragent(), contractId));
             if (null != contragentClientAccount) {
                 return contragentClientAccount.getClient();
                 //return DAOUtils.findClientByContractId(persistenceSession, contractId);
                 //return null;
             }
         } //else {
-        return DAOUtils.findClientByContractId(persistenceSession, contractId);
+        return findClientByContractId(persistenceSession, contractId);
         ///}
     }
 
@@ -1969,7 +1995,7 @@ public class Processor implements SyncProcessor,
             /* совместимость организаций которые не имеют дружественных организаций */
             orgSet.add(org);
             for (Org o : orgSet) {
-                List clientGroups = DAOUtils.getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
+                List clientGroups = getClientGroupsByIdOfOrg(persistenceSession, o.getIdOfOrg());
                 HashMap<String, ClientGroup> nameIdGroupMap = new HashMap<String, ClientGroup>();
                 for (Object object : clientGroups) {
                     ClientGroup clientGroup = (ClientGroup) object;
@@ -1980,7 +2006,7 @@ public class Processor implements SyncProcessor,
             }
             Long version = null;
             if (clientParamItems.hasNext()) {
-                version = DAOUtils.updateClientRegistryVersion(persistenceSession);
+                version = updateClientRegistryVersion(persistenceSession);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2020,7 +2046,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
+            Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 errorClientIds.add(client.getIdOfClient());
                 throw new IllegalArgumentException("Client from another organization");
@@ -2113,8 +2139,8 @@ public class Processor implements SyncProcessor,
                 ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
                 //если группы нет то создаем
                 if (clientGroup == null) {
-                    clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
-                            clientParamItem.getGroupName());
+                    clientGroup = createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                          clientParamItem.getGroupName());
                     // заносим в хэш - карту
                     orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                 }
@@ -2188,7 +2214,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            Org organization = findOrg(persistenceSession, idOfOrg);
             // Ищем "лишние" группы
             List<ClientGroup> superfluousClientGroups = new ArrayList<ClientGroup>();
             for (ClientGroup clientGroup : organization.getClientGroups()) {
@@ -2263,7 +2289,7 @@ public class Processor implements SyncProcessor,
             SyncRequest.OrgStructure.Group reqGroup) throws Exception {
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),
                 reqGroup.getIdOfGroup());
-        ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compositeIdOfClientGroup);
+        ClientGroup clientGroup = findClientGroup(persistenceSession, compositeIdOfClientGroup);
         if (null != clientGroup) {
             if (!StringUtils.equals(reqGroup.getName(), clientGroup.getGroupName())) {
                 clientGroup.setGroupName(reqGroup.getName());
@@ -2292,15 +2318,14 @@ public class Processor implements SyncProcessor,
 
         // Добавляем в группу клиентов согласно запросу
         for (Long idOfClient : reqGroup.getClients()) {
-            Long idOfClientGroup = DAOUtils.getClientGroup(persistenceSession, idOfClient, organization.getIdOfOrg());
+            Long idOfClientGroup = getClientGroup(persistenceSession, idOfClient, organization.getIdOfOrg());
             if (idOfClientGroup != null && (idOfClientGroup.longValue() == clientGroup.getCompositeIdOfClientGroup()
                     .getIdOfClientGroup().longValue())) {
                 continue;
             }
             ////
-            Client client = DAOUtils.findClient(persistenceSession, idOfClient);
-            Set<Long> idOfFriendlyOrgSet = DAOUtils
-                    .getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
+            Client client = findClient(persistenceSession, idOfClient);
+            Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
             if (null == client) {
                 logger.info(String.format("Client with IdOfClient == %s not found", idOfClient));
             } else if (!client.getOrg().getIdOfOrg().equals(organization.getIdOfOrg()) && !idOfFriendlyOrgSet
@@ -2338,8 +2363,7 @@ public class Processor implements SyncProcessor,
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion,
-                    remoteAddress);
+            updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -2356,7 +2380,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
             SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,remoteAddress);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();
@@ -2378,7 +2402,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            SyncHistory syncHistory = DAOUtils.getSyncHistoryReference(persistenceSession, idOfSync);
+            SyncHistory syncHistory = getSyncHistoryReference(persistenceSession, idOfSync);
             syncHistory.setSyncEndTime(endTime);
             syncHistory.setSyncResult(syncResult);
             persistenceSession.update(syncHistory);
@@ -2409,7 +2433,7 @@ public class Processor implements SyncProcessor,
                 idOfOrgSet.add(o.getIdOfOrg());
             }
             idOfOrgSet.add(idOfOrg);
-            List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
+            List<Card> cards = getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
             for (Card card : cards) {
                 Client client = card.getClient();
                 accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
@@ -2444,8 +2468,8 @@ public class Processor implements SyncProcessor,
             final Date currentDate = new Date();
             persistenceSession.refresh(org);
             List<AccountTransaction> accountTransactionList;
-            accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, org,
-                    fromDateTime, currentDate);
+            accountTransactionList = getAccountTransactionsForOrgSinceTime(persistenceSession, org, fromDateTime,
+                  currentDate);
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 accRegistryUpdate.addAccountTransactionInfo(accountTransaction);
             }
@@ -2472,9 +2496,8 @@ public class Processor implements SyncProcessor,
                     AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE,
                     AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE);
             persistenceSession.refresh(org);
-            List<AccountTransaction> accountTransactionList = DAOUtils
-                    .getAccountTransactionsForOrgSinceTime(persistenceSession, org, fromDateTime, currentDate,
-                            transactionSourceTypes);
+            List<AccountTransaction> accountTransactionList = getAccountTransactionsForOrgSinceTime(persistenceSession,
+                  org, fromDateTime, currentDate, transactionSourceTypes);
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
                         accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
@@ -2501,10 +2524,11 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
             List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
             orgList.add(organization);
-            List<Client> clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
+            List<Client> clients = findNewerClients(persistenceSession, orgList,
+                  clientRegistryRequest.getCurrentVersion());
             for (Client client : clients) {
                 if(client.getOrg().getIdOfOrg().equals(idOfOrg)){
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
@@ -2512,7 +2536,7 @@ public class Processor implements SyncProcessor,
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            List<Long> activeClientsId = DAOUtils.findActiveClientsId(persistenceSession, orgList);
+            List<Long> activeClientsId = findActiveClientsId(persistenceSession, orgList);
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager.findAllocatedClients(persistenceSession, organization);
             for (Map.Entry<String, Set<Client>> entry : alienClients.entrySet()) {
@@ -2533,11 +2557,14 @@ public class Processor implements SyncProcessor,
                 }
             }
             if(!errorClientIds.isEmpty()){
-                List errorClients = DAOUtils.fetchErrorClientsWithOutFriendlyOrg(persistenceSession, organization.getFriendlyOrg(), errorClientIds);
-                ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                List errorClients = fetchErrorClientsWithOutFriendlyOrg(persistenceSession,
+                      organization.getFriendlyOrg(), errorClientIds);
+                ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
+                      organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                 // Есть возможность отсутсвия даной группы
                 if(clientGroup==null){
-                    clientGroup = DAOUtils.createClientGroup(persistenceSession, organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING);
+                    clientGroup = createClientGroup(persistenceSession, organization.getIdOfOrg(),
+                          ClientGroup.Predefined.CLIENT_LEAVING);
                 }
                 for (Object object : errorClients) {
                     Client client = (Client) object;
@@ -2559,6 +2586,28 @@ public class Processor implements SyncProcessor,
         return clientRegistry;
     }
 
+    private ProhibitionsMenu getProhibitionsMenuData(Org org, long version) throws Exception{
+        ProhibitionsMenu prohibitionsMenu = new ProhibitionsMenu();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            persistenceSession.refresh(org);
+            List<ProhibitionMenu> prohibitionMenuList;
+            prohibitionMenuList = getProhibitionMenuForOrgSinceVersion(persistenceSession, org, version);
+            for (ProhibitionMenu prohibitionMenu: prohibitionMenuList){
+                prohibitionsMenu.addProhibitionMenuInfo(prohibitionMenu);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return prohibitionsMenu;
+    }
+
     private void processSyncMenu(Long idOfOrg, SyncRequest.ReqMenu reqMenu) throws Exception {
         if (null != reqMenu) {
             Session persistenceSession = null;
@@ -2566,7 +2615,7 @@ public class Processor implements SyncProcessor,
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
 
-                Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+                Org organization = getOrgReference(persistenceSession, idOfOrg);
 
                 boolean bOrgIsMenuExchangeSource = isOrgMenuExchangeSource(persistenceSession, idOfOrg);
 
@@ -2599,7 +2648,7 @@ public class Processor implements SyncProcessor,
                     ///
                     Date menuDate = item.getDate();
                     ////
-                    Menu menu = DAOUtils.findMenu(persistenceSession, organization, Menu.ORG_MENU_SOURCE, menuDate);
+                    Menu menu = findMenu(persistenceSession, organization, Menu.ORG_MENU_SOURCE, menuDate);
                     Integer detailsHashCode = null;
                     // Подсчитываем хеш-код входных данных
                     final int detailsHashCode1 = item.hashCode();
@@ -2655,7 +2704,7 @@ public class Processor implements SyncProcessor,
     private void processReqComplexInfos(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
             HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
-        DAOUtils.deleteComplexInfoForDate(persistenceSession, organization, menuDate);
+        deleteComplexInfoForDate(persistenceSession, organization, menuDate);
 
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
             ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
@@ -2671,7 +2720,7 @@ public class Processor implements SyncProcessor,
                 complexInfo.setCurrentPrice(currentPrice);
             }
             if (goodsGuid != null) {
-                Good good = DAOUtils.findGoodByGuid(persistenceSession, goodsGuid);
+                Good good = findGoodByGuid(persistenceSession, goodsGuid);
                 complexInfo.setGood(good);
             }
             Integer usedSubscriptionFeeding = reqComplexInfo.getUsedSubscriptionFeeding();
@@ -2680,8 +2729,8 @@ public class Processor implements SyncProcessor,
             }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
-                MenuDetail menuDetailOptional = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
-                        reqComplexInfo.getReqMenuDetail().getIdOfMenu());
+                MenuDetail menuDetailOptional = findMenuDetailByLocalId(persistenceSession, menu,
+                      reqComplexInfo.getReqMenuDetail().getIdOfMenu());
                 if (menuDetailOptional != null) {
                     complexInfo.setMenuDetail(menuDetailOptional);
                 }
@@ -2698,7 +2747,7 @@ public class Processor implements SyncProcessor,
                 if (idOfClientGroup != null) {
                     CompositeIdOfClientGroup compId = new CompositeIdOfClientGroup(organization.getIdOfOrg(),
                             idOfClientGroup);
-                    ClientGroup clientGroup = DAOUtils.findClientGroup(persistenceSession, compId);
+                    ClientGroup clientGroup = findClientGroup(persistenceSession, compId);
                     complexInfoDiscountDetail.setClientGroup(clientGroup);
                     complexInfoDiscountDetail.setOrg(clientGroup.getOrg());
                 }
@@ -2740,7 +2789,7 @@ public class Processor implements SyncProcessor,
 
     private void processReqAssortment(Session persistenceSession, Org organization, Date menuDate,
             List<SyncRequest.ReqMenu.Item.ReqAssortment> reqAssortments) {
-        DAOUtils.deleteAssortmentForDate(persistenceSession, organization, menuDate);
+        deleteAssortmentForDate(persistenceSession, organization, menuDate);
         for (SyncRequest.ReqMenu.Item.ReqAssortment reqAssortment : reqAssortments) {
             Assortment assortment = new Assortment(organization, menuDate, reqAssortment.getName(),
                     reqAssortment.getFullName(), reqAssortment.getGroup(), reqAssortment.getMenuOrigin(),
@@ -2881,12 +2930,11 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(persistenceSession, idOfOrg);
+            Long idOfSourceOrg = findMenuExchangeSourceOrg(persistenceSession, idOfOrg);
 
             if (idOfSourceOrg != null) {
-                List<MenuExchange> menuExchangeList = DAOUtils
-                        .findMenuExchangeDataBetweenDatesIncludingSettings(persistenceSession, idOfSourceOrg,
-                                toDate(startDate), toDate(endDate));
+                List<MenuExchange> menuExchangeList = findMenuExchangeDataBetweenDatesIncludingSettings(
+                      persistenceSession, idOfSourceOrg, toDate(startDate), toDate(endDate));
                 boolean hasAnchorMenu = false;
                 for (MenuExchange menuExchange : menuExchangeList) {
                     if ((menuExchange.getFlags() & MenuExchange.FLAG_ANCHOR_MENU) != 0) {
@@ -2896,9 +2944,8 @@ public class Processor implements SyncProcessor,
                 }
                 /// если в период выборки не попало корневое меню, то ищем его на предыдущие даты
                 if (!hasAnchorMenu) {
-                    MenuExchange anchorMenu = DAOUtils
-                            .findMenuExchangeBeforeDateByEqFlag(persistenceSession, idOfSourceOrg, toDate(startDate),
-                                    MenuExchange.FLAG_ANCHOR_MENU);
+                    MenuExchange anchorMenu = findMenuExchangeBeforeDateByEqFlag(persistenceSession, idOfSourceOrg,
+                          toDate(startDate), MenuExchange.FLAG_ANCHOR_MENU);
                     if (anchorMenu != null) {
                         resMenuExData.addItem(anchorMenu.getMenuDataWithDecompress());
                     }
@@ -2932,10 +2979,9 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            List menus = DAOUtils
-                    .findMenusBetweenDates(persistenceSession, organization, Menu.CONTRAGENT_MENU_SOURCE, startDate,
-                            endDate);
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
+            List menus = findMenusBetweenDates(persistenceSession, organization, Menu.CONTRAGENT_MENU_SOURCE, startDate,
+                  endDate);
             for (Object object : menus) {
                 Menu menu = (Menu) object;
                 resMenu.addItem(new SyncResponse.ResMenu.Item(menu));
@@ -2957,7 +3003,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
             // Ищем "лишние" предметы
             List<DiaryClass> superfluousDiaryClasses = new LinkedList<DiaryClass>();
             for (DiaryClass diaryClass : organization.getDiaryClasses()) {
@@ -3005,9 +3051,9 @@ public class Processor implements SyncProcessor,
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
                 final long idOfOrg = org.getIdOfOrg();
-                if (DAOUtils.existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
-                    EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
-                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
+                if (existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
+                    EnterEvent ee = findEnterEvent(persistenceSession,
+                          new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
                     // Если ENTER событие существует (может быть последний результат синхронизации не был передан клиенту)
 final boolean checkClient = (ee.getClient() == null && idOfClient == null) || (ee.getClient() != null && ee
                                     .getClient().getIdOfClient().equals(idOfClient));
@@ -3101,7 +3147,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
-                        Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
+                        Card card = findCardByCardNo(persistenceSession, e.getIdOfCard());
                         final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent.getCompositeIdOfEnterEvent();
                         if (card == null) {
                             final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
@@ -3111,7 +3157,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         }
 
                         if (card != null && card.getCardType() == Card.TYPE_UEC) {
-                            String OGRN = DAOUtils.extraxtORGNFromOrgByIdOfOrg(persistenceSession, idOfOrg);
+                            String OGRN = extraxtORGNFromOrgByIdOfOrg(persistenceSession, idOfOrg);
                             String transCode;
                             switch (e.getPassDirection()) {
                                 case EnterEvent.ENTRY:
@@ -3254,7 +3300,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             SyncRequest.ReqDiary.ReqDiaryClass reqDiaryClass) throws Exception {
         CompositeIdOfDiaryClass compositeIdOfDiaryClass = new CompositeIdOfDiaryClass(organization.getIdOfOrg(),
                 reqDiaryClass.getIdOfClass());
-        DiaryClass diaryClass = DAOUtils.findDiaryClass(persistenceSession, compositeIdOfDiaryClass);
+        DiaryClass diaryClass = findDiaryClass(persistenceSession, compositeIdOfDiaryClass);
         if (null == diaryClass) {
             diaryClass = new DiaryClass(compositeIdOfDiaryClass, reqDiaryClass.getName());
             persistenceSession.save(diaryClass);
@@ -3269,7 +3315,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             SyncRequest.ReqDiary.ReqDiaryTimesheet reqDiaryTimesheet) throws Exception {
         CompositeIdOfDiaryTimesheet compositeIdOfDiaryTimesheet = new CompositeIdOfDiaryTimesheet(
                 organization.getIdOfOrg(), reqDiaryTimesheet.getIdOfClientGroup(), reqDiaryTimesheet.getDate());
-        DiaryTimesheet diaryTimesheet = DAOUtils.findDiaryTimesheet(persistenceSession, compositeIdOfDiaryTimesheet);
+        DiaryTimesheet diaryTimesheet = findDiaryTimesheet(persistenceSession, compositeIdOfDiaryTimesheet);
         if (null == diaryTimesheet) {
             diaryTimesheet = new DiaryTimesheet(compositeIdOfDiaryTimesheet);
             fill(diaryTimesheet, reqDiaryTimesheet.getClasses());
@@ -3357,7 +3403,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         } else {
             throw new IllegalArgumentException("Unkown day value type");
         }
-        DiaryValue diaryValue = DAOUtils.findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
+        DiaryValue diaryValue = findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
         if (null == diaryValue) {
             diaryValue = new DiaryValue(compositeIdOfDiaryValue, parsedDayValue);
             persistenceSession.save(diaryValue);
@@ -3371,7 +3417,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         CompositeIdOfDiaryValue compositeIdOfDiaryValue = new CompositeIdOfDiaryValue(organization.getIdOfOrg(),
                 reqDiaryValue.getIdOfClient(), reqDiaryValue.getIdOfClass(), date,
                 DiaryValue.QUARTER_VALUE_TYPES[reqDiaryValue.getVType() - 1]);
-        DiaryValue diaryValue = DAOUtils.findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
+        DiaryValue diaryValue = findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
         if (null == diaryValue) {
             diaryValue = new DiaryValue(compositeIdOfDiaryValue, reqDiaryValue.getValue());
             persistenceSession.save(diaryValue);
@@ -3384,7 +3430,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             SyncRequest.ReqDiary.ReqDiaryTimesheet.ReqDiaryValue reqDiaryValue) throws Exception {
         CompositeIdOfDiaryValue compositeIdOfDiaryValue = new CompositeIdOfDiaryValue(organization.getIdOfOrg(),
                 reqDiaryValue.getIdOfClient(), reqDiaryValue.getIdOfClass(), date, DiaryValue.YEAR_VALUE_TYPE);
-        DiaryValue diaryValue = DAOUtils.findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
+        DiaryValue diaryValue = findDiaryValue(persistenceSession, compositeIdOfDiaryValue);
         if (null == diaryValue) {
             diaryValue = new DiaryValue(compositeIdOfDiaryValue, reqDiaryValue.getValue());
             persistenceSession.save(diaryValue);
@@ -3404,16 +3450,16 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     }
 
     private void createTempCard(Session persistenceSession, Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
-        Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+        Org org = getOrgReference(persistenceSession, idOfOrg);
         if (org == null) {
             throw new Exception(String.format("Организация не найдена: %d", idOfOrg));
         }
-        Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+        Card c = findCardByCardNo(persistenceSession, cardNo);
         if (c != null) {
             throw new Exception(
                     String.format("Карта уже зарегистрирована на клиента: %d", c.getClient().getIdOfClient()));
         }
-        CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+        CardTemp cardTemp = findCardTempByCardNo(persistenceSession, cardNo);
         if (cardTemp != null) {
             if(cardTemp.getOrg().getIdOfOrg().equals(idOfOrg)){
                 cardTemp.setCardPrintedNo(cardPrintedNo);
@@ -3448,7 +3494,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
             Long result = organization.getIdOfPacket();
             organization.setIdOfPacket(result + 1);
             persistenceSession.update(organization);

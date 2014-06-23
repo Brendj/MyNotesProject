@@ -6,11 +6,11 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.Prohibitions" table="cf_prohibitions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu" table="cf_prohibitions">
         <id name="idOfProhibitions" column="idOfProhibitions" type="long">
             <generator class="identity"/>
         </id>
-        <version name="version" column="version" type="long"/>
+        <property name="version" column="version" type="long"/>
         <property name="filterText" column="filterText" type="string"/>
         <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="updateDate" column="updateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
