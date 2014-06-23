@@ -2987,7 +2987,26 @@ CREATE TABLE cf_Registry_Talon
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );
 
+-- Пакет обновлений 2.2.66
+-- таблица блокирования заказов
+CREATE TABLE cf_Prohibitions
+(
+  IdOfProhibitions bigserial NOT NULL,
+  IdOfClient bigint NOT NULL,
+  FilterText character varying(1024) NOT NULL,
+  ProhibitionFilterType int NOT NULL,
+  CreateDate bigint NOT NULL,
+  UpdateDate bigint,
+  Version bigint,
+  deletedState boolean NOT NULL DEFAULT false,
+  CONSTRAINT cf_Prohibitions_pk PRIMARY KEY (IdOfProhibitions),
+  CONSTRAINT cf_Prohibitions_Client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+CREATE INDEX cf_Prohibitions_idOfClient_idx on cf_Prohibitions USING btree (IdOfClient);
+CREATE INDEX cf_Prohibitions_version_idx on cf_Prohibitions USING btree (Version);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum,
-                                   BuildVersionNum, UpdateTime, CommitText) VALUES(2, 2, 63, 140515, 0, '');
+                                   BuildVersionNum, UpdateTime, CommitText) VALUES(2, 2, 65, 140609, 0, '');
 
