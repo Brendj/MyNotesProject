@@ -77,7 +77,7 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <c:if test="${not empty mainPage.deliveredServicesReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesReportPage.deliveredServicesReport.htmlReport}" >
+        <c:if test="${not empty referReportPage.htmlReport}" >
             <h:outputText escape="true" value="Справка расходованных средств" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
@@ -90,6 +90,9 @@
                 </div>
             </f:verbatim>
         </c:if>
+
+        <h:outputText escape="true" value="В данной организации нет учащихся с выбранной категорией" style="font-style: italic"
+                      styleClass="output-text" rendered="#{referReportPage.showMissReportMessage}"/>
         <%--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />--%>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

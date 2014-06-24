@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,11 @@ public class ReferReportPage extends OnlineReportPage {
         this.category = category;
     }
 
+    public boolean getShowMissReportMessage() {
+        boolean res = (dailyReport!=null || monthlyReport!=null) && StringUtils.isBlank(htmlReport);
+        return res;
+    }
+
 
 
     @Transactional
@@ -129,6 +135,13 @@ public class ReferReportPage extends OnlineReportPage {
         }
     }
 
+    public ReferReport getMonthlyReport() {
+        return monthlyReport;
+    }
+
+    public DailyReferReport getDailyReport() {
+        return dailyReport;
+    }
 
     @Override
     public void onShow() throws Exception {
@@ -203,11 +216,19 @@ public class ReferReportPage extends OnlineReportPage {
             switch (reportType) {
                 case MONTHLY_REPORT:
                     generateMonthlyReport(session, orgItem, cal, null);
-                    htmlReport = monthlyReport.getHtmlReport();
+                    if(monthlyReport.getItems().size() > 0) {
+                        htmlReport = monthlyReport.getHtmlReport();
+                    } else {
+                        htmlReport = "";
+                    }
                     break;
                 case DAILY_REPORT:
                     generateDailyReport(session, orgItem, cal, null);
-                    htmlReport = dailyReport.getHtmlReport();
+                    if(dailyReport.getItems().size() > 0) {
+                        htmlReport = dailyReport.getHtmlReport();
+                    } else {
+                        htmlReport = "";
+                    }
                     break;
             }
         } catch (Exception e) {
