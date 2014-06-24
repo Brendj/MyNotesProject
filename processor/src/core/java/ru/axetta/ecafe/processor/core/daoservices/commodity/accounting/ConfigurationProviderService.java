@@ -51,7 +51,7 @@ public class ConfigurationProviderService {
             if(!orgs.equals(cp.getOrgs())){
                 for (Org org: cp.getOrgs()){
                     org.setCommodityAccounting(false);
-                    entityManager.persist(org);
+//                    entityManager.persist(org);
                 }
                 cp.clearOrg();
                 cp.addOrg(orgs);

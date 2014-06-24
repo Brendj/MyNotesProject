@@ -39,7 +39,7 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Сохрнить" action="#{configurationProviderEditPage.save}"
+        <a4j:commandButton value="Сохранить" action="#{configurationProviderEditPage.save}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
         <a4j:commandButton value="Востановить" action="#{configurationProviderEditPage.show}"
