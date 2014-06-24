@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.66
+-- Пакет обновлений 2.2.67
 
 -- таблица блокирования заказов
 CREATE TABLE cf_Prohibitions
@@ -27,3 +27,4 @@ ALTER TABLE cf_subscriber_feeding ADD constraint cf_service_subscriber_feeding_s
 
 ALTER TABLE cf_clients_cycle_diagrams ADD column idOfStaff bigint;
 ALTER TABLE cf_clients_cycle_diagrams ADD constraint cf_clients_cycle_diagrams_staff_fk FOREIGN KEY (IdOfStaff) REFERENCES cf_staffs (IdOfStaff);
+--! ФИНАЛИЗИРОВАН (Кадыров, 140624) НЕ МЕНЯТЬ
