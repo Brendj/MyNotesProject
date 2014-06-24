@@ -47,6 +47,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
     private boolean changePassword;
     private String password;
     private String passwordRepeat;
+    private int callFromMenu;
     
     private String infoMessages;
     private String errorMessages;
@@ -58,7 +59,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
 
     public String getPageTitle() {
-        return super.getPageTitle() + " " + username == null ? "" : username;
+        return super.getPageTitle() + " " + (username == null ? "" : username);
     }
 
     public String getPageFilename() {
@@ -128,6 +129,29 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
         this.password = password;
     }
 
+    public int getCallFromMenu() {
+        return callFromMenu;
+    }
+
+    public void setCallFromMenu(int callFromMenu) {
+        this.callFromMenu = callFromMenu;
+    }
+
+    public String getSubmitButtonCaption() {
+        if(idOfClient == null) {
+            return "Создать нового пользователя";
+        } else {
+            return "Изменить пользователя";
+        }
+    }
+
+    public boolean getValidForModify() {
+        if(idOfClient != null && callFromMenu == 1) {
+            return false;
+        }
+        return true;
+    }
+
 
 
 
@@ -139,6 +163,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
         if (null != idOfClient) {
             cl = (Client) session.load(Client.class, idOfClient);
             person = cl.getPerson();
+            String fullName = person.getFullName();
             org = DAOService.getInstance().findOrById(cl.getOrg().getIdOfOrg()); // почему-то LazyInit если напрямую
         }
     }
@@ -276,6 +301,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
             cl = DAOService.getInstance().findClientById(idOfClient); cl = (Client) session.merge(cl);
             person = cl.getPerson();
+            String fullName = person.getFullName();
             org = DAOService.getInstance().getOrg(idOfOrg);
             roleName = ThinClientUserListPage.DEFAULT_ROLE;
         }

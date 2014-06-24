@@ -32,5 +32,6 @@
     <a4j:commandButton value="Редактировать" action="#{thinClientUserEditPage.show}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" >
         <f:setPropertyActionListener value="#{thinClientUserViewPage.idOfClient}" target="#{thinClientUserEditPage.idOfClient}" />
+        <f:setPropertyActionListener value="0" target="#{thinClientUserEditPage.callFromMenu}" />
     </a4j:commandButton>
 </h:panelGrid>

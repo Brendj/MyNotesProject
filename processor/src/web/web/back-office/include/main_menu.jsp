@@ -1074,9 +1074,14 @@
                             action="#{thinClientUserListPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="thinClientUserViewPageMenuItem" binding="#{thinClientUserViewPage.mainMenuComponent}" label="Просмотр"
                             action="#{thinClientUserViewPage.show}" reRender="workspaceForm" />
+        <%--<rich:panelMenuItem id="thinClientUserEditPageMenuItem" binding="#{thinClientUserEditPage.mainMenuComponent}" label="Изменение"
+                            action="#{thinClientUserEditPage.show}" reRender="workspaceForm" >
+            <f:setPropertyActionListener value="1" target="#{thinClientUserEditPage.callFromMenu}" />
+        </rich:panelMenuItem>--%>
         <rich:panelMenuItem id="thinClientUserCreatePageMenuItem" binding="#{thinClientUserEditPage.mainMenuComponent}" label="Создание"
                             action="#{thinClientUserEditPage.show}" reRender="workspaceForm" >
             <f:setPropertyActionListener value="-1" target="#{thinClientUserEditPage.idOfClient}" />
+            <f:setPropertyActionListener value="1" target="#{thinClientUserEditPage.callFromMenu}" />
         </rich:panelMenuItem>
 </rich:panelMenuGroup>
 

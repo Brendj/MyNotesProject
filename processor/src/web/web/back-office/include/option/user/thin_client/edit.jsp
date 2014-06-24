@@ -35,12 +35,19 @@
     <h:outputText escape="true" value="Повторите пароль" styleClass="output-text" rendered="#{thinClientUserEditPage.changePassword}" />
     <h:inputSecret value="#{thinClientUserEditPage.passwordRepeat}" styleClass="input-text" rendered="#{thinClientUserEditPage.changePassword}" />
 </h:panelGrid>
+<%--<h:panelGrid id="thinClientUserEditPage" binding="#{thinClientUserEditPage.pageComponent}" styleClass="borderless-grid"
+             columns="1" rendered="#{!thinClientUserViewPage.validForModify}">
+    <h:outputText value="Необходимо выбрать клиента на странице " styleClass="output-text"/>
+    <a4j:commandLink value="Списка пользователей" styleClass="output-text">
+        <a4j:support event="onclick" action="#{thinClientUserListPage.show}" reRender="mainMenu, workspaceForm"/>
+    </a4j:commandLink>
+</h:panelGrid>--%>
 <h:panelGrid styleClass="borderless-grid">
     <h:panelGrid id="messages">
         <h:outputText escape="true" value="#{thinClientUserEditPage.infoMessages}" rendered="#{not empty thinClientUserEditPage.infoMessages}" styleClass="info-messages" />
         <h:outputText escape="true" value="#{thinClientUserEditPage.errorMessages}" rendered="#{not empty thinClientUserEditPage.errorMessages}" styleClass="error-messages" />
     </h:panelGrid>
 
-    <a4j:commandButton value="Применить" action="#{thinClientUserEditPage.doSave}"
+    <a4j:commandButton value="#{thinClientUserEditPage.submitButtonCaption}" action="#{thinClientUserEditPage.doSave}"
                        reRender="mainMenu, workspaceTogglePanel, messages" styleClass="command-button" />
 </h:panelGrid>
