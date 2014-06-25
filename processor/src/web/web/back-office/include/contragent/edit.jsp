@@ -16,7 +16,7 @@
              columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentEditPage.idOfContragent}" readonly="true" styleClass="input-text" />
-    <h:outputText escape="true" value="Имя контрагента" styleClass="output-text" />
+    <h:outputText escape="true" value="Название" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentEditPage.contragentName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Класс" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.contragentEditPage.classId}" styleClass="input-text">

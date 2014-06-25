@@ -13,7 +13,7 @@
              columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentViewPage.idOfContragent}" readonly="true" styleClass="input-text" />
-    <h:outputText escape="true" value="Имя контрагента" styleClass="output-text" />
+    <h:outputText escape="true" value="Название" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.contragentName}" styleClass="input-text" />
     <h:outputText escape="true" value="Класс" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.classId}" converter="contragentClassConverter"

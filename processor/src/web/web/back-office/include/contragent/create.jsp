@@ -14,7 +14,7 @@
 <%-- Панель создания контрагента --%>
 <h:panelGrid id="contragentCreateGrid" binding="#{mainPage.contragentCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Имя контрагента" styleClass="output-text" />
+    <h:outputText escape="true" value="Название" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.contragentName}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Класс" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.contragentCreatePage.classId}" styleClass="input-text">
