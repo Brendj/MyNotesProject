@@ -50,9 +50,7 @@ public class RegistryTalon extends DistributedObject {
         if (dateDate != null)
             setTalonDate(dateDate);
         Long longNumber = XMLUtils.getLongAttributeValue(node, "Number");
-        if (longNumber != null) {
-            setNumber(longNumber);
-        }
+        setNumber(longNumber);
         Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
         if(intType != null){
             setTalonType(RegistryTalonType.values()[intType]);
@@ -94,11 +92,11 @@ public class RegistryTalon extends DistributedObject {
         this.talonDate = talonDate;
     }
 
-    public long getNumber() {
+    public Long getNumber() {
         return number;
     }
 
-    public void setNumber(long number) {
+    public void setNumber(Long number) {
         this.number = number;
     }
 
