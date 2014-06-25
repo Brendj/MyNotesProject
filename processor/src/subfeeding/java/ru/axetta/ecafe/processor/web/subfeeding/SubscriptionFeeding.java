@@ -29,6 +29,19 @@ public class SubscriptionFeeding implements Serializable {
     private Boolean suspended;
     private String changesPlace;
 
+    public SubscriptionFeedingExt toSubscriptionFeedingExt(){
+        SubscriptionFeedingExt subscriptionFeedingExt = new SubscriptionFeedingExt();
+        subscriptionFeedingExt.setIdOfSubscriptionFeeding(idOfSubscriptionFeeding);
+        subscriptionFeedingExt.setGuid(guid);
+        subscriptionFeedingExt.setDateCreateService(dateCreateService);
+        subscriptionFeedingExt.setDateActivate(dateActivate);
+        subscriptionFeedingExt.setLastDatePause(lastDatePause);
+        subscriptionFeedingExt.setDateDeactivate(dateDeactivate);
+        subscriptionFeedingExt.setUpdateDate(updateDate);
+        subscriptionFeedingExt.setSuspended(suspended);
+        return subscriptionFeedingExt;
+    }
+
     public SubscriptionFeeding(SubscriptionFeedingExt subscriptionFeedingExt) {
         this.idOfSubscriptionFeeding = subscriptionFeedingExt.getIdOfSubscriptionFeeding();
         this.guid = subscriptionFeedingExt.getGuid();

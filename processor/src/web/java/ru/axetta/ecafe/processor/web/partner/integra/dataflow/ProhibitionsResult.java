@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.web.partner.integra;
+package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 

@@ -52,12 +52,7 @@ public class SubscriptionFeedingExt {
         } else {
             this.updateDate = subscriptionFeeding.getLastUpdate();
         }
-
-        if (subscriptionFeeding.getStaff() == null) {
-            this.changesPlace = false;
-        } else {
-            this.changesPlace = true;
-        }
+        this.changesPlace = subscriptionFeeding.getStaff() != null;
     }
 
     public Long getIdOfSubscriptionFeeding() {

@@ -224,14 +224,14 @@ public class SubscriptionFeedingService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает комплексы, участвующие в АП, для данной орг-ии.
     // isParant при ложном занчении вернет комплексы только для детей
-    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParant) {
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addOneDay(today);
         Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
         for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
             idOfComplex.add(i);
         }
-        if(!isParant){
+        if(!isParent){
             Session session = entityManager.unwrap(Session.class);
             Criteria criteria = session.createCriteria(ComplexRole.class);
             String arrayOfFilterText = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
@@ -327,6 +327,45 @@ public class SubscriptionFeedingService {
         criteria.add(Restrictions.eq("client", c));
         criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
         return criteria.list();
+    }
+
+    public static SubscriptionFeeding getCurrentSubscriptionFeedingByClientToDay(Session session, Client c, Date currentDate) {
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
+        subQuery.add(Restrictions.eq("client", c));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.le("dateCreateService", currentDate));
+        subQuery.add(Restrictions.or(
+              Restrictions.isNull("dateDeactivateService"),
+              Restrictions.gt("dateDeactivateService", currentDate)
+        ));
+        subQuery.setProjection(Projections.max("dateCreateService"));
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
+        List list = criteria.list();
+        List<SubscriptionFeeding> subscriptionFeedings = new ArrayList<SubscriptionFeeding>(list.size());
+        for (Object obj: list){
+            SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) obj;
+            subscriptionFeedings.add(subscriptionFeeding);
+        }
+        Collections.reverse(subscriptionFeedings);
+        SubscriptionFeeding subscriptionFeeding = null;
+        for (SubscriptionFeeding sf: subscriptionFeedings){
+            subscriptionFeeding = sf;
+            if((sf.getDateActivateService() == null || sf.getDateActivateService().before(currentDate)) &&
+                  (sf.getLastDatePauseService()==null || sf.getLastDatePauseService().after(currentDate))){
+                break;
+            }
+        }
+        return subscriptionFeeding;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public SubscriptionFeeding getCurrentSubscriptionFeedingByClientToDay(Client c, Date currentDate) {
+        Session session = entityManager.unwrap(Session.class);
+        return getCurrentSubscriptionFeedingByClientToDay(session, c, currentDate);
     }
 
     @SuppressWarnings("unchecked")
@@ -486,7 +525,6 @@ public class SubscriptionFeedingService {
     @Transactional(rollbackFor = Exception.class)
     // Приостанавливает подписку АП.
     public void suspendSubscriptionFeeding(Client client, Date endPauseDate) throws Exception {
-        //Date date = new Date();
         DAOService daoService = DAOService.getInstance();
         List<ECafeSettings> settings = daoService
                 .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);

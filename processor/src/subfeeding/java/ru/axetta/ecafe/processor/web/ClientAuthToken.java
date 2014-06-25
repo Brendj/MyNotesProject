@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web;
 
+import ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding;
+
 import javax.servlet.http.HttpSession;
 
 /**
@@ -39,4 +41,5 @@ public class ClientAuthToken {
     public boolean isSsoAuth() {
         return ssoAuth;
     }
+
 }

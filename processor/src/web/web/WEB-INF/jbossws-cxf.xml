@@ -100,11 +100,11 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </jaxws:outInterceptors>-->
     </jaxws:endpoint>
-    <jaxws:endpoint
+   <!-- <jaxws:endpoint
             id="NSIDeltaController"
             address='http://localhost:8080/processor/soap/nsi_delta'
             implementor='ru.axetta.ecafe.processor.web.partner.nsi.NSIDeltaController'>
-        <!--        <jaxws:inInterceptors>
+                <jaxws:inInterceptors>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
             <ref bean="signRequest"/>
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>
@@ -113,8 +113,8 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor"/>
             <ref bean="signResponse"/>
             <bean class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-        </jaxws:outInterceptors>-->
-    </jaxws:endpoint>
+        </jaxws:outInterceptors>
+    </jaxws:endpoint>-->
     <jaxws:endpoint
             id="PaymentControllerWS"
             address='http://localhost:8080/processor/soap/payment'

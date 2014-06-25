@@ -45,8 +45,6 @@ public class SubscriptionFeeding extends DistributedObject{
     private Boolean wasSuspended;
     /* юридическая дата подписки, всегда присутствует */
     private Date dateCreateService;
-    /* коментарии причина отказа */
-    private String reasonWasSuspended;
     private Staff staff;
     private String guidOfStaff;
 
@@ -63,7 +61,6 @@ public class SubscriptionFeeding extends DistributedObject{
         projectionList.add(Projections.property("dateDeactivateService"), "dateDeactivateService");
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
         projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
-        //projectionList.add(Projections.property("reasonWasSuspended"), "reasonWasSuspended");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
     }
@@ -123,9 +120,6 @@ public class SubscriptionFeeding extends DistributedObject{
         if (dateCreateService != null) {
             XMLUtils.setAttributeIfNotNull(element, "DateCreate", df.format(dateCreateService));
         }
-        //if (reasonWasSuspended != null) {
-        //    XMLUtils.setAttributeIfNotNull(element, "ReasonWasSuspended", df.format(reasonWasSuspended));
-        //}
         if (guidOfStaff != null) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
         }
@@ -180,11 +174,6 @@ public class SubscriptionFeeding extends DistributedObject{
             }
         }
 
-        //String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
-        //if (reasonWasSuspended != null) {
-        //    setReasonWasSuspended(reasonWasSuspended);
-        //}
-
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
 
         setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -201,7 +190,6 @@ public class SubscriptionFeeding extends DistributedObject{
         setDateDeactivateService(((SubscriptionFeeding) distributedObject).getDateDeactivateService());
         setWasSuspended(((SubscriptionFeeding) distributedObject).getWasSuspended());
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
-        //setReasonWasSuspended(((SubscriptionFeeding) distributedObject).getReasonWasSuspended());
         setStaff(((SubscriptionFeeding) distributedObject).getStaff());
         setGuidOfStaff(((SubscriptionFeeding) distributedObject).getGuidOfStaff());
     }
@@ -266,14 +254,6 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setDateCreateService(Date dateCreateService) {
         this.dateCreateService = dateCreateService;
-    }
-
-    public String getReasonWasSuspended() {
-        return reasonWasSuspended;
-    }
-
-    public void setReasonWasSuspended(String reasonWasSuspended) {
-        this.reasonWasSuspended = reasonWasSuspended;
     }
 
     public Staff getStaff() {

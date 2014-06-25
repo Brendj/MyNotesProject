@@ -209,8 +209,7 @@
         <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
             Просмотр циклограммы
         </button>
-        <button type="button"
-                onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
             Перевод средств
         </button>
         <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
@@ -219,19 +218,23 @@
     </p>
     <%-- Подписка ожидается приостановки --%>
     <% } else {%>
-    <button type="submit" id="cancelButton"
-            onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/cancel'">
-        Отменить приостановку подписки
-    </button>
-    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
-        Просмотр циклограммы
-    </button>
-    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
-        Перевод средств
-    </button>
-    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
-        История операций
-    </button>
+    <p style="text-align: center">
+        <button type="submit" id="cancelButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/cancel'">
+            Отменить приостановку подписки
+        </button>
+    </p>
+    <p style="text-align: center">
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
+            Просмотр циклограммы
+        </button>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
+            Перевод средств
+        </button>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/histories'">
+            История операций
+        </button>
+    </p>
+
     <% } %>
 </c:when>
 <c:otherwise>

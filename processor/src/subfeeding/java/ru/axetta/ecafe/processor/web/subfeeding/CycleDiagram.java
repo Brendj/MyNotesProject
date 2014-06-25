@@ -163,9 +163,9 @@ public class CycleDiagram implements Serializable{
         this.sunday = cycleDiagramExt.getSunday();
         this.dateActivationDiagram = cycleDiagramExt.getDateActivationDiagram();
         switch (cycleDiagramExt.getStateDiagram()){
-            case 0:  this.stateDiagram = "Заблокирована"; break;
+            case 0:  this.stateDiagram = "Активная"; break;
             case 1:  this.stateDiagram = "Ожидает активации"; break;
-            case 2:  this.stateDiagram = "Активная"; break;
+            case 2:  this.stateDiagram = "Заблокирована"; break;
             default: this.stateDiagram = "";
         }
         this.mondayPrice = cycleDiagramExt.getMondayPrice();

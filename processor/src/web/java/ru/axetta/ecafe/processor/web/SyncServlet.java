@@ -100,8 +100,9 @@ public class SyncServlet extends HttpServlet {
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
              /* Must be FALSE for testing!!!  */
             boolean verifySignature = true;
-            if (!verifySignature || bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
-            else {
+            if (!verifySignature || bLogPackets) {
+                syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
+            } else {
                 final String message = "Synchronization with %s - type: %s - packets not logged";
                 logger.info(String.format(message, request.getRemoteAddr(), syncType.toString()));
             }

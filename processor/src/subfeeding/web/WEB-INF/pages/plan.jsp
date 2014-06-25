@@ -56,19 +56,9 @@
             $("."+cycleDiagramid+' .totalmonth').text(formatSum(4 * total));
         }
         function addUp(choice, cycleDiagramid){
-            //console.log("before: "+totals[cycleDiagramid]);
             var num = parseInt(choice.value);
-            //console.log("num: "+num);
             totals[cycleDiagramid] += choice.checked?num:-num;
             updateTotalValue(cycleDiagramid, totals[cycleDiagramid]);
-            //var $header = $('.' + cycleDiagramid + ' .active-period');
-            //var index = $header.html().indexOf("*");
-            //console.log("index: "+index);
-            //if(index<=0){
-            //    $header.css({"color":"red"}).append("*");
-            //}
-            //$('input:hidden.'+cycleDiagramid).val(1); // Ставим метку что объект изменен
-            //console.log("after: "+totals[cycleDiagramid]);
         }
         $(function () {
             $("#complexForm").preventDoubleSubmission();

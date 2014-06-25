@@ -35,7 +35,6 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
-        <!--<property name="idOfClient" column="IdOfClient" type="long"/>-->
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="false"/>
 
@@ -49,7 +48,6 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
 
         <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
-        <property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>
 
         <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="idOfStaff" not-null="false" />

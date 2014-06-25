@@ -41,9 +41,9 @@ public class SubscriptionFeedings implements Serializable {
 
     private void buildList(Long contractId, Date startDate, Date endDate){
         subscriptionFeedingResult = getSubFeeding(contractId, startDate, endDate);
-        boolean subfeedingExist = isSubscriptionFeedingExist();
+        boolean subFeedingExist = isSubscriptionFeedingExist();
         subscriptionFeedings = new ArrayList<SubscriptionFeeding>();
-        if(subfeedingExist){
+        if(subFeedingExist){
             for (SubscriptionFeedingExt subscriptionFeedingExt : subscriptionFeedingResult.subscriptionFeedingListExt.getS()){
                 subscriptionFeedings.add(new SubscriptionFeeding(subscriptionFeedingExt));
             }

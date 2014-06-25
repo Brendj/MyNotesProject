@@ -118,15 +118,15 @@ public class CycleDiagram extends DistributedObject{
         }*/
 
         /* При синхронизации пришла активная циклограмма */
-        if(isActual()){
-            /* проверяем, есть ли на текущую дату активная циклограмма */
+        /*if(isActual()){
+            *//* проверяем, есть ли на текущую дату активная циклограмма *//*
             SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
             CycleDiagram cd = sfService.findActiveCycleDiagram(client, this.dateActivationDiagram);
-            /* записываем заблокированной текущую диаграмму */
+            *//* записываем заблокированной текущую диаграмму *//*
             if(cd != null){
                 stateDiagram = StateDiagram.BLOCK;
             }
-        }
+        }*/
         // Проверка на случай, если циклограмма была активирована как на вебе, так и на клиенте.
         //if (cd != null && isActual() && !cd.getGuid().equals(guid)) {
         //    DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");

@@ -24,7 +24,6 @@
     PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
     PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
     TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
-    //List<SubscriptionFeeding> subfeedings = (List<SubscriptionFeeding>) request.getAttribute("subfeedings");
     boolean purchasesExist = isExist(request, "purchasesExist");
     boolean paymentsExist = isExist(request, "paymentsExist");
     boolean transfersExist = isExist(request, "transfersExist");

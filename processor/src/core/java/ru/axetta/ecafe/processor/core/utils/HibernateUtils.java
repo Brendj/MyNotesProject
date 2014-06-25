@@ -86,7 +86,7 @@ public class HibernateUtils {
             return null;
         }
         try {
-            return ((Integer) obj).intValue();
+            return (Integer) obj;
         } catch (Exception e) {
             return null;
         }
@@ -96,11 +96,8 @@ public class HibernateUtils {
         if (obj == null) {
             return null;
         }
-        if (obj == null) {
-            return null;
-        }
         try {
-            return ((Integer) obj).intValue() == 1 ? true : false;
+            return (Integer) obj == 1;
         } catch (Exception e) {
             return null;
         }
