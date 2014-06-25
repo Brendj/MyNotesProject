@@ -26,7 +26,7 @@ import java.util.List;
 public class RegistryTalon extends DistributedObject {
 
     private Date talonDate;
-    private long number;
+    private Long number;
     private RegistryTalonType talonType;
 
     @Override
