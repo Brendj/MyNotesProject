@@ -60,6 +60,7 @@ public class CardFilter {
     }
 
     private Long cardNo = null;
+    private Long cardPrintedNo = null;
     private OrgItem org = new OrgItem();
     private CardStateFilterMenu cardStateFilterMenu = new CardStateFilterMenu();
     private CardLifeStateFilterMenu cardLifeStateFilterMenu = new CardLifeStateFilterMenu();
@@ -116,12 +117,24 @@ public class CardFilter {
         }
     }
 
+    public Long getCardPrintedNo() {
+        return cardPrintedNo;
+    }
+
+    public void setCardPrintedNo(Long cardPrintedNo) {
+        if (0L == cardPrintedNo) {
+            this.cardPrintedNo = null;
+        } else {
+            this.cardPrintedNo = cardPrintedNo;
+        }
+    }
+
     public OrgItem getOrg() {
         return org;
     }
 
     public boolean isEmpty() {
-        return null == cardNo && CardStateFilterMenu.NO_CONDITION == cardState
+        return null == cardNo && null == cardPrintedNo && CardStateFilterMenu.NO_CONDITION == cardState
                 && CardLifeStateFilterMenu.NO_CONDITION == cardLifeState
                 && CompareFilterMenu.NO_CONDITION == balanceCompareCondition && org.isEmpty();
     }
@@ -142,6 +155,7 @@ public class CardFilter {
 
     public void clear() {
         cardNo = null;
+        cardPrintedNo = null;
         org = new OrgItem();
         cardState = CardStateFilterMenu.NO_CONDITION;
         cardLifeState = CardLifeStateFilterMenu.NO_CONDITION;
@@ -154,6 +168,9 @@ public class CardFilter {
         if (!this.isEmpty()) {
             if (null != this.cardNo) {
                 criteria.add(Restrictions.eq("cardNo", this.cardNo));
+            }
+            if (null != this.cardPrintedNo) {
+                criteria.add(Restrictions.eq("cardPrintedNo", this.cardPrintedNo));
             }
             if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
                 criteria.add(Restrictions.eq("state", this.cardState));

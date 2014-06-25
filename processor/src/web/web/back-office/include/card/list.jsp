@@ -29,6 +29,10 @@
             <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="10"
                          style="width: 240px;" styleClass="input-text" />
 
+            <h:outputText escape="true" value="Номер нанесённый на карту" styleClass="output-text" />
+            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="10"
+                         style="width: 240px;" styleClass="input-text"/>
+
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.cardListPage.cardFilter.cardState}" styleClass="input-text"
                              style="width: 240px;">
