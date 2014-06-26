@@ -201,14 +201,17 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             //String typeCondition = " cf_orders.ordertype<>8 and ";
             String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6)) and " +
                                    " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
-            String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
-                    + "split_part(cf_goods.fullname, '/', 2) as level2, "
-                    + "split_part(cf_goods.fullname, '/', 3) as level3, "
-                    + "split_part(cf_goods.fullname, '/', 4) as level4, " + "count(cf_orders.idoforder) as cnt, "
-                    + "(cf_orderdetails.rprice + cf_orderdetails.socdiscount) price, "
-                    + "count(cf_orders.idoforder) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
-                    + "cf_orgs.address, " + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg "
-                    + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+            String sql =
+                      "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
+                           + "split_part(cf_goods.fullname, '/', 2) as level2, "
+                           + "split_part(cf_goods.fullname, '/', 3) as level3, "
+                           + "split_part(cf_goods.fullname, '/', 4) as level4, " + "count(cf_orders.idoforder) as cnt, "
+                           + "(cf_orderdetails.rprice + cf_orderdetails.socdiscount) price, "
+                           + "count(cf_orders.idoforder) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
+                           + "cf_orgs.address, "
+                           + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg "
+                    + "from cf_orgs "
+                    + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
