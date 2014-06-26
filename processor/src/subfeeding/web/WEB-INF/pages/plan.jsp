@@ -78,8 +78,8 @@
                 hideControlOnEnd: true,
                 nextSelector: '.slider-next',
                 prevSelector: '.slider-prev',
-                nextText: 'Следующий',
-                prevText: 'Предыдущий'
+                nextText: 'Следующая',
+                prevText: 'Предыдущая'
             });
             $('.slider-next').button().click(function(e){
                 $(".messageDiv").hide();
