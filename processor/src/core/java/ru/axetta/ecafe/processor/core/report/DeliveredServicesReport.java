@@ -199,7 +199,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
             //String typeCondition = " cf_orders.ordertype<>8 and ";
-            String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6)) and " +
+            String typeCondition = " (cf_orders.ordertype in (0,1,4,6)) and " +
                                    " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql =
                       "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
