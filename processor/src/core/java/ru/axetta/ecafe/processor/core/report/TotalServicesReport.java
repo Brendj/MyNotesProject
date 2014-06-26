@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
@@ -32,6 +33,7 @@ public class TotalServicesReport extends BasicReport {
 
         public TotalServicesReport build(Session session, Date startDate, Date endDate, List<Long> idOfOrgList)
                 throws Exception {
+            java.text.Format df = new SimpleDateFormat("yyyy-MM-dd");
             Date generateTime = new Date();
             Map<Long, TotalEntry> entries = new HashMap<Long, TotalEntry>();
             // Обработать лист с организациями
@@ -42,31 +44,10 @@ public class TotalServicesReport extends BasicReport {
                 }
                 orgCondition = " (" + orgCondition.substring(0, orgCondition.length() - 4) + ") ";
             }
+            TotalServiceQueryLauncher queryLauncher = RuntimeContext.getAppContext().getBean(TotalServiceQueryLauncher.class);
 
-            String preparedQuery =
-                    "select cf_orgs.idoforg, cf_orgs.officialname, count(distinct cf_clients.idofclient) " +
-                            "from cf_orgs " +
-                            "left join cf_clients on cf_clients.idoforg = cf_orgs.idoforg " +
-                            (orgCondition.length() > 0 ? "where " + orgCondition + " AND " : "where ") +
-                            "cf_orgs.state=1 and  cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES
-                            .getValue() + " " +
-                            "group by cf_orgs.idoforg";
-            Query query = session.createSQLQuery(preparedQuery);
-            List resultList = query.list();
-
-            for (Object result : resultList) {
-                Object e[] = (Object[]) result;
-                long id = ((BigInteger) e[0]).longValue();
-                String officialName = ((String) e[1]).trim();
-
-                TotalEntry item = new TotalEntry(officialName);
-                item.put("totalClientsCount", (BigInteger) e[2]);
-                entries.put(id, item);
-            }
-
-            java.text.Format df = new SimpleDateFormat("yyyy-MM-dd");
-
-            loadValue(entries, "planBenefitClientsCount", session,
+            queryLauncher.loadOrgs(orgCondition, entries);
+            queryLauncher.loadValue(entries, "planBenefitClientsCount",
                                         "select cf_orgs.idoforg, count (idofclientcomplexdiscount) "
                                       + "from cf_clientscomplexdiscounts "
                                       + "left join cf_clients on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
@@ -75,7 +56,7 @@ public class TotalServicesReport extends BasicReport {
                                       + " AND " + orgCondition
                                       + "group by cf_orgs.idoforg "
                                       + "order by cf_orgs.idoforg ");
-            loadValue(entries, "currentClientsCount", session,
+            queryLauncher.loadValue(entries, "currentClientsCount",
                     "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
                             "from cf_enterevents " +
                             "left join cf_clients on cf_enterevents.idofclient=cf_enterevents.idofclient " +
@@ -87,7 +68,7 @@ public class TotalServicesReport extends BasicReport {
                             + "') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_enterevents.idoforg");
-            loadValue(entries, "realBenefitClientsCount", session,
+            queryLauncher.loadValue(entries, "realBenefitClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
@@ -100,7 +81,7 @@ public class TotalServicesReport extends BasicReport {
                             + "') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_orgs.idoforg");
-            loadValue(entries, "realPayedClientsCount", session,
+            queryLauncher.loadValue(entries, "realPayedClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
@@ -113,7 +94,7 @@ public class TotalServicesReport extends BasicReport {
                             + "') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_orgs.idoforg");
-            loadValue(entries, "uniqueClientsCount", session,
+            queryLauncher.loadValue(entries, "uniqueClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
@@ -157,23 +138,6 @@ public class TotalServicesReport extends BasicReport {
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                }
-            }
-        }
-
-
-        private void loadValue(Map<Long, TotalEntry> entries, String valueKey, Session session, String preparedQuery) {
-            Query query = session.createSQLQuery(preparedQuery);
-            List resultList = query.list();
-
-            for (Object result : resultList) {
-                Object e[] = (Object[]) result;
-                long id = ((BigInteger) e[0]).longValue();
-
-                try {
-                    TotalEntry item = entries.get(id);
-                    item.put(valueKey, (BigInteger) e[1]);
-                } catch (Exception e1) {
                 }
             }
         }

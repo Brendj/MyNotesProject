@@ -31,33 +31,19 @@ public class TotalServicesReportPage extends OnlineReportPage{
     private TotalServicesReport totalReport;
     private static final Logger logger = LoggerFactory.getLogger(TotalServicesReportPage.class);
 
-    public void buildReport(Session session) throws Exception{
+    public void buildReport() throws Exception{
         this.totalReport = new TotalServicesReport ();
         TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder();
-        this.totalReport = reportBuilder.build(session, startDate, endDate, idOfOrgList);
+        this.totalReport = reportBuilder.build(null, startDate, endDate, idOfOrgList);
     }
 
 
     public void executeReport(){
         FacesContext facesContext = FacesContext.getCurrentInstance ();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         try{
-            try{
-                runtimeContext = RuntimeContext.getInstance ();
-                persistenceSession = runtimeContext.createReportPersistenceSession ();
-                persistenceTransaction = persistenceSession.beginTransaction ();
-                buildReport(persistenceSession);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                facesContext.addMessage(null, new FacesMessage (FacesMessage.SEVERITY_INFO,
-                        "Подготовка отчета завершена успешно", null));
-            }
-            finally{
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
+            buildReport();
+            facesContext.addMessage(null, new FacesMessage (FacesMessage.SEVERITY_INFO,
+                    "Подготовка отчета завершена успешно", null));
         } catch (Exception e){
             logger.error("Failed to build Total Services report", e);
             facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
