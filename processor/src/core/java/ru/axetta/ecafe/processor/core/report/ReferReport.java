@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -126,7 +127,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
             //  Получение рабочих и выходных дней
             PeriodResult periodResult = new PeriodResult();
             Date generateEndTime = new Date();
-            int counts [] = getDaysCount(session, org == null ? null : org.getIdOfOrg(), startTime, endTime);
+            int counts [] = getDaysCount(session, org == null ? null : org.getIdOfOrg(),
+                                         o == null ? null : (String) o, startTime, endTime);
             int workDaysCount = counts [0];
             int weekendsCount = counts [1];
             //  Загрузка данных из БД
@@ -506,18 +508,22 @@ public class ReferReport extends BasicReportForAllOrgJob {
         return result;
     }
 
-    private static final int [] getDaysCount(Session session, Long idoforg, Date startTime, Date endTime) {
+    private static final int [] getDaysCount(Session session, Long idoforg, String region, Date startTime, Date endTime) {
         int count [] = new int[] {0, 0};    //  0 - будние дние; 1 - выхоные
         Calendar day = getClearCalendar(startTime.getTime());
         String orgRestrict = "";
         if(idoforg != null) {
-            orgRestrict = " cf_orders.idoforg=" + idoforg + " and ";
+            orgRestrict = " cf_orgs.idoforg=" + idoforg + " and ";
+        }
+        if(region != null && StringUtils.isBlank(region)) {
+            orgRestrict = " cf_orgs.district='" + region + "' ";
         }
         Query query = session.createSQLQuery(
                 "select int8(EXTRACT(EPOCH FROM d) * 1000) "
                 + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
                 + "      from cf_orders "
                 + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                + "      join cf_orgs on cf_orders.idoforg=cf_orgs.idoforg "
                 + "      where cf_orderdetails.socdiscount<>0 and cf_orders.state=0 and "+ orgRestrict
                 + "            cf_orders.createddate between :start and :end) as dates "
                 + "order by 1");

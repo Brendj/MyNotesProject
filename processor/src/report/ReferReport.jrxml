@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.1000000000000008"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="356"/>
+	<property name="ireport.zoom" value="1.100000000000001"/>
+	<property name="ireport.x" value="91"/>
+	<property name="ireport.y" value="405"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -157,70 +157,70 @@
 		<band height="32"/>
 	</lastPageFooter>
 	<summary>
-		<band height="508">
+		<band height="555">
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="427" width="79" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="475" width="79" height="20"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<text><![CDATA[Составил: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="427" width="265" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="475" width="265" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="494" y="427" width="164" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="494" y="475" width="164" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="20" y="466" width="79" height="20"/>
+				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="20" y="514" width="79" height="20"/>
 				<textElement>
 					<font size="11"/>
 				</textElement>
 				<text><![CDATA[Проверил: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="466" width="265" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="514" width="265" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="611" y="466" width="102" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="611" y="514" width="102" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="638" y="486" width="75" height="20"/>
+				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="638" y="534" width="75" height="20"/>
 				<textElement/>
 				<text><![CDATA[      М.П.]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" style="Crosstab Data Text" x="20" y="341" width="300" height="23"/>
+				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" style="Crosstab Data Text" x="20" y="389" width="300" height="23"/>
 				<textElement>
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Всего будни+субботы"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="395" y="341" width="75" height="23"/>
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="395" y="389" width="75" height="23"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{periodTotal}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="320" y="341" width="75" height="23"/>
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="320" y="389" width="75" height="23"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
@@ -238,35 +238,35 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReferReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="321" width="693" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="369" width="693" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="470" y="341" width="75" height="23"/>
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="470" y="389" width="75" height="23"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("%.2f", $P{periodSummary})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="364" width="693" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="412" width="693" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" x="20" y="384" width="300" height="23"/>
+				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" x="20" y="432" width="300" height="23"/>
 				<textElement textAlignment="Center">
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["кол-во учебных дней будни+субботы " + $P{workdaysCount} + "+" + $P{weekendsCount} + "=" + ($P{workdaysCount} + $P{weekendsCount})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="407" width="693" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="455" width="693" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
