@@ -298,8 +298,7 @@ public class SubFeedingServlet extends HttpServlet {
                     : parseDate(req.getParameter("activateDate"), df);
 
             cycle.setDateActivationDiagram(activateDate);
-            //SubscriptionFeedingListResult res = clientRoomController.activateSubscriptionFeeding(contractId, null);
-            CycleDiagramEditResult cycleDiagramResult = clientRoomController.putCycleDiagram(contractId, cycle);
+            Result cycleDiagramResult = clientRoomController.putCycleDiagram(contractId, cycle);
 
             if (cycleDiagramResult.resultCode == 0) {
                 req.setAttribute(SUCCESS_MESSAGE, "Циклограмма успешно создана.");
@@ -325,8 +324,6 @@ public class SubFeedingServlet extends HttpServlet {
             Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
                     : parseDate(req.getParameter("activateDate"), df);
             cycle.setDateActivationDiagram(activateDate);
-            //SubscriptionFeedingListResult res = clientRoomController.activateSubscriptionFeeding(contractId, activateDate);
-            //CycleDiagramEditResult editResult = clientRoomController.putCycleDiagram(contractId, cycle);
             Result result = clientRoomController.activateSubscriptionFeeding(contractId, cycle);
             if (result.resultCode == 0) {
                 req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно подключена.");
@@ -351,7 +348,7 @@ public class SubFeedingServlet extends HttpServlet {
             Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
                   : parseDate(req.getParameter("activateDate"), df);
             cycle.setDateActivationDiagram(activateDate);
-            CycleDiagramEditResult result = clientRoomController.putCycleDiagram(contractId, cycle);
+            Result result = clientRoomController.putCycleDiagram(contractId, cycle);
             if (result.resultCode == 0) {
                 String stringDate = df.format(cycle.getDateActivationDiagram());
                 String message = "Изменения циклограммы успешно сохранены. Изменения вступят в силу " + stringDate;
@@ -370,16 +367,11 @@ public class SubFeedingServlet extends HttpServlet {
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
         req.setAttribute("client", client.clientSummary);
         Date currentDay = new Date();
-        SubscriptionFeedingListResult result = clientRoomController.getSubscriptionFeedingList(contractId, currentDay);
-        SubscriptionFeedingExt subscriptionFeedingExt = null;
-        if(!result.subscriptionFeedingListExt.getS().isEmpty()){
-            for (SubscriptionFeedingExt sf:result.subscriptionFeedingListExt.getS()){
-                subscriptionFeedingExt = sf;
-                if((sf.getDateActivate()==null || sf.getDateActivate().before(currentDay)) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
-                    break;
-                }
-            }
+        SubscriptionFeedingResult result = clientRoomController.getCurrentSubscriptionFeeding(contractId, currentDay);
+        if(result.resultCode!=0){
+            req.setAttribute(ERROR_MESSAGE, result.description);
         }
+        SubscriptionFeedingExt subscriptionFeedingExt = result.getSubscriptionFeedingExt();
         if(subscriptionFeedingExt!=null){
             req.setAttribute("subscriptionFeeding", new SubscriptionFeeding(subscriptionFeedingExt));
         }

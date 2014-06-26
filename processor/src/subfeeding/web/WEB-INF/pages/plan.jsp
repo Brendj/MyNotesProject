@@ -25,7 +25,6 @@
     final Long subBalance1 = client.getSubBalance1();
     String action = doAction(subscriptionFeeding);
     String activateDate = (String) request.getAttribute("dateActivate");
-    //String currentActivateDate = (String) request.getAttribute("currentActivateDate");
     @SuppressWarnings("unchecked")
     List<CycleDiagram> cycleDiagrams = (List<CycleDiagram>) request.getAttribute("cycleDiagrams");
     @SuppressWarnings("unchecked")
@@ -51,14 +50,16 @@
         function formatSum(sum){
             return (sum/100).toFixed(2).replace(".",",")+" руб";
         }
-        function updateTotalValue(cycleDiagramid, total) {
-            $("."+cycleDiagramid+' .totalweek').text(formatSum(total));
-            $("."+cycleDiagramid+' .totalmonth').text(formatSum(4 * total));
+        function updateTotalValue(cycle, total) {
+            $('#totalweek').text(formatSum(total));
+            $('#totalmonth').text(formatSum(4 * total));
+            $('.'+cycle+' .totalweek').text(formatSum(total));
+            $('.'+cycle+' .totalmonth').text(formatSum(4 * total));
         }
-        function addUp(choice, cycleDiagramid){
+        function addUp(choice, cycle){
             var num = parseInt(choice.value);
-            totals[cycleDiagramid] += choice.checked?num:-num;
-            updateTotalValue(cycleDiagramid, totals[cycleDiagramid]);
+            totals[cycle] += choice.checked?num:-num;
+            updateTotalValue(cycle, totals[cycle]);
         }
         $(function () {
             $("#complexForm").preventDoubleSubmission();
@@ -212,6 +213,7 @@
                     <%
                         @SuppressWarnings("unchecked")
                         Map<Integer, List<String>> activeComplexes1 = (Map<Integer, List<String>>) request.getAttribute("activeComplexes");
+                        Long idDiagram = cycleDiagram==null?0:cycleDiagram.getGlobalId();
                         for (ComplexInfoExt complex : complexes) {
                     %>
                     <div class="simpleRow">
@@ -221,15 +223,18 @@
                         </div>
                         <%
                             for (int i = 1; i <= 6; i++) {
-                                String key = complex.getIdOfComplex() + "_" + i;
+                                String key = complex.getIdOfComplex() + "_" + i+"_"+idDiagram;
                                 boolean checked = activeComplexes1 != null && activeComplexes1.get(i)
                                         .contains(String.valueOf(complex.getIdOfComplex()));
+                                if(cycleDiagram!=null && checked) {
+                                    cycleDiagram.addTotalSum(complex.getCurrentPrice());
+                                }
                         %>
                         <div class="simpleCell">
                             <label><input type="checkbox"
                                           name="complex_option_<%=key%>" value="<%=complex.getCurrentPrice()%>"
                                           title="" <%=checked ? "checked" : ""%>
-                                          onchange="addUp(this);"/></label>
+                                          onchange="addUp(this, <%=idDiagram%>);"/></label>
                         </div>
                         <%
                             }
@@ -238,17 +243,37 @@
                     <%
                         }
                     %>
+                    <%
+                        if(cycleDiagram==null){
+                    %>
+                    <script>
+                        totals[0]=0;
+                    </script>
+                    <%
+                        }  else {
+                    %>
+                    <script>
+                        totals[<%=cycleDiagram.getGlobalId()%>]=<%=cycleDiagram.getTotalSum()%>;
+                    </script>
+                    <%
+                        }
+                    %>
+
                     <div class="simpleTableFooter">
                         <fieldset class="ui-widget ui-widget-content">
                             <legend class="ui-widget-header ui-corner-all"><div>Расчетная информация</div></legend>
                             <div class="simpleTable" style="margin: 0">
                                 <div class="simpleRow">
                                     <div class="simpleCell wideCell" style="text-align: left;">Расчетная стоимость 1-ой недели:</div>
-                                    <div class="simpleCell" id="totalweek" style="text-align: right;"></div>
+                                    <div class="simpleCell" id="totalweek" style="text-align: right;">
+                                        <%=cycleDiagram==null?0:cycleDiagram.getWeekPrices()%> руб
+                                    </div>
                                 </div>
                                 <div class="simpleRow" style="border: 0">
                                     <div class="simpleCell" style="text-align: left;">Расчетная стоимость 4-х недель:</div>
-                                    <div class="simpleCell" id="totalmonth" style="text-align: right;"></div>
+                                    <div class="simpleCell" id="totalmonth" style="text-align: right;">
+                                        <%=cycleDiagram==null?0:cycleDiagram.getMonthPrices()%> руб
+                                    </div>
                                 </div>
                             </div>
                         </fieldset>
@@ -267,7 +292,7 @@
                                     </div>
                                 </c:if>
                                 <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">
-                                    <button type="submit" name="edit">Сохранить изменения</button>
+                                    <button type="submit" name="edit_<%=idDiagram%>">Сохранить изменения</button>
                                 </c:if>
                             </c:if>
                         </c:if>

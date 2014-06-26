@@ -4286,54 +4286,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    @Deprecated
-    public SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "currentDay") Date currentDay) {
-        authenticateRequest(contractId);
-        Session session = null;
-        Transaction transaction = null;
-        SubscriptionFeedingListResult result = new SubscriptionFeedingListResult();
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
-            if (client == null) {
-                result.resultCode = RC_CLIENT_NOT_FOUND;
-                result.description = RC_CLIENT_NOT_FOUND_DESC;
-                return result;
-            }
-            SubscriptionFeedingService subscriptionFeedingService = SubscriptionFeedingService.getInstance();
-            List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingService
-                  .findSubscriptionFeedingByClient(client, currentDay);
-            for (SubscriptionFeeding subscriptionFeeding : subscriptionFeedings) {
-                result.subscriptionFeedingListExt.getS().add(new SubscriptionFeedingExt(subscriptionFeeding));
-            }
-
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage(), ex);
-            result.resultCode = RC_INTERNAL_ERROR;
-            result.description = RC_INTERNAL_ERROR_DESC;
-        } finally {
-            HibernateUtils.close(session, logger);
-        }
-
-        return result;
-    }
-
-    @Override
     public SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "currentDay") Date currentDay) {
         authenticateRequest(contractId);
+        return getCurrentSubscriptionFeeding(contractId, null, currentDay);
+    }
+
+    @Override
+    public SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "currentDay") Date currentDay) {
+        authenticateRequest(null);
+        return getCurrentSubscriptionFeeding(null, san, currentDay);
+    }
+
+    private SubscriptionFeedingResult getCurrentSubscriptionFeeding(Long contractId, String san,  Date currentDay) {
         Session session = null;
         Transaction transaction = null;
         SubscriptionFeedingResult result = new SubscriptionFeedingResult();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -4367,6 +4340,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
           @WebParam(name = "contractId") Long contractId, @WebParam(name = "startDate") Date startDate,
           @WebParam(name = "endDate") Date endDate) {
         authenticateRequest(contractId);
+        return getSubscriptionFeedingHistoryList(contractId, null, startDate, endDate);
+    }
+
+    @Override
+    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(null);
+        return getSubscriptionFeedingHistoryList(null, san, startDate, endDate);
+    }
+
+    private SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(Long contractId, String san, Date startDate,
+          Date endDate) {
         Session session = null;
         Transaction transaction = null;
         SubscriptionFeedingListResult result = new SubscriptionFeedingListResult();
@@ -4405,6 +4390,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
         authenticateRequest(contractId);
+        return getCycleDiagramHistoryList(contractId, null, startDate, endDate);
+    }
+
+    @Override
+    public CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "san") String san,
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(null);
+        return getCycleDiagramHistoryList(null, san, startDate, endDate);
+    }
+
+    private CycleDiagramList getCycleDiagramHistoryList(Long contractId, String san, Date startDate, Date endDate) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramList result = new CycleDiagramList();
@@ -4439,13 +4435,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(contractId);
+        return getCycleDiagramList(contractId, null);
+    }
+
+    @Override
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return getCycleDiagramList(null, san);
+    }
+
+    private CycleDiagramList getCycleDiagramList(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramList result = new CycleDiagramList();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -4474,6 +4480,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
         authenticateRequest(contractId);
+        return activateSubscriptionFeeding(contractId, null, cycleDiagram);
+    }
+
+    @Override
+    public Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+        authenticateRequest(null);
+        return activateSubscriptionFeeding(null, san, cycleDiagram);
+    }
+
+    private Result activateSubscriptionFeeding(Long contractId, String san, CycleDiagramExt cycleDiagram) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
@@ -4621,23 +4638,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
+    @Override
     public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "suspendDate") Date suspendDate) {
         authenticateRequest(contractId);
+        return suspendSubscriptionFeeding(contractId, null, suspendDate);
+    }
+
+    @Override
+    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "suspendDate") Date suspendDate) {
+        authenticateRequest(null);
+        return suspendSubscriptionFeeding(null, san, suspendDate);
+    }
+
+    private Result suspendSubscriptionFeeding(Long contractId, String san, Date suspendDate) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
             SubscriptionFeeding subscriptionFeeding =
-                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client,suspendDate);
+                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, suspendDate);
 
             DAOService daoService = DAOService.getInstance();
             List<ECafeSettings> settings = daoService
@@ -4662,7 +4691,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if(suspendDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Не верная дата активация циклограммы";
+                result.description = "Не верная дата приостановки подписки";
                 return result;
             }
             subscriptionFeeding.setLastDatePauseService(suspendDate);
@@ -4689,13 +4718,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "activateDate") Date activateDate) {
         authenticateRequest(contractId);
+        return reopenSubscriptionFeeding(contractId, null, activateDate);
+    }
+
+    @Override
+    public Result reopenSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "activateDate") Date activateDate) {
+        authenticateRequest(null);
+        return reopenSubscriptionFeeding(null, san, activateDate);
+    }
+
+    private Result reopenSubscriptionFeeding(Long contractId, String san, Date activateDate) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -4757,20 +4797,30 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result cancelSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(contractId);
+        return cancelSubscriptionFeeding(contractId, null);
+    }
+
+    @Override
+    public Result cancelSubscriptionFeeding(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return cancelSubscriptionFeeding(null, san);
+    }
+
+    private Result cancelSubscriptionFeeding(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
             SubscriptionFeeding subscriptionFeeding =
-                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client,new Date());
+                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, new Date());
             if(subscriptionFeeding==null){
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
@@ -4798,120 +4848,144 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public CycleDiagramEditResult putCycleDiagram(@WebParam(name = "contractId") Long contractId,
+    public Result putCycleDiagram(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+        authenticateRequest(contractId);
+        return putCycleDiagram(contractId, null, cycleDiagram);
+    }
+
+    @Override
+    public Result putCycleDiagram(@WebParam(name = "san") String san,
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+        authenticateRequest(null);
+        return putCycleDiagram(null, san, cycleDiagram);
+    }
+
+    private Result putCycleDiagram(Long contractId, String san, CycleDiagramExt cycleDiagram) {
         Session session = null;
         Transaction transaction = null;
-        CycleDiagramEditResult result = new CycleDiagramEditResult();
+        Result result = new Result();
         result.resultCode = RC_OK;
         result.description = RC_OK_DESC;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClient(session, contractId, null, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
             }
-            if (result.resultCode == 0 && client != null) {
-                Criteria settingCriteria = session.createCriteria(ECafeSettings.class);
-                final Org clientOrg = client.getOrg();
-                final Long idOfOrg = clientOrg.getIdOfOrg();
-                settingCriteria.add(Restrictions.eq("orgOwner", idOfOrg));
-                settingCriteria.add(Restrictions.eq("settingsId", SettingsIds.SubscriberFeeding));
-                List settingsList = settingCriteria.list();
-                if (settingsList.isEmpty()) {
-                    result.resultCode = RC_SETTINGS_NOT_FOUND;
-                    result.description = String
-                          .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                                clientOrg.getShortName(), idOfOrg);
-                }
-                if (settingsList.size() > 1) {
-                    result.resultCode = RC_SETTINGS_NOT_FOUND;
-                    result.description = String
-                          .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortName(),
-                                idOfOrg);
-                }
-                ECafeSettings settings = (ECafeSettings) settingsList.get(0);
-                SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
-                      .getSplitSettingValue();
-                if (result.resultCode == 0) {
-                    Criteria criteria = session.createCriteria(CycleDiagram.class);
-                    criteria.add(Restrictions.eq("client", client));
-                    criteria.add(Restrictions.eq("dateActivationDiagram", cycleDiagram.getDateActivationDiagram()));
-                    List list = criteria.list();
-                    SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
-                    if (list.isEmpty()) {
-                        // создаем новую
-                        CycleDiagram diagram = new CycleDiagram();
-                        diagram.setCreatedDate(new Date());
-                        diagram.setClient(client);
-                        diagram.setOrgOwner(clientOrg.getIdOfOrg());
-                        diagram.setIdOfClient(client.getIdOfClient());
-                        diagram.setDateActivationDiagram(cycleDiagram.getDateActivationDiagram());
-                        diagram.setStateDiagram(StateDiagram.WAIT);
-                        diagram.setDeletedState(false);
-                        diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
-                        Long version = DAOService.getInstance()
-                              .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-                        diagram.setGlobalVersionOnCreate(version);
-                        diagram.setGlobalVersion(version);
-                        List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
-                        diagram.setMonday(cycleDiagram.getMonday());
-                        diagram.setMondayPrice(sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
-                        diagram.setTuesday(cycleDiagram.getTuesday());
-                        diagram.setTuesdayPrice(sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
-                        diagram.setWednesday(cycleDiagram.getWednesday());
-                        diagram.setWednesdayPrice(
-                              sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
-                        diagram.setThursday(cycleDiagram.getThursday());
-                        diagram.setThursdayPrice(
-                              sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
-                        diagram.setFriday(diagram.getFriday());
-                        diagram.setFridayPrice(sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
-                        diagram.setSaturday(cycleDiagram.getSaturday());
-                        diagram.setSaturdayPrice(
-                              sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
-                        diagram.setSunday("");
-                        diagram.setSundayPrice(0L);
-                        diagram.setStaff(null);
-                        session.save(diagram);
-                    } else {
-                        // изменяем те что есть
-                        for (Object obj : list) {
-                            CycleDiagram diagram = (CycleDiagram) obj;
-                            diagram.setDateActivationDiagram(cycleDiagram.getDateActivationDiagram());
-                            diagram.setStateDiagram(StateDiagram.WAIT);
-                            diagram.setDeletedState(false);
-                            diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
-                            Long version = DAOService.getInstance()
-                                  .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-                            //diagram.setGlobalVersionOnCreate(version);
-                            diagram.setGlobalVersion(version);
-                            List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
-                            diagram.setMonday(cycleDiagram.getMonday());
-                            diagram.setMondayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
-                            diagram.setTuesday(cycleDiagram.getTuesday());
-                            diagram.setTuesdayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
-                            diagram.setWednesday(cycleDiagram.getWednesday());
-                            diagram.setWednesdayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
-                            diagram.setThursday(cycleDiagram.getThursday());
-                            diagram.setThursdayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
-                            diagram.setFriday(cycleDiagram.getFriday());
-                            diagram.setFridayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
-                            diagram.setSaturday(cycleDiagram.getSaturday());
-                            diagram.setSaturdayPrice(
-                                  sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
-                            diagram.setSunday("");
-                            diagram.setSundayPrice(0L);
-                            session.save(diagram);
-                        }
-                    }
+            Criteria settingCriteria = session.createCriteria(ECafeSettings.class);
+            final Org clientOrg = client.getOrg();
+            final Long idOfOrg = clientOrg.getIdOfOrg();
+            settingCriteria.add(Restrictions.eq("orgOwner", idOfOrg));
+            settingCriteria.add(Restrictions.eq("settingsId", SettingsIds.SubscriberFeeding));
+            List settingsList = settingCriteria.list();
+            if (settingsList.isEmpty()) {
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                      .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                            clientOrg.getShortName(), idOfOrg);
+                return result;
+            }
+            if (settingsList.size() > 1) {
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                      .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortName(),
+                            idOfOrg);
+                return result;
+            }
+            ECafeSettings settings = (ECafeSettings) settingsList.get(0);
+            SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
+                  .getSplitSettingValue();
+            Date date = new Date();
+
+            final int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+            if(dayForbid.getHours()>=12){
+                dayForbid = CalendarUtils.addOneDay(date);
+            }
+            if(cycleDiagram.getDateActivationDiagram().getTime()<dayForbid.getTime()){
+                result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                result.description = "Не верная дата активации циклограммы";
+                return result;
+            }
+            Criteria criteria = session.createCriteria(CycleDiagram.class);
+            criteria.add(Restrictions.eq("client", client));
+            criteria.add(Restrictions.eq("dateActivationDiagram", cycleDiagram.getDateActivationDiagram()));
+            List list = criteria.list();
+            SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
+            if (list.isEmpty()) {
+                // создаем новую
+                CycleDiagram diagram = new CycleDiagram();
+                diagram.setCreatedDate(new Date());
+                diagram.setClient(client);
+                diagram.setOrgOwner(clientOrg.getIdOfOrg());
+                diagram.setIdOfClient(client.getIdOfClient());
+                diagram.setDateActivationDiagram(cycleDiagram.getDateActivationDiagram());
+                diagram.setStateDiagram(StateDiagram.WAIT);
+                diagram.setDeletedState(false);
+                diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
+                Long version = DAOService.getInstance()
+                      .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+                diagram.setGlobalVersionOnCreate(version);
+                diagram.setGlobalVersion(version);
+                List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
+                diagram.setMonday(cycleDiagram.getMonday());
+                diagram.setMondayPrice(sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
+                diagram.setTuesday(cycleDiagram.getTuesday());
+                diagram.setTuesdayPrice(sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
+                diagram.setWednesday(cycleDiagram.getWednesday());
+                diagram.setWednesdayPrice(
+                      sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
+                diagram.setThursday(cycleDiagram.getThursday());
+                diagram.setThursdayPrice(
+                      sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
+                diagram.setFriday(diagram.getFriday());
+                diagram.setFridayPrice(sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
+                diagram.setSaturday(cycleDiagram.getSaturday());
+                diagram.setSaturdayPrice(
+                      sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
+                diagram.setSunday("");
+                diagram.setSundayPrice(0L);
+                diagram.setStaff(null);
+                session.save(diagram);
+            } else {
+                // изменяем те что есть
+                for (Object obj : list) {
+                    CycleDiagram diagram = (CycleDiagram) obj;
+                    diagram.setDateActivationDiagram(cycleDiagram.getDateActivationDiagram());
+                    diagram.setStateDiagram(StateDiagram.WAIT);
+                    diagram.setDeletedState(false);
+                    diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
+                    Long version = DAOService.getInstance()
+                          .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+                    //diagram.setGlobalVersionOnCreate(version);
+                    diagram.setGlobalVersion(version);
+                    List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
+                    diagram.setMonday(cycleDiagram.getMonday());
+                    diagram.setMondayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
+                    diagram.setTuesday(cycleDiagram.getTuesday());
+                    diagram.setTuesdayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
+                    diagram.setWednesday(cycleDiagram.getWednesday());
+                    diagram.setWednesdayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
+                    diagram.setThursday(cycleDiagram.getThursday());
+                    diagram.setThursdayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
+                    diagram.setFriday(cycleDiagram.getFriday());
+                    diagram.setFridayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
+                    diagram.setSaturday(cycleDiagram.getSaturday());
+                    diagram.setSaturdayPrice(
+                          sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
+                    diagram.setSunday("");
+                    diagram.setSundayPrice(0L);
+                    session.save(diagram);
                 }
             }
             transaction.commit();

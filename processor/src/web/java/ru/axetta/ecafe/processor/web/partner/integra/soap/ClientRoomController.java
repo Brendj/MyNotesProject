@@ -299,50 +299,72 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getSubscriptionFeedingSettingBySan")
     SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
-    @WebMethod(operationName = "getSubscriptionFeedingList")
-    SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "currentDay") Date currentDay);
-
     @WebMethod(operationName = "getSubscriptionFeedingHistoryList")
     SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "contractId") Long contractId,
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod(operationName = "getSubscriptionFeedingHistoryListBySan")
+    SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getCurrentSubscriptionFeeding")
     SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "currentDay") Date currentDay);
 
+    @WebMethod(operationName = "getCurrentSubscriptionFeedingBySan")
+    SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "currentDay") Date currentDay);
+
     @WebMethod(operationName = "activateSubscriptionFeeding")
     Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+
+    @WebMethod(operationName = "activateSubscriptionFeedingBySan")
+    Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
     @WebMethod(operationName = "suspendSubscriptionFeeding")
     Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "suspendDate") Date suspendDate);
 
+    @WebMethod(operationName = "suspendSubscriptionFeedingBySan")
+    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san,
+          @WebParam(name = "suspendDate") Date suspendDate);
+
     @WebMethod(operationName = "reopenSubscriptionFeeding")
     Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+          @WebParam(name = "activateDate") Date activateDate);
+
+    @WebMethod(operationName = "reopenSubscriptionFeedingBySan")
+    Result reopenSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "activateDate") Date activateDate);
 
     @WebMethod(operationName = "cancelSubscriptionFeeding")
     Result cancelSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
+    @WebMethod(operationName = "cancelSubscriptionFeedingBySan")
+    Result cancelSubscriptionFeeding(@WebParam(name = "san") String san);
+
     @WebMethod(operationName = "getCycleDiagramList")
     CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "getCycleDiagramListBySan")
+    CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "getCycleDiagramHistoryList")
     CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
-    //@WebMethod(operationName = "suspendSubscriptionFeedingToDay")
-    //Result suspendSubscriptionFeedingToDay(@WebParam(name = "contractId") Long contractId,
-    //      @WebParam(name = "endPauseDate") Date endPauseDate);
-
-    //@WebMethod(operationName = "reopenSubscriptionFeedingToDay")
-    //Result reopenSubscriptionFeedingToDay(@WebParam(name = "contractId") Long contractId,
-    //      @WebParam(name = "endReopenDate") Date endReopenDate);
+    @WebMethod(operationName = "getCycleDiagramHistoryListBySan")
+    CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "san") String san,
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "putCycleDiagram")
-    CycleDiagramEditResult putCycleDiagram(@WebParam(name = "contractId") Long contractId,
+    Result putCycleDiagram(@WebParam(name = "contractId") Long contractId,
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+
+    @WebMethod(operationName = "putCycleDiagramBySan")
+    Result putCycleDiagram(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
     @WebMethod(operationName = "getMenuListWithProhibitions")
@@ -356,5 +378,6 @@ public interface ClientRoomController {
     @WebMethod(operationName = "removeProhibition")
     ProhibitionsResult removeProhibition(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "prohibitionId") Long prohibitionId);
+
 
 }
