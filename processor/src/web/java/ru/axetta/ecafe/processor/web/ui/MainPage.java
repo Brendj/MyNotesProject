@@ -872,6 +872,8 @@ public class MainPage {
         return null;
     }
 
+
+
     /* обновление списка организаций */
     public Object updateOrgListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -2403,6 +2405,59 @@ public class MainPage {
             logger.error("Failed to clear filter for client list page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object updateContragentListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            contragentListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to set filter for client list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object clearContragentListPageFilter() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            contragentListPage.getContragentFilter().clear();
+            contragentListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to clear filter for client list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

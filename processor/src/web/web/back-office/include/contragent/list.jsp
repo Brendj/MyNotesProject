@@ -8,6 +8,35 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<%-- Панель просмотра списка контрагентов --%>
+<h:panelGrid id="orgListPanelGrid" binding="#{mainPage.contragentListPage.pageComponent}" styleClass="borderless-grid">
+
+    <%-- Панель фильтрации контрагенотов:
+     фильтр производиться по идентификатору и по имени контрагенвтов --%>
+
+    <rich:simpleTogglePanel label="Фильтр (#{mainPage.contragentListPage.contragentFilter.status})" switchType="client"
+          eventsQueue="mainFormEventQueue" opened="false" headerClass="filter-panel-header">
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+            <h:outputText escape="true" value="Наименование контрагента" styleClass="output-text" />
+
+            <h:inputText value="#{mainPage.contragentListPage.contragentFilter.officialName}" maxlength="64"
+                         styleClass="input-text" />
+
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+            <a4j:commandButton value="Применить" action="#{mainPage.updateContragentListPage}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+
+            <a4j:commandButton value="Очистить" action="#{mainPage.clearContragentListPageFilter}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+        </h:panelGrid>
+
+    </rich:simpleTogglePanel>
+
 <%-- Список контрагентов --%>
 <rich:dataTable id="contragentTable" value="#{mainPage.contragentListPage.items}" var="item" rows="20"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
@@ -54,3 +83,4 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
+</h:panelGrid>

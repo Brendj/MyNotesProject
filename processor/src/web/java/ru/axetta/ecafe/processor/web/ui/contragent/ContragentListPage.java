@@ -25,6 +25,8 @@ import java.util.*;
  */
 public class ContragentListPage extends BasicWorkspacePage {
 
+    private final ContragentFilter contragentFilter = new ContragentFilter();
+
     public static class PersonItem {
 
         private final String firstName;
@@ -203,24 +205,31 @@ public class ContragentListPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        if(items==null || items.isEmpty()){
-            List<Item> items = new LinkedList<Item>();
-            Criteria criteria = session.createCriteria(Contragent.class);
-            Long idOfUser = null;
-            try {
-                idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-                ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
-            } catch (Exception e) {
-                idOfUser = null;
+        if (!contragentFilter.isEmpty()) {
+            items = contragentFilter.retrieveContragents(session);
+        } else {
+            if (items == null || items.isEmpty()) {
+                List<Item> items = new LinkedList<Item>();
+                Criteria criteria = session.createCriteria(Contragent.class);
+                Long idOfUser = null;
+                try {
+                    idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+                    ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
+                } catch (Exception e) {
+                    idOfUser = null;
+                }
+                criteria.addOrder(Order.asc("idOfContragent"));
+                List contragents = criteria.list();
+                for (Object object : contragents) {
+                    Contragent contragent = (Contragent) object;
+                    items.add(new Item(contragent));
+                }
+                this.items = items;
             }
-            criteria.addOrder(Order.asc("idOfContragent"));
-            List contragents = criteria.list();
-            for (Object object : contragents) {
-                Contragent contragent = (Contragent) object;
-                items.add(new Item(contragent));
-            }
-            this.items = items;
         }
     }
 
+    public ContragentFilter getContragentFilter() {
+        return contragentFilter;
+    }
 }
