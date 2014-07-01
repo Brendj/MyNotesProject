@@ -233,6 +233,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Benefit_Plan));
+        criteria.add(Restrictions.eq("deletedState", false));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();
@@ -252,6 +253,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Pay_Plan));
+        criteria.add(Restrictions.eq("deletedState", false));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();
@@ -271,6 +273,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Subscriber_Feeding_Plan));
+        criteria.add(Restrictions.eq("deletedState", false));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();
