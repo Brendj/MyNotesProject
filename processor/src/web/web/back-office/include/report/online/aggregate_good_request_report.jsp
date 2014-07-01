@@ -104,7 +104,7 @@
                     <rich:column colspan="2">
                         <h:outputText value="Поставщик" />
                     </rich:column>
-                    <rich:column colspan="3">
+                    <rich:column colspan="4">
                         <h:outputText value="Получатель" />
                     </rich:column>
                     <rich:column rowspan="2">
@@ -140,6 +140,9 @@
                     <rich:column>
                         <h:outputText value="Наименование" />
                     </rich:column>
+                    <rich:column>
+                        <h:outputText value="Дата выгрузки" />
+                    </rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column rowspan="#{items.commoditiesCounts}">
@@ -159,6 +162,9 @@
             </rich:column>
             <rich:column rowspan="#{items.commoditiesCounts}">
                 <h:outputText value="#{items.educationName}" />
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.lastCreateOrUpdateDate}" converter="dateConverter" />
             </rich:column>
             <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
             </rich:column>

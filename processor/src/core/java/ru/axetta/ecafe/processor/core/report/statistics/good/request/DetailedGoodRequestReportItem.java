@@ -27,10 +27,11 @@ public class DetailedGoodRequestReportItem {
     private final Date doneDate;
     private final Date lastCreate;
     private final Date lastUpdate;
+    private final Date lastCreateOrUpdateDate;
 
     public DetailedGoodRequestReportItem(String number, Long idOfSupplier, String supplierName, Long idOfEducation,
             String educationNumber, String educationName, List<Commodity> commodities, Date doneDate, Date lastCreate,
-            Date lastUpdate) {
+            Date lastUpdate, Date lastCreateOrUpdateDate) {
         this.number = number;
         this.idOfSupplier = idOfSupplier;
         this.supplierName = supplierName;
@@ -41,10 +42,11 @@ public class DetailedGoodRequestReportItem {
         this.doneDate = doneDate;
         this.lastCreate = lastCreate;
         this.lastUpdate = lastUpdate;
+        this.lastCreateOrUpdateDate = lastCreateOrUpdateDate;
     }
 
     public DetailedGoodRequestReportItem(String number, Long idOfSupplier, String supplierName, Long idOfEducation,
-            String educationName, List<Commodity> commodities, RequestItem requestItem) {
+            String educationName, List<Commodity> commodities, RequestItem requestItem, Date lastCreateOrUpdateDate) {
         this.number = number;
         this.idOfSupplier = idOfSupplier;
         this.supplierName = supplierName;
@@ -55,6 +57,7 @@ public class DetailedGoodRequestReportItem {
         this.doneDate = requestItem.doneDate;
         this.lastCreate = requestItem.lastCreate;
         this.lastUpdate = requestItem.lastUpdate;
+        this.lastCreateOrUpdateDate =  lastCreateOrUpdateDate;
     }
 
     public String getNumber() {
@@ -101,4 +104,7 @@ public class DetailedGoodRequestReportItem {
         return lastUpdate;
     }
 
+    public Date getLastCreateOrUpdateDate() {
+        return lastCreateOrUpdateDate;
+    }
 }

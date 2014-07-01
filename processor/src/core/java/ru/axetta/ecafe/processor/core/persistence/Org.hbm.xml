@@ -84,6 +84,9 @@
             </type>
         </property>
 
+        <property name="lastGoodRequestChange" column="LastGoodRequestChange"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>

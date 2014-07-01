@@ -122,9 +122,12 @@ public class DetailedGoodRequestReportService {
                     for (Object reqObj : requestMap.keySet()) {
                         RequestItem requestItem = (RequestItem) reqObj;
                         List<Commodity> commodityList = (List<Commodity>) requestMap.getCollection(requestItem);
+
+                        Org org = (Org) session.load(Org.class, item.getIdOfOrg());
+
                         DetailedGoodRequestReportItem reportItem = new DetailedGoodRequestReportItem(
                                 requestItem.number, item.getIdOfOrg(), item.getShortName(), edu.getIdOfOrg(),
-                                edu.getShortName(), commodityList, requestItem);
+                                edu.getShortName(), commodityList, requestItem, org.getLastGoodRequestChange());
                         detailedGoodRequestReportItems.add(reportItem);
                     }
 

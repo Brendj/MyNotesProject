@@ -269,6 +269,25 @@ public class GoodRequestsChangeAsyncNotificationService {
                         //}
                     }
                 }
+                // TODO: орг добавить дату   lastCreateOrUpdateDate записать в базу update             lastGoodRequestChange
+                try {
+                    try {
+                        persistenceSession = runtimeContext.createReportPersistenceSession();
+                        persistenceTransaction = persistenceSession.beginTransaction();
+
+                        Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+                        org.setLastGoodRequestChange(lastCreateOrUpdateDate);
+                        persistenceSession.update(org);
+
+                        persistenceTransaction.commit();
+                        persistenceTransaction = null;
+                    } finally {
+                        HibernateUtils.rollback(persistenceTransaction, LOGGER);
+                        HibernateUtils.close(persistenceSession, LOGGER);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Can not update org ", e);
+                }
             } else {
                 LOGGER.debug("IdOfOrg: "+idOfOrg+" email text is empty");
             }
