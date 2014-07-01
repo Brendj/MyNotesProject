@@ -65,7 +65,7 @@
         </h:panelGrid>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
-            <h:outputText escape="true" value="Включить абоненское питание" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить абонементное питание" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.enableSubscriptionFeeding}" styleClass="output-text">
                 <a4j:support event="onclick" ajaxSingle="true" reRender="enableSubBalanceOperationControl"/>
             </h:selectBooleanCheckbox>
