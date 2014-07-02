@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +36,11 @@ public class TotalServicesReportPage extends OnlineReportPage{
     public void buildReport() throws Exception{
         this.totalReport = new TotalServicesReport ();
         TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder();
-        this.totalReport = reportBuilder.build(null, startDate, endDate, idOfOrgList);
+        List<Long> orgs = new ArrayList<Long>();
+        if(idOfOrg != null && idOfOrg>=0) {
+            orgs.add(idOfOrg);
+        }
+        this.totalReport = reportBuilder.build(null, startDate, endDate, orgs);
     }
 
 
@@ -47,7 +53,7 @@ public class TotalServicesReportPage extends OnlineReportPage{
         } catch (Exception e){
             logger.error("Failed to build Total Services report", e);
             facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке отчета", null));
+                    "Ошибка при подготовке отчета: " + e.getMessage(), null));
         }
     }
 
