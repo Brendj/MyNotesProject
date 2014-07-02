@@ -123,7 +123,7 @@ public class DetailedGoodRequestReportService {
                         RequestItem requestItem = (RequestItem) reqObj;
                         List<Commodity> commodityList = (List<Commodity>) requestMap.getCollection(requestItem);
 
-                        Org org = (Org) session.load(Org.class, item.getIdOfOrg());
+                        Org org = (Org) session.load(Org.class, edu.getIdOfOrg());
 
                         DetailedGoodRequestReportItem reportItem = new DetailedGoodRequestReportItem(
                                 requestItem.number, item.getIdOfOrg(), item.getShortName(), edu.getIdOfOrg(),
