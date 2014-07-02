@@ -282,8 +282,10 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder();
+        if (contragentFilter.getContragent().getIdOfContragent() == null) return null;
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
                 Long.toString(contragentFilter.getContragent().getIdOfContragent()));
+        if (contragentReceiverFilter.getContragent().getIdOfContragent() == null) return null;
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                 Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
