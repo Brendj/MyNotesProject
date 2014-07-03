@@ -33,6 +33,9 @@ public class TotalServicesReport extends BasicReport {
 
         public TotalServicesReport build(Session session, Date startDate, Date endDate, List<Long> idOfOrgList)
                 throws Exception {
+            if(idOfOrgList == null || idOfOrgList.size() < 1) {
+                throw new Exception("Необходимо выбрать организацию");
+            }
             java.text.Format df = new SimpleDateFormat("yyyy-MM-dd");
             Date generateTime = new Date();
             Map<Long, TotalEntry> entries = new HashMap<Long, TotalEntry>();
@@ -61,51 +64,40 @@ public class TotalServicesReport extends BasicReport {
                             "from cf_enterevents " +
                             "left join cf_clients on cf_enterevents.idofclient=cf_enterevents.idofclient " +
                             "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " +
-                            "where cf_orgs.state=1 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined
-                            .CLIENT_EMPLOYEES.getValue()
+                            "where cf_orgs.state=1 "
+                            //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                             + " AND " + orgCondition + " and " +
-                            " cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
-                            + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
-                            "group by cf_enterevents.idoforg");
+                            " cf_enterevents.evtdatetime>=" + startDate.getTime() + " AND cf_enterevents.evtdatetime<" + endDate.getTime() +
+                            " group by cf_enterevents.idoforg");
             queryLauncher.loadValue(entries, "realBenefitClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and cf_orders.state=0 "
+                            //+ "and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                             + " AND " + orgCondition + " and "
-                            +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
-                            + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
+                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
                             "group by cf_orgs.idoforg");
             queryLauncher.loadValue(entries, "realPayedClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0  and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0  and cf_orders.state=0 "
+                            //+ "and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                             + " AND " + orgCondition + " and "
-                            +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
-                            + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
+                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
                             "group by cf_orgs.idoforg");
             queryLauncher.loadValue(entries, "uniqueClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1  and cf_orders.state=0 and " +
-                            "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            "where cf_orgs.state=1  and cf_orders.state=0 "
+                            //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                             + " AND " + orgCondition + " and "
-                            +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)
-                            + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(endDate) + "') * 1000 " +
+                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
                             "group by cf_orgs.idoforg");
 
             List<TotalEntry> result = new LinkedList(entries.values());
