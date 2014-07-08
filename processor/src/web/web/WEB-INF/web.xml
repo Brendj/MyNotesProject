@@ -196,14 +196,14 @@
         <servlet-name>FrontControllerWS</servlet-name>
         <url-pattern>/soap/front</url-pattern>
     </servlet-mapping>
-    <!--<servlet>-->
-        <!--<servlet-name>NSIDeltaControllerWS</servlet-name>-->
-        <!--<servlet-class>ru.axetta.ecafe.processor.web.partner.nsi.NSIDeltaController</servlet-class>-->
-    <!--</servlet>-->
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>NSIDeltaControllerWS</servlet-name>-->
-        <!--<url-pattern>/soap/nsi_delta</url-pattern>-->
-    <!--</servlet-mapping>-->
+    <servlet>
+        <servlet-name>NSIDeltaControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.nsi.NSIDeltaController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NSIDeltaControllerWS</servlet-name>
+        <url-pattern>/soap/nsi_delta</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>DashboardServiceWS</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.dashboard.DashboardServiceWS</servlet-class>
