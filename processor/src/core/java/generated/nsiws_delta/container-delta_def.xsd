@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://rstyle.com/nsi/delta"
+           xmlns:nsi="http://rstyle.com/nsi/delta">
+    <xs:element name="container" type="nsi:ContainerDelta"/>
+
+    <xs:simpleType name="ContainerType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CATALOG"/>
+            <xs:enumeration value="HIERARCHY"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ContainerDelta">
+        <xs:sequence>
+            <xs:element name="item" type="nsi:Item" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="type" type="nsi:ContainerType"/>
+    </xs:complexType>
+
+    <xs:simpleType name="Action">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ADDED"/>
+            <xs:enumeration value="MODIFIED"/>
+            <xs:enumeration value="DELETED"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="Item">
+        <xs:sequence>
+            <xs:sequence>
+                <xs:element name="attribute" type="nsi:Attribute" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="primaryKey" type="xs:string"/>
+        <xs:attribute name="action" type="nsi:Action"/>
+    </xs:complexType>
+
+    <xs:complexType name="Attribute">
+        <xs:sequence>
+            <xs:element name="value" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="occurrence" type="xs:int"/>
+                            <xs:attribute name="action" type="nsi:Action"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="groupValue" type="nsi:GroupValue" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="type" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="GroupValue">
+        <xs:sequence>
+            <xs:element name="attribute" type="nsi:Attribute" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="occurrence" type="xs:int"/>
+        <xs:attribute name="action" type="nsi:Action"/>
+    </xs:complexType>
+</xs:schema>

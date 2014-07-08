@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -280,7 +281,14 @@ public class ImportRegisterClientsService {
 
     @Transactional
     public void saveClients(String synchDate, String date, long ts, Org org,
-                            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer) throws Exception {
+            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer) throws Exception {
+        saveClients(synchDate, date, ts, org, pupils, logBuffer, false);
+    }
+
+    @Transactional
+    public void saveClients(String synchDate, String date, long ts, Org org,
+                            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer,
+                            boolean deleteClientsIfNotFound) throws Exception {
         log(synchDate + "Начато сохранение списка клиентов для " + org.getOfficialName() + " в БД", logBuffer);
 
 
@@ -290,36 +298,56 @@ public class ImportRegisterClientsService {
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
 
-        //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
-        //  отправляем уведомление на email
-        List<Client> clientsToRemove = new ArrayList<Client>();
-        for (Client dbClient : currentClients) {
-            boolean found = false;
-            for (ExpandedPupilInfo pupil : pupils) {
-                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
-                        .equals(dbClient.getClientGUID())) {
-                    found = true;
-                    break;
+        //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
+        //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
+        if(deleteClientsIfNotFound) {
+            //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
+            //  отправляем уведомление на email
+            List<Client> clientsToRemove = new ArrayList<Client>();
+            for (Client dbClient : currentClients) {
+                boolean found = false;
+                for (ExpandedPupilInfo pupil : pupils) {
+                    if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
+                            .equals(dbClient.getClientGUID())) {
+                        found = true;
+                        break;
+                    }
+                }
+                try {
+                    ClientGroup currGroup = dbClient.getClientGroup();
+                    //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
+                    //  увеличиваем количество клиентов, подлежих удалению
+                    Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+                    if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
+                        !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
+                        !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+                        log(synchDate + "Удаление " +
+                                emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
+                                + " " +
+                                emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
+                                dbClient.getPerson().getSecondName()) + ", " +
+                                emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
+                    }
+                } catch (Exception e) {
+                    logError("Failed to delete client " + dbClient, e, logBuffer);
                 }
             }
-            try {
-                ClientGroup currGroup = dbClient.getClientGroup();
-                //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
-                //  увеличиваем количество клиентов, подлежих удалению
-                Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
-                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
-                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+        } else {
+            for(ExpandedPupilInfo epi : pupils) {
+                if(epi.deleted) {
+                    Client dbClient = DAOUtils.findClientByGuid(em, epi.guid);
+                    if(dbClient == null) {
+                        continue;
+                    }
                     log(synchDate + "Удаление " +
                             emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
                             + " " +
                             emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                             dbClient.getPerson().getSecondName()) + ", " +
                             emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
+                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
                 }
-            } catch (Exception e) {
-                logError("Failed to delete client " + dbClient, e, logBuffer);
             }
         }
 
@@ -369,7 +397,7 @@ public class ImportRegisterClientsService {
                         + ", " +
                         emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
                         + " в школу " + newOrg.getIdOfOrg(), logBuffer);
-                addClientChange(ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION);
+                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION);
                 continue;
             }
             if (!updateClient) {
@@ -418,11 +446,55 @@ public class ImportRegisterClientsService {
     private void addClientChange(long ts, long idOfOrg,
             FieldProcessor.Config fieldConfig,
             Client currentClient, int operation) throws Exception {
-        addClientChange(ts, idOfOrg, null, fieldConfig, currentClient, operation);
+        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation);
     }
 
+    public static long getLastUncommitedChange(EntityManager em) {
+        long maxTs = 0L;
+        long lastTs = 0L;
+        Session session = (Session) em.getDelegate();
+        Query q = session.createSQLQuery(
+                  "select max(rc1.createdate), 'last' "
+                + "from CF_RegistryChange rc1 "
+                + "where rc1.applied=true "
+                + "union all "
+                + "select max(rc1.createdate), 'max' "
+                + "from CF_RegistryChange rc1");
+        List resultList = q.list();
+        for (Object obj : resultList) {
+            Object[] dat = (Object[]) obj;
+            Long value = ((BigInteger) dat[0]).longValue();
+            String type = (String) dat[1];
+            if(type.equals("max")) {
+                maxTs = value;
+            } else if(type.equals("last")) {
+                lastTs = value;
+            }
+        }
+        if(maxTs > lastTs) {
+            Calendar target = new GregorianCalendar();
+            target.setTimeInMillis(maxTs);
+            target.set(Calendar.HOUR, 0);
+            target.set(Calendar.MINUTE, 0);
+            target.set(Calendar.SECOND, 0);
+            target.set(Calendar.MILLISECOND, 0);
 
-    private void addClientChange(long ts, long idOfOrg, Long idOfMigrateOrg,
+            Calendar now = new GregorianCalendar();
+            now.setTimeInMillis(System.currentTimeMillis());
+            now.set(Calendar.HOUR, 0);
+            now.set(Calendar.MINUTE, 0);
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
+
+            if(target.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)) {
+                return maxTs;
+            }
+        }
+        return System.currentTimeMillis();
+    }
+
+    public static void addClientChange
+                                (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
                                  FieldProcessor.Config fieldConfig,
                                  Client currentClient, int operation) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
@@ -458,7 +530,7 @@ public class ImportRegisterClientsService {
     }
 
 
-    private void addClientChange(long ts, long idOfOrg, Client currentClient, int operation) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
         currentClient = em.merge(currentClient);
@@ -805,8 +877,7 @@ public class ImportRegisterClientsService {
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
-        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName()+" GUID ["+orgGuids.getGuidInfo()+"]", logBuffer);
 
@@ -870,7 +941,7 @@ public class ImportRegisterClientsService {
     } */
 
 
-    private static void log(String str, StringBuffer logBuffer) {
+    public static void log(String str, StringBuffer logBuffer) {
         if (logBuffer != null) {
             logBuffer.append(str).append('\n');
         }
@@ -879,7 +950,7 @@ public class ImportRegisterClientsService {
         }
     }
 
-    private static void logError(String str, Exception e, StringBuffer logBuffer) {
+    public static void logError(String str, Exception e, StringBuffer logBuffer) {
         if (logBuffer != null) {
             logBuffer.append(str).append(": ").append(e.getMessage());
         }
