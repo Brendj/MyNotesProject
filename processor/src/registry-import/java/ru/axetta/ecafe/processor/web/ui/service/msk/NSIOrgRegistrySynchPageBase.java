@@ -160,7 +160,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             ACTION_FILTERS.put(ImportRegisterClientsService.CREATE_OPERATION, "Создание");
             ACTION_FILTERS.put(ImportRegisterClientsService.DELETE_OPERATION, "Удаление");
             ACTION_FILTERS.put(ImportRegisterClientsService.MODIFY_OPERATION, "Изменение");
-            ACTION_FILTERS.put(ImportRegisterClientsService.MOVE_OPERATION, "Премещение");
+            ACTION_FILTERS.put(ImportRegisterClientsService.MOVE_OPERATION, "Перемещение");
             ACTION_FILTERS.put(ALL_OPERATIONS, "Все");
         }
 
@@ -563,7 +563,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 case ImportRegisterClientsService.MODIFY_OPERATION:
                     return "изменение";
                 case ImportRegisterClientsService.MOVE_OPERATION:
-                    return "премещение";
+                    return "перемещение";
                 default:
                     return "неизвестно";
             }

@@ -172,7 +172,7 @@
                             </rich:datascroller>
                         </f:facet>
                     </rich:dataTable>
-                    <a4j:commandButton value="Провести сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                    <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
                 </h:panelGroup>
 

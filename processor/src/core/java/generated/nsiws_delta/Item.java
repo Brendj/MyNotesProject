@@ -45,6 +45,8 @@ public class Item {
 
     @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
     protected List<Attribute> attribute;
+    @XmlAttribute(name = "GUID")
+    protected String guid;
     @XmlAttribute
     protected String primaryKey;
     @XmlAttribute
@@ -92,6 +94,30 @@ public class Item {
     }
 
     /**
+     * Gets the value of the guid property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public String getGUID() {
+        return guid;
+    }
+
+    /**
+     * Sets the value of the guid property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setGUID(String value) {
+        this.guid = value;
+    }
+
+    /**
      * Sets the value of the primaryKey property.
      * 
      * @param value
@@ -131,6 +157,7 @@ public class Item {
     public String toString() {
         return "Item{" +
                 "attribute=" + attribute +
+                ", GUID='" + guid + '\'' +
                 ", primaryKey='" + primaryKey + '\'' +
                 ", action=" + action +
                 '}';

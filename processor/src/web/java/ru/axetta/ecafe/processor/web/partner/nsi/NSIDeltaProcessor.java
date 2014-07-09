@@ -249,6 +249,8 @@ public class NSIDeltaProcessor {
 
         public DeltaItem(Item item) {
             this.primaryKey = item.getPrimaryKey();
+            this.guid = item.getGUID();
+
             for(Attribute at : item.getAttribute()) {
                 if(StringUtils.isBlank(at.getName())) {
                     continue;
@@ -263,9 +265,9 @@ public class NSIDeltaProcessor {
                 else if(attributeName.endsWith("отчество")) {
                     secondName = getSingleValue(at);
                 }
-                else if(attributeName.endsWith("guid")) {
+                /*else if(attributeName.endsWith("guid")) {
                     guid = getSingleValue(at);
-                }
+                }*/
                 else if(attributeName.endsWith("текущий класс или группа")) {
                     group = getSingleValue(at);
                 }
