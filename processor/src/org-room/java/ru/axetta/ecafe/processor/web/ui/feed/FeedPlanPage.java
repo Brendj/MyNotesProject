@@ -21,7 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.OrgRoomMainPage;
 import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
@@ -728,7 +728,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             //  чтобы отобразить ошибки или успехи сохранения заказов
             OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
             panel.setClientSaveMessages(result);
-            MainPage.getSessionInstance().doShowOrderRegistrationResultPanel(this);
+            OrgRoomMainPage.getSessionInstance().doShowOrderRegistrationResultPanel(this);
         } else if (clearPlan) {
             resetMessages();
             if (hasSavedData()) {
@@ -792,14 +792,14 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         resetMessages();
         ReplaceClientPanel panel = RuntimeContext.getAppContext().getBean(ReplaceClientPanel.class);
         panel.setClients(replaceClients, cl);
-        MainPage.getSessionInstance().doShowReplaceClientPanel();
+        OrgRoomMainPage.getSessionInstance().doShowReplaceClientPanel();
     }
 
     public void doShowDisableComplexPanel() {
         resetMessages();
         DisableComplexPanel panel = RuntimeContext.getAppContext().getBean(DisableComplexPanel.class);
         panel.setComplexes(disabledComplexes);
-        MainPage.getSessionInstance().doShowDisableComplexPanel();
+        OrgRoomMainPage.getSessionInstance().doShowDisableComplexPanel();
     }
 
     public void doDecreaseDay() {
