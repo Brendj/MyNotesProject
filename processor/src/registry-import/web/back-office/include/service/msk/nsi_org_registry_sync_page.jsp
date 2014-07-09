@@ -52,7 +52,7 @@
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Дата сверки разногласий" styleClass="output-text" />
-            <h:selectOneMenu id="revisionDates" value="#{NSIOrgRegistrySynchPage.revisionCreateDate}" style="width:150px;" >
+            <h:selectOneMenu id="revisionDates" value="#{NSIOrgRegistrySynchPage.revisionCreateDate}" style="width:350px;" >
                 <f:selectItems value="#{NSIOrgRegistrySynchPage.revisions}"/>
             </h:selectOneMenu>
         </h:panelGrid>

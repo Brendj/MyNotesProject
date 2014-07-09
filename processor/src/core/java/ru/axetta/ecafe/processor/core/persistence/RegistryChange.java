@@ -29,7 +29,10 @@ public class RegistryChange {
     protected String error;
     protected Long idOfClient;
     protected Integer operation;
+    protected Integer type;
     protected Boolean applied;
+    public static final int FULL_COMPARISON = 1;
+    public static final int CHANGES_UPDATE = 2;
 
     public RegistryChange() {
     }
@@ -37,7 +40,7 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Boolean applied, String error) {
+            Long idOfClient, Integer operation, Integer type, Boolean applied, String error) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -54,6 +57,7 @@ public class RegistryChange {
         this.groupNameFrom = groupNameFrom;
         this.idOfClient = idOfClient;
         this.operation = operation;
+        this.type = type;
         this.applied = applied;
         this.error = error;
     }
@@ -184,6 +188,14 @@ public class RegistryChange {
 
     public void setOperation(Integer operation) {
         this.operation = operation;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public Boolean getApplied() {

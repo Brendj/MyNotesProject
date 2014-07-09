@@ -327,7 +327,7 @@ public class ImportRegisterClientsService {
                                 emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                                 dbClient.getPerson().getSecondName()) + ", " +
                                 emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
-                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
+                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
@@ -346,7 +346,7 @@ public class ImportRegisterClientsService {
                             emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                             dbClient.getPerson().getSecondName()) + ", " +
                             emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
-                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
+                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
                 }
             }
         }
@@ -397,7 +397,7 @@ public class ImportRegisterClientsService {
                         + ", " +
                         emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
                         + " в школу " + newOrg.getIdOfOrg(), logBuffer);
-                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION);
+                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION, RegistryChange.FULL_COMPARISON);
                 continue;
             }
             if (!updateClient) {
@@ -412,7 +412,7 @@ public class ImportRegisterClientsService {
                         log(synchDate + "Добавление " + pupil.getGuid() + ", " +
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
-                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION);
+                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION, RegistryChange.FULL_COMPARISON);
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -427,26 +427,13 @@ public class ImportRegisterClientsService {
                             emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION);
+                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION, RegistryChange.FULL_COMPARISON);
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
-    }
-
-
-    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation) throws Exception {
-        //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
-        addClientChange(ts, idOfOrg, fieldConfig, null, operation);
-    }
-
-
-    private void addClientChange(long ts, long idOfOrg,
-            FieldProcessor.Config fieldConfig,
-            Client currentClient, int operation) throws Exception {
-        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation);
     }
 
     public static long getLastUncommitedChange(EntityManager em) {
@@ -493,10 +480,23 @@ public class ImportRegisterClientsService {
         return System.currentTimeMillis();
     }
 
+
+    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation, int type) throws Exception {
+        //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
+        addClientChange(ts, idOfOrg, fieldConfig, null, operation, type);
+    }
+
+
+    private void addClientChange(long ts, long idOfOrg,
+            FieldProcessor.Config fieldConfig,
+            Client currentClient, int operation, int type) throws Exception {
+        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation, type);
+    }
+
     public static void addClientChange
                                 (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
                                  FieldProcessor.Config fieldConfig,
-                                 Client currentClient, int operation) throws Exception {
+                                 Client currentClient, int operation, int type) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
         Session sess = (Session) em.getDelegate();
         if (currentClient != null) {
@@ -514,6 +514,7 @@ public class ImportRegisterClientsService {
         ch.setOperation(operation);
         ch.setCreateDate(ts);
         ch.setApplied(false);
+        ch.setType(type);
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
@@ -530,7 +531,8 @@ public class ImportRegisterClientsService {
     }
 
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg,
+                                       Client currentClient, int operation, int type) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
         currentClient = em.merge(currentClient);
@@ -544,6 +546,7 @@ public class ImportRegisterClientsService {
         ch.setIdOfClient(currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
         ch.setOperation(operation);
+        ch.setType(type);
         ch.setCreateDate(ts);
         ch.setApplied(false);
         sess.save(ch);

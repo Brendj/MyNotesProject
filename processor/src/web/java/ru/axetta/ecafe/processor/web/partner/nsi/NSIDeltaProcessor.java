@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
@@ -137,6 +138,12 @@ public class NSIDeltaProcessor {
                                                StringBuffer logBuffer, DeltaItem item) throws NSIDeltaException {
         if(item.getAction() == Action.ADDED.ordinal()) {
             Org org = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
+            if(org == null) {
+                ImportRegisterClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
+                        item.getFamilyName() + " " + item.getFirstName() + " " +
+                        item.getSecondName() + ", " + item.getGroup() + " невозможено - школа " + item.getOrgGuid() + " не найдена", logBuffer);
+                return;
+            }
             try {
                 //  log
                 ImportRegisterClientsService.log(synchDate + "Добавление " + item.getGuid() + ", " +
@@ -145,13 +152,16 @@ public class NSIDeltaProcessor {
                 //  exec
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig());
                 ImportRegisterClientsService.addClientChange(em, ts, org.getIdOfOrg(), null, fieldConfig, null,
-                        ImportRegisterClientsService.CREATE_OPERATION);
+                        ImportRegisterClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE);
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }
         } else if(item.getAction() == Action.MODIFIED.ordinal()) {
             Client cl = DAOUtils.findClientByGuid(em, StringUtils.isBlank(item.getGuid()) ? "" : item.getGuid());
             if(cl == null) {
+                ImportRegisterClientsService.log(synchDate + "Невозможно обработать изменение клиента " +
+                        emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                        emptyIfNull(cl.getPerson().getFirstName()) + " - не найден", logBuffer);
                 return;
             }
             try {
@@ -164,7 +174,7 @@ public class NSIDeltaProcessor {
                                 emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                                 + ", " +
                                 emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
-                                + " в школу " + item.getOrgGuid() + " невозможен - школа не найдена", logBuffer);
+                                + " в школу " + item.getOrgGuid() + " невозможен - школа " + item.getOrgGuid() + " не найдена", logBuffer);
                         return;
                     }
                     //  log
@@ -176,7 +186,7 @@ public class NSIDeltaProcessor {
                             + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                     //  exec
                     ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl,
-                            ImportRegisterClientsService.MOVE_OPERATION);
+                            ImportRegisterClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE);
                 } else {
                     //  log
                     ImportRegisterClientsService.log(synchDate + "Изменение " +
@@ -189,7 +199,7 @@ public class NSIDeltaProcessor {
                             emptyIfNull(item.getSecondName()) + ", " + emptyIfNull(item.getGroup()), logBuffer);
                     //  exec
                     ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), null, fieldConfig, cl,
-                            ImportRegisterClientsService.MODIFY_OPERATION);
+                            ImportRegisterClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE);
                 }
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
@@ -197,6 +207,9 @@ public class NSIDeltaProcessor {
         } else if(item.getAction() == Action.DELETED.ordinal()) {
             Client cl = DAOUtils.findClientByGuid(em, StringUtils.isBlank(item.getGuid()) ? "" : item.getGuid());
             if(cl == null) {
+                ImportRegisterClientsService.log(synchDate + "Невозможно обработать удаление клиента " +
+                        emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                        emptyIfNull(cl.getPerson().getFirstName()) + " - не найден", logBuffer);
                 return;
             }
             try {
@@ -208,7 +221,7 @@ public class NSIDeltaProcessor {
                         emptyIfNull(cl.getClientGroup().getGroupName()), logBuffer);
                 //  exec
                 ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), cl,
-                        ImportRegisterClientsService.DELETE_OPERATION);
+                        ImportRegisterClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE);
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }

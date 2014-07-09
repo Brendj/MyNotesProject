@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import generated.registry.manual_synch.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -55,7 +56,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
     private long revisionCreateDate;
     private int actionFilter;
-    private List<Long> revisions;
+    private List<RevisionItem> revisions;
     private List<RegistryChangeErrorItem> errors;
     private static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
     private long idOfSelectedError;
@@ -145,11 +146,18 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         List<SelectItem> items = new ArrayList<SelectItem>();
-        for (long date : revisions) {
+        for (RevisionItem item : revisions) {
+            long date = item.getDate();
+            String type = null;
+            if(item.getType() == RegistryChange.CHANGES_UPDATE) {
+                type = "Загрузка обновлений";
+            } else if(item.getType() == RegistryChange.FULL_COMPARISON) {
+                type = "Полная сверка";
+            }
             if (items.size() < 1) {
-                items.add(new SelectItem(date, df.format(new Date(date)) + " - Последняя"));
+                items.add(new SelectItem(date, df.format(new Date(date)) + " - Последняя " + " {" + type + "}"));
             } else {
-                items.add(new SelectItem(date, df.format(new Date(date))));
+                items.add(new SelectItem(date, df.format(new Date(date))+ " {" + type + "}"));
             }
         }
         return items;
@@ -351,7 +359,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         errors = controller.loadRegistryChangeErrorItemsInternal(getIdOfOrg());
     }
 
-    private List<Long> loadRevisions () {
+    private List<RevisionItem> loadRevisions () {
         //  Создание соединения со службой
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 1L) {
@@ -370,7 +378,12 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        return controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());
+        List<Long> res = controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());      ////         !!!!!! ЗАМЕНИТЬ
+        List<RevisionItem> result = new ArrayList<RevisionItem>();
+        for(Long date : res) {
+            result.add(new RevisionItem(date, 1));
+        }
+        return result;
     }
 
 
@@ -440,7 +453,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
     private boolean isPermittedRevision() {
         return (revisionCreateDate < 0 || revisions == null || revisions.get(0) == null ||
-                revisionCreateDate != revisions.get(0)) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
+                revisionCreateDate != revisions.get(0).getDate()) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
     }
 
     private int getCountOfOperation() {
@@ -663,10 +676,36 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             return "";
         }
 
-        if (revisions.get(0).longValue() == revisionCreateDate) {
+        if (revisions.get(0).getDate() == revisionCreateDate) {
             return "последней сверки";
         } else {
             return "сверки от " + df.format(new Date(revisionCreateDate));
+        }
+    }
+
+    public static final class RevisionItem {
+        protected long date;
+        protected int type;
+
+        public RevisionItem(long date, int type) {
+            this.date = date;
+            this.type = type;
+        }
+
+        public long getDate() {
+            return date;
+        }
+
+        public void setDate(long date) {
+            this.date = date;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
     }
 }

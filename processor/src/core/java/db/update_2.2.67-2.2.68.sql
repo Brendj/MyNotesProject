@@ -6,3 +6,6 @@
 
 -- таблица блокирования заказов
 ALTER TABLE cf_orgs ADD COLUMN lastGoodRequestChange bigint;
+
+-- тип сверки с реестром (полная - 1; изменения - 2)
+alter table CF_RegistryChange add column type integer not null default 1;
