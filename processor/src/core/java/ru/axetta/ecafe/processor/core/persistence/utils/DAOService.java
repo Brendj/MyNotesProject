@@ -1306,8 +1306,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
-    public List<Long> getRegistryChangeRevisions(long idOfOrg) throws Exception {
-        TypedQuery<Long> query = entityManager.createQuery("select distinct createDate from RegistryChange where idOfOrg=:idOfOrg order by createDate desc",Long.class);
+    public List getRegistryChangeRevisions(long idOfOrg) throws Exception {
+        Query query = entityManager.createQuery("select distinct createDate, type from RegistryChange where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg",idOfOrg);
         return query.getResultList();
     }

@@ -173,7 +173,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
-    public List<Long> loadRegistryChangeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
+    public List<RegistryChangeRevisionItem> loadRegistryChangeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
             checkRequestValidity(idOfOrg);
         } catch(FrontControllerException fce) {
@@ -185,7 +185,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisionsInternal")
-    public List<Long> loadRegistryChangeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+    public List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {

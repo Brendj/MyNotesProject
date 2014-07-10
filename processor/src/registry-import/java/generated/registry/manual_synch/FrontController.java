@@ -455,13 +455,13 @@ public interface FrontController {
      * 
      * @param idOfOrg
      * @return
-     *     returns java.util.List<java.lang.Long>
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeRevisionItem>
      */
     @WebMethod
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "loadRegistryChangeRevisions", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisions")
     @ResponseWrapper(localName = "loadRegistryChangeRevisionsResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsResponse")
-    public List<Long> loadRegistryChangeRevisions(
+    public List<RegistryChangeRevisionItem> loadRegistryChangeRevisions(
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg);
 
@@ -469,13 +469,13 @@ public interface FrontController {
      * 
      * @param idOfOrg
      * @return
-     *     returns java.util.List<java.lang.Long>
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeRevisionItem>
      */
     @WebMethod
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "loadRegistryChangeRevisionsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsInternal")
     @ResponseWrapper(localName = "loadRegistryChangeRevisionsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsInternalResponse")
-    public List<Long> loadRegistryChangeRevisionsInternal(
+    public List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsInternal(
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg);
 

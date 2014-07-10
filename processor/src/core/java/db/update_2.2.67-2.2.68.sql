@@ -9,3 +9,6 @@ ALTER TABLE cf_orgs ADD COLUMN lastGoodRequestChange bigint;
 
 -- тип сверки с реестром (полная - 1; изменения - 2)
 alter table CF_RegistryChange add column type integer not null default 1;
+CREATE index "cf_cf_registrychange_type_idx" ON CF_RegistryChange (type);
+alter table CF_RegistryChange add column notificationId varchar(15) default null;
+CREATE index "cf_cf_registrychange_notificationId_idx" ON CF_RegistryChange (notificationId);

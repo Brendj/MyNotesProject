@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="return" type="{http://www.w3.org/2001/XMLSchema}long" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="return" type="{http://ru.axetta.ecafe}registryChangeRevisionItem" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,8 +34,8 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class LoadRegistryChangeRevisionsInternalResponse {
 
-    @XmlElement(name = "return", type = Long.class)
-    protected List<Long> _return;
+    @XmlElement(name = "return")
+    protected List<RegistryChangeRevisionItem> _return;
 
     /**
      * Gets the value of the return property.
@@ -55,13 +55,13 @@ public class LoadRegistryChangeRevisionsInternalResponse {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Long }
+     * {@link RegistryChangeRevisionItem }
      * 
      * 
      */
-    public List<Long> getReturn() {
+    public List<RegistryChangeRevisionItem> getReturn() {
         if (_return == null) {
-            _return = new ArrayList<Long>();
+            _return = new ArrayList<RegistryChangeRevisionItem>();
         }
         return this._return;
     }

@@ -33,6 +33,7 @@
         <property name="type" column="Type" type="int" not-null="true"/>
         <property name="applied" column="Applied" type="boolean" not-null="true"/>
         <property name="error" column="Error" type="string" length="256"/>
+        <property name="notificationId" column="NotificationId" type="string" length="15"/>
     </class>
 </hibernate-mapping>
 

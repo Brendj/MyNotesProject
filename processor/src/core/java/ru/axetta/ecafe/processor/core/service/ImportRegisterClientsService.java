@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -443,13 +444,18 @@ public class ImportRegisterClientsService {
         Query q = session.createSQLQuery(
                   "select max(rc1.createdate), 'last' "
                 + "from CF_RegistryChange rc1 "
-                + "where rc1.applied=true "
+                + "where rc1.applied=true and rc1.type=:type "
                 + "union all "
                 + "select max(rc1.createdate), 'max' "
-                + "from CF_RegistryChange rc1");
+                + "from CF_RegistryChange rc1 "
+                + "where rc1.type=:type");
+        q.setParameter("type", RegistryChange.CHANGES_UPDATE);
         List resultList = q.list();
         for (Object obj : resultList) {
             Object[] dat = (Object[]) obj;
+            if(dat[0] == null) {
+                continue;
+            }
             Long value = ((BigInteger) dat[0]).longValue();
             String type = (String) dat[1];
             if(type.equals("max")) {
@@ -494,13 +500,39 @@ public class ImportRegisterClientsService {
     }
 
     public static void addClientChange
+            (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
+                    FieldProcessor.Config fieldConfig,
+                    Client currentClient, int operation, int type) throws Exception {
+        addClientChange(em, ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null);
+    }
+
+    public static boolean isRegistryChangeExist(String notificationId, Client client, int operation, Session session) {
+        Query q = session.createSQLQuery(
+                  "SELECT 1 "
+                + "FROM cf_registrychange "
+                + "where notificationId=:notificationId and operation=:operation");
+        q.setParameter("notificationId", notificationId);
+        q.setParameter("operation", operation);
+        List res = q.list();
+        if(res == null || res.size() < 1) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static void addClientChange
                                 (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
                                  FieldProcessor.Config fieldConfig,
-                                 Client currentClient, int operation, int type) throws Exception {
+                                 Client currentClient, int operation, int type, String notificationId) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
         Session sess = (Session) em.getDelegate();
         if (currentClient != null) {
             currentClient = em.merge(currentClient);
+        }
+        if(type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
+           isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
+            return;
         }
 
         RegistryChange ch = new RegistryChange();
@@ -515,6 +547,7 @@ public class ImportRegisterClientsService {
         ch.setCreateDate(ts);
         ch.setApplied(false);
         ch.setType(type);
+        ch.setNotificationId(notificationId);
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
@@ -530,12 +563,22 @@ public class ImportRegisterClientsService {
         sess.save(ch);
     }
 
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg,
+            Client currentClient, int operation, int type) throws Exception {
+        addClientChange(em, ts, idOfOrg, currentClient, operation, type, null);
+    }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg,
-                                       Client currentClient, int operation, int type) throws Exception {
+            Client currentClient, int operation, int type, String notificationId) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
-        currentClient = em.merge(currentClient);
+        if (currentClient != null) {
+            currentClient = em.merge(currentClient);
+        }
+        if(type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
+           isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
+            return;
+        }
 
         RegistryChange ch = new RegistryChange();
         ch.setClientGUID(currentClient.getClientGUID());
@@ -549,6 +592,7 @@ public class ImportRegisterClientsService {
         ch.setType(type);
         ch.setCreateDate(ts);
         ch.setApplied(false);
+        ch.setNotificationId(notificationId);
         sess.save(ch);
     }
 

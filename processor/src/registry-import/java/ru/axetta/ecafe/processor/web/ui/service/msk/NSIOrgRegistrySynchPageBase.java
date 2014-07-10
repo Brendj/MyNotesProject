@@ -65,6 +65,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private List<SelectItem> displayModes;
     private int displayMode;
     private String nameFilter;
+    private long loadedOrgRevisions = -1L;
 
     public String getPageFilename() {
         return "service/msk/nsi_org_registry_sync_page";
@@ -141,8 +142,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     }
 
     public List<SelectItem> getRevisions() {
-        if (revisions == null || revisions.size() < 1) {
+        if ((revisions == null || revisions.size() < 1) || getIdOfOrg() != loadedOrgRevisions) {
             revisions = loadRevisions();
+            loadedOrgRevisions = getIdOfOrg();
         }
 
         List<SelectItem> items = new ArrayList<SelectItem>();
@@ -378,10 +380,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        List<Long> res = controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());      ////         !!!!!! ЗАМЕНИТЬ
+        List<RegistryChangeRevisionItem> res = controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());
         List<RevisionItem> result = new ArrayList<RevisionItem>();
-        for(Long date : res) {
-            result.add(new RevisionItem(date, 1));
+        for(RegistryChangeRevisionItem i : res) {
+            result.add(new RevisionItem(i.getDate(), i.getType()));
         }
         return result;
     }

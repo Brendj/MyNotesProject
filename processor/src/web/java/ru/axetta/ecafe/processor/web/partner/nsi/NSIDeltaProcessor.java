@@ -152,7 +152,7 @@ public class NSIDeltaProcessor {
                 //  exec
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig());
                 ImportRegisterClientsService.addClientChange(em, ts, org.getIdOfOrg(), null, fieldConfig, null,
-                        ImportRegisterClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE);
+                        ImportRegisterClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }
@@ -186,7 +186,7 @@ public class NSIDeltaProcessor {
                             + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                     //  exec
                     ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl,
-                            ImportRegisterClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE);
+                            ImportRegisterClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId());
                 } else {
                     //  log
                     ImportRegisterClientsService.log(synchDate + "Изменение " +
@@ -199,7 +199,7 @@ public class NSIDeltaProcessor {
                             emptyIfNull(item.getSecondName()) + ", " + emptyIfNull(item.getGroup()), logBuffer);
                     //  exec
                     ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), null, fieldConfig, cl,
-                            ImportRegisterClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE);
+                            ImportRegisterClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId());
                 }
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
@@ -221,7 +221,7 @@ public class NSIDeltaProcessor {
                         emptyIfNull(cl.getClientGroup().getGroupName()), logBuffer);
                 //  exec
                 ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), cl,
-                        ImportRegisterClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE);
+                        ImportRegisterClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
             }
@@ -258,10 +258,10 @@ public class NSIDeltaProcessor {
     protected class DeltaItem {
         protected String familyName, firstName, secondName, guid, group, orgGuid;
         protected int action;
-        protected String primaryKey;
+        protected String notificationId;
 
         public DeltaItem(Item item) {
-            this.primaryKey = item.getPrimaryKey();
+            this.notificationId = item.getNotificationId();
             this.guid = item.getGUID();
 
             for(Attribute at : item.getAttribute()) {
@@ -291,8 +291,8 @@ public class NSIDeltaProcessor {
             action = item.getAction().ordinal();
         }
 
-        public String getPrimaryKey() {
-            return primaryKey;
+        public String getNotificationId() {
+            return notificationId;
         }
 
         public int getAction() {

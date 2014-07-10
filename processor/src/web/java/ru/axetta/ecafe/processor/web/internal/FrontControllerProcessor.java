@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
+import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeRevisionItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebParam;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -68,9 +70,20 @@ public class FrontControllerProcessor {
         }
     }
 
-    public List<Long> loadRegistryChangeRevisions(long idOfOrg) {
+    public List<RegistryChangeRevisionItem> loadRegistryChangeRevisions(long idOfOrg) {
         try {
-            return DAOService.getInstance().getRegistryChangeRevisions(idOfOrg);
+            List queryResult = DAOService.getInstance().getRegistryChangeRevisions(idOfOrg);
+            if(queryResult == null || queryResult.size() < 1) {
+                return Collections.EMPTY_LIST;
+            }
+            List<RegistryChangeRevisionItem> result = new ArrayList<RegistryChangeRevisionItem>();
+            for(Object o : queryResult) {
+                Object entry [] = (Object[]) o;
+                long date = (Long) entry[0];
+                int type = (Integer) entry[1];
+                result.add(new RegistryChangeRevisionItem(date, type));
+            }
+            return result;
         } catch (Exception e) {
             logger.error("Failed to load registry change revisions list", e);
         }

@@ -45,6 +45,8 @@ public class Item {
 
     @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
     protected List<Attribute> attribute;
+    @XmlAttribute(name = "notificationId")
+    protected String notificationId;
     @XmlAttribute(name = "GUID")
     protected String guid;
     @XmlAttribute
@@ -151,6 +153,14 @@ public class Item {
      */
     public void setAction(Action value) {
         this.action = value;
+    }
+
+    public String getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(String notificationId) {
+        this.notificationId = notificationId;
     }
 
     @Override
