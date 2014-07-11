@@ -40,11 +40,7 @@ public class WSLoggingInInterceptor extends AbstractSoapInterceptor {
         super(Phase.RECEIVE);
     }
 
-    protected File getLogFile() {
-        String folder = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_LOGGING_FOLDER);
-        if(StringUtils.isBlank(folder)) {
-            return null;
-        }
+    protected File getLogFile(String folder) {
         String fileName = new SimpleDateFormat("dd_MM_yyyy").format(new Date(System.currentTimeMillis())) + ".log";
         File f = new File(folder, fileName);
         if(!f.exists()) {
@@ -61,8 +57,12 @@ public class WSLoggingInInterceptor extends AbstractSoapInterceptor {
 
     @Override
     public void handleMessage(SoapMessage message) throws Fault {
+        String folder = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_LOGGING_FOLDER);
+        if(folder == null || StringUtils.isBlank(folder)) {
+            return;
+        }
         //get the remote address
-        File f = getLogFile();
+        File f = getLogFile(folder);
         if(f == null) {
             logger.error("Failed to create WS logging file");
             return;
