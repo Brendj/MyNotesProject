@@ -85,6 +85,8 @@ the signature crypto configuration.  See SignaturePropRefId. -->
         </constructor-arg>
     </bean>
 
+    <bean id="wsLoggingInInterceptor" class="ru.axetta.ecafe.processor.web.partner.WSLoggingInInterceptor"/>
+
     <jaxws:endpoint
             id="FrontController"
             address='http://localhost:8080/processor/soap/front'
@@ -104,6 +106,9 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             id="NSIDeltaController"
             address='http://localhost:8080/processor/soap/nsi_delta'
             implementor='ru.axetta.ecafe.processor.web.partner.nsi.NSIDeltaController'>
+        <jaxws:inInterceptors>
+            <ref bean="wsLoggingInInterceptor"/>
+        </jaxws:inInterceptors>
     </jaxws:endpoint>
     <jaxws:endpoint
             id="PaymentControllerWS"

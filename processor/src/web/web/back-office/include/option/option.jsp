@@ -298,6 +298,8 @@
                     <h:inputText value="#{optionPage.syncRegisterDaysTimeout}" styleClass="input-text" size="5" />
                     <h:outputText escape="true" value="Маска IP-адреса для доступа к локальным методам" styleClass="output-text" />
                     <h:inputText value="#{optionPage.frontControllerRequestIpMask}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Вести логгирование запросов в" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.synchLoggingFolder}" styleClass="input-text" size="100" />
                 </h:panelGrid>
             </rich:panel>
 

@@ -92,7 +92,8 @@ public class Option {
             OPTION_FRON_CONTROLLER_REQ_IP_MASK=100046,
 
             OPTION_SYNCH_CLEANUP_ON=100047,
-            OPTION_MSK_NSI_WSDL_URL=100048
+            OPTION_MSK_NSI_WSDL_URL=100048,
+            OPTION_MSK_NSI_LOGGING_FOLDER=100049
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -163,7 +164,8 @@ public class Option {
             OPTION_EXPORT_BI_DATA_LAST_UPDATE,"1386374400000",
             OPTION_RECONCILIATION_SETTING, "",
             OPTION_FRON_CONTROLLER_REQ_IP_MASK, "127\\.0\\.0\\.1",
-            OPTION_SYNCH_CLEANUP_ON, "1"
+            OPTION_SYNCH_CLEANUP_ON, "1",
+            OPTION_MSK_NSI_LOGGING_FOLDER, ""
 };
 
     private Long idOfOption;

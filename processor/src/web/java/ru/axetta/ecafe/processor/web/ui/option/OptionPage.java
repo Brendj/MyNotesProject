@@ -100,6 +100,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String frontControllerRequestIpMask;
     private Boolean synchCleanup;
     private String arrayOfFilterText;
+    private String synchLoggingFolder;
 
     private List<BankOptionItem> banks;
 
@@ -622,6 +623,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.arrayOfFilterText = arrayOfFilterText;
     }
 
+    public String getSynchLoggingFolder() {
+        return synchLoggingFolder;
+    }
+
+    public void setSynchLoggingFolder(String synchLoggingFolder) {
+        this.synchLoggingFolder = synchLoggingFolder;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -703,6 +712,7 @@ public class OptionPage extends BasicWorkspacePage {
                 Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
         frontControllerRequestIpMask = runtimeContext.getOptionValueString(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK);
         synchCleanup = runtimeContext.getOptionValueBool(Option.OPTION_SYNCH_CLEANUP_ON);
+        synchLoggingFolder = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_LOGGING_FOLDER);
 
         bankListPage.onShow();
 
@@ -826,6 +836,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK, frontControllerRequestIpMask);
             runtimeContext.setOptionValue(Option.OPTION_SYNCH_CLEANUP_ON, synchCleanup);
             runtimeContext.setOptionValue(Option.OPTION_ARRAY_OF_FILTER_TEXT, arrayOfFilterText);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_LOGGING_FOLDER, synchLoggingFolder);
+
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
