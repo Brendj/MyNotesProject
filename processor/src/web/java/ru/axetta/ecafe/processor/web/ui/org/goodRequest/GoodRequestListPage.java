@@ -53,7 +53,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         return null;
     }
 
-    public void reload() throws Exception{
+    private void reload() throws Exception{
         stateList.clear();
         for (Integer i: documentState){
             stateList.add(DocumentState.values()[i]);
@@ -62,7 +62,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         localCalendar.setTime(endDate);
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         Date end = localCalendar.getTime();
-        goodRequestList = goodRequestRepository.findByFilter(idOfOrg,stateList,baseDate,end,deletedState, Boolean.FALSE);
+        goodRequestList = goodRequestRepository.findByFilterOnlyGoodRequest(idOfOrg,stateList,baseDate,end,deletedState);
     }
 
     public String getPageTitle() {

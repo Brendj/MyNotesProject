@@ -121,6 +121,30 @@ public class GoodRequestRepository {
         return criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public List<GoodRequest> findByFilterOnlyGoodRequest(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState) {
+        Session session =  entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.between("doneDate", startDate, endDate));
+        if (deletedState != 2) {
+            boolean deletedFlag = false;
+            if (deletedState == 1) {
+                deletedFlag = true;
+            }
+            criteria.add(Restrictions.eq("deletedState",deletedFlag));
+        }
+        if (idOfOrg != null) {
+            criteria.add(Restrictions.eq("orgOwner",idOfOrg));
+        }
+
+        if ((stateList != null) && !stateList.isEmpty()) {
+            criteria.add(Restrictions.in("state",stateList));
+        }
+        criteria.addOrder(Order.desc("doneDate"));
+        return criteria.list();
+    }
+
     @Transactional(readOnly = true)
     public List<GoodRequest> findGoodRequestAll(List<Long> idOfOrg){
         TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequest where deletedState=false and orgOwner in :orgOwner", GoodRequest.class);
