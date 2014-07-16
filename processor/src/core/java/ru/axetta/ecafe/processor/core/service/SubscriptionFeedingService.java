@@ -344,19 +344,25 @@ public class SubscriptionFeedingService {
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
         List list = criteria.list();
-        List<SubscriptionFeeding> subscriptionFeedings = new ArrayList<SubscriptionFeeding>(list.size());
+        ArrayList<SubscriptionFeeding> subscriptionFeedings = new ArrayList<SubscriptionFeeding>(list.size());
         for (Object obj: list){
             SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) obj;
             subscriptionFeedings.add(subscriptionFeeding);
         }
-        Collections.reverse(subscriptionFeedings);
+        Collections.sort(subscriptionFeedings, new Comparator<SubscriptionFeeding>() {
+            @Override public int compare(SubscriptionFeeding o1, SubscriptionFeeding o2) {
+                return o2.getGlobalId().compareTo(o1.getGlobalId());
+            }
+        });
         SubscriptionFeeding subscriptionFeeding = null;
         for (SubscriptionFeeding sf: subscriptionFeedings){
-            subscriptionFeeding = sf;
-            if((sf.getDateActivateService() == null || sf.getDateActivateService().before(currentDate)) &&
-                  (sf.getLastDatePauseService()==null || sf.getLastDatePauseService().after(currentDate))){
+            if(sf.getLastDatePauseService()!=null){
                 break;
             }
+            subscriptionFeeding = sf;
+        }
+        if(subscriptionFeeding==null && !subscriptionFeedings.isEmpty()){
+            subscriptionFeeding = subscriptionFeedings.get(subscriptionFeedings.size()-1);
         }
         return subscriptionFeeding;
     }

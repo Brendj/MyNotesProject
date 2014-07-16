@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.subfeeding;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingExt;
 
 import java.io.Serializable;
@@ -83,6 +84,20 @@ public class SubscriptionFeeding implements Serializable {
         if(dateActivate.getTime()<currentDate.getTime() && lastDatePause==null) return "Активна";
         if(lastDatePause!=null && lastDatePause.getTime()>currentDate.getTime()) return "Ожидает прекращения";
         if(lastDatePause!=null && lastDatePause.getTime()<currentDate.getTime()) return "Приостановлена";
+        return "";
+    }
+
+    public String getSubscriptionStateWithDate(){
+        Date currentDate = new Date();
+        if(dateActivate==null) return "Услуга подключена";
+        if(dateActivate.getTime()>currentDate.getTime() && lastDatePause==null)
+            return String.format("Ожидает активации c %s", CalendarUtils.dateShortToString(dateActivate));
+        if(dateActivate.getTime()<currentDate.getTime() && lastDatePause==null)
+            return "Активна";
+        if(lastDatePause!=null && lastDatePause.getTime()>currentDate.getTime())
+            return String.format("Ожидает прекращения c %s", CalendarUtils.dateShortToString(lastDatePause));
+        if(lastDatePause!=null && lastDatePause.getTime()<currentDate.getTime())
+            return "Приостановлена";
         return "";
     }
 

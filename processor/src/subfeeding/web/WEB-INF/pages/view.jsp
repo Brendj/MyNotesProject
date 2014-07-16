@@ -82,6 +82,11 @@
         <div class="rightcol"><%=subBalance1%> руб.</div>
     </div>
     <c:if test="${requestScope.subscriptionFeeding!=null}">
+        <%--<div class="colRow">--%>
+            <%--<div class="leftcol">Идентификатор:</div>--%>
+            <%--<div class="rightcol"><%=subscriptionFeeding.getIdOfSubscriptionFeeding()%>--%>
+            <%--</div>--%>
+        <%--</div>--%>
         <div class="colRow">
             <div class="leftcol">Дата создания услуги АП:</div>
             <div class="rightcol"><%=df.format(subscriptionFeeding.getDateCreateService())%>
@@ -108,14 +113,7 @@
             <div class="colRow">
                 <div class="leftcol">Состояние услуги:</div>
                 <div class="rightcol">
-                    <%String status = "услуга активна";
-                        if (wasSuspended && subscriptionFeeding.getLastDatePause() != null) {
-                            boolean reallySuspended = subscriptionFeeding.getLastDatePause().after(new Date());
-                            status =
-                                    "услуга " + (reallySuspended ? "приостанавливается" : "приостановлена") + " с " + df
-                                            .format(subscriptionFeeding.getLastDatePause());
-                        }
-                        out.print(status);%>
+                    <%=subscriptionFeeding.getSubscriptionStateWithDate()%>
                 </div>
             </div>
         </c:if>

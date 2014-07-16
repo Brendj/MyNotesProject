@@ -4770,6 +4770,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             SubscriptionFeeding sf = new SubscriptionFeeding();
+            sf.setCreatedDate(new Date());
+            sf.setLastUpdate(new Date());
             sf.fill(subscriptionFeeding);
             sf.setDateActivateService(activateDate);
             sf.setLastDatePauseService(null);
