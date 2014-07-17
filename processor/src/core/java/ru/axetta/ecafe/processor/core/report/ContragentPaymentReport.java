@@ -199,7 +199,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 }
                 contragentPayer = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentPayer));
             }
-            parameterMap.put("contragentName", contragentPayer.getContragentName());
+           // parameterMap.put("contragentName", contragentPayer.getContragentName());
             String idOfContragentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID);
             Long lIdOfContragentReceiver=null; Contragent contragentReceiver=null;
             if (idOfContragentReceiver!=null) {
@@ -225,9 +225,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                     createDataSource(session, contragentPayer, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
                             parameterMap, idOfOrgList));
             Date generateEndTime = new Date();
+            Long idOfContragent1 = contragentPayer == null?null:contragentPayer.getIdOfContragent();
             if (!exportToHTML) {
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, contragentPayer.getIdOfContragent());
+                        jasperPrint, startTime, endTime, idOfContragent1);
                 report.setReportProperties(getReportProperties());
                 return report;
             }  else {
@@ -242,7 +243,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, contragentPayer.getIdOfContragent()).setHtmlReport(os.toString("UTF-8"));
+                        jasperPrint, startTime, endTime, idOfContragent1).setHtmlReport(os.toString("UTF-8"));
                 report.setReportProperties(getReportProperties());
                 return report;
             }
@@ -258,7 +259,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             if (contragentReceiver!=null) {
                 clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
             }
-            clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
+            if (contragent !=null) {
+                clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
+            }
             clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
             HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");

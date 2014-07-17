@@ -22,6 +22,9 @@
 	<parameter name="startTime" class="java.lang.Long"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
 	<field name="idOfPayment" class="java.lang.String"/>
 	<field name="createTime" class="java.util.Date"/>
 	<field name="surName" class="java.lang.String"/>
@@ -38,7 +41,7 @@
 		<variableExpression><![CDATA[$F{paySum}]]></variableExpression>
 	</variable>
 	<title>
-		<band height="118" splitType="Stretch">
+		<band height="98" splitType="Stretch">
 			<textField>
 				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="13" width="802" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -75,78 +78,63 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="72fdfc22-15c9-46d3-b36e-d238b86fbc5c" isPrintRepeatedValues="false" x="176" y="56" width="289" height="20"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{contragentName}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement uuid="4dcb0689-770d-4e85-85ea-b52b6fbf6e17" x="0" y="56" width="175" height="20"/>
-				<textElement>
-					<font size="14" isBold="true"/>
-					<paragraph leftIndent="10"/>
-				</textElement>
-				<text><![CDATA[Контрагент:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a5f656fd-5fab-4c34-9aee-0201b02f8c18" style="style1" stretchType="RelativeToTallestObject" x="0" y="76" width="81" height="41"/>
+				<reportElement uuid="a5f656fd-5fab-4c34-9aee-0201b02f8c18" style="style1" stretchType="RelativeToTallestObject" x="0" y="57" width="81" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дата платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="style1" stretchType="RelativeToTallestObject" x="81" y="76" width="94" height="41"/>
+				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="style1" stretchType="RelativeToTallestObject" x="82" y="57" width="94" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Идентификатор платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="style1" stretchType="RelativeToTallestObject" x="465" y="76" width="60" height="41"/>
+				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="style1" stretchType="RelativeToTallestObject" x="465" y="57" width="60" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер л/с]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="style1" stretchType="RelativeToTallestObject" x="525" y="76" width="63" height="41"/>
+				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="style1" stretchType="RelativeToTallestObject" x="525" y="57" width="63" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Фамилия]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="style1" stretchType="RelativeToTallestObject" x="588" y="76" width="64" height="41"/>
+				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="style1" stretchType="RelativeToTallestObject" x="588" y="57" width="64" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Имя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="652" y="76" width="68" height="41"/>
+				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="652" y="57" width="68" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Отчество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="style1" stretchType="RelativeToTallestObject" x="742" y="76" width="60" height="41"/>
+				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="style1" stretchType="RelativeToTallestObject" x="742" y="57" width="60" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Сумма платежа]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="393" y="76" width="72" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="393" y="57" width="72" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Получатель]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="315" y="76" width="78" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="315" y="57" width="78" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Плательщик]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="175" y="76" width="105" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="175" y="57" width="105" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="720" y="76" width="22" height="41"/>
+				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="720" y="57" width="22" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Тип]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="280" y="76" width="35" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="280" y="57" width="35" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[№ орг.]]></text>
 			</staticText>

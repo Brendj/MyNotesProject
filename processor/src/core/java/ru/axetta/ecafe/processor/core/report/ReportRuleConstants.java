@@ -124,11 +124,12 @@ public class ReportRuleConstants {
             new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"),
             new ParamHint("idOfOrg", "Организации").setDefaultRule("= org: "),
             new ParamHint("shortName", "Краткое название организации"),
-            new ParamHint("officialName", "Официальное название организации"),
-            new ParamHint("groupName", "Название класса"), new ParamHint("idOfClient", "Идентификатор клиента"),
+            new ParamHint("officialName", "Официальное название организации"),   //5
+            new ParamHint("groupName", "Название класса"),
+            new ParamHint("idOfClient", "Идентификатор клиента"),
             new ParamHint("email", "Адрес электронной почты клиента"),
-            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),      //10
-            new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),
+            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),
+            new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),   //10
             new ParamHint("contractPerson.secondName", "Отчество физического лица, заключившего контракт"),
             new ParamHint("contractPerson.abbreviation", "Фамилия И.О. физического лица, заключившего контракт"),
             new ParamHint("person.surname", "Фамилия обслуживаемого физического лица"),
@@ -136,10 +137,12 @@ public class ReportRuleConstants {
             new ParamHint("person.secondName", "Отчество обслуживаемого физического лица"),
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
-            new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
+            new ParamHint("mobile", "Номер мобильного телефона клиента"),
+            new ParamHint("address", "Адрес клиента"),
             new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента")
                     .setDefaultRule("= contragent: "),    //20
-            new ParamHint("contragentName", "Название контрагента"), new ParamHint("category", "Категория организации"),
+            new ParamHint("contragentName", "Наименование контрагента"),
+            new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule(
                     "= " + RuleProcessor.RADIO_EXPRESSION
@@ -223,7 +226,7 @@ public class ReportRuleConstants {
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{39}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{-31, 21, 30, 32}),
+            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{31, 21, 30, 32}),
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{20, 21}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
@@ -296,9 +299,8 @@ public class ReportRuleConstants {
             for (int i : reportHint.getParamHints()) {
                 //  Изменяем i, делаем его положительным всегда, но если изначально было отрицательным, то указываем, что
                 //  поле является обязательным
-                int i2 = i;
                 ParamHintWrapper newParam = new ParamHintWrapper(ReportRuleConstants.PARAM_HINTS[Math.abs(i)]);
-                this.paramHints.add(newParam.setRequired(i2 < 0));
+                this.paramHints.add(newParam.setRequired(i < 0));
             }
         }
 
