@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="802" pageHeight="150000000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
-	<property name="ireport.zoom" value="1.1000000000000105"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="822" pageHeight="150000000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
+	<property name="ireport.zoom" value="1.2100000000000146"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="style1">
@@ -84,7 +84,7 @@
 				<text><![CDATA[Дата платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="style1" stretchType="RelativeToTallestObject" x="82" y="57" width="94" height="41"/>
+				<reportElement uuid="327ea8eb-75b2-40e6-b75d-ed6ef8a479b7" style="style1" stretchType="RelativeToTallestObject" x="81" y="57" width="94" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Идентификатор платежа	]]></text>
 			</staticText>
