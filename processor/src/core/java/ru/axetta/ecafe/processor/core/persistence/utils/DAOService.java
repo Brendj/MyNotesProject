@@ -722,6 +722,10 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return DAOUtils.findClientByGuid(entityManager, guid);
     }
 
+    public Client getClientByMobilePhone (String mobile) {
+        return DAOUtils.getClientByMobilePhone(entityManager, mobile);
+    }
+
     public ReportHandleRule getReportHandleRule (long idOfReportHandleRule) {
         try {
             Session session = (Session) entityManager.getDelegate();

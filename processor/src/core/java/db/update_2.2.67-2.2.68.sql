@@ -12,3 +12,6 @@ alter table CF_RegistryChange add column type integer not null default 1;
 CREATE index "cf_cf_registrychange_type_idx" ON CF_RegistryChange (type);
 alter table CF_RegistryChange add column notificationId varchar(15) default null;
 CREATE index "cf_cf_registrychange_notificationId_idx" ON CF_RegistryChange (notificationId);
+
+-- Привязка клиента ИСПП к записи ЕМП
+alter table CF_Clients add column SSOID varchar(50);

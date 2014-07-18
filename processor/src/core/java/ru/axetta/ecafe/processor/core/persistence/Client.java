@@ -78,6 +78,7 @@ public class Client {
     private Long balance;
 
     private Long subBalance1;
+    private String ssoid;
 
     private Long limit;
     private Long expenditureLimit;
@@ -843,6 +844,14 @@ public class Client {
 
     private void setCategoriesInternal(Set<CategoryDiscount> categoriesInternal) {
         this.categoriesInternal = categoriesInternal;
+    }
+
+    public String getSsoid() {
+        return ssoid;
+    }
+
+    public void setSsoid(String ssoid) {
+        this.ssoid = ssoid;
     }
 
     @Override

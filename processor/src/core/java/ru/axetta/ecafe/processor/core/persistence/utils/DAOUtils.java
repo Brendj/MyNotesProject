@@ -126,6 +126,14 @@ public class DAOUtils {
         return ((Client)l.get(0));
     }
 
+    public static Client getClientByMobilePhone(EntityManager em, String mobile) {
+        javax.persistence.Query q = em.createQuery("from Client where mobile=:mobile");
+        q.setParameter("mobile", mobile);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Client)l.get(0));
+    }
+
     public static Long getClientIdByGuid(EntityManager em, String guid) {
         javax.persistence.Query q = em.createQuery("select idOfClient from Client where clientGUID=:guid");
         q.setParameter("guid", guid);

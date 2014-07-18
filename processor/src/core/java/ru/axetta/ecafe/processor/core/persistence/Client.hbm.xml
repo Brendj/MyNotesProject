@@ -60,6 +60,7 @@
         <property name="balance" column="Balance" type="long" not-null="true" update="false"/>
 
         <property name="subBalance1" column="SubBalance1" type="long" not-null="true" update="false"/>
+        <property name="ssoid" column="SSOID" type="string" length="50" />
 
 
         <property name="limit" column="Limits" type="long" not-null="true"/>

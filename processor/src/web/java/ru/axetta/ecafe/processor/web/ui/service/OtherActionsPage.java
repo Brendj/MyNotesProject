@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.web.partner.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -66,6 +67,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runSynchCleanup() throws Exception {
         RuntimeContext.getAppContext().getBean(SynchCleanupService.class).run(); //DEF
         printMessage("Очистка журналов синхронизации успешно завершена");
+    }
+
+    public void runBindEMPClients() throws Exception {
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients(); //DEF
+        printMessage("Привязка клиентов с ЕМП завершена");
+    }
+
+    public void runReceiveEMPUpdates() throws Exception {
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
+        printMessage("Загрузка обновление из ЕМП завершена");
     }
 
 
