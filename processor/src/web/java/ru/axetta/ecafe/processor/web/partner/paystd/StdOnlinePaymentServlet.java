@@ -56,6 +56,7 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
             if (linkConfig==null) throw new Exception("PID parameter missing and invalid client certificatew: DNs: "+DNs);
 
         } else {
+            partnerName = requestParser.getRequestParams().getParam("PID").toLowerCase();
             linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
         }
         if (linkConfig==null) throw new Exception("Invalid PID");
