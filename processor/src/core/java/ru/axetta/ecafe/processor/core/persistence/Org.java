@@ -98,7 +98,6 @@ public class Org {
     private Boolean commodityAccounting;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
-    private Date lastGoodRequestChange;
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -214,14 +213,6 @@ public class Org {
 
     public void setRefectoryType(Integer refectoryType) {
         this.refectoryType = refectoryType;
-    }
-
-    public Date getLastGoodRequestChange() {
-        return lastGoodRequestChange;
-    }
-
-    public void setLastGoodRequestChange(Date lastGoodRequestChange) {
-        this.lastGoodRequestChange = lastGoodRequestChange;
     }
 
     public Set<Org> getFriendlyOrg() {

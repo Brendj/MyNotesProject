@@ -15,3 +15,5 @@ CREATE index "cf_cf_registrychange_notificationId_idx" ON CF_RegistryChange (not
 
 -- Привязка клиента ИСПП к записи ЕМП
 alter table CF_Clients add column SSOID varchar(50);
+
+ALTER TABLE cf_orgs drop column lastGoodRequestChange;

@@ -121,13 +121,31 @@ public class DetailedGoodRequestReportService {
                     }
                     for (Object reqObj : requestMap.keySet()) {
                         RequestItem requestItem = (RequestItem) reqObj;
-                        List<Commodity> commodityList = (List<Commodity>) requestMap.getCollection(requestItem);
 
-                        Org org = (Org) session.load(Org.class, edu.getIdOfOrg());
+                        Date lastCreate = ((RequestItem) reqObj).lastCreate;
+                        Date lastUpdate = ((RequestItem) reqObj).lastUpdate;
+
+                        Date lastCreateOrUpdate;
+                        if (lastUpdate != null) {
+
+                            if (lastUpdate.compareTo(lastCreate) >= 0) {
+                                lastCreateOrUpdate = lastUpdate;
+                            } else {
+                                lastCreateOrUpdate = lastCreate;
+                            }
+                        } else {
+                            if (lastCreate == null) {
+                                lastCreateOrUpdate = lastUpdate;
+                            } else {
+                                lastCreateOrUpdate = lastCreate;
+                            }
+                        }
+
+                        List<Commodity> commodityList = (List<Commodity>) requestMap.getCollection(requestItem);
 
                         DetailedGoodRequestReportItem reportItem = new DetailedGoodRequestReportItem(
                                 requestItem.number, item.getIdOfOrg(), item.getShortName(), edu.getIdOfOrg(),
-                                edu.getShortName(), commodityList, requestItem, org.getLastGoodRequestChange());
+                                edu.getShortName(), commodityList, requestItem, lastCreateOrUpdate);
                         detailedGoodRequestReportItems.add(reportItem);
                     }
 
