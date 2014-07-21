@@ -39,6 +39,7 @@ public class SyncResponse {
         public static class Item {
 
             private final long cardNo;
+            private final long cardPrintedNo;
             private final int cardType;
             private final long idOfClient;
             private final Date updateTime;
@@ -53,6 +54,7 @@ public class SyncResponse {
 
             public Item(Card card) {
                 this.cardNo = card.getCardNo();
+                this.cardPrintedNo = card.getCardPrintedNo();
                 this.cardType = card.getCardType();
                 this.idOfClient = card.getClient().getIdOfClient();
                 this.updateTime = card.getUpdateTime();
@@ -73,6 +75,7 @@ public class SyncResponse {
 
             public Item(Client client, Card card) {
                 this.cardNo = card.getCardNo();
+                this.cardPrintedNo = card.getCardPrintedNo();
                 this.cardType = card.getCardType();
                 this.idOfClient = card.getClient().getIdOfClient();
                 this.updateTime = card.getUpdateTime();
@@ -92,6 +95,10 @@ public class SyncResponse {
             }
 
             public long getCardNo() {
+                return cardNo;
+            }
+
+            public long cardPrintedNo() {
                 return cardNo;
             }
 
@@ -126,6 +133,7 @@ public class SyncResponse {
             public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
                 Element element = document.createElement("AR");
                 element.setAttribute("CardNo", Long.toString(cardNo));
+                element.setAttribute("CardPrintedNo", Long.toString(cardPrintedNo));
                 element.setAttribute("CardType", Integer.toString(cardType));
                 element.setAttribute("IdOfClient", Long.toString(idOfClient));
                 element.setAttribute("LastUpdate", timeFormat.format(updateTime));
@@ -150,7 +158,7 @@ public class SyncResponse {
 
             @Override
             public String toString() {
-                return "Item{" + "cardNo=" + cardNo + ", cardType=" + cardType + ", lastUpdate=" + updateTime
+                return "Item{" + "cardNo=" + cardNo + ", cardPrintedNo=" + cardPrintedNo +  ", cardType=" + cardType + ", lastUpdate=" + updateTime
                         + ", balance=" + balance + ", subBalance1=" + subBalance1 + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit
                         + ", state=" + state + '}';
             }
