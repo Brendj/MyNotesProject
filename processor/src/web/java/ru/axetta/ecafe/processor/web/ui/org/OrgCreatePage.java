@@ -65,7 +65,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String longitude;
     private Integer refectoryType;
     private SelectItem[] refectoryTypeComboMenuItems = readRefectoryTypeComboMenuItems();
-    // тип организации "Школа / ДОУ / Поставщик питания"
+    // тип организации "Общеобразовательнок ОУ / Дошкольное ОУ / Поставщик питания / Профессиональное ОУ"
     private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
 

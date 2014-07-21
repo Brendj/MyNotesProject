@@ -9,9 +9,10 @@ package ru.axetta.ecafe.processor.core.persistence;
  */
 public enum OrganizationType {
 
-    /*0*/ SCHOOL("Школа"),
-    /*1*/ KINDERGARTEN("Садик"),
-    /*2*/ SUPPLIER("Поставщик питания");
+    /*0*/ SCHOOL("Общеобразовательное ОУ"),
+    /*1*/ KINDERGARTEN("Дошкольное ОУ"),
+    /*2*/ SUPPLIER("Поставщик питания"),
+    /*3*/ PROFESSIONAL("Профессиональное ОУ");
 
     private final String description;
 
