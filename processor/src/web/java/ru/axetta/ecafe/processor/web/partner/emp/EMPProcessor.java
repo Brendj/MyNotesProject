@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.partner.emp;
 import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
 import generated.emp_storage.*;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,20 +44,22 @@ public class EMPProcessor {
 
 
     public void runBindClients() {
-        ru.axetta.ecafe.processor.core.persistence.Client client =
-                DAOService.getInstance().getClientByGuid("eb759664-b6be-1ec2-e043-a2997e0a261d");
+        List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOService.getInstance().getNotBindedEMPClients();
+        /*ru.axetta.ecafe.processor.core.persistence.Client client =
+                DAOService.getInstance().getClientByGuid("eb759664-b6be-1ec2-e043-a2997e0a261d");*/
 
         StoragePortType storage = createController();
-        //for(Client c : unbindedClients) {
-        try {
-            bindClient(storage, client);
-        } catch (EMPException empe) {
-            logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()), empe);
+        for(ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
+            try {
+                bindClient(storage, c);
+            } catch (EMPException empe) {
+                logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()), empe);
+            }
         }
-        //}
     }
 
     public void runReceiveUpdates() {
+        long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);
         StoragePortType storage = createController();
         ReceiveDataChangesRequest request = buildReceiveEntryParams(1L);
         ReceiveDataChangesResponse response = storage.receiveDataChanges(request);
@@ -82,6 +86,12 @@ public class EMPProcessor {
                 client.setSsoid(ssoid);
                 DAOService.getInstance().saveEntity(client);
             }
+            changeSequence = e.getChangeSequence();
+        }
+
+        RuntimeContext.getInstance().setOptionValue(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence);
+        if(response.getResult().isHasMoreEntries()) {
+            RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
         }
     }
 

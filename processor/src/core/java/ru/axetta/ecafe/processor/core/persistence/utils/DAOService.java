@@ -1509,4 +1509,9 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         List<Org> list = (List<Org>) q.list();
         return list;
     }
+
+    public List<Client> getNotBindedEMPClients() {
+        TypedQuery<Client> query = entityManager.createQuery("from Client where ssoid is null and clientGUID<>''", Client.class);
+        return query.getResultList();
+    }
 }
