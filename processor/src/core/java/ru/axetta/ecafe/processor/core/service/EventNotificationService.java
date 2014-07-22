@@ -337,7 +337,9 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_SMS_SUB_FEE_WITHDRAW;
             } else if(type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING)){
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING;
-            } else {
+            } else if (type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS)){
+                clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS;
+            }else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
             if (sendAsync) {

@@ -252,7 +252,7 @@
                                  styleClass="input-text" />
                 <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
                 <h:panelGrid>
-                    <h:outputText value="[contractId] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

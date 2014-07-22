@@ -30,6 +30,7 @@ public class ClientSms {
     public static final int TYPE_SMS_SUBSCRIPTION_FEE = 6;
     public static final int TYPE_SMS_SUB_FEE_WITHDRAW = 7;
     public static final int TYPE_SUBSCRIPTION_FEEDING = 8;
+    public static final int TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS = 9;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;
