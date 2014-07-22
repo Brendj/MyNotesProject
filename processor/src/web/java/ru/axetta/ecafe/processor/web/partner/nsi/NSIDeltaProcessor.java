@@ -160,8 +160,8 @@ public class NSIDeltaProcessor {
             Client cl = DAOUtils.findClientByGuid(em, StringUtils.isBlank(item.getGuid()) ? "" : item.getGuid());
             if(cl == null) {
                 ImportRegisterClientsService.log(synchDate + "Невозможно обработать изменение клиента " +
-                        emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                        emptyIfNull(cl.getPerson().getFirstName()) + " - не найден", logBuffer);
+                        emptyIfNull(item.getGuid()) + ", " + emptyIfNull(item.getFamilyName()) + " " +
+                        emptyIfNull(item.getFirstName()) + " - не найден", logBuffer);
                 return;
             }
             try {
@@ -263,7 +263,7 @@ public class NSIDeltaProcessor {
         public DeltaItem(Item item) {
             this.notificationId = item.getNotificationId();
             this.guid = item.getGUID();
-
+            action = item.getAction().ordinal();
             for(Attribute at : item.getAttribute()) {
                 if(StringUtils.isBlank(at.getName())) {
                     continue;
@@ -287,8 +287,10 @@ public class NSIDeltaProcessor {
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);
                 }
+                else if(attributeName.endsWith("статус записи")) {
+                    action = Action.DELETED.ordinal();
+                }
             }
-            action = item.getAction().ordinal();
         }
 
         public String getNotificationId() {
