@@ -57,6 +57,7 @@ public class OrgListSelectPage extends BasicPage {
     private boolean supplierFilterDisabled = false;
     private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
 
+    private List<OrgShortItem> autoCompleteOrgs = new ArrayList<OrgShortItem>();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
@@ -201,7 +202,22 @@ public class OrgListSelectPage extends BasicPage {
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
+        this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
         this.items = items;
+    }
+
+    public List<OrgShortItem> fillAutoCompleteOrgs(Session session) throws HibernateException {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.addOrder(Order.asc("idOfOrg"));
+        criteria.setProjection(
+                Projections.projectionList().add(Projections.distinct(Projections.property("idOfOrg")), "idOfOrg")
+                        .add(Projections.property("shortName"), "shortName")
+                        .add(Projections.property("officialName"), "officialName")
+                        .add(Projections.property("address"), "address"));
+        criteria.setCacheMode(CacheMode.NORMAL);
+        criteria.setCacheable(true);
+        criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
+        return (List<OrgShortItem>) criteria.list();
     }
 
     private void updateSelectedOrgs() {
@@ -294,4 +310,19 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
+    public List<OrgShortItem> autoComplete(Object suggest) {
+        String pref = (String) suggest;
+        List<OrgShortItem> result = new ArrayList<OrgShortItem>();
+        for (OrgShortItem elem : getAutoCompleteOrgs()) {
+            if ((elem.getShortName() != null && elem.getShortName().toLowerCase().contains(pref.toLowerCase())) || ""
+                    .equals(pref)) {
+                result.add(elem);
+            }
+        }
+        return result;
+    }
+
+    public List<OrgShortItem> getAutoCompleteOrgs() {
+        return autoCompleteOrgs;
+    }
 }
