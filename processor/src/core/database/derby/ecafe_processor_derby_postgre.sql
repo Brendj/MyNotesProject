@@ -173,6 +173,7 @@ CREATE TABLE CF_Clients (
   ExternalId              BIGINT, --v17
   ClientGUID              VARCHAR(40), --v17
   CanConfirmGroupPayment  INTEGER           NOT NULL DEFAULT 0,
+  SSOID varchar(50), --v68
   CONSTRAINT CF_Clients_pk PRIMARY KEY (IdOfClient),
   CONSTRAINT CF_Clients_ContractId UNIQUE (ContractId),
   CONSTRAINT CF_Clients_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
@@ -2683,9 +2684,14 @@ create table CF_RegistryChange (
   Operation integer not null,
   Applied boolean not null default false,
   Error character varying(256) DEFAULT null, -- v59
+  Type integer not null default 1, --v68
+  notificationId varchar(15) default null, --v68
   CONSTRAINT cf_registrychange_pk PRIMARY KEY (IdOfRegistryChange),
   CONSTRAINT cf_registrychange_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
 );
+
+CREATE index "cf_cf_registrychange_type_idx" ON CF_RegistryChange (type);
+CREATE index "cf_cf_registrychange_notificationId_idx" ON CF_RegistryChange (notificationId);
 
 -- Таблица для хранения ошибок по поступившим из Реестров изменениям
 create table CF_RegistryChange_Errors (  --v47

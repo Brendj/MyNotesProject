@@ -4,9 +4,6 @@
 
 -- Пакет обновлений 2.2.68
 
--- таблица блокирования заказов
-ALTER TABLE cf_orgs ADD COLUMN lastGoodRequestChange bigint;
-
 -- тип сверки с реестром (полная - 1; изменения - 2)
 alter table CF_RegistryChange add column type integer not null default 1;
 CREATE index "cf_cf_registrychange_type_idx" ON CF_RegistryChange (type);
@@ -15,5 +12,4 @@ CREATE index "cf_cf_registrychange_notificationId_idx" ON CF_RegistryChange (not
 
 -- Привязка клиента ИСПП к записи ЕМП
 alter table CF_Clients add column SSOID varchar(50);
-
-ALTER TABLE cf_orgs drop column lastGoodRequestChange;
+--! ФИНАЛИЗИРОВАН (Сунгатов, 140723) НЕ МЕНЯТЬ
