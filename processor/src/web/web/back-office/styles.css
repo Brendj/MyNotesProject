@@ -339,3 +339,21 @@
 .valign {
     vertical-align:top;
 }
+
+.cachePersitentStat td {
+    text-align: center;
+    width: 100%;
+}
+
+.cachePersitentStat .left {
+    width: 30%;
+}
+.cachePersitentStat .right {
+    width: 70%;
+}
+.cachePersitentStat .right .left {
+    width: 50%;
+}
+.cachePersitentStat .right .right {
+    width: 50%;
+}

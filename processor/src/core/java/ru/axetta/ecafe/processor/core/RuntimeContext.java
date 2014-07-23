@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
+import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.partner.acquiropay.AcquiropaySystemConfig;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
@@ -31,7 +32,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
-import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
@@ -51,15 +51,12 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.*;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.hibernate.type.IntegerType;
-import org.hibernate.type.LongType;
-import org.hibernate.type.Type;
+import org.hibernate.stat.Statistics;
 import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -70,7 +67,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -291,6 +287,16 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public Session createReportPersistenceSession() {
         return reportsSessionFactory.openSession();
+    }
+
+    //hibernate cache for processorPU
+    public static Statistics statisticPersistenceSession() {
+        return sessionFactory.getStatistics();
+    }
+
+    //hibernate cache for reportPU
+    public static Statistics statisticReportPersistenceSession() {
+        return reportsSessionFactory.getStatistics();
     }
 
     public SyncProcessor getSyncProcessor() {

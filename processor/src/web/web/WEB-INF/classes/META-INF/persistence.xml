@@ -25,8 +25,8 @@
             <property name="hibernate.cache.use_minimal_puts" value="true"/>
             <property name="hibernate.cache.use_structured_entries" value="true"/>
             <property name="hibernate.cache.use_sql_comments" value="false"/>
-            <property name="hibernate.cache.generate_statistics" value="false"/>
-            <property name="hibernate.generate_statistics" value="false"/>
+            <property name="hibernate.cache.generate_statistics" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
         </properties>
     </persistence-unit>
     <persistence-unit name="reportsPU" transaction-type="RESOURCE_LOCAL">
@@ -51,8 +51,8 @@
             <property name="hibernate.cache.use_minimal_puts" value="true"/>
             <property name="hibernate.cache.use_structured_entries" value="true"/>
             <property name="hibernate.cache.use_sql_comments" value="false"/>
-            <property name="hibernate.cache.generate_statistics" value="false"/>
-            <property name="hibernate.generate_statistics" value="false"/>
+            <property name="hibernate.cache.generate_statistics" value="true"/>
+            <property name="hibernate.generate_statistics" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>

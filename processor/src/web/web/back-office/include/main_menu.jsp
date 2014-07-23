@@ -777,6 +777,9 @@
                         label="Заказ питания" action="#{ordersMonitoringReportPage.show}"
                         reRender="workspaceForm" />
 
+    <%--@elvariable id="monitoringPersistanceCachePage" type="ru.axetta.ecafe.processor.web.ui.monitoring.MonitoringPersistanceCachePage"--%>
+    <rich:panelMenuItem id="persistanceCacheItem" binding="#{monitoringPersistanceCachePage.mainMenuComponent}"
+                        label="Системные показатели" action="#{monitoringPersistanceCachePage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
