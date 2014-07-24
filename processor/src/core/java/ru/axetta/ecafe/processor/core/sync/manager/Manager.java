@@ -548,12 +548,12 @@ public class Manager {
                 currentResultDOList.removeAll(distributedObjectList);
             }
         }
-        if (doSyncClass.getDoClass() == GoodRequestPosition.class) {
+        if (doSyncClass.getDoClass() == GoodRequestPosition.class && !distributedObjectList.isEmpty()) {
             Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
             final Date lastCreateOrUpdateDate = calendarEnd.getTime();
             calendarEnd.add(Calendar.MINUTE, 1);
             final Date endGenerateTime = calendarEnd.getTime();
-            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate);
+            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate, distributedObjectList);
         }
         LOGGER.debug("processDistributedObjectsList: end");
         return distributedObjectList;
