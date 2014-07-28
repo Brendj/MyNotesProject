@@ -41,7 +41,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
+            <a4j:commandLink reRender="workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfCategoryDiscount}" target="#{categoryDiscountEditPage.idOfCategoryDiscount}" />
             </a4j:commandLink>

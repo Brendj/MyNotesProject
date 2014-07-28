@@ -21,7 +21,7 @@
             <f:facet name="header">
                 <h:outputText value="Поставщик по умолчанию" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ruleItem.contragentLabel}" action="#{mainPage.showContragentViewPage}"
+            <a4j:commandLink reRender="workspaceForm" value="#{ruleItem.contragentLabel}" action="#{mainPage.showContragentViewPage}"
                            styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.contragent.idOfContragent}"
                                              target="#{mainPage.selectedIdOfContragent}" />
@@ -31,7 +31,7 @@
             <f:facet name="header">
                 <h:outputText value="Организация - источник меню" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ruleItem.distributionOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" value="#{ruleItem.distributionOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.distributionOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
@@ -39,7 +39,7 @@
             <f:facet name="header">
                 <h:outputText value="Организация" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ruleItem.sourceOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" value="#{ruleItem.sourceOrgLabel}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.sourceOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
@@ -47,7 +47,7 @@
             <f:facet name="header">
                 <h:outputText value="Организация - номер" styleClass="output-text" escape="true"/>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ruleItem.sourceOrg.orgNumberInName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" value="#{ruleItem.sourceOrg.orgNumberInName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{ruleItem.sourceOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>

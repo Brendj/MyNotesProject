@@ -36,10 +36,10 @@
 
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{categoryDiscountEditPage.save}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{categoryDiscountEditPage.save}" reRender="workspaceTogglePanel"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{categoryDiscountEditPage.reload}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

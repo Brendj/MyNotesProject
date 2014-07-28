@@ -13,32 +13,32 @@
 <%--Тест лога --%>
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid">
     <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Запустить генерацию ключевых показателей" action="#{otherActionsPage.runProjectStateGenerator}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Запустить синхронизацию с Реестрами" action="#{otherActionsPage.runImportRegisterClients}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Запустить пересчет льготных правил" action="#{otherActionsPage.runBenefitsRecalculation}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Перестроить таблицу опекунов" action="#{otherActionsPage.runClientGuardSANRebuild}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <%--<a4j:commandButton value="Иморт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />--%>
     <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Очистить журналы синхронизации" action="#{otherActionsPage.runSynchCleanup}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Привязать клиентов к ЕМП" action="#{otherActionsPage.runBindEMPClients}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Запустить загрузку обновления из ЕМП" action="#{otherActionsPage.runReceiveEMPUpdates}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

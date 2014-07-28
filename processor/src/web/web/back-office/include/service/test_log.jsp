@@ -15,7 +15,7 @@
         <h:inputText value="#{mainPage.testLogPage.text}" size="128" styleClass="input-text" />
     </h:panelGrid>
     <a4j:commandButton value="Записать текст в лог с уровнем ERROR" action="#{mainPage.doLogTest}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

@@ -18,7 +18,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Имя пользователя" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.userName}" action="#{thinClientUserViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="workspaceForm" value="#{item.userName}" action="#{thinClientUserViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfClient}" target="#{thinClientUserViewPage.idOfClient}" />
         </a4j:commandLink>
     </rich:column>
@@ -26,7 +26,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Клиент" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.clientName}" action="#{thinClientUserViewPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="workspaceForm" value="#{item.clientName}" action="#{thinClientUserViewPage.show}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfClient}" target="#{thinClientUserViewPage.idOfClient}" />
         </a4j:commandLink>
     </rich:column>

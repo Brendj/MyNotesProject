@@ -25,7 +25,7 @@
                 <h:outputText escape="true" value="Организация-источник" />
             </f:facet>
             <%--Отображается при выводе сохраненного правила распределения клиентов--%>
-            <a4j:commandLink rendered="#{not rule.editable}" reRender="mainMenu, workspaceForm"
+            <a4j:commandLink rendered="#{not rule.editable}" reRender="workspaceForm"
                              value="#{rule.sourceOrgName}" action="#{mainPage.showOrgViewPage}"
                              styleClass="command-link">
                 <f:setPropertyActionListener value="#{rule.idOfSourceOrg}" target="#{mainPage.selectedIdOfOrg}" />
@@ -57,7 +57,7 @@
                 <h:outputText escape="true" value="Организация-цель" />
             </f:facet>
             <%--Отображается при выводе сохраненного правила распределения клиентов--%>
-            <a4j:commandLink rendered="#{not rule.editable}" reRender="mainMenu, workspaceForm"
+            <a4j:commandLink rendered="#{not rule.editable}" reRender="workspaceForm"
                              value="#{rule.destOrgName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{rule.idOfDestOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>

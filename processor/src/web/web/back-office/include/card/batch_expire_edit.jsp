@@ -48,7 +48,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Карта" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="workspaceForm">
                 <h:outputText escape="true" value="#{item.card.cardNo}" converter="cardNoConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.card.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
@@ -58,7 +58,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="workspaceForm">
                 <h:outputText escape="true" value="#{item.card.client.shortName}" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.card.client.idOfClient}"
                                              target="#{mainPage.selectedIdOfClient}" />

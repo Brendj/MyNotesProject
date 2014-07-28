@@ -44,7 +44,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Пользователь" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.userName}" action="#{mainPage.showUserViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" value="#{item.userName}" action="#{mainPage.showUserViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
             </a4j:commandLink>
         </rich:column>
@@ -66,7 +66,7 @@
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
             <a4j:repeat value="#{item.contragentList}" var="contragent">
-                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{contragent.contragentName}" action="#{mainPage.showContragentViewPage}" styleClass="command-link">
+                <a4j:commandLink reRender="workspaceForm" value="#{contragent.contragentName}" action="#{mainPage.showContragentViewPage}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{contragent.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
                 </a4j:commandLink>
                 <h:outputText escape="true" value="; " styleClass="output-text" />

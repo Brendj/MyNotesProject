@@ -182,7 +182,7 @@
     </h:panelGrid>
 
     <h:panelGrid columns="2">
-        <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/>
+        <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" reRender="workspaceTogglePanel"/>
     </h:panelGrid>
 
 </h:panelGrid>

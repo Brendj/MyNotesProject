@@ -195,7 +195,7 @@ function checkReporitoryDate () {
                 <h:outputText escape="true" value="Загрузить файл" />
             </f:facet>
             <a4j:commandLink value="#{item.reportFile}" action="#{reportRepositoryListPage.downloadReportFile}"
-                             styleClass="command-link" reRender="mainMenu, workspaceForm">
+                             styleClass="command-link" reRender="workspaceForm">
                 <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}" />
             </a4j:commandLink>
         </rich:column>

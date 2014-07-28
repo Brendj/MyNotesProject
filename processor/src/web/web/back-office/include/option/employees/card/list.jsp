@@ -22,7 +22,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер карты" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{employeeCardViewPage.show}" styleClass="command-link">
                 <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
             </a4j:commandLink>
@@ -55,7 +55,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{employeeCardEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
             </a4j:commandLink>

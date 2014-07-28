@@ -184,10 +184,10 @@
 
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="workspaceTogglePanel"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showOrgEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 <a4j:status id="sOrgCreateStatus">
     <f:facet name="start">
