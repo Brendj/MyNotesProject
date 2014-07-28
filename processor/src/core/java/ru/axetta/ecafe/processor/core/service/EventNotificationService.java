@@ -110,7 +110,7 @@ public class EventNotificationService {
                     + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
                     + "</body>\n</html>",
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
-            "Л/с: [contractId] Сервис АП отключен. Причина: недостаточный баланс.",
+            "Л/с: [contractId] Сервис АП. Причина: недостаточный баланс субсчета АП.",
             /////
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_SMS,
             "[eventName] [eventTime] [surname] [firstName] ([guardian])",

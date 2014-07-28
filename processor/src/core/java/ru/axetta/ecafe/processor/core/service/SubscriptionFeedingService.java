@@ -83,7 +83,7 @@ public class SubscriptionFeedingService {
     private EventNotificationService enService;
 
     /**
-     * Метод оповещает об отключении АП из за отсутсвия средств на субсчете
+     * Метод оповещает об отсутсвии средств на субсчете АП
      */
     public void notifyDeactivateClients(){
         SubscriptionFeedingService instance = SubscriptionFeedingService.getInstance();
@@ -92,7 +92,7 @@ public class SubscriptionFeedingService {
         if(list.isEmpty()) LOGGER.debug("clients empty");
         for (Object obj: list){
             Client client = (Client) obj;
-            final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
+            final String contractId = String.valueOf(client.getContractId());
             String[] values = new String[]{"contractId", contractId};
             enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, values);
         }

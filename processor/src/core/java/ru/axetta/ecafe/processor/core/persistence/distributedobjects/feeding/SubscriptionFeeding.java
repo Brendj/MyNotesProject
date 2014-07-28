@@ -33,7 +33,7 @@ import java.util.List;
  * User: damir
  * Date: 02.09.13
  * Time: 13:35
- * Полписка на Абоненское питание
+ * Подписка на Абонементное питание
  */
 public class SubscriptionFeeding extends DistributedObject{
 
