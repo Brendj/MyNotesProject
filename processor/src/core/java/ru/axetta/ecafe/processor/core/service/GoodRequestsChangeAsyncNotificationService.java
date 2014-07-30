@@ -174,10 +174,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                 localCalendar.add(Calendar.DATE, maxNumDays - 1);
                 localCalendar.add(Calendar.MILLISECOND, -1);
                 enDate = localCalendar.getTime();
-                localCalendar.add(Calendar.DATE, 1);
                 intervals.add(new DateInterval(stDate, enDate));
             }
-
 
             //Date endDate;
             //do{
@@ -235,8 +233,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                         //persistenceSession = runtimeContext.createReportPersistenceSession();
                         persistenceSession = runtimeContext.createPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
-                        reportJob = builder
-                                .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
+                        reportJob = builder.build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
                         //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                         persistenceTransaction.commit();
                         persistenceTransaction = null;
@@ -270,17 +267,17 @@ public class GoodRequestsChangeAsyncNotificationService {
                 }
 
                 if (StringUtils.isNotEmpty(htmlReport)) {
-                    try {
-                        String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
-                        File file = new File(fileName);
-                        FileOutputStream outputStream = new FileOutputStream(file);
-                        outputStream.write(htmlReport.getBytes());
-                        outputStream.flush();
-                        outputStream.close();
-                        LOGGER.debug(String.format("save report file '%s'", fileName));
-                    } catch (Exception e) {
-                        LOGGER.error("Cannot save report file", e);
-                    }
+                    //try {
+                    //    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
+                    //    File file = new File(fileName);
+                    //    FileOutputStream outputStream = new FileOutputStream(file);
+                    //    outputStream.write(htmlReport.getBytes());
+                    //    outputStream.flush();
+                    //    outputStream.close();
+                    //    LOGGER.debug(String.format("save report file '%s'", fileName));
+                    //} catch (Exception e) {
+                    //    LOGGER.error("Cannot save report file", e);
+                    //}
 
                     //List<String> addresses = new ArrayList<String>();
 

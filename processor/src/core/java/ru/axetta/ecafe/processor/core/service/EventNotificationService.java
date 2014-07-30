@@ -192,7 +192,7 @@ public class EventNotificationService {
     }
 
     @Async
-    public boolean sendEmailAsync(String email, String type, String[] values) {
+    public synchronized boolean sendEmailAsync(String email, String type, String[] values) {
         logger.trace("start");
         if (StringUtils.isEmpty(email)) {
             logger.trace("email is empry");
