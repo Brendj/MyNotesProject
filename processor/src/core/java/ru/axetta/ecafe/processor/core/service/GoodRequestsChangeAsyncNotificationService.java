@@ -156,13 +156,28 @@ public class GoodRequestsChangeAsyncNotificationService {
             }
 
             List<DateInterval> intervals = new ArrayList<DateInterval>();
-            //Подправить интервалы + 1 день начало второй недели
+            //Подправить интервалы в зависимости от дня недели день начало второй недели
             Date stDate = minDone;
             Date enDate = maxDone;
 
             CalendarUtils.truncateToDayOfMonth(localCalendar);
             stDate = localCalendar.getTime();
-            localCalendar.add(Calendar.DATE, maxNumDays);
+            String weekDay = CalendarUtils.dayInWeekToString(stDate);
+
+            if (weekDay.equals("Пн")) {
+                localCalendar.add(Calendar.DATE, maxNumDays);
+            } else if (weekDay.equals("Вт")) {
+                localCalendar.add(Calendar.DATE, maxNumDays - 1);
+            } else if (weekDay.equals("Ср")) {
+                localCalendar.add(Calendar.DATE, maxNumDays - 2);
+            } else if (weekDay.equals("Чт")) {
+                localCalendar.add(Calendar.DATE, maxNumDays - 3);
+            } else if (weekDay.equals("Пт")) {
+                localCalendar.add(Calendar.DATE, maxNumDays - 4);
+            } else if (weekDay.equals("Сб")) {
+                localCalendar.add(Calendar.DATE, maxNumDays - 5);
+            }
+
             localCalendar.add(Calendar.MILLISECOND, -1);
             enDate = localCalendar.getTime();
             intervals.add(new DateInterval(stDate, enDate));
@@ -177,17 +192,6 @@ public class GoodRequestsChangeAsyncNotificationService {
                 intervals.add(new DateInterval(stDate, enDate));
             }
 
-            //Date endDate;
-            //do{
-            //    CalendarUtils.truncateToDayOfMonth(localCalendar);
-            //    Date startDate = localCalendar.getTime();
-            //    localCalendar.add(Calendar.DATE, maxNumDays);
-            //    localCalendar.add(Calendar.MILLISECOND, -1);
-            //    endDate = localCalendar.getTime();
-            //    intervals.add(new DateInterval(startDate, endDate));
-            //} while (endDate.getTime()<maxDone.getTime());
-
-            //            intervals.add(new DateInterval(minDone, maxDone));
             LOGGER.debug(String.valueOf(intervals.size()));
             String message = "";
             message += "IdOfOrg: " + idOfOrg;
@@ -224,6 +228,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             /* создаем отчет */
             String htmlReport = "";
 
+            Collections.reverse(intervals);
 
             for (DateInterval interval : intervals) {
 
@@ -321,9 +326,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                     //boolean sended = false;
                     for (String address : addresses) {
                         if (StringUtils.trimToNull(address) != null) {
-                            eventNotificationService
-                                    .sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
-                                            values);
+                            eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                         }
                     }
                 } else {

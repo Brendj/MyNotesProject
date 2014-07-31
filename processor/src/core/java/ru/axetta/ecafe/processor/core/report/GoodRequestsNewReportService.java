@@ -164,14 +164,18 @@ public class GoodRequestsNewReportService {
                 Date createDate = position.getCreatedDate();
                 if (CalendarUtils.betweenDate(createDate, generateBeginTime, generateEndTime)) {
                     newTotalCount = totalCount;
-                    newDailySample = dailySampleCount;
+                    if (dailySampleCount != null) {
+                        newDailySample = dailySampleCount;
+                    }
                 }
 
                 Date lastDate = position.getLastUpdate();
                 if (lastDate != null) {
                     if (CalendarUtils.betweenDate(lastDate, generateBeginTime, generateEndTime)) {
                         newTotalCount = totalCount - position.getLastTotalCount() / 1000;
-                        newDailySample = dailySampleCount - position.getLastDailySampleCount() / 1000;
+                        if (dailySampleCount != null) {
+                            newDailySample = dailySampleCount - position.getLastDailySampleCount() / 1000;
+                        }
                     }
                 }
             }
