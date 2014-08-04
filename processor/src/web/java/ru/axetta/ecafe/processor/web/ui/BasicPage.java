@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import javax.faces.component.UIComponent;
+import java.io.Serializable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +14,7 @@ import javax.faces.component.UIComponent;
  * Time: 14:23:22
  * To change this template use File | Settings | File Templates.
  */
-public class BasicPage {
+public class BasicPage implements Serializable {
 
     private UIComponent pageComponent;
 

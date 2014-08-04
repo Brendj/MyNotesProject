@@ -15,16 +15,16 @@ public class Test {
     public static void main( String[] args )
             throws Exception
     {
-        String url = "https://78.46.34.200:8443/processor/payment-std?CLIENTID=200022&SUM=100&TIME=1406290983&OPID=1005002614&TERMID=500100&PID=qiwi&V=1";
+        String url = "CLIENTID=00100016&SUM=100&TIME=1406290983&OPID=5&TERMID=1&PID=qiwi8&V=1";
         String singnature = generateSignature(url);
         String resultUrl = url + "&SIGNATURE=" + singnature;
         System.out.print(resultUrl);
     }
-    //full url
+
     private static String generateSignature(String url)throws Exception{
         // Read keystore
         KeyStore ks = KeyStore.getInstance("pkcs12","SunJSSE");
-        InputStream ksin = new FileInputStream(new File("F:\\backup\\Информация\\сертификаты\\тестовый сервер\\test_server\\qiwi_test\\ispp_qiwi_test.pfx"));
+        InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\Сертификаты\\ispp_org_pp_test_qiwi8.pfx"));
         ks.load(ksin, "1".toCharArray());  /// 1 - password for  pfx key
         ksin.close();
 

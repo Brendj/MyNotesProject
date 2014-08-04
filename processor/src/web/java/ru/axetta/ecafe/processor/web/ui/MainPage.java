@@ -67,10 +67,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +80,7 @@ import java.util.Stack;
  * Time: 14:49:47
  * To change this template use File | Settings | File Templates.
  */
-public class MainPage {
+public class MainPage implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
 
