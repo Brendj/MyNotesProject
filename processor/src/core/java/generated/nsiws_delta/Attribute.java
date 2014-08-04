@@ -47,15 +47,15 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Attribute", namespace = "http://rstyle.com/nsi/delta", propOrder = {
+@XmlType(name = "Attribute", namespace = "", propOrder = {
     "value",
     "groupValue"
 })
 public class Attribute {
 
-    @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
+    @XmlElement(namespace = "")
     protected List<Attribute.Value> value;
-    @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
+    @XmlElement(namespace = "")
     protected List<GroupValue> groupValue;
     @XmlAttribute
     protected String name;

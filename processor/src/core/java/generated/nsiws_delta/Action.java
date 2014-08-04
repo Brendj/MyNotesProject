@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  * 
  */
-@XmlType(name = "Action", namespace = "http://rstyle.com/nsi/delta")
+@XmlType(name = "Action", namespace = "")
 @XmlEnum
 public enum Action {
 

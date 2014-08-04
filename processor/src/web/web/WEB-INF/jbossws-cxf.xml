@@ -104,7 +104,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
     </jaxws:endpoint>
     <jaxws:endpoint
             id="NSIDeltaController"
-            address='http://localhost:8080/processor/soap/nsi_delta'
+            address='https://31.13.60.140:28881/processor/soap/nsi_delta'
             implementor='ru.axetta.ecafe.processor.web.partner.nsi.NSIDeltaController'>
         <jaxws:inInterceptors>
             <ref bean="wsLoggingInInterceptor"/>

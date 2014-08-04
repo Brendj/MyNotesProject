@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.emp;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl;
+import generated.emp_events.*;
 import generated.emp_storage.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -20,9 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.math.BigInteger;
 import java.net.URL;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -43,12 +46,70 @@ public class EMPProcessor {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPProcessor.class);
 
 
+    protected SendSubscriptionStreamEventsRequestType buildEvenParam(ru.axetta.ecafe.processor.core.persistence.Client client) {
+        SendSubscriptionStreamEventsRequestType sending = new SendSubscriptionStreamEventsRequestType();
+        try {
+            GregorianCalendar gcal = new GregorianCalendar();
+            gcal.setTimeInMillis(System.currentTimeMillis());
+            XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
+
+            //  sending spec
+            sending.setToken(ATTRIBUTE_TOKEN_VALUE);
+            sending.setDatetime(xgcal);
+            sending.setSystemId("100999");
+            sending.setId("c758b1e0-deef-4eea-bac7-21cda8531d9f");
+
+            EventType event = new EventType();
+            //  event spec
+            event.setDatetime(xgcal);
+            event.setDescription("Пробное информирование");
+            event.setId("e8356612-3a60-4922-8ece-5a8244cd6794");
+            event.setStreamId(4);
+            event.setTypeId(1);
+            //  event message params
+            EventMessageType messageParams = new EventMessageType();
+            List<EventMessageParameterType> params = messageParams.getParameters().getParameter();
+            //  name param
+            EventMessageParameterType nameParam = new EventMessageParameterType();
+            nameParam.setName("NAME");
+            nameParam.setValue("Здесь будет имя пользователя");
+            params.add(nameParam);
+            //  txt
+            EventMessageParameterType textParam = new EventMessageParameterType();
+            textParam.setName("парам1");
+            textParam.setValue("Тестирование");
+            params.add(textParam);
+            event.setMessage(messageParams);
+            //  filters
+            List<EventFilterType> filters = event.getFilters().getFilter();
+            EventFilterType f1 = new EventFilterType();
+            EventFilterType.Persons.Person personFilter = new EventFilterType.Persons.Person();
+            personFilter.setSSOID(client.getSsoid());
+            f1.getPersons().getPerson().add(personFilter);
+            filters.add(f1);
+
+            //  bind event
+            sending.getEvents().getEvent().add(event);
+        } catch (Exception e) {
+
+        }
+        return sending;
+    }
+
+    public void sendEvent() {
+        ru.axetta.ecafe.processor.core.persistence.Client client =
+                DAOService.getInstance().getClientByGuid("eb759664-b6be-1ec2-e043-a2997e0a261d");
+        SubscriptionPortType subscription = createEventController();
+        SendSubscriptionStreamEventsRequestType eventParam = buildEvenParam(client);
+        subscription.sendSubscriptionStreamEvents(eventParam);
+    }
+
     public void runBindClients() {
         List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOService.getInstance().getNotBindedEMPClients();
         /*ru.axetta.ecafe.processor.core.persistence.Client client =
                 DAOService.getInstance().getClientByGuid("eb759664-b6be-1ec2-e043-a2997e0a261d");*/
 
-        StoragePortType storage = createController();
+        StoragePortType storage = createStorageController();
         for(ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
                 bindClient(storage, c);
@@ -60,7 +121,7 @@ public class EMPProcessor {
 
     public void runReceiveUpdates() {
         long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);
-        StoragePortType storage = createController();
+        StoragePortType storage = createStorageController();
         ReceiveDataChangesRequest request = buildReceiveEntryParams(1L);
         ReceiveDataChangesResponse response = storage.receiveDataChanges(request);
         if(response.getErrorCode() != 0) {
@@ -219,12 +280,30 @@ public class EMPProcessor {
         return request;
     }
 
-    protected StoragePortType createController() {
+    protected StoragePortType createStorageController() {
         StoragePortType controller = null;
         try {
             StorageService service = new StorageService(new URL("http://Inv5379-NB:8088/mockStorageBinding?wsdl"),
                     new QName("http://emp.mos.ru/schemas/storage/", "StorageService"));
             controller = service.getStoragePort();
+
+            Client client = ClientProxy.getClient(controller);
+            HTTPConduit conduit = (HTTPConduit) client.getConduit();
+            HTTPClientPolicy policy = conduit.getClient();
+            policy.setReceiveTimeout(30 * 60 * 1000);
+            policy.setConnectionTimeout(30 * 60 * 1000);
+            return controller;
+        } catch (java.lang.Exception e) {
+            return null;
+        }
+    }
+
+    protected SubscriptionPortType createEventController() {
+        SubscriptionPortType controller = null;
+        try {
+            SubscriptionService service = new SubscriptionService(new URL("http://Inv5379-NB:8088/mockSubscriptionBinding?wsdl"),
+                    new QName("http://emp.mos.ru/schemas/storage/", "SubscriptionService"));
+            controller = service.getServicePort();
 
             Client client = ClientProxy.getClient(controller);
             HTTPConduit conduit = (HTTPConduit) client.getConduit();

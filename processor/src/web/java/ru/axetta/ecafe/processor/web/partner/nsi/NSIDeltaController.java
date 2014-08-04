@@ -42,7 +42,7 @@ import java.util.*;
  */
 @Component
 @Scope("singleton")
-@WebService(targetNamespace = "http://ru.axetta.ecafe")
+@WebService(targetNamespace = "http://rstyle.com/nsi/delta/service", serviceName = "NSIDeltaSOAPService", portName = "NSIDeltaServicePort")
 public class NSIDeltaController extends HttpServlet implements NSIDeltaService {
 
 

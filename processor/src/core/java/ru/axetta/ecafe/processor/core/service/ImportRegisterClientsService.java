@@ -585,7 +585,7 @@ public class ImportRegisterClientsService {
         ch.setFirstName(currentClient.getPerson().getFirstName());
         ch.setSecondName(currentClient.getPerson().getSecondName());
         ch.setSurname(currentClient.getPerson().getSurname());
-        ch.setGroupName(currentClient.getClientGroup().getGroupName());
+        ch.setGroupName(currentClient.getClientGroup() == null ? "" : currentClient.getClientGroup().getGroupName());
         ch.setIdOfClient(currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
         ch.setOperation(operation);

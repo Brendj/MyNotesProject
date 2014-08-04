@@ -54,7 +54,7 @@ public class DeltaType {
     @XmlElement(required = true)
     protected DeltaType.Part part;
     @XmlElement(required = true)
-    protected DataType data;
+    protected String data;
     @XmlElement(required = true)
     protected XMLGregorianCalendar date;
 
@@ -114,7 +114,7 @@ public class DeltaType {
      *     {@link DataType }
      *     
      */
-    public DataType getData() {
+    public String getData() {
         return data;
     }
 
@@ -126,7 +126,7 @@ public class DeltaType {
      *     {@link DataType }
      *     
      */
-    public void setData(DataType value) {
+    public void setData(String value) {
         this.data = value;
     }
 

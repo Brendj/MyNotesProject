@@ -36,12 +36,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "GroupValue", namespace = "http://rstyle.com/nsi/delta", propOrder = {
+@XmlType(name = "GroupValue", namespace = "", propOrder = {
     "attribute"
 })
 public class GroupValue {
 
-    @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
+    @XmlElement(namespace = "")
     protected List<Attribute> attribute;
     @XmlAttribute
     protected Integer occurrence;

@@ -7,11 +7,7 @@ package generated.nsiws_delta;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -35,13 +31,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 
  */
+@XmlRootElement(name = "containerDelta", namespace = "http://rstyle.com/nsi/delta")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ContainerDelta", namespace = "http://rstyle.com/nsi/delta", propOrder = {
     "item"
 })
 public class ContainerDelta {
 
-    @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
+    @XmlElement(namespace = "")
     protected List<Item> item;
     @XmlAttribute
     protected String name;

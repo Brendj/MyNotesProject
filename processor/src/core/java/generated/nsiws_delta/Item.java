@@ -38,12 +38,12 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Item", namespace = "http://rstyle.com/nsi/delta", propOrder = {
+@XmlType(name = "Item", namespace = "", propOrder = {
     "attribute"
 })
 public class Item {
 
-    @XmlElement(namespace = "http://rstyle.com/nsi/delta/service")
+    @XmlElement(namespace = "")
     protected List<Attribute> attribute;
     @XmlAttribute(name = "notificationId")
     protected String notificationId;
