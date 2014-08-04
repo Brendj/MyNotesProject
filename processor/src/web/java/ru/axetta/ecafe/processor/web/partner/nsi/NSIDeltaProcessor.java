@@ -126,6 +126,9 @@ public class NSIDeltaProcessor {
             ImportRegisterClientsService.log(synchDate + "Загрузка изменений с использованием нового метода доверительного к Реестрам" + items.size(), logBuffer);
             for(Item i : items) {
                 DeltaItem deltaItem = new DeltaItem(i);
+                if(deltaItem.isEmpty()) {
+                    continue;
+                }
                 RuntimeContext.getAppContext().getBean(NSIDeltaProcessor.class).saveClientTrustedComparison(synchDate,
                         date, ts, logBuffer, deltaItem);
             }
@@ -359,6 +362,17 @@ public class NSIDeltaProcessor {
 
         public String getOrgGuid() {
             return orgGuid;
+        }
+
+        public boolean isEmpty() {
+            if(StringUtils.isBlank(getFirstName()) &&
+                StringUtils.isBlank(getFamilyName()) &&
+                StringUtils.isBlank(getSecondName()) &&
+                StringUtils.isBlank(getGroup()) &&
+                StringUtils.isBlank(getOrgGuid())) {
+                return true;
+            }
+            return false;
         }
 
         @Override
