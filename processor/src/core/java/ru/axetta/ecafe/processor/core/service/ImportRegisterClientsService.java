@@ -327,7 +327,8 @@ public class ImportRegisterClientsService {
                                 + " " +
                                 emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                                 dbClient.getPerson().getSecondName()) + ", " +
-                                emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                                emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
+                                logBuffer);
                         addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
                     }
                 } catch (Exception e) {
@@ -346,7 +347,7 @@ public class ImportRegisterClientsService {
                             + " " +
                             emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                             dbClient.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                            emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()), logBuffer);
                     addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
                 }
             }
@@ -380,7 +381,7 @@ public class ImportRegisterClientsService {
                 //  Если группа у клиента не указана, то перемещаем его в Другие
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
                         ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
-                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean guidFound = false;
@@ -392,11 +393,12 @@ public class ImportRegisterClientsService {
             }
             if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
                 Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
-                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
-                        cl.getPerson().getSurname()) + " " +
-                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
+                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
+                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
+                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " +
+                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName())
                         + ", " +
-                        emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
+                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
                         + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                 addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION, RegistryChange.FULL_COMPARISON);
                 continue;
@@ -424,7 +426,7 @@ public class ImportRegisterClientsService {
                             emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
                             cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на " +
                             emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
@@ -668,7 +670,7 @@ public class ImportRegisterClientsService {
                     + " " +
                     emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                     dbClient.getPerson().getSecondName()) + ", " +
-                    emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                    emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()), logBuffer);
             if (performChanges) {
                 dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 session.save(dbClient);
@@ -731,7 +733,7 @@ public class ImportRegisterClientsService {
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean guidFound = false;
@@ -747,7 +749,7 @@ public class ImportRegisterClientsService {
                         cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                         + ", " +
-                        emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
+                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
                         + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                 if (performChanges) {
                     cl.setOrg(newOrg);
@@ -782,7 +784,7 @@ public class ImportRegisterClientsService {
                             emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
                             cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на " +
                             emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
