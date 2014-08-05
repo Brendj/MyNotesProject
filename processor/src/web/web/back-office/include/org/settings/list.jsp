@@ -59,7 +59,7 @@
                 <h:outputText value="GUID"/>
             </f:facet>
             <a4j:commandLink value="#{setting.guid}" action="#{settingsListPage.view}"
-                             styleClass="command-link" reRender="workspaceForm"/>
+                             styleClass="command-link" reRender="mainMenu, workspaceForm"/>
         </rich:column>
         <rich:column sortBy="#{setting.globalVersion}">
             <f:facet name="header">
@@ -83,7 +83,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink action="#{settingsListPage.edit}" styleClass="command-link" reRender="workspaceForm">
+            <a4j:commandLink action="#{settingsListPage.edit}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             </a4j:commandLink>
         </rich:column>

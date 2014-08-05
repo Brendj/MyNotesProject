@@ -25,7 +25,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <a4j:commandLink reRender="workspaceForm" action="#{categoryOrgEditPage.show}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryOrgEditPage.show}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item}" target="#{categoryOrgEditPage.entity}" />
         </a4j:commandLink>

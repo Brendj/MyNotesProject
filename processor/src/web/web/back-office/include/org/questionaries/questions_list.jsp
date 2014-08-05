@@ -64,7 +64,7 @@
             <h:outputText value="#{questionary.idOfQuestionary}"/>
         </rich:column>
         <rich:column>
-            <a4j:commandLink reRender="workspaceForm" value="#{questionary.questionName}" action="#{questionaryViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{questionary.questionName}" action="#{questionaryViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
@@ -78,11 +78,11 @@
             <h:outputText value="#{questionary.createdDate}" converter="timeConverter"/>
         </rich:column>
         <rich:column>
-            <a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.inactiveStatus}" reRender="workspaceForm">
+            <a4j:commandLink action="#{questionaryListPage.start}" rendered="#{questionary.inactiveStatus}" reRender="mainMenu, workspaceForm">
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/play.png" style="border: 0;" />
             </a4j:commandLink>
-            <a4j:commandLink action="#{questionaryListPage.stop}" rendered="#{questionary.startStatus}" reRender="workspaceForm">
+            <a4j:commandLink action="#{questionaryListPage.stop}" rendered="#{questionary.startStatus}" reRender="mainMenu, workspaceForm">
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>
                 <h:graphicImage value="/images/16x16/stop.png" style="border: 0;" />
             </a4j:commandLink>
@@ -93,13 +93,13 @@
         </rich:column>
 
         <rich:column>
-            <a4j:commandLink reRender="workspaceForm" action="#{questionaryEditPage.show}">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{questionaryEditPage.show}">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column>
-            <a4j:commandLink reRender="workspaceForm" action="#{questionaryListPage.remove}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{questionaryListPage.remove}"
                              rendered="#{!questionary.startStatus}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:param name="id" value="#{questionary.idOfQuestionary}"/>

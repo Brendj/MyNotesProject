@@ -68,7 +68,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Организация" />
             </f:facet>
-            <a4j:commandLink reRender="workspaceForm" value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
@@ -119,7 +119,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="workspaceForm" action="#{mainPage.showOrgEditPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>

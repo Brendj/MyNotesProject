@@ -45,9 +45,9 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сохранить" action="#{employeeEditPage.save}"
-                           reRender="workspaceTogglePanel" styleClass="command-button" />
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <a4j:commandButton value="Востановить" action="#{employeeEditPage.show}"
-                           reRender="workspaceTogglePanel" styleClass="command-button" />
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid">

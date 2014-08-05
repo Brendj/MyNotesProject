@@ -70,7 +70,7 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showReportRuleEditPage}"
-                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 <rich:dataTable value="#{mainPage.reportRuleViewPage.paramHints}" var="item"
                 columnClasses="left-aligned-column, left-aligned-column">

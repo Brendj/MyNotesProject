@@ -24,13 +24,13 @@
     <h:panelGrid rendered="#{empty thinClientUserViewPage.idOfClient}">
         <h:outputText value="Необходимо выбрать клиента на странице " styleClass="output-text"/>
         <a4j:commandLink value="Списка пользователей" styleClass="output-text">
-            <a4j:support event="onclick" action="#{thinClientUserListPage.show}" reRender="workspaceForm"/>
+            <a4j:support event="onclick" action="#{thinClientUserListPage.show}" reRender="mainMenu, workspaceForm"/>
         </a4j:commandLink>
     </h:panelGrid>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" rendered="#{not empty thinClientUserViewPage.idOfClient}">
     <a4j:commandButton value="Редактировать" action="#{thinClientUserEditPage.show}"
-                       reRender="workspaceTogglePanel" styleClass="command-button" >
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" >
         <f:setPropertyActionListener value="#{thinClientUserViewPage.idOfClient}" target="#{thinClientUserEditPage.idOfClient}" />
         <f:setPropertyActionListener value="0" target="#{thinClientUserEditPage.callFromMenu}" />
     </a4j:commandButton>

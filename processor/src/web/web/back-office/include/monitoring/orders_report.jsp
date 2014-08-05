@@ -13,7 +13,7 @@
     <h:panelGrid columns="2">
         <h:outputText value="Статус: " styleClass="output-text"/>
         <h:panelGroup>
-            <a4j:commandLink reRender="workspaceForm" value="#{ordersMonitoringReportPage.missingCount}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ordersMonitoringReportPage.missingCount}"
                              action="#{mainPage.showGoodRequestReportPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="-1" target="#{mainPage.goodRequestReportPage.requestsFilter}" />
                 <f:setPropertyActionListener value="2" target="#{mainPage.goodRequestReportPage.daysLimit}" />
@@ -25,7 +25,7 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Обновить отчет" action="#{ordersMonitoringReportPage.doGenerateReport}"
-                           reRender="workspaceTogglePanel, ordersMonitoringReportTable"
+                           reRender="mainMenu, workspaceTogglePanel, ordersMonitoringReportTable"
                            styleClass="command-button" status="statusSyncReportGenerateStatus" />
         <a4j:status id="statusSyncReportGenerateStatus">
             <f:facet name="start">

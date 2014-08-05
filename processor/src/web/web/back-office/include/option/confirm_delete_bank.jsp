@@ -26,7 +26,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{bankDeletePage.delete}"
                                            oncomplete="#{rich:component('removedBankItemDeletePanel')}.hide();"
-                                           reRender="bankListTable"
+                                           reRender="mainMenu, bankListTable"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"
                                            onclick="#{rich:component('removedBankItemDeletePanel')}.hide();return false;" />

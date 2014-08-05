@@ -74,9 +74,9 @@
 
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{ruleEditPage.updateRule}" reRender="mainMenu, workspaceTogglePanel"
                        styleClass="command-button" />
-    <a4j:commandButton value="Восстановить" action="#{ruleEditPage.reload}" reRender="workspaceTogglePanel"
+    <a4j:commandButton value="Восстановить" action="#{ruleEditPage.reload}" reRender="mainMenu, workspaceTogglePanel"
                        ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 

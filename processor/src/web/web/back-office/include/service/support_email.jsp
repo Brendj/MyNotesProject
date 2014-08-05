@@ -68,7 +68,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton id="sendSupportEmailBtn" value="Отправить" action="#{mainPage.sendSupportEmail}"
-                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button"
                            status="mailSendGenerateStatus" />
         <a4j:status id="mailSendGenerateStatus">
             <f:facet name="start">

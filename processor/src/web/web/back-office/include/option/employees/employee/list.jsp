@@ -89,7 +89,7 @@
             <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
-            <a4j:commandLink value="#{employee.surname}" reRender="workspaceForm"
+            <a4j:commandLink value="#{employee.surname}" reRender="mainMenu, workspaceForm"
                              action="#{employeeViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}"/>
             </a4j:commandLink>
@@ -120,7 +120,7 @@
         </rich:column>
 
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="workspaceForm" action="#{employeeEditPage.show}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeEditPage.show}"
                              styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />
@@ -128,7 +128,7 @@
         </rich:column>
 
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="workspaceForm" action="#{employeeListPage.deleteEmployee}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeListPage.deleteEmployee}"
                              styleClass="command-link" rendered="#{not employee.deleted}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />

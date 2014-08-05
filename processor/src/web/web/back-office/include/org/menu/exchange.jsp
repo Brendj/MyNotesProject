@@ -35,7 +35,7 @@
         <h:outputText value="#{menuExchange.menuDate}" styleClass="output-text"  converter="timeConverter"/>
     </rich:column>
     <rich:column styleClass="left-aligned-column">
-        <a4j:commandLink reRender="workspaceForm" action="#{mainPage.showMenuDataXML}" styleClass="command-link" value="Просмотреть" target="_blink">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showMenuDataXML}" styleClass="command-link" value="Просмотреть" target="_blink">
             <f:setPropertyActionListener value="#{menuExchange.menuData}" target="#{mainPage.selectedMenuDataXML}" />
         </a4j:commandLink>
     </rich:column>

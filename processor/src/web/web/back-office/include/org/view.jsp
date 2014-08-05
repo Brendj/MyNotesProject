@@ -128,7 +128,7 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"
-                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Синхронизация балансов" action="#{mainPage.orgViewPage.updateBalance}" styleClass="command-button" />
 </h:panelGrid>
 <a4j:status id="sOrgViewStatus">

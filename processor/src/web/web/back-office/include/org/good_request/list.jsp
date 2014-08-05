@@ -66,7 +66,7 @@
                 <f:facet name="header">
                     <h:outputText value="ID" styleClass="output-text" escape="true" />
                 </f:facet>
-                <a4j:commandLink reRender="workspaceForm" value="#{goodRequest.globalId}"
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalId}"
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{goodRequest}"
                                                  target="#{goodRequestPositionListPage.goodRequest}" />
@@ -76,7 +76,7 @@
                 <f:facet name="header">
                     <h:outputText value="Номер" styleClass="output-text" escape="true" />
                 </f:facet>
-                <a4j:commandLink reRender="workspaceForm" value="#{goodRequest.number}"
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.number}"
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{goodRequest}"
                                                  target="#{goodRequestPositionListPage.goodRequest}" />

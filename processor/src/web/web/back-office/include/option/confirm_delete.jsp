@@ -25,7 +25,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeReportTemplate}"
                                            oncomplete="#{rich:component('reportTemplateDeletePanel')}.hide();"
-                                           reRender="reportTemplateListTable, #{mainPage.topMostPage.pageComponent.id}"
+                                           reRender="mainMenu, reportTemplateListTable, #{mainPage.topMostPage.pageComponent.id}"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"
                                            onclick="#{rich:component('reportTemplateDeletePanel')}.hide();return false;" />

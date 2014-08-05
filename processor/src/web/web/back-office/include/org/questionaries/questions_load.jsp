@@ -73,7 +73,7 @@
                 <h:outputText value="Наименование" styleClass="output-text"/>
             </f:facet>
             <h:outputText value="#{item.questionaryItem}" styleClass="output-text" rendered="#{item.questionaryItem!=null}"/>
-            <a4j:commandLink reRender="workspaceForm" value="#{item.questionary.question}"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.questionary.question}"
                              action="#{questionaryViewPage.show}" styleClass="command-link" rendered="#{item.questionary!=null}">
                 <f:setPropertyActionListener value="#{item.questionary}" target="#{questionaryGroupPage.questionary}" />
             </a4j:commandLink>

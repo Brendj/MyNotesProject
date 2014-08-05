@@ -110,8 +110,8 @@
         </rich:column>
     </rich:dataTable>
     <h:panelGrid columns="2">
-        <a4j:commandButton action="#{questionaryEditPage.save}" value="Сохранить" reRender="workspaceTogglePanel"/>
-        <a4j:commandButton action="#{questionaryEditPage.reload}" value="Востановить" reRender="workspaceTogglePanel"/>
+        <a4j:commandButton action="#{questionaryEditPage.save}" value="Сохранить" reRender="mainMenu, workspaceTogglePanel"/>
+        <a4j:commandButton action="#{questionaryEditPage.reload}" value="Востановить" reRender="mainMenu, workspaceTogglePanel"/>
     </h:panelGrid>
 </h:panelGrid>
 

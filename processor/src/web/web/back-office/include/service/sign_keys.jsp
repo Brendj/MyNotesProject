@@ -18,7 +18,7 @@
                      styleClass="input-text" />
     </h:panelGrid>
     <a4j:commandButton value="Генерировать пару ключей для ЭЦП" action="#{mainPage.buildSignKeys}"
-                       reRender="workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

@@ -23,7 +23,7 @@
     <h:outputText value="Список организаций" styleClass="output-text"/>
     <h:panelGroup>
         <a4j:repeat var="org" value="#{questionaryViewPage.orgItemList}">
-            <a4j:commandLink reRender="workspaceForm" value="#{org.shortName}" styleClass="command-link"
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{org.shortName}" styleClass="command-link"
                              action="#{mainPage.showOrgViewPage}">
                 <f:setPropertyActionListener value="#{org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
@@ -57,7 +57,7 @@
     <h:outputText value="Дата последних изменений" styleClass="output-text"/>
     <h:inputText readonly="true" value="#{questionaryViewPage.questionary.updatedDate}" converter="timeConverter" styleClass="input-text"/>
 
-    <a4j:commandButton value="Редактировать" reRender="workspaceForm"  action="#{questionaryEditPage.show}" styleClass="command-button"/>
+    <a4j:commandButton value="Редактировать" reRender="mainMenu, workspaceForm"  action="#{questionaryEditPage.show}" styleClass="command-button"/>
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
