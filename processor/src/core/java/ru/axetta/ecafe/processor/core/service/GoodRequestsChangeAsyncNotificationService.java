@@ -43,6 +43,7 @@ import javax.persistence.Query;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
 import java.util.*;
 
 
@@ -89,7 +90,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     @Async
     public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<DistributedObject> distributedObjectList) {
+            final Date lastCreateOrUpdateDate, List<String> guids) {
         if (!enableNotify) {
             return;
         }
@@ -98,10 +99,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             /* проверим есть ли измененые заявки на неделю */
-            List<String> guids = new ArrayList<String>(distributedObjectList.size());
-            for (DistributedObject distributedObject : distributedObjectList) {
-                guids.add(distributedObject.getGuid());
-            }
+
             Date minDone = new Date();
             Date maxDone = new Date();
             try {
@@ -123,6 +121,15 @@ public class GoodRequestsChangeAsyncNotificationService {
                     requestCriteria.setProjection(Projections.projectionList()  // внутри селекта
                             .add(Projections.max("gr.doneDate")).add(Projections.min("gr.doneDate")));
                     List list = requestCriteria.list();
+
+                 /*   org.hibernate.Query query = persistenceSession.createSQLQuery(
+                            "SELECT max(gr.DoneDate), min(gr.DoneDate) " + "FROM cf_goods_requests_positions grp "
+                                    + "INNER JOIN cf_goods_requests gr "
+                                    + "ON grp.IdOfGoodsRequest = gr.IdOfGoodsRequest " + "WHERE grp.guid IN (:guid)");
+                    query.setParameterList("guid", guids);
+                    System.out.println(query);
+                    List list = query.list();*/
+
                     if (!list.isEmpty()) {
                         Object[] objects = (Object[]) list.get(0);
                         maxDone = (Date) objects[0];

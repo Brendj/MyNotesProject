@@ -553,7 +553,11 @@ public class Manager {
             final Date lastCreateOrUpdateDate = calendarEnd.getTime();
             calendarEnd.add(Calendar.MINUTE, 1);
             final Date endGenerateTime = calendarEnd.getTime();
-            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate, distributedObjectList);
+            List<String> guids = new ArrayList<String>();
+            for (DistributedObject distributedObject : distributedObjectList) {
+                guids.add(distributedObject.getGuid());
+            }
+            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate, guids);
         }
         LOGGER.debug("processDistributedObjectsList: end");
         return distributedObjectList;
