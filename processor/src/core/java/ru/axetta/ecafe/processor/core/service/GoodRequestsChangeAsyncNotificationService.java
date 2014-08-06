@@ -404,8 +404,9 @@ public class GoodRequestsChangeAsyncNotificationService {
             List<String> address = clientCriteria.list();
             for (String addres : address) {
                 if (StringUtils.isNotEmpty(addres)) {
-                    List<String> strings = Arrays.asList(StringUtils.split(addres, ";"));
-                    addresses.addAll(strings);
+                    for(String email : StringUtils.split(addres, ";")){
+                        addresses.add(email.trim());
+                    }
                 }
             }
             //addresses.addAll(address);
@@ -420,8 +421,9 @@ public class GoodRequestsChangeAsyncNotificationService {
         for (Object o : list) {
             UserOrgs userOrgs = (UserOrgs) o;
             if (userOrgs.getUser() != null && StringUtils.isNotEmpty(userOrgs.getUser().getEmail())) {
-                List<String> strings = Arrays.asList(StringUtils.split(userOrgs.getUser().getEmail(), ";"));
-                addresses.addAll(strings);
+                for(String email : StringUtils.split(userOrgs.getUser().getEmail(), ";")){
+                    addresses.add(email.trim());
+                }
             }
         }
     }
