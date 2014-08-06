@@ -357,3 +357,11 @@
 .cachePersitentStat .right .right {
     width: 50%;
 }
+
+.orgMenuView td td{
+    border: 1px solid black;
+}
+
+.orgMenuView .right {
+    padding-left: 80px
+}

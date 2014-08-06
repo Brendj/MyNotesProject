@@ -8,21 +8,22 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDetail" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Menu" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.MenuDetail" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
 <%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.Transaction" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
@@ -30,7 +31,6 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -364,7 +364,7 @@
 </form>
 
 <%if (haveDataToProcess && dataToProcessVerified) {%>
-<table>
+<table class="orgMenuView">
 <tr>
 <td valign="top">
     <%--<div style="margin-top: 0px">--%>
@@ -496,7 +496,7 @@
     </table>
 
 </td>
-<td valign="top">
+<td valign="top" class="right">
     <%--<div style="margin-top: 0px">--%>
     <table>
         <tr>
