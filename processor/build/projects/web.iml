@@ -51,7 +51,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../target/production/web" />
     <output-test url="file://$MODULE_DIR$/../../target/test/web" />
     <exclude-output />
