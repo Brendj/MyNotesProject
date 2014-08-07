@@ -32,6 +32,8 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
 
+<%--Просмотр меню--%>
+
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
 <!--Include YUI Loader: -->
@@ -628,6 +630,7 @@
                         <td><div class="column-header">Цена комплекса</div></td>
                         <td><div class="column-header">Содержание</div></td>
                         <td><div class="column-header">Цена</div></td>
+                        <td><div class="column-header">Льготный</div></td>
                         <td><div class="column-header">Выход</div></td>
                     </tr>
                     <%
@@ -697,6 +700,17 @@
                                 <%=StringEscapeUtils.escapeHtml(elementPrice)%>
                             </div>
                         </td>
+                        <td>
+                            <%
+                                String modeFree = "";
+                                if(currComplexDetail.getComplexInfo().getModeFree() == 1 )
+                                    modeFree = "v";
+                            %>
+                            <div class="output-text" style="text-align:center">
+                                <%=StringEscapeUtils.escapeHtml(modeFree)%>
+                            </div>
+                        </td>
+
                         <td>
                             <div class="output-text">
                                 <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailOutput())%>

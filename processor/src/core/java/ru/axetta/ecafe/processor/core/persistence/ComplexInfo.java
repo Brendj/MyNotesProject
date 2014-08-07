@@ -7,16 +7,15 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 
 import java.util.Date;
-import java.util.Set;
 
 public class ComplexInfo {
 
     private Long idOfComplexInfo;
     private int idOfComplex;
     private Org org;
-    private int modeFree;
-    private int modeGrant;
-    private int modeOfAdd;
+    private int modeFree; //Режим бесплатного питания (0-выключен, 1-включен)
+    private int modeGrant; // Режим дотации (0-выключен, 1 - включен)
+    private int modeOfAdd; //Режим добавления блюд из комплекса ( 0 – режим добавления всех блюд, 1 – режи добавления по 1 блюду, 2 – режим фиксированная цена,3 – режим свободный выбор)
     private Integer useTrDiscount;
     private String complexName;
     private Date menuDate;
@@ -24,7 +23,7 @@ public class ComplexInfo {
     private MenuDetail menuDetail;
     private Long currentPrice;
     private Good good;
-    private Integer usedSubscriptionFeeding;
+    private Integer usedSubscriptionFeeding; //Признак использования комплекса в абонементном питании. 1 – может быть использован, 0 – не может быть использован
 
     protected ComplexInfo() {}
 
