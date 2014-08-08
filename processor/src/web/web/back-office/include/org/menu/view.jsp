@@ -631,7 +631,6 @@
                         <td><div class="column-header">Содержание</div></td>
                         <td><div class="column-header">Цена</div></td>
                         <td><div class="column-header">Льготный</div></td>
-                        <td><div class="column-header">Выход</div></td>
                     </tr>
                     <%
                         //boolean firstGroup = true;
@@ -704,16 +703,14 @@
                             <%
                                 String modeFree = "";
                                 if(currComplexDetail.getComplexInfo().getModeFree() == 1 )
-                                    modeFree = "v";
+                                    modeFree = "л";
+                                String subscription = "";
+                                if(currComplexDetail.getComplexInfo().getUsedSubscriptionFeeding() == 1 )
+                                    subscription = "ап";
                             %>
                             <div class="output-text" style="text-align:center">
                                 <%=StringEscapeUtils.escapeHtml(modeFree)%>
-                            </div>
-                        </td>
-
-                        <td>
-                            <div class="output-text">
-                                <%=StringEscapeUtils.escapeHtml(currComplexDetail.getMenuDetail().getMenuDetailOutput())%>
+                                <%=StringEscapeUtils.escapeHtml(subscription)%>
                             </div>
                         </td>
                     </tr>
