@@ -98,6 +98,7 @@ public class Org {
     private Boolean commodityAccounting;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
+    private OrganizationStatus status;
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -128,6 +129,7 @@ public class Org {
         this.commodityAccounting=false;
         this.usePlanOrders = true;  // плана питания включен по умолчаню
         this.type = type;
+        this.status = OrganizationStatus.ACTIVE;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -723,7 +725,13 @@ public class Org {
         this.type = type;
     }
 
+    public OrganizationStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(OrganizationStatus status) {
+        this.status = status;
+    }
 
     @Override
     public boolean equals(Object o) {

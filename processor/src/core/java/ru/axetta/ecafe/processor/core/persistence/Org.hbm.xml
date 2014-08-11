@@ -84,6 +84,12 @@
             </type>
         </property>
 
+        <property name="status" column="OrganizationStatus">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationStatus</param>
+            </type>
+        </property>
+
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>

@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -65,14 +62,38 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Общеобразовательные учреждения (Orgs)
         //  ------------------------------------------
+        String orgTypeCases = ", case ";
+        for(OrganizationType ot : OrganizationType.values()) {
+            orgTypeCases += " when organizationtype=" + ot.ordinal() + " then '" + ot.toString() + "'";
+        }
+        orgTypeCases += " else 'Неизвестный тип ОУ' end as orgtype ";
+        String orgStatusCases = ", case ";
+        for(OrganizationStatus os : OrganizationStatus.values()) {
+            orgStatusCases += " when organizationstatus=" + os.ordinal() + " then '" + os.toString() + "'";
+        }
+        orgStatusCases += " else 'Неизвестный статус ОУ' end as status ";
         TYPES.add(new BIDataExportType("orgs",
-                "select cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
+                "select cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district, "
+                        + "array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm, "
+                        + "cf_orgs.latitude as latitude, cf_orgs.longitude as longitude "
+                        + orgTypeCases
+                        + orgStatusCases
                         + "from cf_orgs "
                         + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
                         + "where cf_orgs.state<>0 "
                         + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district "
                         + "order by cf_orgs.shortname",
-                new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm"}));
+                new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm", "latitude", "longitude", "orgtype", "status"}));
+
+        //  ------------------------------------------
+        //  Оффициальные данные ОУ (Orgs_official)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orgs_official",
+                "select idoforg, guid, officialname "
+                + "from cf_orgs "
+                + "where shortname<>'' and officialname<>'' "
+                + "order by officialname",
+                new String[]{"idoforg", "guid", "officialname"}));
 
         //  ------------------------------------------
         //  Поставщики питания (Contragents)
