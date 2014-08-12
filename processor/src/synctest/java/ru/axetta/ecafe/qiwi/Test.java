@@ -9,22 +9,25 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Signature;
 
-
 public class Test {
+    final static String SIGNATURE_PARAM="&SIGNATURE=";
 
     public static void main( String[] args )
             throws Exception
     {
-        String url = "CLIENTID=00100016&SUM=100&TIME=1406290983&OPID=5&TERMID=1&PID=qiwi8&V=1";
+        String url = "CLIENTID=00000026&SUM=100&TIME=1406290983&OPID=7&TERMID=1&PID=test&V=1";   //localhost
+
+        //String url = "CLIENTID=00000026&SUM=100&TIME=1407833350000&OPID=4&TERMID=1&PID=test&V=1";
         String singnature = generateSignature(url);
-        String resultUrl = url + "&SIGNATURE=" + singnature;
+        String resultUrl = url + SIGNATURE_PARAM + singnature;
         System.out.print(resultUrl);
     }
 
     private static String generateSignature(String url)throws Exception{
         // Read keystore
         KeyStore ks = KeyStore.getInstance("pkcs12","SunJSSE");
-        InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\Сертификаты\\ispp_org_pp_test_qiwi8.pfx"));
+        //InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\Сертификаты\\ispp_org_pp_test_qiwi8.pfx"));
+        InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\ключ\\qiwi\\ispp_qiwi_test.pfx")); //localhost
         ks.load(ksin, "1".toCharArray());  /// 1 - password for  pfx key
         ksin.close();
 
@@ -52,6 +55,4 @@ public class Test {
         }
         return hex.toString();
     }
-
-
 }
