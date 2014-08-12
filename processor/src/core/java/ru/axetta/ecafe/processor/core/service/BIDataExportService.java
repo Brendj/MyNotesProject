@@ -89,10 +89,12 @@ public class BIDataExportService {
         //  Оффициальные данные ОУ (Orgs_official)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs_official",
-                "select idoforg, guid, officialname "
-                + "from cf_orgs "
-                + "where shortname<>'' and officialname<>'' "
-                + "order by officialname",
+                "select o.idoforg, o.guid, o2.officialname "
+                + "from cf_orgs o "
+                + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
+                + "join cf_orgs o2 on o2.idoforg=f.currentorg "
+                + "where o.shortname<>'' and o2.officialname<>'' "
+                + "order by o2.officialname",
                 new String[]{"idoforg", "guid", "officialname"}));
 
         //  ------------------------------------------
