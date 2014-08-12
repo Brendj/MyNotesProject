@@ -11,7 +11,6 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -42,8 +41,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.math.BigInteger;
 import java.util.*;
 
 
@@ -320,12 +317,12 @@ public class GoodRequestsChangeAsyncNotificationService {
                     }
                     LOGGER.debug("addresses " + addresses.toString());
                     //boolean sended = false;
-                    //for (String address : addresses) {
-                    //    if (StringUtils.trimToNull(address) != null) {
-                    //        eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                    //    }
-                    //}
-                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    for (String address : addresses) {
+                        if (StringUtils.trimToNull(address) != null) {
+                            eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                        }
+                    }
+                    //eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
