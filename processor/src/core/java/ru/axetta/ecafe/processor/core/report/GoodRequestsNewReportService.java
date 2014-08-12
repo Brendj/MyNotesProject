@@ -83,14 +83,14 @@ public class GoodRequestsNewReportService {
         List<Item> itemList = new LinkedList<Item>();
 
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-        Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
+        Date endDate = CalendarUtils.endOfDay(endTime);
         TreeSet<Date> dates = new TreeSet<Date>();
 
         Criteria criteriaComplex = session.createCriteria(ComplexInfo.class);
         criteriaComplex.createAlias("org", "o");
         criteriaComplex.add(Restrictions.isNotNull("good"));
         criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
-        criteriaComplex.add(Restrictions.between("menuDate", endDate, CalendarUtils.addOneDay(endDate)));
+        criteriaComplex.add(Restrictions.between("menuDate", beginDate,endDate));
         List list = criteriaComplex.list();
         Map<Long, ComplexInfoItem> complexOrgDictionary = new HashMap<Long, ComplexInfoItem>();
         Map<Long, GoodInfo> allGoodsInfo = new HashMap<Long, GoodInfo>();
@@ -123,9 +123,11 @@ public class GoodRequestsNewReportService {
             allGoodsInfo.put(globalId, info);
         }
 
+        String sqlWhere = "{alias}.created_at > DATE_SUB(startTime, INTERVAL 1 DAY)";
+
         Criteria goodRequestPositionCriteria = session.createCriteria(GoodRequestPosition.class);
         goodRequestPositionCriteria.createAlias("goodRequest", "gr");
-        goodRequestPositionCriteria.add(Restrictions.between("gr.doneDate", startTime, endTime));
+        goodRequestPositionCriteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
         goodRequestPositionCriteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
         goodRequestPositionCriteria.add(Restrictions.isNotNull("good"));
         goodRequestPositionCriteria.add(Restrictions.eq("deletedState", false));
@@ -145,7 +147,7 @@ public class GoodRequestsNewReportService {
 
         List goodRequestPositionList = goodRequestPositionCriteria.list();
 
-        Date doneDate = CalendarUtils.truncateToDayOfMonth(new Date(endDate.getTime()));
+        Date doneDate = endDate;
         Map<Long, GoodInfo> requestGoodsInfo = new HashMap<Long, GoodInfo>();
         for (Object obj : goodRequestPositionList) {
             GoodRequestPosition position = (GoodRequestPosition) obj;
@@ -253,7 +255,7 @@ public class GoodRequestsNewReportService {
                                 }
                             } else {
                                 beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-                                endDate = CalendarUtils.truncateToDayOfMonth(endTime);
+                                endDate = CalendarUtils.endOfDay(endTime);
                                 while (beginDate.getTime() <= endDate.getTime()) {
                                     addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
                                             hideLastValue, goodInfo.feedingPlanType);

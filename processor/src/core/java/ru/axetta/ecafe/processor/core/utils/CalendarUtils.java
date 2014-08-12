@@ -104,10 +104,25 @@ public class CalendarUtils {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
     }
 
+    public static void endOfDay(Calendar calendar) {
+        calendar.set(Calendar.MILLISECOND, 999);
+        calendar.set(Calendar.MILLISECOND, 999);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+    }
+
     public static Date truncateToDayOfMonth(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
         truncateToDayOfMonth(c);
+        return c.getTime();
+    }
+
+    public static Date endOfDay(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        endOfDay(c);
         return c.getTime();
     }
     public static Date truncateToDayOfMonthAndAddDay(Date date) {

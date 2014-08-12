@@ -122,14 +122,6 @@ public class GoodRequestsChangeAsyncNotificationService {
                             .add(Projections.max("gr.doneDate")).add(Projections.min("gr.doneDate")));
                     List list = requestCriteria.list();
 
-                 /*   org.hibernate.Query query = persistenceSession.createSQLQuery(
-                            "SELECT max(gr.DoneDate), min(gr.DoneDate) " + "FROM cf_goods_requests_positions grp "
-                                    + "INNER JOIN cf_goods_requests gr "
-                                    + "ON grp.IdOfGoodsRequest = gr.IdOfGoodsRequest " + "WHERE grp.guid IN (:guid)");
-                    query.setParameterList("guid", guids);
-                    System.out.println(query);
-                    List list = query.list();*/
-
                     if (!list.isEmpty()) {
                         Object[] objects = (Object[]) list.get(0);
                         maxDone = (Date) objects[0];
