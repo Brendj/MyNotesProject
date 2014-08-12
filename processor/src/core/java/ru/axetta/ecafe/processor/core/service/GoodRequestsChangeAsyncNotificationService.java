@@ -271,22 +271,19 @@ public class GoodRequestsChangeAsyncNotificationService {
                 }
 
                 if (StringUtils.isNotEmpty(htmlReport)) {
-                    //try {
-                    //    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
-                    //    File file = new File(fileName);
-                    //    FileOutputStream outputStream = new FileOutputStream(file);
-                    //    outputStream.write(htmlReport.getBytes());
-                    //    outputStream.flush();
-                    //    outputStream.close();
-                    //    LOGGER.debug(String.format("save report file '%s'", fileName));
-                    //} catch (Exception e) {
-                    //    LOGGER.error("Cannot save report file", e);
-                    //}
-
-                    //List<String> addresses = new ArrayList<String>();
+                    boolean modifyTypeEdit = htmlReport.contains("#FF6666");
+                    boolean modifyTypeCreate = htmlReport.contains("#92D050");
+                    String reportType = "-";
+                    if (modifyTypeCreate && modifyTypeEdit) {
+                        reportType = "О";
+                    } else if (modifyTypeCreate) {
+                        reportType = "Н";
+                    } else if (modifyTypeEdit) {
+                        reportType = "К";
+                    }
 
                     String[] values = {
-                            "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport};
+                            "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport, "reportType",reportType};
                     List<String> strings = Arrays
                             .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
                     Set<String> addresses = new HashSet<String>(strings);
@@ -323,11 +320,12 @@ public class GoodRequestsChangeAsyncNotificationService {
                     }
                     LOGGER.debug("addresses " + addresses.toString());
                     //boolean sended = false;
-                    for (String address : addresses) {
-                        if (StringUtils.trimToNull(address) != null) {
-                            eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                        }
-                    }
+                    //for (String address : addresses) {
+                    //    if (StringUtils.trimToNull(address) != null) {
+                    //        eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    //    }
+                    //}
+                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
