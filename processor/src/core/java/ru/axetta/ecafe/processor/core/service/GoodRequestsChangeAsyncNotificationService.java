@@ -165,19 +165,19 @@ public class GoodRequestsChangeAsyncNotificationService {
                 localCalendar.add(Calendar.DATE, -1);
                 stDate = localCalendar.getTime();
             } else if (weekDay.equals("Ср")) {
-                localCalendar.add(Calendar.DATE, - 2);
+                localCalendar.add(Calendar.DATE, -2);
                 stDate = localCalendar.getTime();
             } else if (weekDay.equals("Чт")) {
-                localCalendar.add(Calendar.DATE, - 3);
+                localCalendar.add(Calendar.DATE, -3);
                 stDate = localCalendar.getTime();
             } else if (weekDay.equals("Пт")) {
-                localCalendar.add(Calendar.DATE, - 4);
+                localCalendar.add(Calendar.DATE, -4);
                 stDate = localCalendar.getTime();
             } else if (weekDay.equals("Сб")) {
-                localCalendar.add(Calendar.DATE, - 5);
+                localCalendar.add(Calendar.DATE, -5);
                 stDate = localCalendar.getTime();
             } else if (weekDay.equals("Вс")) {
-                localCalendar.add(Calendar.DATE, - 6);
+                localCalendar.add(Calendar.DATE, -6);
                 stDate = localCalendar.getTime();
             }
 
@@ -186,8 +186,10 @@ public class GoodRequestsChangeAsyncNotificationService {
             enDate = localCalendar.getTime();
 
             intervals.add(new DateInterval(stDate, enDate));
+            Date eD = CalendarUtils.truncateToDayOfMonth(enDate);
+            Date mD = CalendarUtils.truncateToDayOfMonth(maxDone);
 
-            while (enDate.after(maxDone)) {
+            while (eD.before(mD)) {
                 localCalendar.add(Calendar.DATE, 1);
                 localCalendar.add(Calendar.MILLISECOND, -1);
                 stDate = localCalendar.getTime();
@@ -243,7 +245,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                         //persistenceSession = runtimeContext.createReportPersistenceSession();
                         persistenceSession = runtimeContext.createPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
-                        reportJob = builder.build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
+                        reportJob = builder
+                                .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
                         //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                         persistenceTransaction.commit();
                         persistenceTransaction = null;
@@ -289,7 +292,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                     }
 
                     String[] values = {
-                            "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport, "reportType",reportType};
+                            "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport,
+                            "reportType", reportType};
                     List<String> strings = Arrays
                             .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
                     Set<String> addresses = new HashSet<String>(strings);
@@ -328,10 +332,13 @@ public class GoodRequestsChangeAsyncNotificationService {
                     //boolean sended = false;
                     for (String address : addresses) {
                         if (StringUtils.trimToNull(address) != null) {
-                            eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                            eventNotificationService
+                                    .sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
+                                            values);
                         }
                     }
-                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru",
+                            EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
@@ -400,7 +407,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             List<String> address = clientCriteria.list();
             for (String addres : address) {
                 if (StringUtils.isNotEmpty(addres)) {
-                    for(String email : StringUtils.split(addres, ";")){
+                    for (String email : StringUtils.split(addres, ";")) {
                         addresses.add(email.trim());
                     }
                 }
@@ -417,7 +424,7 @@ public class GoodRequestsChangeAsyncNotificationService {
         for (Object o : list) {
             UserOrgs userOrgs = (UserOrgs) o;
             if (userOrgs.getUser() != null && StringUtils.isNotEmpty(userOrgs.getUser().getEmail())) {
-                for(String email : StringUtils.split(userOrgs.getUser().getEmail(), ";")){
+                for (String email : StringUtils.split(userOrgs.getUser().getEmail(), ";")) {
                     addresses.add(email.trim());
                 }
             }
