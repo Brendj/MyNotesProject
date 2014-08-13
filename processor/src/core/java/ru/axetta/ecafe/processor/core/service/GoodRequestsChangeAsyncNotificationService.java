@@ -176,6 +176,9 @@ public class GoodRequestsChangeAsyncNotificationService {
             } else if (weekDay.equals("Сб")) {
                 localCalendar.add(Calendar.DATE, - 5);
                 stDate = localCalendar.getTime();
+            } else if (weekDay.equals("Вс")) {
+                localCalendar.add(Calendar.DATE, - 6);
+                stDate = localCalendar.getTime();
             }
 
             localCalendar.add(Calendar.DATE, maxNumDays - 1);
@@ -184,7 +187,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
             intervals.add(new DateInterval(stDate, enDate));
 
-            while (enDate.getTime() < maxDone.getTime()) {
+            while (enDate.after(maxDone)) {
                 localCalendar.add(Calendar.DATE, 1);
                 localCalendar.add(Calendar.MILLISECOND, -1);
                 stDate = localCalendar.getTime();
@@ -328,7 +331,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                             eventNotificationService.sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                         }
                     }
-                    //eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru", EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
