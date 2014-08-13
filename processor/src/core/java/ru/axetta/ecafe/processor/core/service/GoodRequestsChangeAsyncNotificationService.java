@@ -154,28 +154,34 @@ public class GoodRequestsChangeAsyncNotificationService {
             List<DateInterval> intervals = new ArrayList<DateInterval>();
             //Подправить интервалы в зависимости от дня недели день начало второй недели
             Date stDate = minDone;
-            Date enDate = maxDone;
+            Date enDate;
 
             CalendarUtils.truncateToDayOfMonth(localCalendar);
-            stDate = localCalendar.getTime();
             String weekDay = CalendarUtils.dayInWeekToString(stDate);
 
-            if (weekDay.equals("Пн")) {
-                localCalendar.add(Calendar.DATE, maxNumDays);
-            } else if (weekDay.equals("Вт")) {
-                localCalendar.add(Calendar.DATE, maxNumDays - 1);
+            localCalendar.setTime(stDate);
+
+            if (weekDay.equals("Вт")) {
+                localCalendar.add(Calendar.DATE, -1);
+                stDate = localCalendar.getTime();
             } else if (weekDay.equals("Ср")) {
-                localCalendar.add(Calendar.DATE, maxNumDays - 2);
+                localCalendar.add(Calendar.DATE, - 2);
+                stDate = localCalendar.getTime();
             } else if (weekDay.equals("Чт")) {
-                localCalendar.add(Calendar.DATE, maxNumDays - 3);
+                localCalendar.add(Calendar.DATE, - 3);
+                stDate = localCalendar.getTime();
             } else if (weekDay.equals("Пт")) {
-                localCalendar.add(Calendar.DATE, maxNumDays - 4);
+                localCalendar.add(Calendar.DATE, - 4);
+                stDate = localCalendar.getTime();
             } else if (weekDay.equals("Сб")) {
-                localCalendar.add(Calendar.DATE, maxNumDays - 5);
+                localCalendar.add(Calendar.DATE, - 5);
+                stDate = localCalendar.getTime();
             }
 
+            localCalendar.add(Calendar.DATE, maxNumDays - 1);
             localCalendar.add(Calendar.MILLISECOND, -1);
             enDate = localCalendar.getTime();
+
             intervals.add(new DateInterval(stDate, enDate));
 
             while (enDate.getTime() < maxDone.getTime()) {
