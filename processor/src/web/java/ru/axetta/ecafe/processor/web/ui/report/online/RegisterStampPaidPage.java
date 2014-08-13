@@ -48,7 +48,7 @@ public class RegisterStampPaidPage extends OnlineReportPage {
     @Autowired
     private ReportDAOService daoService;
     private String htmlReport = null;
-    private Boolean includeActDiscrepancies = true;
+//    private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     public PeriodTypeMenu getPeriodTypeMenu() {
@@ -177,7 +177,7 @@ public class RegisterStampPaidPage extends OnlineReportPage {
         localCalendar.add(Calendar.MONTH, 1);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
-        includeActDiscrepancies = true;
+//        includeActDiscrepancies = true;
         htmlReport = null;
         return null;
     }
@@ -253,14 +253,14 @@ public class RegisterStampPaidPage extends OnlineReportPage {
         return String.format("%s-%s-%s.xls", "RegisterStampPaidReport", reportDistinctText, format);
     }
 
-    public Boolean getIncludeActDiscrepancies() {
+/*    public Boolean getIncludeActDiscrepancies() {
         return includeActDiscrepancies;
     }
 
     public void setIncludeActDiscrepancies(Boolean includeActDiscrepancies) {
         htmlReport = null;
         this.includeActDiscrepancies = includeActDiscrepancies;
-    }
+    }*/
 
     @Override
     public String getPageFilename() {

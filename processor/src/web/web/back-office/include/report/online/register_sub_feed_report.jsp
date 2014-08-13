@@ -56,10 +56,10 @@
                              actionListener="#{registerStampSubscriptionFeedingPage.onEndDateSpecified}" />
             </rich:calendar>
 
-            <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
+<%--            <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
             <h:selectBooleanCheckbox value="#{registerStampSubscriptionFeedingPage.includeActDiscrepancies}">
                 <a4j:support event="onchange" reRender="registerStampSubscriptionFeedingReportPanel"/>
-            </h:selectBooleanCheckbox>
+            </h:selectBooleanCheckbox>--%>
 
 
         </h:panelGrid>

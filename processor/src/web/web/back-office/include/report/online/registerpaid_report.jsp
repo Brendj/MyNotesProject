@@ -52,10 +52,10 @@
                              actionListener="#{registerStampPaidPage.onEndDateSpecified}" />
             </rich:calendar>
 
-            <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
+            <%--<h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
             <h:selectBooleanCheckbox value="#{registerStampPaidPage.includeActDiscrepancies}">
                 <a4j:support event="onchange" reRender="registerStampPaidReportPanel"/>
-            </h:selectBooleanCheckbox>
+            </h:selectBooleanCheckbox>--%>
 
 
         </h:panelGrid>
