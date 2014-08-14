@@ -71,6 +71,10 @@
             <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.fullNameValidation}" styleClass="output-text"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText value="Включать только классы:" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.showOnlyClientGoups}"/>
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchPage.doUpdate}"
                                reRender="synchTable,synchTableInfoPanel,revisionInfo,NSIOrgRegistrySynchPage_tabpanel,resultTitle" styleClass="command-button" status="updateStatus"
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>

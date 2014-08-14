@@ -242,7 +242,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     protected List<ImportRegisterClientsService.ExpandedPupilInfo> clearClientsByClass(List<ImportRegisterClientsService.ExpandedPupilInfo> source) {
         List<ImportRegisterClientsService.ExpandedPupilInfo> result = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         for(ImportRegisterClientsService.ExpandedPupilInfo i : source) {
-            if(!i.getGroup().matches("^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9.,$;]+$")) {
+            //if(!i.getGroup().matches("^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9.,$;]+$")) {
+            if(i.getGroup().matches("^[0-9].*")) {
                 result.add(i);
             } else {
                 //

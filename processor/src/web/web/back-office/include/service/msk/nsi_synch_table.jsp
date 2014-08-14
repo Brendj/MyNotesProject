@@ -30,6 +30,7 @@
 
     <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchOverviewPage.doUpdate}"
                        reRender="workspaceTogglePanel" styleClass="command-button" />
+    <h:commandButton value="Генерировать в Excel" actionListener="#{NSIOrgRegistrySynchOverviewPage.doGenerateXLS}" styleClass="command-button" />
 
     <rich:dataTable value="#{NSIOrgRegistrySynchOverviewPage.list}" var="e" footerClass="data-table-footer"
                     width="350px" rows="20" id="table" rowKeyVar="row">

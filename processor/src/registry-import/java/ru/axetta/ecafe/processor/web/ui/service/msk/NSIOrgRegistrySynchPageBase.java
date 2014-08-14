@@ -66,6 +66,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private int displayMode;
     private String nameFilter;
     private long loadedOrgRevisions = -1L;
+    boolean showOnlyClientGoups = true;
+
 
     public String getPageFilename() {
         return "service/msk/nsi_org_registry_sync_page";
@@ -73,6 +75,14 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
     public String getPageDirectoryRoot() {
         return "/back-office/include";
+    }
+
+    public boolean isShowOnlyClientGoups() {
+        return showOnlyClientGoups;
+    }
+
+    public void setShowOnlyClientGoups(boolean showOnlyClientGoups) {
+        this.showOnlyClientGoups = showOnlyClientGoups;
     }
 
     public String getPageTitle() {
@@ -327,6 +337,11 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
         items = new ArrayList<WebRegistryChangeItem>();
         for (RegistryChangeItem i : changedItems) {
+            if(showOnlyClientGoups) {
+                if(!i.getGroupName().matches("^[0-9].*")) {
+                    continue;
+                }
+            }
             items.add(new WebRegistryChangeItem(i));
         }
         if (this.items.size() > 0) {

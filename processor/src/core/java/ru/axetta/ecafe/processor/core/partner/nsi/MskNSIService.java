@@ -437,6 +437,14 @@ public class MskNSIService {
             searchPredicateInfo.addSearchPredicate(search);
         }
 
+        //  Запрет на удаленных
+        SearchPredicate search = new SearchPredicate();
+        search.setAttributeName("Статус записи");
+        search.setAttributeType(TYPE_STRING);
+        search.setAttributeValue("Удален%");
+        search.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search);
+
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
         for(Item i : queryResults) {

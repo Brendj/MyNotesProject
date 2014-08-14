@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -47,6 +48,15 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
+
+    public void doGenerateXLS(ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(NSIOrgRegistrySynchOverviewPage.class).doUpdate();
+        RuntimeContext.getAppContext().getBean(NSIOrgRegistrySynchOverviewPage.class).generateXLS();
+    }
+
+    public void generateXLS() {
+
+    }
 
     public String getOrgFilter() {
         return orgFilter;
