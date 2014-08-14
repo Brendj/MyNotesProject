@@ -21,6 +21,11 @@
 
         <h:outputText value="Только не синхронизированные последние 2 дня" styleClass="output-text"/>
         <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchOverviewPage.showOnlyUnsynch}"/>
+
+        <h:outputText escape="true" value="Тип сверки" styleClass="output-text" />
+        <h:selectOneMenu id="regionsList" value="#{NSIOrgRegistrySynchOverviewPage.typeFilter}" style="width:325px;" >
+            <f:selectItems value="#{NSIOrgRegistrySynchOverviewPage.types}"/>
+        </h:selectOneMenu>
     </h:panelGrid>
 
     <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchOverviewPage.doUpdate}"
@@ -89,6 +94,13 @@
                 <h:outputText value="Дата сверки" />
             </f:facet>
             <h:outputText styleClass="output-text" value="#{e.date}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Тип сверки" />
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{e.type}"
                           style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
 

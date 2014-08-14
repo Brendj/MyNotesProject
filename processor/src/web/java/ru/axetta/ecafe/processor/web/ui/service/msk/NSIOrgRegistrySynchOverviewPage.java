@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -16,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
@@ -39,6 +42,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
     protected boolean showOnlyUnsynch = false;
     protected static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     protected static final long OUT_OF_SYNCH_LIMIT = 86400000L * 2;
+    protected int typeFilter;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -58,6 +62,22 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
 
     public void setShowOnlyUnsynch(boolean showOnlyUnsynch) {
         this.showOnlyUnsynch = showOnlyUnsynch;
+    }
+
+    public int getTypeFilter() {
+        return typeFilter;
+    }
+
+    public void setTypeFilter(int typeFilter) {
+        this.typeFilter = typeFilter;
+    }
+
+    public List<SelectItem> getTypes() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(0, ""));
+        items.add(new SelectItem(RegistryChange.FULL_COMPARISON, "Полная сверка"));
+        items.add(new SelectItem(RegistryChange.CHANGES_UPDATE, "Загрузка обновлений"));
+        return items;
     }
 
     @Override
@@ -96,14 +116,25 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
             Session session = (Session) entityManager.getDelegate();
             String orgStatement = "";
             if(orgFilter != null && orgFilter.length() > 0) {
-                orgStatement = " where cf_orgs.shortname like '%" + orgFilter + "%' ";
+                orgStatement = " cf_orgs.shortname like '%" + orgFilter + "%' ";
+            }
+            String typeStatement = "";
+            if(typeFilter != 0) {
+                if(orgStatement.length() > 0) {
+                    typeStatement = " and ";
+                }
+                typeStatement += String.format(" cf_registrychange.type=%s ", typeFilter);
+            }
+            String whereClause = "";
+            if(orgStatement.length() > 0 || typeStatement.length() > 0) {
+                whereClause = " where " + orgStatement + typeStatement;
             }
             Query q = session.createSQLQuery(
-                    "select cf_orgs.idoforg, cf_orgs.officialname, operation, cf_registrychange.createdate, count(cf_registrychange.operation) "
+                    "select cf_orgs.idoforg, cf_orgs.officialname, operation, cf_registrychange.createdate, count(cf_registrychange.operation), cf_registrychange.type "
                     + "from cf_registrychange "
                     + "left join cf_orgs on cf_orgs.idoforg=cf_registrychange.idoforg "
-                    + orgStatement
-                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_registrychange.createdate, operation "
+                    + whereClause
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_registrychange.createdate, operation, type "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, cf_registrychange.createdate desc, operation");
             List result = q.list();
 
@@ -122,6 +153,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
                 int operation = ((Integer) o[2]).intValue();
                 long ts = ((BigInteger) o[3]).longValue();
                 long count = ((BigInteger) o[4]).longValue();
+                int type = ((Integer) o[5]).intValue();
 
                 if(showOnlyUnsynch && isUnsynch(idoforg, ts, excludeOrgs)) {
                     continue;
@@ -172,6 +204,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
                         i.addTotal(count);
                         break;
                 }
+                i.setType(type);
             }
 
             for (Long id : res.keySet()) {
@@ -199,6 +232,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
         protected long total;
         protected long ts;
         protected String date;
+        protected int type;
 
         public Item(long idoforg, String orgName, long ts) {
             this.idoforg = idoforg;
@@ -282,6 +316,19 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
 
         public boolean isOutOfSynch() {
             return System.currentTimeMillis() - ts > OUT_OF_SYNCH_LIMIT;
+        }
+
+        public String getType() {
+            if(type == RegistryChange.FULL_COMPARISON) {
+                return "Полная сверка";
+            } else if (type == RegistryChange.CHANGES_UPDATE) {
+                return "Загрузка изменений";
+            }
+            return "Неизвестный тип";
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
     }
 }
