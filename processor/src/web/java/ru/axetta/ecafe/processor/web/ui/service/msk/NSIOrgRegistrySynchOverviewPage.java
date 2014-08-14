@@ -18,10 +18,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -55,7 +59,43 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
     }
 
     public void generateXLS() {
+        try {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            ExternalContext externalContext = facesContext.getExternalContext();
+            HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
 
+
+            response.setCharacterEncoding("winwdows-1251");
+            response.setHeader("Content-Type", "text/csv");
+            response.setHeader("Content-Disposition", "attachment;filename=\"synchHistory.csv\"");
+            final ServletOutputStream responseOutputStream = response.getOutputStream();
+            try {
+                String str = "№;ID;Наименование;Всего;Добавленных;Измененных;Перемещенных;Удаленных;Дата сверки;Тип сверки;\n";
+                responseOutputStream.write(str.getBytes("windows-1251"));
+                for (int i=0; i<list.size(); i++) {
+                    Item it = list.get(i);
+                    str = i + ";" +
+                          it.getIdoforg() + ";" +
+                          it.getOrgName() + ";" +
+                          it.getTotal() + ";" +
+                          it.getCreated() + ";" +
+                          it.getModified() + ";" +
+                          it.getMoved() + ";" +
+                          it.getDeleted() + ";" +
+                          dateFormat.format(new Date(it.getTs())) + ";" +
+                          it.getType() + ";\n";
+                    responseOutputStream.write(str.getBytes("windows-1251"));
+                }
+                responseOutputStream.flush();
+            } catch (Exception e1) {
+                throw e1;
+            } finally {
+                responseOutputStream.close();
+            }
+            facesContext.responseComplete();
+        } catch (Exception e) {
+            logger.error("Failed to send comparison file", e);
+        }
     }
 
     public String getOrgFilter() {
