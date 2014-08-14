@@ -505,9 +505,11 @@ public class DAOUtils {
         String predefinedGroups = "";
         if (dismissPredefinedGroups) {
             //  Проверяем не попадает ли в CLIENT_EMPLOYEES, а так же в ВЫБЫВШИЕ за предыдущие года
-            predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
+            /*predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
-                    " ) ) and ";
+                    " ) ) and ";*/
+            predefinedGroups = " (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
+                    " ) and ";
             // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
         }
@@ -552,9 +554,11 @@ public class DAOUtils {
         String predefinedGroups = "";
         if (dismissPredefinedGroups) {
             //  Проверяем не попадает ли в CLIENT_EMPLOYEES, а так же в ВЫБЫВШИЕ за предыдущие года
-            predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
+            /*predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
-                    " ) ) and ";
+                    " ) ) and ";*/
+            predefinedGroups = " (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
+                    " ) and ";
             // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
         }
