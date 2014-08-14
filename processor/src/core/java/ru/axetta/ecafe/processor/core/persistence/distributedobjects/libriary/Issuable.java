@@ -79,7 +79,7 @@ public class Issuable extends LibraryDistributedObject {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
             setOrgOwner(longOrgOwner);
-        Long longBarCode = XMLUtils.getLongAttributeValue(node, "Barcode");
+        Long longBarCode = XMLUtils.getLongAttributeValue(node, "BarCode");
         if (longBarCode != null)
             setBarcode(longBarCode);
         Character charType = XMLUtils.getCharacterAttributeValue(node, "Type");
