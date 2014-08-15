@@ -18,6 +18,8 @@ public class LibraryGroup extends AbstractGroup {
     @Override
     protected void fill() {
         doClassMap.put("Publication", new DOSyncClass(Publication.class, 0));
+        doClassMap.put("BBK", new DOSyncClass(BBK.class, 0));
+        doClassMap.put("BBKDetails", new DOSyncClass(BBKDetails.class, 4));
         doClassMap.put("Source", new DOSyncClass(Source.class, 0));
         doClassMap.put("TypeOfAccompanyingDocument", new DOSyncClass(TypeOfAccompanyingDocument.class, 0));
         doClassMap.put("InventoryBook", new DOSyncClass(InventoryBook.class, 0));

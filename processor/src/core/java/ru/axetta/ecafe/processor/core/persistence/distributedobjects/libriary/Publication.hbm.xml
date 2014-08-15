@@ -41,6 +41,9 @@
         <property name="publicationdate" column="PublicationDate" type="string" length="15" not-null="false"/>
         <property name="publisher" column="Publisher" type="string" length="255" not-null="false"/>
         <property name="hash" column="Hash" type="integer" not-null="false"/>
+        <property name="idOfLang" column="IdOfLang" type="long" not-null="false"/>
+
+        <many-to-one name="bbkDetails" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="true" column="idOfBBKDetails"/>
 
         <set name="journalInternal" lazy="true" inverse="true">
             <key>

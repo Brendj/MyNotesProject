@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -50,8 +51,13 @@ public class Publication extends LibraryDistributedObject {
     private Set<Journal> journalInternal;
     private Set<Instance> instanceInternal;
 
+    private BBKDetails bbkDetails;
+    private String guidBBKDetail;
+    private Long idOfLang;
+
     @Override
     public void createProjections(Criteria criteria) {
+        criteria.createAlias("bbkDetails", "de", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
@@ -65,7 +71,9 @@ public class Publication extends LibraryDistributedObject {
         projectionList.add(Projections.property("publicationdate"), "publicationdate");
         projectionList.add(Projections.property("publisher"), "publisher");
         projectionList.add(Projections.property("hash"), "hash");
+        projectionList.add(Projections.property("idOfLang"), "idOfLang");
 
+        projectionList.add(Projections.property("de.guid"), "guidBBKDetail");
         criteria.setProjection(projectionList);
     }
 
@@ -145,6 +153,8 @@ public class Publication extends LibraryDistributedObject {
         if (stringPublisher != null) {
             setPublisher(stringPublisher);
         }
+        guidBBKDetail = XMLUtils.getStringAttributeValue(node, "GuidBBKDetail", 36);
+        idOfLang = XMLUtils.getLongAttributeValue(node, "IdOfLang");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
@@ -161,6 +171,8 @@ public class Publication extends LibraryDistributedObject {
         setPublisher(((Publication) distributedObject).getPublisher());
         setHash(((Publication) distributedObject).getHash());
         setValidISBN(((Publication) distributedObject).getValidISBN());
+        setBbkDetails(((Publication) distributedObject).getBbkDetails());
+        setIdOfLang(((Publication) distributedObject).getIdOfLang());
     }
 
     public Set<Instance> getInstanceInternal() {
@@ -249,6 +261,30 @@ public class Publication extends LibraryDistributedObject {
 
     public void setHash(Integer hash) {
         this.hash = hash;
+    }
+
+    public BBKDetails getBbkDetails() {
+        return bbkDetails;
+    }
+
+    public void setBbkDetails(BBKDetails bbkDetails) {
+        this.bbkDetails = bbkDetails;
+    }
+
+    public String getGuidBBKDetail() {
+        return guidBBKDetail;
+    }
+
+    public void setGuidBBKDetail(String guidBBKDetail) {
+        this.guidBBKDetail = guidBBKDetail;
+    }
+
+    public Long getIdOfLang() {
+        return idOfLang;
+    }
+
+    public void setIdOfLang(Long idOfLang) {
+        this.idOfLang = idOfLang;
     }
 
     @Override
