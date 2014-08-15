@@ -508,7 +508,7 @@ public class DAOUtils {
             /*predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
                     " ) ) and ";*/
-            predefinedGroups = " (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
+            predefinedGroups = " (cf_clients.idofclientgroup<=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
                     " ) and ";
             // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
@@ -557,7 +557,7 @@ public class DAOUtils {
             /*predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
                     " ) ) and ";*/
-            predefinedGroups = " (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
+            predefinedGroups = " (cf_clients.idofclientgroup<=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
                     " ) and ";
             // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
