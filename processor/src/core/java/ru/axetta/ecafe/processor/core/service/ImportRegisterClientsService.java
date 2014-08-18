@@ -283,7 +283,7 @@ public class ImportRegisterClientsService {
     @Transactional
     public void saveClients(String synchDate, String date, long ts, Org org,
             List<ExpandedPupilInfo> pupils, StringBuffer logBuffer) throws Exception {
-        saveClients(synchDate, date, ts, org, pupils, logBuffer, false);
+        saveClients(synchDate, date, ts, org, pupils, logBuffer, true);
     }
 
     @Transactional
