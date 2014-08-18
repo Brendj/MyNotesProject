@@ -196,6 +196,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                 localCalendar.add(Calendar.DATE, maxNumDays - 1);
                 localCalendar.add(Calendar.MILLISECOND, -1);
                 enDate = localCalendar.getTime();
+                eD = CalendarUtils.truncateToDayOfMonth(enDate);
                 intervals.add(new DateInterval(stDate, enDate));
             }
 
