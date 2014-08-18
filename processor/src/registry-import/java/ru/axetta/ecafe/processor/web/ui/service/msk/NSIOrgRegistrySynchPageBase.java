@@ -469,7 +469,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     }
 
     private boolean isPermittedRevision() {
-        return (revisionCreateDate < 0 || revisions == null || revisions.get(0) == null ||
+        return (revisionCreateDate < 0 || revisions == null || revisions.size() < 1 || revisions.get(0) == null ||
                 revisionCreateDate != revisions.get(0).getDate()) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
     }
 
