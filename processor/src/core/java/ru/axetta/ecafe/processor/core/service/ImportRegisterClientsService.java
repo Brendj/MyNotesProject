@@ -556,11 +556,15 @@ public class ImportRegisterClientsService {
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
-            currentGroup = em.merge(currentGroup);
+            if(currentGroup == null) {
+                currentGroup = em.merge(currentGroup);
+                ch.setGroupNameFrom(currentGroup.getGroupName());
+            } else {
+                ch.setGroupNameFrom("");
+            }
             ch.setFirstNameFrom(currentClient.getPerson().getFirstName());
             ch.setSecondNameFrom(currentClient.getPerson().getSecondName());
             ch.setSurnameFrom(currentClient.getPerson().getSurname());
-            ch.setGroupNameFrom(currentGroup.getGroupName());
         }
         sess.save(ch);
     }
