@@ -385,18 +385,28 @@ public class MskNSIService {
             }
         }*/
 
+        //  Ограничение по guid'ам
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр обучаемых");
+        String guidCase = "";
         if (guids != null && guids.size() > 0) {
             for (String guid : guids) {
-                SearchPredicate search = new SearchPredicate();
-                search.setAttributeName("GUID образовательного учреждения");
-                search.setAttributeType(TYPE_STRING);
-                search.setAttributeValue(guid);
-                search.setAttributeOp("=");
-                searchPredicateInfo.addSearchPredicate(search);
+                if(guidCase.length() > 0) {
+                    guidCase += ", ";
+                }
+                guidCase += guid;
             }
         }
+        if(guidCase.length() > 0) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("GUID образовательного учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(guidCase);
+            search.setAttributeOp("in");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  ФИО ограничения
         if(!StringUtils.isBlank(familyName)) {
             SearchPredicate search = new SearchPredicate();
             search.setAttributeName("Фамилия");
