@@ -47,3 +47,5 @@ CREATE TABLE cf_bbk_details (
 
 ALTER TABLE cf_publications ADD COLUMN idOfLang bigint;
 ALTER TABLE cf_publications ADD COLUMN idOfBBKDetails bigint;
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 140819) НЕ МЕНЯТЬ

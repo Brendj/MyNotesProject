@@ -94,6 +94,6 @@ public class BBK extends LibraryDistributedObject {
     }
 
     public List<BBKDetails> getBbkDetail() {
-        return new ArrayList<>(getBbkDetailsInternal());
+        return new ArrayList<BBKDetails>(getBbkDetailsInternal());
     }
 }
