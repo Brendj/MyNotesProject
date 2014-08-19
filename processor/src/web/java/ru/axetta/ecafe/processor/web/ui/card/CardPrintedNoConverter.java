@@ -32,6 +32,9 @@ public class CardPrintedNoConverter implements Converter {
             return null;
         }
         try {
+            if (string.contains(" ")) {
+                string = string.replaceAll(" ", "");
+            }
             return CardPrintedNoFormat.parse(string);
         } catch (Exception e) {
             logger.error("Failed to convert card printed number", e);

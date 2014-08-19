@@ -29,8 +29,8 @@
             <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="10"
                          style="width: 240px;" styleClass="input-text" />
 
-            <h:outputText escape="true" value="Номер нанесённый на карту" styleClass="output-text" />
-            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="10"
+            <h:outputText escape="true" value="Номер, нанесённый на карту" styleClass="output-text" />
+            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="16"
                          style="width: 240px;" styleClass="input-text"/>
 
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
@@ -71,6 +71,16 @@
             </f:facet>
             <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter"
+                              styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Номер, нанесённый на карту" />
+            </f:facet>
+            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{item.cardPrintedNo}" converter="cardNoConverter"
                               styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
             </a4j:commandLink>
