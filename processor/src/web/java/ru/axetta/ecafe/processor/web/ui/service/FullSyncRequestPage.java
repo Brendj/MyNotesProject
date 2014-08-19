@@ -29,7 +29,7 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class FullSyncRequestPage extends BasicWorkspacePage implements OrganizationListSelect /*implements OrgListSelectPage.CompleteHandlerList*/ {
+public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
     private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
@@ -56,7 +56,7 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements Organizat
         return null;
     }
 
-    @Override
+/*    @Override
     public void select(List<OrgShortItem> orgShortItem) {
         idOfOrgList.clear();
         if(orgShortItem.isEmpty()){
@@ -67,24 +67,24 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements Organizat
                 filter = filter.concat(item.getShortName() + "; ");
             }
         }
-    }
+    }*/
 
-    //@Override
-    //public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
-    //    if (orgMap != null) {
-    //        idOfOrgList = new ArrayList<Long>(orgMap.size());
-    //        if (orgMap.isEmpty())
-    //            filter = "Не выбрано";
-    //        else {
-    //            filter = "";
-    //            for(Long idOfOrg : orgMap.keySet()) {
-    //                idOfOrgList.add(idOfOrg);
-    //                filter = filter.concat(orgMap.get(idOfOrg) + "; ");
-    //            }
-    //            filter = filter.substring(0, filter.length() - 2);
-    //        }
-    //    }
-    //}
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            idOfOrgList = new ArrayList<Long>(orgMap.size());
+            if (orgMap.isEmpty())
+                filter = "Не выбрано";
+            else {
+                filter = "";
+                for(Long idOfOrg : orgMap.keySet()) {
+                    idOfOrgList.add(idOfOrg);
+                    filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+                }
+                filter = filter.substring(0, filter.length() - 2);
+            }
+        }
+    }
 
     @Override
     public String getPageFilename() {
