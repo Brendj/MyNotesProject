@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -221,7 +222,7 @@ public class ClientOrderList {
         Criteria criteria = session.createCriteria(Order.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ge("createTime", startTime));
-        criteria.add(Restrictions.le("createTime", endTime));
+        criteria.add(Restrictions.le("createTime", CalendarUtils.addDays(endTime, 1)));
 
         List<Item> items = new LinkedList<Item>();
         List orders = criteria.list();
