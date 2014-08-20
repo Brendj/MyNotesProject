@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +47,12 @@ public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgL
 
     public Object applyUsePlanOrdersOperation(){
         try {
-            daoService.applyUsePlanOrdersOperationByOrgList(idOfOrgList);
-            printMessage("Запрос отправлен");
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                daoService.applyUsePlanOrdersOperationByOrgList(idOfOrgList);
+                printMessage("Запрос отправлен");
+            } else {
+                printError("Не выбрана организация");
+            }
         } catch (Exception e){
             printError("Ошибка при сохранении данных: "+e.getMessage());
             logAndPrintMessage("Error by update pay plan param",e);

@@ -189,6 +189,7 @@ public class OrgListSelectPage extends BasicPage {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
         this.items = items;
+        this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
     }
 
     public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList,

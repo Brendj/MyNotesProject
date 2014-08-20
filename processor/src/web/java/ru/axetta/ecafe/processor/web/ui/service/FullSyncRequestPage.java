@@ -4,12 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
-import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrganizationListSelect;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +46,12 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
 
     public Object applyFullSyncOperation(){
         try {
-            daoService.applyFullSyncOperationByOrgList(idOfOrgList);
-            printMessage("Запрос отправлен");
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                daoService.applyFullSyncOperationByOrgList(idOfOrgList);
+                printMessage("Запрос отправлен");
+            } else {
+                printError("Не выбрана организация");
+            }
         } catch (Exception e){
             printError("Ошибка при сохранении данных: "+e.getMessage());
             logAndPrintMessage("Error by update full sync param",e);
