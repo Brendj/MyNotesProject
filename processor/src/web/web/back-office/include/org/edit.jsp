@@ -105,20 +105,6 @@
     <h:outputText id="payPlanParamLabel" escape="true" value="Включить использование плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="payPlanParamCheckbox" value="#{mainPage.orgEditPage.usePlanOrders}"/>
 
-    <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
-    <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.publicKey}" maxlength="1024" styleClass="input-text long-field" />
-    <h:outputText escape="true" value="Текущий номер пакета" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.idOfPacket}" maxlength="10" styleClass="input-text" />
-    <h:outputText escape="true" value="Отправитель SMS" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.smsSender}" maxlength="32" styleClass="input-text" />
-    <h:outputText escape="true" value="Стоимость SMS" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.priceOfSms}" converter="copeckSumConverter" styleClass="input-text" />
-    <h:outputText escape="true" value="Размер абонентской платы" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.subscriptionPrice}" converter="copeckSumConverter"
-                 styleClass="input-text" />
-
     <h:outputText escape="true" value="Включить товарный учет" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeCommodityAccounting}" styleClass="output-text">
         <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />
@@ -132,6 +118,20 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
+
+    <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
+    <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.publicKey}" maxlength="1024" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Текущий номер пакета" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.idOfPacket}" maxlength="10" styleClass="input-text" />
+    <h:outputText escape="true" value="Отправитель SMS" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.smsSender}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="Стоимость SMS" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.priceOfSms}" converter="copeckSumConverter" styleClass="input-text" />
+    <h:outputText escape="true" value="Размер абонентской платы" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.subscriptionPrice}" converter="copeckSumConverter"
+                 styleClass="input-text" />
 
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
