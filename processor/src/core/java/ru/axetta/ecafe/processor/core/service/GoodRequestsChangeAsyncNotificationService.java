@@ -338,8 +338,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                                             values);
                         }
                     }
-                    eventNotificationService.sendEmailAsync("sungatov@axetta.ru",
-                            EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    //eventNotificationService.sendEmailAsync("sungatov@axetta.ru",
+                    //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }

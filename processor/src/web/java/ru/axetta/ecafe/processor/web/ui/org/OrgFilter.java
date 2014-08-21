@@ -11,9 +11,11 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 

@@ -1,4 +1,3 @@
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Org" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
@@ -109,6 +108,9 @@
 
     <h:outputText escape="true" value="Использование плана питания" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.usePlanOrders?'Включен':'Выключен'}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />
+    <h:selectBooleanCheckbox readonly="true" disabled="true" value="#{mainPage.orgViewPage.mainBuidling}" styleClass="input-text" />
 
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:outputText value="{#{mainPage.orgViewPage.friendlyFilterOrgs}}" styleClass="output-text"/>

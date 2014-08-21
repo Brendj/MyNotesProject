@@ -165,6 +165,9 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="friendlyOrg"/>
         </set>
 
+        <property name="mainBuilding" column="MainBuilding"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+
         <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="IdOfOrg" not-null="true" />

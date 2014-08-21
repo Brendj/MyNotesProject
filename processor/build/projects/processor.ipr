@@ -544,7 +544,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="1033305336">
+  <component name="DataSourceManagerImpl" format="xml" hash="756791487">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -575,12 +575,12 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.3.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/moscow_141_14-07</jdbc-url>
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <schema-pattern>moscow.public</schema-pattern>
@@ -1357,7 +1357,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">

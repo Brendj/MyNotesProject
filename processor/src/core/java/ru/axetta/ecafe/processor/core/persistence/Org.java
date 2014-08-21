@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,7 +32,7 @@ import java.util.regex.Pattern;
  * Time: 10:39:31
  * To change this template use File | Settings | File Templates.
  */
-public class Org {
+public class Org implements Serializable {
 
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
     public static final String UNKNOWN_STATE_NAME = "Неизвестное состояние";
@@ -82,6 +83,7 @@ public class Org {
     private Date lastSuccessfulBalanceSync;
     private Date lastUnSuccessfulBalanceSync;
     private Set<Org> friendlyOrg;
+    private Boolean mainBuilding;
     private String tag;
     private String city; 
     private String district;
@@ -233,6 +235,14 @@ public class Org {
 
     public void setFriendlyOrg(Set<Org> friendlyOrg) {
         this.friendlyOrg = friendlyOrg;
+    }
+
+    public Boolean isMainBuilding() {
+        return mainBuilding == null? false : mainBuilding;
+    }
+
+    public void setMainBuilding(Boolean mainBuilding) {
+        this.mainBuilding = mainBuilding;
     }
 
     public Contract getContract() {

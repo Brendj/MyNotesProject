@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -226,6 +225,14 @@ public class DAOUtils {
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
+    }
+
+    /*
+    * Обновляет орг. Ставит признак mainbuilding = 0
+    * */
+    public static int orgMainBuildingUnset(Session session, long idOfOrg)  {
+        Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg").setParameter("idOfOrg",idOfOrg);
+        return q.executeUpdate();
     }
 
     public static Order findOrder(Session persistenceSession, Long idOfOrg, Long idOfOrder) throws Exception {

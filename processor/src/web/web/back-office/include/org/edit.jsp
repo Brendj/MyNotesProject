@@ -1,4 +1,3 @@
-<%@ page import="ru.axetta.ecafe.processor.web.ui.org.OrgEditPage" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
@@ -147,9 +146,13 @@
         </a4j:commandButton>
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />
+    <h:selectBooleanCheckbox disabled="#{mainPage.orgEditPage.mainBuilding}" value="#{mainPage.orgEditPage.mainBuilding}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-div" columns="2">
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                           rendered="#{mainPage.orgEditPage.mainBuilding}"
                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                 styleClass="command-link" style="width: 25px;" >
             <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfFriendlyOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>

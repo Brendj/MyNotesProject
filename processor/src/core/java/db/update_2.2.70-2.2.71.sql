@@ -5,3 +5,11 @@
 -- Пакет обновлений 2.2.71
 ALTER TABLE cf_orgs ADD COLUMN DisableEditingClientsFromAISReestr  integer NOT NULL DEFAULT 0;
 update cf_orgs set DisableEditingClientsFromAISReestr =0;
+
+
+--Добавляем параметр главное здание для организаций не имеюших friendly org.
+update cf_orgs
+set MainBuilding = 1 where idOfOrg  in (SELECT friendlyorg from cf_friendly_organization group by friendlyorg having count(*) < 2 )
+
+update cf_orgs
+set MainBuilding = 1 where idOfOrg not in (select friendlyorg from cf_friendly_organization  )

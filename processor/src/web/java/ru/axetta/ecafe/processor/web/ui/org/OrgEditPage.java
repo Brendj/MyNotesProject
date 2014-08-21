@@ -89,6 +89,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private List<Long> friendlyIdOfOrgList = new ArrayList<Long>();
     private String filterFriendlyOrgs = "Не выбрано";
 
+    private boolean mainBuilding = true;
+
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         fill(org);
@@ -143,6 +145,20 @@ public class OrgEditPage extends BasicWorkspacePage
             List categoryOrgList = DAOUtils.getCategoryOrgWithIds(session, this.idOfCategoryOrgList);
             for (Object object: categoryOrgList){
                 org.getCategories().add((CategoryOrg) object);
+            }
+        }
+
+        if(!org.isMainBuilding() ){
+            if((org.getFriendlyOrg()== null||(org.getFriendlyOrg()!=null && org.getFriendlyOrg().size() == 0)) ){
+                org.setMainBuilding(true);
+            } else if(mainBuilding) {
+                for(Org fOrg : org.getFriendlyOrg()){
+                    if (fOrg.isMainBuilding()) {
+                        fOrg.setMainBuilding(false);
+                        DAOUtils.orgMainBuildingUnset(session, fOrg.getIdOfOrg());
+                    }
+                }
+                org.setMainBuilding(true);
             }
         }
 
@@ -259,6 +275,8 @@ public class OrgEditPage extends BasicWorkspacePage
             }
             this.filterCategoryOrg = stringBuilder.substring(0,stringBuilder.length()-2);
         }
+
+        this.mainBuilding = org.isMainBuilding();
 
         select(org.getConfigurationProvider());
         friendlyIdOfOrgList.clear();
@@ -759,5 +777,13 @@ public class OrgEditPage extends BasicWorkspacePage
         public String getContragentName() {
             return contragentName;
         }
+    }
+
+    public boolean isMainBuilding() {
+        return mainBuilding;
+    }
+
+    public void setMainBuilding(boolean mainBuilding) {
+        this.mainBuilding = mainBuilding;
     }
 }

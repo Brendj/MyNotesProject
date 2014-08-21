@@ -10,7 +10,10 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,6 +57,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private List<Long> idOfOrgList;
     private String filterOrgs = "Не выбрано";
     private String friendlyFilterOrgs = "Не выбрано";
+    private boolean mainBuidling;
     private String city;
     private String district;
     private String location;
@@ -151,7 +155,7 @@ public class OrgViewPage extends BasicWorkspacePage {
             }
             friendlyFilterOrgs = stringBuilder.toString();
         }
-
+        this.mainBuidling = org.isMainBuilding();
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
         this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
         this.mailingListReports1 = org.getMailingListReports1();
@@ -370,6 +374,10 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setCommodityAccountingParam(Boolean commodityAccountingParam) {
         this.commodityAccountingParam = commodityAccountingParam;
+    }
+
+    public boolean isMainBuidling() {
+        return mainBuidling;
     }
 
     public Object updateBalance(){
