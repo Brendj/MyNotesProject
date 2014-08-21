@@ -96,6 +96,7 @@ public class Org {
     private Boolean fullSyncParam;
     private Boolean usePlanOrders;
     private Boolean commodityAccounting;
+    private Boolean disableEditingClientsFromAISReestr;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
     private OrganizationStatus status;
@@ -128,6 +129,7 @@ public class Org {
         this.fullSyncParam=false;
         this.commodityAccounting=false;
         this.usePlanOrders = true;  // плана питания включен по умолчаню
+        this.disableEditingClientsFromAISReestr = true;
         this.type = type;
         this.status = OrganizationStatus.ACTIVE;
     }
@@ -175,6 +177,14 @@ public class Org {
 
     public void setUsePlanOrders(Boolean payPlanParam) {
         this.usePlanOrders = payPlanParam;
+    }
+
+    public Boolean getDisableEditingClientsFromAISReestr() {
+        return disableEditingClientsFromAISReestr;
+    }
+
+    public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
+        this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
     }
 
     public Set<ClientMigration> getClientMigration() {

@@ -28,15 +28,21 @@ public class DirectiveElement {
     public void process(Session session, Org org) throws Exception{
 
         directiveItemList = new ArrayList<DirectiveItem>();
+
         Boolean fullSync = org.getFullSyncParam();
         if(fullSync) {
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOUtils.falseFullSyncByOrg(session, org.getIdOfOrg());
         }
+
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+
         Boolean usePlanOrders = org.getUsePlanOrders();
         directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
+
+        Boolean disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
+        directiveItemList.add(new DirectiveItem("DisableEditingClientsFromAISReestr", disableEditingClientsFromAISReestr?"1":"0"));
     }
 
     public Element toElement(Document document) throws Exception {

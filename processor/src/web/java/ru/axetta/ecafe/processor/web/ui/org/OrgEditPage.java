@@ -75,6 +75,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean fullSyncParam;
     private Boolean changeCommodityAccounting;
     private Boolean usePlanOrders;
+    private Boolean disableEditingClientsFromAISReestr;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -181,6 +182,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setUsePlanOrders(usePlanOrders);
 
+        org.setDisableEditingClientsFromAISReestr(disableEditingClientsFromAISReestr);
+
         session.update(org);
         fill(org);
         /////
@@ -223,6 +226,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.guid = org.getGuid();
         this.fullSyncParam = org.getFullSyncParam();
         this.usePlanOrders = org.getUsePlanOrders();
+        this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -724,6 +728,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setUsePlanOrders(Boolean usePlanOrders) {
         this.usePlanOrders = usePlanOrders;
+    }
+
+    public Boolean getDisableEditingClientsFromAISReestr() {
+        return disableEditingClientsFromAISReestr;
+    }
+
+    public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
+        this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
     }
 
     public static class ContragentItem {
