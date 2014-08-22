@@ -99,6 +99,7 @@ public class Org implements Serializable {
     private Boolean usePlanOrders;
     private Boolean commodityAccounting;
     private Boolean disableEditingClientsFromAISReestr;
+    private Boolean usePaydableSubscriptionFeeding;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
     private OrganizationStatus status;
@@ -131,7 +132,8 @@ public class Org implements Serializable {
         this.fullSyncParam=false;
         this.commodityAccounting=false;
         this.usePlanOrders = true;  // плана питания включен по умолчаню
-        this.disableEditingClientsFromAISReestr = true;
+        this.disableEditingClientsFromAISReestr = false;
+        this.usePaydableSubscriptionFeeding = false;
         this.type = type;
         this.status = OrganizationStatus.ACTIVE;
     }
@@ -187,6 +189,14 @@ public class Org implements Serializable {
 
     public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
         this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
+    }
+
+    public Boolean getUsePaydableSubscriptionFeeding() {
+        return usePaydableSubscriptionFeeding;
+    }
+
+    public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
+        this.usePaydableSubscriptionFeeding = usePaydableSubscriptionFeeding;
     }
 
     public Set<ClientMigration> getClientMigration() {

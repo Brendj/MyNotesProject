@@ -76,6 +76,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean changeCommodityAccounting;
     private Boolean usePlanOrders;
     private Boolean disableEditingClientsFromAISReestr;
+    private Boolean usePaydableSubscriptionFeeding;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -200,6 +201,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setDisableEditingClientsFromAISReestr(disableEditingClientsFromAISReestr);
 
+        org.setUsePaydableSubscriptionFeeding(usePaydableSubscriptionFeeding);
+
         session.update(org);
         fill(org);
         /////
@@ -243,6 +246,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.fullSyncParam = org.getFullSyncParam();
         this.usePlanOrders = org.getUsePlanOrders();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
+        this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -754,6 +758,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
         this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
+    }
+
+    public Boolean getUsePaydableSubscriptionFeeding() {
+        return usePaydableSubscriptionFeeding;
+    }
+
+    public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
+        this.usePaydableSubscriptionFeeding = usePaydableSubscriptionFeeding;
     }
 
     public static class ContragentItem {

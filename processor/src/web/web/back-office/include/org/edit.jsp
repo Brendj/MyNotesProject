@@ -121,6 +121,9 @@
     <h:outputText id="disableEditingClientsFromAISReestrLabel" escape="true" value="Отключить создание, редактирование, удаление клиентов и их атрибутов" styleClass="output-text"/>
     <h:selectBooleanCheckbox id="disableEditingClientsFromAISReestrCheckbox" value="#{mainPage.orgEditPage.disableEditingClientsFromAISReestr}" />
 
+    <h:outputText id="PaydableSubscriptionFeedingLabel" escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
+    <h:selectBooleanCheckbox id="PaydableSubscriptionFeedingCheckbox" value="#{mainPage.orgEditPage.usePaydableSubscriptionFeeding}"/>
+
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />

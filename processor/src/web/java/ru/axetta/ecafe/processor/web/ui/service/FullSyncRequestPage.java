@@ -31,7 +31,7 @@ import java.util.Map;
 public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
     private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
-    private List<Long> idOfOrgList = new ArrayList<Long>(0);
+    private List<Long> idOfOrgList = new ArrayList<Long>();
 
     @Autowired
     private DAOService daoService;
@@ -40,8 +40,8 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
 
     @Override
     public void onShow() throws Exception {
-        filter = "Не выбрано";
-        idOfOrgList.clear();
+//        filter = "Не выбрано";
+//        idOfOrgList.clear();
     }
 
     public Object applyFullSyncOperation(){
@@ -59,34 +59,25 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
         return null;
     }
 
-/*    @Override
-    public void select(List<OrgShortItem> orgShortItem) {
-        idOfOrgList.clear();
-        if(orgShortItem.isEmpty()){
-            filter = "Не выбрано";
-        } else {
-            for (OrgShortItem item: orgShortItem){
-                idOfOrgList.add(item.getIdOfOrg());
-                filter = filter.concat(item.getShortName() + "; ");
-            }
-        }
-    }*/
-
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
-            idOfOrgList = new ArrayList<Long>(orgMap.size());
+            idOfOrgList = new ArrayList<>();
             if (orgMap.isEmpty())
                 filter = "Не выбрано";
             else {
-                filter = "";
+                StringBuilder stringBuilder = new StringBuilder();
                 for(Long idOfOrg : orgMap.keySet()) {
                     idOfOrgList.add(idOfOrg);
-                    filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
                 }
-                filter = filter.substring(0, filter.length() - 2);
+                filter = stringBuilder.substring(0, stringBuilder.length() - 2);
             }
         }
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9]]", "");
     }
 
     @Override

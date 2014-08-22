@@ -37,12 +37,21 @@ public class DirectiveElement {
 
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+    }
+
+    public void processForFullSync(Org org) throws Exception {
+
+        directiveItemList = new ArrayList<>();
+
+        Boolean disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
+        directiveItemList.add(new DirectiveItem("DisableEditingClientsFromAISReestr", disableEditingClientsFromAISReestr?"1":"0"));
+
+        Boolean usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
+        directiveItemList.add(new DirectiveItem("UsePaydableSubscriptionFeeding", usePaydableSubscriptionFeeding?"1":"0"));
 
         Boolean usePlanOrders = org.getUsePlanOrders();
         directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
 
-        Boolean disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
-        directiveItemList.add(new DirectiveItem("DisableEditingClientsFromAISReestr", disableEditingClientsFromAISReestr?"1":"0"));
     }
 
     public Element toElement(Document document) throws Exception {

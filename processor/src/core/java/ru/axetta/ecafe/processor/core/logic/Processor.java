@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.PaymentProcessEvent;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
+import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
@@ -21,7 +22,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
@@ -989,6 +989,13 @@ public class Processor implements SyncProcessor,
             DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
         }
 
+        try {
+            directiveElement = processFullSyncDirective(request.getOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
         Date syncEndTime = new Date();
         updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
         updateFullSyncParam(request.getIdOfOrg());
@@ -1064,6 +1071,13 @@ public class Processor implements SyncProcessor,
         //} else {
         //    DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
         //}
+
+        try {
+            directiveElement = processFullSyncDirective(request.getOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
 
         Date syncEndTime = new Date();
 
@@ -1422,6 +1436,12 @@ public class Processor implements SyncProcessor,
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        return directiveElement;
+    }
+
+    private DirectiveElement processFullSyncDirective(Org org) throws Exception{
+        DirectiveElement directiveElement = new DirectiveElement();
+        directiveElement.processForFullSync(org);
         return directiveElement;
     }
 
@@ -3121,6 +3141,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         //        e.getPassDirection(), e.getEvtDateTime(), guardianId);
                         final String[] values = generateNotificationParams(persistenceSession, client, e);
                         switch (org.getType()){
+                            case PROFESSIONAL:
                             case SCHOOL: {
                                 notificationService.sendNotificationAsync(client,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values);

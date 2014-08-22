@@ -26,7 +26,7 @@
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{fullSyncRequestPage.idOfOrgList}"
+                    <f:setPropertyActionListener value="#{fullSyncRequestPage.getStringIdOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" id="fullSyncRequestPageFilter" escape="true"
