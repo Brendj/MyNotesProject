@@ -556,7 +556,7 @@ public class ImportRegisterClientsService {
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
-            if(currentGroup == null) {
+            if(currentGroup != null) {
                 currentGroup = em.merge(currentGroup);
                 ch.setGroupNameFrom(currentGroup.getGroupName());
             } else {
