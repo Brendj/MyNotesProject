@@ -41,7 +41,7 @@ public class DirectiveElement {
 
     public void processForFullSync(Org org) throws Exception {
 
-        directiveItemList = new ArrayList<>();
+        directiveItemList = new ArrayList<DirectiveItem>();
 
         Boolean disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         directiveItemList.add(new DirectiveItem("DisableEditingClientsFromAISReestr", disableEditingClientsFromAISReestr?"1":"0"));

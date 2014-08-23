@@ -62,7 +62,7 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
-            idOfOrgList = new ArrayList<>();
+            idOfOrgList = new ArrayList<Long>();
             if (orgMap.isEmpty())
                 filter = "Не выбрано";
             else {
