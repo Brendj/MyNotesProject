@@ -17,3 +17,5 @@ update cf_orgs
 set MainBuilding = 1 where idOfOrg not in (select friendlyorg from cf_friendly_organization  );
 
 alter table cf_orgs add column MainBuilding integer ;
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 140819) НЕ МЕНЯТЬ

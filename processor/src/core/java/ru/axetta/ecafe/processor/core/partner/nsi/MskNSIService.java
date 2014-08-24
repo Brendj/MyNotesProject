@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
-import generated.nsiws2.com.rstyle.nsi.beans.*;
+import generated.nsiws2.com.rstyle.nsi.beans.Attribute;
+import generated.nsiws2.com.rstyle.nsi.beans.Context;
+import generated.nsiws2.com.rstyle.nsi.beans.Item;
+import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 import generated.nsiws2.com.rstyle.nsi.services.NSIService;
 import generated.nsiws2.com.rstyle.nsi.services.NSIServiceService;
 import generated.nsiws2.com.rstyle.nsi.services.in.NSIRequestType;
