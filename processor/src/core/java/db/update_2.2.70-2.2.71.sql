@@ -11,7 +11,9 @@ update cf_orgs set UsePaydableSubscriptionFeeding =0;
 
 --Добавляем параметр главное здание для организаций не имеюших friendly org.
 update cf_orgs
-set MainBuilding = 1 where idOfOrg  in (SELECT friendlyorg from cf_friendly_organization group by friendlyorg having count(*) < 2 )
+set MainBuilding = 1 where idOfOrg  in (SELECT friendlyorg from cf_friendly_organization group by friendlyorg having count(*) < 2 );
 
 update cf_orgs
-set MainBuilding = 1 where idOfOrg not in (select friendlyorg from cf_friendly_organization  )
+set MainBuilding = 1 where idOfOrg not in (select friendlyorg from cf_friendly_organization  );
+
+alter table cf_orgs add column MainBuilding integer ;
