@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ProhibitionsResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 
 import javax.jws.WebMethod;
@@ -185,6 +184,8 @@ public interface ClientRoomController {
     @WebMethod Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId);
 
     @WebMethod ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name = "guardSan") String guardSan);
+
+    @WebMethod ClientSummaryExt[] getSummaryByGuardMobile(@WebParam(name = "guardMobile") String guardSan);
 
     @WebMethod Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state);

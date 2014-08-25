@@ -1555,6 +1555,52 @@ public class DAOUtils {
         return q.list();
     }
 
+    public static List<Long> extractIDFromGuardByGuardMobile(Session persistenceSession, String guardMobile) {
+        Query q = persistenceSession.createQuery("select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile");
+        q.setParameter("guardMobile", guardMobile);
+        List<Long> clients = q.list();
+        if (clients != null && !clients.isEmpty()){
+            String ids = "(";
+            for(Long id : clients){
+                if(ids.length()> 1) {
+                    ids+= ",";
+                }
+                ids+= id ;
+            }
+            ids += ")";
+            q = persistenceSession.createSQLQuery("select idofguardian from cf_client_guardian  where idofchildren in "+ ids);
+
+            List<BigInteger> res = q.list();
+            if(res.size() > 0){
+                clients.clear();
+                for(BigInteger parent : res){
+                    clients.add(parent.longValue());
+                }
+            }
+        }
+        if (clients != null && clients.isEmpty()){
+            return clients;
+        }
+        String ids = "(";
+        for(Long id : clients){
+            if(ids.length()> 1) {
+                ids+= ",";
+            }
+            ids+= id ;
+        }
+        ids += ")";
+        q = persistenceSession.createSQLQuery("select idofchildren from cf_client_guardian  where idofguardian in " + ids);
+        List<BigInteger> children = q.list();
+
+        if(children.size() > 0){
+            clients.clear();
+            for(BigInteger child : children){
+                clients.add(child.longValue());
+            }
+        }
+        return clients;
+    }
+
     public static List<Good> getAllGoods (Session persistenceSession) {
         return getAllGoods (persistenceSession, null);
     }

@@ -2506,6 +2506,44 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
+
+
+    public ClientsData getClientsByGuardMobile(String mobile) {
+        authenticateRequest(null);
+        ClientsData data = new ClientsData();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            List<Long> idOfClients = DAOUtils.extractIDFromGuardByGuardMobile(persistenceSession,
+                    Client.checkAndConvertMobile(mobile));
+            data.clientList = new ClientList();
+            for (Long idOfClient : idOfClients) {
+                Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
+                ClientItem clientItem = new ClientItem();
+                clientItem.setContractId(cl.getContractId());
+                clientItem.setSan(cl.getSan());
+                data.clientList.getClients().add(clientItem);
+            }
+            data.resultCode = RC_OK;
+            data.description = "OK";
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.toString();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return data;
+    }
+
     @Override
     public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
         guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
@@ -2782,6 +2820,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null);
 
         ClientsData cd = getClientsByGuardSan(guardSan);
+        LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
+        if (cd != null && cd.clientList != null) {
+            for (ClientItem ci : cd.clientList.getClients()) {
+                ClientSummaryResult cs = getSummary(ci.getContractId());
+                if (cs.clientSummary != null) {
+                    clientSummaries.add(cs.clientSummary);
+                }
+            }
+        }
+        return clientSummaries.toArray(new ClientSummaryExt[0]);
+    }
+
+    @Override
+    public ClientSummaryExt[] getSummaryByGuardMobile(String guardMobile) {
+        authenticateRequest(null);
+
+        ClientsData cd = getClientsByGuardMobile(guardMobile);
         LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
         if (cd != null && cd.clientList != null) {
             for (ClientItem ci : cd.clientList.getClients()) {

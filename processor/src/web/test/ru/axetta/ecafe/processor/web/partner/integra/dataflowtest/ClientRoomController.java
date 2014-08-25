@@ -1,7 +1,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflowtest;
 
-import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -10,6 +9,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
+import java.util.List;
 
 
 /**
@@ -349,6 +349,20 @@ public interface ClientRoomController {
     public List<ClientSummaryExt> getSummaryByGuardSan(
         @WebParam(name = "guardSan", targetNamespace = "")
         String guardSan);
+
+    /**
+     *
+     * @param guardMobile
+     * @return
+     *     returns java.util.List<ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.ClientSummaryExt>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "getSummaryByGuardMobile", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetSummaryByGuardMobile")
+    @ResponseWrapper(localName = "getSummaryByGuardMobileResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.partner.integra.dataflowtest.GetSummaryByGuardMobileResponse")
+    public List<ClientSummaryExt> getSummaryByGuardMobile(
+            @WebParam(name = "guardMobile", targetNamespace = "")
+            String guardMobile);
 
     /**
      * 
