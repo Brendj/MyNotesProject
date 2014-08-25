@@ -2371,6 +2371,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public EnterEventWithRepListResult getEnterEventWithRepList(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processEnterEventWithRepList(client, data, objectFactory, session, endDate, startDate, false);
+            }
+        });
+
+        EnterEventWithRepListResult enterEventWithRepListResult = new EnterEventWithRepListResult();
+        enterEventWithRepListResult.enterEventWithRepList = data.getEnterEventWithRepList();
+        enterEventWithRepListResult.resultCode = data.getResultCode();
+        enterEventWithRepListResult.description = data.getDescription();
+        return enterEventWithRepListResult;
+    }
+
+    @Override
     public EnterEventListResult getEnterEventListByGuardian(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
         Data data = new ClientRequest().process(contractId, new Processor() {
@@ -2405,12 +2423,54 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return enterEventListResult;
     }
 
-    private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
+    private void processEnterEventWithRepList(Client client, Data data, ObjectFactory objectFactory, Session session,
           Date endDate, Date startDate, boolean byGuardian) throws Exception {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        Criteria enterEventWithRepCriteria = session.createCriteria(EnterEvent.class);
+        enterEventWithRepCriteria.add(byGuardian ? Restrictions.eq("guardianId", client.getIdOfClient())
+              : Restrictions.eq("client", client));
+        enterEventWithRepCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        enterEventWithRepCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        enterEventWithRepCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+
+        Locale locale = new Locale("ru", "RU");
+        Calendar calendar = Calendar.getInstance(locale);
+
+        List<EnterEvent> enterEvents = enterEventWithRepCriteria.list();
+        EnterEventWithRepList enterEventWithRepList = objectFactory.createEnterEventWithRepList();
+        int nRecs = 0;
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+            EnterEventWithRepItem enterEventWithRepItem = objectFactory.createEnterEventWithRepItem();
+            enterEventWithRepItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
+            calendar.setTime(enterEvent.getEvtDateTime());
+            enterEventWithRepItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventWithRepItem.setEnterName(enterEvent.getEnterName());
+            enterEventWithRepItem.setDirection(enterEvent.getPassDirection());
+            enterEventWithRepItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
+
+            enterEventWithRepItem.setRepId(enterEvent.getClient().getContractId());
+            enterEventWithRepItem.setRepName(enterEvent.getClient().getPerson().getSurnameAndFirstLetters());
+
+            final Long guardianId = enterEvent.getGuardianId();
+            if (guardianId != null) {
+                //Client guardian = DAOUtils.findClient(session, guardianId);
+                //enterEventItem.setGuardianSan(guardian.getSan());
+                enterEventWithRepItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
+            }
+            enterEventWithRepList.getE().add(enterEventWithRepItem);
+        }
+        data.setEnterEventWithRepList(enterEventWithRepList);
+    }
+
+    private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Date endDate, Date startDate, boolean byGuardian) throws Exception {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
         enterEventCriteria.add(byGuardian ? Restrictions.eq("guardianId", client.getIdOfClient())
-              : Restrictions.eq("client", client));
+                : Restrictions.eq("client", client));
         enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
         enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
         enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));

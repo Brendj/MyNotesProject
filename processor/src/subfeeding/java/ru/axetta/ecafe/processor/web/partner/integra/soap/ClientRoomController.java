@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ProhibitionsResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 
 import javax.jws.WebMethod;
@@ -154,6 +153,10 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getEnterEventList")
     EnterEventListResult getEnterEventList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod(operationName = "getEnterEventWithRepList")
+    EnterEventWithRepListResult getEnterEventWithRepList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getEnterEventListBySan")
     EnterEventListResult getEnterEventList(@WebParam(name = "san") String san,
@@ -378,6 +381,9 @@ public interface ClientRoomController {
     @WebMethod(operationName = "removeProhibition")
     ProhibitionsResult removeProhibition(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "prohibitionId") Long prohibitionId);
+
+    @WebMethod(operationName = "getClientRepresentatives")
+    ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") Long contractId);
 
 
 }

@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.*;
@@ -23,6 +22,7 @@ import javax.xml.bind.annotation.*;
  *         &lt;element name="MenuListExt" type="{}MenuListExt" minOccurs="0"/>
  *         &lt;element name="CardList" type="{}CardList" minOccurs="0"/>
  *         &lt;element name="EnterEventList" type="{}EnterEventList" minOccurs="0"/>
+ *         &lt;element name="EnterEventWithRepList" type="{}EnterEventWithRepList" minOccurs="0"/>
  *         &lt;element name="CirculationItemList" type="{}CirculationItemList" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="IdOfContract" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -46,6 +46,7 @@ import javax.xml.bind.annotation.*;
     "menuListExt",
     "cardList",
     "enterEventList",
+    "enterEventWithRepList",
     "circulationItemList",
     "complexDateList",
     "questionaryList"
@@ -73,6 +74,8 @@ public class Data {
     protected CardList cardList;
     @XmlElement(name = "EnterEventList")
     protected EnterEventList enterEventList;
+    @XmlElement(name = "EnterEventWithRepList")
+    protected EnterEventWithRepList enterEventWithRepList;
     @XmlElement(name = "CirculationItemList")
     protected CirculationItemList circulationItemList;
     @XmlAttribute(name = "IdOfContract")
@@ -307,6 +310,30 @@ public class Data {
      */
     public void setEnterEventList(EnterEventList value) {
         this.enterEventList = value;
+    }
+
+    /**
+     * Gets the value of the enterEventWithRepList property.
+     *
+     * @return
+     *     possible object is
+     *     {@link EnterEventWithRepList }
+     *
+     */
+    public EnterEventWithRepList getEnterEventWithRepList() {
+        return enterEventWithRepList;
+    }
+
+    /**
+     * Sets the value of the enterEventWithRepList property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link EnterEventWithRepList }
+     *
+     */
+    public void setEnterEventWithRepList(EnterEventWithRepList value) {
+        this.enterEventWithRepList = value;
     }
 
     /**

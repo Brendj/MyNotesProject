@@ -272,4 +272,20 @@ public class ObjectFactory {
     public QuestionaryList createQuestionaryList() {
         return new QuestionaryList();
     }
+
+    /**
+     * Create an instance of {@link EnterEventItem }
+     *
+     */
+    public EnterEventWithRepItem createEnterEventWithRepItem() {
+        return new EnterEventWithRepItem();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventWithRepList }
+     *
+     */
+    public EnterEventWithRepList createEnterEventWithRepList() {
+        return new EnterEventWithRepList();
+    }
 }

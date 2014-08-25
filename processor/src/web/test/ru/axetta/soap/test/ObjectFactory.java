@@ -1,5 +1,7 @@
-
 package ru.axetta.soap.test;
+
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventWithRepItem;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.EnterEventWithRepList;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
@@ -148,6 +150,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link EnterEventWithRepList }
+     *
+     */
+    public EnterEventWithRepList createEnterEventWithRepList() {
+        return new EnterEventWithRepList();
+    }
+
+    /**
      * Create an instance of {@link MenuList }
      * 
      */
@@ -209,6 +219,14 @@ public class ObjectFactory {
      */
     public EnterEventItem createEnterEventItem() {
         return new EnterEventItem();
+    }
+
+    /**
+     * Create an instance of {@link EnterEventItem }
+     *
+     */
+    public EnterEventWithRepItem createEnterEventWithRepItem() {
+        return new EnterEventWithRepItem();
     }
 
     /**
