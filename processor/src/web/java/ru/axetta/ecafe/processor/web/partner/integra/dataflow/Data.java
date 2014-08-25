@@ -1,12 +1,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -86,6 +81,10 @@ public class Data {
     protected Long resultCode;
     @XmlAttribute(name = "Description")
     protected String description;
+    @XmlAttribute(name = "RepId")
+    protected Long repId;
+    @XmlAttribute(name = "RepName")
+    protected String repName;
     @XmlElement(name = "QuestionaryList")
     protected QuestionaryList questionaryList;
 

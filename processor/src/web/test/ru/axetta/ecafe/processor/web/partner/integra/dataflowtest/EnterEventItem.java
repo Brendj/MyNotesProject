@@ -1,11 +1,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflowtest;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
@@ -25,6 +21,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="EnterName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Direction" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="TemporaryCard" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="RepId" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="RepName" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -47,6 +45,10 @@ public class EnterEventItem {
     protected Integer direction;
     @XmlAttribute(name = "TemporaryCard")
     protected Integer temporaryCard;
+    @XmlAttribute(name = "RepId")
+    protected Long repId;
+    @XmlAttribute(name = "RepName")
+    protected String repName;
 
     /**
      * Gets the value of the dateTime property.
@@ -168,4 +170,19 @@ public class EnterEventItem {
         this.temporaryCard = value;
     }
 
+    public Long getRepId() {
+        return repId;
+    }
+
+    public void setRepId(Long repId) {
+        this.repId = repId;
+    }
+
+    public String getRepName() {
+        return repName;
+    }
+
+    public void setRepName(String repName) {
+        this.repName = repName;
+    }
 }

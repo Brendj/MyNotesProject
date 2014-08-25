@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
@@ -41,7 +40,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ProhibitionsResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
@@ -50,7 +48,10 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2420,6 +2421,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<EnterEvent> enterEvents = enterEventCriteria.list();
         EnterEventList enterEventList = objectFactory.createEnterEventList();
         int nRecs = 0;
+        Map<Long, Client> guardianMap = new HashMap<Long, Client>();
         for (EnterEvent enterEvent : enterEvents) {
             if (nRecs++ > MAX_RECS) {
                 break;
@@ -2433,7 +2435,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
-                //Client guardian = DAOUtils.findClient(session, guardianId);
+                Client guardian = guardianMap.get(guardianId);
+                if (guardian == null){
+                    guardian = DAOUtils.findClient(session, guardianId);
+                    guardianMap.put(guardianId, guardian);
+                }
+                enterEventItem.setRepId(guardian.getContractId());
+                enterEventItem.setRepName(guardian.getPerson().getFullName());
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
             }
