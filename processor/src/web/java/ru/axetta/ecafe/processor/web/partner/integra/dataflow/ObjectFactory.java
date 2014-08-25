@@ -282,10 +282,10 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EnterEventWithRepList }
+     * Create an instance of {@link EnterEventWithRepLists }
      *
      */
-    public EnterEventWithRepList createEnterEventWithRepList() {
-        return new EnterEventWithRepList();
+    public EnterEventWithRepLists createEnterEventWithRepList() {
+        return new EnterEventWithRepLists();
     }
 }

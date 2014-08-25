@@ -2382,7 +2382,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         });
 
         EnterEventWithRepListResult enterEventWithRepListResult = new EnterEventWithRepListResult();
-        enterEventWithRepListResult.enterEventWithRepList = data.getEnterEventWithRepList();
+        enterEventWithRepListResult.enterEventWithRepLists = data.getEnterEventWithRepLists();
         enterEventWithRepListResult.resultCode = data.getResultCode();
         enterEventWithRepListResult.description = data.getDescription();
         return enterEventWithRepListResult;
@@ -2437,7 +2437,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Calendar calendar = Calendar.getInstance(locale);
 
         List<EnterEvent> enterEvents = enterEventWithRepCriteria.list();
-        EnterEventWithRepList enterEventWithRepList = objectFactory.createEnterEventWithRepList();
+        EnterEventWithRepLists enterEventWithRepLists = objectFactory.createEnterEventWithRepList();
         int nRecs = 0;
         for (EnterEvent enterEvent : enterEvents) {
             if (nRecs++ > MAX_RECS) {
@@ -2460,9 +2460,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventWithRepItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
             }
-            enterEventWithRepList.getE().add(enterEventWithRepItem);
+            enterEventWithRepLists.getE().add(enterEventWithRepItem);
         }
-        data.setEnterEventWithRepList(enterEventWithRepList);
+        data.setEnterEventWithRepLists(enterEventWithRepLists);
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
