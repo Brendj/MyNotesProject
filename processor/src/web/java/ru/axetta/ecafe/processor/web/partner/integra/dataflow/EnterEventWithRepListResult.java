@@ -8,7 +8,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  */
 
 public class EnterEventWithRepListResult {
-    public EnterEventWithRepLists enterEventWithRepLists;
+    public EnterEventWithRepList enterEventWithRepList;
     public Long resultCode;
     public String description;
 }

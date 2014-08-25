@@ -32,10 +32,10 @@ import java.util.List;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EnterEventWithRepLists", propOrder = {
+@XmlType(name = "EnterEventWithRepList", propOrder = {
         "e"
 })
-public class EnterEventWithRepLists {
+public class EnterEventWithRepList {
 
     @XmlElement(name = "E")
     protected List<EnterEventWithRepItem> e;

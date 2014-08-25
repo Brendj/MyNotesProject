@@ -44,8 +44,7 @@ import javax.xml.bind.annotation.*;
     "menuList",
     "menuListExt",
     "cardList",
-    "enterEventList",
-    "enterEventWithRepLists",
+    "enterEventList", "enterEventWithRepList",
     "circulationItemList",
     "complexDateList",
     "questionaryList"
@@ -73,8 +72,8 @@ public class Data {
     protected CardList cardList;
     @XmlElement(name = "EnterEventList")
     protected EnterEventList enterEventList;
-    @XmlElement(name = "EnterEventWithRepLists")
-    protected EnterEventWithRepLists enterEventWithRepLists;
+    @XmlElement(name = "EnterEventWithRepList")
+    protected EnterEventWithRepList enterEventWithRepList;
     @XmlElement(name = "CirculationItemList")
     protected CirculationItemList circulationItemList;
     @XmlAttribute(name = "IdOfContract")
@@ -316,11 +315,11 @@ public class Data {
      *
      * @return
      *     possible object is
-     *     {@link EnterEventWithRepLists }
+     *     {@link EnterEventWithRepList }
      *
      */
-    public EnterEventWithRepLists getEnterEventWithRepLists() {
-        return enterEventWithRepLists;
+    public EnterEventWithRepList getEnterEventWithRepList() {
+        return enterEventWithRepList;
     }
 
     /**
@@ -328,11 +327,11 @@ public class Data {
      *
      * @param value
      *     allowed object is
-     *     {@link EnterEventWithRepLists }
+     *     {@link EnterEventWithRepList }
      *
      */
-    public void setEnterEventWithRepLists(EnterEventWithRepLists value) {
-        this.enterEventWithRepLists = value;
+    public void setEnterEventWithRepList(EnterEventWithRepList value) {
+        this.enterEventWithRepList = value;
     }
 
     /**
