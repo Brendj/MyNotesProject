@@ -47,7 +47,8 @@ import javax.xml.bind.annotation.*;
     "enterEventList", "enterEventWithRepList",
     "circulationItemList",
     "complexDateList",
-    "questionaryList"
+    "questionaryList",
+    "clientRepresentativesList"
 })
 @XmlRootElement(name = "Data")
 public class Data {
@@ -84,6 +85,8 @@ public class Data {
     protected String description;
     @XmlElement(name = "QuestionaryList")
     protected QuestionaryList questionaryList;
+    @XmlElement(name = "ClientRepresentativesList")
+    private ClientRepresentativesList clientRepresentativesList;
 
 
     public ComplexDateList getComplexDateList() {
@@ -436,5 +439,13 @@ public class Data {
 
     public void setQuestionaryList(QuestionaryList questionaryList) {
         this.questionaryList = questionaryList;
+    }
+
+    public void setClientRepresentativesList(ClientRepresentativesList clientRepresentativesList) {
+        this.clientRepresentativesList = clientRepresentativesList;
+    }
+
+    public ClientRepresentativesList getClientRepresentativesList() {
+        return clientRepresentativesList;
     }
 }

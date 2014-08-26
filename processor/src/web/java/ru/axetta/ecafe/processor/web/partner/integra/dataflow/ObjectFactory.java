@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -287,5 +286,9 @@ public class ObjectFactory {
      */
     public EnterEventWithRepList createEnterEventWithRepList() {
         return new EnterEventWithRepList();
+    }
+
+    public ClientRepresentatives creteClientRepresentatives() {
+        return new ClientRepresentatives();
     }
 }

@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
@@ -2586,13 +2585,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 clientItem.setSan(cl.getSan());
                 data.clientList.getClients().add(clientItem);
             }
-            if(idOfClients.size() > 0){
-                data.resultCode = RC_OK;
-                data.description = "OK";
-            }else{
-                data.resultCode = RC_CLIENT_NOT_FOUND;
-                data.description = "Клиент не найден";
-            }
+            data.resultCode = RC_OK;
+            data.description = "OK";
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2604,7 +2598,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-
         return data;
     }
 
@@ -2919,7 +2912,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryExtListResult;
     }
 
-    @Override
+/*    @Override
     public ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
         Long contractIdLong = Long.valueOf(contractId);
         authenticateRequest(contractIdLong);
@@ -2951,6 +2944,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientRepresentativesList.add(clientRepresentative);
         }
 
+        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
+//        clientRepresentativesResult.clientRepresentativesList = clientRepresentativesList;
+        clientRepresentativesResult.resultCode = 0l;
         clientRepresentativesResult.cReps = new ClientRepresentativesList();
         clientRepresentativesResult.cReps.getCRep().addAll(clientRepresentativesList);
         if(clientRepresentativesResult.resultCode == null){
@@ -2966,6 +2962,53 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
         return clientRepresentativesResult;
+    }*/
+
+    @Override
+    public ClientRepresentativesResult getClientRepresentatives(String contractId) {
+        Long contractIdLong = Long.valueOf(contractId);
+        authenticateRequest(contractIdLong);
+
+        Data data = new ClientRequest().process(contractIdLong, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processClientRepresentativeList(client, data, objectFactory, session);
+            }
+        });
+
+        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
+        clientRepresentativesResult.clientRepresentativesList = data.getClientRepresentativesList();
+        clientRepresentativesResult.resultCode = RC_OK;
+        clientRepresentativesResult.description = RC_OK_DESC;
+
+       return clientRepresentativesResult;
+    }
+
+    private void processClientRepresentativeList(Client client, Data data, ObjectFactory objectFactory, Session session) {
+        try {
+            Criteria criteria  = session.createCriteria(ClientGuardian.class);
+            criteria.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+            List guardiansResults = criteria.list();
+
+            ClientRepresentativesList clientRepresentativesList = new ClientRepresentativesList();
+
+            for (Object o: guardiansResults) {
+                ClientGuardian clientGuardian = (ClientGuardian) o;
+                Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
+                if (cl != null) {
+                    ClientRepresentatives clientRepresentatives = objectFactory.creteClientRepresentatives();
+                    clientRepresentatives.setId(cl.getContractId());
+                    clientRepresentatives.setName(cl.getPerson().getSurnameAndFirstLetters());
+
+                    clientRepresentativesList.getRep().add(clientRepresentatives);
+                }
+            }
+
+            data.setClientRepresentativesList(clientRepresentativesList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
