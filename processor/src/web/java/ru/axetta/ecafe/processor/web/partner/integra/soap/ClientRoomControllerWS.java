@@ -2439,6 +2439,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<EnterEvent> enterEvents = enterEventWithRepCriteria.list();
         EnterEventWithRepList enterEventWithRepList = objectFactory.createEnterEventWithRepList();
         int nRecs = 0;
+        Map<Long, Client> guardianMap = new HashMap<Long, Client>();
         for (EnterEvent enterEvent : enterEvents) {
             if (nRecs++ > MAX_RECS) {
                 break;
@@ -2451,12 +2452,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventWithRepItem.setDirection(enterEvent.getPassDirection());
             enterEventWithRepItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
 
-            enterEventWithRepItem.setRepId(enterEvent.getClient().getContractId());
-            enterEventWithRepItem.setRepName(enterEvent.getClient().getPerson().getSurnameAndFirstLetters());
-
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
-                //Client guardian = DAOUtils.findClient(session, guardianId);
+                Client guardian = guardianMap.get(guardianId);
+                if (guardian == null){
+                    guardian = DAOUtils.findClient(session, guardianId);
+                    guardianMap.put(guardianId, guardian);
+                }
+                enterEventWithRepItem.setRepId(guardian.getContractId());
+                enterEventWithRepItem.setRepName(guardian.getPerson().getFullName());
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventWithRepItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
             }
