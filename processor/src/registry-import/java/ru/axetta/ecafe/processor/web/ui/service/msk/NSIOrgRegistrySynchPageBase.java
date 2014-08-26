@@ -310,7 +310,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private void load (boolean refresh) {
         resetMessages();
         long idOfOrg = getIdOfOrg();
-        if (idOfOrg < 1L) {
+        if (idOfOrg < 0L) {
             if (items == null) {
                 items = new ArrayList<WebRegistryChangeItem>();
             }
