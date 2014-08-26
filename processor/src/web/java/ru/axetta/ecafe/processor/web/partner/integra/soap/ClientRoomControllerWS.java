@@ -2586,8 +2586,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 clientItem.setSan(cl.getSan());
                 data.clientList.getClients().add(clientItem);
             }
-            data.resultCode = RC_OK;
-            data.description = "OK";
+            if(idOfClients.size() > 0){
+                data.resultCode = RC_OK;
+                data.description = "OK";
+            }else{
+                data.resultCode = RC_CLIENT_NOT_FOUND;
+                data.description = "Клиент не найден";
+            }
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2599,6 +2604,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+
         return data;
     }
 
@@ -2907,7 +2913,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientSummaryExtListResult clientSummaryExtListResult = new ClientSummaryExtListResult();
         clientSummaryExtListResult.clientSummary = clientSummaries;
-        clientSummaryExtListResult.resultCode = 0l;
+        clientSummaryExtListResult.resultCode = cd.resultCode;
+        clientSummaryExtListResult.description = cd.description;
 
         return clientSummaryExtListResult;
     }
@@ -2919,19 +2926,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
-        List<Client> representativeList = null;
+        List<Client> representativeList = new ArrayList<Client>();
+        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
 
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
-
-            representativeList = ClientManager.loadGuardiansByChildren(persistenceSession, contractIdLong);
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractIdLong);
+            if (null != client){
+                representativeList = ClientManager.loadGuardiansByChildren(persistenceSession, client.getIdOfClient());
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.warn("Error", e);
+            clientRepresentativesResult.resultCode = 100l;
+            clientRepresentativesResult.description = "Внутренняя ошибка";
         }
-        if (representativeList == null || representativeList.isEmpty()) {
-            return null;
-        }
+
         List<ClientRepresentatives> clientRepresentativesList = new ArrayList<ClientRepresentatives>();
 
         for (Client aRepresentativeList : representativeList) {
@@ -2941,9 +2951,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientRepresentativesList.add(clientRepresentative);
         }
 
-        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
         clientRepresentativesResult.clientRepresentativesList = clientRepresentativesList;
-        clientRepresentativesResult.resultCode = 0l;
+        if(clientRepresentativesResult.resultCode == null){
+            if(clientRepresentativesList.size() == 0 ){
+                clientRepresentativesResult.resultCode = 110l;
+                clientRepresentativesResult.description = "Лицевой счет не найден";
+            }else {
+                clientRepresentativesResult.resultCode = 0l;
+                clientRepresentativesResult.description = "OK";
+            }
+
+        }
+
+
         return clientRepresentativesResult;
     }
 
