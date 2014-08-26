@@ -2951,7 +2951,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientRepresentativesList.add(clientRepresentative);
         }
 
-        clientRepresentativesResult.clientRepresentativesList = clientRepresentativesList;
+        clientRepresentativesResult.cReps = new ClientRepresentativesList();
+        clientRepresentativesResult.cReps.getCRep().addAll(clientRepresentativesList);
         if(clientRepresentativesResult.resultCode == null){
             if(clientRepresentativesList.size() == 0 ){
                 clientRepresentativesResult.resultCode = 110l;
