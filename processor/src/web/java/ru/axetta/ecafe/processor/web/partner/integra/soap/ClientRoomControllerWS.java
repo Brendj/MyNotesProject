@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
@@ -2886,7 +2887,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
-        return clientSummaries.toArray(new ClientSummaryExt[0]);
+        return clientSummaries.toArray(new ClientSummaryExt[clientSummaries.size()]);
     }
 
     @Override
@@ -2903,7 +2904,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
-        return clientSummaries.toArray(new ClientSummaryExt[0]);
+
+        return clientSummaries.toArray(new ClientSummaryExt[clientSummaries.size()]);
+    }
+
+    @Override
+    public ClientRepresentatives[] getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
+        Long contractIdLong = Long.valueOf(contractId);
+        authenticateRequest(contractIdLong);
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        List<Client> representativeList = null;
+
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+
+            representativeList = ClientManager.loadGuardiansByChildren(persistenceSession, contractIdLong);
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        if (representativeList == null || representativeList.isEmpty()) {
+            return null;
+        }
+        List<ClientRepresentatives> clientRepresentativesList = new ArrayList<ClientRepresentatives>();
+
+        for (Client aRepresentativeList : representativeList) {
+            ClientRepresentatives clientRepresentative = new ClientRepresentatives();
+            clientRepresentative.setId(aRepresentativeList.getContractId());
+            clientRepresentative.setName(aRepresentativeList.getPerson().getFullName());
+            clientRepresentativesList.add(clientRepresentative);
+        }
+
+        return clientRepresentativesList.toArray(new ClientRepresentatives[clientRepresentativesList.size()]);
     }
 
     @Override
