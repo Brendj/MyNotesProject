@@ -31,7 +31,7 @@ import java.util.Map;
 public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
     private static Logger logger = LoggerFactory.getLogger(UsePlanOrdersRequestPage.class);
-    private List<Long> idOfOrgList = new ArrayList<Long>(0);
+    private List<Long> idOfOrgList = new ArrayList<Long>();
 
     @Autowired
     private DAOService daoService;
@@ -40,8 +40,8 @@ public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgL
 
     @Override
     public void onShow() throws Exception {
-        filter = "Не выбрано";
-        idOfOrgList.clear();
+//        filter = "Не выбрано";
+//        idOfOrgList.clear();
     }
 
     public Object applyUsePlanOrdersOperation(){
@@ -71,7 +71,7 @@ public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgL
                     idOfOrgList.add(idOfOrg);
                     filter = filter.concat(orgMap.get(idOfOrg) + "; ");
                 }
-                filter = filter.substring(0, filter.length() - 2);
+                filter = filter.substring(0, filter.length() - 1);
             }
         }
     }
@@ -81,8 +81,8 @@ public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgL
         return "service/use_plan_orders_request";
     }
 
-    public List<Long> getIdOfOrgList() {
-        return idOfOrgList;
+    public String getIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
     public void setIdOfOrgList(List<Long> idOfOrgList) {

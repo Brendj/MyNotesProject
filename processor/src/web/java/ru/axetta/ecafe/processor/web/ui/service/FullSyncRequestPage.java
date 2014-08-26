@@ -63,21 +63,18 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
             idOfOrgList = new ArrayList<Long>();
-            if (orgMap.isEmpty())
+            if (orgMap.isEmpty())  {
                 filter = "Не выбрано";
-            else {
+            } else {
+                filter = "";
                 StringBuilder stringBuilder = new StringBuilder();
                 for(Long idOfOrg : orgMap.keySet()) {
                     idOfOrgList.add(idOfOrg);
                     stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
                 }
-                filter = stringBuilder.substring(0, stringBuilder.length() - 2);
+                filter = stringBuilder.substring(0, stringBuilder.length() - 1);
             }
         }
-    }
-
-    public String getGetStringIdOfOrgList() {
-        return idOfOrgList.toString().replaceAll("[^0-9]]", "");
     }
 
     @Override
@@ -85,8 +82,8 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
         return "service/full_sync_request";
     }
 
-    public List<Long> getIdOfOrgList() {
-        return idOfOrgList;
+    public String getIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
     public void setIdOfOrgList(List<Long> idOfOrgList) {
