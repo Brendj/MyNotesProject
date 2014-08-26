@@ -189,10 +189,11 @@ public interface ClientRoomController {
 
     @WebMethod ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name = "guardSan") String guardSan);
 
-    @WebMethod ClientSummaryExt[] getSummaryByGuardMobile(@WebParam(name = "guardMobile") String guardSan);
+    @WebMethod
+    ClientSummaryExtListResult getSummaryByGuardMobile(@WebParam(name = "guardMobile") String guardSan);
 
     @WebMethod
-    ClientRepresentatives[] getClientRepresentatives(@WebParam(name = "contractId") String contractId);
+    ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId);
 
     @WebMethod Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state);

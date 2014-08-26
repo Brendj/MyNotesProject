@@ -2891,7 +2891,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ClientSummaryExt[] getSummaryByGuardMobile(String guardMobile) {
+    public ClientSummaryExtListResult getSummaryByGuardMobile(String guardMobile) {
         authenticateRequest(null);
 
         ClientsData cd = getClientsByGuardMobile(guardMobile);
@@ -2905,11 +2905,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         }
 
-        return clientSummaries.toArray(new ClientSummaryExt[clientSummaries.size()]);
+        ClientSummaryExtListResult clientSummaryExtListResult = new ClientSummaryExtListResult();
+        clientSummaryExtListResult.clientSummary = clientSummaries;
+        clientSummaryExtListResult.resultCode = 0l;
+
+        return clientSummaryExtListResult;
     }
 
     @Override
-    public ClientRepresentatives[] getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
+    public ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
         Long contractIdLong = Long.valueOf(contractId);
         authenticateRequest(contractIdLong);
 
@@ -2937,7 +2941,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientRepresentativesList.add(clientRepresentative);
         }
 
-        return clientRepresentativesList.toArray(new ClientRepresentatives[clientRepresentativesList.size()]);
+        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
+        clientRepresentativesResult.clientRepresentativesList = clientRepresentativesList;
+        clientRepresentativesResult.resultCode = 0l;
+        return clientRepresentativesResult;
     }
 
     @Override
