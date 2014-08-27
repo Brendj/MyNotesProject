@@ -7,8 +7,6 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * Time: 17:27
  */
 
-public class EnterEventWithRepListResult {
+public class EnterEventWithRepListResult extends Result {
     public EnterEventWithRepList enterEventWithRepList;
-    public Long resultCode;
-    public String description;
 }

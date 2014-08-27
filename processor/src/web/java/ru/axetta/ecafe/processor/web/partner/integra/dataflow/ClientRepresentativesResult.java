@@ -6,8 +6,4 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 public class ClientRepresentativesResult extends Result {
     public ClientRepresentativesList clientRepresentativesList;
-    public Long resultCode;
-    public String description;
-
-
 }
