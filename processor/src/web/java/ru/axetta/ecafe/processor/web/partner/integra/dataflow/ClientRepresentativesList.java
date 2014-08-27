@@ -38,7 +38,7 @@ import java.util.List;
 public class ClientRepresentativesList {
 
     @XmlElement(name = "Rep")
-    protected List<ClientRepresentatives> Rep;
+    protected List<ClientRepresentative> Rep;
 
     /**
      * Gets the value of the e property.
@@ -62,9 +62,9 @@ public class ClientRepresentativesList {
      *
      *
      */
-    public List<ClientRepresentatives> getRep() {
+    public List<ClientRepresentative> getRep() {
         if (Rep == null) {
-            Rep = new ArrayList<ClientRepresentatives>();
+            Rep = new ArrayList<ClientRepresentative>();
         }
         return this.Rep;
     }

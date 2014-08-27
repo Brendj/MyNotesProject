@@ -12,12 +12,12 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ClientRepresentatives complex type.
+ * <p>Java class for ClientRepresentative complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="ClientRepresentatives">
+ * &lt;complexType name="ClientRepresentative">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -30,8 +30,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ClientRepresentatives")
-public class ClientRepresentatives {
+@XmlType(name = "ClientRepresentative")
+public class ClientRepresentative {
 
     @XmlAttribute(name = "Id")
     protected Long id;

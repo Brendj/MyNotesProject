@@ -288,7 +288,7 @@ public class ObjectFactory {
         return new EnterEventWithRepList();
     }
 
-    public ClientRepresentatives creteClientRepresentatives() {
-        return new ClientRepresentatives();
+    public ClientRepresentative creteClientRepresentative() {
+        return new ClientRepresentative();
     }
 }

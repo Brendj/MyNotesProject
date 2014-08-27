@@ -2935,10 +2935,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientRepresentativesResult.description = "Внутренняя ошибка";
         }
 
-        List<ClientRepresentatives> clientRepresentativesList = new ArrayList<ClientRepresentatives>();
+        List<ClientRepresentative> clientRepresentativesList = new ArrayList<ClientRepresentative>();
 
         for (Client aRepresentativeList : representativeList) {
-            ClientRepresentatives clientRepresentative = new ClientRepresentatives();
+            ClientRepresentative clientRepresentative = new ClientRepresentative();
             clientRepresentative.setId(aRepresentativeList.getContractId());
             clientRepresentative.setName(aRepresentativeList.getPerson().getFullName());
             clientRepresentativesList.add(clientRepresentative);
@@ -2996,11 +2996,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ClientGuardian clientGuardian = (ClientGuardian) o;
                 Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
                 if (cl != null) {
-                    ClientRepresentatives clientRepresentatives = objectFactory.creteClientRepresentatives();
-                    clientRepresentatives.setId(cl.getContractId());
-                    clientRepresentatives.setName(cl.getPerson().getSurnameAndFirstLetters());
+                    ClientRepresentative clientRepresentative = objectFactory.creteClientRepresentative();
+                    clientRepresentative.setId(cl.getContractId());
+                    clientRepresentative.setName(cl.getPerson().getSurnameAndFirstLetters());
 
-                    clientRepresentativesList.getRep().add(clientRepresentatives);
+                    clientRepresentativesList.getRep().add(clientRepresentative);
                 }
             }
 
