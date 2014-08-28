@@ -384,14 +384,21 @@ public class ImportRegisterClientsService {
                         cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
-            boolean guidFound = false;
-            for (Org o : orgsList) {
-                if (o.getGuid().equals(pupil.getGuidOfOrg())) {
-                    guidFound = true;
-                    break;
+            boolean crossFound = false;
+            if(cl != null) {
+                if(org.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
+                    crossFound = true;
+                }
+                else {
+                    for (Org o : orgsList) {
+                        if (o.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
+                            crossFound = true;
+                            break;
+                        }
+                    }
                 }
             }
-            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
+            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
                 Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
                 log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
@@ -553,6 +560,13 @@ public class ImportRegisterClientsService {
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
+            ClientGroup currentGroup = currentClient.getClientGroup();
+            if(currentGroup != null) {
+                currentGroup = em.merge(currentGroup);
+                ch.setGroupNameFrom(currentGroup.getGroupName());
+            } else {
+                ch.setGroupNameFrom("");
+            }
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
