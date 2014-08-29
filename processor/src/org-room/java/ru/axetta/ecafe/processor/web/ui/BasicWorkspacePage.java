@@ -119,8 +119,8 @@ public class BasicWorkspacePage extends BasicPage {
         try {
             this.onShow();
             showAndExpandParentMenuGroup();
-            MainPage.getSessionInstance().setCurrentWorkspacePage(this);
-            MainPage.getSessionInstance().updateSelectedMainMenu();
+            OrgRoomMainPage.getSessionInstance().setCurrentWorkspacePage(this);
+            OrgRoomMainPage.getSessionInstance().updateSelectedMainMenu();
         } catch (Exception e) {
             logger.error("Failed to load page", e);
             facesContext.addMessage(null,
