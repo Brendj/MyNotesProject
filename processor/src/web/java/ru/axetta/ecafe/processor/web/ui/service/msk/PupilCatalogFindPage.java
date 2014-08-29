@@ -225,7 +225,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             Collections.sort(pis, new PupilCatalogComparator());
             for (ImportRegisterClientsService.ExpandedPupilInfo pi : pis) {
                 Item i = new Item(pi);
-                i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
+                i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid, true);
                 if (i.idOfClient == null) {
                     nItemsNotFound++;
                 }

@@ -134,8 +134,19 @@ public class DAOUtils {
     }
 
     public static Long getClientIdByGuid(EntityManager em, String guid) {
-        javax.persistence.Query q = em.createQuery("select idOfClient from Client where clientGUID=:guid");
+        return getClientIdByGuid(em, guid, false);
+    }
+
+    public static Long getClientIdByGuid(EntityManager em, String guid, boolean excludeLeaved) {
+        String sql = "select idOfClient from Client where clientGUID=:guid";
+        if(excludeLeaved) {
+            sql += " and idOfClientGroup<:leavedGroup ";
+        }
+        javax.persistence.Query q = em.createQuery(sql);
         q.setParameter("guid", guid);
+        if(excludeLeaved) {
+            q.setParameter("leavedGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        }
         List l = q.getResultList();
         if (l.size()==0) return null;
         return ((Long)l.get(0));
