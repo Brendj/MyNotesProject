@@ -138,7 +138,7 @@
                             <f:facet name="header">
                                 <h:outputText value="Предыдущая Группа" />
                             </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.groupName}" rendered="#{e.groupChangeExists}" />
+                            <h:outputText styleClass="output-text" value="#{e.groupNameFrom}" rendered="#{e.groupChangeExists}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
