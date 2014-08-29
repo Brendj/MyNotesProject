@@ -36,7 +36,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import ru.axetta.ecafe.processor.web.ui.Constants;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.OrgRoomMainPage;
 import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateListener;
