@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
-import ru.axetta.ecafe.processor.web.partner.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
@@ -77,6 +80,15 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runReceiveEMPUpdates() throws Exception {
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
+    }
+
+    public void runSendEMPEvent() throws Exception {
+        Client client = DAOService.getInstance().getClientByGuid("e50051c4-143f-1afd-e043-a2997e0af273");
+        EMPEventType event = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, client);
+        RuntimeContext.getAppContext().getBean(EventNotificationService.class).
+                sendSMS(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
+                        new String[] {}, true, null); //DEF
+        printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
 

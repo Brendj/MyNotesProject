@@ -94,7 +94,9 @@ public class Option {
             OPTION_SYNCH_CLEANUP_ON=100047,
             OPTION_MSK_NSI_WSDL_URL=100048,
             OPTION_MSK_NSI_LOGGING_FOLDER=100049,
-            OPTION_EMP_CHANGE_SEQUENCE=100050
+            OPTION_EMP_CHANGE_SEQUENCE=100050,
+            OPTION_EMP_CLIENTS_PER_PACKAGE=100051,
+            OPTION_EMP_PROCESSOR_INSTANCE=100052
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -167,7 +169,9 @@ public class Option {
             OPTION_FRON_CONTROLLER_REQ_IP_MASK, "127\\.0\\.0\\.1",
             OPTION_SYNCH_CLEANUP_ON, "1",
             OPTION_MSK_NSI_LOGGING_FOLDER, "",
-            OPTION_EMP_CHANGE_SEQUENCE, "1"
+            OPTION_EMP_CHANGE_SEQUENCE, "1",
+            OPTION_EMP_CLIENTS_PER_PACKAGE, "100",
+            OPTION_EMP_PROCESSOR_INSTANCE, "(Москва)[2]"
 };
 
     private Long idOfOption;

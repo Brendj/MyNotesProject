@@ -7,9 +7,12 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +47,19 @@ public class SMSService {
     private org.springframework.transaction.PlatformTransactionManager transactionManager;
 
     public SMSService() {
+    }
+
+    @Async
+    public void sendSMSAsync(long idOfClient, EMPEventType empEvent) throws Exception {
+        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, empEvent);
+    }
+
+    public boolean sendSMS(long idOfClient, EMPEventType empEvent) throws Exception {
+        Client client = DAOService.getInstance().findClientById(idOfClient);
+        boolean sending = RuntimeContext.getAppContext().getBean(EMPProcessor.class).sendEvent(client, empEvent);
+        boolean result = registerClientSMSCharge(sending, client,
+                                                 "", client.getMobile(), empEvent.getType(), empEvent.buildText());
+        return result;
     }
 
     @Async
@@ -100,11 +116,18 @@ public class SMSService {
                 }
             }
         }
+        boolean result = registerClientSMSCharge(null != sendResponse && sendResponse.isSuccess(), client,
+                                                 sendResponse.getMessageId(), phoneNumber, messageType, text);
+        return result;
+    }
+
+    protected boolean registerClientSMSCharge(boolean success, Client client, String messageId,
+                                              String phoneNumber, int messageType, String text) throws Exception {
         ClientSms clientSms = null;
         boolean result = false;
-        if (null != sendResponse && sendResponse.isSuccess()) {
+        if (success) {
             clientSms = RuntimeContext.getFinancialOpsManager()
-                    .createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber, messageType, text,
+                    .createClientSmsCharge(client, messageId, phoneNumber, messageType, text,
                             new Date());
             result = true;
         }

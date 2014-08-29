@@ -39,6 +39,9 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Запустить загрузку обновления из ЕМП" action="#{otherActionsPage.runReceiveEMPUpdates}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
 
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

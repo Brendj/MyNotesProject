@@ -1510,8 +1510,17 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return list;
     }
 
-    public List<Client> getNotBindedEMPClients() {
-        TypedQuery<Client> query = entityManager.createQuery("from Client where ssoid is null and clientGUID<>''", Client.class);
+    public List<Client> getNotBindedEMPClients(int clientsPerPackage) {
+        String q = "from Client where ssoid is null and mobile<>''";//and clientGUID<>''";
+        TypedQuery<Client> query = entityManager.createQuery(q, Client.class);
+        query.setMaxResults(clientsPerPackage);
         return query.getResultList();
+    }
+
+    public Person getPersonByClient(Client client) {
+        Client cl = (Client) entityManager.merge(client);
+        Person p = cl.getPerson();
+        p.getFirstName();
+        return p;
     }
 }

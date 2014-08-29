@@ -3144,7 +3144,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             case PROFESSIONAL:
                             case SCHOOL: {
                                 notificationService.sendNotificationAsync(client,
-                                        EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
+                                        EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                             } break;
                             case KINDERGARTEN: {
                                 if(guardianId!=null){
@@ -3152,11 +3152,11 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                     if(!(clients==null || clients.isEmpty())){
                                         for (Client cl: clients){
                                             notificationService.sendNotificationAsync(cl,
-                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection());
                                         }
                                     } else {
                                         notificationService.sendNotificationAsync(client,
-                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection());
                                     }
                                 }
                             } break;

@@ -5,10 +5,10 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -229,11 +229,30 @@ public class EventNotificationService {
     }
 
     @Async
+    public void sendNotificationAsync(Client client, String type, String[] values, Client guardian) {
+        sendNotification(client, type, values, null, guardian);
+    }
+
+    @Async
+    public void sendNotificationAsync(Client client, String type, String[] values, Integer passDirection) {
+        sendNotification(client, type, values, passDirection, null);
+    }
+
+    @Async
+    public void sendNotificationAsync(Client client, String type, String[] values, Integer passDirection, Client guardian) {
+        sendNotification(client, type, values, passDirection, guardian);
+    }
+
+    @Async
     public void sendMessageAsync(Client client, String type, String[] values) {
         sendMessage(client, type, values);
     }
 
     public void sendNotification(Client client, String type, String[] values) {
+        sendNotification(client, type, values, null, null);
+    }
+
+    public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian) {
         if (!client.isNotifyViaSMS() && !client.isNotifyViaEmail()) {
             return;
         }
@@ -242,7 +261,7 @@ public class EventNotificationService {
         }
         if (client.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
-                sendSMS(client, type, values);
+                sendSMS(client, type, values, passDirection, guardian);
             }
         }
         if (client.isNotifyViaEmail()) {
@@ -308,7 +327,27 @@ public class EventNotificationService {
         return sendSMS(client, type, values, true);
     }
 
+    public boolean sendSMS(Client client, String type, String[] values, Client guardian) {
+        return sendSMS(client, type, values, true, null, guardian);
+    }
+
+    public boolean sendSMS(Client client, String type, String[] values, Integer passDirection) {
+        return sendSMS(client, type, values, true, passDirection);
+    }
+
     public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync) {
+        return sendSMS(client, type, values, sendAsync, null);
+    }
+
+    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync, Integer direction) {
+        return sendSMS(client, type, values, sendAsync, direction, null);
+    }
+
+    public boolean sendSMS(Client client, String type, String[] values, Integer direction, Client guardian) {
+        return sendSMS(client, type, values, true, direction, null);
+    }
+
+    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync, Integer direction, Client guardian) {
         if (client.getMobile() == null || client.getMobile().length() == 0) {
             return false;
         }
@@ -322,7 +361,7 @@ public class EventNotificationService {
         if (text.length() > 68) {
             text = text.substring(0, 67) + "..";
         }
-        boolean result;
+        boolean result = false;
         try {
             int clientSMSType;
             if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
@@ -345,11 +384,43 @@ public class EventNotificationService {
             }else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
-            if (sendAsync) {
-                smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
-                result = true;
+
+
+            EMPEventType empType = null;
+            /*if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
+               (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, client);
+            } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
+                    (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, client);
+                putGuardianParams(guardian, empType);
+            } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, client);
+            } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
+                    (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, client);
+            } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
+                    (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, client);
+                putGuardianParams(guardian, empType);
+            }* else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
+                EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
+            }*/
+
+
+            if(empType == null) {
+                if (sendAsync) {
+                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
+                    result = true;
+                } else {
+                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
+                }
             } else {
-                result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
+                if (sendAsync) {
+                    smsService.sendSMSAsync(client.getIdOfClient(), empType);
+                } else {
+                    result = smsService.sendSMS(client.getIdOfClient(), empType);
+                }
             }
         } catch (Exception e) {
             String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
@@ -357,6 +428,17 @@ public class EventNotificationService {
             return false;
         }
         return result;
+    }
+
+    private static final void putGuardianParams(Client guardian, EMPEventType empType) {
+        String sn = "-";
+        String n = "-";
+        if(guardian != null) {
+            sn = guardian.getPerson().getSurname();
+            n = guardian.getPerson().getFirstName();
+        }
+        empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_SURNAME_PARAM, sn);
+        empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_NAME_PARAM, n);
     }
 
     private boolean isSMSNotificationEnabledForType(String type) {
