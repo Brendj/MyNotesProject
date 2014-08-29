@@ -848,7 +848,7 @@
                             label="Реестр талонов" action="#{registerStampPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
-                            label="Отчет по предоставленным услугам"
+                            label="Отчет по оказанным услугам"
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"
