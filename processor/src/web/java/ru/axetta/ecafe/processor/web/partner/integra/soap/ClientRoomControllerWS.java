@@ -2563,10 +2563,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-
-
     public ClientsData getClientsByGuardMobile(String mobile) {
         authenticateRequest(null);
+
         ClientsData data = new ClientsData();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -2578,15 +2577,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<Long> idOfClients = DAOUtils.extractIDFromGuardByGuardMobile(persistenceSession,
                     Client.checkAndConvertMobile(mobile));
             data.clientList = new ClientList();
-            for (Long idOfClient : idOfClients) {
-                Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
-                ClientItem clientItem = new ClientItem();
-                clientItem.setContractId(cl.getContractId());
-                clientItem.setSan(cl.getSan());
-                data.clientList.getClients().add(clientItem);
+            if (idOfClients.isEmpty()) {
+                data.resultCode = RC_CLIENT_NOT_FOUND;
+                data.description = "Клиент не найден";
+            } else {
+                for (Long idOfClient : idOfClients) {
+                    Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
+                    ClientItem clientItem = new ClientItem();
+                    clientItem.setContractId(cl.getContractId());
+                    clientItem.setSan(cl.getSan());
+                    data.clientList.getClients().add(clientItem);
+                }
+
+                data.resultCode = RC_OK;
+                data.description = "OK";
             }
-            data.resultCode = RC_OK;
-            data.description = "OK";
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2894,6 +2899,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null);
 
         ClientsData cd = getClientsByGuardMobile(guardMobile);
+
         LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
         if (cd != null && cd.clientList != null) {
             for (ClientItem ci : cd.clientList.getClients()) {

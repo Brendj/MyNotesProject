@@ -1555,49 +1555,34 @@ public class DAOUtils {
         return q.list();
     }
 
+    /*
+    * Находит детей представителя или ребенка, у которого указан телефонный номер
+    * */
     public static List<Long> extractIDFromGuardByGuardMobile(Session persistenceSession, String guardMobile) {
         Query q = persistenceSession.createQuery("select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile");
         q.setParameter("guardMobile", guardMobile);
         List<Long> clients = q.list();
+
         if (clients != null && !clients.isEmpty()){
-            String ids = "(";
-            for(Long id : clients){
-                if(ids.length()> 1) {
-                    ids+= ",";
-                }
-                ids+= id ;
-            }
-            ids += ")";
-            q = persistenceSession.createSQLQuery("select idofguardian from cf_client_guardian  where idofchildren in "+ ids);
-
-            List<BigInteger> res = q.list();
-            if(res.size() > 0){
-                clients.clear();
-                for(BigInteger parent : res){
-                    clients.add(parent.longValue());
+            List<BigInteger> children = new ArrayList<BigInteger>();
+            List<Long> clientsCopy = new ArrayList<Long>(clients);
+            for(Long id : clientsCopy){
+                children.clear();
+                q = persistenceSession.createSQLQuery("select idofchildren from cf_client_guardian  where idofguardian = "+ id);
+                children = q.list();
+                if(!children.isEmpty()){
+                    clients.remove(id);
+                    for(BigInteger child : children){
+                        clients.add(child.longValue());
+                    }
                 }
             }
         }
-        if (clients != null && clients.isEmpty()){
-            return clients;
-        }
-        String ids = "(";
-        for(Long id : clients){
-            if(ids.length()> 1) {
-                ids+= ",";
-            }
-            ids+= id ;
-        }
-        ids += ")";
-        q = persistenceSession.createSQLQuery("select idofchildren from cf_client_guardian  where idofguardian in " + ids);
-        List<BigInteger> children = q.list();
 
-        if(children.size() > 0){
-            clients.clear();
-            for(BigInteger child : children){
-                clients.add(child.longValue());
-            }
-        }
+        Set<Long> tempSet = new HashSet<Long>();
+        tempSet.addAll(clients);
+        clients.clear();
+        clients.addAll(tempSet);
         return clients;
     }
 
