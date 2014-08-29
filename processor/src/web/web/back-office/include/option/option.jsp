@@ -325,7 +325,7 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <rich:panel>
                 <f:facet name="header"><h:outputText styleClass="column-header"
-                                                                      value="Испорт из РНИП" /></f:facet>
+                                                                      value="Криптоконтейнер ключей взаимодействия с РНИП" /></f:facet>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText escape="true" value="Наименование контейнера" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsStore}" styleClass="input-text" size="40" />
