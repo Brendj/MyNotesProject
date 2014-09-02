@@ -319,9 +319,10 @@ public class ImportRegisterClientsService {
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
                     //  увеличиваем количество клиентов, подлежих удалению
                     Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
-                        !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
-                        !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+                    if (emptyIfNull(dbClient.getClientGUID()).equals("") ||
+                        (!found && currGroupId != null &&
+                         !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
+                         !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
                         log(synchDate + "Удаление " +
                                 emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
                                 + " " +
