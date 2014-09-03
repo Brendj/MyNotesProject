@@ -40,14 +40,22 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class EMPProcessor {
-    public static final String ATTRIBUTE_ACCOUNT_NAME      = "MSISDN";
+    public static final String ATTRIBUTE_ACCOUNT_NAME      = "ACCOUNT";
     public static final String ATTRIBUTE_MOBILE_PHONE_NAME = "MSISDN";
+    public static final String ATTRIBUTE_RULE_ID           = "RULE_ID";
     public static final String ATTRIBUTE_SSOID_NAME        = "SSOID";
     public static final String ATTRIBUTE_EMAIL_NAME        = "EMAIL";
+    public static final String ATTRIBUTE_ACTIVE            = "ACTIVE";
+    public static final String ATTRIBUTE_SMS_SEND          = "SMS_SEND";
+    public static final String ATTRIBUTE_EMAIL_SEND        = "EMAIL_SEND";
+    public static final String ATTRIBUTE_PUSH_SEND         = "PUSH_SEND";
+    //  system
     public static final String ATTRIBUTE_TOKEN_VALUE       = "49aafdb8198311e48ee8416c74617269";
     public static final String ATTRIBUTE_SYSTEM_ID         = "666255";
-    public static final int ATTRIBUTE_STREAM               = 124;
+    public static final String ATTRIBUTE_CATALOG_VALUE     = "SYS666254CAT0000000SUBSCRIPTIONS";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPProcessor.class);
+    //  errors
+    public static final int EMP_ERROR_CODE_NOTHING_FOUND = 504;
 
 
     protected int getMaximumClientsPerPackage() {
@@ -65,7 +73,7 @@ public class EMPProcessor {
         return true;
     }
 
-    public void runBindClients() {
+    public void runBindClients() throws EMPException {
         if(!isAllowed()) {
             return;
         }
@@ -80,6 +88,9 @@ public class EMPProcessor {
 
         //  Отправка запроса на привязку
         StoragePortType storage = createStorageController();
+        if(storage == null) {
+            throw new EMPException("Failed to create connection with EMP web service");
+        }
         for(ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
                 bindClient(storage, c, synchDate);
@@ -89,7 +100,7 @@ public class EMPProcessor {
         }
     }
 
-    public void runReceiveUpdates() {
+    public void runReceiveUpdates() throws EMPException {
         if(!isAllowed()) {
             return;
         }
@@ -101,6 +112,9 @@ public class EMPProcessor {
         //  Загрузка клиентов для связки
         long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);
         StoragePortType storage = createStorageController();
+        if(storage == null) {
+            throw new EMPException("Failed to create connection with EMP web service");
+        }
         ReceiveDataChangesRequest request = buildReceiveEntryParams(changeSequence);
         ReceiveDataChangesResponse response = storage.receiveDataChanges(request);
         if(response.getErrorCode() != 0) {
@@ -116,18 +130,22 @@ public class EMPProcessor {
 
         log(synchDate + "Поступило " + entries.size() + " изменений из ЕМП по очереди " + changeSequence, null);
         for(ReceiveDataChangesResponse.Result.Entry e : entries) {
-            List<EntryAttribute> attributes = e.getAttribute();
+            List<ReceiveDataChangesResponse.Result.Entry.Attribute> attributes = e.getAttribute();
             String ssoid = "";
             String msisdn = "";
-            for(EntryAttribute attr : attributes) {
-                if(attr.getName().equals(ATTRIBUTE_SSOID_NAME)) {
-                    ssoid = attr.getValue();
+            for(ReceiveDataChangesResponse.Result.Entry.Attribute attr : attributes) {
+                if(!StringUtils.isBlank(attr.getName()) &&
+                   attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
+                   attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                    ssoid = attr.getValue().get(0).toString();
                 }
-                if(attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME)) {
-                    msisdn = attr.getValue();
+                if(!StringUtils.isBlank(attr.getName()) &&
+                   attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME) &&
+                   attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                    msisdn = attr.getValue().get(0).toString();
                 }
             }
-            if(!StringUtils.isBlank(msisdn)) {
+            if(!StringUtils.isBlank(msisdn) && !StringUtils.isBlank(ssoid)) {
                 ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance().getClientByMobilePhone(msisdn);
                 if(client != null) {
                     log(synchDate + "Поступили изменения {SSOID: " + ssoid + "}, {Моб. тел: " + msisdn + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
@@ -139,7 +157,7 @@ public class EMPProcessor {
         }
 
         log(synchDate + "Обновление очереди до " + changeSequence, null);
-        RuntimeContext.getInstance().setOptionValue(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence);
+        RuntimeContext.getInstance().setOptionValue(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence + 1);
         if(response.getResult().isHasMoreEntries()) {
             log(synchDate + "Изменения в ЕМП обработаны не до конца, запрос будет выполнен повторно", null);
             RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
@@ -161,12 +179,15 @@ public class EMPProcessor {
 
         //  Отправка запроса
         SubscriptionPortType subscription = createEventController();
+        if(subscription == null) {
+            throw new EMPException("Failed to create connection with EMP web service");
+        }
         SendSubscriptionStreamEventsRequestType eventParam = buildEvenParam(event);
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
         if(response.getErrorCode() != 0) {
             log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
             throw new EMPException(String.format("Failed to execute event notification: Error [%s] %s",
-                                                 response.getErrorCode(), response.getErrorMessage()));
+                    response.getErrorCode(), response.getErrorMessage()));
         }
         log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client.getMobile() + " доставлено", null);
         return true;
@@ -185,6 +206,9 @@ public class EMPProcessor {
         //  execute reqeuest
         SelectEntriesRequest request = buildSelectEntryParams(client);
         SelectEntriesResponse response = storage.selectEntries(request);
+        if(response.getErrorCode() == EMP_ERROR_CODE_NOTHING_FOUND) {
+            return false;
+        }
         if(response.getErrorCode() != 0) {
             throw new EMPException(response.getErrorCode(), response.getErrorMessage());
         }
@@ -196,13 +220,15 @@ public class EMPProcessor {
             boolean requiresUpdate = false;
             for(EntryAttribute attr : attributes) {
                 if(attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
-                        !attr.getValue().equals(client.getMobile())) {
-                    client.setSsoid(attr.getValue());
+                        !attr.getValue().equals(client.getMobile()) &&
+                        attr.getValue() != null && attr.getValue().size() > 0) {
+                    client.setSsoid(attr.getValue().get(0).toString());
                     requiresUpdate = true;
                 }
                 if(attr.getName().equals(ATTRIBUTE_EMAIL_NAME) &&
-                        !attr.getValue().equals(client.getEmail())) {
-                    client.setEmail(attr.getValue());
+                        !attr.getValue().equals(client.getEmail()) &&
+                        attr.getValue() != null && attr.getValue().size() > 0) {
+                    client.setEmail(attr.getValue().get(0).toString());
                     requiresUpdate = true;
                 }
             }
@@ -286,24 +312,47 @@ public class EMPProcessor {
         AddEntriesRequest request = new AddEntriesRequest();
         //  base
         request.setToken(ATTRIBUTE_TOKEN_VALUE);
-        request.setCatalogOwner("System");
-        request.setCatalogName("Citizens");
+        //request.setCatalogOwner("System");
+        request.setCatalogName(ATTRIBUTE_CATALOG_VALUE);
 
         List<Entry> criteries = request.getEntry();
         //  entry
         Entry entry = new Entry();
+        criteries.add(entry);
+        //  main
         EntryAttribute msisdn = new EntryAttribute();
         msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
-        msisdn.setValue(client.getMobile());
+        msisdn.getValue().add(client.getMobile());
         entry.getAttribute().add(msisdn);
         EntryAttribute email = new EntryAttribute();
         email.setName(ATTRIBUTE_EMAIL_NAME);
-        email.setValue(client.getEmail());
+        email.getValue().add(client.getEmail());
         entry.getAttribute().add(email);
-        EntryAttribute account = new EntryAttribute();
+        /*EntryAttribute account = new EntryAttribute();
         account.setName(ATTRIBUTE_ACCOUNT_NAME);
-        account.setValue("" + client.getContractId());
-        entry.getAttribute().add(account);
+        account.getValue().add("" + client.getContractId());
+        entry.getAttribute().add(account);*/
+        EntryAttribute ruleId = new EntryAttribute();
+        ruleId.setName(ATTRIBUTE_RULE_ID);
+        ruleId.getValue().add("" + client.getContractId());
+        entry.getAttribute().add(ruleId);
+        //  second
+        EntryAttribute active = new EntryAttribute();
+        active.setName(ATTRIBUTE_ACTIVE);
+        active.getValue().add(Boolean.TRUE);
+        entry.getAttribute().add(active);
+        EntryAttribute smsSend = new EntryAttribute();
+        smsSend.setName(ATTRIBUTE_SMS_SEND);
+        smsSend.getValue().add(Boolean.TRUE);
+        entry.getAttribute().add(smsSend);
+        EntryAttribute emailSend = new EntryAttribute();
+        emailSend.setName(ATTRIBUTE_EMAIL_SEND);
+        emailSend.getValue().add(Boolean.TRUE);
+        entry.getAttribute().add(emailSend);
+        EntryAttribute pushSend = new EntryAttribute();
+        pushSend.setName(ATTRIBUTE_PUSH_SEND);
+        pushSend.getValue().add(Boolean.TRUE);
+        entry.getAttribute().add(pushSend);
 
         return request;
     }
@@ -312,8 +361,8 @@ public class EMPProcessor {
         SelectEntriesRequest request = new SelectEntriesRequest();
         //  base
         request.setToken(ATTRIBUTE_TOKEN_VALUE);
-        request.setCatalogOwner("System");
-        request.setCatalogName("Citizens");
+        //request.setCatalogOwner("System");
+        request.setCatalogName(ATTRIBUTE_CATALOG_VALUE);
 
         //  paging
         Paging paging = new Paging();
@@ -321,11 +370,11 @@ public class EMPProcessor {
         paging.setSize(new BigInteger("100"));
         request.setPaging(paging);
 
-        //  criteries
+        //  criterions
         List<EntryAttribute> criteries = request.getCriteria();
         EntryAttribute msisdn = new EntryAttribute();
         msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
-        msisdn.setValue(client.getMobile());
+        msisdn.getValue().add(client.getMobile());
         criteries.add(msisdn);
 
         return request;
@@ -335,8 +384,8 @@ public class EMPProcessor {
         ReceiveDataChangesRequest request = new ReceiveDataChangesRequest();
         //  base
         request.setToken(ATTRIBUTE_TOKEN_VALUE);
-        request.setCatalogOwner("System");
-        request.setCatalogName("Citizens");
+        //request.setCatalogOwner("System");
+        request.setCatalogName(ATTRIBUTE_CATALOG_VALUE);
 
         //  paging
         Paging paging = new Paging();
@@ -352,7 +401,7 @@ public class EMPProcessor {
     protected StoragePortType createStorageController() {
         StoragePortType controller = null;
         try {
-            StorageService service = new StorageService(new URL("http://Inv5379-NB:8088/mockStorageBinding?wsdl"),
+            StorageService service = new StorageService(new URL("http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl"),
                     new QName("http://emp.mos.ru/schemas/storage/", "StorageService"));
             controller = service.getStoragePort();
 
@@ -371,7 +420,7 @@ public class EMPProcessor {
     protected SubscriptionPortType createEventController() {
         SubscriptionPortType controller = null;
         try {
-            SubscriptionService service = new SubscriptionService(new URL("http://Inv5379-NB:8088/mockSubscriptionBinding?wsdl"),
+            SubscriptionService service = new SubscriptionService(new URL("http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl"),
                     new QName("urn://emp.altarix.ru/subscriptions", "SubscriptionService"));
             controller = service.getServicePort();
 

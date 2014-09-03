@@ -25,7 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="surname" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="patronymic" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="msisdn" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
+ *         &lt;element name="msisdn" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="msisdnConfirmed" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *         &lt;element name="emailConfirmed" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
@@ -69,7 +69,7 @@ public class CitizenProfileBaseType {
     protected String surname;
     protected String name;
     protected String patronymic;
-    protected Integer msisdn;
+    protected Long msisdn;
     protected String email;
     protected Boolean msisdnConfirmed;
     protected Boolean emailConfirmed;
@@ -154,10 +154,10 @@ public class CitizenProfileBaseType {
      * 
      * @return
      *     possible object is
-     *     {@link Integer }
+     *     {@link Long }
      *     
      */
-    public Integer getMsisdn() {
+    public Long getMsisdn() {
         return msisdn;
     }
 
@@ -166,10 +166,10 @@ public class CitizenProfileBaseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link Integer }
+     *     {@link Long }
      *     
      */
-    public void setMsisdn(Integer value) {
+    public void setMsisdn(Long value) {
         this.msisdn = value;
     }
 

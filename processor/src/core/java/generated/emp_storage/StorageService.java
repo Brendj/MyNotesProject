@@ -16,7 +16,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "StorageService", targetNamespace = "http://emp.mos.ru/schemas/storage/", wsdlLocation = "http://Inv5379-NB:8088/mockStorageBinding?wsdl")
+@WebServiceClient(name = "StorageService", targetNamespace = "http://emp.mos.ru/schemas/storage/", wsdlLocation = "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl")
 public class StorageService
     extends Service
 {
@@ -26,7 +26,7 @@ public class StorageService
     static {
         URL url = null;
         try {
-            url = new URL("http://Inv5379-NB:8088/mockStorageBinding?wsdl");
+            url = new URL("http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

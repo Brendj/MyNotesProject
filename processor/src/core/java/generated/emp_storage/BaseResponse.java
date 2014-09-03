@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Основная структура для всех ответоы
+ * Основная структура для всех ответов
  * 
  * <p>Java class for BaseResponse complex type.
  * 
@@ -40,7 +40,18 @@ import javax.xml.bind.annotation.XmlType;
     ReceiveDataChangesResponse.class,
     UpdateEntriesResponse.class,
     DeleteEntriesResponse.class,
-    AddEntriesResponse.class
+    AddEntriesResponse.class,
+    SelectCatalogsResponse.class,
+    DeleteCatalogResponse.class,
+    UpdateCatalogResponse.class,
+    AddCatalogResponse.class,
+    AddIndexResponse.class,
+    RemoveAttributeFromIndexResponse.class,
+    AddAttributeToIndexResponse.class,
+    DeleteAttributeResponse.class,
+    GetCatalogResponse.class,
+    DeleteIndexResponse.class,
+    AddAttributeResponse.class
 })
 public class BaseResponse {
 

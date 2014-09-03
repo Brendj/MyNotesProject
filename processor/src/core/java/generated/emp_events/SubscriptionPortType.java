@@ -179,4 +179,16 @@ public interface SubscriptionPortType {
         @WebParam(name = "deleteCitizenProfileOptionsRequest", targetNamespace = "urn://subscription.api.emp.altarix.ru", partName = "parameter")
         DeleteCitizenProfileOptionsRequestType parameter);
 
+    /**
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_events.CreateCitizenProfileResponseType
+     */
+    @WebMethod(action = "urn:#createCitizenProfile")
+    @WebResult(name = "createCitizenProfileResponse", targetNamespace = "urn://subscription.api.emp.altarix.ru", partName = "parameter")
+    public CreateCitizenProfileResponseType createCitizenProfile(
+        @WebParam(name = "createCitizenProfileRequest", targetNamespace = "urn://subscription.api.emp.altarix.ru", partName = "parameter")
+        CreateCitizenProfileRequestType parameter);
+
 }

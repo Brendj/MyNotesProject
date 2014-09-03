@@ -39,13 +39,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "DeleteEntriesResponse", propOrder = {
+@XmlType(name = "DeleteEntriesResponse", namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", propOrder = {
     "result"
 })
 public class DeleteEntriesResponse
     extends BaseResponse
 {
 
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
     protected DeleteEntriesResponse.Result result;
 
     /**
@@ -98,7 +99,7 @@ public class DeleteEntriesResponse
     })
     public static class Result {
 
-        @XmlElement(required = true)
+        @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", required = true)
         @XmlSchemaType(name = "positiveInteger")
         protected BigInteger affected;
 

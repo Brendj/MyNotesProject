@@ -39,13 +39,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "UpdateEntriesResponse", propOrder = {
+@XmlType(name = "UpdateEntriesResponse", namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", propOrder = {
     "result"
 })
 public class UpdateEntriesResponse
     extends BaseResponse
 {
 
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
     protected UpdateEntriesResponse.Result result;
 
     /**
@@ -98,7 +99,7 @@ public class UpdateEntriesResponse
     })
     public static class Result {
 
-        @XmlElement(required = true)
+        @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", required = true)
         @XmlSchemaType(name = "positiveInteger")
         protected BigInteger affected;
 

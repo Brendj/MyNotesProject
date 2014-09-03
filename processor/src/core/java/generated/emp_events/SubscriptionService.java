@@ -16,7 +16,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "SubscriptionService", targetNamespace = "urn://emp.altarix.ru/subscriptions", wsdlLocation = "http://localhost:8088/mockSubscriptionBinding?wsdl")
+@WebServiceClient(name = "SubscriptionService", targetNamespace = "urn://emp.altarix.ru/subscriptions", wsdlLocation = "http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl")
 public class SubscriptionService
     extends Service
 {
@@ -26,7 +26,7 @@ public class SubscriptionService
     static {
         URL url = null;
         try {
-            url = new URL("http://localhost:8088/mockSubscriptionBinding?wsdl");
+            url = new URL("http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

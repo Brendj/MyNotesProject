@@ -38,7 +38,18 @@ import javax.xml.bind.annotation.XmlType;
     DeleteEntriesRequest.class,
     ReceiveDataChangesRequest.class,
     SelectEntriesRequest.class,
-    AddEntriesRequest.class
+    AddEntriesRequest.class,
+    AddAttributeToIndexRequest.class,
+    RemoveAttributeFromIndexRequest.class,
+    GetCatalogRequest.class,
+    SelectCatalogsRequest.class,
+    UpdateCatalogRequest.class,
+    AddAttributeRequest.class,
+    DeleteAttributeRequest.class,
+    DeleteIndexRequest.class,
+    AddIndexRequest.class,
+    DeleteCatalogRequest.class,
+    AddCatalogRequest.class
 })
 public class BaseRequest {
 

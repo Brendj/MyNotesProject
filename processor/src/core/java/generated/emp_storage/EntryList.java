@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -33,6 +34,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "EntryList", namespace = "http://emp.mos.ru/schemas/storage/entity/entry.xsd", propOrder = {
     "entry"
+})
+@XmlSeeAlso({
+    generated.emp_storage.SelectEntriesResponse.Result.class
 })
 public class EntryList {
 

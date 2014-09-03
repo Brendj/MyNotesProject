@@ -1,10 +1,9 @@
 
 package generated.emp_storage;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -21,12 +20,11 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="result" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *               &lt;extension base="{http://emp.mos.ru/schemas/storage/entity/entry.xsd}EntryList">
  *                 &lt;sequence>
- *                   &lt;element name="entry" type="{http://emp.mos.ru/schemas/storage/entity/entry.xsd}Entry" maxOccurs="unbounded" minOccurs="0"/>
  *                   &lt;element name="hasMoreEntries" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
- *               &lt;/restriction>
+ *               &lt;/extension>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
@@ -39,13 +37,14 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SelectEntriesResponse", propOrder = {
+@XmlType(name = "SelectEntriesResponse", namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", propOrder = {
     "result"
 })
 public class SelectEntriesResponse
     extends BaseResponse
 {
 
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
     protected SelectEntriesResponse.Result result;
 
     /**
@@ -81,12 +80,11 @@ public class SelectEntriesResponse
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *     &lt;extension base="{http://emp.mos.ru/schemas/storage/entity/entry.xsd}EntryList">
      *       &lt;sequence>
-     *         &lt;element name="entry" type="{http://emp.mos.ru/schemas/storage/entity/entry.xsd}Entry" maxOccurs="unbounded" minOccurs="0"/>
      *         &lt;element name="hasMoreEntries" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
-     *     &lt;/restriction>
+     *     &lt;/extension>
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
@@ -95,42 +93,14 @@ public class SelectEntriesResponse
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "entry",
         "hasMoreEntries"
     })
-    public static class Result {
+    public static class Result
+        extends EntryList
+    {
 
-        protected List<Entry> entry;
+        @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
         protected boolean hasMoreEntries;
-
-        /**
-         * Gets the value of the entry property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the entry property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getEntry().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Entry }
-         * 
-         * 
-         */
-        public List<Entry> getEntry() {
-            if (entry == null) {
-                entry = new ArrayList<Entry>();
-            }
-            return this.entry;
-        }
 
         /**
          * Gets the value of the hasMoreEntries property.

@@ -17,8 +17,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;extension base="{http://emp.mos.ru/schemas/storage/request/common.xsd}BaseRequest">
  *       &lt;sequence>
- *         &lt;element name="catalogOwner" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="catalogName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="catalogName" type="{http://emp.mos.ru/schemas/storage/entity/catalog.xsd}catalogName"/>
  *         &lt;element name="paging" type="{http://emp.mos.ru/schemas/storage/request/common.xsd}Paging" minOccurs="0"/>
  *         &lt;element name="changeSequence" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *       &lt;/sequence>
@@ -30,8 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ReceiveDataChangesRequest", propOrder = {
-    "catalogOwner",
+@XmlType(name = "ReceiveDataChangesRequest", namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", propOrder = {
     "catalogName",
     "paging",
     "changeSequence"
@@ -40,35 +38,12 @@ public class ReceiveDataChangesRequest
     extends BaseRequest
 {
 
-    protected String catalogOwner;
-    @XmlElement(required = true)
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", required = true)
     protected String catalogName;
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
     protected Paging paging;
+    @XmlElement(namespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd")
     protected long changeSequence;
-
-    /**
-     * Gets the value of the catalogOwner property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCatalogOwner() {
-        return catalogOwner;
-    }
-
-    /**
-     * Sets the value of the catalogOwner property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCatalogOwner(String value) {
-        this.catalogOwner = value;
-    }
 
     /**
      * Gets the value of the catalogName property.

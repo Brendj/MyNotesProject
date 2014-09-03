@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;choice>
  *         &lt;element name="SSOID" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="citizenId" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="msisdn" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *       &lt;/choice>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -30,7 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "getCitizenProfileRequest_Type", propOrder = {
     "ssoid",
-    "citizenId"
+    "citizenId",
+    "msisdn"
 })
 public class GetCitizenProfileRequestType
     extends BaseRequestType
@@ -39,6 +41,7 @@ public class GetCitizenProfileRequestType
     @XmlElement(name = "SSOID")
     protected String ssoid;
     protected Integer citizenId;
+    protected Long msisdn;
 
     /**
      * Gets the value of the ssoid property.
@@ -86,6 +89,30 @@ public class GetCitizenProfileRequestType
      */
     public void setCitizenId(Integer value) {
         this.citizenId = value;
+    }
+
+    /**
+     * Gets the value of the msisdn property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getMsisdn() {
+        return msisdn;
+    }
+
+    /**
+     * Sets the value of the msisdn property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setMsisdn(Long value) {
+        this.msisdn = value;
     }
 
 }

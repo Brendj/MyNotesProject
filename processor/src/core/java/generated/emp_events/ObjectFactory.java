@@ -30,19 +30,21 @@ public class ObjectFactory {
     private final static QName _DeactivateCitizenSubscriptionResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "deactivateCitizenSubscriptionResponse");
     private final static QName _SelectSubscriptionStreamCategoriesResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "selectSubscriptionStreamCategoriesResponse");
     private final static QName _SetUpCitizenSubscriptionSettingsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "setUpCitizenSubscriptionSettingsRequest");
-    private final static QName _DeleteCitizenProfileOptionsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "deleteCitizenProfileOptionsResponse");
     private final static QName _DropCitizenSubscriptionSettingsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "dropCitizenSubscriptionSettingsResponse");
+    private final static QName _DeleteCitizenProfileOptionsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "deleteCitizenProfileOptionsResponse");
     private final static QName _GetCitizenProfileRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "getCitizenProfileRequest");
     private final static QName _GetSubscriptionStreamRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "getSubscriptionStreamRequest");
     private final static QName _SelectSubscriptionStreamsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "selectSubscriptionStreamsRequest");
     private final static QName _DropCitizenSubscriptionSettingsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "dropCitizenSubscriptionSettingsRequest");
     private final static QName _SendSubscriptionStreamEventsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "sendSubscriptionStreamEventsResponse");
     private final static QName _SelectSubscriptionStreamCategoriesRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "selectSubscriptionStreamCategoriesRequest");
+    private final static QName _CreateCitizenProfileResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "createCitizenProfileResponse");
     private final static QName _GetCitizenProfileResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "getCitizenProfileResponse");
     private final static QName _SetUpCitizenSubscriptionSettingsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "setUpCitizenSubscriptionSettingsResponse");
     private final static QName _SelectSubscriptionStreamsResponse_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "selectSubscriptionStreamsResponse");
     private final static QName _DeleteCitizenProfileOptionsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "deleteCitizenProfileOptionsRequest");
     private final static QName _GetSubscriptionStreamCategoryRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "getSubscriptionStreamCategoryRequest");
+    private final static QName _CreateCitizenProfileRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "createCitizenProfileRequest");
     private final static QName _SetCitizenProfileRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "setCitizenProfileRequest");
     private final static QName _SendSubscriptionStreamEventsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "sendSubscriptionStreamEventsRequest");
     private final static QName _SelectCitizenSubscriptionsRequest_QNAME = new QName("urn://subscription.api.emp.altarix.ru", "selectCitizenSubscriptionsRequest");
@@ -59,35 +61,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SetCitizenProfileRequestType }
+     * Create an instance of {@link EventFilterType }
      * 
      */
-    public SetCitizenProfileRequestType createSetCitizenProfileRequestType() {
-        return new SetCitizenProfileRequestType();
-    }
-
-    /**
-     * Create an instance of {@link EventType }
-     * 
-     */
-    public EventType createEventType() {
-        return new EventType();
-    }
-
-    /**
-     * Create an instance of {@link SetCitizenProfileResponseType }
-     * 
-     */
-    public SetCitizenProfileResponseType createSetCitizenProfileResponseType() {
-        return new SetCitizenProfileResponseType();
-    }
-
-    /**
-     * Create an instance of {@link SelectSubscriptionStreamCategoriesRequestType }
-     * 
-     */
-    public SelectSubscriptionStreamCategoriesRequestType createSelectSubscriptionStreamCategoriesRequestType() {
-        return new SelectSubscriptionStreamCategoriesRequestType();
+    public EventFilterType createEventFilterType() {
+        return new EventFilterType();
     }
 
     /**
@@ -99,171 +77,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EventMessageParameterType }
+     * Create an instance of {@link SelectCitizenSubscriptionsResponseType }
      * 
      */
-    public EventMessageParameterType createEventMessageParameterType() {
-        return new EventMessageParameterType();
-    }
-
-    /**
-     * Create an instance of {@link SelectSubscriptionStreamsResponseType.Return }
-     * 
-     */
-    public SelectSubscriptionStreamsResponseType.Return createSelectSubscriptionStreamsResponseTypeReturn() {
-        return new SelectSubscriptionStreamsResponseType.Return();
-    }
-
-    /**
-     * Create an instance of {@link SubscriptionType }
-     * 
-     */
-    public SubscriptionType createSubscriptionType() {
-        return new SubscriptionType();
-    }
-
-    /**
-     * Create an instance of {@link SelectSubscriptionStreamCategoriesResponseType.Return }
-     * 
-     */
-    public SelectSubscriptionStreamCategoriesResponseType.Return createSelectSubscriptionStreamCategoriesResponseTypeReturn() {
-        return new SelectSubscriptionStreamCategoriesResponseType.Return();
-    }
-
-    /**
-     * Create an instance of {@link CitizenProfileType }
-     * 
-     */
-    public CitizenProfileType createCitizenProfileType() {
-        return new CitizenProfileType();
-    }
-
-    /**
-     * Create an instance of {@link GetSubscriptionStreamRequestType }
-     * 
-     */
-    public GetSubscriptionStreamRequestType createGetSubscriptionStreamRequestType() {
-        return new GetSubscriptionStreamRequestType();
-    }
-
-    /**
-     * Create an instance of {@link EventMessageType }
-     * 
-     */
-    public EventMessageType createEventMessageType() {
-        return new EventMessageType();
-    }
-
-    /**
-     * Create an instance of {@link SetUpCitizenSubscriptionSettingsRequestType.Settings }
-     * 
-     */
-    public SetUpCitizenSubscriptionSettingsRequestType.Settings createSetUpCitizenSubscriptionSettingsRequestTypeSettings() {
-        return new SetUpCitizenSubscriptionSettingsRequestType.Settings();
-    }
-
-    /**
-     * Create an instance of {@link SelectCitizenSubscriptionsRequestType }
-     * 
-     */
-    public SelectCitizenSubscriptionsRequestType createSelectCitizenSubscriptionsRequestType() {
-        return new SelectCitizenSubscriptionsRequestType();
-    }
-
-    /**
-     * Create an instance of {@link SelectSubscriptionStreamCategoriesResponseType }
-     * 
-     */
-    public SelectSubscriptionStreamCategoriesResponseType createSelectSubscriptionStreamCategoriesResponseType() {
-        return new SelectSubscriptionStreamCategoriesResponseType();
-    }
-
-    /**
-     * Create an instance of {@link CitizenProfileBaseType }
-     * 
-     */
-    public CitizenProfileBaseType createCitizenProfileBaseType() {
-        return new CitizenProfileBaseType();
-    }
-
-    /**
-     * Create an instance of {@link GetSubscriptionStreamCategoryResponseType }
-     * 
-     */
-    public GetSubscriptionStreamCategoryResponseType createGetSubscriptionStreamCategoryResponseType() {
-        return new GetSubscriptionStreamCategoryResponseType();
-    }
-
-    /**
-     * Create an instance of {@link DropCitizenSubscriptionSettingsResponseType }
-     * 
-     */
-    public DropCitizenSubscriptionSettingsResponseType createDropCitizenSubscriptionSettingsResponseType() {
-        return new DropCitizenSubscriptionSettingsResponseType();
-    }
-
-    /**
-     * Create an instance of {@link EventFilterType.Groups }
-     * 
-     */
-    public EventFilterType.Groups createEventFilterTypeGroups() {
-        return new EventFilterType.Groups();
-    }
-
-    /**
-     * Create an instance of {@link EventMessageType.Parameters }
-     * 
-     */
-    public EventMessageType.Parameters createEventMessageTypeParameters() {
-        return new EventMessageType.Parameters();
-    }
-
-    /**
-     * Create an instance of {@link DeactivateCitizenSubscriptionRequestType }
-     * 
-     */
-    public DeactivateCitizenSubscriptionRequestType createDeactivateCitizenSubscriptionRequestType() {
-        return new DeactivateCitizenSubscriptionRequestType();
-    }
-
-    /**
-     * Create an instance of {@link ActivateCitizenSubscriptionResponseType }
-     * 
-     */
-    public ActivateCitizenSubscriptionResponseType createActivateCitizenSubscriptionResponseType() {
-        return new ActivateCitizenSubscriptionResponseType();
-    }
-
-    /**
-     * Create an instance of {@link GetSubscriptionStreamCategoryRequestType }
-     * 
-     */
-    public GetSubscriptionStreamCategoryRequestType createGetSubscriptionStreamCategoryRequestType() {
-        return new GetSubscriptionStreamCategoryRequestType();
-    }
-
-    /**
-     * Create an instance of {@link GetCitizenProfileResponseType }
-     * 
-     */
-    public GetCitizenProfileResponseType createGetCitizenProfileResponseType() {
-        return new GetCitizenProfileResponseType();
-    }
-
-    /**
-     * Create an instance of {@link EventFilterType.Options.Option }
-     * 
-     */
-    public EventFilterType.Options.Option createEventFilterTypeOptionsOption() {
-        return new EventFilterType.Options.Option();
-    }
-
-    /**
-     * Create an instance of {@link GetCitizenProfileRequestType }
-     * 
-     */
-    public GetCitizenProfileRequestType createGetCitizenProfileRequestType() {
-        return new GetCitizenProfileRequestType();
+    public SelectCitizenSubscriptionsResponseType createSelectCitizenSubscriptionsResponseType() {
+        return new SelectCitizenSubscriptionsResponseType();
     }
 
     /**
@@ -275,35 +93,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link StreamSettingType }
+     * Create an instance of {@link SelectCitizenSubscriptionsRequestType }
      * 
      */
-    public StreamSettingType createStreamSettingType() {
-        return new StreamSettingType();
+    public SelectCitizenSubscriptionsRequestType createSelectCitizenSubscriptionsRequestType() {
+        return new SelectCitizenSubscriptionsRequestType();
     }
 
     /**
-     * Create an instance of {@link DropCitizenSubscriptionSettingsRequestType.Settings }
+     * Create an instance of {@link CreateCitizenProfileRequestType.Options.Option }
      * 
      */
-    public DropCitizenSubscriptionSettingsRequestType.Settings createDropCitizenSubscriptionSettingsRequestTypeSettings() {
-        return new DropCitizenSubscriptionSettingsRequestType.Settings();
-    }
-
-    /**
-     * Create an instance of {@link EventType.Filters }
-     * 
-     */
-    public EventType.Filters createEventTypeFilters() {
-        return new EventType.Filters();
-    }
-
-    /**
-     * Create an instance of {@link StreamType.Settings }
-     * 
-     */
-    public StreamType.Settings createStreamTypeSettings() {
-        return new StreamType.Settings();
+    public CreateCitizenProfileRequestType.Options.Option createCreateCitizenProfileRequestTypeOptionsOption() {
+        return new CreateCitizenProfileRequestType.Options.Option();
     }
 
     /**
@@ -315,27 +117,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link EventMessageObjectType }
+     * Create an instance of {@link SelectSubscriptionStreamsResponseType.Return }
      * 
      */
-    public EventMessageObjectType createEventMessageObjectType() {
-        return new EventMessageObjectType();
+    public SelectSubscriptionStreamsResponseType.Return createSelectSubscriptionStreamsResponseTypeReturn() {
+        return new SelectSubscriptionStreamsResponseType.Return();
     }
 
     /**
-     * Create an instance of {@link SelectSubscriptionStreamsRequestType }
+     * Create an instance of {@link DropCitizenSubscriptionSettingsRequestType.Settings }
      * 
      */
-    public SelectSubscriptionStreamsRequestType createSelectSubscriptionStreamsRequestType() {
-        return new SelectSubscriptionStreamsRequestType();
+    public DropCitizenSubscriptionSettingsRequestType.Settings createDropCitizenSubscriptionSettingsRequestTypeSettings() {
+        return new DropCitizenSubscriptionSettingsRequestType.Settings();
     }
 
     /**
-     * Create an instance of {@link SelectSubscriptionStreamsResponseType }
+     * Create an instance of {@link CitizenProfileBaseType.Options }
      * 
      */
-    public SelectSubscriptionStreamsResponseType createSelectSubscriptionStreamsResponseType() {
-        return new SelectSubscriptionStreamsResponseType();
+    public CitizenProfileBaseType.Options createCitizenProfileBaseTypeOptions() {
+        return new CitizenProfileBaseType.Options();
     }
 
     /**
@@ -355,99 +157,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DropCitizenSubscriptionSettingsRequestType }
+     * Create an instance of {@link CreateCitizenProfileRequestType.Options }
      * 
      */
-    public DropCitizenSubscriptionSettingsRequestType createDropCitizenSubscriptionSettingsRequestType() {
-        return new DropCitizenSubscriptionSettingsRequestType();
+    public CreateCitizenProfileRequestType.Options createCreateCitizenProfileRequestTypeOptions() {
+        return new CreateCitizenProfileRequestType.Options();
     }
 
     /**
-     * Create an instance of {@link StreamType }
+     * Create an instance of {@link StreamSettingType }
      * 
      */
-    public StreamType createStreamType() {
-        return new StreamType();
-    }
-
-    /**
-     * Create an instance of {@link BaseResponseType }
-     * 
-     */
-    public BaseResponseType createBaseResponseType() {
-        return new BaseResponseType();
-    }
-
-    /**
-     * Create an instance of {@link EventMessageType.Objects }
-     * 
-     */
-    public EventMessageType.Objects createEventMessageTypeObjects() {
-        return new EventMessageType.Objects();
-    }
-
-    /**
-     * Create an instance of {@link ActivateCitizenSubscriptionRequestType.Settings }
-     * 
-     */
-    public ActivateCitizenSubscriptionRequestType.Settings createActivateCitizenSubscriptionRequestTypeSettings() {
-        return new ActivateCitizenSubscriptionRequestType.Settings();
-    }
-
-    /**
-     * Create an instance of {@link SubscriptionType.Settings }
-     * 
-     */
-    public SubscriptionType.Settings createSubscriptionTypeSettings() {
-        return new SubscriptionType.Settings();
-    }
-
-    /**
-     * Create an instance of {@link DeleteCitizenProfileOptionsRequestType }
-     * 
-     */
-    public DeleteCitizenProfileOptionsRequestType createDeleteCitizenProfileOptionsRequestType() {
-        return new DeleteCitizenProfileOptionsRequestType();
-    }
-
-    /**
-     * Create an instance of {@link EventFilterType.Options }
-     * 
-     */
-    public EventFilterType.Options createEventFilterTypeOptions() {
-        return new EventFilterType.Options();
-    }
-
-    /**
-     * Create an instance of {@link SendSubscriptionStreamEventsResponseType }
-     * 
-     */
-    public SendSubscriptionStreamEventsResponseType createSendSubscriptionStreamEventsResponseType() {
-        return new SendSubscriptionStreamEventsResponseType();
-    }
-
-    /**
-     * Create an instance of {@link DeleteCitizenProfileOptionsResponseType }
-     * 
-     */
-    public DeleteCitizenProfileOptionsResponseType createDeleteCitizenProfileOptionsResponseType() {
-        return new DeleteCitizenProfileOptionsResponseType();
-    }
-
-    /**
-     * Create an instance of {@link StreamCategoryType }
-     * 
-     */
-    public StreamCategoryType createStreamCategoryType() {
-        return new StreamCategoryType();
-    }
-
-    /**
-     * Create an instance of {@link SelectCitizenSubscriptionsResponseType }
-     * 
-     */
-    public SelectCitizenSubscriptionsResponseType createSelectCitizenSubscriptionsResponseType() {
-        return new SelectCitizenSubscriptionsResponseType();
+    public StreamSettingType createStreamSettingType() {
+        return new StreamSettingType();
     }
 
     /**
@@ -459,6 +181,134 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SelectSubscriptionStreamCategoriesResponseType }
+     * 
+     */
+    public SelectSubscriptionStreamCategoriesResponseType createSelectSubscriptionStreamCategoriesResponseType() {
+        return new SelectSubscriptionStreamCategoriesResponseType();
+    }
+
+    /**
+     * Create an instance of {@link StreamType }
+     * 
+     */
+    public StreamType createStreamType() {
+        return new StreamType();
+    }
+
+    /**
+     * Create an instance of {@link DeactivateCitizenSubscriptionRequestType }
+     * 
+     */
+    public DeactivateCitizenSubscriptionRequestType createDeactivateCitizenSubscriptionRequestType() {
+        return new DeactivateCitizenSubscriptionRequestType();
+    }
+
+    /**
+     * Create an instance of {@link SelectSubscriptionStreamCategoriesResponseType.Return }
+     * 
+     */
+    public SelectSubscriptionStreamCategoriesResponseType.Return createSelectSubscriptionStreamCategoriesResponseTypeReturn() {
+        return new SelectSubscriptionStreamCategoriesResponseType.Return();
+    }
+
+    /**
+     * Create an instance of {@link EventFilterType.Options }
+     * 
+     */
+    public EventFilterType.Options createEventFilterTypeOptions() {
+        return new EventFilterType.Options();
+    }
+
+    /**
+     * Create an instance of {@link GetSubscriptionStreamRequestType }
+     * 
+     */
+    public GetSubscriptionStreamRequestType createGetSubscriptionStreamRequestType() {
+        return new GetSubscriptionStreamRequestType();
+    }
+
+    /**
+     * Create an instance of {@link BaseResponseType }
+     * 
+     */
+    public BaseResponseType createBaseResponseType() {
+        return new BaseResponseType();
+    }
+
+    /**
+     * Create an instance of {@link GetCitizenProfileRequestType }
+     * 
+     */
+    public GetCitizenProfileRequestType createGetCitizenProfileRequestType() {
+        return new GetCitizenProfileRequestType();
+    }
+
+    /**
+     * Create an instance of {@link DropCitizenSubscriptionSettingsResponseType }
+     * 
+     */
+    public DropCitizenSubscriptionSettingsResponseType createDropCitizenSubscriptionSettingsResponseType() {
+        return new DropCitizenSubscriptionSettingsResponseType();
+    }
+
+    /**
+     * Create an instance of {@link CreateCitizenProfileResponseType }
+     * 
+     */
+    public CreateCitizenProfileResponseType createCreateCitizenProfileResponseType() {
+        return new CreateCitizenProfileResponseType();
+    }
+
+    /**
+     * Create an instance of {@link CitizenProfileType }
+     * 
+     */
+    public CitizenProfileType createCitizenProfileType() {
+        return new CitizenProfileType();
+    }
+
+    /**
+     * Create an instance of {@link EventMessageType }
+     * 
+     */
+    public EventMessageType createEventMessageType() {
+        return new EventMessageType();
+    }
+
+    /**
+     * Create an instance of {@link EventMessageType.Parameters }
+     * 
+     */
+    public EventMessageType.Parameters createEventMessageTypeParameters() {
+        return new EventMessageType.Parameters();
+    }
+
+    /**
+     * Create an instance of {@link StreamCategoryType }
+     * 
+     */
+    public StreamCategoryType createStreamCategoryType() {
+        return new StreamCategoryType();
+    }
+
+    /**
+     * Create an instance of {@link CitizenProfileBaseType }
+     * 
+     */
+    public CitizenProfileBaseType createCitizenProfileBaseType() {
+        return new CitizenProfileBaseType();
+    }
+
+    /**
+     * Create an instance of {@link ActivateCitizenSubscriptionResponseType }
+     * 
+     */
+    public ActivateCitizenSubscriptionResponseType createActivateCitizenSubscriptionResponseType() {
+        return new ActivateCitizenSubscriptionResponseType();
+    }
+
+    /**
      * Create an instance of {@link BaseRequestType }
      * 
      */
@@ -467,19 +317,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CitizenProfileBaseType.Options }
+     * Create an instance of {@link EventFilterType.Options.Option }
      * 
      */
-    public CitizenProfileBaseType.Options createCitizenProfileBaseTypeOptions() {
-        return new CitizenProfileBaseType.Options();
+    public EventFilterType.Options.Option createEventFilterTypeOptionsOption() {
+        return new EventFilterType.Options.Option();
     }
 
     /**
-     * Create an instance of {@link SetUpCitizenSubscriptionSettingsRequestType }
+     * Create an instance of {@link EventMessageParameterType }
      * 
      */
-    public SetUpCitizenSubscriptionSettingsRequestType createSetUpCitizenSubscriptionSettingsRequestType() {
-        return new SetUpCitizenSubscriptionSettingsRequestType();
+    public EventMessageParameterType createEventMessageParameterType() {
+        return new EventMessageParameterType();
+    }
+
+    /**
+     * Create an instance of {@link SubscriptionType }
+     * 
+     */
+    public SubscriptionType createSubscriptionType() {
+        return new SubscriptionType();
+    }
+
+    /**
+     * Create an instance of {@link DeleteCitizenProfileOptionsRequestType }
+     * 
+     */
+    public DeleteCitizenProfileOptionsRequestType createDeleteCitizenProfileOptionsRequestType() {
+        return new DeleteCitizenProfileOptionsRequestType();
+    }
+
+    /**
+     * Create an instance of {@link EventMessageObjectType }
+     * 
+     */
+    public EventMessageObjectType createEventMessageObjectType() {
+        return new EventMessageObjectType();
+    }
+
+    /**
+     * Create an instance of {@link GetSubscriptionStreamCategoryResponseType }
+     * 
+     */
+    public GetSubscriptionStreamCategoryResponseType createGetSubscriptionStreamCategoryResponseType() {
+        return new GetSubscriptionStreamCategoryResponseType();
     }
 
     /**
@@ -491,19 +373,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DeactivateCitizenSubscriptionResponseType }
+     * Create an instance of {@link GetCitizenProfileResponseType }
      * 
      */
-    public DeactivateCitizenSubscriptionResponseType createDeactivateCitizenSubscriptionResponseType() {
-        return new DeactivateCitizenSubscriptionResponseType();
-    }
-
-    /**
-     * Create an instance of {@link EventFilterType }
-     * 
-     */
-    public EventFilterType createEventFilterType() {
-        return new EventFilterType();
+    public GetCitizenProfileResponseType createGetCitizenProfileResponseType() {
+        return new GetCitizenProfileResponseType();
     }
 
     /**
@@ -515,6 +389,78 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link EventMessageType.Objects }
+     * 
+     */
+    public EventMessageType.Objects createEventMessageTypeObjects() {
+        return new EventMessageType.Objects();
+    }
+
+    /**
+     * Create an instance of {@link SelectSubscriptionStreamCategoriesRequestType }
+     * 
+     */
+    public SelectSubscriptionStreamCategoriesRequestType createSelectSubscriptionStreamCategoriesRequestType() {
+        return new SelectSubscriptionStreamCategoriesRequestType();
+    }
+
+    /**
+     * Create an instance of {@link DeactivateCitizenSubscriptionResponseType }
+     * 
+     */
+    public DeactivateCitizenSubscriptionResponseType createDeactivateCitizenSubscriptionResponseType() {
+        return new DeactivateCitizenSubscriptionResponseType();
+    }
+
+    /**
+     * Create an instance of {@link SendSubscriptionStreamEventsResponseType }
+     * 
+     */
+    public SendSubscriptionStreamEventsResponseType createSendSubscriptionStreamEventsResponseType() {
+        return new SendSubscriptionStreamEventsResponseType();
+    }
+
+    /**
+     * Create an instance of {@link SelectSubscriptionStreamsResponseType }
+     * 
+     */
+    public SelectSubscriptionStreamsResponseType createSelectSubscriptionStreamsResponseType() {
+        return new SelectSubscriptionStreamsResponseType();
+    }
+
+    /**
+     * Create an instance of {@link SetUpCitizenSubscriptionSettingsRequestType }
+     * 
+     */
+    public SetUpCitizenSubscriptionSettingsRequestType createSetUpCitizenSubscriptionSettingsRequestType() {
+        return new SetUpCitizenSubscriptionSettingsRequestType();
+    }
+
+    /**
+     * Create an instance of {@link SelectSubscriptionStreamsRequestType }
+     * 
+     */
+    public SelectSubscriptionStreamsRequestType createSelectSubscriptionStreamsRequestType() {
+        return new SelectSubscriptionStreamsRequestType();
+    }
+
+    /**
+     * Create an instance of {@link ActivateCitizenSubscriptionRequestType.Settings }
+     * 
+     */
+    public ActivateCitizenSubscriptionRequestType.Settings createActivateCitizenSubscriptionRequestTypeSettings() {
+        return new ActivateCitizenSubscriptionRequestType.Settings();
+    }
+
+    /**
+     * Create an instance of {@link SetCitizenProfileResponseType }
+     * 
+     */
+    public SetCitizenProfileResponseType createSetCitizenProfileResponseType() {
+        return new SetCitizenProfileResponseType();
+    }
+
+    /**
      * Create an instance of {@link SelectCitizenSubscriptionsResponseType.Return }
      * 
      */
@@ -523,11 +469,107 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link EventFilterType.Groups }
+     * 
+     */
+    public EventFilterType.Groups createEventFilterTypeGroups() {
+        return new EventFilterType.Groups();
+    }
+
+    /**
+     * Create an instance of {@link SubscriptionType.Settings }
+     * 
+     */
+    public SubscriptionType.Settings createSubscriptionTypeSettings() {
+        return new SubscriptionType.Settings();
+    }
+
+    /**
+     * Create an instance of {@link StreamType.Settings }
+     * 
+     */
+    public StreamType.Settings createStreamTypeSettings() {
+        return new StreamType.Settings();
+    }
+
+    /**
+     * Create an instance of {@link EventType }
+     * 
+     */
+    public EventType createEventType() {
+        return new EventType();
+    }
+
+    /**
+     * Create an instance of {@link EventType.Filters }
+     * 
+     */
+    public EventType.Filters createEventTypeFilters() {
+        return new EventType.Filters();
+    }
+
+    /**
+     * Create an instance of {@link DropCitizenSubscriptionSettingsRequestType }
+     * 
+     */
+    public DropCitizenSubscriptionSettingsRequestType createDropCitizenSubscriptionSettingsRequestType() {
+        return new DropCitizenSubscriptionSettingsRequestType();
+    }
+
+    /**
+     * Create an instance of {@link CreateCitizenProfileRequestType }
+     * 
+     */
+    public CreateCitizenProfileRequestType createCreateCitizenProfileRequestType() {
+        return new CreateCitizenProfileRequestType();
+    }
+
+    /**
+     * Create an instance of {@link SetUpCitizenSubscriptionSettingsRequestType.Settings }
+     * 
+     */
+    public SetUpCitizenSubscriptionSettingsRequestType.Settings createSetUpCitizenSubscriptionSettingsRequestTypeSettings() {
+        return new SetUpCitizenSubscriptionSettingsRequestType.Settings();
+    }
+
+    /**
+     * Create an instance of {@link GetSubscriptionStreamCategoryRequestType }
+     * 
+     */
+    public GetSubscriptionStreamCategoryRequestType createGetSubscriptionStreamCategoryRequestType() {
+        return new GetSubscriptionStreamCategoryRequestType();
+    }
+
+    /**
+     * Create an instance of {@link DeleteCitizenProfileOptionsResponseType }
+     * 
+     */
+    public DeleteCitizenProfileOptionsResponseType createDeleteCitizenProfileOptionsResponseType() {
+        return new DeleteCitizenProfileOptionsResponseType();
+    }
+
+    /**
+     * Create an instance of {@link SetCitizenProfileRequestType }
+     * 
+     */
+    public SetCitizenProfileRequestType createSetCitizenProfileRequestType() {
+        return new SetCitizenProfileRequestType();
+    }
+
+    /**
      * Create an instance of {@link EventFilterType.Persons }
      * 
      */
     public EventFilterType.Persons createEventFilterTypePersons() {
         return new EventFilterType.Persons();
+    }
+
+    /**
+     * Create an instance of {@link CreateCitizenProfileResponseType.Return }
+     * 
+     */
+    public CreateCitizenProfileResponseType.Return createCreateCitizenProfileResponseTypeReturn() {
+        return new CreateCitizenProfileResponseType.Return();
     }
 
     /**
@@ -585,21 +627,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DeleteCitizenProfileOptionsResponseType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "deleteCitizenProfileOptionsResponse")
-    public JAXBElement<DeleteCitizenProfileOptionsResponseType> createDeleteCitizenProfileOptionsResponse(DeleteCitizenProfileOptionsResponseType value) {
-        return new JAXBElement<DeleteCitizenProfileOptionsResponseType>(_DeleteCitizenProfileOptionsResponse_QNAME, DeleteCitizenProfileOptionsResponseType.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link DropCitizenSubscriptionSettingsResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "dropCitizenSubscriptionSettingsResponse")
     public JAXBElement<DropCitizenSubscriptionSettingsResponseType> createDropCitizenSubscriptionSettingsResponse(DropCitizenSubscriptionSettingsResponseType value) {
         return new JAXBElement<DropCitizenSubscriptionSettingsResponseType>(_DropCitizenSubscriptionSettingsResponse_QNAME, DropCitizenSubscriptionSettingsResponseType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DeleteCitizenProfileOptionsResponseType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "deleteCitizenProfileOptionsResponse")
+    public JAXBElement<DeleteCitizenProfileOptionsResponseType> createDeleteCitizenProfileOptionsResponse(DeleteCitizenProfileOptionsResponseType value) {
+        return new JAXBElement<DeleteCitizenProfileOptionsResponseType>(_DeleteCitizenProfileOptionsResponse_QNAME, DeleteCitizenProfileOptionsResponseType.class, null, value);
     }
 
     /**
@@ -657,6 +699,15 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CreateCitizenProfileResponseType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "createCitizenProfileResponse")
+    public JAXBElement<CreateCitizenProfileResponseType> createCreateCitizenProfileResponse(CreateCitizenProfileResponseType value) {
+        return new JAXBElement<CreateCitizenProfileResponseType>(_CreateCitizenProfileResponse_QNAME, CreateCitizenProfileResponseType.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetCitizenProfileResponseType }{@code >}}
      * 
      */
@@ -699,6 +750,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "getSubscriptionStreamCategoryRequest")
     public JAXBElement<GetSubscriptionStreamCategoryRequestType> createGetSubscriptionStreamCategoryRequest(GetSubscriptionStreamCategoryRequestType value) {
         return new JAXBElement<GetSubscriptionStreamCategoryRequestType>(_GetSubscriptionStreamCategoryRequest_QNAME, GetSubscriptionStreamCategoryRequestType.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CreateCitizenProfileRequestType }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://subscription.api.emp.altarix.ru", name = "createCitizenProfileRequest")
+    public JAXBElement<CreateCitizenProfileRequestType> createCreateCitizenProfileRequest(CreateCitizenProfileRequestType value) {
+        return new JAXBElement<CreateCitizenProfileRequestType>(_CreateCitizenProfileRequest_QNAME, CreateCitizenProfileRequestType.class, null, value);
     }
 
     /**

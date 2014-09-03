@@ -88,4 +88,147 @@ public interface StoragePortType {
         @WebParam(name = "receiveDataChangesRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/entry.xsd", partName = "parameter")
         ReceiveDataChangesRequest parameter);
 
+    /**
+     * Создание нового каталога
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.AddCatalogResponse
+     */
+    @WebMethod(action = "urn:#addCatalog")
+    @WebResult(name = "addCatalogResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public AddCatalogResponse addCatalog(
+        @WebParam(name = "addCatalogRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        AddCatalogRequest parameter);
+
+    /**
+     * Обновление каталога
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.UpdateCatalogResponse
+     */
+    @WebMethod(action = "urn:#updateCatalog")
+    @WebResult(name = "updateCatalogResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public UpdateCatalogResponse updateCatalog(
+        @WebParam(name = "updateCatalogRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        UpdateCatalogRequest parameter);
+
+    /**
+     * Удаление каталога
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.DeleteCatalogResponse
+     */
+    @WebMethod(action = "urn:#deleteCatalog")
+    @WebResult(name = "deleteCatalogResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public DeleteCatalogResponse deleteCatalog(
+        @WebParam(name = "deleteCatalogRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        DeleteCatalogRequest parameter);
+
+    /**
+     * Получение каталога
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.GetCatalogResponse
+     */
+    @WebMethod(action = "urn:#getCatalog")
+    @WebResult(name = "getCatalogResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public GetCatalogResponse getCatalog(
+        @WebParam(name = "getCatalogRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        GetCatalogRequest parameter);
+
+    /**
+     * Получение списка каталогов
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.SelectCatalogsResponse
+     */
+    @WebMethod(action = "urn:#selectCatalogs")
+    @WebResult(name = "selectCatalogsResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public SelectCatalogsResponse selectCatalogs(
+        @WebParam(name = "selectCatalogsRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        SelectCatalogsRequest parameter);
+
+    /**
+     * Добавление нового атрибута
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.AddAttributeResponse
+     */
+    @WebMethod(action = "urn:#addAttribute")
+    @WebResult(name = "addAttributeResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public AddAttributeResponse addAttribute(
+        @WebParam(name = "addAttributeRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        AddAttributeRequest parameter);
+
+    /**
+     * Удаление атрибута
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.DeleteAttributeResponse
+     */
+    @WebMethod(action = "urn:#deleteAttribute")
+    @WebResult(name = "deleteAttributeResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public DeleteAttributeResponse deleteAttribute(
+        @WebParam(name = "deleteAttributeRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        DeleteAttributeRequest parameter);
+
+    /**
+     * Добавление нового индекса
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.AddIndexResponse
+     */
+    @WebMethod(action = "urn:#addIndex")
+    @WebResult(name = "addIndexResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public AddIndexResponse addIndex(
+        @WebParam(name = "addIndexRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        AddIndexRequest parameter);
+
+    /**
+     * Добавление атрибута в индекс
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.AddAttributeToIndexResponse
+     */
+    @WebMethod(action = "urn:#addAttributeToIndex")
+    @WebResult(name = "addAttributeToIndexResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public AddAttributeToIndexResponse addAttributeToIndex(
+        @WebParam(name = "addAttributeToIndexRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        AddAttributeToIndexRequest parameter);
+
+    /**
+     * Удаление атрибута из индекса
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.RemoveAttributeFromIndexResponse
+     */
+    @WebMethod(action = "urn:#removeAttributeFromIndex")
+    @WebResult(name = "removeAttributeFromIndexResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public RemoveAttributeFromIndexResponse removeAttributeFromIndex(
+        @WebParam(name = "removeAttributeFromIndexRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        RemoveAttributeFromIndexRequest parameter);
+
+    /**
+     * Удаление индекса
+     * 
+     * @param parameter
+     * @return
+     *     returns generated.emp_storage.DeleteIndexResponse
+     */
+    @WebMethod(action = "urn:#deleteIndex")
+    @WebResult(name = "deleteIndexResponse", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+    public DeleteIndexResponse deleteIndex(
+        @WebParam(name = "deleteIndexRequest", targetNamespace = "http://emp.mos.ru/schemas/storage/request/catalog.xsd", partName = "parameter")
+        DeleteIndexRequest parameter);
+
 }

@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
     SelectSubscriptionStreamsResponseType.class,
     SetUpCitizenSubscriptionSettingsResponseType.class,
     SendSubscriptionStreamEventsResponseType.class,
+    CreateCitizenProfileResponseType.class,
     SetCitizenProfileResponseType.class,
     SelectCitizenSubscriptionsResponseType.class,
     GetSubscriptionStreamCategoryResponseType.class,

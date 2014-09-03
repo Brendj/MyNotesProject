@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
     DeleteCitizenProfileOptionsRequestType.class,
     GetSubscriptionStreamCategoryRequestType.class,
     SelectSubscriptionStreamCategoriesRequestType.class,
+    CreateCitizenProfileRequestType.class,
     SetCitizenProfileRequestType.class,
     SendSubscriptionStreamEventsRequestType.class,
     SelectCitizenSubscriptionsRequestType.class,
