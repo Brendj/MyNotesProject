@@ -43,6 +43,7 @@ public class EMPProcessor {
     public static final String ATTRIBUTE_ACCOUNT_NAME      = "ACCOUNT";
     public static final String ATTRIBUTE_MOBILE_PHONE_NAME = "MSISDN";
     public static final String ATTRIBUTE_RULE_ID           = "RULE_ID";
+    public static final String ATTRIBUTE_SUBSCRIPTION_ID   = "SUBSCRIPTION_ID";
     public static final String ATTRIBUTE_SSOID_NAME        = "SSOID";
     public static final String ATTRIBUTE_EMAIL_NAME        = "EMAIL";
     public static final String ATTRIBUTE_ACTIVE            = "ACTIVE";
@@ -328,14 +329,14 @@ public class EMPProcessor {
         email.setName(ATTRIBUTE_EMAIL_NAME);
         email.getValue().add(client.getEmail());
         entry.getAttribute().add(email);
-        /*EntryAttribute account = new EntryAttribute();
-        account.setName(ATTRIBUTE_ACCOUNT_NAME);
-        account.getValue().add("" + client.getContractId());
-        entry.getAttribute().add(account);*/
         EntryAttribute ruleId = new EntryAttribute();
         ruleId.setName(ATTRIBUTE_RULE_ID);
         ruleId.getValue().add("" + client.getContractId());
         entry.getAttribute().add(ruleId);
+        EntryAttribute subscriptionId = new EntryAttribute();
+        subscriptionId.setName(ATTRIBUTE_SUBSCRIPTION_ID);
+        subscriptionId.getValue().add("" + client.getContractId());
+        entry.getAttribute().add(subscriptionId);
         //  second
         EntryAttribute active = new EntryAttribute();
         active.setName(ATTRIBUTE_ACTIVE);
@@ -353,6 +354,23 @@ public class EMPProcessor {
         pushSend.setName(ATTRIBUTE_PUSH_SEND);
         pushSend.getValue().add(Boolean.TRUE);
         entry.getAttribute().add(pushSend);
+        //  empty
+        String [] emptyParams = new String [] { "SURNAME", "NAME", "PATRONYMIC" };
+        String [] nullParams = new String [] { "SMS_SEND_START", "SMS_SEND_STOP", "SMS_SEND_EXCLUDE_DAYS",
+                                               "EMAIL_SEND_START", "EMAIL_SEND_STOP", "EMAIL_SEND_EXCLUDE_DAYS",
+                                               "PUSH_SEND_START", "PUSH_SEND_STOP", "PUSH_SEND_EXCLUDE_DAYS" };
+        for(String p : emptyParams) {
+            EntryAttribute paramId = new EntryAttribute();
+            paramId.setName(p);
+            paramId.getValue().add("");
+            entry.getAttribute().add(paramId);
+        }
+        for(String p : nullParams) {
+            EntryAttribute paramId = new EntryAttribute();
+            paramId.setName(p);
+            paramId.getValue().add(null);
+            entry.getAttribute().add(paramId);
+        }
 
         return request;
     }
