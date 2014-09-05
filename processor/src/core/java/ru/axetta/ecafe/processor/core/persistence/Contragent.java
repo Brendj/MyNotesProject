@@ -81,6 +81,7 @@ public class Contragent {
     private Set<AddPayment> receiverAddPayments = new HashSet<AddPayment>();
     private String kpp;
     private String ogrn;
+    private String lastRNIPUpdate;
 
 
     protected Contragent() {
@@ -544,6 +545,14 @@ public class Contragent {
 
     public String getMfrId() {
         return StringUtils.substringBetween(remarks, "{MFR_ID=", "}");
+    }
+
+    public String getLastRNIPUpdate() {
+        return lastRNIPUpdate;
+    }
+
+    public void setLastRNIPUpdate(String lastRNIPUpdate) {
+        this.lastRNIPUpdate = lastRNIPUpdate;
     }
 
     @Override
