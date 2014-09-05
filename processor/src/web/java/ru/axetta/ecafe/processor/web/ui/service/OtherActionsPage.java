@@ -83,10 +83,9 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runSendEMPEvent() throws Exception {
-        Client client = DAOService.getInstance().getClientByGuid("e50051c4-143f-1afd-e043-a2997e0af273");
-        EMPEventType event = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, client);
+        Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                sendSMS(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP,
+                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
                         new String[] {}, true, null); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }

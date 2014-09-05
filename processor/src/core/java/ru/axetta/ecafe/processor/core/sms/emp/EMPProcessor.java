@@ -21,10 +21,13 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.w3c.dom.Element;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -111,12 +114,13 @@ public class EMPProcessor {
         String synchDate = "[Получение изменений из ЕМП " + date + "]: ";
 
         //  Загрузка клиентов для связки
-        long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);
+        long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);//750
         StoragePortType storage = createStorageController();
         if(storage == null) {
             throw new EMPException("Failed to create connection with EMP web service");
         }
         ReceiveDataChangesRequest request = buildReceiveEntryParams(changeSequence);
+        logRequest(request);
         ReceiveDataChangesResponse response = storage.receiveDataChanges(request);
         if(response.getErrorCode() != 0) {
             logger.error(String.format("Failed to receive updates: [code=%s] %s", response.getErrorCode(), response.getErrorMessage()));
@@ -138,12 +142,20 @@ public class EMPProcessor {
                 if(!StringUtils.isBlank(attr.getName()) &&
                    attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
                    attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
-                    ssoid = attr.getValue().get(0).toString();
+                    try {
+                        ssoid = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                    } catch (Exception e1) {
+                        logger.error("Failed to parse " + ATTRIBUTE_SSOID_NAME + " value", e1);
+                    }
                 }
                 if(!StringUtils.isBlank(attr.getName()) &&
                    attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME) &&
                    attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
-                    msisdn = attr.getValue().get(0).toString();
+                    try {
+                        msisdn = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                    } catch (Exception e1) {
+                        logger.error("Failed to parse " + ATTRIBUTE_MOBILE_PHONE_NAME + " value", e1);
+                    }
                 }
             }
             if(!StringUtils.isBlank(msisdn) && !StringUtils.isBlank(ssoid)) {
@@ -158,10 +170,21 @@ public class EMPProcessor {
         }
 
         log(synchDate + "Обновление очереди до " + changeSequence, null);
-        RuntimeContext.getInstance().setOptionValue(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence + 1);
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_EMP_CHANGE_SEQUENCE, changeSequence + 1);
         if(response.getResult().isHasMoreEntries()) {
             log(synchDate + "Изменения в ЕМП обработаны не до конца, запрос будет выполнен повторно", null);
             RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
+        }
+    }
+
+    protected void logRequest(ReceiveDataChangesRequest request) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(ReceiveDataChangesRequest.class);
+            StringWriter writer = new StringWriter();
+            jaxbContext.createMarshaller().marshal(request, writer);
+            logger.info(writer.toString());
+        } catch (Exception e) {
+            logger.error("Failed to log", e);
         }
     }
 
@@ -222,15 +245,29 @@ public class EMPProcessor {
             for(EntryAttribute attr : attributes) {
                 if(attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
                         !attr.getValue().equals(client.getMobile()) &&
-                        attr.getValue() != null && attr.getValue().size() > 0) {
-                    client.setSsoid(attr.getValue().get(0).toString());
-                    requiresUpdate = true;
+                        attr.getValue() != null && attr.getValue().size() > 0 &&
+                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null) {
+                    try {
+                        String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                        client.setSsoid(val);
+                        requiresUpdate = true;
+                    } catch (Exception e1) {
+                        logger.error("Failed to process existing object", e1);
+                        throw e1;
+                    }
                 }
                 if(attr.getName().equals(ATTRIBUTE_EMAIL_NAME) &&
                         !attr.getValue().equals(client.getEmail()) &&
-                        attr.getValue() != null && attr.getValue().size() > 0) {
-                    client.setEmail(attr.getValue().get(0).toString());
-                    requiresUpdate = true;
+                        attr.getValue() != null && attr.getValue().size() > 0 &&
+                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null) {
+                    try {
+                        String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                        client.setEmail(val);
+                        requiresUpdate = true;
+                    } catch (Exception e1) {
+                        logger.error("Failed to process existing object");
+                        throw e1;
+                    }
                 }
             }
             if(requiresUpdate) {
@@ -333,10 +370,10 @@ public class EMPProcessor {
         ruleId.setName(ATTRIBUTE_RULE_ID);
         ruleId.getValue().add("" + client.getContractId());
         entry.getAttribute().add(ruleId);
-        EntryAttribute subscriptionId = new EntryAttribute();
+        /*EntryAttribute subscriptionId = new EntryAttribute();
         subscriptionId.setName(ATTRIBUTE_SUBSCRIPTION_ID);
         subscriptionId.getValue().add("" + client.getContractId());
-        entry.getAttribute().add(subscriptionId);
+        entry.getAttribute().add(subscriptionId);*/
         //  second
         EntryAttribute active = new EntryAttribute();
         active.setName(ATTRIBUTE_ACTIVE);
@@ -371,7 +408,6 @@ public class EMPProcessor {
             paramId.getValue().add(null);
             entry.getAttribute().add(paramId);
         }
-
         return request;
     }
 
