@@ -156,6 +156,13 @@ public class BIDataExportService {
         TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
                 .setSpecificExporter("cardTypesExporter"));
 
+        //  ------------------------------------------
+        //  Детализация заказа (OrderDetails)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("mobilenotify",
+                "select idofclient, mobile, email from cf_clients where mobile<>'' or email<>''",
+                new String[]{"idofclient", "mobile", "email"}));
+
 
 
 
