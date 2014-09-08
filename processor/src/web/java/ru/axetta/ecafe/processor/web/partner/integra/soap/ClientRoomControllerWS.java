@@ -1706,9 +1706,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setLastFreePayTime(xmlLastFreePayTime);
         }
 
-
         clientSummaryExt.setDiscountMode(client.getDiscountMode());
 
+        clientSummaryExt.setOrgId(client.getOrg().getIdOfOrg());
+        clientSummaryExt.setOrgType(client.getOrg().getType());
 
         data.setClientSummaryExt(clientSummaryExt);
     }

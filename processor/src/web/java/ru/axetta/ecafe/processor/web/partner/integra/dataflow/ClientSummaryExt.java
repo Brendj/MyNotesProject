@@ -1,6 +1,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+
 import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -88,7 +90,10 @@ public class ClientSummaryExt {
     protected Long defaultMerchantId;
     @XmlAttribute(name = "DefaultMerchantInfo")
     protected String defaultMerchantInfo;
-
+    @XmlAttribute(name = "OrgType")
+    protected String orgType;
+    @XmlAttribute(name = "OrgId")
+    protected Long orgId;
 
     @XmlAttribute(name = "Address")
     protected String address;
@@ -646,5 +651,29 @@ public class ClientSummaryExt {
             sb.append(" ").append(middleName);
         }
         return sb.toString().trim();
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(OrganizationType orgType) {
+        if (OrganizationType.KINDERGARTEN.equals(orgType) ){
+            this.orgType = "ch";
+        }else if(OrganizationType.SCHOOL.equals(orgType)){
+            this.orgType = "sc";
+        }else if (OrganizationType.PROFESSIONAL.equals(orgType)){
+            this.orgType = "st";
+        }else if (OrganizationType.SUPPLIER.equals(orgType)){
+            this.orgType = "su";
+        }
+    }
+
+    public Long getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(Long orgId) {
+        this.orgId = orgId;
     }
 }
