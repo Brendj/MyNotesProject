@@ -106,9 +106,11 @@ public class Instance extends LibraryDistributedObject {
         }
 
         if(ib!=null && invNumber!=null  && !getTagName().equalsIgnoreCase("m")) {
+            boolean deleteFlag = false;
             Criteria criteria = session.createCriteria(Instance.class);
             criteria.add(Restrictions.eq("inventoryBook", ib));
             criteria.add(Restrictions.eq("invNumber", invNumber));
+            criteria.add(Restrictions.eq("deletedState", deleteFlag));
             Instance instance = (Instance) criteria.uniqueResult();
             session.clear();
             if(instance!=null){
