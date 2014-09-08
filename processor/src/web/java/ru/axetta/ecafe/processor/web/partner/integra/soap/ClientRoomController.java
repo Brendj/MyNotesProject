@@ -389,8 +389,7 @@ public interface ClientRoomController {
     ProhibitionsResult removeProhibition(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "prohibitionId") Long prohibitionId);
 
-
-    @WebMethod(operationName = "getOrgSummury")
+    @WebMethod(operationName = "getOrgSummary")
     OrgSummaryResult getOrgSummary(@WebParam(name = "orgId") Long orgId);
 
 }
