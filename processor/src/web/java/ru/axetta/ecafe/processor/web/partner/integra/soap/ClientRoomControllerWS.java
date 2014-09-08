@@ -41,6 +41,8 @@ import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummury;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -5381,6 +5383,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public OrgSummaryResult getOrgSummary(@WebParam(name = "orgId") Long orgId) {
+        OrgSummaryResult result = new OrgSummaryResult();
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            Org org = DAOUtils.findOrg(session, orgId);
+            if (org != null){
+                result.orgSummury = new OrgSummury(org);
+            }else {
+                result.notFound();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.internalError();
         }
         return result;
     }

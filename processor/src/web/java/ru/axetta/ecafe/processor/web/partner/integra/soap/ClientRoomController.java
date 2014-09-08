@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -388,5 +389,8 @@ public interface ClientRoomController {
     ProhibitionsResult removeProhibition(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "prohibitionId") Long prohibitionId);
 
+
+    @WebMethod(operationName = "getOrgSummury")
+    OrgSummaryResult getOrgSummary(@WebParam(name = "orgId") Long orgId);
 
 }
