@@ -136,8 +136,9 @@ public class EMPProcessor {
         log(synchDate + "Поступило " + entries.size() + " изменений из ЕМП по очереди " + changeSequence, null);
         for(ReceiveDataChangesResponse.Result.Entry e : entries) {
             List<ReceiveDataChangesResponse.Result.Entry.Attribute> attributes = e.getAttribute();
+            List<ReceiveDataChangesResponse.Result.Entry.Identifier> identifiers = e.getIdentifier();
             String ssoid = "";
-            String msisdn = "";
+            String ruleId = "";
             for(ReceiveDataChangesResponse.Result.Entry.Attribute attr : attributes) {
                 if(!StringUtils.isBlank(attr.getName()) &&
                    attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
@@ -148,20 +149,23 @@ public class EMPProcessor {
                         logger.error("Failed to parse " + ATTRIBUTE_SSOID_NAME + " value", e1);
                     }
                 }
-                if(!StringUtils.isBlank(attr.getName()) &&
-                   attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME) &&
-                   attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+            }
+            for(ReceiveDataChangesResponse.Result.Entry.Identifier id : identifiers) {
+                if(!StringUtils.isBlank(id.getName()) &&
+                        id.getName().equals(ATTRIBUTE_RULE_ID) &&
+                        id.getValue() != null && id.getValue() != null && !StringUtils.isBlank(id.getValue().toString())) {
                     try {
-                        msisdn = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                        ruleId = ((Element) id.getValue()).getFirstChild().getTextContent();
+                        break;
                     } catch (Exception e1) {
-                        logger.error("Failed to parse " + ATTRIBUTE_MOBILE_PHONE_NAME + " value", e1);
+                        logger.error("Failed to parse " + ATTRIBUTE_RULE_ID + " value", e1);
                     }
                 }
             }
-            if(!StringUtils.isBlank(msisdn) && !StringUtils.isBlank(ssoid)) {
-                ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance().getClientByMobilePhone(msisdn);
+            if(!StringUtils.isBlank(ruleId) && !StringUtils.isBlank(ssoid) && NumberUtils.isNumber(ruleId)) {
+                ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance().getClientByContractId(NumberUtils.toLong(ruleId));
                 if(client != null) {
-                    log(synchDate + "Поступили изменения {SSOID: " + ssoid + "}, {Моб. тел: " + msisdn + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
+                    log(synchDate + "Поступили изменения {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
                     client.setSsoid(ssoid);
                     DAOService.getInstance().saveEntity(client);
                 }

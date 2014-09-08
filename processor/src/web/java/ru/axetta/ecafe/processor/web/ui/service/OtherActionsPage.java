@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
@@ -86,7 +87,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
                 sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
-                        new String[] {}, true, null); //DEF
+                        new String[] {}, true, EnterEvent.ENTRY); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
