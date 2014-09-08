@@ -253,7 +253,7 @@ public class EMPProcessor {
                         requiresUpdate = true;
                     } catch (Exception e1) {
                         logger.error("Failed to process existing object", e1);
-                        throw e1;
+                        throw new EMPException(e1);
                     }
                 }
                 if(attr.getName().equals(ATTRIBUTE_EMAIL_NAME) &&
@@ -266,7 +266,7 @@ public class EMPProcessor {
                         requiresUpdate = true;
                     } catch (Exception e1) {
                         logger.error("Failed to process existing object");
-                        throw e1;
+                        throw new EMPException(e1);
                     }
                 }
             }
