@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Provider;
@@ -86,7 +87,8 @@ public class RNIPLoadPaymentsService {
     /**
      * Файл с документом для подписи.
      */
-    private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private final static String RNIP_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd";
     private final static String LOAD_PAYMENTS_TEMPLATE = "META-INF/rnip/getPayments_byDate.xml";
     public final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
     private final static String MODIFY_CATALOG_TEMPLATE = "META-INF/rnip/modifyCatalog.xml";
@@ -295,9 +297,9 @@ public class RNIPLoadPaymentsService {
         }
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType);
-        //Array.writeFile("C:/out.signed.xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+        Array.writeFile("C:/out.signed.xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
         SOAPMessage in = send(out);
-        //Array.writeFile("C:/in.signed.xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        Array.writeFile("C:/in.signed.xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
     
@@ -666,48 +668,48 @@ public class RNIPLoadPaymentsService {
 
         String content = new String(data);
         if (content.indexOf("%START_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(getLastUpdateDate(contragent));
+            String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getLastUpdateDate(contragent));
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 986400000));
-            content = content.replaceAll("%START_DATE%", str.trim());
+            content = content.replaceAll("%START_DATE%", formatString(str.trim()));
         }
         if (content.indexOf("%END_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis()));
+            String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() + 986400000));
-            content = content.replaceAll("%END_DATE%", str.trim());
+            content = content.replaceAll("%END_DATE%", formatString(str.trim()));
         }
         if (content.indexOf("%CONTRAGENT_ID%") > 1) {
             String id = getRNIPIdFromRemarks(contragent.getRemarks());
-            content = content.replaceAll("%CONTRAGENT_ID%", id == null ? "" : id);
+            content = content.replaceAll("%CONTRAGENT_ID%", formatString(id == null ? "" : id));
         }
         if (content.indexOf("%FINANCE_PROVIDER%") > 1) {
-            content = content.replaceAll("%FINANCE_PROVIDER%", contragent.getBank());
+            content = content.replaceAll("%FINANCE_PROVIDER%", formatString(contragent.getBank()));
         }
         if (content.indexOf("%CONTRAGENT_NAME%") > 1) {
-            content = content.replaceAll("%CONTRAGENT_NAME%", contragent.getContragentName());
+            content = content.replaceAll("%CONTRAGENT_NAME%", formatString(contragent.getContragentName()));
         }
         if (content.indexOf("%FINANCE_ACCOUNT%") > 1) {
-            content = content.replaceAll("%FINANCE_ACCOUNT%", contragent.getAccount());
+            content = content.replaceAll("%FINANCE_ACCOUNT%", formatString(contragent.getAccount()));
         }
         if (content.indexOf("%KORR_FINANCE_ACCOUNT%") > 1) {
-            content = content.replaceAll("%KORR_FINANCE_ACCOUNT%", contragent.getCorrAccount());
+            content = content.replaceAll("%KORR_FINANCE_ACCOUNT%", formatString(contragent.getCorrAccount()));
         }
         if (content.indexOf("%KBK%") > 1) {
             content = content.replaceAll("%KBK%", "00000000000000000000");
         }
         if (content.indexOf("%INN%") > 1) {
-            content = content.replaceAll("%INN%", contragent.getInn());
+            content = content.replaceAll("%INN%", formatString(contragent.getInn()));
         }
         if (content.indexOf("%KPP%") > 1) {
-            content = content.replaceAll("%KPP%", contragent.getKpp());
+            content = content.replaceAll("%KPP%", formatString(contragent.getKpp()));
         }
         if (content.indexOf("%OKATO%") > 1) {
-            content = content.replaceAll("%OKATO%", contragent.getOkato());
+            content = content.replaceAll("%OKATO%", formatString(contragent.getOkato()));
         }
         if (content.indexOf("%OGRN%") > 1) {
-            content = content.replaceAll("%OGRN%", contragent.getOgrn());
+            content = content.replaceAll("%OGRN%", formatString(contragent.getOgrn()));
         }
         if (content.indexOf("%BIK%") > 1) {
-            content = content.replaceAll("%BIK%", contragent.getBic());
+            content = content.replaceAll("%BIK%", formatString(contragent.getBic()));
         }
         if (content.indexOf("%COMISSION_PERCENTS%") > 1) {
             String comissionStr = getRNIPComissionFromRemarks(contragent.getRemarks());
@@ -718,13 +720,29 @@ public class RNIPLoadPaymentsService {
                 comission = 0D;
             }
             String cStr = new BigDecimal(comission).setScale(1, BigDecimal.ROUND_HALF_DOWN).toString();
-            content = content.replaceAll("%COMISSION_PERCENTS%", cStr.trim());
+            content = content.replaceAll("%COMISSION_PERCENTS%", formatString(cStr.trim()));
+        }
+        if(content.indexOf("%CURRENT_DATE%") > 1) {
+            String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis()));
+            content = content.replaceAll("%CURRENT_DATE%", formatString(str));
+        }
+        if(content.indexOf("%CURRENT_DATE_TIME%") > 1) {
+            String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
+            content = content.replaceAll("%CURRENT_DATE_TIME%", formatString(str));
         }
 
 
         StreamSource res = new StreamSource();
         res.setReader(new StringReader(content));
         return res;
+    }
+
+    public String formatString(String str) {
+        try {
+            return URLEncoder.encode(str, "UTF-8");
+        } catch (Exception e) {
+            return str;
+        }
     }
 
 
