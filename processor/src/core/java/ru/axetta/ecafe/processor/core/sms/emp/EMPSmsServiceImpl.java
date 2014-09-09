@@ -123,6 +123,11 @@ public class EMPSmsServiceImpl extends ISmsService {
         return true;
     }
 
+    public void runStorageMerge() throws EMPException {
+        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runBindClients();
+        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runReceiveUpdates();
+    }
+
     public void runBindClients() throws EMPException {
         if(!isAllowed()) {
             return;
