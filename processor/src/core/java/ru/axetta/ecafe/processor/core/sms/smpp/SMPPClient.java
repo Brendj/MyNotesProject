@@ -43,7 +43,11 @@ public class SMPPClient extends ISmsService {
 
 
     @Override
-    public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
+    public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject) throws Exception {
+        if(!(textObject instanceof String)) {
+            throw new Exception("Text argument must be a string");
+        }
+        String text = (String) textObject;
         LOGGER.info("start sending: " + text);
         long destination = Long.parseLong(phoneNumber);
         SendResult sr;

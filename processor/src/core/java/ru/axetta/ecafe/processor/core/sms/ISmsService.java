@@ -17,6 +17,11 @@ public abstract class ISmsService {
         private final String password;
         private final String defaultSender;
         private final String serviceTimeZone;
+        private final String token;
+        private final String systemId;
+        private final String catalogName;
+        private final String subscriptionServiceUrl;
+        private final String storageServiceUrl;
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone)
                 throws Exception {
@@ -25,6 +30,27 @@ public abstract class ISmsService {
             this.password = password;
             this.defaultSender = StringUtils.substring(defaultSender, 0, 11);
             this.serviceTimeZone = serviceTimeZone;
+            this.subscriptionServiceUrl = "";
+            this.storageServiceUrl = "";
+            this.token = "";
+            this.systemId = "";
+            this.catalogName = "";
+        }
+
+        public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone,
+                String subscriptionServiceUrl, String storageServiceUrl, String token,String systemId,
+                String catalogName)
+        throws Exception {
+            this.serviceUrl = serviceUrl;
+            this.userName = userName;
+            this.password = password;
+            this.defaultSender = StringUtils.substring(defaultSender, 0, 11);
+            this.serviceTimeZone = serviceTimeZone;
+            this.subscriptionServiceUrl = subscriptionServiceUrl;
+            this.storageServiceUrl = storageServiceUrl;
+            this.token = token;
+            this.systemId = systemId;
+            this.catalogName = catalogName;
         }
 
         public String getServiceUrl() {
@@ -46,6 +72,26 @@ public abstract class ISmsService {
         public String getServiceTimeZone() {
             return serviceTimeZone;
         }
+
+        public String getSubscriptionServiceUrl() {
+            return subscriptionServiceUrl;
+        }
+
+        public String getStorageServiceUrl() {
+            return storageServiceUrl;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public String getSystemId() {
+            return systemId;
+        }
+
+        public String getCatalogName() {
+            return catalogName;
+        }
     }
     protected Config config;
     protected static Logger logger;
@@ -53,10 +99,12 @@ public abstract class ISmsService {
         try {  logger = LoggerFactory.getLogger(ISmsService.class); } catch (Throwable ignored) {}
     }
 
+    public ISmsService() {
+    }
     public ISmsService(Config config) {
         this.config = config;
     }
-    public abstract SendResponse sendTextMessage(String sender, String phoneNumber, String text)
+    public abstract SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject)
             throws Exception;
     public abstract DeliveryResponse getDeliveryStatus(String messageId) throws Exception;
 }

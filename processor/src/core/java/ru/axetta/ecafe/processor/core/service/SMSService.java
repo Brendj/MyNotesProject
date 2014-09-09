@@ -49,7 +49,7 @@ public class SMSService {
     public SMSService() {
     }
 
-    @Async
+    /*@Async
     public void sendSMSAsync(long idOfClient, EMPEventType empEvent) throws Exception {
         RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, empEvent);
     }
@@ -60,14 +60,14 @@ public class SMSService {
         boolean result = registerClientSMSCharge(sending, client,
                                                  "", client.getMobile(), empEvent.getType(), empEvent.buildText());
         return result;
-    }
+    }*/
 
     @Async
-    public void sendSMSAsync(long idOfClient, int messageType, String text) throws Exception {
-        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, text);
+    public void sendSMSAsync(long idOfClient, int messageType, Object textObject) throws Exception {
+        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, textObject);
     }
 
-    public boolean sendSMS(long idOfClient, int messageType, String text) throws Exception {
+    public boolean sendSMS(long idOfClient, int messageType, Object textObject) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
         Client client = null; String phoneNumber, sender;
@@ -91,33 +91,35 @@ public class SMSService {
 
         SendResponse sendResponse = null;
         ISmsService smsService = runtimeContext.getSmsService();
-        logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber, text});
+        logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber,
+                                                                                       textObject.toString()});
         if(smsService instanceof SMPPClient){
             try {
-                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
+                sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                 logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                        sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
+                        sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(), sendResponse.getStatusCode(), sendResponse.getError()));
             } catch (Exception e) {
                 logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                        new Object[]{sender, phoneNumber, text, e});
+                        new Object[]{sender, phoneNumber, textObject.toString(), e});
             }
         } else {
             for (int i = 0; i < 3; i++) {
                 try {
-                    sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
+                    sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                     logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                            sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
+                            sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(), sendResponse.getStatusCode(), sendResponse.getError()));
                     if (sendResponse.isSuccess()) {
                         break;
                     }
                 } catch (Exception e) {
                     logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                            new Object[]{sender, phoneNumber, text, e});
+                            new Object[]{sender, phoneNumber, textObject.toString(), e});
                 }
             }
         }
         boolean result = registerClientSMSCharge(null != sendResponse && sendResponse.isSuccess(), client,
-                                                 sendResponse.getMessageId(), phoneNumber, messageType, text);
+                                                 sendResponse.getMessageId(), phoneNumber, messageType,
+                                                 textObject.toString());
         return result;
     }
 

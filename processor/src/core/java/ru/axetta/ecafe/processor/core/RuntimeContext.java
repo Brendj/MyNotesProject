@@ -37,6 +37,7 @@ import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.altarix.AltarixSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
 import ru.axetta.ecafe.processor.core.sms.teralect.TeralectSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
@@ -1139,8 +1140,15 @@ public class RuntimeContext implements ApplicationContextAware {
         String sender = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".sender", "Novshkola");
         String timeZone = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".timeZone", "GMT-1");
         String userServiceId = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".serviceId", "14");
+        String token = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".token", "49aafdb8198311e48ee8416c74617269");               //  EMP
+        String systemId = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".systemId", "666255");                                   //  EMP
+        String catalogName = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".catalogName", "SYS666254CAT0000000SUBSCRIPTIONS");   //  EMP
+        String subscriptionServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".subscriptionUrl", "http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl");                                        //  EMP
+        String storageServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");   //  EMP
 
-        ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone);
+        ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone,
+                                                           subscriptionServiceUrl, storageServiceUrl, token,
+                                                           systemId, catalogName);
         ISmsService smsService = null;
         if (serviceType.equalsIgnoreCase("atompark")) {
             smsService = new AtomparkSmsServiceImpl(config);
@@ -1150,6 +1158,8 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = new AltarixSmsServiceImpl(config, userServiceId);
         } else if (serviceType.equalsIgnoreCase("smpp")) {
             smsService = new SMPPClient(config, properties, SMS_SERVICE_PARAM_BASE);
+        } else if(serviceType.equalsIgnoreCase("emp")) {
+            smsService = EMPSmsServiceImpl.getInstance(config);
         } else {
             throw new Exception("Invalid SMS service type: " + serviceType);
         }

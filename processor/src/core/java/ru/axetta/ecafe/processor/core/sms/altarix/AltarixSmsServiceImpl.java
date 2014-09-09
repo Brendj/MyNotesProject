@@ -140,7 +140,11 @@ public class AltarixSmsServiceImpl extends ISmsService {
     }
 
     @Override
-    public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
+    public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject) throws Exception {
+        if(!(textObject instanceof String)) {
+            throw new Exception("Text argument must be a string");
+        }
+        String text = (String) textObject;
         NameValuePair[] queryParameters = createQueryParameters(userServiceId, phoneNumber, text, "send", "sms");
 
         //MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();

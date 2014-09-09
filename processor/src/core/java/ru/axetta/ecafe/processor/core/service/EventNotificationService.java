@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
@@ -14,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -49,6 +52,8 @@ public class EventNotificationService {
 
     @Resource
     SMSService smsService;
+    @Autowired
+    private RuntimeContext runtimeContext;
 
     static final String[] DEFAULT_MESSAGES = {
             NOTIFICATION_ENTER_EVENT + "." + TYPE_SMS,
@@ -385,10 +390,29 @@ public class EventNotificationService {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
 
+            Object textObject = getTextObject(text, type, client, direction, guardian);
+            if(textObject != null) {
+                if (sendAsync) {
+                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, textObject);
+                    result = true;
+                } else {
+                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, textObject);
+                }
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
+            logger.error(message, e);
+            return false;
+        }
+        return result;
+    }
 
+    private Object getTextObject(String text, String type, Client client, Integer direction, Client guardian) {
+        ISmsService smsService = runtimeContext.getSmsService();
+        if(smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
-            /*if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
-               (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
+            if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
+                    (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, client);
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
@@ -403,31 +427,13 @@ public class EventNotificationService {
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, client);
                 putGuardianParams(guardian, empType);
-            }* else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
+            } /*else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
             }*/
-
-
-            if(empType == null) {
-                if (sendAsync) {
-                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
-                    result = true;
-                } else {
-                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
-                }
-            } else {
-                if (sendAsync) {
-                    smsService.sendSMSAsync(client.getIdOfClient(), empType);
-                } else {
-                    result = smsService.sendSMS(client.getIdOfClient(), empType);
-                }
-            }
-        } catch (Exception e) {
-            String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
-            logger.error(message, e);
-            return false;
+            return empType;
+        } else {
+            return text;
         }
-        return result;
     }
 
     private static final void putGuardianParams(Client guardian, EMPEventType empType) {

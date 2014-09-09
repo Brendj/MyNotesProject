@@ -72,8 +72,12 @@ public class AtomparkSmsServiceImpl extends ISmsService {
      * @return
      * @throws Exception
      */
-    public SendResponse sendTextMessage(String sender, String phoneNumber, String text)
+    public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject)
             throws Exception {
+        if(!(textObject instanceof String)) {
+            throw new Exception("Text argument must be a string");
+        }
+        String text = (String) textObject;
         if (StringUtils.isEmpty(sender)) {
             sender = config.getDefaultSender();
         }

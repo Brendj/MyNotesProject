@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -74,12 +75,12 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runBindEMPClients() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients(); //DEF
+        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runBindClients(); //DEF
         printMessage("Привязка клиентов с ЕМП завершена");
     }
 
     public void runReceiveEMPUpdates() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
+        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runReceiveUpdates(); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
     }
 
