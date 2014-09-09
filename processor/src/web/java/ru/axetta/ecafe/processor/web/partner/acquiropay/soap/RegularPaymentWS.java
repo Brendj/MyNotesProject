@@ -57,6 +57,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Subscription with id = %s not found.";
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
 
+    private static final int CLIENT_ID_TYPE_CONTRACTID = 0;
     private static final int CLIENT_ID_TYPE_SAN = 1;
     private static final int CLIENT_ID_TYPE_MOBILE = 2;
 
@@ -187,11 +188,15 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         RequestResult requestResult = new RequestResult();
         List<Long> subscriptionList;
         try {
-            if (clientIDType == CLIENT_ID_TYPE_SAN) {
-                subscriptionList = rpService.findSubscriptionsId(null, clientID);
+            if (clientIDType == CLIENT_ID_TYPE_CONTRACTID) {
+                Long contractId = Long.parseLong(clientID);
+                subscriptionList = rpService.findSubscriptionsId(contractId, null, null);
+            }
+            else if (clientIDType == CLIENT_ID_TYPE_SAN) {
+                subscriptionList = rpService.findSubscriptionsId(null, null, clientID);
             } else if (clientIDType == CLIENT_ID_TYPE_MOBILE) {
                 subscriptionList = rpService
-                        .findSubscriptionsId(PhoneNumberCanonicalizator.canonicalize(clientID), null);
+                        .findSubscriptionsId(null, PhoneNumberCanonicalizator.canonicalize(clientID), null);
             } else {
                 subscriptionList = new ArrayList<Long>();
             }
@@ -212,11 +217,15 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         RequestResult result = new RequestResult();
         List<Long> subscriptionList;
         try {
-            if (clientIDType == CLIENT_ID_TYPE_SAN) {
-                subscriptionList = rpService.findSubscriptionsId(null, clientID);
+            if (clientIDType == CLIENT_ID_TYPE_CONTRACTID) {
+                Long contractId = Long.parseLong(clientID);
+                subscriptionList = rpService.findSubscriptionsId(contractId, null, null);
+            }
+            else if (clientIDType == CLIENT_ID_TYPE_SAN) {
+                subscriptionList = rpService.findSubscriptionsId(null, null, clientID);
             } else if (clientIDType == CLIENT_ID_TYPE_MOBILE) {
                 subscriptionList = rpService
-                        .findSubscriptionsId(PhoneNumberCanonicalizator.canonicalize(clientID), null);
+                        .findSubscriptionsId(null, PhoneNumberCanonicalizator.canonicalize(clientID), null);
             } else {
                 subscriptionList = new ArrayList<Long>();
             }

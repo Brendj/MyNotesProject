@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -281,10 +284,13 @@ public class RegularPaymentSubscriptionService {
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     @SuppressWarnings("unchecked")
-    public List<Long> findSubscriptionsId(String mobile, String san) {
+    public List<Long> findSubscriptionsId(Long contractId, String mobile, String san) throws Exception {
         Criteria criteria = em.unwrap(Session.class).createCriteria(BankSubscription.class);
         criteria.setProjection(Projections.property("idOfSubscription")).createAlias("client", "c")
                 .add(Restrictions.isNotNull("activationDate"));
+        if (contractId != null) {
+            criteria.add(Restrictions.eq("c.contractId", contractId));
+        }
         if (mobile != null) {
             criteria.add(Restrictions.eq("c.mobile", mobile));
         }

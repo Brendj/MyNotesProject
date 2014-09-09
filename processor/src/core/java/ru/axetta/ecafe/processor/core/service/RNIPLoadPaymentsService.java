@@ -42,6 +42,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.X509Security;
 import org.hibernate.Session;
@@ -666,7 +667,7 @@ public class RNIPLoadPaymentsService {
         byte[] data = new byte[is.available()];
         is.read(data);
 
-        String content = new String(data);
+        String content = new String(data, "UTF-8");
         if (content.indexOf("%START_DATE%") > 1) {
             String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getLastUpdateDate(contragent));
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 986400000));
@@ -739,7 +740,7 @@ public class RNIPLoadPaymentsService {
 
     public String formatString(String str) {
         try {
-            return URLEncoder.encode(str, "UTF-8");
+            return StringEscapeUtils.escapeXml(str);//URLEncoder.encode(str, "UTF-8");
         } catch (Exception e) {
             return str;
         }
