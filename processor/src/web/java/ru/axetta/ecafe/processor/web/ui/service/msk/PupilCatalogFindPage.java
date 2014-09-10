@@ -335,8 +335,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 RuntimeContext.getAppContext().getBean(PupilCatalogFindPage.class).bindClient(i);
                 nItems++;
             } catch (Exception e) {
-                errors.append(String.format("Не удалось связать % % % [%]",
-                              i.getFamilyName(), i.getFirstName(), i.getSecondName(), i.getGuid()));
+                errors.append(String.format("Не удалось связать % % % [%]: %s",
+                              i.getFamilyName(), i.getFirstName(), i.getSecondName(), i.getGuid(), e.getMessage()));
             }
         }
 
