@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.cxf.frontend.ClientProxy;
@@ -79,6 +80,10 @@ public class EMPSmsServiceImpl extends ISmsService {
         super(config);
     }
 
+    public Config getConfig() {
+        return config;
+    }
+
     public static ISmsService getInstance(Config config) {
         EMPSmsServiceImpl impl = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class);
         impl.config = config;
@@ -113,14 +118,26 @@ public class EMPSmsServiceImpl extends ISmsService {
         return runtimeContext.getOptionValueInt(Option.OPTION_EMP_CLIENTS_PER_PACKAGE);
     }
 
-    protected boolean isAllowed() {
+    public boolean isAllowed() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String instance = runtimeContext.getInstanceNameDecorated();
-        String reqInstance = runtimeContext.getOptionValueString(Option.OPTION_EMP_PROCESSOR_INSTANCE);
+        String instance = runtimeContext.getNodeName();
+        //String reqInstance = runtimeContext.getOptionValueString(Option.OPTION_EMP_PROCESSOR_INSTANCE);
+        String reqInstance = config.getSyncServiceNode();
         if(StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(reqInstance.trim())) {
             return false;
         }
         return true;
+    }
+
+    public void recalculateEMPClientsCount() {
+        EMPStatistics statistics = loadEMPStatistics();
+        long notBinded = DAOService.getInstance().getNotBindedEMPClientsCount();
+        long waitBind = DAOService.getInstance().getBindWaitingEMPClients();
+        long binded = DAOService.getInstance().getBindedEMPClientsCount();
+        statistics.setNotBindedCount(notBinded);
+        statistics.setWaitBindingCount(waitBind);
+        statistics.setBindedCount(binded);
+        saveEMPStatistics(statistics);
     }
 
     public void runStorageMerge() throws EMPException {
@@ -133,6 +150,8 @@ public class EMPSmsServiceImpl extends ISmsService {
             return;
         }
 
+        //  Загружаем статистику
+        EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Привязка клиентов ИСПП к ЕМП " + date + "]: ";
@@ -149,11 +168,13 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
         for(ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
-                bindClient(storage, c, synchDate);
+                bindClient(storage, c, synchDate, statistics);
             } catch (EMPException empe) {
                 logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()), empe);
             }
         }
+        //  Обновляем изменившуюся статистику
+        saveEMPStatistics(statistics);
     }
 
     public void runReceiveUpdates() throws EMPException {
@@ -161,6 +182,8 @@ public class EMPSmsServiceImpl extends ISmsService {
             return;
         }
 
+        //  Загружаем статистику
+        EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Получение изменений из ЕМП " + date + "]: ";
@@ -217,6 +240,13 @@ public class EMPSmsServiceImpl extends ISmsService {
             if(!StringUtils.isBlank(ruleId) && !StringUtils.isBlank(ssoid) && NumberUtils.isNumber(ruleId)) {
                 ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance().getClientByContractId(NumberUtils.toLong(ruleId));
                 if(client != null) {
+                    //  Обновляем статистику
+                    statistics.addBinded();
+                    if(!StringUtils.isBlank(client.getSsoid()) && client.getSsoid().equals("-1")) {
+                        statistics.removeWaitBinding();
+                    } else {
+                        statistics.removeNotBinded();
+                    }
                     log(synchDate + "Поступили изменения {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
                     client.setSsoid(ssoid);
                     DAOService.getInstance().saveEntity(client);
@@ -231,6 +261,8 @@ public class EMPSmsServiceImpl extends ISmsService {
             log(synchDate + "Изменения в ЕМП обработаны не до конца, запрос будет выполнен повторно", null);
             RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runReceiveUpdates();
         }
+        //  Обновляем изменившуюся статистику
+        saveEMPStatistics(statistics);
     }
 
     public boolean sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event) throws EMPException {
@@ -264,11 +296,13 @@ public class EMPSmsServiceImpl extends ISmsService {
         return true;
     }
 
-    protected void bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client, String synchDate) throws EMPException {
+    protected void bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client, String synchDate, EMPStatistics statistics) throws EMPException {
         if(bindThrowSelect(storage, client, synchDate)) {
-            logger.debug("Client is binded");
+            statistics.addBinded();
+            statistics.removeNotBinded();
         } else if(bindThrowAdd(storage, client, synchDate)) {
-            logger.debug("Client is binded");
+            statistics.addWaitBinding();
+            statistics.removeNotBinded();
         }
     }
 
@@ -588,12 +622,85 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
     protected void logRequest(JAXBContext jaxbContext, Object obj) {
+        if(!config.getLogging()) {
+            return;
+        }
+
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             FileWriter fw = new FileWriter("C:/out.signed.xml");
             marshaller.marshal(obj, fw);
         } catch (Exception e) {
             logger.error("Failed to log", e);
+        }
+    }
+
+    public static EMPStatistics loadEMPStatistics() {
+        return new EMPStatistics();
+    }
+
+    public static void saveEMPStatistics(EMPStatistics statistics) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        runtimeContext.setOptionValueWithSave(Option.OPTION_EMP_NOT_BINDED_CLIENTS_COUNT, statistics.getNotBindedCount());
+        runtimeContext.setOptionValueWithSave(Option.OPTION_EMP_BIND_WAITING_CLIENTS_COUNT, statistics.getWaitBindingCount());
+        runtimeContext.setOptionValueWithSave(Option.OPTION_EMP_BINDED_CLIENTS_COUNT, statistics.getBindedCount());
+    }
+
+    public static class EMPStatistics {
+        protected long notBindedCount;
+        protected long waitBindingCount;
+        protected long bindedCount;
+
+        public EMPStatistics() {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            notBindedCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_NOT_BINDED_CLIENTS_COUNT);
+            waitBindingCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_BIND_WAITING_CLIENTS_COUNT);
+            bindedCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_BINDED_CLIENTS_COUNT);
+        }
+
+        public long getNotBindedCount() {
+            return notBindedCount;
+        }
+
+        public long getWaitBindingCount() {
+            return waitBindingCount;
+        }
+
+        public long getBindedCount() {
+            return bindedCount;
+        }
+
+        public void addNotBinded() {
+            notBindedCount++;
+        }
+
+        public void addWaitBinding() {
+            waitBindingCount++;
+        }
+
+        public void addBinded() {
+            bindedCount++;
+        }
+
+        public void removeNotBinded() {
+            notBindedCount--;
+        }
+
+        public void removeWaitBinding() {
+            waitBindingCount--;
+        }
+
+        public void setNotBindedCount(long notBindedCount) {
+            this.notBindedCount = notBindedCount;
+        }
+
+        public void setWaitBindingCount(long waitBindingCount) {
+            this.waitBindingCount = waitBindingCount;
+        }
+
+        public void setBindedCount(long bindedCount) {
+            this.bindedCount = bindedCount;
         }
     }
 }

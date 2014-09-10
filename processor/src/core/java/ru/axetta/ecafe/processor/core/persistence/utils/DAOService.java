@@ -1523,4 +1523,19 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         p.getFirstName();
         return p;
     }
+
+    public long getNotBindedEMPClientsCount() {
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid is null and mobile<>''");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
+    public long getBindedEMPClientsCount() {
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid is not null and ssoid<>'-1' and mobile<>''");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
+    public long getBindWaitingEMPClients() {
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid='-1'");
+        return Long.parseLong("" + q.getSingleResult());
+    }
 }

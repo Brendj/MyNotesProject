@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sms;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ public abstract class ISmsService {
         private final String catalogName;
         private final String subscriptionServiceUrl;
         private final String storageServiceUrl;
+        private final boolean logging;
+        private final String syncServiceNode;
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone)
                 throws Exception {
@@ -35,11 +38,13 @@ public abstract class ISmsService {
             this.token = "";
             this.systemId = "";
             this.catalogName = "";
+            this.logging = false;
+            this.syncServiceNode = "";
         }
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone,
                 String subscriptionServiceUrl, String storageServiceUrl, String token,String systemId,
-                String catalogName)
+                String catalogName, String logging, String syncServiceNode)
         throws Exception {
             this.serviceUrl = serviceUrl;
             this.userName = userName;
@@ -51,6 +56,8 @@ public abstract class ISmsService {
             this.token = token;
             this.systemId = systemId;
             this.catalogName = catalogName;
+            this.logging = BooleanUtils.toBoolean(logging);
+            this.syncServiceNode = syncServiceNode;
         }
 
         public String getServiceUrl() {
@@ -91,6 +98,14 @@ public abstract class ISmsService {
 
         public String getCatalogName() {
             return catalogName;
+        }
+
+        public boolean getLogging() {
+            return logging;
+        }
+
+        public String getSyncServiceNode() {
+            return syncServiceNode;
         }
     }
     protected Config config;

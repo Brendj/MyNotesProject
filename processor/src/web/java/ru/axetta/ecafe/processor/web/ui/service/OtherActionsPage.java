@@ -92,6 +92,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
+    public void runRecalculateEMPStatistics() throws Exception {
+        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).recalculateEMPClientsCount(); //DEF
+        printMessage("Статистика ЕМП обновлена");
+    }
+
 
 
     @Override

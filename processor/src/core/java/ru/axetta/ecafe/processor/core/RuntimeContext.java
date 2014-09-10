@@ -379,6 +379,10 @@ public class RuntimeContext implements ApplicationContextAware {
                 : (" (" + instanceName + ")") + (StringUtils.isEmpty(nodeName) ? "" : "[" + nodeName + "]");
     }
 
+    public String getNodeName() {
+        return nodeName;
+    }
+
     ///////////////////////////////////////////////////////////
 
 
@@ -1145,10 +1149,12 @@ public class RuntimeContext implements ApplicationContextAware {
         String catalogName = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".catalogName", "SYS666254CAT0000000SUBSCRIPTIONS");   //  EMP
         String subscriptionServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".subscriptionUrl", "http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl");                                        //  EMP
         String storageServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");   //  EMP
+        String logging = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".logging", "false");   //  EMP
+        String syncServiceNode = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".syncServiceNode", "1");   //  EMP
 
         ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone,
                                                            subscriptionServiceUrl, storageServiceUrl, token,
-                                                           systemId, catalogName);
+                                                           systemId, catalogName, logging, syncServiceNode);
         ISmsService smsService = null;
         if (serviceType.equalsIgnoreCase("atompark")) {
             smsService = new AtomparkSmsServiceImpl(config);

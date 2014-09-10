@@ -41,6 +41,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Обновить статистику ЕМП" action="#{otherActionsPage.runRecalculateEMPStatistics}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
 
 
