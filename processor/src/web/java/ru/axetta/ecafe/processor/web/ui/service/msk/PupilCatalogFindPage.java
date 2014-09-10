@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
@@ -323,27 +324,38 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         return null;
     }
 
-    @Transactional
     public Object bindClients() {
+        StringBuilder errors = new StringBuilder();
         int nItems = 0;
-        try {
-            for (Item i : pupilInfos) {
-                if (!i.isToBind() || i.idOfClientForBind == null) {
-                    continue;
-                }
-                Client client = em.find(Client.class, i.idOfClientForBind);
-                client.setClientGUID(i.getGuid());
-                em.persist(client);
-                i.toBind = false;
-                i.toAdd = false;
-                i.idOfClient = i.idOfClientForBind;
-                nItems++;
+        for (Item i : pupilInfos) {
+            if (!i.isToBind() || i.idOfClientForBind == null) {
+                continue;
             }
-            printMessage("Успешно связано клиентов: " + nItems);
-        } catch (Exception e) {
-            logAndPrintMessage("Ошибка при связывании", e);
+            try {
+                RuntimeContext.getAppContext().getBean(PupilCatalogFindPage.class).bindClient(i);
+                nItems++;
+            } catch (Exception e) {
+                errors.append(String.format("Не удалось связать % % % [%]",
+                              i.getFamilyName(), i.getFirstName(), i.getSecondName(), i.getGuid()));
+            }
         }
 
+        if(errors.length() < 1) {
+            printMessage("Успешно связано клиентов: " + nItems);
+        } else {
+            printMessage(errors.toString());
+        }
+        return null;
+    }
+
+    @Transactional
+    public Object bindClient(Item i) throws Exception {
+        Client client = em.find(Client.class, i.idOfClientForBind);
+        client.setClientGUID(i.getGuid());
+        em.persist(client);
+        i.toBind = false;
+        i.toAdd = false;
+        i.idOfClient = i.idOfClientForBind;
         return null;
     }
 
