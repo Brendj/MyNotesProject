@@ -39,12 +39,16 @@ public class SubscriptionFeeding extends DistributedObject{
 
     private Long idOfClient;
     private Client client;
-    private Date dateActivateService;
-    private Date lastDatePauseService;
-    private Date dateDeactivateService;
-    private Boolean wasSuspended;
+
     /* юридическая дата подписки, всегда присутствует */
     private Date dateCreateService;
+    private Date dateDeactivateService;
+    //дата
+    private Date dateActivateSubscription;
+    private Date lastDatePauseSubscription;
+
+    private Boolean wasSuspended;
+
     private Staff staff;
     private String guidOfStaff;
 
@@ -80,17 +84,6 @@ public class SubscriptionFeeding extends DistributedObject{
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
-        //SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
-        //List<SubscriptionFeeding> subscriptionFeedings = sfService.findSubscriptionFeedingByClient(client);
-        // Если уже есть у клиента актуальная подписка и с АРМа приходит тоже актулаьная, то АРМовскую "разворачиваем".
-        // Потому что не может быть у клиента двух актуальных подписок на АП !
-        //for (SubscriptionFeeding sf: Lists.reverse(subscriptionFeedings)){
-        //    if (isActual() && !sf.getGuid().equals(guid)) {
-        //        DistributedObjectException doe = new DistributedObjectException("SubscriptionFeeding DATA_EXIST_VALUE");
-        //        doe.setData(sf.getGuid());
-        //        throw doe;
-        //    }
-        //}
 
     }
 
@@ -107,18 +100,18 @@ public class SubscriptionFeeding extends DistributedObject{
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
         DateFormat df = CalendarUtils.getDateFormatLocal();
-        if (dateActivateService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateActivate", df.format(dateActivateService));
+        if (dateActivateSubscription != null) {
+            XMLUtils.setAttributeIfNotNull(element, "DateActivateSubscription", df.format(dateActivateSubscription));
         }
-        if (lastDatePauseService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "LastDatePause", df.format(lastDatePauseService));
+        if (lastDatePauseSubscription != null) {
+            XMLUtils.setAttributeIfNotNull(element, "LastDatePauseSubscription", df.format(lastDatePauseSubscription));
         }
         if (dateDeactivateService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateDeactivate", df.format(dateDeactivateService));
+            XMLUtils.setAttributeIfNotNull(element, "DateDeactivateService", df.format(dateDeactivateService));
         }
         XMLUtils.setAttributeIfNotNull(element, "WasSuspended", wasSuspended);
         if (dateCreateService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateCreate", df.format(dateCreateService));
+            XMLUtils.setAttributeIfNotNull(element, "DateCreateService", df.format(dateCreateService));
         }
         if (guidOfStaff != null) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
@@ -140,14 +133,14 @@ public class SubscriptionFeeding extends DistributedObject{
             throw new DistributedObjectException("Client is empty");
         }
 
-        Date dateDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivate");
+        Date dateDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivateService");
         if (dateDateActivateService != null){
-            setDateActivateService(dateDateActivateService);
+            setDateActivateSubscription(dateDateActivateService);
         }
 
-        Date dateLastDatePauseService = XMLUtils.getDateAttributeValue(node, "LastDatePause");
-        if (dateLastDatePauseService != null){
-            setLastDatePauseService(dateLastDatePauseService);
+        Date dateLastDatePauseSubscription = XMLUtils.getDateAttributeValue(node, "LastDatePauseSubscription");
+        if (dateLastDatePauseSubscription != null){
+            setLastDatePauseSubscription(dateLastDatePauseSubscription);
         }
 
         Date dateDateDeactivateService = XMLUtils.getDateAttributeValue(node, "DateDeactivate");
@@ -185,8 +178,8 @@ public class SubscriptionFeeding extends DistributedObject{
         setOrgOwner(((SubscriptionFeeding) distributedObject).getOrgOwner());
         setIdOfClient(((SubscriptionFeeding) distributedObject).getIdOfClient());
         setClient(((SubscriptionFeeding) distributedObject).getClient());
-        setDateActivateService(((SubscriptionFeeding) distributedObject).getDateActivateService());
-        setLastDatePauseService(((SubscriptionFeeding) distributedObject).getLastDatePauseService());
+        setDateActivateSubscription(((SubscriptionFeeding) distributedObject).getDateActivateSubscription());
+        setLastDatePauseSubscription(((SubscriptionFeeding) distributedObject).getLastDatePauseSubscription());
         setDateDeactivateService(((SubscriptionFeeding) distributedObject).getDateDeactivateService());
         setWasSuspended(((SubscriptionFeeding) distributedObject).getWasSuspended());
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
@@ -216,20 +209,20 @@ public class SubscriptionFeeding extends DistributedObject{
         this.idOfClient = idOfClient;
     }
 
-    public Date getDateActivateService() {
-        return dateActivateService;
+    public Date getDateActivateSubscription() {
+        return dateActivateSubscription;
     }
 
-    public void setDateActivateService(Date dateActivateService) {
-        this.dateActivateService = dateActivateService;
+    public void setDateActivateSubscription(Date dateActivateSubscription) {
+        this.dateActivateSubscription = dateActivateSubscription;
     }
 
-    public Date getLastDatePauseService() {
-        return lastDatePauseService;
+    public Date getLastDatePauseSubscription() {
+        return lastDatePauseSubscription;
     }
 
-    public void setLastDatePauseService(Date lastDatePauseService) {
-        this.lastDatePauseService = lastDatePauseService;
+    public void setLastDatePauseSubscription(Date lastDatePauseSubscription) {
+        this.lastDatePauseSubscription = lastDatePauseSubscription;
     }
 
     public Date getDateDeactivateService() {

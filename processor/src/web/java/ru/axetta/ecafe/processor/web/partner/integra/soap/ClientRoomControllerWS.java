@@ -4775,7 +4775,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             SubscriptionFeeding sf = new SubscriptionFeeding();
             sf.fill(subscriptionFeeding);
-            sf.setDateActivateService(activateDate);
+            sf.setDateActivateSubscription(activateDate);
             sf.setStaff(null);
             sf.setDeletedState(false);
             Long sfVersion = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
@@ -4928,7 +4928,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = "Не верная дата приостановки подписки";
                 return result;
             }
-            subscriptionFeeding.setLastDatePauseService(suspendDate);
+            subscriptionFeeding.setLastDatePauseSubscription(suspendDate);
             subscriptionFeeding.setWasSuspended(true);
             subscriptionFeeding.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
             subscriptionFeeding.setLastUpdate(new Date());
@@ -5007,8 +5007,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setCreatedDate(new Date());
             sf.setLastUpdate(new Date());
             sf.fill(subscriptionFeeding);
-            sf.setDateActivateService(activateDate);
-            sf.setLastDatePauseService(null);
+            sf.setDateActivateSubscription(activateDate);
+            sf.setLastDatePauseSubscription(null);
             sf.setStaff(null);
             sf.setDeletedState(false);
             Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
@@ -5064,7 +5064,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             DAOService daoService = DAOService.getInstance();
             subscriptionFeeding.setWasSuspended(false);
-            subscriptionFeeding.setLastDatePauseService(null);
+            subscriptionFeeding.setLastDatePauseSubscription(null);
             subscriptionFeeding.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
             subscriptionFeeding.setLastUpdate(new Date());
             session.saveOrUpdate(subscriptionFeeding);

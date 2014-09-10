@@ -97,7 +97,7 @@ public class SubscriptionFeedingReportBuilder extends BasicReportForOrgJob.Build
                 currentDate = CalendarUtils.addOneDay(currentDate);
                 dayWeek++;
             }
-            subscriptionFeedingReportItems.add(new SubscriptionFeedingReportItem(client.getPerson(), client, subscriptionFeeding.getDateActivateService(),  cycleDiagram,  currentDate));
+            subscriptionFeedingReportItems.add(new SubscriptionFeedingReportItem(client.getPerson(), client, subscriptionFeeding.getDateActivateSubscription(),  cycleDiagram,  currentDate));
         }
         return new SubscriptionFeedingReport(generateTime, new Date().getTime() - generateTime.getTime(), subscriptionFeedingReportItems);
     }

@@ -38,9 +38,9 @@
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="false"/>
 
-        <property name="dateActivateService" column="DateActivateService"
+        <property name="dateActivateSubscription" column="DateActivateSubscription"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="lastDatePauseService" column="LastDatePauseService"
+        <property name="lastDatePauseSubscription" column="LastDatePauseSubscription"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="dateDeactivateService" column="DateDeactivateService"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>

@@ -10,3 +10,7 @@ ALTER TABLE cf_contragents ADD COLUMN LastRNIPUpdate VARCHAR(15) NOT NULL DEFAUL
 -- Новое условие уникальности по полям
 ALTER TABLE cf_instances DROP CONSTRAINT cf_instances_invbook_invnumber_key;
 ALTER TABLE cf_instances ADD CONSTRAINT cf_instances_invbook_invnumber_key UNIQUE (invbook , invnumber, deletedstate);
+
+ALTER TABLE cf_subscriber_feeding RENAME COLUMN lastdatepauseservice to lastdatepausesubscription;
+ALTER TABLE cf_subscriber_feeding RENAME COLUMN dateactivateservice to dateactivatesubscription;
+

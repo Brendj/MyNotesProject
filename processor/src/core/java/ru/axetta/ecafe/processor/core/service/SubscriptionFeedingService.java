@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import com.google.common.collect.Lists;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
@@ -16,7 +14,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -40,7 +37,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.setDayOfMonth;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
 /**
@@ -158,8 +154,8 @@ public class SubscriptionFeedingService {
         nextWeekDay = CalendarUtils.addDays(nextWeekDay, 7);
         final String sql = "select cl, cd from CycleDiagram cd left join cd.client cl where cd.stateDiagram=0 and "
                 + " exists (from SubscriptionFeeding sf "
-                + "  where sf.dateCreateService<:currentDate and sf.dateActivateService<:currentDate  "
-                + "  and (sf.lastDatePauseService is null or sf.lastDatePauseService>:nextWeekDay) "
+                + "  where sf.dateCreateService<:currentDate and sf.dateActivateSubscription<:currentDate  "
+                + "  and (sf.lastDatePauseSubscription is null or sf.lastDatePauseSubscription>:nextWeekDay) "
                 + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:nextWeekDay) and sf.client=cl and sf.deletedState=false) "
                 + " and not (cl.subBalance1 is null) and cl.subBalance1>0 and"
                 + " cl.subBalance1-cd.mondayPrice-cd.tuesdayPrice-cd.wednesdayPrice-cd.thursdayPrice-cd.fridayPrice-cd.saturdayPrice-cd.sundayPrice<=0 and "
@@ -356,7 +352,7 @@ public class SubscriptionFeedingService {
         });
         SubscriptionFeeding subscriptionFeeding = null;
         for (SubscriptionFeeding sf: subscriptionFeedings){
-            if(sf.getLastDatePauseService()!=null){
+            if(sf.getLastDatePauseSubscription()!=null){
                 break;
             }
             subscriptionFeeding = sf;
@@ -519,7 +515,7 @@ public class SubscriptionFeedingService {
         if(dayForbid.getHours()>=12){
             dayForbid = CalendarUtils.addOneDay(currentDay);
         }
-        sf.setLastDatePauseService(dayForbid);
+        sf.setLastDatePauseSubscription(dayForbid);
         sf.setWasSuspended(true);
         //DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
@@ -539,7 +535,7 @@ public class SubscriptionFeedingService {
         Date today = truncateToDayOfMonth(endPauseDate);
 
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
-        sf.setLastDatePauseService(today);
+        sf.setLastDatePauseSubscription(today);
         sf.setWasSuspended(true);
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(new Date());
@@ -567,7 +563,7 @@ public class SubscriptionFeedingService {
         sf.setClient(client);
         sf.setOrgOwner(lassf.getOrgOwner());
         sf.setIdOfClient(client.getIdOfClient());
-        sf.setDateActivateService(endReopenDate);
+        sf.setDateActivateSubscription(endReopenDate);
         sf.setDateCreateService(lassf.getDateCreateService());
         sf.setDateDeactivateService(lassf.getDateDeactivateService());
         sf.setDeletedState(false);
@@ -592,7 +588,7 @@ public class SubscriptionFeedingService {
     public void cancelSubscriptionFeeding(Client client) {
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setWasSuspended(false);
-        sf.setLastDatePauseService(null);
+        sf.setLastDatePauseSubscription(null);
         DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(new Date());
@@ -612,7 +608,7 @@ public class SubscriptionFeedingService {
         sf.setClient(client);
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
-        sf.setDateActivateService(newDateActivateService);
+        sf.setDateActivateSubscription(newDateActivateService);
         sf.setDateCreateService(dateCreateService);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -641,7 +637,7 @@ public class SubscriptionFeedingService {
         Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
         List<SubscriptionFeeding> list = findSubscriptionFeedingByClient(client, dayBegin);
         SubscriptionFeeding sf = list.get(0);
-        sf.setDateActivateService(dateActivationDiagram);
+        sf.setDateActivateSubscription(dateActivationDiagram);
         Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
         sf.setGlobalVersionOnCreate(version);
         sf.setGlobalVersion(version);
@@ -706,7 +702,7 @@ public class SubscriptionFeedingService {
         //  if(!( new Date() between  dateActivateService and dateDeActivateService)) {
         //     редактируем
         //  }
-        if(!(currentDate.after(sf.getDateActivateService()) && sf.isActual())){
+        if(!(currentDate.after(sf.getDateActivateSubscription()) && sf.isActual())){
             if(cd==null){
                 cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
                         dateActivationDiagram, false);

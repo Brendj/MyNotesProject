@@ -22,20 +22,20 @@ public class SubscriptionFeedingExt {
     @XmlElement(name = "DateCreateService")
     @XmlSchemaType(name = "dateTime")
     private Date dateCreateService;
-    @XmlElement(name = "DateActivate")
+    @XmlElement(name = "DateActivateSubscription")
     @XmlSchemaType(name = "dateTime")
-    private Date dateActivate;
-    @XmlElement(name = "LastDatePause")
+    private Date dateActivateSubscription;
+    @XmlElement(name = "LastDatePauseSubscription")
     @XmlSchemaType(name = "dateTime")
-    private Date lastDatePause;
-    @XmlElement(name = "DateDeactivate")
+    private Date lastDatePauseSubscription;
+    @XmlElement(name = "DateDeactivateService")
     @XmlSchemaType(name = "dateTime")
-    private Date dateDeactivate;
+    private Date dateDeactivateService;
     @XmlElement(name = "UpdateDate")
     @XmlSchemaType(name = "dateTime")
     private Date updateDate;
-    @XmlElement(name = "Suspended")
-    private Boolean suspended;
+    @XmlElement(name = "WasSuspended")
+    private Boolean wasSuspended;
     @XmlElement(name = "ChangesPlace")
     private Boolean changesPlace;
 
@@ -43,10 +43,10 @@ public class SubscriptionFeedingExt {
         this.idOfSubscriptionFeeding = subscriptionFeeding.getGlobalId();
         this.guid = subscriptionFeeding.getGuid();
         this.dateCreateService = subscriptionFeeding.getDateCreateService();
-        this.dateActivate = subscriptionFeeding.getDateActivateService();
-        this.lastDatePause = subscriptionFeeding.getLastDatePauseService();
-        this.dateDeactivate = subscriptionFeeding.getDateDeactivateService();
-        this.suspended = subscriptionFeeding.getWasSuspended();
+        this.dateActivateSubscription = subscriptionFeeding.getDateActivateSubscription();
+        this.lastDatePauseSubscription = subscriptionFeeding.getLastDatePauseSubscription();
+        this.dateDeactivateService = subscriptionFeeding.getDateDeactivateService();
+        this.wasSuspended = subscriptionFeeding.getWasSuspended();
         if(subscriptionFeeding.getLastUpdate()==null){
             this.updateDate = subscriptionFeeding.getCreatedDate();
         } else {
@@ -79,36 +79,36 @@ public class SubscriptionFeedingExt {
         this.dateCreateService = dateCreateService;
     }
 
-    public Date getDateActivate() {
-        return dateActivate;
+    public Date getDateActivateSubscription() {
+        return dateActivateSubscription;
     }
 
-    public void setDateActivate(Date dateActivate) {
-        this.dateActivate = dateActivate;
+    public void setDateActivateSubscription(Date dateActivateSubscription) {
+        this.dateActivateSubscription = dateActivateSubscription;
     }
 
-    public Date getLastDatePause() {
-        return lastDatePause;
+    public Date getLastDatePauseSubscription() {
+        return lastDatePauseSubscription;
     }
 
-    public void setLastDatePause(Date lastDatePause) {
-        this.lastDatePause = lastDatePause;
+    public void setLastDatePauseSubscription(Date lastDatePauseSubscription) {
+        this.lastDatePauseSubscription = lastDatePauseSubscription;
     }
 
-    public Date getDateDeactivate() {
-        return dateDeactivate;
+    public Date getDateDeactivateService() {
+        return dateDeactivateService;
     }
 
-    public void setDateDeactivate(Date dateDeactivate) {
-        this.dateDeactivate = dateDeactivate;
+    public void setDateDeactivateService(Date dateDeactivateService) {
+        this.dateDeactivateService = dateDeactivateService;
     }
 
-    public Boolean getSuspended() {
-        return suspended;
+    public Boolean getWasSuspended() {
+        return wasSuspended;
     }
 
-    public void setSuspended(Boolean suspended) {
-        this.suspended = suspended;
+    public void setWasSuspended(Boolean wasSuspended) {
+        this.wasSuspended = wasSuspended;
     }
 
     public Date getUpdateDate() {
