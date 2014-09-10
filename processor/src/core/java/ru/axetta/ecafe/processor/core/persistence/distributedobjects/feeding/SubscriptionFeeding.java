@@ -60,9 +60,9 @@ public class SubscriptionFeeding extends DistributedObject{
         addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("cl.idOfClient"), "idOfClient");
-        projectionList.add(Projections.property("dateActivateService"), "dateActivateService");
-        projectionList.add(Projections.property("lastDatePauseService"), "lastDatePauseService");
         projectionList.add(Projections.property("dateDeactivateService"), "dateDeactivateService");
+        projectionList.add(Projections.property("lastDatePauseSubscription"), "lastDatePauseSubscription");
+        projectionList.add(Projections.property("dateActivateSubscription"), "dateActivateSubscription");
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
         projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
@@ -101,17 +101,17 @@ public class SubscriptionFeeding extends DistributedObject{
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
         DateFormat df = CalendarUtils.getDateFormatLocal();
         if (dateActivateSubscription != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateActivateSubscription", df.format(dateActivateSubscription));
+            XMLUtils.setAttributeIfNotNull(element, "DateActivate", df.format(dateActivateSubscription));
         }
         if (lastDatePauseSubscription != null) {
-            XMLUtils.setAttributeIfNotNull(element, "LastDatePauseSubscription", df.format(lastDatePauseSubscription));
+            XMLUtils.setAttributeIfNotNull(element, "LastDatePause", df.format(lastDatePauseSubscription));
         }
         if (dateDeactivateService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateDeactivateService", df.format(dateDeactivateService));
+            XMLUtils.setAttributeIfNotNull(element, "DateDeactivate", df.format(dateDeactivateService));
         }
         XMLUtils.setAttributeIfNotNull(element, "WasSuspended", wasSuspended);
         if (dateCreateService != null) {
-            XMLUtils.setAttributeIfNotNull(element, "DateCreateService", df.format(dateCreateService));
+            XMLUtils.setAttributeIfNotNull(element, "DateCreate", df.format(dateCreateService));
         }
         if (guidOfStaff != null) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
@@ -133,12 +133,12 @@ public class SubscriptionFeeding extends DistributedObject{
             throw new DistributedObjectException("Client is empty");
         }
 
-        Date dateDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivateService");
+        Date dateDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivate");
         if (dateDateActivateService != null){
             setDateActivateSubscription(dateDateActivateService);
         }
 
-        Date dateLastDatePauseSubscription = XMLUtils.getDateAttributeValue(node, "LastDatePauseSubscription");
+        Date dateLastDatePauseSubscription = XMLUtils.getDateAttributeValue(node, "LastDatePause");
         if (dateLastDatePauseSubscription != null){
             setLastDatePauseSubscription(dateLastDatePauseSubscription);
         }
