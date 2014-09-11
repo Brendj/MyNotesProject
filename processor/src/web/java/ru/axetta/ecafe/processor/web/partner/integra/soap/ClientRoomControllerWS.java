@@ -4769,11 +4769,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date activateDate = cycleDiagram.getDateActivationDiagram();
             if(activateDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Не верная дата активация подписки";
+                result.description = "Неверная дата активация подписки";
                 return result;
             }
 
             SubscriptionFeeding sf = new SubscriptionFeeding();
+            sf.setCreatedDate(new Date());
             sf.fill(subscriptionFeeding);
             sf.setDateActivateSubscription(activateDate);
             sf.setStaff(null);
