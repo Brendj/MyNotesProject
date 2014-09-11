@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.subfeeding;
 
-import com.google.common.collect.Lists;
-
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -16,7 +14,6 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWSService;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +30,9 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Properties;
+import java.util.TimeZone;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.addDays;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
@@ -246,19 +245,19 @@ public class SubFeedingServlet extends HttpServlet {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         Date activationDate = addDays(currentDay, 1);
-        if(subscriptionFeedingExt!=null && subscriptionFeedingExt.getDateActivate()!=null){
+        if(subscriptionFeedingExt!=null && subscriptionFeedingExt.getDateActivateSubscription()!=null){
             SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
                     contractId);
             if (settingResult.resultCode == 0) {
                 int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
                 activationDate = addDays(currentDay, dayForbidChange);
-                if(subscriptionFeedingExt.getDateActivate().after(activationDate)){
-                    activationDate =  subscriptionFeedingExt.getDateActivate();
+                if(subscriptionFeedingExt.getDateActivateSubscription().after(activationDate)){
+                    activationDate =  subscriptionFeedingExt.getDateActivateSubscription();
                 } else {
-                    if(subscriptionFeedingExt.getDateActivate().before(currentDay)){
+                    if(subscriptionFeedingExt.getDateActivateSubscription().before(currentDay)){
                         activationDate = addDays(currentDay, dayForbidChange);
                     } else {
-                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeedingExt.getDateActivate()), dayForbidChange);
+                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeedingExt.getDateActivateSubscription()), dayForbidChange);
                     }
                 }
             } else {

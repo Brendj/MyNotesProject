@@ -3,14 +3,13 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.OrderDetailViewInfo" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
-<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding" %>
 <%
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -92,16 +91,16 @@
             <div class="rightcol"><%=df.format(subscriptionFeeding.getDateCreateService())%>
             </div>
         </div>
-        <c:if test="${requestScope.subscriptionFeeding.dateActivate==null}">
+        <c:if test="${requestScope.subscriptionFeeding.dateActivateSubscription==null}">
             <div class="colRow">
                 <div class="leftcol">Состояние услуги:</div>
                 <div class="rightcol">Нет подключеий</div>
             </div>
         </c:if>
-        <c:if test="${requestScope.subscriptionFeeding.dateActivate!=null}">
+        <c:if test="${requestScope.subscriptionFeeding.dateActivateSubscription!=null}">
             <div class="colRow">
                 <div class="leftcol">Дата начала подписки на услугу АП:</div>
-                <div class="rightcol"><%=df.format(subscriptionFeeding.getDateActivate())%>
+                <div class="rightcol"><%=df.format(subscriptionFeeding.getDateActivateSubscription())%>
                 </div>
             </div>
             <div class="colRow">
@@ -156,7 +155,7 @@
 <c:otherwise>
 <c:choose>
 <%-- Подписки нет но услуга создана --%>
-<c:when test="${requestScope.subscriptionFeeding.dateActivate==null}">
+<c:when test="${requestScope.subscriptionFeeding.dateActivateSubscription==null}">
     <c:choose>
         <%-- У клиента не достаточно средств --%>
         <c:when test="${requestScope.client.subBalance1==null || requestScope.client.subBalance1<=0}">

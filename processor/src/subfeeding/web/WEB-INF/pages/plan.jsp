@@ -3,15 +3,19 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ComplexInfoExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.CycleDiagram" %>
+<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.*" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.*" %>
-<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding" %>
-<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.CycleDiagram" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.TimeZone" %>
 <%
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -24,7 +28,7 @@
     final Long subBalance0 = client.getSubBalance0();
     final Long subBalance1 = client.getSubBalance1();
     String action = doAction(subscriptionFeeding);
-    String activateDate = (String) request.getAttribute("dateActivate");
+    String activateDate = (String) request.getAttribute("dateActivateSubscription");
     @SuppressWarnings("unchecked")
     List<CycleDiagram> cycleDiagrams = (List<CycleDiagram>) request.getAttribute("cycleDiagrams");
     @SuppressWarnings("unchecked")
@@ -285,13 +289,13 @@
                         </c:if>
                         <c:if test="${requestScope.subscriptionFeeding!=null}">
                             <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null}">
-                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
+                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivateSubscription==null}">
                                     <button type="submit" name="activate">Активировать</button>
                                     <div style="font-size: 0.8em;">
                                         Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
                                     </div>
                                 </c:if>
-                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">
+                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivateSubscription!=null}">
                                     <button type="submit" name="edit_<%=idDiagram%>">Сохранить изменения</button>
                                 </c:if>
                             </c:if>
@@ -435,13 +439,13 @@
                                 </c:if>
                                 <c:if test="${requestScope.subscriptionFeeding!=null}">
                                     <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null}">
-                                        <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
+                                        <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivateSubscription==null}">
                                             <button type="submit" name="activate">Активировать</button>
                                             <div style="font-size: 0.8em;">
                                                 Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
                                             </div>
                                         </c:if>
-                                        <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">
+                                        <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivateSubscription!=null}">
                                             <button type="submit" class="edit_btn" name="edit_<%=cycleDiagram.getGlobalId()%>">
                                                 Сохранить изменения
                                             </button>
@@ -473,6 +477,6 @@
     }
 
     private String doAction(SubscriptionFeeding subscriptionFeeding) {
-        return subscriptionFeeding == null || subscriptionFeeding.getDateActivate() == null ? "create" : "edit";
+        return subscriptionFeeding == null || subscriptionFeeding.getDateActivateSubscription() == null ? "create" : "edit";
     }
 %>

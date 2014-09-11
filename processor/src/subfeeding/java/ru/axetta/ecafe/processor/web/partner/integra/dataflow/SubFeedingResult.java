@@ -21,9 +21,9 @@ public class SubFeedingResult extends Result implements Serializable {
 
     @XmlElement(name = "IdOfSubscriptionFeeding")
     private Long idOfSubscriptionFeeding;
-    @XmlElement(name = "DateActivate")
+    @XmlElement(name = "DateActivateSubscription")
     @XmlSchemaType(name = "dateTime")
-    private Date dateActivate;
+    private Date dateActivateSubscription;
     @XmlElement(name = "LastDatePause")
     @XmlSchemaType(name = "dateTime")
     private Date lastDatePause;
@@ -41,12 +41,12 @@ public class SubFeedingResult extends Result implements Serializable {
         this.idOfSubscriptionFeeding = idOfSubscriptionFeeding;
     }
 
-    public Date getDateActivate() {
-        return dateActivate;
+    public Date getDateActivateSubscription() {
+        return dateActivateSubscription;
     }
 
-    public void setDateActivate(Date dateActivate) {
-        this.dateActivate = dateActivate;
+    public void setDateActivateSubscription(Date dateActivateSubscription) {
+        this.dateActivateSubscription = dateActivateSubscription;
     }
 
     public Date getLastDatePause() {

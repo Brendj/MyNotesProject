@@ -31,7 +31,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -99,7 +98,7 @@ public class SyncServlet extends HttpServlet {
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
              /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+            boolean verifySignature = false;
             if (!verifySignature || bLogPackets) {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             } else {

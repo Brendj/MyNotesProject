@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingExt;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -23,7 +22,7 @@ public class SubscriptionFeeding implements Serializable {
     private Long idOfSubscriptionFeeding;
     private String guid;
     private Date dateCreateService;
-    private Date dateActivate;
+    private Date dateActivateSubscription;
     private Date lastDatePause;
     private Date dateDeactivate;
     private Date updateDate;
@@ -35,11 +34,11 @@ public class SubscriptionFeeding implements Serializable {
         subscriptionFeedingExt.setIdOfSubscriptionFeeding(idOfSubscriptionFeeding);
         subscriptionFeedingExt.setGuid(guid);
         subscriptionFeedingExt.setDateCreateService(dateCreateService);
-        subscriptionFeedingExt.setDateActivate(dateActivate);
-        subscriptionFeedingExt.setLastDatePause(lastDatePause);
-        subscriptionFeedingExt.setDateDeactivate(dateDeactivate);
+        subscriptionFeedingExt.setDateActivateSubscription(dateActivateSubscription);
+        subscriptionFeedingExt.setLastDatePauseSubscription(lastDatePause);
+        subscriptionFeedingExt.setDateDeactivateService(dateDeactivate);
         subscriptionFeedingExt.setUpdateDate(updateDate);
-        subscriptionFeedingExt.setSuspended(suspended);
+        subscriptionFeedingExt.setWasSuspended(suspended);
         return subscriptionFeedingExt;
     }
 
@@ -47,20 +46,20 @@ public class SubscriptionFeeding implements Serializable {
         this.idOfSubscriptionFeeding = subscriptionFeedingExt.getIdOfSubscriptionFeeding();
         this.guid = subscriptionFeedingExt.getGuid();
         this.dateCreateService = subscriptionFeedingExt.getDateCreateService();
-        this.dateActivate = subscriptionFeedingExt.getDateActivate();
-        this.lastDatePause = subscriptionFeedingExt.getLastDatePause();
-        this.dateDeactivate = subscriptionFeedingExt.getDateDeactivate();
+        this.dateActivateSubscription = subscriptionFeedingExt.getDateActivateSubscription();
+        this.lastDatePause = subscriptionFeedingExt.getLastDatePauseSubscription();
+        this.dateDeactivate = subscriptionFeedingExt.getDateDeactivateService();
         this.updateDate = subscriptionFeedingExt.getUpdateDate();
-        this.suspended = subscriptionFeedingExt.getSuspended();
+        this.suspended = subscriptionFeedingExt.getWasSuspended();
         this.changesPlace = subscriptionFeedingExt.getChangesPlace() ? "АРМ Администратора" : "Личный кабинет";
     }
 
     public Date getSubscriptionActionDate(){
-        if(dateActivate==null){
+        if(dateActivateSubscription ==null){
             return dateCreateService;
         } else {
             if(lastDatePause==null){
-                return dateActivate;
+                return dateActivateSubscription;
             } else {
                 return lastDatePause;
             }
@@ -69,9 +68,9 @@ public class SubscriptionFeeding implements Serializable {
 
     public String getSubscriptionAction(){
         Date currentDate = new Date();
-        if(dateActivate==null) return "Создание услуги АП";
-        if(dateActivate.getTime()>currentDate.getTime() && lastDatePause==null) return "Возобновление подписки на услугу АП";
-        if(dateActivate.getTime()<currentDate.getTime() && lastDatePause==null) return "Начало подписки на услугу АП";
+        if(dateActivateSubscription ==null) return "Создание услуги АП";
+        if(dateActivateSubscription.getTime()>currentDate.getTime() && lastDatePause==null) return "Возобновление подписки на услугу АП";
+        if(dateActivateSubscription.getTime()<currentDate.getTime() && lastDatePause==null) return "Начало подписки на услугу АП";
         if(lastDatePause!=null && lastDatePause.getTime()>currentDate.getTime()) return "Прекращение услуги АП";
         if(lastDatePause!=null && lastDatePause.getTime()<currentDate.getTime()) return "Приостановка подписки на услугу АП";
         return "";
@@ -79,9 +78,9 @@ public class SubscriptionFeeding implements Serializable {
 
     public String getSubscriptionState(){
         Date currentDate = new Date();
-        if(dateActivate==null) return "Услуга подключена";
-        if(dateActivate.getTime()>currentDate.getTime() && lastDatePause==null) return "Ожидает активации";
-        if(dateActivate.getTime()<currentDate.getTime() && lastDatePause==null) return "Активна";
+        if(dateActivateSubscription ==null) return "Услуга подключена";
+        if(dateActivateSubscription.getTime()>currentDate.getTime() && lastDatePause==null) return "Ожидает активации";
+        if(dateActivateSubscription.getTime()<currentDate.getTime() && lastDatePause==null) return "Активна";
         if(lastDatePause!=null && lastDatePause.getTime()>currentDate.getTime()) return "Ожидает прекращения";
         if(lastDatePause!=null && lastDatePause.getTime()<currentDate.getTime()) return "Приостановлена";
         return "";
@@ -89,10 +88,10 @@ public class SubscriptionFeeding implements Serializable {
 
     public String getSubscriptionStateWithDate(){
         Date currentDate = new Date();
-        if(dateActivate==null) return "Услуга подключена";
-        if(dateActivate.getTime()>currentDate.getTime() && lastDatePause==null)
-            return String.format("Ожидает активации c %s", CalendarUtils.dateShortToString(dateActivate));
-        if(dateActivate.getTime()<currentDate.getTime() && lastDatePause==null)
+        if(dateActivateSubscription ==null) return "Услуга подключена";
+        if(dateActivateSubscription.getTime()>currentDate.getTime() && lastDatePause==null)
+            return String.format("Ожидает активации c %s", CalendarUtils.dateShortToString(dateActivateSubscription));
+        if(dateActivateSubscription.getTime()<currentDate.getTime() && lastDatePause==null)
             return "Активна";
         if(lastDatePause!=null && lastDatePause.getTime()>currentDate.getTime())
             return String.format("Ожидает прекращения c %s", CalendarUtils.dateShortToString(lastDatePause));
@@ -113,8 +112,8 @@ public class SubscriptionFeeding implements Serializable {
         return dateCreateService;
     }
 
-    public Date getDateActivate() {
-        return dateActivate;
+    public Date getDateActivateSubscription() {
+        return dateActivateSubscription;
     }
 
     public Date getLastDatePause() {
