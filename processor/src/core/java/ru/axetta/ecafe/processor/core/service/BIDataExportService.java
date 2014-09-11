@@ -261,7 +261,7 @@ public class BIDataExportService {
 
 
         Calendar now = new GregorianCalendar();
-        now.setTimeInMillis(System.currentTimeMillis()/* - MILLISECONDS_IN_DAY * 3*/);
+        now.setTimeInMillis(System.currentTimeMillis() - MILLISECONDS_IN_DAY * 3);
         clearCalendar(now);
 
         buildFiles(newTypes, now);
