@@ -62,7 +62,7 @@ public class Source extends LibraryDistributedObject {
     }
 
     @Override
-    public Source parseAttributes(Node node) throws Exception {
+    public DistributedObject parseAttributes(Node node) throws Exception {
         String sourceName = XMLUtils.getStringAttributeValue(node, "SourceName", 127);
         if (sourceName != null)
             setSourceName(sourceName);

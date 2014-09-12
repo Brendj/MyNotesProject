@@ -70,7 +70,7 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
     }
 
     @Override
-    public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception {
+    public DistributedObject parseAttributes(Node node) throws Exception {
         String typeOfAccompanyingDocumentName = XMLUtils.getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 36);
         if (typeOfAccompanyingDocumentName != null) {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
