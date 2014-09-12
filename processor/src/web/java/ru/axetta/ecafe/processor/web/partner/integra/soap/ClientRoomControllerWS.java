@@ -4393,7 +4393,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(
-          @WebParam(name = "contractId") Long contractId) {
+            @WebParam(name = "contractId") Long contractId) {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
@@ -4418,7 +4418,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (list == null || list.isEmpty()) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description =
-                      "Отсутствуют настройки абонементного питания для организации " + clientOrg.getShortName();
+                        "Отсутствуют настройки абонементного питания для организации " + clientOrg.getShortName();
                 return result;
             }
             if (list.size() > 1) {
@@ -4428,19 +4428,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
-                  .getSplitSettingValue();
+                    .getSplitSettingValue();
             SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
             settingExt.setDayDeActivate(parser.getDayDeActivate());
-            Date currentDay = new Date();
-            final int hoursForbidChange = parser.getHoursForbidChange();
-            int dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
-            Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
-            if (dayForbid.getHours() >= 12) {
+            int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = 0;
+            if (hoursForbidChange < 24) {
                 dayForbidChange++;
+            } else {
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
             }
             settingExt.setDayForbidChange(dayForbidChange);
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
+            settingExt.setSixWorkWeek(parser.isSixWorkWeek());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4479,32 +4480,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (list == null || list.isEmpty()) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
-                      .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                            client.getOrg().getShortName(), idOfOrg);
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), idOfOrg);
                 return result;
             }
             if (list.size() > 1) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String.format("Организация имеет более одной настройки %s (IdOfOrg = %s)",
-                      client.getOrg().getShortName(), idOfOrg);
+                        client.getOrg().getShortName(), idOfOrg);
                 return result;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
-                  .getSplitSettingValue();
+                    .getSplitSettingValue();
             SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
             settingExt.setDayDeActivate(parser.getDayDeActivate());
-            Date currentDay = new Date();
-            final int hoursForbidChange = parser.getHoursForbidChange();
-            int dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
-            Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
-            if (dayForbid.getHours() >= 12) {
+            int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = 0;
+            if (hoursForbidChange < 24) {
                 dayForbidChange++;
+            } else {
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
             }
             settingExt.setDayForbidChange(dayForbidChange);
-            //settingExt.setDayForbidChange(parser.getDayForbidChange());
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
+            settingExt.setSixWorkWeek(parser.isSixWorkWeek());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4718,6 +4719,50 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "dateActivateSubscription") Date dateActivateSubscription) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        Result result = new Result();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if(client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Date currentDate = new Date();
+            SubscriptionFeeding subscriptionFeeding = SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, currentDate);
+            if(subscriptionFeeding==null){
+                result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
+                result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
+                return result;
+            }
+
+            if(subscriptionFeeding.getDateActivateSubscription() != null) {
+
+            } else {
+
+            }
+
+            session.save(subscriptionFeeding);
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
     public Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
         authenticateRequest(null);
@@ -4759,6 +4804,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
+
+            //Date dayForbid = GetFirstCanChangeSF(settings);
 
             final int hoursForbidChange = parser.getHoursForbidChange();
             int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
@@ -4872,6 +4919,49 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+/*    private Date GetFirstCanChangeSF(List<ECafeSettings> settings) {
+        ECafeSettings cafeSettings = settings.get(0);
+        SubscriberFeedingSettingSettingValue parser;
+        parser = (SubscriberFeedingSettingSettingValue)cafeSettings.getSplitSettingValue();
+        Date firstDayChange = new Date();
+        final int hoursForbidChange = parser.getHoursForbidChange();
+        int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+        int workDaysCount = 0;
+        while (workDaysCount < dayForbidChange)
+        {
+            firstDayChange = CalendarUtils.addOneDay(firstDayChange);
+            if (IsWorkDay(firstDayChange))
+            {
+                workDaysCount++;
+            }
+            else
+            {
+                while (!IsWorkDay(firstDayChange))
+                {
+                    firstDayChange = CalendarUtils.addOneDay(firstDayChange);
+                }
+                return firstDayChange;
+            }
+        }
+        if (firstDayChange.getHours()>=12) {
+            while (!IsWorkDay(firstDayChange))
+            {
+                firstDayChange =CalendarUtils.addOneDay(firstDayChange);
+            }
+        }
+        return firstDayChange;
+    }
+
+
+    private boolean IsWorkDay(Date date) {
+          boolean sixWeek = false;
+        if (sixWeek){
+            return date != sunday;
+        }
+        else
+            return date!=sunday and date!= saturday;
+    }*/
 
     @Override
     public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,

@@ -20,6 +20,8 @@ public class SubscriptionFeedingSettingExt{
     protected Boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
     @XmlAttribute(name = "dayForbidChange")
     protected Integer dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
+    @XmlAttribute(name = "sixWorkWeek")
+    protected  Boolean sixWorkWeek; // Шестидневный план рабочих дней
 
     public Integer getDayRequest() {
         return dayRequest;
@@ -51,5 +53,13 @@ public class SubscriptionFeedingSettingExt{
 
     public void setDayForbidChange(Integer dayForbidChange) {
         this.dayForbidChange = dayForbidChange;
+    }
+
+    public Boolean getSixWorkWeek() {
+        return sixWorkWeek;
+    }
+
+    public void setSixWorkWeek(Boolean sixWorkWeek) {
+        this.sixWorkWeek = sixWorkWeek;
     }
 }

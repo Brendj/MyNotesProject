@@ -16,6 +16,7 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
     private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
     //private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
     private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
+    private boolean sixWorkWeek; // Шестидневный план рабочих дней
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -28,12 +29,13 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
         this.enableFeeding = values[2].equals("1");
         //this.dayForbidChange = Integer.parseInt(values[3]);
         this.hoursForbidChange = Integer.parseInt(values[3]);
+        this.sixWorkWeek = values[4].equals("1");
     }
 
     @Override
     public String build() {
         //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
-        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";";
+        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (sixWorkWeek ? 1 : 0) + ";";
     }
 
     @Override
@@ -79,5 +81,13 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
 
     public void setHoursForbidChange(int hoursForbidChange) {
         this.hoursForbidChange = hoursForbidChange;
+    }
+
+    public boolean isSixWorkWeek() {
+        return sixWorkWeek;
+    }
+
+    public void setSixWorkWeek(boolean sixWorkWeek) {
+        this.sixWorkWeek = sixWorkWeek;
     }
 }

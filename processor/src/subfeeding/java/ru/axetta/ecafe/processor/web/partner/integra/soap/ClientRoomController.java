@@ -322,6 +322,10 @@ public interface ClientRoomController {
     Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
 
+    @WebMethod(operationName = "activateCurrentSubscriptionFeeding")
+    Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "dateActivateSubscription") Date dateActivateSubscription);
+
     @WebMethod(operationName = "activateSubscriptionFeedingBySan")
     Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
