@@ -1151,10 +1151,11 @@ public class RuntimeContext implements ApplicationContextAware {
         String storageServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");   //  EMP
         String logging = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".logging", "false");   //  EMP
         String syncServiceNode = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".syncServiceNode", "1");   //  EMP
+        String packageSize = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".packageSize", "100");   //  EMP
 
         ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone,
                                                            subscriptionServiceUrl, storageServiceUrl, token,
-                                                           systemId, catalogName, logging, syncServiceNode);
+                                                           systemId, catalogName, logging, syncServiceNode, packageSize);
         ISmsService smsService = null;
         if (serviceType.equalsIgnoreCase("atompark")) {
             smsService = new AtomparkSmsServiceImpl(config);

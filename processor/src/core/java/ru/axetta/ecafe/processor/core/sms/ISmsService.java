@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sms;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -25,6 +26,7 @@ public abstract class ISmsService {
         private final String storageServiceUrl;
         private final boolean logging;
         private final String syncServiceNode;
+        private final int packageSize;
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone)
                 throws Exception {
@@ -40,11 +42,12 @@ public abstract class ISmsService {
             this.catalogName = "";
             this.logging = false;
             this.syncServiceNode = "";
+            packageSize = 0;
         }
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone,
                 String subscriptionServiceUrl, String storageServiceUrl, String token,String systemId,
-                String catalogName, String logging, String syncServiceNode)
+                String catalogName, String logging, String syncServiceNode, String packageSize)
         throws Exception {
             this.serviceUrl = serviceUrl;
             this.userName = userName;
@@ -58,6 +61,7 @@ public abstract class ISmsService {
             this.catalogName = catalogName;
             this.logging = BooleanUtils.toBoolean(logging);
             this.syncServiceNode = syncServiceNode;
+            this.packageSize = NumberUtils.toInt(packageSize);
         }
 
         public String getServiceUrl() {
@@ -106,6 +110,10 @@ public abstract class ISmsService {
 
         public String getSyncServiceNode() {
             return syncServiceNode;
+        }
+
+        public int getPackageSize() {
+            return packageSize;
         }
     }
     protected Config config;

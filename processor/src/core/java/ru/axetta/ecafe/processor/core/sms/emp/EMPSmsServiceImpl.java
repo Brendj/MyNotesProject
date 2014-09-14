@@ -69,6 +69,9 @@ public class EMPSmsServiceImpl extends ISmsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPSmsServiceImpl.class);
     //  errors
     public static final int EMP_ERROR_CODE_NOTHING_FOUND = 504;
+    //  services instances
+    protected SubscriptionPortType subscriptionService;
+    protected StoragePortType storageService;
 
 
 
@@ -114,8 +117,7 @@ public class EMPSmsServiceImpl extends ISmsService {
 
 
     protected int getMaximumClientsPerPackage() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        return runtimeContext.getOptionValueInt(Option.OPTION_EMP_CLIENTS_PER_PACKAGE);
+        return config.getPackageSize();
     }
 
     public boolean isAllowed() {
@@ -214,6 +216,7 @@ public class EMPSmsServiceImpl extends ISmsService {
             List<ReceiveDataChangesResponse.Result.Entry.Identifier> identifiers = e.getIdentifier();
             String ssoid = "";
             String ruleId = "";
+            StringBuilder logStr = new StringBuilder();
             for(ReceiveDataChangesResponse.Result.Entry.Attribute attr : attributes) {
                 if(!StringUtils.isBlank(attr.getName()) &&
                         attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
@@ -224,6 +227,9 @@ public class EMPSmsServiceImpl extends ISmsService {
                         logger.error("Failed to parse " + ATTRIBUTE_SSOID_NAME + " value", e1);
                     }
                 }
+
+                //  logging
+                addEntryToLogString(attr, logStr);
             }
             for(ReceiveDataChangesResponse.Result.Entry.Identifier id : identifiers) {
                 if(!StringUtils.isBlank(id.getName()) &&
@@ -236,6 +242,7 @@ public class EMPSmsServiceImpl extends ISmsService {
                         logger.error("Failed to parse " + ATTRIBUTE_RULE_ID + " value", e1);
                     }
                 }
+                addEntryToLogString(id, logStr);
             }
             if(!StringUtils.isBlank(ruleId) && !StringUtils.isBlank(ssoid) && NumberUtils.isNumber(ruleId)) {
                 ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance().getClientByContractId(NumberUtils.toLong(ruleId));
@@ -247,10 +254,12 @@ public class EMPSmsServiceImpl extends ISmsService {
                     } else {
                         statistics.removeNotBinded();
                     }
-                    log(synchDate + "Поступили изменения {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
+                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile(), null);
                     client.setSsoid(ssoid);
                     DAOService.getInstance().saveEntity(client);
                 }
+            } else {
+                log(synchDate + "Полученное изменение из ЕМП не удалось связать: " + logStr.toString(), null);
             }
             changeSequence = e.getChangeSequence();
         }
@@ -558,6 +567,9 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
     protected StoragePortType createStorageController() {
+        if(storageService != null) {
+            return storageService;
+        }
         StoragePortType controller = null;
         try {
             StorageService service = new StorageService(new URL(config.getStorageServiceUrl()),
@@ -569,6 +581,7 @@ public class EMPSmsServiceImpl extends ISmsService {
             HTTPClientPolicy policy = conduit.getClient();
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
+            storageService = controller;
             return controller;
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS controller", e);
@@ -577,6 +590,9 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
     protected SubscriptionPortType createEventController() {
+        if (subscriptionService != null) {
+            return subscriptionService;
+        }
         SubscriptionPortType controller = null;
         try {
             SubscriptionService service = new SubscriptionService(new URL(config.getSubscriptionServiceUrl()),
@@ -588,6 +604,7 @@ public class EMPSmsServiceImpl extends ISmsService {
             HTTPClientPolicy policy = conduit.getClient();
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
+            subscriptionService = controller;
             return controller;
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS controller", e);
@@ -602,6 +619,36 @@ public class EMPSmsServiceImpl extends ISmsService {
         if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
             logger.info(str);
         }
+    }
+
+    public static void addEntryToLogString(ReceiveDataChangesResponse.Result.Entry.Identifier id, StringBuilder str) {
+        addEntryToLogString(id.getName(), id.getValue(), str);
+    }
+
+    public static void addEntryToLogString(ReceiveDataChangesResponse.Result.Entry.Attribute attr, StringBuilder str) {
+        Object val = null;
+        if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+            val = attr.getValue().get(0);
+        }
+        addEntryToLogString(attr.getName(), val, str);
+    }
+
+    protected static void addEntryToLogString(String name, Object val, StringBuilder str) {
+        String valStr = null;
+        if(val != null && val instanceof Element) {
+            Element e = ((Element) val);
+            if(e != null && e.getFirstChild() != null) {
+                valStr = e.getFirstChild().getTextContent();
+            }
+        }
+        if (valStr == null) {
+            valStr = "-NULL-";
+        }
+
+        if(str.length() > 0) {
+            str.append(",");
+        }
+        str.append(String.format("{%s: %s}", name, valStr));
     }
 
     protected void logRequest(ReceiveDataChangesRequest request) {
