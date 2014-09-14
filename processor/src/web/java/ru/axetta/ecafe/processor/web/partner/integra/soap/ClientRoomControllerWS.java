@@ -113,6 +113,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_PROHIBIT_EXIST = 300L;
     private static final Long RC_PROHIBIT_NOT_FOUND = 310L;
     private static final Long RC_PROHIBIT_REMOVED = 320L;
+    private static final Long RC_SUBSCRIPTION_FEEDING_ACTIVATED = 330L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -4713,13 +4714,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+            @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
         authenticateRequest(contractId);
         return activateSubscriptionFeeding(contractId, null, cycleDiagram);
     }
 
     @Override
-    public Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "dateActivateSubscription") Date dateActivateSubscription) {
+    public Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "dateActivateSubscription") Date dateActivateSubscription) {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
@@ -4728,29 +4730,76 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClient(session, contractId, null, result);
-            if(client == null) {
+            if (client == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
-            Date currentDate = new Date();
-            SubscriptionFeeding subscriptionFeeding = SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, currentDate);
-            if(subscriptionFeeding==null){
+            DAOService daoService = DAOService.getInstance();
+            List<ECafeSettings> settings = daoService
+                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+            if (settings.isEmpty()) {
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                return result;
+            }
+            Date currentDate = CalendarUtils.truncateToDayOfMonth(new Date());
+            SubscriptionFeeding subscriptionFeeding = SubscriptionFeedingService
+                    .getCurrentSubscriptionFeedingByClientToDay(session, client, currentDate);
+            if (subscriptionFeeding == null) {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
                 return result;
             }
+            if (subscriptionFeeding.getDateActivateSubscription() == null) {
+                ECafeSettings cafeSettings = settings.get(0);
+                SubscriberFeedingSettingSettingValue parser;
+                parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
+                final int hoursForbidChange = parser.getHoursForbidChange();
 
-            if(subscriptionFeeding.getDateActivateSubscription() != null) {
+                int dayForbidChange = 0;
+                if (hoursForbidChange < 24) {
+                    dayForbidChange++;
+                } else {
+                    dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
+                            : hoursForbidChange / 24 + 1);
+                }
 
+                //Вычисление с какой даты можно активировать по поставщику ориентируясь.
+                Date dayForbid = CalendarUtils.addDays(currentDate, dayForbidChange);
+
+                if (parser.isSixWorkWeek()) {
+                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                        dayForbid = CalendarUtils.addOneDay(dayForbid);
+                    }
+                } else {
+                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
+                        dayForbid = CalendarUtils.addOneDay(dayForbid);
+                    }
+                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                        dayForbid = CalendarUtils.addOneDay(dayForbid);
+                    }
+                }
+                if (dateActivateSubscription.getTime() < dayForbid.getTime()) {
+                    result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                    result.description = "Неверная дата активация подписки";
+                    return result;
+                }
+                subscriptionFeeding.setDateActivateSubscription(dayForbid);
+                session.save(subscriptionFeeding);
+                transaction.commit();
+
+                result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
+                result.description = String.format("Подписка успешно активирована, начнет действовать после " + dayForbid);
+                return result;
             } else {
-
+                result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
+                result.description = String.format("У вас уже есть подписка, дата ее ативации " + subscriptionFeeding
+                        .getDateActivateSubscription());
+                return result;
             }
-
-            session.save(subscriptionFeeding);
-            transaction.commit();
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
