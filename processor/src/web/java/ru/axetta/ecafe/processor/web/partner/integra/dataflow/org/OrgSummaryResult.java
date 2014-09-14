@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ResultConst;
  * Date: 08.09.14
  */
 public class OrgSummaryResult extends Result {
-    public OrgSummury orgSummury;
+    public OrgSummary orgSummary;
 
     public OrgSummaryResult() {
         resultCode = ResultConst.CODE_OK;

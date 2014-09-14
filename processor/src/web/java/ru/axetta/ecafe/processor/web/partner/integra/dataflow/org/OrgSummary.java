@@ -7,15 +7,15 @@ import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
  * User: Shamil
  * Date: 08.09.14
  */
-public class OrgSummury {
+public class OrgSummary {
     public Long id;
     public String name;
     public String orgType;
 
-    public OrgSummury() {
+    public OrgSummary() {
     }
 
-    public OrgSummury(Org org) {
+    public OrgSummary(Org org) {
         this.id = org.getIdOfOrg();
         this.name = org.getOfficialName();
         this.setOrgType(org.getType());

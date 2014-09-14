@@ -41,8 +41,8 @@ import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummury;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -5552,7 +5552,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             Org org = DAOUtils.findOrg(session, orgId);
             if (org != null){
-                result.orgSummury = new OrgSummury(org);
+                result.orgSummary = new OrgSummary(org);
             }else {
                 result.notFound();
             }

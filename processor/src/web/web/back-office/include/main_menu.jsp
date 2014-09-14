@@ -758,6 +758,7 @@
     <rich:panelMenuItem id="syncMonitorItem" binding="#{syncMonitorPage.mainMenuComponent}"
                         label="Мониторинг синхронизации" action="#{syncMonitorPage.show}" reRender="workspaceForm" />
 
+    <%--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"--%>
     <rich:panelMenuItem id="dashboardMenuItem" binding="#{dashboardPage.mainMenuComponent}"
                         label="Мониторинг активности" action="#{dashboardPage.show}" reRender="workspaceForm" />
 
