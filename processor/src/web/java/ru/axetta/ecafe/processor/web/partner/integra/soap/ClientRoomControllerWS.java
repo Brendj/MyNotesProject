@@ -4712,12 +4712,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
+/*    @Override
     public Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
         authenticateRequest(contractId);
         return activateSubscriptionFeeding(contractId, null, cycleDiagram);
-    }
+    }*/
 
     @Override
     public Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
@@ -4811,14 +4811,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
+/*    @Override
     public Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
         authenticateRequest(null);
         return activateSubscriptionFeeding(null, san, cycleDiagram);
-    }
+    }*/
 
-    private Result activateSubscriptionFeeding(Long contractId, String san, CycleDiagramExt cycleDiagram) {
+    /*private Result activateSubscriptionFeeding(Long contractId, String san, CycleDiagramExt cycleDiagram) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
@@ -4967,49 +4967,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
-    }
-
-/*    private Date GetFirstCanChangeSF(List<ECafeSettings> settings) {
-        ECafeSettings cafeSettings = settings.get(0);
-        SubscriberFeedingSettingSettingValue parser;
-        parser = (SubscriberFeedingSettingSettingValue)cafeSettings.getSplitSettingValue();
-        Date firstDayChange = new Date();
-        final int hoursForbidChange = parser.getHoursForbidChange();
-        int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
-        int workDaysCount = 0;
-        while (workDaysCount < dayForbidChange)
-        {
-            firstDayChange = CalendarUtils.addOneDay(firstDayChange);
-            if (IsWorkDay(firstDayChange))
-            {
-                workDaysCount++;
-            }
-            else
-            {
-                while (!IsWorkDay(firstDayChange))
-                {
-                    firstDayChange = CalendarUtils.addOneDay(firstDayChange);
-                }
-                return firstDayChange;
-            }
-        }
-        if (firstDayChange.getHours()>=12) {
-            while (!IsWorkDay(firstDayChange))
-            {
-                firstDayChange =CalendarUtils.addOneDay(firstDayChange);
-            }
-        }
-        return firstDayChange;
-    }
-
-
-    private boolean IsWorkDay(Date date) {
-          boolean sixWeek = false;
-        if (sixWeek){
-            return date != sunday;
-        }
-        else
-            return date!=sunday and date!= saturday;
     }*/
 
     @Override
@@ -5055,14 +5012,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            Date date = new Date();
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
 
             final int hoursForbidChange = parser.getHoursForbidChange();
-            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
-            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-            if(dayForbid.getHours()>=12){
-                dayForbid = CalendarUtils.addOneDay(date);
+
+            int dayForbidChange = 0;
+            if (hoursForbidChange < 24) {
+                dayForbidChange++;
+            } else {
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
+                        : hoursForbidChange / 24 + 1);
             }
+
+            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
+            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+
+            if (parser.isSixWorkWeek()) {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+            } else {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+            }
+
             if(suspendDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = "Не верная дата приостановки подписки";
@@ -5130,13 +5107,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            Date date = new Date();
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
 
             final int hoursForbidChange = parser.getHoursForbidChange();
-            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+
+            int dayForbidChange = 0;
+            if (hoursForbidChange < 24) {
+                dayForbidChange++;
+            } else {
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
+                        : hoursForbidChange / 24 + 1);
+            }
+
+            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
             Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-            if(dayForbid.getHours()>=12){
-                dayForbid = CalendarUtils.addOneDay(date);
+
+            if (parser.isSixWorkWeek()) {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+            } else {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
             }
             if(activateDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
@@ -5275,14 +5271,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings settings = (ECafeSettings) settingsList.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
                   .getSplitSettingValue();
-            Date date = new Date();
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
 
             final int hoursForbidChange = parser.getHoursForbidChange();
-            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
-            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-            if(dayForbid.getHours()>=12){
-                dayForbid = CalendarUtils.addOneDay(date);
+
+            int dayForbidChange = 0;
+            if (hoursForbidChange < 24) {
+                dayForbidChange++;
+            } else {
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
+                        : hoursForbidChange / 24 + 1);
             }
+
+            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
+            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+
+            if (parser.isSixWorkWeek()) {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+            } else {
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
+                    dayForbid = CalendarUtils.addOneDay(dayForbid);
+                }
+            }
+
             if(cycleDiagram.getDateActivationDiagram().getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = "Не верная дата активации циклограммы";

@@ -325,13 +325,13 @@ public interface ClientRoomController {
     SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "san") String san,
           @WebParam(name = "currentDay") Date currentDay);
 
-    @WebMethod(operationName = "activateSubscriptionFeeding")
+    /*@WebMethod(operationName = "activateSubscriptionFeeding")
     Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);*/
 
-    @WebMethod(operationName = "activateSubscriptionFeedingBySan")
+    /*@WebMethod(operationName = "activateSubscriptionFeedingBySan")
     Result activateSubscriptionFeeding(@WebParam(name = "san") String san,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram);*/
 
     @WebMethod(operationName = "activateCurrentSubscriptionFeeding")
     Result activateCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
