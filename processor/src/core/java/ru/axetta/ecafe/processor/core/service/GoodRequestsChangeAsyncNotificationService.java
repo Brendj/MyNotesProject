@@ -123,6 +123,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                         Object[] objects = (Object[]) list.get(0);
                         maxDone = (Date) objects[0];
                         minDone = (Date) objects[1];
+                        minDone = CalendarUtils.truncateToDayOfMonth(minDone);
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -290,6 +291,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                         reportType = "Н";
                     } else if (modifyTypeEdit) {
                         reportType = "К";
+                    }else {
+                        return;
                     }
 
                     String[] values = {

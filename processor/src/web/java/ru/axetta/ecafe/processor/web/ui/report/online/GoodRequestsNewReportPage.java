@@ -235,8 +235,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 exporter1.exportReport();
                 String[] values = {"address", "Адрес орга", "shortOrgName", "vjz jhuf", "reportValues", os.toString("UTF-8")};
                 EventNotificationService eventNotificationService = RuntimeContext.getAppContext().getBean(EventNotificationService.class);
-                eventNotificationService.sendEmailAsync("kadyrov@axetta.ru",
-                        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                //eventNotificationService.sendEmailAsync("kadyrov@axetta.ru",
+                //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 //eventNotificationService.sendEmailAsync("dizzarg@mail.ru",
                 //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
             } catch (Exception e) {

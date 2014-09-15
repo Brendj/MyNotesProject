@@ -203,7 +203,7 @@ public class EventNotificationService {
     public synchronized boolean sendEmailAsync(String email, String type, String[] values) {
         logger.trace("start");
         if (StringUtils.isEmpty(email)) {
-            logger.trace("email is empry");
+            logger.trace("email is empty");
             return false;
         }  else {
 
