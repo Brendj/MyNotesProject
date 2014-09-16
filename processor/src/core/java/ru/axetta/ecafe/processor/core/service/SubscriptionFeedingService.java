@@ -95,7 +95,7 @@ public class SubscriptionFeedingService {
     }
 
     /**
-     * Метод оповещает о не достатке средств оплаты АП на ближайшую неделю
+     * Метод оповещает о не достатке средств оплаты АП на ближайшие недели
      * При условии что дата отключения или паузы бедет более чем через неделю
      * TODO: добавить взятие даты паузы или отключения последней циклограммы для уточнения даты
      */
@@ -112,21 +112,37 @@ public class SubscriptionFeedingService {
             CycleDiagram diagram = (CycleDiagram) row[1];
             final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
             final Long subBalance = client.getSubBalance1();
-            long[] days = new long[7];
-            days[0] = diagram.getSundayPrice();
-            days[1] = diagram.getMondayPrice();
-            days[2] = diagram.getTuesdayPrice();
-            days[3] = diagram.getWednesdayPrice();
-            days[4] = diagram.getThursdayPrice();
-            days[5] = diagram.getFridayPrice();
-            days[6] = diagram.getSaturdayPrice();
+            String[] weeks = new String[7];
+            weeks[0] = diagram.getSundayPrice();
+            weeks[1] = diagram.getMondayPrice();
+            weeks[2] = diagram.getTuesdayPrice();
+            weeks[3] = diagram.getWednesdayPrice();
+            weeks[4] = diagram.getThursdayPrice();
+            weeks[5] = diagram.getFridayPrice();
+            weeks[6] = diagram.getSaturdayPrice();
+
+            String[] val = null;
+            long[] weeksPriseSummary = new long[7];
+
+            for (int j = 0; j < weeks.length; j++) {
+                if (weeks[j] != null) {
+                    if (weeks[j].contains("|")) {
+                        val = weeks[j].split("\\|");
+                    } else {
+                        val[0] = weeks[j];
+                    }
+                    for (String value : val) {
+                        weeksPriseSummary[j] = weeksPriseSummary[j] + Long.parseLong(value);
+                    }
+                }
+            }
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(currentDay);
             long currentBalance = subBalance;
             int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
             String[] values = null;
             for (int i=dayWeek; i<dayWeek+7; i++){
-                currentBalance = currentBalance-days[i%7];
+                currentBalance = currentBalance-weeksPriseSummary[i%7];
                 final Date date = CalendarUtils.addDays(currentDay, i - dayWeek+1);
                 if(currentBalance<=0){
                     values = new String[]{"contractId", contractId, "withdrawDate", dateFormat.format(date),
@@ -158,7 +174,7 @@ public class SubscriptionFeedingService {
                 + "  and (sf.lastDatePauseSubscription is null or sf.lastDatePauseSubscription>:nextWeekDay) "
                 + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:nextWeekDay) and sf.client=cl and sf.deletedState=false) "
                 + " and not (cl.subBalance1 is null) and cl.subBalance1>0 and"
-                + " cl.subBalance1-cd.mondayPrice-cd.tuesdayPrice-cd.wednesdayPrice-cd.thursdayPrice-cd.fridayPrice-cd.saturdayPrice-cd.sundayPrice<=0 and "
+                //+ " cl.subBalance1-cd.mondayPrice-cd.tuesdayPrice-cd.wednesdayPrice-cd.thursdayPrice-cd.fridayPrice-cd.saturdayPrice-cd.sundayPrice<=0 and "
                 + " cd.dateActivationDiagram = ( select max(incd.dateActivationDiagram) from CycleDiagram incd where incd.client=cl "
                 + "and incd.dateActivationDiagram<:currentDate and incd.deletedState=false)";
         Query cycleDiagramTypedQuery = entityManager.createQuery(sql);
@@ -179,8 +195,8 @@ public class SubscriptionFeedingService {
     public List findNotifyClientsDeactivate(final Date date) {
         final String sql = "select cl from CycleDiagram cd left join cd.client cl where cd.stateDiagram=0 and "
                 + " exists (from SubscriptionFeeding sf "
-                + "  where sf.dateCreateService<:currentDate and sf.dateActivateService<:currentDate  "
-                + "  and (sf.lastDatePauseService is null or sf.lastDatePauseService>:currentDate) "
+                + "  where sf.dateCreateService<:currentDate and sf.dateActivateSubscription<:currentDate  "
+                + "  and (sf.lastDatePauseSubscription is null or sf.lastDatePauseSubscription>:currentDate) "
                 + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:currentDate) and sf.client=cl and sf.deletedState=false) "
                 + " and not (cl.subBalance1 is null) and "
                 + " cl.subBalance1<=0 and "
@@ -683,7 +699,7 @@ public class SubscriptionFeedingService {
         cd.setSaturday(saturday);
         cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
         cd.setSunday("");
-        cd.setSundayPrice(0L);
+        cd.setSundayPrice("0");
         cd.setStaff(null);
         entityManager.persist(cd);
         return cd;
@@ -755,27 +771,37 @@ public class SubscriptionFeedingService {
         cd.setSaturday(saturday);
         cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
         cd.setSunday("");
-        cd.setSundayPrice(0L);
+        cd.setSundayPrice("0");
         cd.setStaff(null);
     }
 
     // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
-    public Long getPriceOfDay(String dayComplexes, List<ComplexInfo> availableComplexes) {
+    public String getPriceOfDay(String dayComplexes, List<ComplexInfo> availableComplexes) {
         if (StringUtils.isEmpty(dayComplexes)) {
-            return 0L;
+            return "0";
         }
-        String[] complexIds = StringUtils.split(dayComplexes, ';');
-        List<Integer> ids = new ArrayList<Integer>();
-        for (String id : complexIds) {
-            ids.add(Integer.valueOf(id));
-        }
-        long price = 0L;
-        for (ComplexInfo ci : availableComplexes) {
-            if (ids.contains(ci.getIdOfComplex())) {
-                price += ci.getCurrentPrice();
+        String[] weekComplexIds = StringUtils.split(dayComplexes, "\\|");
+        String realPrice = "";
+        for (int i = 0; i < weekComplexIds.length; i++) {
+
+            String[] complexIds = StringUtils.split(weekComplexIds[i], ';');
+            List<Integer> ids = new ArrayList<Integer>();
+            for (String id : complexIds) {
+                ids.add(Integer.valueOf(id));
+            }
+            long price = 0L;
+            for (ComplexInfo ci : availableComplexes) {
+                if (ids.contains(ci.getIdOfComplex())) {
+                    price += ci.getCurrentPrice();
+                }
+            }
+            if (i == weekComplexIds.length - 1)  {
+            realPrice = realPrice.concat(String.valueOf(price));
+            } else {
+                realPrice = realPrice.concat(String.valueOf(price) + "|");
             }
         }
-        return price;
+        return realPrice;
     }
 
 }

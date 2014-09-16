@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.subfeeding;
 
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ComplexInfoExt;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CycleDiagramExt;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,13 +33,13 @@ public class CycleDiagram implements Serializable{
     private Date dateActivationDiagram;
     private Date dateDeactivationDiagram;
     private String stateDiagram;
-    private Long mondayPrice;
-    private Long tuesdayPrice;
-    private Long wednesdayPrice;
-    private Long thursdayPrice;
-    private Long fridayPrice;
-    private Long saturdayPrice;
-    private Long sundayPrice;
+    private String mondayPrice;
+    private String tuesdayPrice;
+    private String wednesdayPrice;
+    private String thursdayPrice;
+    private String fridayPrice;
+    private String saturdayPrice;
+    private String sundayPrice;
     private Date updateDate;
     private Boolean onChange = false;
     private String changesPlace;
@@ -219,31 +218,31 @@ public class CycleDiagram implements Serializable{
         return stateDiagram;
     }
 
-    public Long getMondayPrice() {
+    public String getMondayPrice() {
         return mondayPrice;
     }
 
-    public Long getTuesdayPrice() {
+    public String getTuesdayPrice() {
         return tuesdayPrice;
     }
 
-    public Long getWednesdayPrice() {
+    public String getWednesdayPrice() {
         return wednesdayPrice;
     }
 
-    public Long getThursdayPrice() {
+    public String getThursdayPrice() {
         return thursdayPrice;
     }
 
-    public Long getFridayPrice() {
+    public String getFridayPrice() {
         return fridayPrice;
     }
 
-    public Long getSaturdayPrice() {
+    public String getSaturdayPrice() {
         return saturdayPrice;
     }
 
-    public Long getSundayPrice() {
+    public String getSundayPrice() {
         return sundayPrice;
     }
 

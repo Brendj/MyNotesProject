@@ -43,19 +43,19 @@
         </property>
 
         <property name="monday" column="monday" type="string" length="255" />
-        <property name="mondayPrice" column="mondayPrice" type="long" />
+        <property name="mondayPrice" column="mondayPrice" type="string" length="255" />
         <property name="tuesday" column="tuesday" type="string" length="255" />
-        <property name="tuesdayPrice" column="tuesdayPrice" type="long" />
+        <property name="tuesdayPrice" column="tuesdayPrice" type="string" length="255" />
         <property name="wednesday" column="wednesday" type="string" length="255"/>
-        <property name="wednesdayPrice" column="wednesdayPrice" type="long"/>
+        <property name="wednesdayPrice" column="wednesdayPrice" type="string" length="255" />
         <property name="thursday" column="thursday" type="string" length="255"/>
-        <property name="thursdayPrice" column="thursdayPrice" type="long"/>
+        <property name="thursdayPrice" column="thursdayPrice" type="string" length="255" />
         <property name="friday" column="friday" type="string" length="255"/>
-        <property name="fridayPrice" column="fridayPrice" type="long"/>
+        <property name="fridayPrice" column="fridayPrice" type="string" length="255" />
         <property name="saturday" column="saturday" type="string" length="255" />
-        <property name="saturdayPrice" column="saturdayPrice" type="long" />
+        <property name="saturdayPrice" column="saturdayPrice" type="string" length="255" />
         <property name="sunday" column="sunday" type="string" length="255" />
-        <property name="sundayPrice" column="sundayPrice" type="long" />
+        <property name="sundayPrice" column="sundayPrice" type="string" length="255" />
 
         <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="idOfStaff" not-null="false" />

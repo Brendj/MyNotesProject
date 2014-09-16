@@ -7,7 +7,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -16,7 +15,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,19 +36,19 @@ public class CycleDiagram extends DistributedObject{
     private Date dateActivationDiagram;
     private StateDiagram stateDiagram;
     private String monday;
-    private Long mondayPrice;
+    private String mondayPrice;
     private String tuesday;
-    private Long tuesdayPrice;
+    private String tuesdayPrice;
     private String wednesday;
-    private Long wednesdayPrice;
+    private String wednesdayPrice;
     private String thursday;
-    private Long thursdayPrice;
+    private String thursdayPrice;
     private String friday;
-    private Long fridayPrice;
+    private String fridayPrice;
     private String saturday;
-    private Long saturdayPrice;
+    private String saturdayPrice;
     private String sunday;
-    private Long sundayPrice;
+    private String sundayPrice;
     private Staff staff;
     private String guidOfStaff;
 
@@ -192,19 +190,19 @@ public class CycleDiagram extends DistributedObject{
         }
 
         setMonday(XMLUtils.getStringAttributeValue(node, "Monday", 255));
-        setMondayPrice(XMLUtils.getLongAttributeValue(node, "MondayPrice"));
+        setMondayPrice(XMLUtils.getStringAttributeValue(node, "MondayPrice", 255));
         setTuesday(XMLUtils.getStringAttributeValue(node, "Tuesday", 255));
-        setTuesdayPrice(XMLUtils.getLongAttributeValue(node, "TuesdayPrice"));
+        setTuesdayPrice(XMLUtils.getStringAttributeValue(node, "TuesdayPrice", 255));
         setWednesday(XMLUtils.getStringAttributeValue(node, "Wednesday", 255));
-        setWednesdayPrice(XMLUtils.getLongAttributeValue(node, "WednesdayPrice"));
+        setWednesdayPrice(XMLUtils.getStringAttributeValue(node, "WednesdayPrice", 255));
         setThursday(XMLUtils.getStringAttributeValue(node, "Thursday", 255));
-        setThursdayPrice(XMLUtils.getLongAttributeValue(node, "ThursdayPrice"));
+        setThursdayPrice(XMLUtils.getStringAttributeValue(node, "ThursdayPrice", 255));
         setFriday(XMLUtils.getStringAttributeValue(node, "Friday", 255));
-        setFridayPrice(XMLUtils.getLongAttributeValue(node, "FridayPrice"));
+        setFridayPrice(XMLUtils.getStringAttributeValue(node, "FridayPrice", 255));
         setSaturday(XMLUtils.getStringAttributeValue(node, "Saturday", 255));
-        setSaturdayPrice(XMLUtils.getLongAttributeValue(node, "SaturdayPrice"));
+        setSaturdayPrice(XMLUtils.getStringAttributeValue(node, "SaturdayPrice", 255));
         setSunday(XMLUtils.getStringAttributeValue(node, "Sunday", 255));
-        setSundayPrice(XMLUtils.getLongAttributeValue(node, "SundayPrice"));
+        setSundayPrice(XMLUtils.getStringAttributeValue(node, "SundayPrice", 255));
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
@@ -273,28 +271,12 @@ public class CycleDiagram extends DistributedObject{
         this.monday = monday;
     }
 
-    public Long getMondayPrice() {
-        return mondayPrice;
-    }
-
-    public void setMondayPrice(Long mondayPrice) {
-        this.mondayPrice = mondayPrice;
-    }
-
     public String getTuesday() {
         return tuesday;
     }
 
     public void setTuesday(String tuesday) {
         this.tuesday = tuesday;
-    }
-
-    public Long getTuesdayPrice() {
-        return tuesdayPrice;
-    }
-
-    public void setTuesdayPrice(Long tuesdayPrice) {
-        this.tuesdayPrice = tuesdayPrice;
     }
 
     public String getWednesday() {
@@ -305,28 +287,12 @@ public class CycleDiagram extends DistributedObject{
         this.wednesday = wednesday;
     }
 
-    public Long getWednesdayPrice() {
-        return wednesdayPrice;
-    }
-
-    public void setWednesdayPrice(Long wednesdayPrice) {
-        this.wednesdayPrice = wednesdayPrice;
-    }
-
     public String getThursday() {
         return thursday;
     }
 
     public void setThursday(String thursday) {
         this.thursday = thursday;
-    }
-
-    public Long getThursdayPrice() {
-        return thursdayPrice;
-    }
-
-    public void setThursdayPrice(Long thursdayPrice) {
-        this.thursdayPrice = thursdayPrice;
     }
 
     public String getFriday() {
@@ -337,28 +303,12 @@ public class CycleDiagram extends DistributedObject{
         this.friday = friday;
     }
 
-    public Long getFridayPrice() {
-        return fridayPrice;
-    }
-
-    public void setFridayPrice(Long fridayPrice) {
-        this.fridayPrice = fridayPrice;
-    }
-
     public String getSaturday() {
         return saturday;
     }
 
     public void setSaturday(String saturday) {
         this.saturday = saturday;
-    }
-
-    public Long getSaturdayPrice() {
-        return saturdayPrice;
-    }
-
-    public void setSaturdayPrice(Long saturdayPrice) {
-        this.saturdayPrice = saturdayPrice;
     }
 
     public String getSunday() {
@@ -369,16 +319,64 @@ public class CycleDiagram extends DistributedObject{
         this.sunday = sunday;
     }
 
-    public Long getSundayPrice() {
+    public String getMondayPrice() {
+        return mondayPrice;
+    }
+
+    public void setMondayPrice(String mondayPrice) {
+        this.mondayPrice = mondayPrice;
+    }
+
+    public String getTuesdayPrice() {
+        return tuesdayPrice;
+    }
+
+    public void setTuesdayPrice(String tuesdayPrice) {
+        this.tuesdayPrice = tuesdayPrice;
+    }
+
+    public String getWednesdayPrice() {
+        return wednesdayPrice;
+    }
+
+    public void setWednesdayPrice(String wednesdayPrice) {
+        this.wednesdayPrice = wednesdayPrice;
+    }
+
+    public String getThursdayPrice() {
+        return thursdayPrice;
+    }
+
+    public void setThursdayPrice(String thursdayPrice) {
+        this.thursdayPrice = thursdayPrice;
+    }
+
+    public String getFridayPrice() {
+        return fridayPrice;
+    }
+
+    public void setFridayPrice(String fridayPrice) {
+        this.fridayPrice = fridayPrice;
+    }
+
+    public String getSaturdayPrice() {
+        return saturdayPrice;
+    }
+
+    public void setSaturdayPrice(String saturdayPrice) {
+        this.saturdayPrice = saturdayPrice;
+    }
+
+    public String getSundayPrice() {
         return sundayPrice;
     }
 
-    public void setSundayPrice(Long sundayPrice) {
+    public void setSundayPrice(String sundayPrice) {
         this.sundayPrice = sundayPrice;
     }
 
     public Long getWeekPrice(){
-        return mondayPrice+tuesdayPrice+wednesdayPrice+thursdayPrice+fridayPrice+saturdayPrice+sundayPrice;
+        return 0L;// mondayPrice+tuesdayPrice+wednesdayPrice+thursdayPrice+fridayPrice+saturdayPrice+sundayPrice;
     }
 
     public Long getMonthPrice(){

@@ -5257,20 +5257,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (settingsList.isEmpty()) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
-                      .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                            clientOrg.getShortName(), idOfOrg);
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                clientOrg.getShortName(), idOfOrg);
                 return result;
             }
             if (settingsList.size() > 1) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
-                      .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortName(),
-                            idOfOrg);
+                        .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortName(),
+                                idOfOrg);
                 return result;
             }
             ECafeSettings settings = (ECafeSettings) settingsList.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
-                  .getSplitSettingValue();
+                    .getSplitSettingValue();
             Date date = CalendarUtils.truncateToDayOfMonth(new Date());
 
             final int hoursForbidChange = parser.getHoursForbidChange();
@@ -5279,8 +5279,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (hoursForbidChange < 24) {
                 dayForbidChange++;
             } else {
-                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
-                        : hoursForbidChange / 24 + 1);
+                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
             }
 
             //Вычисление с какой даты можно активировать по поставщику ориентируясь.
@@ -5299,7 +5298,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
 
-            if(cycleDiagram.getDateActivationDiagram().getTime()<dayForbid.getTime()){
+            if (cycleDiagram.getDateActivationDiagram().getTime() < dayForbid.getTime()) {
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = "Не верная дата активации циклограммы";
                 return result;
@@ -5321,7 +5320,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setDeletedState(false);
                 diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
                 Long version = DAOService.getInstance()
-                      .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+                        .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
                 diagram.setGlobalVersionOnCreate(version);
                 diagram.setGlobalVersion(version);
                 List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
@@ -5330,18 +5329,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setTuesday(cycleDiagram.getTuesday());
                 diagram.setTuesdayPrice(sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
                 diagram.setWednesday(cycleDiagram.getWednesday());
-                diagram.setWednesdayPrice(
-                      sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
+                diagram.setWednesdayPrice(sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
                 diagram.setThursday(cycleDiagram.getThursday());
-                diagram.setThursdayPrice(
-                      sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
-                diagram.setFriday(diagram.getFriday());
+                diagram.setThursdayPrice(sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
+                diagram.setFriday(cycleDiagram.getFriday());
                 diagram.setFridayPrice(sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
                 diagram.setSaturday(cycleDiagram.getSaturday());
-                diagram.setSaturdayPrice(
-                      sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
+                diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                 diagram.setSunday("");
-                diagram.setSundayPrice(0L);
+                diagram.setSundayPrice("0");
                 diagram.setStaff(null);
                 session.save(diagram);
             } else {
@@ -5353,30 +5349,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     diagram.setDeletedState(false);
                     diagram.setSendAll(SendToAssociatedOrgs.SendToSelf);
                     Long version = DAOService.getInstance()
-                          .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+                            .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
                     //diagram.setGlobalVersionOnCreate(version);
                     diagram.setGlobalVersion(version);
                     List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
                     diagram.setMonday(cycleDiagram.getMonday());
-                    diagram.setMondayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
+                    diagram.setMondayPrice(sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
                     diagram.setTuesday(cycleDiagram.getTuesday());
-                    diagram.setTuesdayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
+                    diagram.setTuesdayPrice(sfService.getPriceOfDay(cycleDiagram.getTuesday(), availableComplexes));
                     diagram.setWednesday(cycleDiagram.getWednesday());
-                    diagram.setWednesdayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
+                    diagram.setWednesdayPrice(sfService.getPriceOfDay(cycleDiagram.getWednesday(), availableComplexes));
                     diagram.setThursday(cycleDiagram.getThursday());
-                    diagram.setThursdayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
+                    diagram.setThursdayPrice(sfService.getPriceOfDay(cycleDiagram.getThursday(), availableComplexes));
                     diagram.setFriday(cycleDiagram.getFriday());
-                    diagram.setFridayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
+                    diagram.setFridayPrice(sfService.getPriceOfDay(cycleDiagram.getFriday(), availableComplexes));
                     diagram.setSaturday(cycleDiagram.getSaturday());
-                    diagram.setSaturdayPrice(
-                          sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
+                    diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                     diagram.setSunday("");
-                    diagram.setSundayPrice(0L);
+                    diagram.setSundayPrice("0");
                     session.save(diagram);
                 }
             }

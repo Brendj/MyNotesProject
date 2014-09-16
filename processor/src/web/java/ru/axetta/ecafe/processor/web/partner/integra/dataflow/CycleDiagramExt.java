@@ -38,19 +38,19 @@ public class CycleDiagramExt {
     @XmlElement(name = "StateDiagram")
     private int stateDiagram;
     @XmlElement(name = "MondayPrice")
-    private Long mondayPrice;
+    private String mondayPrice;
     @XmlElement(name = "TuesdayPrice")
-    private Long tuesdayPrice;
+    private String tuesdayPrice;
     @XmlElement(name = "WednesdayPrice")
-    private Long wednesdayPrice;
+    private String wednesdayPrice;
     @XmlElement(name = "ThursdayPrice")
-    private Long thursdayPrice;
+    private String thursdayPrice;
     @XmlElement(name = "FridayPrice")
-    private Long fridayPrice;
+    private String fridayPrice;
     @XmlElement(name = "SaturdayPrice")
-    private Long saturdayPrice;
+    private String saturdayPrice;
     @XmlElement(name = "SundayPrice")
-    private Long sundayPrice;
+    private String sundayPrice;
     @XmlElement(name = "UpdateDate")
     @XmlSchemaType(name = "dateTime")
     private Date updateDate;
@@ -170,59 +170,59 @@ public class CycleDiagramExt {
         this.stateDiagram = stateDiagram;
     }
 
-    public Long getMondayPrice() {
+    public String getMondayPrice() {
         return mondayPrice;
     }
 
-    public void setMondayPrice(Long mondayPrice) {
+    public void setMondayPrice(String mondayPrice) {
         this.mondayPrice = mondayPrice;
     }
 
-    public Long getTuesdayPrice() {
+    public String getTuesdayPrice() {
         return tuesdayPrice;
     }
 
-    public void setTuesdayPrice(Long tuesdayPrice) {
+    public void setTuesdayPrice(String tuesdayPrice) {
         this.tuesdayPrice = tuesdayPrice;
     }
 
-    public Long getWednesdayPrice() {
+    public String getWednesdayPrice() {
         return wednesdayPrice;
     }
 
-    public void setWednesdayPrice(Long wednesdayPrice) {
+    public void setWednesdayPrice(String wednesdayPrice) {
         this.wednesdayPrice = wednesdayPrice;
     }
 
-    public Long getThursdayPrice() {
+    public String getThursdayPrice() {
         return thursdayPrice;
     }
 
-    public void setThursdayPrice(Long thursdayPrice) {
+    public void setThursdayPrice(String thursdayPrice) {
         this.thursdayPrice = thursdayPrice;
     }
 
-    public Long getFridayPrice() {
+    public String getFridayPrice() {
         return fridayPrice;
     }
 
-    public void setFridayPrice(Long fridayPrice) {
+    public void setFridayPrice(String fridayPrice) {
         this.fridayPrice = fridayPrice;
     }
 
-    public Long getSaturdayPrice() {
+    public String getSaturdayPrice() {
         return saturdayPrice;
     }
 
-    public void setSaturdayPrice(Long saturdayPrice) {
+    public void setSaturdayPrice(String saturdayPrice) {
         this.saturdayPrice = saturdayPrice;
     }
 
-    public Long getSundayPrice() {
+    public String getSundayPrice() {
         return sundayPrice;
     }
 
-    public void setSundayPrice(Long sundayPrice) {
+    public void setSundayPrice(String sundayPrice) {
         this.sundayPrice = sundayPrice;
     }
 

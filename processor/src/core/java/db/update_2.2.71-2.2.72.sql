@@ -14,3 +14,19 @@ ALTER TABLE cf_instances ADD CONSTRAINT cf_instances_invbook_invnumber_key UNIQU
 ALTER TABLE cf_subscriber_feeding RENAME COLUMN lastdatepauseservice to lastdatepausesubscription;
 ALTER TABLE cf_subscriber_feeding RENAME COLUMN dateactivateservice to dateactivatesubscription;
 
+-- Синхронизация переделывание полей с требованиями для недель
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN mondayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN tuesdayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN wednesdayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN thursdayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN fridayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN saturdayprice;
+ALTER TABLE cf_clients_cycle_diagrams DROP COLUMN sundayprice;
+
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN mondayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN tuesdayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN wednesdayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN thursdayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN fridayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN saturdayprice character varying(255);
+ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN sundayprice character varying(255);

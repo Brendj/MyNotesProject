@@ -80,13 +80,13 @@ public class SubscriptionFeedingReportBuilder extends BasicReportForOrgJob.Build
             subscriptionFeedingCriteria.setMaxResults(1);
             SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) subscriptionFeedingCriteria.uniqueResult();
             long[] days = new long[7];
-            days[0] = cycleDiagram.getSundayPrice();
+           /* days[0] = cycleDiagram.getSundayPrice();
             days[1] = cycleDiagram.getMondayPrice();
             days[2] = cycleDiagram.getTuesdayPrice();
             days[3] = cycleDiagram.getWednesdayPrice();
             days[4] = cycleDiagram.getThursdayPrice();
             days[5] = cycleDiagram.getFridayPrice();
-            days[6] = cycleDiagram.getSaturdayPrice();
+            days[6] = cycleDiagram.getSaturdayPrice();*/
             Calendar diagramCalendar = Calendar.getInstance();
             Date currentDate = new Date();
             diagramCalendar.setTime(currentDate);
