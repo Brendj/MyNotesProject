@@ -74,6 +74,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
@@ -4726,6 +4727,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
+        DateFormat df = CalendarUtils.getDateFormatLocal();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -4792,12 +4794,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 transaction.commit();
 
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
-                result.description = String.format("Подписка успешно активирована, начнет действовать после " + dayForbid);
+                result.description = String.format("Подписка успешно активирована, начнет действовать после " + df.format(dayForbid));
                 return result;
             } else {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
-                result.description = String.format("У вас уже есть подписка, дата ее ативации " + subscriptionFeeding
-                        .getDateActivateSubscription());
+                result.description = String.format("У вас уже есть подписка, дата ее ативации " + df.format(subscriptionFeeding
+                        .getDateActivateSubscription()));
                 return result;
             }
         } catch (Exception ex) {
