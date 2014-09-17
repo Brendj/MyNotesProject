@@ -4793,7 +4793,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 session.save(subscriptionFeeding);
                 transaction.commit();
 
-                result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
+                result.resultCode = RC_OK;
                 result.description = String.format("Подписка успешно активирована, начнет действовать после " + df.format(dayForbid));
                 return result;
             } else {
