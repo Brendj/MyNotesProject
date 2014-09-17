@@ -18,7 +18,7 @@ import java.util.Date;
 public class ClientNotificationSetting {
 
     public enum Predefined {
-        SMS_SETTING_CHANGED(1L, "Настройки были изменены", true),
+        SMS_SETTING_CHANGED(1L, "Настройки были изменены", true), // наличие данной записи у клиента означает что настройки уведомлений отличаются от дефолтных
         SMS_NOTIFY_REFILLS(1000000000L, "Оповещать о пополнениях", EventNotificationService.NOTIFICATION_BALANCE_TOPUP, true),
         SMS_NOTIFY_EVENTS(1100000000L, "Оповещать о проходах", EventNotificationService.NOTIFICATION_ENTER_EVENT, true),
         SMS_NOTIFY_ORDERS(1200000000L, "Оповещать о покупках", EventNotificationService.MESSAGE_PAYMENT);

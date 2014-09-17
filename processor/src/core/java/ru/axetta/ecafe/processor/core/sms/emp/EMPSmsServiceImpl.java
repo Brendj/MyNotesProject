@@ -316,10 +316,11 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
     protected boolean bindThrowSelect(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client, String synchDate) throws EMPException {
-        log(synchDate + "Попытка сзязать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + " с использованием поиска по телефону", null);
+        log(synchDate + "Попытка связать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + " с использованием поиска по телефону", null);
         //  execute reqeuest
-        SelectEntriesRequest request = buildSelectEntryParams(client);
+        SelectEntriesRequest request = buildSelectEntryParams(client.getMobile());
         SelectEntriesResponse response = storage.selectEntries(request);
+        log(synchDate + "Получен ответ: "+response.getErrorCode()+": "+response.getErrorMessage()+", записей: "+response.getResult().getEntry().size(), null);
         if(response.getErrorCode() == EMP_ERROR_CODE_NOTHING_FOUND) {
             return false;
         }
@@ -334,9 +335,10 @@ public class EMPSmsServiceImpl extends ISmsService {
             boolean requiresUpdate = false;
             for(EntryAttribute attr : attributes) {
                 if(attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
-                        !attr.getValue().equals(client.getMobile()) &&
                         attr.getValue() != null && attr.getValue().size() > 0 &&
-                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null) {
+                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null
+                        && !attr.getValue().get(0).equals(client.getSsoid())
+                        ) {
                     try {
                         String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
                         client.setSsoid(val);
@@ -347,9 +349,10 @@ public class EMPSmsServiceImpl extends ISmsService {
                     }
                 }
                 if(attr.getName().equals(ATTRIBUTE_EMAIL_NAME) &&
-                        !attr.getValue().equals(client.getEmail()) &&
                         attr.getValue() != null && attr.getValue().size() > 0 &&
-                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null) {
+                        attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null
+                        && !attr.getValue().get(0).equals(client.getEmail())
+                        ) {
                     try {
                         String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
                         client.setEmail(val);
@@ -361,12 +364,17 @@ public class EMPSmsServiceImpl extends ISmsService {
                 }
             }
             if(requiresUpdate) {
-                log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " найден по телефону. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid() + "}", null);
+                log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid() + "}", null);
                 DAOService.getInstance().saveEntity(client);
                 return true;
             }
+            else {
+                log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " найден по телефону, не обновлен", null);
+                return true;
+            }
         }
-        log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " не найден по телефону", null);
+        log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " не найден по телефону",
+                null);
         return false;
     }
 
@@ -525,7 +533,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         return request;
     }
 
-    protected SelectEntriesRequest buildSelectEntryParams(ru.axetta.ecafe.processor.core.persistence.Client client) {
+    protected SelectEntriesRequest buildSelectEntryParams(String clientMobile) {
         SelectEntriesRequest request = new SelectEntriesRequest();
         //  base
         request.setToken(config.getToken());
@@ -542,7 +550,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         List<EntryAttribute> criteries = request.getCriteria();
         EntryAttribute msisdn = new EntryAttribute();
         msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
-        msisdn.getValue().add(client.getMobile());
+        msisdn.getValue().add(clientMobile);
         criteries.add(msisdn);
 
         return request;
@@ -750,4 +758,5 @@ public class EMPSmsServiceImpl extends ISmsService {
             this.bindedCount = bindedCount;
         }
     }
+
 }

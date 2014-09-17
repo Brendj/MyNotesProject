@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
@@ -55,6 +56,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Client with %s = %s not found.";
     private static final String RC_INTERNAL_SERVER_ERROR_DESC = "Internal server error.";
     private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Subscription with id = %s not found.";
+    private static final String RC_SUBSCRIPTION_CLIENT_NOT_VALID = "Subscription client not valid.";
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
 
     private static final int CLIENT_ID_TYPE_CONTRACTID = 0;
@@ -128,7 +130,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     @Override
     @WebMethod
     public RequestResult regularPaymentDeleteSubscription(
-            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID) {
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId) {
         boolean result = false;
         RequestResult requestResult = new RequestResult();
         try {
@@ -136,6 +139,9 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (bs == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_SUBSCRIPTION_NOT_FOUND_DESC, regularPaymentSubscriptionID));
+                return requestResult;
+            }
+            if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
                 return requestResult;
             }
             result = !bs.isActive() || rpService.deactivateSubscription(regularPaymentSubscriptionID);
@@ -151,13 +157,31 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         return requestResult;
     }
 
+    private boolean checkSubscriptionContractId(BankSubscription bs, Long contractId, RequestResult requestResult) {
+        if (contractId != null) {
+            Client c = DAOService.getInstance().getClientByContractId(contractId);
+            if (c == null) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, "contractId", contractId));
+                return false;
+            }
+            if (c.getIdOfClient().longValue() != bs.getClient().getIdOfClient().longValue()) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(RC_SUBSCRIPTION_CLIENT_NOT_VALID);
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     @WebMethod
     public RequestResult regularPaymentEditSubscription(
             @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period) {
+            @WebParam(name = "subscriptionPeriodOfValidity") int period,
+            @WebParam(name = "contractId") Long contractId) {
         RequestResult requestResult = new RequestResult();
         try {
             BankSubscription bs = rpService.findBankSubscription(regularPaymentSubscriptionID);
@@ -166,6 +190,10 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 requestResult.setErrorDesc(String.format(RC_SUBSCRIPTION_NOT_FOUND_DESC, regularPaymentSubscriptionID));
                 return requestResult;
             }
+            if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
+                return requestResult;
+            }
+
             if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
@@ -191,8 +219,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (clientIDType == CLIENT_ID_TYPE_CONTRACTID) {
                 Long contractId = Long.parseLong(clientID);
                 subscriptionList = rpService.findSubscriptionsId(contractId, null, null);
-            }
-            else if (clientIDType == CLIENT_ID_TYPE_SAN) {
+            } else if (clientIDType == CLIENT_ID_TYPE_SAN) {
                 subscriptionList = rpService.findSubscriptionsId(null, null, clientID);
             } else if (clientIDType == CLIENT_ID_TYPE_MOBILE) {
                 subscriptionList = rpService
@@ -220,8 +247,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (clientIDType == CLIENT_ID_TYPE_CONTRACTID) {
                 Long contractId = Long.parseLong(clientID);
                 subscriptionList = rpService.findSubscriptionsId(contractId, null, null);
-            }
-            else if (clientIDType == CLIENT_ID_TYPE_SAN) {
+            } else if (clientIDType == CLIENT_ID_TYPE_SAN) {
                 subscriptionList = rpService.findSubscriptionsId(null, null, clientID);
             } else if (clientIDType == CLIENT_ID_TYPE_MOBILE) {
                 subscriptionList = rpService
@@ -247,7 +273,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     @Override
     @WebMethod
     public RequestResult regularPaymentReadSubscription(
-            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID) {
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId) {
         RequestResult result = new RequestResult();
         try {
             BankSubscription bs = rpService.getSubscriptionWithClient(regularPaymentSubscriptionID);
@@ -256,6 +283,10 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 result.setErrorDesc(String.format(RC_SUBSCRIPTION_NOT_FOUND_DESC, regularPaymentSubscriptionID));
                 return result;
             }
+            if (contractId != null && !checkSubscriptionContractId(bs, contractId, result)) {
+                return result;
+            }
+
             SubscriptionInfo si = createSubscriptionInfo(bs);
             result.setSubscriptionInfo(si);
         } catch (Exception ex) {
@@ -270,7 +301,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     @WebMethod
     public RequestResult regularPaymentReadPayments(
             @WebParam(name = "regularPaymentSubscriptionID") Long subscriptionID,
-            @WebParam(name = "beginDate") Date beginDate, @WebParam(name = "endDate") Date endDate) {
+            @WebParam(name = "beginDate") Date beginDate, @WebParam(name = "endDate") Date endDate,
+            @WebParam(name = "contractId") Long contractId) {
         RequestResult result = new RequestResult();
         try {
             BankSubscription bs = rpService.findBankSubscription(subscriptionID);
@@ -279,6 +311,10 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 result.setErrorDesc(String.format(RC_SUBSCRIPTION_NOT_FOUND_DESC, subscriptionID));
                 return result;
             }
+            if (contractId != null && !checkSubscriptionContractId(bs, contractId, result)) {
+                return result;
+            }
+
             List<RegularPayment> rpList = rpService.getSubscriptionPayments(subscriptionID, beginDate, endDate, false);
             result.setPaymentList(new RegularPaymentList());
             result.getPaymentList().setList(new ArrayList<RegularPaymentList.RegularPaymentInfo>());

@@ -26,17 +26,6 @@ public interface IRegularPayment {
             @WebParam(name = "subscriptionPeriodOfValidity") int period);
 
     @WebMethod
-    RequestResult regularPaymentDeleteSubscription(
-            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID);
-
-    @WebMethod
-    RequestResult regularPaymentEditSubscription(
-            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
-            @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
-            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period);
-
-    @WebMethod
     RequestResult regularPaymentReadSubscriptionList(@WebParam(name = "clientID") String clientID,
             @WebParam(name = "clientIDType") int clientIDType);
 
@@ -45,13 +34,28 @@ public interface IRegularPayment {
             @WebParam(name = "clientIDType") int clientIDType);
 
     @WebMethod
-    RequestResult regularPaymentReadSubscription(
-            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID);
+    RequestResult regularPaymentReadSettings();
+
+    @WebMethod
+    RequestResult regularPaymentDeleteSubscription(
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId);
 
     @WebMethod
     RequestResult regularPaymentReadPayments(@WebParam(name = "regularPaymentSubscriptionID") Long subscriptionID,
-            @WebParam(name = "beginDate") Date beginDate, @WebParam(name = "endDate") Date endDate);
+            @WebParam(name = "beginDate") Date beginDate, @WebParam(name = "endDate") Date endDate,
+            @WebParam(name = "contractId") Long contractId);
 
     @WebMethod
-    RequestResult regularPaymentReadSettings();
+    RequestResult regularPaymentReadSubscription(
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId);
+
+    @WebMethod
+    RequestResult regularPaymentEditSubscription(
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
+            @WebParam(name = "subscriptionPeriodOfValidity") int period,
+            @WebParam(name = "contractId") Long contractId);
 }

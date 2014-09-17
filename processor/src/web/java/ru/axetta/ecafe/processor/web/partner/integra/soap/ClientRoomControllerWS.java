@@ -4015,15 +4015,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
 
+            boolean clientHasCustomNotificationSettings = false;
             for (ClientNotificationSetting setting : client.getNotificationSettings()) {
                 if (setting.getNotifyType()
                       .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                    clientHasCustomNotificationSettings = true;
                     continue;
                 }
                 ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
                 it.setTypeOfNotification(setting.getNotifyType());
                 it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(setting.getNotifyType()).getName());
                 list.add(it);
+            }
+            // если у клиента нет записи изменения настроек - выдаем настройки по умолчанию
+            if (!clientHasCustomNotificationSettings) {
+                for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+                    if (predefined.isEnabledAtDefault()) {
+                        ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                        it.setTypeOfNotification(predefined.getValue());
+                        it.setNameOfNotification(predefined.getName());
+                        list.add(it);
+                    }
+                }
             }
             res.setSettings(list);
         } catch (Exception e) {
