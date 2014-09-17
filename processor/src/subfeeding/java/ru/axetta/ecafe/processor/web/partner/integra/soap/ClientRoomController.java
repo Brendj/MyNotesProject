@@ -310,6 +310,10 @@ public interface ClientRoomController {
     SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
+    @WebMethod(operationName = "getSubscriptionFeedingJournal")
+    SubscriptionFeedingJournalResult getSubscriptionFeedingJournal(@WebParam(name = "contractid") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+
     @WebMethod(operationName = "getCurrentSubscriptionFeeding")
     SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "currentDay") Date currentDay);

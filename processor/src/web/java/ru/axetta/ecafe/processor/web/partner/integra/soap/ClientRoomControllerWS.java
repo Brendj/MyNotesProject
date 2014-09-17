@@ -4624,6 +4624,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public SubscriptionFeedingJournalResult getSubscriptionFeedingJournal(Long contractId, Date startDate, Date endDate) {
+        Session session = null;
+        Transaction transaction = null;
+        SubscriptionFeedingJournalResult result = new SubscriptionFeedingJournalResult();
+
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            transaction.commit();
+            SubscriptionFeedingService subscriptionFeedingService = SubscriptionFeedingService.getInstance();
+            List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingService.findSubscriptionFeedingByClient(client, startDate, endDate);
+            for (SubscriptionFeeding subscriptionFeeding: subscriptionFeedings) {
+                result.subscriptionFeedingJournalListExt.getS().add(new SubscriptionFeedingJournalExt(subscriptionFeeding));
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+
+        return result;
+    }
+
+    @Override
     public CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
         authenticateRequest(contractId);
