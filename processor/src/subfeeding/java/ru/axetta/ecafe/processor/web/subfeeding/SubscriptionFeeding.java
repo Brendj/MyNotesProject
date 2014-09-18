@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.subfeeding;
 
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingExt;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingJournalExt;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -43,6 +44,18 @@ public class SubscriptionFeeding implements Serializable {
     }
 
     public SubscriptionFeeding(SubscriptionFeedingExt subscriptionFeedingExt) {
+        this.idOfSubscriptionFeeding = subscriptionFeedingExt.getIdOfSubscriptionFeeding();
+        this.guid = subscriptionFeedingExt.getGuid();
+        this.dateCreateService = subscriptionFeedingExt.getDateCreateService();
+        this.dateActivateSubscription = subscriptionFeedingExt.getDateActivateSubscription();
+        this.lastDatePause = subscriptionFeedingExt.getLastDatePauseSubscription();
+        this.dateDeactivate = subscriptionFeedingExt.getDateDeactivateService();
+        this.updateDate = subscriptionFeedingExt.getUpdateDate();
+        this.suspended = subscriptionFeedingExt.getWasSuspended();
+        this.changesPlace = subscriptionFeedingExt.getChangesPlace() ? "АРМ Администратора" : "Личный кабинет";
+    }
+
+    public SubscriptionFeeding(SubscriptionFeedingJournalExt subscriptionFeedingExt) {
         this.idOfSubscriptionFeeding = subscriptionFeedingExt.getIdOfSubscriptionFeeding();
         this.guid = subscriptionFeedingExt.getGuid();
         this.dateCreateService = subscriptionFeedingExt.getDateCreateService();

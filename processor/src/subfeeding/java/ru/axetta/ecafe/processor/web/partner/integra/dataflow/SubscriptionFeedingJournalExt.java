@@ -14,7 +14,7 @@ import java.util.Date;
  * Time: 17:22
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "SubscriptionFeedingExt")
+@XmlType(name = "SubscriptionFeedingJournalExt")
 public class SubscriptionFeedingJournalExt {
 
     @XmlElement(name = "IdOfSubscriptionFeeding")

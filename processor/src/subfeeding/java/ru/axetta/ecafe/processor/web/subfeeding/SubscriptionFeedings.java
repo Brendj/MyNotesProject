@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.subfeeding;
 
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingExt;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingJournalExt;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingJournalResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingListResult;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
 import ru.axetta.ecafe.processor.web.subfeeding.SubscriptionFeeding;
@@ -22,7 +24,7 @@ import java.util.*;
 public class SubscriptionFeedings implements Serializable {
 
     private ClientRoomController clientRoomController;
-    private SubscriptionFeedingListResult subscriptionFeedingResult;
+    private SubscriptionFeedingJournalResult subscriptionFeedingJournalResult;
     private List<SubscriptionFeeding> subscriptionFeedings;
 
     private SubscriptionFeedings(ClientRoomController clientRoomController) {
@@ -40,20 +42,20 @@ public class SubscriptionFeedings implements Serializable {
     }
 
     private void buildList(Long contractId, Date startDate, Date endDate){
-        subscriptionFeedingResult = getSubFeeding(contractId, startDate, endDate);
+        subscriptionFeedingJournalResult = getSubFeeding(contractId, startDate, endDate);
         boolean subFeedingExist = isSubscriptionFeedingExist();
         subscriptionFeedings = new ArrayList<SubscriptionFeeding>();
         if(subFeedingExist){
-            for (SubscriptionFeedingExt subscriptionFeedingExt : subscriptionFeedingResult.subscriptionFeedingListExt.getS()){
-                subscriptionFeedings.add(new SubscriptionFeeding(subscriptionFeedingExt));
+            for (SubscriptionFeedingJournalExt subscriptionFeedingJournalExt : subscriptionFeedingJournalResult.subscriptionFeedingJournalListExt.getS()){
+                subscriptionFeedings.add(new SubscriptionFeeding(subscriptionFeedingJournalExt));
             }
             Collections.sort(subscriptionFeedings, buildUpdateDateComparator());
         }
     }
 
     public Boolean isSubscriptionFeedingExist() {
-        return subscriptionFeedingResult != null && subscriptionFeedingResult.subscriptionFeedingListExt != null &&
-                !subscriptionFeedingResult.subscriptionFeedingListExt.getS().isEmpty();
+        return subscriptionFeedingJournalResult != null && subscriptionFeedingJournalResult.subscriptionFeedingJournalListExt != null &&
+                !subscriptionFeedingJournalResult.subscriptionFeedingJournalListExt.getS().isEmpty();
     }
 
     public List<SubscriptionFeeding> getSubscriptionFeedings() {
@@ -72,8 +74,8 @@ public class SubscriptionFeedings implements Serializable {
 
     }
 
-    private SubscriptionFeedingListResult getSubFeeding(Long contractId, Date startDate, Date endDate) {
-        return clientRoomController.getSubscriptionFeedingHistoryList(contractId, startDate, endDate);
+    private SubscriptionFeedingJournalResult getSubFeeding(Long contractId, Date startDate, Date endDate) {
+        return clientRoomController.getSubscriptionFeedingJournal(contractId, startDate, endDate);
     }
 
 
