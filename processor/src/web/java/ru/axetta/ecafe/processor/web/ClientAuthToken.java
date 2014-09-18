@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web;
 
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpSession;
  * Time: 13:17:39
  * To change this template use File | Settings | File Templates.
  */
-public class ClientAuthToken {
+public class ClientAuthToken implements Serializable {
 
     private static final String HTTP_SESSION_ATTRIBUTE = ClientAuthToken.class.getCanonicalName();
     private final Long contractId;
