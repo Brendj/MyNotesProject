@@ -4585,22 +4585,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(
+    //@Override
+/*    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(
           @WebParam(name = "contractId") Long contractId, @WebParam(name = "startDate") Date startDate,
           @WebParam(name = "endDate") Date endDate) {
         authenticateRequest(contractId);
         return getSubscriptionFeedingHistoryList(contractId, null, startDate, endDate);
-    }
+    }*/
 
-    @Override
-    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
+    //@Override
+/*    public SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
         authenticateRequest(null);
         return getSubscriptionFeedingHistoryList(null, san, startDate, endDate);
-    }
+    }*/
 
-    private SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(Long contractId, String san, Date startDate,
+   /* private SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(Long contractId, String san, Date startDate,
           Date endDate) {
         Session session = null;
         Transaction transaction = null;
@@ -4634,7 +4634,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
-    }
+    }*/
 
     @Override
     public SubscriptionFeedingJournalResult getSubscriptionFeedingJournal(Long contractId, Date startDate, Date endDate) {
@@ -4845,7 +4845,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = String.format("Подписка успешно активирована, начнет действовать после " + df.format(dayForbid));
                 return result;
             } else {
-                result.resultCode = RC_SUBSCRIPTION_FEEDING_ACTIVATED;
+                result.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
                 result.description = String.format("У вас уже есть подписка, дата ее ативации " + df.format(subscriptionFeeding
                         .getDateActivateSubscription()));
                 return result;

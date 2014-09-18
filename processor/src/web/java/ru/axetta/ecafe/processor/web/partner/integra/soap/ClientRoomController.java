@@ -309,13 +309,13 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getSubscriptionFeedingSettingBySan")
     SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
-    @WebMethod(operationName = "getSubscriptionFeedingHistoryList")
+/*    @WebMethod(operationName = "getSubscriptionFeedingHistoryList")
     SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getSubscriptionFeedingHistoryListBySan")
     SubscriptionFeedingListResult getSubscriptionFeedingHistoryList(@WebParam(name = "san") String san,
-          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);*/
 
     @WebMethod(operationName = "getSubscriptionFeedingJournal")
     SubscriptionFeedingJournalResult getSubscriptionFeedingJournal(@WebParam(name = "contractId") Long contractId,
