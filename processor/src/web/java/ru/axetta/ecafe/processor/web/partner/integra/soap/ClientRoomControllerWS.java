@@ -4068,15 +4068,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_CLIENT_NOT_FOUND_DESC;
                 return res;
             }
-            if (notificationTypes != null) {
-                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
-                    ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
-                    if (notificationTypes.contains(pd.getValue()) || pd.getValue()
-                          .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                        client.getNotificationSettings().add(cns);
-                    } else {
-                        client.getNotificationSettings().remove(cns);
-                    }
+            for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
+                ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
+                if ((notificationTypes!=null && notificationTypes.contains(pd.getValue())) || pd.getValue()
+                      .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                    client.getNotificationSettings().add(cns);
+                } else {
+                    client.getNotificationSettings().remove(cns);
                 }
             }
             persistenceTransaction.commit();
