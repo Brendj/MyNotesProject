@@ -75,12 +75,12 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runBindEMPClients() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runBindClients(); //DEF
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients(); //DEF
         printMessage("Привязка клиентов с ЕМП завершена");
     }
 
     public void runReceiveEMPUpdates() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).runReceiveUpdates(); //DEF
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates(); //DEF
         printMessage("Загрузка обновление из ЕМП завершена");
     }
 
@@ -93,7 +93,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runRecalculateEMPStatistics() throws Exception {
-        RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).recalculateEMPClientsCount(); //DEF
+        RuntimeContext.getAppContext().getBean(EMPProcessor.class).recalculateEMPClientsCount(); //DEF
         printMessage("Статистика ЕМП обновлена");
     }
 

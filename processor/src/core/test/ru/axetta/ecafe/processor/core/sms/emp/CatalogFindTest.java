@@ -19,21 +19,20 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(locations = { "/META-INF/context.xml" })
 public class CatalogFindTest {
 
-    EMPSmsServiceImpl smsService;
+    EMPProcessor empProcessor;
 
     @Before
     public void init() throws Exception {
-        ISmsService.Config c = new ISmsService.Config(null, null, null, null, null,
-                "http://91.228.153.167:8090/ws/subscriptions/?wsdl", "http://91.228.153.167:8090/ws/storage/?wsdl",
-                "49aafdb8198311e48ee8416c74617269", "666255", "SYS666254CAT0000000SUBSCRIPTIONS", "true", "", "200");
-        smsService = new EMPSmsServiceImpl(c);
+        /// "http://91.228.153.167:8090/ws/subscriptions/?wsdl", "http://91.228.153.167:8090/ws/storage/?wsdl",
+        ///                "49aafdb8198311e48ee8416c74617269", "666255", "SYS666254CAT0000000SUBSCRIPTIONS", "true", "", "200"
+        empProcessor = new EMPProcessor();
     }
 
     @Test
     public void searchInCatalogue() {
-        SelectEntriesRequest request = smsService.buildSelectEntryParams("79162224001");
-        SelectEntriesResponse response = smsService.createStorageController().selectEntries(request);
-        if (response.getErrorCode() == EMPSmsServiceImpl.EMP_ERROR_CODE_NOTHING_FOUND) {
+        SelectEntriesRequest request = empProcessor.buildSelectEntryParams("79162224001");
+        SelectEntriesResponse response = empProcessor.createStorageController().selectEntries(request);
+        if (response.getErrorCode() == EMPProcessor.EMP_ERROR_CODE_NOTHING_FOUND) {
             System.out.println("Client not found in catalog");
         }
         if (response.getErrorCode() != 0) {

@@ -19,14 +19,6 @@ public abstract class ISmsService {
         private final String password;
         private final String defaultSender;
         private final String serviceTimeZone;
-        private final String token;
-        private final String systemId;
-        private final String catalogName;
-        private final String subscriptionServiceUrl;
-        private final String storageServiceUrl;
-        private final boolean logging;
-        private final String syncServiceNode;
-        private final int packageSize;
 
         public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone)
                 throws Exception {
@@ -35,33 +27,6 @@ public abstract class ISmsService {
             this.password = password;
             this.defaultSender = StringUtils.substring(defaultSender, 0, 11);
             this.serviceTimeZone = serviceTimeZone;
-            this.subscriptionServiceUrl = "";
-            this.storageServiceUrl = "";
-            this.token = "";
-            this.systemId = "";
-            this.catalogName = "";
-            this.logging = false;
-            this.syncServiceNode = "";
-            packageSize = 0;
-        }
-
-        public Config(String serviceUrl, String userName, String password, String defaultSender, String serviceTimeZone,
-                String subscriptionServiceUrl, String storageServiceUrl, String token,String systemId,
-                String catalogName, String logging, String syncServiceNode, String packageSize)
-        throws Exception {
-            this.serviceUrl = serviceUrl;
-            this.userName = userName;
-            this.password = password;
-            this.defaultSender = StringUtils.substring(defaultSender, 0, 11);
-            this.serviceTimeZone = serviceTimeZone;
-            this.subscriptionServiceUrl = subscriptionServiceUrl;
-            this.storageServiceUrl = storageServiceUrl;
-            this.token = token;
-            this.systemId = systemId;
-            this.catalogName = catalogName;
-            this.logging = BooleanUtils.toBoolean(logging);
-            this.syncServiceNode = syncServiceNode;
-            this.packageSize = NumberUtils.toInt(packageSize);
         }
 
         public String getServiceUrl() {
@@ -84,37 +49,6 @@ public abstract class ISmsService {
             return serviceTimeZone;
         }
 
-        public String getSubscriptionServiceUrl() {
-            return subscriptionServiceUrl;
-        }
-
-        public String getStorageServiceUrl() {
-            return storageServiceUrl;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public String getSystemId() {
-            return systemId;
-        }
-
-        public String getCatalogName() {
-            return catalogName;
-        }
-
-        public boolean getLogging() {
-            return logging;
-        }
-
-        public String getSyncServiceNode() {
-            return syncServiceNode;
-        }
-
-        public int getPackageSize() {
-            return packageSize;
-        }
     }
     protected Config config;
     protected static Logger logger;

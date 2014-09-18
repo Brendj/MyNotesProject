@@ -120,7 +120,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
 
-    private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
+    public static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
     public static final String PARAM_NAME_DB_MAINTANANCE_HOUR = PROCESSOR_PARAM_BASE + ".dbmaintanance.hour";
     public static final String PARAM_NAME_TIME_ZONE = PROCESSOR_PARAM_BASE + ".time.zone";
     public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM = PROCESSOR_PARAM_BASE + ".processor.hiddenPages";
@@ -615,6 +615,10 @@ public class RuntimeContext implements ApplicationContextAware {
         <prop key="org.apache.ws.security.crypto.merlin.truststore.password">BCGG00</prop>
         <prop key="org.apache.ws.security.crypto.merlin.truststore.file">/temp/certs/ispp_agent_istk.pfx</prop>
         */
+    }
+
+    public Properties getConfigProperties() {
+        return configProperties;
     }
 
     public SchemaVersionInfo getCurrentDBSchemaVersion() {
@@ -1144,18 +1148,8 @@ public class RuntimeContext implements ApplicationContextAware {
         String sender = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".sender", "Novshkola");
         String timeZone = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".timeZone", "GMT-1");
         String userServiceId = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".serviceId", "14");
-        String token = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".token", "49aafdb8198311e48ee8416c74617269");               //  EMP
-        String systemId = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".systemId", "666255");                                   //  EMP
-        String catalogName = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".catalogName", "SYS666254CAT0000000SUBSCRIPTIONS");   //  EMP
-        String subscriptionServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".subscriptionUrl", "http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl");                                        //  EMP
-        String storageServiceUrl = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");   //  EMP
-        String logging = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".logging", "false");   //  EMP
-        String syncServiceNode = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".syncServiceNode", "1");   //  EMP
-        String packageSize = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".packageSize", "100");   //  EMP
 
-        ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone,
-                                                           subscriptionServiceUrl, storageServiceUrl, token,
-                                                           systemId, catalogName, logging, syncServiceNode, packageSize);
+        ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone);
         ISmsService smsService = null;
         if (serviceType.equalsIgnoreCase("atompark")) {
             smsService = new AtomparkSmsServiceImpl(config);

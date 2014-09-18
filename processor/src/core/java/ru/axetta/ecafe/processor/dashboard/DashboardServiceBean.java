@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.dashboard;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
@@ -128,11 +129,11 @@ public class DashboardServiceBean {
             }
 
             //  добавляем статистику по емп только если инстанс соответствует установкам в конфигурации, а так же для отправки смс используется ЕМП
-            ISmsService smsService = RuntimeContext.getInstance().getSmsService();
-            if(smsService != null && smsService instanceof EMPSmsServiceImpl) {
-                EMPSmsServiceImpl empSmsService = (EMPSmsServiceImpl) smsService;
-                if(empSmsService.isAllowed()) {
-                    EMPSmsServiceImpl.EMPStatistics empStatistics = EMPSmsServiceImpl.loadEMPStatistics();
+            EMPProcessor empProcessor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+            //ISmsService smsService = RuntimeContext.getInstance().getSmsService();
+            if(empProcessor!= null) {
+                if(empProcessor.isAllowed()) {
+                    EMPProcessor.EMPStatistics empStatistics = EMPProcessor.loadEMPStatistics();
                     params.add(new DashboardResponse.NamedParams("Не связано учеников с ЕМП", empStatistics.getNotBindedCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников ожидает связки с ЕМП", empStatistics.getWaitBindingCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников связанных с ЕМП", empStatistics.getBindedCount()));
