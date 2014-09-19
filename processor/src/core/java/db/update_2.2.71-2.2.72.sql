@@ -30,3 +30,6 @@ ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN thursdayprice character varying
 ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN fridayprice character varying(255);
 ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN saturdayprice character varying(255);
 ALTER TABLE cf_clients_cycle_diagrams ADD COLUMN sundayprice character varying(255);
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 140918) НЕ МЕНЯТЬ
