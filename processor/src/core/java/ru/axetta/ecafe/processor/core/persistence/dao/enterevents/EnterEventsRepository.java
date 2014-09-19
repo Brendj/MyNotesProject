@@ -45,10 +45,10 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                 + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient "
                 + " WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
                 + "ORDER BY e.idoforg, e.idofclient, e.evtdatetime DESC\n")
-                //.setParameter("startDateTime", begin.getTimeInMillis())
-                //.setParameter("endDateTime", Calendar.getInstance().getTimeInMillis())
-                 .setParameter("startDateTime", 1355097600000L)
-                .setParameter("endDateTime", 1355183999000L)
+                .setParameter("startDateTime", begin.getTimeInMillis())
+                .setParameter("endDateTime", Calendar.getInstance().getTimeInMillis())
+                 //.setParameter("startDateTime", 1355097600000L)
+                //.setParameter("endDateTime", 1355183999000L)
                 .getResultList();
         List<DAOEnterEventSummaryModel> result = new ArrayList<DAOEnterEventSummaryModel>();
         for (Object[] temp:tempList){
