@@ -1806,4 +1806,9 @@ public class DAOUtils {
         }
         return version;
     }
+
+
+    public static List enterEventsSummary(){
+                 return null;
+    }
 }

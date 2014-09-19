@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
@@ -31,6 +32,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQues
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
+import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
@@ -43,6 +45,9 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -5598,6 +5603,79 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             e.printStackTrace();
             result.internalError();
         }
+        return result;
+    }
+
+    @Override
+    public VisitorsSummaryResult getVisitorsSummary() {
+        VisitorsSummaryResult result = new VisitorsSummaryResult();
+        Session session = null;
+        result.orgsList = new VisitorsSummaryList();
+        result.orgsList.org = new ArrayList<VisitorsSummary>();
+        result.orgsList.org.add(new VisitorsSummary());
+        result.orgsList.org.add(new VisitorsSummary());
+        result.orgsList.org.add(new VisitorsSummary());
+        result.orgsList.org.add(new VisitorsSummary());
+
+        EnterEventsService enterEventsService = (EnterEventsService) RuntimeContext.getAppContext()
+                .getBean(EnterEventsService.class);
+        List<DAOEnterEventSummaryModel> data = enterEventsService.getEnterEventsSummary();
+        List<VisitorsSummary> visitorsSummaryList = new ArrayList<VisitorsSummary>();
+        Long lastClientId = null;
+        Long currentOrgId = null ;
+        VisitorsSummary visitorsSummary = new VisitorsSummary();
+        if(data.size() > 0 ){
+            visitorsSummary.id = data.get(0).getIdOfOrg();
+            currentOrgId = data.get(0).getIdOfOrg();
+        }
+        for (DAOEnterEventSummaryModel model : data) {
+            if(lastClientId == null){
+                if (model.getIdofvisitor() != null ) {
+                    if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
+                        visitorsSummary.others++;
+                    }
+                } else {
+                    if (model.getEventCode() == 112) {
+                        visitorsSummary.cardless++;
+                    }
+
+                    if((model.getPassDirection() == 1) || (model.getPassDirection() == 7)){
+                        visitorsSummary.exitsCardless++;
+                    }
+                }
+            }
+            if(lastClientId != null && lastClientId.equals(model.getIdOfClient()) ){
+                continue;
+            }else {
+                lastClientId = model.getIdOfClient();
+            }
+
+            if (!model.getIdOfOrg().equals(currentOrgId)) {
+                visitorsSummaryList.add(visitorsSummary);
+                visitorsSummary = new VisitorsSummary();
+                visitorsSummary.id = model.getIdOfOrg();
+                currentOrgId = model.getIdOfOrg();
+            }
+
+            if (model.getIdOfClient() != null) {
+                if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)) {
+                    if (model.getIdofclientgroup() != null) {
+                        if ((model.getIdofclientgroup() > 1000000000L) && (model.getIdofclientgroup() < 1100000000L)) {
+                            visitorsSummary.students++;
+                        } else if ((model.getIdofclientgroup() >= 1100000000L) && (model.getIdofclientgroup() <= 1100000020L)) {
+                            visitorsSummary.employee++;
+                        } else if ((model.getIdofclientgroup() == 1100000030L) && (model.getIdofclientgroup() == 1100000040L)) {
+                            visitorsSummary.others++;
+                        }
+                    } else {
+
+                        visitorsSummary.others++;
+                    }
+
+                }
+            }
+        }
+        result.orgsList.org = visitorsSummaryList;
         return result;
     }
 }

@@ -1,7 +1,8 @@
-package ru.axetta.ecafe.processor.core.persistence.dao;
+package ru.axetta.ecafe.processor.core.persistence.dao.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.dao.AbstractJpaDao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

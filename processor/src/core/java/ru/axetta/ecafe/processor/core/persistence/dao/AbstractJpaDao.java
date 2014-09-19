@@ -15,7 +15,7 @@ public abstract class AbstractJpaDao< T extends Serializable> {
     private Class< T > clazz;
 
     @PersistenceContext(unitName = "processorPU")
-    EntityManager entityManager;
+    protected EntityManager entityManager;
 
     public void setClazz( Class< T > clazzToSet ){
         this.clazz = clazzToSet;
