@@ -90,7 +90,7 @@ public class SubscriptionFeedingJournalExt {
         if (subscriptionFeeding.getDateActivateSubscription() != null
                 && subscriptionFeeding.getLastDatePauseSubscription() != null
                 && subscriptionFeeding.getWasSuspended() == true
-                && subscriptionFeeding.getLastDatePauseSubscription().getTime() > currentDate.getTime()) {
+                && subscriptionFeeding.getLastDatePauseSubscription().getTime() <= currentDate.getTime()) {
             return "Приостановлена";
         }
 
