@@ -10,20 +10,18 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
-import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.mapping.Array;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
@@ -164,7 +162,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
             parameterMap.put("orgName", org.getOfficialName());
             calendar.setTime(startTime);
-            Calendar c = Calendar.getInstance();
+//            Calendar c = Calendar.getInstance();
 //            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
             for (int day = 1; day <= 31; day++) {
                 daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(CalendarUtils.addDays(startTime, day - 1))));

@@ -33,6 +33,8 @@ public class EnterEvent {
     private Org org;
     private Long guardianId;
 
+
+    //pass direction
     public static final int ENTRY = 0; // вход
     public static final int EXIT = 1; // выход
     public static final int PASSAGE_IS_FORBIDDEN = 2; // проход запрещен
@@ -44,6 +46,8 @@ public class EnterEvent {
     public static final int DIRECTION_ENTER = 0;
     public static final int DIRECTION_EXIT = 1;
     public static final int DETECTED_INSIDE =100; // обнаружен на подносе карты внутри здания
+
+    //eventcode
    //
 
     public static boolean isEntryOrExitEvent(int passDirection){

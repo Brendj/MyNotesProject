@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -399,5 +400,9 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getOrgSummary")
     OrgSummaryResult getOrgSummary(@WebParam(name = "orgId") Long orgId);
+
+
+    @WebMethod(operationName = "getVisitorsSummary")
+    VisitorsSummaryResult getVisitorsSummary ();
 
 }
