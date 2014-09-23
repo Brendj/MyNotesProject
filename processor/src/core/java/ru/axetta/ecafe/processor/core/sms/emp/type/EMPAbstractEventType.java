@@ -105,7 +105,13 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("account", "" + client.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
-        params.put("balance", new BigDecimal((double) client.getBalance() / 100).setScale(2).toString());
+        BigDecimal balance = null;
+        if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
+            balance = new BigDecimal(0D).setScale(2);
+        } else {
+            balance = new BigDecimal((double) client.getBalance() / 100).setScale(2);
+        }
+        params.put("balance", balance.toString());
     }
 
     @Override
