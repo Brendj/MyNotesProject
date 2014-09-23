@@ -84,7 +84,7 @@ public class EMPSmsServiceImpl extends ISmsService {
     @Override
     public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject) throws Exception {
         if (!(textObject instanceof EMPEventType)) {
-            throw new Exception("Text argument must be an EMPEventType");
+            throw new Exception("Text argument must be an EMPEventType instead of " + textObject.getClass().toString());
         }
 
         EMPEventType empEvent = (EMPEventType) textObject;
