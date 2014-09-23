@@ -196,6 +196,13 @@ public class NSIDeltaProcessor {
                         emptyIfNull(item.getFirstName()) + " - не найден", logBuffer);
                 return;
             }
+            //  проверка клиента
+            if(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                return;
+            }
+
+
             try {
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig(), cl);
                 if(!StringUtils.isBlank(item.getOrgGuid()) && !cl.getOrg().getGuid().equals(item.getOrgGuid())) {

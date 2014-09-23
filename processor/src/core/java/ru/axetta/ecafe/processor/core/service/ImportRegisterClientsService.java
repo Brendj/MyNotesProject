@@ -316,6 +316,10 @@ public class ImportRegisterClientsService {
                 }
                 try {
                     ClientGroup currGroup = dbClient.getClientGroup();
+                    if(currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                        break;
+                    }
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
                     //  увеличиваем количество клиентов, подлежих удалению
                     Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
@@ -363,6 +367,10 @@ public class ImportRegisterClientsService {
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
+                if(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                    continue;
+                }
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
             }
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
