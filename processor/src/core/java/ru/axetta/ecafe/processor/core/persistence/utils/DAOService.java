@@ -622,7 +622,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
         try {
             Query q = entityManager.createNativeQuery(
-                    "UPDATE cf_clients SET cf_clients.idofclientgroup=:idofclientgroup WHERE cf_clients.idofclient=:idofclient");
+                    "UPDATE cf_clients SET idofclientgroup=:idofclientgroup WHERE idofclient=:idofclient");
             q.setParameter("idofclient", idofclient);
             q.setParameter("idofclientgroup", idofclientgroup);
             return q.executeUpdate() > 0;

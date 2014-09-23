@@ -47,6 +47,7 @@ public class NSIRepairService {
 
     public void run() {
         List<RepairEntry> toRepair = RuntimeContext.getAppContext().getBean(NSIRepairService.class).loadRepairEntries();
+        toRepair.add(new RepairEntry(1L, 136L, 79280L, "Сотрудники"));
         long repaired = 0;
         for(RepairEntry re : toRepair) {
             try {
@@ -108,13 +109,13 @@ public class NSIRepairService {
             if(groups.length() > 0) {
                 groups += ", ";
             }
-            groups += " " + grp.getNameOfGroup();
+            groups += String.format(" '%s'", grp.getNameOfGroup());
         }
         q = q.replaceAll("%GROUPS_LIST%", groups);
         return q;
     }
 
-    protected class RepairEntry {
+    public class RepairEntry {
         protected long idofregistrychange;
         protected long idoforg;
         protected long idofclient;
