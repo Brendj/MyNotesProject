@@ -160,7 +160,10 @@ public class BIDataExportService {
         //  Детализация заказа (OrderDetails)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("mobilenotify",
-                "select idofclient, mobile, email from cf_clients where mobile<>'' or email<>''",
+                "select idofclient, mobile, email "
+                + "from cf_clients "
+                + "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient "
+                + "where mobile<>'' or email<>'' and cf_cards.state=0",
                 new String[]{"idofclient", "mobile", "email"}));
 
 
