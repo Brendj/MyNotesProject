@@ -43,6 +43,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Обновить статистику ЕМП" action="#{otherActionsPage.runRecalculateEMPStatistics}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
 
 

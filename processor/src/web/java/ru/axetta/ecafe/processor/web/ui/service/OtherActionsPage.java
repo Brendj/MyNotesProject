@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
+import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
@@ -87,14 +88,19 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runSendEMPEvent() throws Exception {
         Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
-                        new String[] {}, true, EnterEvent.ENTRY); //DEF
+                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT, new String[]{}, true,
+                        EnterEvent.ENTRY); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
     public void runRecalculateEMPStatistics() throws Exception {
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).recalculateEMPClientsCount(); //DEF
         printMessage("Статистика ЕМП обновлена");
+    }
+
+    public void repairNSI() throws Exception {
+        RuntimeContext.getAppContext().getBean(NSIRepairService.class).run(); //DEF
+        printMessage("Записи из Реестров исправлены");
     }
 
 

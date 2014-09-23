@@ -198,7 +198,9 @@ public class NSIDeltaProcessor {
             }
             //  проверка клиента
             if(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
-                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+               cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() <
+                                                    ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
                 return;
             }
 

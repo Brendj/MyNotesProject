@@ -317,7 +317,9 @@ public class ImportRegisterClientsService {
                 try {
                     ClientGroup currGroup = dbClient.getClientGroup();
                     if(currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
-                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+                        currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() <
+                                    ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
                         break;
                     }
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
