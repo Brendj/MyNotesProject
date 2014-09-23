@@ -47,7 +47,6 @@ public class NSIRepairService {
 
     public void run() {
         List<RepairEntry> toRepair = RuntimeContext.getAppContext().getBean(NSIRepairService.class).loadRepairEntries();
-        toRepair.add(new RepairEntry(1L, 136L, 79280L, "Сотрудники"));
         long repaired = 0;
         for(RepairEntry re : toRepair) {
             try {
