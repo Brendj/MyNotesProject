@@ -66,7 +66,7 @@ public class Menu {
         return menuDate;
     }
 
-    private void setMenuDate(Date menuDate) {
+    public void setMenuDate(Date menuDate) {
         // For Hibernate only
         this.menuDate = menuDate;
     }

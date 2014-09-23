@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
@@ -55,10 +56,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1956,7 +1954,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setPaymentList(paymentList);
     }
 
-    @Override
+/*    @Override
     public MenuListResult getMenuList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
 
@@ -1972,7 +1970,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuListResult.resultCode = data.getResultCode();
         menuListResult.description = data.getDescription();
         return menuListResult;
-    }
+    }*/
 
     @Override
     public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
@@ -1982,7 +1980,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                      processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
                   }
               });
 
@@ -1994,6 +1992,148 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public MenuListResult getMenuFirstDay(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+            }
+        });
+
+        MenuListResult menuListResult = new MenuListResult();
+        menuListResult.menuList = data.getMenuListExt();
+        menuListResult.resultCode = data.getResultCode();
+        menuListResult.description = data.getDescription();
+        return menuListResult;
+    }
+
+    private void processMenuFirstDay(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
+            Date endDate) throws DatatypeConfigurationException {
+
+        Menu menuByOneDay = getMenuByOneDay(session, startDate, org);
+
+        if (menuByOneDay != null) {
+            if (menuByOneDay.getMenuDetails().isEmpty() || menuByOneDay.getMenuDetails().size() < 30) {
+                processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
+            } else {
+                processMenuList(org, data, objectFactory, session, startDate, endDate);
+            }
+        }
+    }
+
+    private Menu getMenuByOneDay(Session session, Date startDate, Org org) {
+        Date endDate = CalendarUtils.addOneDay(startDate);
+
+        Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuByDayCriteria.add(Restrictions.eq("org", org));
+        menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+
+        return (Menu) menuByDayCriteria.uniqueResult();
+    }
+
+    private void processMenuByMaxIdOfMenu(Session session, Date startDate, Date endDate, ObjectFactory objectFactory,
+            Org org, Data data) throws DatatypeConfigurationException {
+        Criteria menuMaxIdCriteria = session.createCriteria(MenuDetail.class);
+        menuMaxIdCriteria.createAlias("menu", "m", JoinType.LEFT_OUTER_JOIN);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuMaxIdCriteria.add(Restrictions.eq("m.org", org));
+        menuMaxIdCriteria.add(Restrictions.eq("m.menuSource", Menu.ORG_MENU_SOURCE));
+        menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
+        menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
+        menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
+
+        Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
+
+        List menus = new ArrayList();
+
+        if (menuMaxId != null) {
+        Criteria menuCriteria = session.createCriteria(Menu.class);
+        menuCriteria.add(Restrictions.eq("org", org));
+        menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuCriteria.add(Restrictions.eq("idOfMenu", menuMaxId));
+
+        Menu menu = (Menu) menuCriteria.uniqueResult();
+        menu.setMenuDate(startDate);
+
+
+        menus.add(menu);
+
+        startDate = CalendarUtils.addOneDay(startDate);
+        }
+        Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuByDayCriteria.add(Restrictions.eq("org", org));
+        menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+
+        List menusRemaining = menuByDayCriteria.list();
+        menus.addAll(menusRemaining);
+        generateMenuDetail(objectFactory, menus, session, data);
+    }
+
+    private void generateMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
+            throws DatatypeConfigurationException {
+
+        MenuListExt menuListExt = objectFactory.createMenuListExt();
+        int nRecs = 0;
+        for (Object currObject : menus) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+
+            Menu menu = (Menu) currObject;
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
+
+            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
+            menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
+            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
+            List menuDetails = menuDetailCriteria.list();
+
+            for (Object o : menuDetails) {
+                MenuDetail menuDetail = (MenuDetail) o;
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(menuDetail.getGroupName());
+                menuItemExt.setName(menuDetail.getMenuDetailName());
+                menuItemExt.setPrice(menuDetail.getPrice());
+                menuItemExt.setCalories(menuDetail.getCalories());
+                menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitC(menuDetail.getVitC());
+                menuItemExt.setVitA(menuDetail.getVitA());
+                menuItemExt.setVitE(menuDetail.getVitE());
+                menuItemExt.setMinCa(menuDetail.getMinCa());
+                menuItemExt.setMinP(menuDetail.getMinP());
+                menuItemExt.setMinMg(menuDetail.getMinMg());
+                menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuDateItemExt.getE().add(menuItemExt);
+            }
+
+            menuListExt.getM().add(menuDateItemExt);
+        }
+        data.setMenuListExt(menuListExt);
+    }
+
+    @Override
     public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId, final Date startDate,
           final Date endDate) {
         authenticateRequest(null);
@@ -2001,7 +2141,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new OrgRequest().process(orgId, new Processor() {
             public void process(Org org, Data data, ObjectFactory objectFactory, Session session,
                   Transaction transaction) throws Exception {
-                processMenuList(org, data, objectFactory, session, startDate, endDate);
+                processMenuFirstDay(org, data, objectFactory, session, startDate, endDate);
             }
         });
 
@@ -2029,6 +2169,150 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         complexListResult.resultCode = data.getResultCode();
         complexListResult.description = data.getDescription();
         return complexListResult;
+    }
+
+    private void processMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Date startDate, Date endDate) throws DatatypeConfigurationException {
+        Menu menuByOneDay = getMenuByOneDay(session, startDate, client.getOrg());
+
+        if (menuByOneDay != null) {
+            if (menuByOneDay.getMenuDetails().isEmpty() || menuByOneDay.getMenuDetails().size() < 30) {
+                processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+            } else {
+                processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+            }
+        }
+    }
+
+    private void processMenuByMaxIdOfMenuWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
+            Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
+        Criteria menuMaxIdCriteria = session.createCriteria(MenuDetail.class);
+        menuMaxIdCriteria.createAlias("menu", "m", JoinType.LEFT_OUTER_JOIN);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuMaxIdCriteria.add(Restrictions.eq("m.org", client.getOrg()));
+        menuMaxIdCriteria.add(Restrictions.eq("m.menuSource", Menu.ORG_MENU_SOURCE));
+        menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
+        menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
+        menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
+
+        Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
+
+        List menus = new ArrayList();
+
+        if (menuMaxId != null) {
+            Criteria menuCriteria = session.createCriteria(Menu.class);
+            menuCriteria.add(Restrictions.eq("org", client.getOrg()));
+            menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+            menuCriteria.add(Restrictions.eq("idOfMenu", menuMaxId));
+
+            Menu menu = (Menu) menuCriteria.uniqueResult();
+            menu.setMenuDate(startDate);
+
+
+            menus.add(menu);
+
+            startDate = CalendarUtils.addOneDay(startDate);
+        }
+        Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuByDayCriteria.add(Restrictions.eq("org", client.getOrg()));
+        menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+
+        List menusRemaining = menuByDayCriteria.list();
+        menus.addAll(menusRemaining);
+        generateMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
+    }
+
+    private void generateMenuDetailWithProhibitions(Session session, Client client, ObjectFactory objectFactory, List menus, Data data)
+            throws DatatypeConfigurationException {
+        Map<String, Long> ProhibitByFilter = new HashMap<String, Long>();
+        Map<String, Long> ProhibitByName = new HashMap<String, Long>();
+        Map<String, Long> ProhibitByGroup = new HashMap<String, Long>();
+
+        Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
+        prohibitionsCriteria.add(Restrictions.eq("client", client));
+        prohibitionsCriteria.add(Restrictions.eq("deletedState", false));
+
+        List prohibitions = prohibitionsCriteria.list();
+        for (Object prohibitObj : prohibitions) {
+            ProhibitionMenu prohibition = (ProhibitionMenu) prohibitObj;
+
+            switch (prohibition.getProhibitionFilterType()) {
+                case PROHIBITION_BY_FILTER:
+                    ProhibitByFilter.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GOODS_NAME:
+                    ProhibitByName.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GROUP_NAME:
+                    ProhibitByGroup.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+            }
+        }
+
+        MenuListExt menuListExt = objectFactory.createMenuListExt();
+        int nRecs = 0;
+        for (Object currObject : menus) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+
+            Menu menu = (Menu) currObject;
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
+
+            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
+            menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            //   menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
+            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
+            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
+            List menuDetails = menuDetailCriteria.list();
+            for (Object o : menuDetails) {
+                MenuDetail menuDetail = (MenuDetail) o;
+
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(menuDetail.getGroupName());
+                menuItemExt.setName(menuDetail.getMenuDetailName());
+                menuItemExt.setPrice(menuDetail.getPrice());
+                menuItemExt.setCalories(menuDetail.getCalories());
+                menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitC(menuDetail.getVitC());
+                menuItemExt.setVitA(menuDetail.getVitA());
+                menuItemExt.setVitE(menuDetail.getVitE());
+                menuItemExt.setMinCa(menuDetail.getMinCa());
+                menuItemExt.setMinP(menuDetail.getMinP());
+                menuItemExt.setMinMg(menuDetail.getMinMg());
+                menuItemExt.setMinFe(menuDetail.getMinFe());
+
+                if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
+                    menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
+                } else {
+                    if (ProhibitByName.containsKey(menuDetail.getMenuDetailName())) {
+                        menuItemExt.setIdOfProhibition(ProhibitByName.get(menuDetail.getMenuDetailName()));
+                    } else {
+                        //пробегаться в цикле.
+                        for (String filter : ProhibitByFilter.keySet()) {
+                            if (menuDetail.getMenuDetailName().indexOf(filter) != -1) {
+                                menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            }
+                        }
+                    }
+                }
+                menuDateItemExt.getE().add(menuItemExt);
+            }
+            menuListExt.getM().add(menuDateItemExt);
+        }
+        data.setMenuListExt(menuListExt);
     }
 
     private void processMenuListWithProhibitions(Client client, Data data, ObjectFactory objectFactory, Session session,
@@ -2085,7 +2369,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
-            menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
+            //menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
@@ -5446,7 +5730,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                   Session session, Transaction transaction) throws Exception {
-                processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                processMenuFirstDayWithProhibitions(client, data, objectFactory, session, startDate, endDate);
             }
         });
         MenuListWithProhibitionsResult menuListWithProhibitionsResult = new MenuListWithProhibitionsResult();
