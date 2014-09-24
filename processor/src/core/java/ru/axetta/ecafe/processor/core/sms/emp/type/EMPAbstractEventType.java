@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,7 +110,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
             balance = new BigDecimal(0D).setScale(2);
         } else {
-            balance = new BigDecimal((double) client.getBalance() / 100).setScale(2);
+            balance = new BigDecimal(Math.ceil((double) client.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
         }
         params.put("balance", balance.toString());
     }
