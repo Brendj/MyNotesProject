@@ -48,17 +48,20 @@ public class NSIRepairService {
     public void run() {
         List<RepairEntry> toRepair = RuntimeContext.getAppContext().getBean(NSIRepairService.class).loadRepairEntries();
         long repaired = 0;
+        logger.info(String.format("[Фикс записей из Реестров] К исправлению: %s", toRepair.size()));
         for(RepairEntry re : toRepair) {
             try {
+                logger.info(String.format("[Фикс записей из Реестров] Попытка исправить: %s", re));
                 RuntimeContext.getAppContext().getBean(NSIRepairService.class).repair(re);
                 repaired++;
+                logger.info(String.format("[Фикс записей из Реестров] %s исправлен", re));
                 /*if(RuntimeContext.getAppContext().getBean(NSIRepairService.class).remove(re)) {
                 }*/
             } catch (Exception e) {
-                logger.error("Failed to repair item: " + re);
+                logger.error(String.format("[Фикс записей из Реестров] Не удалось исправить %s", re), e);
             }
         }
-        logger.info(String.format("NSI Repair Tool - to repair: %s; repaired: %s", toRepair.size(), repaired));
+        logger.info(String.format("[Фикс записей из Реестров] К исправлению: %s, исправлено: %s", toRepair.size(), repaired));
     }
 
     @Transactional
