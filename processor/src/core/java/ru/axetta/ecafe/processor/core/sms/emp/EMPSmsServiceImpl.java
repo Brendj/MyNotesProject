@@ -103,11 +103,6 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
 
-    public static void log(String str) {
-        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
-            logger.info(str);
-        }
-    }
 
     public boolean sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
@@ -118,8 +113,8 @@ public class EMPSmsServiceImpl extends ISmsService {
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Отправка события " + date + "]: ";
-        log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
-                .getMobile());
+        empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" +
+                client.getIdOfClient() + "] " + client.getMobile());
 
         //  Отправка запроса
         SubscriptionPortType subscription = createEventController();
@@ -127,16 +122,16 @@ public class EMPSmsServiceImpl extends ISmsService {
             throw new EMPException("Failed to create connection with EMP web service");
         }
         SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
-        logRequest(eventParam);
+        empProcessor.logRequest(eventParam);
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
         if (response.getErrorCode() != 0) {
-            log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
+            empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
             throw new EMPException(
                     String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
                             response.getErrorMessage()));
         }
-        log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
+        empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
                 .getMobile() + " доставлено");
         return true;
     }
@@ -234,28 +229,4 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
         return sending;
     }
-
-    protected void logRequest(SendSubscriptionStreamEventsRequestType request) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("generated.emp_events");
-            logRequest(jaxbContext, request);
-        } catch (Exception e) {
-
-        }
-    }
-
-    protected void logRequest(JAXBContext jaxbContext, Object obj) {
-        if (!empProcessor.getConfigLogging()) {
-            return;
-        }
-
-        try {
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            FileWriter fw = new FileWriter("C:/out.signed.xml");
-            marshaller.marshal(obj, fw);
-        } catch (Exception e) {
-            logger.error("Failed to log", e);
-        }
-    }
-
 }

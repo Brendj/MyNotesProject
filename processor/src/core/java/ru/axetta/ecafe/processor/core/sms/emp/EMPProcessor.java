@@ -492,10 +492,15 @@ public class EMPProcessor {
     }
 
 
-    public static void log(String str) {
-        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
+    public void log(String str) {
+        /*if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
             logger.info(str);
+        }*/
+        if (!getConfigLogging()) {
+            return;
         }
+
+        logger.info(str);
     }
 
     public static void addEntryToLogString(ReceiveDataChangesResponse.Result.Entry.Identifier id, StringBuilder str) {
@@ -526,6 +531,15 @@ public class EMPProcessor {
             str.append(",");
         }
         str.append(String.format("{%s: %s}", name, valStr));
+    }
+
+    protected void logRequest(SendSubscriptionStreamEventsRequestType request) {
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance("generated.emp_events");
+            logRequest(jaxbContext, request);
+        } catch (Exception e) {
+
+        }
     }
 
     protected void logRequest(ReceiveDataChangesRequest request) {
