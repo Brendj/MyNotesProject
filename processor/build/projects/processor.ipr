@@ -1749,8 +1749,8 @@
     </library>
     <library name="javamelody-monitoring">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/javamelody-1.33.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.14.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/javamelody-1.52.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
