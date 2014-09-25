@@ -78,12 +78,15 @@ public class BIDataExportService {
                         + "cf_orgs.latitude as latitude, cf_orgs.longitude as longitude "
                         + orgTypeCases
                         + orgStatusCases
+                        + ", cf_orgs.statusDetailing, cf_orgs.btiUnom, cf_orgs.btiUnad, cf_orgs.introductionQueue, cf_orgs.additionalIdBuilding "
                         + "from cf_orgs "
                         + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
                         + "where cf_orgs.state<>0 "
                         + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district "
                         + "order by cf_orgs.shortname",
-                new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm", "latitude", "longitude", "orgtype", "status"}));
+                new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm",
+                             "latitude", "longitude", "orgtype", "status",
+                             "statusDetailing", "btiUnom", "btiUnad", "introductionQueue", "additionalIdBuilding"}));
 
         //  ------------------------------------------
         //  Оффициальные данные ОУ (Orgs_official)
