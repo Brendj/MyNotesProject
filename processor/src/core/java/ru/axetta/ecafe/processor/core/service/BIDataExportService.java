@@ -161,7 +161,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("mobilenotify",
                 "select idofclient, mobile, email "
-                + "from cf_clients "
+                + "from cf_clients as regOrgSrc "
                 + "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient "
                 + "where mobile<>'' or email<>'' and cf_cards.state=0",
                 new String[]{"idofclient", "mobile", "email"}));
@@ -190,16 +190,16 @@ public class BIDataExportService {
         //  Заказы (Orders)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orders",
-                "select cf_orders.idofclient, cf_orders.createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
+                "select cf_orders.idofclient, cf_orders.orderdate as createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
                         + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
                         + "from cf_orders "
                         + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
                         + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
                         + "left join cf_orgs on cf_orders.idoforg=cf_orgs.idoforg "
-                        + "where cf_orders.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and " // cf_orders.idofclient<>0 and
-                        + "      cf_orders.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "where cf_orders.orderdate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and " // cf_orders.idofclient<>0 and
+                        + "      cf_orders.orderdate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + "      and cf_orgs.state<>0 "
-                        + "order by createddate",
+                        + "order by orderdate",
                 new String[]{"idofclient", "createddate", "idoforg", "idoforder", "idofcontragent","cardtype", "rsum", "socdiscount"}));
 
         //  ------------------------------------------
@@ -216,10 +216,10 @@ public class BIDataExportService {
                         + "join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder "
                         + "left join CF_ComplexRoles on CF_ComplexRoles.IdOfRole=cf_orderdetails.idofrule "
                         + "left join cf_orgs on cf_orders.idoforg=cf_orgs.idoforg "
-                        + "where cf_orders.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "//cf_orders.idofclient<>0 and
-                        + "      cf_orders.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "where cf_orders.orderdate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "//cf_orders.idofclient<>0 and
+                        + "      cf_orders.orderdate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + "      and cf_orgs.state<>0 "
-                        + "order by cf_orders.createddate",
+                        + "order by cf_orders.orderdate",
                 new String[]{"idoforg", "idoforder", "idoforderdetail", "foodtype", "groupname", "rationtype", "idofcategorydiscount", "rsum", "socdiscount"}));
 
 
@@ -264,7 +264,7 @@ public class BIDataExportService {
 
 
         Calendar now = new GregorianCalendar();
-        now.setTimeInMillis(System.currentTimeMillis() - MILLISECONDS_IN_DAY * 3);
+        now.setTimeInMillis(System.currentTimeMillis());// - MILLISECONDS_IN_DAY * 3);
         clearCalendar(now);
 
         buildFiles(newTypes, now);
