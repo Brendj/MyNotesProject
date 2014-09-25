@@ -370,7 +370,9 @@ public class ImportRegisterClientsService {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
                 if(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
-                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue()) {
+                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+                   cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() <
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
                     continue;
                 }
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
@@ -411,6 +413,9 @@ public class ImportRegisterClientsService {
             }
             if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
                 Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
+                if(newOrg == null) {
+                    continue;
+                }
                 log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " +
