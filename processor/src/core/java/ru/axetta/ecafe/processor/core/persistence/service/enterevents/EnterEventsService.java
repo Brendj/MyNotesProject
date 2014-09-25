@@ -23,7 +23,7 @@ public class EnterEventsService {
     @Autowired
     EnterEventsRepository enterEventsRepository;
 
-    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(){
-        return enterEventsRepository.getEnterEventsSummary();
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long dateTime){
+        return enterEventsRepository.getEnterEventsSummary(dateTime);
     }
 }

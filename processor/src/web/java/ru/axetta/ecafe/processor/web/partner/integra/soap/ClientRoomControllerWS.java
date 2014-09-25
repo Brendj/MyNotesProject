@@ -5892,6 +5892,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public VisitorsSummaryResult getVisitorsSummary() {
+        return getVisitorsSummaryByDate(Calendar.getInstance().getTimeInMillis());
+    }
+
+    @Override
+    public VisitorsSummaryResult getVisitorsSummaryByDate(Long datetime) {
         VisitorsSummaryResult result = new VisitorsSummaryResult();
         Session session = null;
         result.orgsList = new VisitorsSummaryList();
@@ -5903,7 +5908,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         EnterEventsService enterEventsService = (EnterEventsService) RuntimeContext.getAppContext()
                 .getBean(EnterEventsService.class);
-        List<DAOEnterEventSummaryModel> data = enterEventsService.getEnterEventsSummary();
+        List<DAOEnterEventSummaryModel> data = enterEventsService.getEnterEventsSummary(datetime);
         List<VisitorsSummary> visitorsSummaryList = new ArrayList<VisitorsSummary>();
         Long lastClientId = null;
         Long currentOrgId = null ;
@@ -5913,7 +5918,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             currentOrgId = data.get(0).getIdOfOrg();
         }
         for (DAOEnterEventSummaryModel model : data) {
-            if(lastClientId == null){
+            if(model.getIdOfClient() == null){
+                System.out.print("");
+            }
+            if(model.getIdOfClient() == null){
                 if (model.getIdofvisitor() != null ) {
                     if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
                         visitorsSummary.others++;
@@ -5928,7 +5936,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 }
             }
-            if(lastClientId != null && lastClientId.equals(model.getIdOfClient()) ){
+            if(lastClientId != null && lastClientId.equals(model.getIdOfClient()) && (model.getIdOfOrg().equals(currentOrgId)) ){
                 continue;
             }else {
                 lastClientId = model.getIdOfClient();
@@ -5958,6 +5966,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 }
             }
+        }
+        if( (!visitorsSummaryList.contains(visitorsSummary)) && (!visitorsSummary.isEmpty()) ) {
+            visitorsSummaryList.add(visitorsSummary);
         }
         result.orgsList.org = visitorsSummaryList;
         return result;

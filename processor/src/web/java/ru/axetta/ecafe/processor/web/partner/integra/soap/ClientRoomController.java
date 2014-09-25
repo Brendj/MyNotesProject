@@ -409,4 +409,7 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getVisitorsSummary")
     VisitorsSummaryResult getVisitorsSummary ();
 
+    @WebMethod(operationName = "getVisitorsSummaryByDate")
+    public VisitorsSummaryResult getVisitorsSummaryByDate(@WebParam(name = "dateTime")Long datetime);
+
 }

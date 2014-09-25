@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors;
 
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
@@ -27,4 +28,26 @@ public class VisitorsSummary {
     @XmlAttribute(name = "exitsCardless")
     public Long exitsCardless = 0L;
 
+    @Transient
+    public boolean isEmpty(){
+        if(id != 0){
+            return false;
+        }
+        if(students != 0){
+            return false;
+        }
+        if(employee != 0){
+            return false;
+        }
+        if(others != 0){
+            return false;
+        }
+        if(cardless != 0){
+            return false;
+        }
+        if(exitsCardless != 0){
+            return false;
+        }
+        return true;
+    }
 }

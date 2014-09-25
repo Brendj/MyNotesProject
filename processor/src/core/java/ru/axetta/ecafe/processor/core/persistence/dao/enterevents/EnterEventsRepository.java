@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,33 +28,31 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 @Repository
-@Transactional
 public class EnterEventsRepository extends AbstractJpaDao<Org> {
+
     private final static Logger logger = LoggerFactory.getLogger(EnterEventsRepository.class);
 
     public static EnterEventsRepository getInstance() {
         return RuntimeContext.getAppContext().getBean(EnterEventsRepository.class);
     }
 
-    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(){
-        Calendar begin = Calendar.getInstance();
-        CalendarUtils.truncateToDayOfMonth(begin);
-
-         List<Object[]> tempList = (ArrayList)entityManager.createNativeQuery("SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup  "
-                + "FROM cf_enterevents e "
-                + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient "
-                + " WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
-                + "ORDER BY e.idoforg, e.idofclient, e.evtdatetime DESC\n")
-                .setParameter("startDateTime", begin.getTimeInMillis())
-                .setParameter("endDateTime", Calendar.getInstance().getTimeInMillis())
-                 //.setParameter("startDateTime", 1355097600000L)
-                //.setParameter("endDateTime", 1355183999000L)
+    @Transactional(readOnly = true)
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long dateTime) {
+        long begin = CalendarUtils.truncateToDayOfMonth(new Date(dateTime)).getTime();
+        List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
+                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup  "
+                        + "FROM cf_enterevents e " + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient "
+                        + " WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
+                        + "ORDER BY e.idoforg, e.idofclient, e.evtdatetime DESC\n").setParameter("startDateTime", begin)
+                .setParameter("endDateTime", dateTime)
+                        //.setParameter("startDateTime", 1355097600000L)
+                        //.setParameter("endDateTime", 1355183999000L)
                 .getResultList();
         List<DAOEnterEventSummaryModel> result = new ArrayList<DAOEnterEventSummaryModel>();
-        for (Object[] temp:tempList){
+        for (Object[] temp : tempList) {
 
             DAOEnterEventSummaryModel entry = new DAOEnterEventSummaryModel();
-            entry.setIdOfClient(temp[0]!= null ?((BigInteger) temp[0]).longValue() : null);
+            entry.setIdOfClient(temp[0] != null ? ((BigInteger) temp[0]).longValue() : null);
             entry.setIdOfOrg(temp[1] != null ? ((BigInteger) temp[1]).longValue() : null);
             entry.setPassDirection((Integer) temp[2]);
             entry.setEventCode((Integer) temp[3]);
