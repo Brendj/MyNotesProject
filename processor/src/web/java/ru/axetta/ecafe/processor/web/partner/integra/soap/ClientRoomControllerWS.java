@@ -5908,7 +5908,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         EnterEventsService enterEventsService = (EnterEventsService) RuntimeContext.getAppContext()
                 .getBean(EnterEventsService.class);
-        List<DAOEnterEventSummaryModel> data = enterEventsService.getEnterEventsSummary(datetime);
+        List<DAOEnterEventSummaryModel> data = new ArrayList<DAOEnterEventSummaryModel>();
+        try{
+            data = enterEventsService.getEnterEventsSummary(datetime);
+        } catch (Exception i) {
+            result.resultCode = ResultConst.CODE_INTERNAL_ERROR;
+            result.description = ResultConst.DESCR_INTERNAL_ERROR;
+        }
         List<VisitorsSummary> visitorsSummaryList = new ArrayList<VisitorsSummary>();
         Long lastClientId = null;
         Long currentOrgId = null ;
@@ -5971,6 +5977,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             visitorsSummaryList.add(visitorsSummary);
         }
         result.orgsList.org = visitorsSummaryList;
+        if (result.orgsList.org.size() == 0 ){
+            result.description = ResultConst.DESCR_NOT_FOUND;
+            result.resultCode = ResultConst.CODE_NOT_FOUND;
+        }
         return result;
     }
 }

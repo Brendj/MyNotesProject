@@ -11,3 +11,4 @@ ALTER TABLE cf_orgs ADD COLUMN introductionQueue VARCHAR(64) DEFAULT '';
 ALTER TABLE cf_orgs ADD COLUMN additionalIdBuilding INTEGER;
 ALTER TABLE cf_orgs ADD COLUMN statusDetailing VARCHAR(256) DEFAULT '';
 
+--! ФИНАЛИЗИРОВАН (Сунгатов, 140925) НЕ МЕНЯТЬ
