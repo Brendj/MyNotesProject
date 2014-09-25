@@ -98,6 +98,23 @@
         <f:selectItems value="#{mainPage.orgEditPage.orgStateMenu.items}" />
     </h:selectOneMenu>
 
+    <h:outputText escape="true" value="Детализация статуса" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:selectOneMenu value="#{mainPage.orgEditPage.statusDetail}" styleClass="input-text">
+            <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+            <f:selectItems value="#{mainPage.orgEditPage.statusDetails}" />
+        </h:selectOneMenu>
+        <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgEditPage.statusTextArea}" styleClass="input-text" />
+    </h:panelGrid>
+    <h:outputText escape="true" value="БТИ УНОМ" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.btiUnom}" maxlength="8" styleClass="input-text" />
+    <h:outputText escape="true" value="БТИ УНАД" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.btiUnad}" maxlength="1" styleClass="input-text" />
+    <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.introductionQueue}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.additionalIdBuilding}" styleClass="input-text" />
+
     <h:outputText id="fullSyncParamLabel" escape="true" value="Произвести полную синхронизацию" styleClass="output-text" />
     <h:selectBooleanCheckbox id="fullSyncParamCheckbox" value="#{mainPage.orgEditPage.fullSyncParam}" disabled="#{mainPage.orgEditPage.fullSyncParam}"/>
 

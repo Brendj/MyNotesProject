@@ -97,6 +97,11 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationStatus</param>
             </type>
         </property>
+        <property name="statusDetailing" column="StatusDetailing" type="string" length="256"/>
+        <property name="btiUnom" column="BtiUnom" type="long" length="8"/>
+        <property name="btiUnad" column="BtiUnad" type="long" length="1"/>
+        <property name="introductionQueue" column="IntroductionQueue" type="string" length="64"/>
+        <property name="additionalIdBuilding" column="AdditionalIdBuilding" type="long"/>
 
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"

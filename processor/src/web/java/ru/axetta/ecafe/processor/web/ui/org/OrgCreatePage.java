@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +69,40 @@ public class OrgCreatePage extends BasicWorkspacePage
     // тип организации "Общеобразовательнок ОУ / Дошкольное ОУ / Поставщик питания / Профессиональное ОУ"
     private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+
+    private Long btiUnom;
+    private Long btiUnad;
+    private String introductionQueue;
+    private Long additionalIdBuilding;
+    private String statusDetailing;
+
+    private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+
+    private SelectItem[] readStatusDetailsComboMenuItems() {
+        SelectItem[] items = new SelectItem[5];
+        items[0] = new SelectItem(0, "");
+        items[1] = new SelectItem(1, "Запланировано подключение");
+        items[2] = new SelectItem(2, "На ремонте");
+        items[3] = new SelectItem(3, "Закрыто");
+        items[4] = new SelectItem(4, "Другое");
+        return items;
+    }
+
+    private List detailsItem = readDetailItems();
+
+    private List<String> readDetailItems() {
+        List<String> items = new ArrayList();
+        items.add("");
+        items.add("Запланировано подключение");
+        items.add("На ремонте");
+        items.add("Закрыто");
+        items.add("Другое");
+        return items;
+    }
+
+    private String statusTextArea;
+
+    private String statusDetail;
 
     public OrganizationType getOrganizationType() {
         return organizationType;
@@ -390,10 +425,22 @@ public class OrgCreatePage extends BasicWorkspacePage
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class,
                 this.defaultSupplier.getIdOfContragent());
 
+        if (this.statusTextArea != null) {
+            if (statusDetail != null && statusDetail.length() > 0) {
+                this.statusDetailing = detailsItem.get(Integer.parseInt(statusDetail)) + "/" + statusTextArea;
+            } else {
+                this.statusDetailing = "/" + statusTextArea;
+            }
+        } else {
+            if (statusDetail != null && statusDetail.length() > 0) {
+                this.statusDetailing = detailsItem.get(Integer.parseInt(statusDetail)).toString();
+            }
+        }
+
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
-                this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2);
+                this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.introductionQueue, this.additionalIdBuilding, this.statusDetailing);
         org.setCity(city);
         org.setDistrict(district);
         org.setLocation(location);
@@ -461,5 +508,69 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public OrganizationTypeMenu getOrganizationTypeMenu() {
         return organizationTypeMenu;
+    }
+
+    public Long getBtiUnom() {
+        return btiUnom;
+    }
+
+    public void setBtiUnom(Long btiUnom) {
+        this.btiUnom = btiUnom;
+    }
+
+    public Long getBtiUnad() {
+        return btiUnad;
+    }
+
+    public void setBtiUnad(Long btiUnad) {
+        this.btiUnad = btiUnad;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public Long getAdditionalIdBuilding() {
+        return additionalIdBuilding;
+    }
+
+    public void setAdditionalIdBuilding(Long additionalIdBuilding) {
+        this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
+    }
+
+    public SelectItem[] getStatusDetails() {
+        return statusDetails;
+    }
+
+    public void setStatusDetails(SelectItem[] statusDetails) {
+        this.statusDetails = statusDetails;
+    }
+
+    public String getStatusDetail() {
+        return statusDetail;
+    }
+
+    public void setStatusDetail(String statusDetail) {
+        this.statusDetail = statusDetail;
+    }
+
+    public String getStatusTextArea() {
+        return statusTextArea;
+    }
+
+    public void setStatusTextArea(String statusTextArea) {
+        this.statusTextArea = statusTextArea;
     }
 }

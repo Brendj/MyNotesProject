@@ -92,6 +92,41 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private boolean mainBuilding = true;
 
+    private Long btiUnom;
+    private Long btiUnad;
+    private String introductionQueue;
+    private Long additionalIdBuilding;
+
+    private String statusDetailing;
+
+    private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+
+    private SelectItem[] readStatusDetailsComboMenuItems() {
+        SelectItem[] items = new SelectItem[5];
+        items[0] = new SelectItem(0, "");
+        items[1] = new SelectItem(1, "Запланировано подключение");
+        items[2] = new SelectItem(2, "На ремонте");
+        items[3] = new SelectItem(3, "Закрыто");
+        items[4] = new SelectItem(4, "Другое");
+        return items;
+    }
+
+    private List detailsItem = readDetailItems();
+
+    private List<String> readDetailItems() {
+        List<String> items = new ArrayList();
+        items.add("");
+        items.add("Запланировано подключение");
+        items.add("На ремонте");
+        items.add("Закрыто");
+        items.add("Другое");
+        return items;
+    }
+
+    private String statusTextArea;
+
+    private String statusDetail;
+
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         fill(org);
@@ -203,6 +238,23 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setUsePaydableSubscriptionFeeding(usePaydableSubscriptionFeeding);
 
+        org.setBtiUnom(btiUnom);
+        org.setBtiUnad(btiUnad);
+        org.setIntroductionQueue(introductionQueue);
+        org.setAdditionalIdBuilding(additionalIdBuilding);
+
+        if (this.statusTextArea != null) {
+            if (statusDetail != null && statusDetail.length() > 0) {
+                org.setStatusDetailing(detailsItem.get(Integer.parseInt(statusDetail)) + "/" + statusTextArea);
+            } else {
+                org.setStatusDetailing("/" + statusTextArea);
+            }
+        } else {
+            if (statusDetail != null && statusDetail.length() > 0) {
+                org.setStatusDetailing(detailsItem.get(Integer.parseInt(statusDetail)).toString());
+            }
+        }
+
         session.update(org);
         fill(org);
         /////
@@ -296,6 +348,31 @@ public class OrgEditPage extends BasicWorkspacePage
             }
             filterFriendlyOrgs = stringBuilder.toString();
         }
+
+        this.btiUnom = org.getBtiUnom();
+        this.btiUnad = org.getBtiUnad();
+        this.introductionQueue = org.getIntroductionQueue();
+        this.additionalIdBuilding = org.getAdditionalIdBuilding();
+
+        String[] strings = org.getStatusDetailing().split("/");
+
+        if (strings.length > 0) {
+            if (strings[0].equals("")) {
+                this.statusDetail = "0";
+            } else if (strings[0].equals("Запланировано подключение")) {
+                this.statusDetail = "1";
+            } else if (strings[0].equals("На ремонте")) {
+                this.statusDetail = "2";
+            } else if (strings[0].equals("Закрыто")) {
+                this.statusDetail = "3";
+            } else if (strings[0].equals("Другое")) {
+                this.statusDetail = "4";
+            }
+        }
+        if (strings.length == 2) {
+        statusTextArea = strings[1];
+        }
+
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -797,5 +874,77 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setMainBuilding(boolean mainBuilding) {
         this.mainBuilding = mainBuilding;
+    }
+
+    public Long getBtiUnom() {
+        return btiUnom;
+    }
+
+    public void setBtiUnom(Long btiUnom) {
+        this.btiUnom = btiUnom;
+    }
+
+    public Long getBtiUnad() {
+        return btiUnad;
+    }
+
+    public void setBtiUnad(Long btiUnad) {
+        this.btiUnad = btiUnad;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public Long getAdditionalIdBuilding() {
+        return additionalIdBuilding;
+    }
+
+    public void setAdditionalIdBuilding(Long additionalIdBuilding) {
+        this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
+    }
+
+    public SelectItem[] getStatusDetails() {
+        return statusDetails;
+    }
+
+    public void setStatusDetails(SelectItem[] statusDetails) {
+        this.statusDetails = statusDetails;
+    }
+
+    public List getDetailsItem() {
+        return detailsItem;
+    }
+
+    public void setDetailsItem(List detailsItem) {
+        this.detailsItem = detailsItem;
+    }
+
+    public String getStatusTextArea() {
+        return statusTextArea;
+    }
+
+    public void setStatusTextArea(String statusTextArea) {
+        this.statusTextArea = statusTextArea;
+    }
+
+    public String getStatusDetail() {
+        return statusDetail;
+    }
+
+    public void setStatusDetail(String statusDetail) {
+        this.statusDetail = statusDetail;
     }
 }

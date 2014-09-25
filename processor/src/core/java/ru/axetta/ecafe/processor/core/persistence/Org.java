@@ -103,11 +103,17 @@ public class Org implements Serializable {
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
     private OrganizationStatus status;
+    private Long btiUnom;
+    private Long btiUnad;
+    private String introductionQueue;
+    private Long additionalIdBuilding;
+    private String statusDetailing;
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
-            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
+            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
+            Long btiUnom, Long btiUnad, String introductionQueue, Long additionalIdBuilding, String statusDetailing) throws Exception {
         this.shortName = shortName;
         this.officialName = officialName;
         this.address = address;
@@ -136,6 +142,11 @@ public class Org implements Serializable {
         this.usePaydableSubscriptionFeeding = false;
         this.type = type;
         this.status = OrganizationStatus.ACTIVE;
+        this.btiUnom = btiUnom;
+        this.btiUnad = btiUnad;
+        this.introductionQueue = introductionQueue;
+        this.additionalIdBuilding = additionalIdBuilding;
+        this.statusDetailing = statusDetailing;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -761,6 +772,46 @@ public class Org implements Serializable {
 
     public void setStatus(OrganizationStatus status) {
         this.status = status;
+    }
+
+    public Long getBtiUnom() {
+        return btiUnom;
+    }
+
+    public void setBtiUnom(Long btiUnom) {
+        this.btiUnom = btiUnom;
+    }
+
+    public Long getBtiUnad() {
+        return btiUnad;
+    }
+
+    public void setBtiUnad(Long btiUnad) {
+        this.btiUnad = btiUnad;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public Long getAdditionalIdBuilding() {
+        return additionalIdBuilding;
+    }
+
+    public void setAdditionalIdBuilding(Long additionalIdBuilding) {
+        this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
     }
 
     @Override

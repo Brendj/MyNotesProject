@@ -88,6 +88,23 @@
     <h:selectOneMenu value="#{mainPage.orgCreatePage.state}" styleClass="input-text">
         <f:selectItems value="#{mainPage.orgCreatePage.orgStateMenu.items}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Детализация статуса" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:selectOneMenu value="#{mainPage.orgCreatePage.statusDetail}" styleClass="input-text">
+            <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+            <f:selectItems value="#{mainPage.orgCreatePage.statusDetails}" />
+        </h:selectOneMenu>
+        <h:inputTextarea rows="2" cols="64" value="#{mainPage.orgCreatePage.statusTextArea}" styleClass="input-text" />
+    </h:panelGrid>
+    <h:outputText escape="true" value="БТИ УНОМ" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.btiUnom}" maxlength="8" styleClass="input-text" />
+    <h:outputText escape="true" value="БТИ УНАД" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.btiUnad}" maxlength="1" styleClass="input-text" />
+    <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.introductionQueue}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.additionalIdBuilding}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />

@@ -10,10 +10,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import javax.faces.model.SelectItem;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -69,6 +67,39 @@ public class OrgViewPage extends BasicWorkspacePage {
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private String refectoryTypeStringRepresentation;
+    private Long btiUnom;
+    private Long btiUnad;
+    private String introductionQueue;
+    private Long additionalIdBuilding;
+    private String statusDetailing;
+
+    private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+
+    private SelectItem[] readStatusDetailsComboMenuItems() {
+        SelectItem[] items = new SelectItem[5];
+        items[0] = new SelectItem(0, "");
+        items[1] = new SelectItem(1, "Запланировано подключение");
+        items[2] = new SelectItem(2, "На ремонте");
+        items[3] = new SelectItem(3, "Закрыто");
+        items[4] = new SelectItem(4, "Другое");
+        return items;
+    }
+
+    private List detailsItem = readDetailItems();
+
+    private List<String> readDetailItems() {
+        List<String> items = new ArrayList();
+        items.add("");
+        items.add("Запланировано подключение");
+        items.add("На ремонте");
+        items.add("Закрыто");
+        items.add("Другое");
+        return items;
+    }
+
+    private String statusTextArea;
+
+    private String statusDetail;
 
     public String getRefectoryTypeStringRepresentation() {
         if ((refectoryType == null) || (refectoryType >= Org.REFECTORY_TYPE_NAMES.length)) {
@@ -160,6 +191,35 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
+        this.btiUnom = org.getBtiUnom();
+        this.btiUnad = org.getBtiUnad();
+        this.additionalIdBuilding = org.getAdditionalIdBuilding();
+        this.introductionQueue = org.getIntroductionQueue();
+        this.statusDetailing = org.getStatusDetailing();
+
+        String[] strings = this.statusDetailing.split("/");
+
+        if (strings.length > 0) {
+            if (strings[0].equals("")) {
+                this.statusDetail = "0";
+            } else if (strings[0].equals("Запланировано подключение")) {
+                this.statusDetail = "1";
+            } else if (strings[0].equals("На ремонте")) {
+                this.statusDetail = "2";
+            } else if (strings[0].equals("Закрыто")) {
+                this.statusDetail = "3";
+            } else if (strings[0].equals("Другое")) {
+                this.statusDetail = "4";
+            }
+        } else {
+            statusDetail = "";
+        }
+
+        if (strings.length == 2) {
+            statusTextArea = strings[1];
+        } else {
+            statusTextArea = "";
+        }
 
     }
 
@@ -378,6 +438,78 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public boolean isMainBuidling() {
         return mainBuidling;
+    }
+
+    public Long getAdditionalIdBuilding() {
+        return additionalIdBuilding;
+    }
+
+    public void setAdditionalIdBuilding(Long additionalIdBuilding) {
+        this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public Long getBtiUnad() {
+        return btiUnad;
+    }
+
+    public void setBtiUnad(Long btiUnad) {
+        this.btiUnad = btiUnad;
+    }
+
+    public Long getBtiUnom() {
+        return btiUnom;
+    }
+
+    public void setBtiUnom(Long btiUnom) {
+        this.btiUnom = btiUnom;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
+    }
+
+    public String getStatusDetail() {
+        return statusDetail;
+    }
+
+    public void setStatusDetail(String statusDetail) {
+        this.statusDetail = statusDetail;
+    }
+
+    public String getStatusTextArea() {
+        return statusTextArea;
+    }
+
+    public void setStatusTextArea(String statusTextArea) {
+        this.statusTextArea = statusTextArea;
+    }
+
+    public List getDetailsItem() {
+        return detailsItem;
+    }
+
+    public void setDetailsItem(List detailsItem) {
+        this.detailsItem = detailsItem;
+    }
+
+    public SelectItem[] getStatusDetails() {
+        return statusDetails;
+    }
+
+    public void setStatusDetails(SelectItem[] statusDetails) {
+        this.statusDetails = statusDetails;
     }
 
     public Object updateBalance(){
