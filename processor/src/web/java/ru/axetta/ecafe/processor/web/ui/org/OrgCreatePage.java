@@ -426,14 +426,14 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.defaultSupplier.getIdOfContragent());
 
         if (this.statusTextArea != null) {
-            if (statusDetail != null && statusDetail.length() > 0) {
-                this.statusDetailing = detailsItem.get(Integer.parseInt(statusDetail)) + "/" + statusTextArea;
+            if (this.statusDetail != null && this.statusDetail.length() > 0) {
+                this.statusDetailing = this.detailsItem.get(Integer.parseInt(this.statusDetail)) + "/" + this.statusTextArea;
             } else {
-                this.statusDetailing = "/" + statusTextArea;
+                this.statusDetailing = "/" + this.statusTextArea;
             }
         } else {
-            if (statusDetail != null && statusDetail.length() > 0) {
-                this.statusDetailing = detailsItem.get(Integer.parseInt(statusDetail)).toString();
+            if (this.statusDetail != null && this.statusDetail.length() > 0) {
+                this.statusDetailing = this.detailsItem.get(Integer.parseInt(this.statusDetail)).toString();
             }
         }
 

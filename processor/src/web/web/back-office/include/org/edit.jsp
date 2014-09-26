@@ -113,7 +113,7 @@
     <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.introductionQueue}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.additionalIdBuilding}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.additionalIdBuilding}" maxlength="9" styleClass="input-text" />
 
     <h:outputText id="fullSyncParamLabel" escape="true" value="Произвести полную синхронизацию" styleClass="output-text" />
     <h:selectBooleanCheckbox id="fullSyncParamCheckbox" value="#{mainPage.orgEditPage.fullSyncParam}" disabled="#{mainPage.orgEditPage.fullSyncParam}"/>

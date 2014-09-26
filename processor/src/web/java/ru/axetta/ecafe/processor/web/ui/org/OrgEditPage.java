@@ -244,14 +244,14 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAdditionalIdBuilding(additionalIdBuilding);
 
         if (this.statusTextArea != null) {
-            if (statusDetail != null && statusDetail.length() > 0) {
-                org.setStatusDetailing(detailsItem.get(Integer.parseInt(statusDetail)) + "/" + statusTextArea);
+            if (this.statusDetail != null && this.statusDetail.length() > 0) {
+                org.setStatusDetailing(this.detailsItem.get(Integer.parseInt(this.statusDetail)) + "/" + this.statusTextArea);
             } else {
-                org.setStatusDetailing("/" + statusTextArea);
+                org.setStatusDetailing("/" + this.statusTextArea);
             }
         } else {
-            if (statusDetail != null && statusDetail.length() > 0) {
-                org.setStatusDetailing(detailsItem.get(Integer.parseInt(statusDetail)).toString());
+            if (this.statusDetail != null && this.statusDetail.length() > 0) {
+                org.setStatusDetailing(this.detailsItem.get(Integer.parseInt(this.statusDetail)).toString());
             }
         }
 
@@ -368,9 +368,13 @@ public class OrgEditPage extends BasicWorkspacePage
             } else if (strings[0].equals("Другое")) {
                 this.statusDetail = "4";
             }
+        } else {
+            this.statusDetail = "";
         }
         if (strings.length == 2) {
-        statusTextArea = strings[1];
+        this.statusTextArea = strings[1];
+        } else {
+            this.statusTextArea = "";
         }
 
     }

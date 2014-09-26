@@ -212,13 +212,13 @@ public class OrgViewPage extends BasicWorkspacePage {
                 this.statusDetail = "4";
             }
         } else {
-            statusDetail = "";
+            this.statusDetail = "";
         }
 
         if (strings.length == 2) {
-            statusTextArea = strings[1];
+            this.statusTextArea = strings[1];
         } else {
-            statusTextArea = "";
+            this.statusTextArea = "";
         }
 
     }
