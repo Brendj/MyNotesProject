@@ -8,6 +8,9 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -34,6 +37,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     protected String text;
     protected int stream;
     protected String ssoid;
+    protected Long msisdn;
     protected Map<String, String> params;
 
     public EMPAbstractEventType() {
@@ -74,6 +78,10 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         return ssoid;
     }
 
+    public Long getMsisdn() {
+        return msisdn;
+    }
+
     public String buildText() {
         if(text == null || text.trim().length() < 1) {
             return "";
@@ -89,6 +97,9 @@ public abstract class EMPAbstractEventType implements EMPEventType {
 
     protected void parseClientSimpleInfo(Client client) {
         ssoid = client.getSsoid();
+        if(!StringUtils.isBlank(client.getMobile()) && NumberUtils.isNumber(client.getMobile())) {
+            msisdn = NumberUtils.toLong(client.getMobile().replaceAll("-", ""));
+        }
         Person person = null;
         try {
             person = client.getPerson();

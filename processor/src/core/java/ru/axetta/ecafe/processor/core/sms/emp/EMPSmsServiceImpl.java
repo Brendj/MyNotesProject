@@ -209,6 +209,7 @@ public class EMPSmsServiceImpl extends ISmsService {
             EventFilterType f1 = new EventFilterType();
             EventFilterType.Persons.Person personFilter = new EventFilterType.Persons.Person();
             personFilter.setSSOID(eventType.getSsoid());
+            personFilter.setMSISDN(eventType.getMsisdn());
             EventFilterType.Persons personsObj = f1.getPersons();
             if (personsObj == null) {
                 personsObj = new EventFilterType.Persons();

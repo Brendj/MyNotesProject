@@ -34,5 +34,7 @@ public interface EMPEventType {
 
     public String getSsoid();
 
+    public Long getMsisdn();
+
     public String buildText();
 }
