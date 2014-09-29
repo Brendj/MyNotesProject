@@ -27,17 +27,19 @@ public class ClientPaymentsPage extends OnlineReportPage {
     }
 
     public boolean validateFormData() {
-        if(startDate==null){
+/*        if(startDate==null){
             printError("Не указано дата выборки от");
             return true;
-        }
+        }*/
         if(endDate==null){
             printError("Не указано дата выборки до");
             return true;
         }
+        if(startDate!=null){
         if(startDate.after(endDate)){
             printError("Дата выборки от меньше дата выборки до");
             return true;
+        }
         }
         return false;
     }

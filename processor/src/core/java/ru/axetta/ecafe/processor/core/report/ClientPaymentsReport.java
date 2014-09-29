@@ -40,6 +40,23 @@ public class ClientPaymentsReport extends BasicReport {
                       + "where cf_orgs.idOfOrg in (:ids) "
                       + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
                       + "order by cf_orgs.shortname, cf_contragents.contragentname";
+
+    private static final String SALES_SQL_WITHOUT_START_DATE =
+            "select "
+                    + "cf_orgs.idoforg, "
+                    + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                    + "cf_contragents.contragentname, "
+                    + "int8(sum(cf_orders.rsum)) as sales, "
+                    + "int8(sum(cf_orders.socdiscount)) as discounts, "
+                    + "cf_orgs.shortname "
+                    + "from cf_orgs "
+                    + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
+                    + "                       cf_orders.createddate <= :toCreatedDate "
+                    + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
+                    + "where cf_orgs.idOfOrg in (:ids) "
+                    + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
+                    + "order by cf_orgs.shortname, cf_contragents.contragentname";
+
     private static final String TRANSACTIONS_SQL =
                         "select "
                       + "cf_orgs.idoforg, "
@@ -56,6 +73,23 @@ public class ClientPaymentsReport extends BasicReport {
                       + "where cf_orgs.idOfOrg in (:ids) "
                       + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
                       + "order by cf_orgs.shortname";
+
+    private static final String TRANSACTIONS_SQL_WITHOUT_START_DATE =
+            "select "
+                    + "cf_orgs.idoforg, "
+                    + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                    + "cf_contragents.contragentname, "
+                    + "int8(sum(cf_clientpayments.paysum)) as payments, "
+                    + "cf_orgs.shortname "
+                    + "from cf_orgs "
+                    + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
+                    + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
+                    + "                             cf_transactions.transactiondate <= :toCreatedDate "
+                    + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
+                    + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
+                    + "where cf_orgs.idOfOrg in (:ids) "
+                    + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
+                    + "order by cf_orgs.shortname";
 
     private final List<ClientPaymentItem> items;
 
@@ -93,9 +127,15 @@ public class ClientPaymentsReport extends BasicReport {
             List<ClientPaymentItem> items = new LinkedList<ClientPaymentItem>();
             idOfOrgList = receiveOrgList(idOfOrgList);
             if (!idOfOrgList.isEmpty()) {
+                if (startDate != null) {
                 parseSales(items, executeSQL(session, SALES_SQL, startDate.getTime(), endDate.getTime(), idOfOrgList));
                 parseTransactions(items,
                         executeSQL(session, TRANSACTIONS_SQL, startDate.getTime(), endDate.getTime(), idOfOrgList));
+                } else {
+                    parseSales(items, executeWithOutStartDaySQL(session, SALES_SQL_WITHOUT_START_DATE, endDate.getTime(), idOfOrgList));
+                    parseTransactions(items,
+                            executeWithOutStartDaySQL(session, TRANSACTIONS_SQL_WITHOUT_START_DATE, endDate.getTime(), idOfOrgList));
+                }
             }
             return new ClientPaymentsReport(generateTime, new Date().getTime() - generateTime.getTime(), items);
         }
@@ -103,6 +143,14 @@ public class ClientPaymentsReport extends BasicReport {
         private List executeSQL(Session session, String sql, long startDate, long endDate, List<Long> idOfOrgList) {
             Query query = session.createSQLQuery(sql);
             query.setLong("fromCreatedDate", startDate);
+            query.setLong("toCreatedDate", endDate);
+            query.setParameter("contragentType", Contragent.TSP);
+            query.setParameterList("ids", idOfOrgList);
+            return query.list();
+        }
+
+        private List executeWithOutStartDaySQL(Session session, String sql, long endDate, List<Long> idOfOrgList) {
+            Query query = session.createSQLQuery(sql);
             query.setLong("toCreatedDate", endDate);
             query.setParameter("contragentType", Contragent.TSP);
             query.setParameterList("ids", idOfOrgList);
