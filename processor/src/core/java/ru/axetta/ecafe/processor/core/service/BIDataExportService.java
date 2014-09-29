@@ -166,7 +166,7 @@ public class BIDataExportService {
                 "select idofclient, mobile, email "
                 + "from cf_clients as regOrgSrc "
                 + "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient "
-                + "where mobile<>'' or email<>'' and cf_cards.state=0",
+                + "where (mobile<>'' or email<>'') and cf_cards.state=0",
                 new String[]{"idofclient", "mobile", "email"}));
 
 
