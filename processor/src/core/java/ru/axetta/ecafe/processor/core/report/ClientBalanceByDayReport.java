@@ -78,6 +78,8 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             private String surname;
             private String secondName;
             private long totalBalance;
+            private Long idOfClient;
+            private Long limit;
 
             ClientBalanceInfo(Client client, long totalBalance) {
                 this.contractId = client.getContractId();
@@ -86,6 +88,24 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 this.surname = person.getSurname();
                 this.secondName = person.getSecondName();
                 this.totalBalance = totalBalance;
+                this.idOfClient = client.getIdOfClient();
+                this.limit = client.getLimit();
+            }
+
+            public Long getLimit() {
+                return limit;
+            }
+
+            public void setLimit(Long limit) {
+                this.limit = limit;
+            }
+
+            public Long getIdOfClient() {
+                return idOfClient;
+            }
+
+            public void setIdOfClient(Long idOfClient) {
+                this.idOfClient = idOfClient;
             }
 
             public Long getContractId() {

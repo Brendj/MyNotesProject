@@ -70,12 +70,20 @@
                         <h:outputText styleClass="column-header" escape="true" value="Отчество" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Текущий овердрафт"/>
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Баланс" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="left-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.contractId}" converter="contractIdConverter"/>
+                <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link"
+                                 reRender="mainMenu, workspaceForm">
+                    <h:outputText styleClass="output-text" value="#{complex.contractId}"
+                                  converter="contractIdConverter" />
+                    <f:setPropertyActionListener value="#{complex.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+                </a4j:commandLink>
             </rich:column>
             <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.surname}" />
@@ -87,11 +95,14 @@
                 <h:outputText styleClass="output-text" value="#{complex.secondName}" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.limit}"/>
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.totalBalance}" converter="copeckSumConverter"/>
             </rich:column>
             <f:facet name="footer">
                 <rich:columnGroup rendered="#{not empty mainPage.clientBalanceByDayReportPage.clientsBalance}">
-                    <rich:column styleClass="right-aligned-column" colspan="4">
+                    <rich:column styleClass="right-aligned-column" colspan="5">
                         <h:outputText styleClass="column-header" escape="true" value="ИТОГО" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
