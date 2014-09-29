@@ -43,10 +43,11 @@ import java.util.concurrent.Executors;
 @Component
 @Scope("singleton")
 public class ImportRegisterClientsService {
+
     public static final int CREATE_OPERATION = 1;
     public static final int DELETE_OPERATION = 2;
     public static final int MODIFY_OPERATION = 3;
-    public static final int MOVE_OPERATION   = 4;
+    public static final int MOVE_OPERATION = 4;
 
     private static final int MAX_CLIENTS_PER_TRANSACTION = 50;
     @PersistenceContext(unitName = "processorPU")
@@ -96,7 +97,7 @@ public class ImportRegisterClientsService {
             throw new Exception(
                     "У организации " + idOfOrg + " не установлен тэг синхронизации с Реестрами: " + ORG_SYNC_MARKER);
         }
-        
+
         StringBuffer logBuffer = new StringBuffer();
         return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
                 .syncClientsWithRegistry(idOfOrg, performChanges, logBuffer, true);
@@ -104,11 +105,12 @@ public class ImportRegisterClientsService {
 
 
     public class WorkerThread implements Runnable {
+
         private String command;
         private List<Org> orgs;
 
-        public WorkerThread(String s){
-            this.command=s;
+        public WorkerThread(String s) {
+            this.command = s;
         }
 
         @Override
@@ -141,15 +143,16 @@ public class ImportRegisterClientsService {
                                     .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
                         } catch (SocketTimeoutException ste) {
                         } catch (Exception e) {
-                            logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e, null);
+                            logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e,
+                                    null);
                             break;
                         } finally {
                             attempt++;
                         }
                     }
                     if (attempt >= maxAttempts) {
-                        logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts
-                                + ")", null, null);
+                        logError("Неудалось подключиться к сервису, превышено максимальное количество попыток ("
+                                + maxAttempts + ")", null, null);
                     }
                 }
                 Thread.sleep(5000);
@@ -159,7 +162,7 @@ public class ImportRegisterClientsService {
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return this.command;
         }
     }
@@ -171,9 +174,9 @@ public class ImportRegisterClientsService {
         int l = 0;
         int i = 0;
         Org o = orgs.get(i);
-        while(o != null) {
+        while (o != null) {
             List<Org> list = null;
-            if(result.size() > l) {
+            if (result.size() > l) {
                 list = result.get(l);
             } else {
                 list = new ArrayList<Org>();
@@ -182,13 +185,13 @@ public class ImportRegisterClientsService {
             list.add(o);
 
             l++;
-            if(l >= threadsCount) {
+            if (l >= threadsCount) {
                 l = 0;
             }
             i++;
 
 
-            if(orgs.size() > i) {
+            if (orgs.size() > i) {
                 o = orgs.get(i);
             } else {
                 o = null;
@@ -203,8 +206,7 @@ public class ImportRegisterClientsService {
             return;
         }
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                .checkRegistryChangesValidity();
+        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
         List<List<Org>> orgsPack = buildOrgsPack(orgs, MAX_THREADS);
 
         log("Start import register with " + MAX_THREADS + " threads", null);
@@ -212,7 +214,7 @@ public class ImportRegisterClientsService {
 
         for (int i = 0; i < orgsPack.size(); i++) {
             List<Org> pack = orgsPack.get(i);
-            log(String.format("Create thread %s of %s with %s orgs", i+1, orgsPack.size(), pack.size()), null);
+            log(String.format("Create thread %s of %s with %s orgs", i + 1, orgsPack.size(), pack.size()), null);
             Runnable worker = new WorkerThread("" + i).setOrgs(pack);
             executor.execute(worker);
         }
@@ -264,7 +266,9 @@ public class ImportRegisterClientsService {
 
     @Transactional
     public void checkRegistryChangesValidity() {
-        long minCreateDate = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT) * MILLISECONDS_IN_DAY;
+        long minCreateDate =
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT)
+                        * MILLISECONDS_IN_DAY;
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis() - minCreateDate);
         cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -281,15 +285,14 @@ public class ImportRegisterClientsService {
     }
 
     @Transactional
-    public void saveClients(String synchDate, String date, long ts, Org org,
-            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer) throws Exception {
+    public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
+            StringBuffer logBuffer) throws Exception {
         saveClients(synchDate, date, ts, org, pupils, logBuffer, true);
     }
 
     @Transactional
-    public void saveClients(String synchDate, String date, long ts, Org org,
-                            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer,
-                            boolean deleteClientsIfNotFound) throws Exception {
+    public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
+            StringBuffer logBuffer, boolean deleteClientsIfNotFound) throws Exception {
         log(synchDate + "Начато сохранение списка клиентов для " + org.getOfficialName() + " в БД", logBuffer);
 
 
@@ -301,7 +304,7 @@ public class ImportRegisterClientsService {
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
         //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
-        if(deleteClientsIfNotFound) {
+        if (deleteClientsIfNotFound) {
             //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
             //  отправляем уведомление на email
             List<Client> clientsToRemove = new ArrayList<Client>();
@@ -316,46 +319,51 @@ public class ImportRegisterClientsService {
                 }
                 try {
                     ClientGroup currGroup = dbClient.getClientGroup();
-                    if(currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
-                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
-                        currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() <
-                                    ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
+                    if (currGroup != null &&
+                            currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                                    .Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+                            currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup
+                                    .Predefined.CLIENT_LEAVING.getValue().longValue()) {
                         break;
                     }
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
                     //  увеличиваем количество клиентов, подлежих удалению
-                    Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if (emptyIfNull(dbClient.getClientGUID()).equals("") ||
-                        (!found && currGroupId != null &&
-                         !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
-                         !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
+                    Long currGroupId =
+                            currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+                    if (emptyIfNull(dbClient.getClientGUID()).equals("") || (!found && currGroupId != null &&
+                            !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
+                            !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
                         log(synchDate + "Удаление " +
-                                emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
-                                + " " +
+                                emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
+                                dbClient.getPerson().getSurname()) + " " +
                                 emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                                 dbClient.getPerson().getSecondName()) + ", " +
-                                emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
-                                logBuffer);
-                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
+                                emptyIfNull(dbClient.getClientGroup() == null ? ""
+                                        : dbClient.getClientGroup().getGroupName()), logBuffer);
+                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
+                                RegistryChange.FULL_COMPARISON);
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
                 }
             }
         } else {
-            for(ExpandedPupilInfo epi : pupils) {
-                if(epi.deleted) {
+            for (ExpandedPupilInfo epi : pupils) {
+                if (epi.deleted) {
                     Client dbClient = DAOUtils.findClientByGuid(em, epi.guid);
-                    if(dbClient == null) {
+                    if (dbClient == null) {
                         continue;
                     }
                     log(synchDate + "Удаление " +
-                            emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
-                            + " " +
+                            emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
+                            dbClient.getPerson().getSurname()) + " " +
                             emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                             dbClient.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()), logBuffer);
-                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON);
+                            emptyIfNull(
+                                    dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
+                            logBuffer);
+                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
+                            RegistryChange.FULL_COMPARISON);
                 }
             }
         }
@@ -369,17 +377,16 @@ public class ImportRegisterClientsService {
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
-                if(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >=
-                                                    ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
-                   cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() <
-                                ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
+                if (cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                        .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
+                        && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
+                        < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
                     continue;
                 }
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
             }
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
-                    cl == null ? null : cl.getClientGUID(),
-                    updateClient);
+                    cl == null ? null : cl.getClientGUID(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                     cl == null ? null : cl.getPerson().getSurname(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
@@ -388,21 +395,21 @@ public class ImportRegisterClientsService {
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null || cl.getClientGroup() == null ?
-                                                null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                        updateClient);
             } else {
                 //  Если группа у клиента не указана, то перемещаем его в Другие
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
                         ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
-                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                        updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean crossFound = false;
-            if(cl != null) {
-                if(org.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
+            if (cl != null) {
+                if (org.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
                     crossFound = true;
-                }
-                else {
+                } else {
                     for (Org o : orgsList) {
                         if (o.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
                             crossFound = true;
@@ -413,17 +420,17 @@ public class ImportRegisterClientsService {
             }
             if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
                 Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
-                if(newOrg == null) {
+                if (newOrg == null) {
                     continue;
                 }
                 log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " +
-                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName())
-                        + ", " +
-                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
-                        + " в школу " + newOrg.getIdOfOrg(), logBuffer);
-                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION, RegistryChange.FULL_COMPARISON);
+                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " +
+                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
+                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg(), logBuffer);
+                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
+                        RegistryChange.FULL_COMPARISON);
                 continue;
             }
             if (!updateClient) {
@@ -438,7 +445,8 @@ public class ImportRegisterClientsService {
                         log(synchDate + "Добавление " + pupil.getGuid() + ", " +
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
-                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION, RegistryChange.FULL_COMPARISON);
+                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
+                                RegistryChange.FULL_COMPARISON);
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -449,11 +457,13 @@ public class ImportRegisterClientsService {
                             emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
                             cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на "
+                            +
                             emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION, RegistryChange.FULL_COMPARISON);
+                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
+                            RegistryChange.FULL_COMPARISON);
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
@@ -466,30 +476,25 @@ public class ImportRegisterClientsService {
         long maxTs = 0L;
         long lastTs = 0L;
         Session session = (Session) em.getDelegate();
-        Query q = session.createSQLQuery(
-                  "select max(rc1.createdate), 'last' "
-                + "from CF_RegistryChange rc1 "
-                + "where rc1.applied=true and rc1.type=:type "
-                + "union all "
-                + "select max(rc1.createdate), 'max' "
-                + "from CF_RegistryChange rc1 "
-                + "where rc1.type=:type");
+        Query q = session.createSQLQuery("select max(rc1.createdate), 'last' " + "from CF_RegistryChange rc1 "
+                + "where rc1.applied=true and rc1.type=:type " + "union all " + "select max(rc1.createdate), 'max' "
+                + "from CF_RegistryChange rc1 " + "where rc1.type=:type");
         q.setParameter("type", RegistryChange.CHANGES_UPDATE);
         List resultList = q.list();
         for (Object obj : resultList) {
             Object[] dat = (Object[]) obj;
-            if(dat[0] == null) {
+            if (dat[0] == null) {
                 continue;
             }
             Long value = ((BigInteger) dat[0]).longValue();
             String type = (String) dat[1];
-            if(type.equals("max")) {
+            if (type.equals("max")) {
                 maxTs = value;
-            } else if(type.equals("last")) {
+            } else if (type.equals("last")) {
                 lastTs = value;
             }
         }
-        if(maxTs > lastTs) {
+        if (maxTs > lastTs) {
             Calendar target = new GregorianCalendar();
             target.setTimeInMillis(maxTs);
             target.set(Calendar.HOUR, 0);
@@ -504,7 +509,7 @@ public class ImportRegisterClientsService {
             now.set(Calendar.SECOND, 0);
             now.set(Calendar.MILLISECOND, 0);
 
-            if(target.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)) {
+            if (target.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)) {
                 return maxTs;
             }
         }
@@ -512,51 +517,46 @@ public class ImportRegisterClientsService {
     }
 
 
-    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation, int type) throws Exception {
+    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation, int type)
+            throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
         addClientChange(ts, idOfOrg, fieldConfig, null, operation, type);
     }
 
 
-    private void addClientChange(long ts, long idOfOrg,
-            FieldProcessor.Config fieldConfig,
-            Client currentClient, int operation, int type) throws Exception {
+    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, Client currentClient,
+            int operation, int type) throws Exception {
         addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation, type);
     }
 
-    public static void addClientChange
-            (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
-                    FieldProcessor.Config fieldConfig,
-                    Client currentClient, int operation, int type) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
+            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type) throws Exception {
         addClientChange(em, ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null);
     }
 
     public static boolean isRegistryChangeExist(String notificationId, Client client, int operation, Session session) {
-        Query q = session.createSQLQuery(
-                  "SELECT 1 "
-                + "FROM cf_registrychange "
+        Query q = session.createSQLQuery("SELECT 1 " + "FROM cf_registrychange "
                 + "where notificationId=:notificationId and operation=:operation");
         q.setParameter("notificationId", notificationId);
         q.setParameter("operation", operation);
         List res = q.list();
-        if(res == null || res.size() < 1) {
+        if (res == null || res.size() < 1) {
             return false;
         } else {
             return true;
         }
     }
 
-    public static void addClientChange
-                                (EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
-                                 FieldProcessor.Config fieldConfig,
-                                 Client currentClient, int operation, int type, String notificationId) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
+            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, String notificationId)
+            throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
         Session sess = (Session) em.getDelegate();
         if (currentClient != null) {
             currentClient = em.merge(currentClient);
         }
-        if(type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
-           isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
+        if (type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
+                isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
             return;
         }
 
@@ -577,7 +577,7 @@ public class ImportRegisterClientsService {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
             ClientGroup currentGroup = currentClient.getClientGroup();
-            if(currentGroup != null) {
+            if (currentGroup != null) {
                 currentGroup = em.merge(currentGroup);
                 ch.setGroupNameFrom(currentGroup.getGroupName());
             } else {
@@ -586,7 +586,7 @@ public class ImportRegisterClientsService {
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
-            if(currentGroup != null) {
+            if (currentGroup != null) {
                 currentGroup = em.merge(currentGroup);
                 ch.setGroupNameFrom(currentGroup.getGroupName());
             } else {
@@ -599,20 +599,20 @@ public class ImportRegisterClientsService {
         sess.save(ch);
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg,
-            Client currentClient, int operation, int type) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
+            int type) throws Exception {
         addClientChange(em, ts, idOfOrg, currentClient, operation, type, null);
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg,
-            Client currentClient, int operation, int type, String notificationId) throws Exception {
+    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
+            int type, String notificationId) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
         if (currentClient != null) {
             currentClient = em.merge(currentClient);
         }
-        if(type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
-           isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
+        if (type == RegistryChange.CHANGES_UPDATE && !StringUtils.isBlank(notificationId) &&
+                isRegistryChangeExist(notificationId, currentClient, operation, sess)) {
             return;
         }
 
@@ -662,7 +662,7 @@ public class ImportRegisterClientsService {
             ClientGroup currGroup = dbClient.getClientGroup();
             //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
             //  увеличиваем количество клиентов, подлежих удалению
-            Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+            Long currGroupId = currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
                     !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
                     !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
@@ -691,7 +691,7 @@ public class ImportRegisterClientsService {
 
 
         //  Удаляем найденных клиентов
-        for (Client dbClient: clientsToRemove) {
+        for (Client dbClient : clientsToRemove) {
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
@@ -700,11 +700,12 @@ public class ImportRegisterClientsService {
                         ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
             }
             log(synchDate + "Удаление " +
-                    emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
-                    + " " +
+                    emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname()) + " "
+                    +
                     emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                     dbClient.getPerson().getSecondName()) + ", " +
-                    emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()), logBuffer);
+                    emptyIfNull(dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
+                    logBuffer);
             if (performChanges) {
                 dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 session.save(dbClient);
@@ -767,7 +768,8 @@ public class ImportRegisterClientsService {
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                        updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean guidFound = false;
@@ -783,8 +785,8 @@ public class ImportRegisterClientsService {
                         cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
                         + ", " +
-                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
-                        + " в школу " + newOrg.getIdOfOrg(), logBuffer);
+                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
+                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                 if (performChanges) {
                     cl.setOrg(newOrg);
                 }
@@ -818,7 +820,8 @@ public class ImportRegisterClientsService {
                             emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
                             emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
                             cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на "
+                            +
                             emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
@@ -834,19 +837,24 @@ public class ImportRegisterClientsService {
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
     }
-    
+
     public static class OrgRegistryGUIDInfo {
+
         Set<String> orgGuids;
         String guidInfo;
-        
+
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
-            guidInfo="";
+            guidInfo = "";
             for (Org o : orgs) {
-                if (o.getGuid()==null) continue;
-                if (guidInfo.length()>0) guidInfo+=", ";
-                guidInfo+=o.getOrgNumberInName()+": "+o.getGuid();
+                if (o.getGuid() == null) {
+                    continue;
+                }
+                if (guidInfo.length() > 0) {
+                    guidInfo += ", ";
+                }
+                guidInfo += o.getOrgNumberInName() + ": " + o.getGuid();
                 orgGuids.add(o.getGuid());
             }
         }
@@ -861,7 +869,7 @@ public class ImportRegisterClientsService {
     }
 
     public RegistryChange getRegistryChange(Long idOfRegistryChange) {
-        if(idOfRegistryChange == null) {
+        if (idOfRegistryChange == null) {
             return null;
         }
         RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
@@ -869,7 +877,7 @@ public class ImportRegisterClientsService {
     }
 
     public RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError) {
-        if(idOfRegistryChangeError == null) {
+        if (idOfRegistryChangeError == null) {
             return null;
         }
         RegistryChangeError e = em.find(RegistryChangeError.class, idOfRegistryChangeError);
@@ -906,11 +914,12 @@ public class ImportRegisterClientsService {
                         (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
                 break;
             case DELETE_OPERATION:
-                ClientGroup deletedClientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
-                        ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                ClientGroup deletedClientGroup = DAOUtils
+                        .findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                 if (deletedClientGroup == null) {
-                    deletedClientGroup = DAOUtils.createClientGroup
-                                (session, change.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
+                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                 }
                 dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 session.save(dbClient);
@@ -927,9 +936,8 @@ public class ImportRegisterClientsService {
                 modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                 ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
-                                                          em.find(Org.class, change.getIdOfOrg()),
-                                                          String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
-                                                          dbClient, session, true);
+                        em.find(Org.class, change.getIdOfOrg()), String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
+                        dbClient, session, true);
                 break;
             default:
                 logger.error("Unknown update registry change operation " + change.getOperation());
@@ -949,24 +957,26 @@ public class ImportRegisterClientsService {
             throw ex;
         }
         String err = e.getMessage();
-        if(err.length() > 255) {
+        if (err.length() > 255) {
             err = err.substring(0, 255).trim();
         }
         change.setError(err);
         session.update(change);
     }
-    
+
     @Transactional
-    public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
+    public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
+            boolean manualCheckout) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
-        log(synchDate + "Производится синхронизация для " + org.getOfficialName()+" GUID ["+orgGuids.getGuidInfo()+"]", logBuffer);
+        log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
+                + "]", logBuffer);
 
         //  Итеративно загружаем клиентов, используя ограничения
         List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
-        log(synchDate + "Получено " + pupils.size() +" записей", logBuffer);
+        log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
         //  !!!!!!!!!!
         //  !!!!!!!!!!
         //  parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
@@ -1045,16 +1055,17 @@ public class ImportRegisterClientsService {
     }
 
     public static boolean isPupilIgnoredFromImport(String guid, String group) {
-        if (group!=null && group.toLowerCase().startsWith("дошкол")) {
+        if (group != null && group.toLowerCase().startsWith("дошкол")) {
             return true;
         }
-        if (guid==null || guid.length()==0) {
+        if (guid == null || guid.length() == 0) {
             return true;
         }
         return false;
     }
 
     public static class ExpandedPupilInfo {
+
         public String familyName, firstName, secondName, guid, group, enterGroup, enterDate, leaveDate;
         public String birthDate;
 
