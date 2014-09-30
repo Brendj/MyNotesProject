@@ -1909,10 +1909,13 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
             String newRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
-            contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
-            if (newRNIPId != null) {
+            Boolean upd = contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
+            if (upd != null && upd == true) {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП", null));
+            } else if(upd != null && upd == false) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не удалось загрузить данные контрагента в РНИП", null));
             }
         } catch (IllegalStateException ise) {
             logger.error("Failed to update contragent catalog in RNIP", ise);

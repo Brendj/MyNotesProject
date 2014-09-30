@@ -191,6 +191,7 @@ public class RNIPLoadPaymentsService {
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
+            throw new IllegalStateException("Failed to access RNIP service", e);
         }
 
         String soapError = checkError (response);
@@ -213,6 +214,7 @@ public class RNIPLoadPaymentsService {
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
+            throw new IllegalStateException("Failed to access RNIP service", e);
         }
 
         String soapError = checkError (response);

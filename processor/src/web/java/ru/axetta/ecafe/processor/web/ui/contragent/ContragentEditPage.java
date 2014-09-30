@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -89,6 +90,8 @@ public class ContragentEditPage extends BasicWorkspacePage {
         return "contragent/edit";
     }
 
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ContragentEditPage.class);
     private Long idOfContragent;
     private PersonItem contactPerson;
     private Integer parentId;
@@ -403,14 +406,17 @@ public class ContragentEditPage extends BasicWorkspacePage {
     }
 
 
-    public void updateContragentRNIP (Session session, Long idOfContragent, String prevId) throws Exception {
+    public Boolean updateContragentRNIP (Session session, Long idOfContragent, String prevId) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
         // Получаем id в РНИП, который был там до изменения (если он изменится или отсутствует,
         // то необходимо пересоздаваить каталог в самом РНИП)
         String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (isEmpty (id)) {
-            return;
+            return null;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
+        }
+        if(isEmpty(prevId) || prevId.equals(id)) {
+            return null;
         }
         if (isEmpty (contragent.getContragentName())) {
             throw new IllegalStateException("Необходимо указать наименование Контрагента");
@@ -448,10 +454,13 @@ public class ContragentEditPage extends BasicWorkspacePage {
             else {
                 RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
             }
+            return Boolean.TRUE;
         } catch (IllegalStateException ise) {
-            throw ise;
+            logger.error("Failed to update contragent in RNIP", ise);
+            return Boolean.FALSE;
         } catch (Exception e) {
-            //logger.error(e);
+            logger.error("Failed to update contragent in RNIP", e);
+            return Boolean.FALSE;
         }
     }
 
