@@ -205,7 +205,6 @@
                                action="#{pupilCatalogFindPage.buildComparisonCSVFile}" styleClass="command-button" />
             </h:panelGroup>
         </f:facet>
-
     </rich:dataTable>
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

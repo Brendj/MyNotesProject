@@ -52,6 +52,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     boolean showExtendedInfo;
     boolean showOnlyClientGoups = true;
 
+
     public boolean isShowExtendedInfo() {
         return showExtendedInfo;
     }
@@ -335,7 +336,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 RuntimeContext.getAppContext().getBean(PupilCatalogFindPage.class).bindClient(i);
                 nItems++;
             } catch (Exception e) {
-                errors.append(String.format("Не удалось связать % % % [%]: %s",
+                errors.append(String.format("Не удалось связать %s %s %s [%s]: %s<br/>",
                               i.getFamilyName(), i.getFirstName(), i.getSecondName(), i.getGuid(), e.getMessage()));
             }
         }
