@@ -330,9 +330,12 @@ public class ImportRegisterClientsService {
                     //  увеличиваем количество клиентов, подлежих удалению
                     Long currGroupId =
                             currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                    if (emptyIfNull(dbClient.getClientGUID()).equals("") || (!found && currGroupId != null &&
-                            !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
-                            !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
+                    if(currGroupId != null &&
+                       (currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) ||
+                        currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
+                        continue;
+                    }
+                    if (emptyIfNull(dbClient.getClientGUID()).equals("") || !found) {
                         log(synchDate + "Удаление " +
                                 emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
                                 dbClient.getPerson().getSurname()) + " " +
@@ -561,7 +564,7 @@ public class ImportRegisterClientsService {
         }
 
         RegistryChange ch = new RegistryChange();
-        ch.setClientGUID(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+        ch.setClientGUID(emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID)));
         ch.setFirstName(fieldConfig.getValue(ClientManager.FieldId.NAME));
         ch.setSecondName(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME));
         ch.setSurname(fieldConfig.getValue(ClientManager.FieldId.SURNAME));
@@ -617,7 +620,7 @@ public class ImportRegisterClientsService {
         }
 
         RegistryChange ch = new RegistryChange();
-        ch.setClientGUID(currentClient.getClientGUID());
+        ch.setClientGUID(emptyIfNull(currentClient.getClientGUID()));
         ch.setFirstName(currentClient.getPerson().getFirstName());
         ch.setSecondName(currentClient.getPerson().getSecondName());
         ch.setSurname(currentClient.getPerson().getSurname());
