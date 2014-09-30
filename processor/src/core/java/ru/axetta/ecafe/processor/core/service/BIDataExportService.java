@@ -96,7 +96,7 @@ public class BIDataExportService {
                 + "from cf_orgs o "
                 + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                 + "join cf_orgs o2 on o2.idoforg=f.currentorg "
-                + "where o.shortname<>'' and o2.officialname<>'' "
+                + "where o.shortname<>'' and o2.officialname<>'' and cf_orgs.state<>0 "
                 + "order by o2.officialname",
                 new String[]{"idoforg", "guid", "officialname"}));
 
@@ -163,7 +163,7 @@ public class BIDataExportService {
         //  Детализация заказа (OrderDetails)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("mobilenotify",
-                "select idofclient, mobile, email "
+                "select regOrgSrc.idofclient, mobile, email "
                 + "from cf_clients as regOrgSrc "
                 + "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient "
                 + "where (mobile<>'' or email<>'') and cf_cards.state=0",
