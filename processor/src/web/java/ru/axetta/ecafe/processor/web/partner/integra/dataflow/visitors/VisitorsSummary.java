@@ -30,7 +30,7 @@ public class VisitorsSummary {
 
     @Transient
     public boolean isEmpty(){
-        if(id != 0){
+        if(id != null && id != 0){
             return false;
         }
         if(students != 0){
