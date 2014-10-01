@@ -365,4 +365,12 @@ public class CalendarUtils {
     }
 
     private CalendarUtils() {}
+
+    //Сравнивает часы
+    public static boolean timeEquals(String one, String two) {
+        int oneTime,twoTime;
+        oneTime = Integer.valueOf(one.replace(":",""));
+        twoTime = Integer.valueOf(two.replace(":",""));
+        return oneTime > twoTime;
+    }
 }
