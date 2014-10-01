@@ -56,8 +56,8 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                     transaction.begin();
                     Criteria allOrgCriteria = session.createCriteria(Org.class);
                     allOrgCriteria.addOrder(Order.asc("idOfOrg"));
-                    //allOrgCriteria.setCacheMode(CacheMode.NORMAL);
-                    //allOrgCriteria.setCacheable(true);
+                    allOrgCriteria.setCacheMode(CacheMode.GET);
+                    allOrgCriteria.setCacheable(true);
                     List allOrgs = allOrgCriteria.list();
 
                     for (Object object : allOrgs) {
