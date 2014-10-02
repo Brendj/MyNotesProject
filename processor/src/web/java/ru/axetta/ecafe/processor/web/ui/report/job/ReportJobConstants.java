@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingJasperReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
@@ -171,7 +170,8 @@ public class ReportJobConstants {
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{20/*, 26, 27, 28, 29, 30, 31, 32*/}),
-            new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{31})
+            new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{31}),
+            new ReportHint(AutoEnterEventV2Report.class.getCanonicalName(), new int[]{3})
     };
 
 

@@ -3,9 +3,10 @@ package ru.axetta.ecafe.processor.core.report.model.autoenterevent;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import javax.persistence.Transient;
-import java.sql.ResultSet;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * User: Shamil
@@ -29,22 +30,22 @@ public class Data {
     public Data() {
     }
 
-    public Data(ResultSet rs) throws SQLException {
-        this.eventId = rs.getLong("idofenterevent");
-        this.f01 =  ""+rs.getLong("idofclient");
-        this.f02 = rs.getString("surname")+ " " + rs.getString("firstname") + " " + rs.getString("secondname");
-        this.f03 = rs.getString("groupname");
-        this.f04 = CalendarUtils.dateShortToString(new Date(rs.getLong("evtdatetime")));
-        this.f05 = rs.getString("officialname");
-        if (( rs.getInt("passdirection") == 0 ) || ( rs.getInt("passdirection") == 6)){
+    public Data(Map<String,Object> rs) throws SQLException {
+        this.eventId = ((BigInteger)rs.get("idofenterevent")).longValue();
+        this.f01 =  ((BigInteger)rs.get("idofclient")).toString();
+        this.f02 = rs.get("surname")+ " " + rs.get("firstname") + " " + rs.get("secondname");
+        this.f03 = (String) rs.get("groupname");
+        this.f04 = CalendarUtils.dateShortToString(new Date(((BigInteger)rs.get("evtdatetime")).longValue()));
+        this.f05 = (String) rs.get("officialname");
+        if (( (Integer)rs.get("passdirection") == 0 ) || ( (Integer)rs.get("passdirection") == 6)){
             //Enter
-            this.f06 = CalendarUtils.timeToString(new Date(rs.getLong("evtdatetime")));
-            this.f09 = CalendarUtils.timeToString(new Date(rs.getLong("evtdatetime"))) + "(+)";
+            this.f06 = CalendarUtils.timeToString(new Date(((BigInteger)rs.get("evtdatetime")).longValue()));
+            this.f09 = CalendarUtils.timeToString(new Date(((BigInteger)rs.get("evtdatetime")).longValue())) + "(+)";
 
-        } else if (( rs.getInt("passdirection") == 1 ) || ( rs.getInt("passdirection") == 7)){
+        } else if (( (Integer)rs.get("passdirection") == 1 ) || ( (Integer)rs.get("passdirection") == 7)){
             //exit
-            this.f07 = CalendarUtils.timeToString(new Date(rs.getLong("evtdatetime")));
-            this.f09 = CalendarUtils.timeToString(new Date(rs.getLong("evtdatetime"))) + "(-)";
+            this.f07 = CalendarUtils.timeToString(new Date(((BigInteger)rs.get("evtdatetime")).longValue()));
+            this.f09 = CalendarUtils.timeToString(new Date(((BigInteger)rs.get("evtdatetime")).longValue())) + "(-)";
         }
     }
 

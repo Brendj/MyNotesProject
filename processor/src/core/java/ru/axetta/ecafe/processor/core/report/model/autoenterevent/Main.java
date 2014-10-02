@@ -1,29 +1,12 @@
 package ru.axetta.ecafe.processor.core.report.model.autoenterevent;
 
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.view.JasperViewer;
-
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
-import org.hibernate.Session;
-
-import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
-
 /**
  * User: shamil
  * Date: 23.09.14
  * Time: 15:55
  */
 public class Main {
-
+           /*
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
     private Properties reportProperties = new Properties();
@@ -275,5 +258,5 @@ public class Main {
             }
         }
         return resultList;
-    }
+    }                                   */
 }
