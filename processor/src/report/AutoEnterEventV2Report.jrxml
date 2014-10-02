@@ -210,9 +210,9 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="40" splitType="Stretch">
+		<band height="72" splitType="Stretch">
 			<crosstab>
-				<reportElement x="0" y="0" width="8510" height="40" uuid="4a45e44c-ff31-4c00-9430-8aad72ed2013"/>
+				<reportElement x="0" y="29" width="8510" height="40" uuid="4a45e44c-ff31-4c00-9430-8aad72ed2013"/>
 				<crosstabDataset isDataPreSorted="true">
 					<dataset>
 						<datasetRun subDataset="Dataset2" uuid="1ea0f84f-adc9-485d-a1b7-4ebc829e6a14">
@@ -355,6 +355,13 @@
 					<cellContents mode="Opaque" style="Crosstab 4_CT"/>
 				</crosstabCell>
 			</crosstab>
+			<staticText>
+				<reportElement x="0" y="0" width="524" height="29" uuid="2348220d-26c1-4395-91f6-df2cace48cee"/>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Детализированный отчет по посещению]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
