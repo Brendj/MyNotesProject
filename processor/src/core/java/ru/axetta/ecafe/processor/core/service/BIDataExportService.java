@@ -96,7 +96,7 @@ public class BIDataExportService {
                 + "from cf_orgs o "
                 + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                 + "join cf_orgs o2 on o2.idoforg=f.currentorg "
-                + "where o.shortname<>'' and o2.officialname<>'' and cf_orgs.state<>0 "
+                + "where o.shortname<>'' and o2.officialname<>'' and o.state<>0 "
                 + "order by o2.officialname",
                 new String[]{"idoforg", "guid", "officialname"}));
 
