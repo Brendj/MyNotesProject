@@ -39,9 +39,9 @@
         <many-to-one name="parentBbkDetails" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="false"
                      column="idOfParentBbkDetails"/>
 
-        <set name="bbkDetailsInternal" lazy="true" inverse="true">
+        <set name="bbkDetailsInternal" table="cf_bbk_details" lazy="true" inverse="true">
             <key>
-                <column name="idOfBbkDetails"/>
+                <column name="idofbbkdetails"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" />
         </set>

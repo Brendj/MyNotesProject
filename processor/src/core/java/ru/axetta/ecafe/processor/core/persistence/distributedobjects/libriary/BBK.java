@@ -14,10 +14,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,12 +29,62 @@ import java.util.Set;
  * Time: 11:14
  */
 public class BBK extends LibraryDistributedObject {
+
+    public static final int NAME_LENGTH = 127;
+    public static final int NOTE_LENGTH = 255;
     private String name;
     private String note;
-    private Set<BBKDetails> bbkDetailsInternal;
+    private Set<BBKDetails> bbkDetails;
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
+    protected void appendAttributes(Element element) {
+        XMLUtils.setAttributeIfNotNull(element, "Name", name);
+        XMLUtils.setAttributeIfNotNull(element, "Note", note);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        // Проверка на дублирование данных
+        Criteria criteria = session.createCriteria(BBK.class);
+        criteria.add(Restrictions.eq("name", getName()));
+        List bbkList = criteria.list();
+        BBK bbk = null;
+        if(bbkList != null && !bbkList.isEmpty()){
+            bbk = (BBK) bbkList.get(0);
+        }
+        if(!(bbk==null || bbk.getDeletedState() || guid.equals(bbk.getGuid()))){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("BBK DATA_EXIST_VALUE Name equals");
+            distributedObjectException.setData(bbk.getGuid());
+            throw  distributedObjectException;
+        }
+    }
+
+    @Override
+    public BBK parseAttributes(Node node) throws Exception {
+        name = XMLUtils.getStringAttributeValue(node, "Name", NAME_LENGTH);
+        note = XMLUtils.getStringAttributeValue(node, "Note", NOTE_LENGTH);
+        setSendAll(SendToAssociatedOrgs.DontSend);
+        return this;
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setName(((BBK) distributedObject).getName());
+        setNote(((BBK) distributedObject).getNote());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
+        Criteria criteria = session.createCriteria(BBK.class);
+        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+        createProjections(criteria);
+        criteria.setCacheable(false);
+        criteria.setReadOnly(true);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
+    }
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -44,29 +95,6 @@ public class BBK extends LibraryDistributedObject {
         projectionList.add(Projections.property("note"), "note");
 
         criteria.setProjection(projectionList);
-    }
-
-    @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
-            String currentLastGuid, Integer currentLimit) throws Exception {
-        return null;
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {}
-
-    @Override
-    public BBK parseAttributes(Node node) throws Exception {
-        name = XMLUtils.getStringAttributeValue(node, "Name", 127);
-        note = XMLUtils.getStringAttributeValue(node, "Note", 36);
-        setSendAll(SendToAssociatedOrgs.DontSend);
-        return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setName(((BBK) distributedObject).getName());
-        setNote(((BBK) distributedObject).getNote());
     }
 
     public String getName() {
@@ -85,15 +113,16 @@ public class BBK extends LibraryDistributedObject {
         this.note = note;
     }
 
-    public Set<BBKDetails> getBbkDetailsInternal() {
-        return bbkDetailsInternal;
+    public Set<BBKDetails> getBbkDetails() {
+        return bbkDetails;
     }
 
-    public void setBbkDetailsInternal(Set<BBKDetails> bbkDetailsInternal) {
-        this.bbkDetailsInternal = bbkDetailsInternal;
+    public void setBbkDetails(Set<BBKDetails> bbkDetailsInternal) {
+        this.bbkDetails = bbkDetailsInternal;
     }
 
-    public List<BBKDetails> getBbkDetail() {
-        return new ArrayList<BBKDetails>(getBbkDetailsInternal());
+    @Override
+    public String toString() {
+        return String.format("BBK{name='%s', note='%s'}", name, note);
     }
 }

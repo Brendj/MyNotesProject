@@ -15,13 +15,16 @@ import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -91,11 +94,16 @@ public class Publication extends LibraryDistributedObject {
             criteria.add(Restrictions.eq("publicationdate",publicationdate));
             criteria.add(Restrictions.eq("validISBN",true));
             criteria.add(Restrictions.ne("guid", guid));
-            Publication publication = (Publication) criteria.uniqueResult();
+            Publication publication = null;
+            List publicationList = criteria.list();
+            if (publicationList != null && !publicationList.isEmpty()) {
+                publication = (Publication) publicationList.get(0);
+            }
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
-                distributedObjectException.setData(publication.getGuid());
+                String exceptionData = publication.getGuid();
+                distributedObjectException.setData(exceptionData);
                 throw  distributedObjectException;
             }
         } else {
