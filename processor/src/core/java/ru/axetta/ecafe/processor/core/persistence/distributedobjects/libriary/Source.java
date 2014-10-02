@@ -67,7 +67,7 @@ public class Source extends LibraryDistributedObject {
         if (sourceName != null)
             setSourceName(sourceName);
         setHashCode(hashCode());
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

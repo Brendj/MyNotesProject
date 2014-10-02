@@ -76,7 +76,7 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
         }
         setHashCode(hashCode());
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

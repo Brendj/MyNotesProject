@@ -95,7 +95,7 @@ public class AccompanyingDocument extends LibraryDistributedObject {
         }
         guidTypeOfAccompanyingDocument = XMLUtils.getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 36);
         guidSource = XMLUtils.getStringAttributeValue(node, "GuidSource", 36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

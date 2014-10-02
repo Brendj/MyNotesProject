@@ -65,7 +65,7 @@ public class LibVisit extends LibraryDistributedObject {
         idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         date = XMLUtils.getDateTimeAttributeValue(node, "date");
         source = XMLUtils.getIntegerAttributeValue(node, "source");
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

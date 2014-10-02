@@ -67,7 +67,7 @@ public class RetirementReason extends LibraryDistributedObject {
         if (retirementReasonName != null)
             setRetirementReasonName(retirementReasonName);
         setHashCode(hashCode());
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 

@@ -91,7 +91,7 @@ public class Circulation extends LibraryDistributedObject {
         refundDate = XMLUtils.getDateAttributeValue(node, "RefundDate");
         realRefundDate = XMLUtils.getDateTimeAttributeValue(node, "RealRefundDate");
         status = XMLUtils.getIntegerAttributeValue(node, "Status");
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
