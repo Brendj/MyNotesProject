@@ -36,7 +36,7 @@
 
         <many-to-one name="bbk" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBK" not-null="true" column="idOfBbk"/>
 
-        <many-to-one name="parentBbkDetails" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="false"
+        <many-to-one name="parentBBKDetails" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="false"
                      column="idOfParentBbkDetails"/>
 
         <set name="bbkDetailsInternal" table="cf_bbk_details" lazy="true" inverse="true">
