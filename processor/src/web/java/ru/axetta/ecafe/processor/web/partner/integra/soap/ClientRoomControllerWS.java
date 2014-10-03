@@ -5900,33 +5900,51 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         VisitorsSummaryResult result = new VisitorsSummaryResult();
         Session session = null;
         result.orgsList = new VisitorsSummaryList();
-        result.orgsList.org = new ArrayList<VisitorsSummary>();
-        result.orgsList.org.add(new VisitorsSummary());
-        result.orgsList.org.add(new VisitorsSummary());
-        result.orgsList.org.add(new VisitorsSummary());
-        result.orgsList.org.add(new VisitorsSummary());
 
         EnterEventsService enterEventsService = (EnterEventsService) RuntimeContext.getAppContext()
                 .getBean(EnterEventsService.class);
-        List<DAOEnterEventSummaryModel> data = new ArrayList<DAOEnterEventSummaryModel>();
+        List<DAOEnterEventSummaryModel> dataClients = new ArrayList<DAOEnterEventSummaryModel>();
+        List<DAOEnterEventSummaryModel> dataOthers = new ArrayList<DAOEnterEventSummaryModel>();
         try{
-            data = enterEventsService.getEnterEventsSummary(datetime);
+            dataClients = enterEventsService.getEnterEventsSummaryNotEmptyClient(datetime);
+            dataOthers = enterEventsService.getEnterEventsSummaryEmptyClient(datetime);
         } catch (Exception i) {
             result.resultCode = ResultConst.CODE_INTERNAL_ERROR;
             result.description = ResultConst.DESCR_INTERNAL_ERROR;
         }
-        List<VisitorsSummary> visitorsSummaryList = new ArrayList<VisitorsSummary>();
-        Long lastClientId = null;
-        Long currentOrgId = null ;
-        VisitorsSummary visitorsSummary = new VisitorsSummary();
-        if(data.size() > 0 ){
-            visitorsSummary.id = data.get(0).getIdOfOrg();
-            currentOrgId = data.get(0).getIdOfOrg();
+
+        Map<Long,VisitorsSummary> visitorsSummaryList = new HashMap<Long, VisitorsSummary>();
+
+        parseVisitorsSummary(visitorsSummaryList,dataClients);
+        parseVisitorsSummary(visitorsSummaryList,dataOthers);
+
+        //visitorsSummaryList.addAll( parseVisitorsSummary(dataOthers) );
+
+        result.orgsList.org = new LinkedList<VisitorsSummary>(visitorsSummaryList.values());
+        if (result.orgsList.org.size() == 0 ){
+            result.description = ResultConst.DESCR_NOT_FOUND;
+            result.resultCode = ResultConst.CODE_NOT_FOUND;
+        }
+        return result;
+    }
+
+    private static Map<Long,VisitorsSummary> parseVisitorsSummary (Map<Long,VisitorsSummary> visitorsSummaryList,List<DAOEnterEventSummaryModel> data){
+
+
+        VisitorsSummary visitorsSummary = null;
+        if(data.size() > 0) {
+
         }
         for (DAOEnterEventSummaryModel model : data) {
-            if(model.getIdOfClient() == null){
-                System.out.print("");
+            if( visitorsSummary == null || model.getIdOfOrg() != visitorsSummary.id  ){
+                visitorsSummary = visitorsSummaryList.get(model.getIdOfOrg());
+                if(visitorsSummary == null) {
+                    visitorsSummary = new VisitorsSummary();
+                    visitorsSummary.id = model.getIdOfOrg();
+                    visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
+                }
             }
+
             if(model.getIdOfClient() == null){
                 if (model.getIdofvisitor() != null ) {
                     if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
@@ -5942,27 +5960,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 }
             }
-            if(lastClientId != null && lastClientId.equals(model.getIdOfClient()) && (model.getIdOfOrg().equals(currentOrgId)) ){
-                continue;
-            }else {
-                lastClientId = model.getIdOfClient();
-            }
-
-            if (!model.getIdOfOrg().equals(currentOrgId)) {
-                visitorsSummaryList.add(visitorsSummary);
-                visitorsSummary = new VisitorsSummary();
-                visitorsSummary.id = model.getIdOfOrg();
-                currentOrgId = model.getIdOfOrg();
-            }
 
             if (model.getIdOfClient() != null) {
                 if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)) {
                     if (model.getIdofclientgroup() != null) {
-                        if ((model.getIdofclientgroup() > 1000000000L) && (model.getIdofclientgroup() < 1100000000L)) {
+                        if ((model.getIdofclientgroup() >= 1000000000L) && (model.getIdofclientgroup() < 1100000000L)) {
                             visitorsSummary.students++;
                         } else if ((model.getIdofclientgroup() >= 1100000000L) && (model.getIdofclientgroup() <= 1100000020L)) {
                             visitorsSummary.employee++;
-                        } else if ((model.getIdofclientgroup() == 1100000030L) && (model.getIdofclientgroup() == 1100000040L)) {
+                        } else{
                             visitorsSummary.others++;
                         }
                     } else {
@@ -5973,14 +5979,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
-        if( (!visitorsSummaryList.contains(visitorsSummary)) && (!visitorsSummary.isEmpty()) ) {
-            visitorsSummaryList.add(visitorsSummary);
-        }
-        result.orgsList.org = visitorsSummaryList;
-        if (result.orgsList.org.size() == 0 ){
-            result.description = ResultConst.DESCR_NOT_FOUND;
-            result.resultCode = ResultConst.CODE_NOT_FOUND;
-        }
-        return result;
+        return visitorsSummaryList;
     }
 }
