@@ -54,7 +54,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Категория ОУ (CategoryOrg)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("categoryorg",
+        /*TYPES.add(new BIDataExportType("categoryorg",
                 "select idofcategoryorg, categoryname "
                         + "from cf_categoryorg",
                 new String[]{"idofcategoryorg", "categoryname"}));
@@ -160,14 +160,22 @@ public class BIDataExportService {
                 .setSpecificExporter("cardTypesExporter"));
 
         //  ------------------------------------------
-        //  Детализация заказа (OrderDetails)
+        //  Оповещение пользователей (MobileNotify)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("mobilenotify",
                 "select regOrgSrc.idofclient, mobile, email "
                 + "from cf_clients as regOrgSrc "
                 + "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient "
                 + "where (mobile<>'' or email<>'') and cf_cards.state=0",
-                new String[]{"idofclient", "mobile", "email"}));
+                new String[]{"idofclient", "mobile", "email"}));*/
+
+        //  ------------------------------------------
+        //  Различные свойства системы (SystemProps)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("plannedimpl",
+                "select vawe, period, region, toimplement "
+                + "from cf_system_planned_implementation order by vawe, period, region",
+                new String[]{"vawe", "period", "region", "toimplement"}));
 
 
 
@@ -176,7 +184,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Проходы (Events)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("events",
+        /*TYPES.add(new BIDataExportType("events",
                 "select cf_enterevents.idofclient, cf_enterevents.evtdatetime, cf_enterevents.idoforg, cf_enterevents.idofenterevent, "
                         + "       case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
                         + "from cf_enterevents "
@@ -224,7 +232,7 @@ public class BIDataExportService {
                         + "      and cf_orgs.state<>0 "
                         + "order by cf_orders.orderdate",
                 new String[]{"idoforg", "idoforder", "idoforderdetail", "foodtype", "groupname", "rationtype", "idofcategorydiscount", "rsum", "socdiscount"}));
-
+        */
 
         newTypes = new ExportType(TYPES, "new");
     }
