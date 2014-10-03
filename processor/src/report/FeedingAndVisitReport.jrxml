@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FeedingAndVisitReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6571417e-f6fc-44f1-8c7c-e336e63b1b6c">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="323" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="15" width="100" height="20" uuid="cef45c4f-cda2-4779-980a-0e6ef35c4849"/>
+				<text><![CDATA[Утверждаю]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="45" width="50" height="20" uuid="6fe6ad3f-179d-4838-8430-7607c348983b"/>
+				<text><![CDATA[Директор ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="75" width="171" height="20" uuid="9d854fe9-4229-45be-b396-fba6a9bcf306"/>
+				<text><![CDATA[Отчет по льготному плану питания - ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="104" width="123" height="17" uuid="2abd4e6b-4612-4d4b-b3e2-109db6fd20fd"/>
+				<text><![CDATA[Значения в ячейках:
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="129" width="100" height="20" uuid="ad9dc97a-8475-46a8-bb96-a5e23e91f480"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Н
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="149" width="100" height="20" uuid="c5f9acc5-92f6-4632-bffa-3561ee6c2528"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[10:45 - 15:56
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="169" width="100" height="20" uuid="0f5cd7dd-7989-46b0-ab6d-d242bc145cb0"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[10:45 - 15:56
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="189" width="100" height="20" uuid="8c72cbeb-d408-4db3-9685-52c1c4e47c4e"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Х
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="129" width="578" height="20" uuid="fe31d41b-8c18-4fd2-a9e2-e1858c4f12df"/>
+				<text><![CDATA[обучающийся не был в ОО (проход через турникет не зафиксирован)
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="149" width="578" height="20" uuid="aedd2351-97f1-48e7-9957-20b0d77a4293"/>
+				<text><![CDATA[обучающийся был в ОО (зафиксирован проход через турникет), в плане льготного питания не оплачен
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="169" width="578" height="20" uuid="55e904d0-08a8-45db-9ef7-4f99a56fa788"/>
+				<text><![CDATA[обучающийся был в ОО (зафиксирован проход через турникет), в льготном плане питания оплачен
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="189" width="578" height="20" uuid="93c54f39-5318-49d8-8c0b-08ca12770ee8"/>
+				<text><![CDATA[обучающийся не был в ОО (проход через турникет не зафиксирован), в льготном плане питания оплачен]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="50" y="45" width="100" height="20" uuid="dcc0c290-a07c-49cf-954e-83099eb62867"/>
+				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
