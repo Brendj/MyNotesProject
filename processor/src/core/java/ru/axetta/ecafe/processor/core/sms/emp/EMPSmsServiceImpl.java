@@ -106,7 +106,7 @@ public class EMPSmsServiceImpl extends ISmsService {
 
     public boolean sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
-        if (StringUtils.isBlank(client.getSsoid()) || NumberUtils.toLong(client.getSsoid()) < 0L) {
+        if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
             return false;
         }
 
