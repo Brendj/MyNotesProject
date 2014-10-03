@@ -59,6 +59,11 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgName", org.getOfficialName());
+
+            calendar.setTime(endTime);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            endTime.setTime(calendar.getTimeInMillis());
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
@@ -72,7 +77,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
-            endTime = CalendarUtils.truncateToDayOfMonth(endTime);
+
 
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
@@ -219,7 +224,9 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         List<Data> resultList = new LinkedList<Data>();
         List<String> dateList = new LinkedList<String>();
         dateList.add(CalendarUtils.dateShortToString(begin));
-        while (!begin.equals(end)) {
+        Calendar beginC = Calendar.getInstance();
+        Calendar endC = Calendar.getInstance();
+        while ( (beginC.get(Calendar.DAY_OF_MONTH) != endC.get(Calendar.DAY_OF_MONTH)) && (beginC.get(Calendar.YEAR) != endC.get(Calendar.YEAR))) {
             begin = CalendarUtils.addDays(begin, 1);
             dateList.add(CalendarUtils.dateShortToString(begin));
         }
