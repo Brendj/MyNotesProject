@@ -32,7 +32,7 @@
     <persistence-unit name="reportsPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:jboss/PostgresReportDS</jta-data-source>
-        <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
+        <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.show_sql" value="false"/>
@@ -46,8 +46,8 @@
                       value="org.hibernate.transaction.JBossTransactionManagerLookup"/>
             <!--<property name="hibernate.transaction.factory_class"-->
                       <!--value="org.hibernate.transaction.CMTTransactionFactory"/>-->
-            <property name="hibernate.cache.use_second_level_cache" value="true"/>
-            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache" value="false"/>
+            <property name="hibernate.cache.use_query_cache" value="false"/>
             <property name="hibernate.cache.use_minimal_puts" value="true"/>
             <property name="hibernate.cache.use_structured_entries" value="true"/>
             <property name="hibernate.cache.use_sql_comments" value="false"/>
