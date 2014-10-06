@@ -129,7 +129,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Карты (Cards)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("clients",
+        TYPES.add(new BIDataExportType("cards",
                 "select cl.idofclient, c.idofcard "
                 + "from cf_cards c "
                 + "join cf_clients cl on cl.idofclient=c.idofclient "
