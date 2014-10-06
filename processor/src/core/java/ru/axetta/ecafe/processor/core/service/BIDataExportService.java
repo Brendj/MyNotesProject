@@ -127,6 +127,17 @@ public class BIDataExportService {
                 new String[]{"idofclient", "idoforg", "idofclientgroup", "socdiscount"}));
 
         //  ------------------------------------------
+        //  Карты (Cards)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("clients",
+                "select cl.idofclient, c.idofcard "
+                + "from cf_cards c "
+                + "join cf_clients cl on cl.idofclient=c.idofclient "
+                + "join cf_orgs o on cl.idoforg=o.idoforg "
+                + "where o.state<>0",
+                new String[]{"idofclient", "idofcard"}));
+
+        //  ------------------------------------------
         //  Правила социальных скидок (DiscountRules)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("discountrules",
