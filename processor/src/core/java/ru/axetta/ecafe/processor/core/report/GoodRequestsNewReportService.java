@@ -98,7 +98,7 @@ public class GoodRequestsNewReportService {
             ComplexInfo complexInfo = (ComplexInfo) obj;
             FeedingPlanType feedingPlanType = null;
             if(complexInfo!=null){
-                if(complexInfo.getUsedSubscriptionFeeding()==1){
+                if((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()==1)){
                     //feedingPlanType = "Абонементное питание";
                     feedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING;
                 } else {
