@@ -5921,6 +5921,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         //visitorsSummaryList.addAll( parseVisitorsSummary(dataOthers) );
 
         result.orgsList.org = new LinkedList<VisitorsSummary>(visitorsSummaryList.values());
+        result.orgsList.orgCount = visitorsSummaryList.values().size();
         if (result.orgsList.org.size() == 0 ){
             result.description = ResultConst.DESCR_NOT_FOUND;
             result.resultCode = ResultConst.CODE_NOT_FOUND;
@@ -5929,12 +5930,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private static Map<Long,VisitorsSummary> parseVisitorsSummary (Map<Long,VisitorsSummary> visitorsSummaryList,List<DAOEnterEventSummaryModel> data){
-
-
         VisitorsSummary visitorsSummary = null;
-        if(data.size() > 0) {
-
-        }
         for (DAOEnterEventSummaryModel model : data) {
             if( visitorsSummary == null || model.getIdOfOrg() != visitorsSummary.id  ){
                 visitorsSummary = visitorsSummaryList.get(model.getIdOfOrg());
@@ -5944,7 +5940,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
                 }
             }
-
             if(model.getIdOfClient() == null){
                 if (model.getIdofvisitor() != null ) {
                     if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
@@ -5962,10 +5957,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             if (model.getIdOfClient() != null) {
-                if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)) {
+                visitorsSummary.studentsTotal++;
+                if ( (model.getPassDirection() != 1) && (model.getPassDirection() != 7) ) {
                     if (model.getIdofclientgroup() != null) {
                         if ((model.getIdofclientgroup() >= 1000000000L) && (model.getIdofclientgroup() < 1100000000L)) {
-                            visitorsSummary.students++;
+                            visitorsSummary.studentsInside++;
                         } else if ((model.getIdofclientgroup() >= 1100000000L) && (model.getIdofclientgroup() <= 1100000020L)) {
                             visitorsSummary.employee++;
                         } else{

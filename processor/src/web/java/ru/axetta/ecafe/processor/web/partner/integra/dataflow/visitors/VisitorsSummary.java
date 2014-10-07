@@ -17,8 +17,11 @@ public class VisitorsSummary {
 
     @XmlAttribute(name = "id")
     public Long id = null;
-    @XmlAttribute(name = "students")
-    public Long students = 0L;
+
+    @XmlAttribute(name = "studentsTotal")
+    public int studentsTotal = 0;
+    @XmlAttribute(name = "studentsInside")
+    public Long studentsInside = 0L;
     @XmlAttribute(name = "employee")
     public Long employee = 0L;
     @XmlAttribute(name = "others")
@@ -33,7 +36,10 @@ public class VisitorsSummary {
         if(id != null && id != 0){
             return false;
         }
-        if(students != 0){
+        if(studentsTotal != 0){
+            return false;
+        }
+        if(studentsInside != 0){
             return false;
         }
         if(employee != 0){

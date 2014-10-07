@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: shamil
@@ -29,5 +30,9 @@ public class EnterEventsService {
 
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryEmptyClient(Long dateTime){
         return enterEventsRepository.getEnterEventsSummaryEmptyClient(dateTime);
+    }
+
+    public Map<Long, Map<Long, List<DAOEnterEventSummaryModel>>> getEnterEventsSummaryNotEmptyClientFull(Long dateTime){
+        return enterEventsRepository.getEnterEventsSummaryNotEmptyClientFull(dateTime);
     }
 }

@@ -16,9 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -91,5 +89,39 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             result.add(entry);
         }
         return result;
+    }
+
+
+    @Transactional(readOnly = true)
+    public Map<Long, Map<Long, List<DAOEnterEventSummaryModel> > > getEnterEventsSummaryNotEmptyClientFull(Long dateTime) {
+        long begin = CalendarUtils.truncateToDayOfMonth(new Date(dateTime)).getTime();
+        List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
+                "SELECT e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, ( e.idoforg || ' ' || e.idofclient )as e  "
+                        + "FROM cf_enterevents e "
+                        + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
+                        + "and e.idofclient is not null "
+                        + "ORDER BY e, e.evtdatetime DESC")
+                .setParameter("startDateTime", begin)
+                .setParameter("endDateTime", dateTime)
+                        //.setParameter("startDateTime", 1398027420000L)
+                        //.setParameter("endDateTime", 1398106620000L)
+                .getResultList();
+
+        Map<Long, Map<Long, List<DAOEnterEventSummaryModel> > > resultMap = new HashMap<Long, Map<Long, List<DAOEnterEventSummaryModel> > >();
+
+        for(DAOEnterEventSummaryModel model : parse(tempList) ){
+            if( !resultMap.containsKey(model.getIdOfOrg()) ){
+                resultMap.put(model.getIdOfOrg(), new HashMap<Long, List<DAOEnterEventSummaryModel>>());
+            }
+            if( !resultMap.get(model.getIdOfOrg()).containsKey(model.getIdOfClient()) ){
+                resultMap.get(model.getIdOfOrg()).put(model.getIdOfClient(), new LinkedList<DAOEnterEventSummaryModel>());
+            }
+
+
+
+            resultMap.get(model.getIdOfOrg()).get(model.getIdOfClient()).add(model);
+        }
+        return resultMap;
     }
 }
