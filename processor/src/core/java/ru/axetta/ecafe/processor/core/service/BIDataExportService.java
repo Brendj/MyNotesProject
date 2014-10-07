@@ -130,7 +130,7 @@ public class BIDataExportService {
         //  Карты (Cards)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("cards",
-                "select cl.idofclient, c.idofcard, c.state, c.cardtype "
+                "select cl.idofclient, c.idofcard "
                 + "from cf_cards c "
                 + "join cf_clients cl on cl.idofclient=c.idofclient "
                 + "join cf_orgs o on cl.idoforg=o.idoforg "
@@ -185,7 +185,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("plannedimpl",
                 "select vawe, period, region, toimplement "
-                + "from cf_system_implementation_forecast order by vawe, period, region",
+                + "from cf_system_planned_implementation order by vawe, period, region",
                 new String[]{"vawe", "period", "region", "toimplement"}));
 
 
