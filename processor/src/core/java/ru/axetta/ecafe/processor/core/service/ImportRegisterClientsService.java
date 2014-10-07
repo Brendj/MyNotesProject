@@ -380,7 +380,8 @@ public class ImportRegisterClientsService {
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
-                if (cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                if (cl.getClientGroup() != null &&
+                    cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
                         .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
                         && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
                         < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
