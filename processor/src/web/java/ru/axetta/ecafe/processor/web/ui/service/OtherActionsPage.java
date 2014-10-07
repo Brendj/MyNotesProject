@@ -86,7 +86,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runSendEMPEvent() throws Exception {
-        Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
+        //Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
+        Client client = DAOService.getInstance().findClientById(1069L);
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
                 sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT, new String[]{}, true,
                         EnterEvent.ENTRY); //DEF

@@ -81,18 +81,22 @@ public class EMPSmsServiceImpl extends ISmsService {
         return impl;
     }
 
-    @Override
-    public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject) throws Exception {
+    public SendResponse sendTextMessage(String sender, Client client, Object textObject) throws Exception {
         if (!(textObject instanceof EMPEventType)) {
             throw new Exception("Text argument must be an EMPEventType instead of " + textObject.getClass().toString());
         }
 
         EMPEventType empEvent = (EMPEventType) textObject;
-        List<Client> client = DAOService.getInstance().findClientsByMobilePhone(phoneNumber);
-        for (Client c : client) {
-            RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(c, empEvent);
-        }
-        return new SendResponse(0, null, "");// messageId ???
+        //List<Client> client = DAOService.getInstance().findClientsByMobilePhone(phoneNumber);
+        //for (Client c : client) {
+            RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
+        ///}
+        return new SendResponse(1, null, "");// messageId ???
+    }
+
+    @Override
+    public SendResponse sendTextMessage(String sender, String phoneNumber, Object textObject) throws Exception {
+        throw new UnsupportedOperationException();
     }
 
 
