@@ -142,6 +142,8 @@ public class EMPProcessor {
         //  Загрузка клиентов для связки
         List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOService.getInstance()
                 .getNotBindedEMPClients(getConfigPackageSize());
+        //notBindedClients.clear();                                                 !! TEST ONLY
+        //notBindedClients.add(DAOService.getInstance().findClientById(1069L));     !! TEST ONLY
         log(synchDate + "Количество клиентов к привязке: " + notBindedClients.size());
 
         //  Отправка запроса на привязку
@@ -303,8 +305,7 @@ public class EMPProcessor {
                     + "] " + client.getMobile());
         }
         Entry e = entries.get(0);
-        /// устанавливаем чтобы повторно не попал в выборку на регистрацию
-        client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
+        boolean found = false;
         ///
         List<EntryAttribute> attributes = e.getAttribute();
         for (EntryAttribute attr : attributes) {
@@ -315,6 +316,7 @@ public class EMPProcessor {
                 try {
                     String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
                     client.setSsoid(val);
+                    found = true;
                 } catch (Exception e1) {
                     logger.error("Failed to process existing object", e1);
                     throw new EMPException(e1);
@@ -327,17 +329,22 @@ public class EMPProcessor {
                 try {
                     String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
                     client.setEmail(val);
+                    found = true;
                 } catch (Exception e1) {
                     logger.error("Failed to process existing object");
                     throw new EMPException(e1);
                 }
             }
         }
-        log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
-                + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid()
-                + "}");
-        DAOService.getInstance().saveEntity(client);
-        return true;
+        if(found) {
+            log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
+                    + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid()
+                    + "}");
+            DAOService.getInstance().saveEntity(client);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected boolean bindThrowAdd(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
