@@ -307,6 +307,7 @@ public class EMPProcessor {
         Entry e = entries.get(0);
         boolean found = false;
         ///
+        client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
         List<EntryAttribute> attributes = e.getAttribute();
         for (EntryAttribute attr : attributes) {
             if (attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
@@ -336,15 +337,15 @@ public class EMPProcessor {
                 }
             }
         }
-        if(found) {
+        //if(found) {
             log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
                     + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid()
                     + "}");
             DAOService.getInstance().saveEntity(client);
             return true;
-        } else {
+        /*} else {
             return false;
-        }
+        }*/
     }
 
     protected boolean bindThrowAdd(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
@@ -365,8 +366,9 @@ public class EMPProcessor {
             DAOService.getInstance().saveEntity(client);
             return true;
         }
-        log(synchDate + "Не удалось зарегистрировать клиента [" + client.getIdOfClient() + "] " + client.getMobile());
-        throw new EMPException("Failed to make registration request");
+        log(synchDate + "Не удалось зарегистрировать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + ", либо клиент уже зарегистрирован в ЕМП");
+        //throw new EMPException("Failed to make registration request");
+        return true;
     }
 
     protected AddEntriesRequest buildAddEntryParams(ru.axetta.ecafe.processor.core.persistence.Client client) {
