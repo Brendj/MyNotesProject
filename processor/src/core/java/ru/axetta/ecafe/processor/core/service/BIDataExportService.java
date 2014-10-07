@@ -185,7 +185,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("plannedimpl",
                 "select vawe, period, region, toimplement "
-                + "from cf_system_planned_implementation order by vawe, period, region",
+                + "from cf_system_implementation_forecast order by vawe, period, region",
                 new String[]{"vawe", "period", "region", "toimplement"}));
 
 
