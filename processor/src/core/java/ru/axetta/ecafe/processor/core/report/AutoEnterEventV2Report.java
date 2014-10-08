@@ -59,6 +59,8 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgName", org.getOfficialName());
+            parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
+            parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
             calendar.setTime(endTime);
             calendar.set(Calendar.HOUR_OF_DAY, 23);
