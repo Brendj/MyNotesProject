@@ -95,10 +95,10 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                             + "    LEFT JOIN cf_clients cs ON ee.idoforg = cs.idoforg AND ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
                             + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND ee.idoforg = cg.idoforg "
-                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg " + "     WHERE ee.idoforg IN ("
-                            + friendlyOrgsIds + ") " + "     AND ee.evtdatetime BETWEEN " + startTime.getTime()
+                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
+                            + friendlyOrgsIds + ")  AND ee.evtdatetime BETWEEN " + startTime.getTime()
                             + " AND " + endTime.getTime() + "     AND ee.idofclient IS NOT null "
-                            + "     AND cs.idofclientgroup BETWEEN 1000000000 AND 1100000000 "
+                            + "     AND cs.idofclientgroup != 1100000060 "
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
 
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
@@ -135,15 +135,13 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
             for(StClass stClass : stClassList){
                 for (Data data : stClass.getDataList()){
-                    updateInsideTime(data);
+                    //updateInsideTime(data);
                     updateInsideSummaryTime(data);
                 }
             }
-
             Collections.sort(stClassList);
             return new JRBeanCollectionDataSource(stClassList);
         }
-
     }
 
 
@@ -225,10 +223,15 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         List<String> dateList = new LinkedList<String>();
         dateList.add(CalendarUtils.dateShortToString(begin));
         Calendar beginC = Calendar.getInstance();
+        beginC.setTime(begin);
         Calendar endC = Calendar.getInstance();
-        while ( (beginC.get(Calendar.DAY_OF_MONTH) != endC.get(Calendar.DAY_OF_MONTH)) && (beginC.get(Calendar.YEAR) != endC.get(Calendar.YEAR))) {
-            begin = CalendarUtils.addDays(begin, 1);
-            dateList.add(CalendarUtils.dateShortToString(begin));
+        endC.setTime(end);
+        while ( beginC.compareTo(endC) == -1) {
+            beginC.add(Calendar.DAY_OF_MONTH, 1);
+            dateList.add(CalendarUtils.dateShortToString(beginC.getTime()));
+        }
+        if(dateList.size() > 1){
+            dateList.remove(dateList.size()-1);
         }
 
         for (String date : dateList) {

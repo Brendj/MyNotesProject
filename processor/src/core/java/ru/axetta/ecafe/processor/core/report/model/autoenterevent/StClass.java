@@ -40,13 +40,10 @@ public class StClass implements Comparable<StClass> {
         Integer numO = Integer.valueOf(numOString);
         String sThis = getName().replaceAll("[^\\D]", "").toUpperCase();
         String sO = o.getName().replaceAll("[^\\D]", "").toUpperCase();
-        if (numThis.compareTo(numO) == -1) {
-            return -1;
-        }else if(numThis.compareTo(numO) == 1){
-            return 1;
+        if ( numThis.compareTo(numO) != 0) {
+            return numThis.compareTo(numO);
         }
-
-        return Character.getNumericValue(sThis.charAt(0)) > Character.getNumericValue(sO.charAt(0)) ? -1 : 1;
+        return Character.getNumericValue(sThis.charAt(0)) > Character.getNumericValue(sO.charAt(0)) ? 1 : -1;
     }
 
     public String getName() {
