@@ -87,47 +87,47 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             dataList.add( new Data("3В",days));
 
             dataList.get(0).setReserve(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan1", 1, "ddd", 1));
-                add(new Row(1L, "Ivan2", 3, "ddd", 1));
-                add(new Row(1L, "Ivan2", 4, "ddd", 1));
+                add(new Row(1L, "Ivan1", 1, "10:45 - 15:56", 1));
+                add(new Row(1L, "Ivan2", 3, "10:45 - 15:56", 1));
+                add(new Row(1L, "Ivan2", 4, "10:45 - 15:56", 1));
             }});
             dataList.get(0).setPlan(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan41", 1, "ddd", 1));
-                add(new Row(1L, "Ivan52", 2, "ddd", 1));
+                add(new Row(1L, "Ivan41", 1, "10:45 - 15:56", 1));
+                add(new Row(1L, "Ivan52", 2, "10:45 - 15:56", 1));
             }});
             dataList.get(0).setTotal(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan6", 1, "ddd", 1));
-                add(new Row(1L, "Ivan7", 2, "ddd", 1));
+                add(new Row(1L, "Ivan6", 1, "10:45 - 15:56", 1));
+                add(new Row(1L, "Ivan7", 2, "10:45 - 15:56", 1));
             }});
 
 
 
             dataList.get(1).setReserve(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 3,"ddd",1));
-                add(new Row(1L,"Ivan", 4,"ddd",1));
+                add(new Row(1L,"Ivan", 1,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 3,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 4,"10:45 - 15:56",1));
             }});
             dataList.get(1).setPlan(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 2,"ddd",1));
+                add(new Row(1L,"Ivan", 1,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 2,"10:45 - 15:56",1));
             }});
             dataList.get(1).setTotal(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 2,"ddd",1));
+                add(new Row(1L,"Ivan", 1," - 15:56",1));
+                add(new Row(1L,"Ivan", 2,"10:45 - 15:56",1));
             }});
 
             dataList.get(2).setReserve(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 3,"ddd",1));
-                add(new Row(1L,"Ivan", 4,"ddd",1));
+                add(new Row(1L,"Ivan", 1,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 3,"10:45 - ",1));
+                add(new Row(1L,"Ivan", 4,"10:45 - 15:56",1));
             }});
             dataList.get(2).setPlan(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 2,"ddd",1));
+                add(new Row(1L,"Ivan", 1,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 2,"X",1));
             }});
             dataList.get(2).setTotal(new LinkedList<Row>(){{
-                add(new Row(1L,"Ivan", 1,"ddd",1));
-                add(new Row(1L,"Ivan", 2,"ddd",1));
+                add(new Row(1L,"Ivan", 1,"10:45 - 15:56",1));
+                add(new Row(1L,"Ivan", 2,"H",1));
             }});
 
             return dataList;
