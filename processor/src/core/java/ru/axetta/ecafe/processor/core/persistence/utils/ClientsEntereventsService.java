@@ -1,14 +1,15 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,19 +66,19 @@ public class ClientsEntereventsService {
             List<Long> idsOfClients = query.list();
             return idsOfClients;
         }
-        return new ArrayList<>();
+        return new ArrayList<Long>();
     }
 
     public static List<Long> getClientsOrders(Session session, List<Long> idOfClients, Long idOfOrg, Date startDate,
             Date endDate) throws Exception {
         org.hibernate.Query query = session.createSQLQuery("");
-        List<Long> arr = new ArrayList<>();
+        List<Long> arr = new ArrayList<Long>();
         return arr;
     }
 
     // Выбор правил по льготам
     public static List<DiscountRule> getDiscountRulesByClientBenefits(Session session, List<Long> clientBenefits) {
-        List<DiscountRule> discountRulesResult = new ArrayList<>();
+        List<DiscountRule> discountRulesResult = new ArrayList<DiscountRule>();
 
         Criteria discountRulesCriteria = session.createCriteria(DiscountRule.class);
         List<DiscountRule> discountRules = discountRulesCriteria.list();
@@ -85,7 +86,7 @@ public class ClientsEntereventsService {
         for (DiscountRule discount : discountRules) {
             String[] categoryDiscounts = discount.getCategoryDiscounts().split(",");
             if (categoryDiscounts.length > 0) {
-                List<Long> categoryDiscountsList = new ArrayList<>();
+                List<Long> categoryDiscountsList = new ArrayList<Long>();
 
                 for (Object idsCategoryDiscounts : categoryDiscounts) {
                     categoryDiscountsList.add(Long.parseLong(StringUtils.trim((String) idsCategoryDiscounts)));
@@ -102,7 +103,7 @@ public class ClientsEntereventsService {
     // Получает все льготы клиента
     public static List<Long> getClientBenefits(Session session, Long idOfClient) {
         Client client = (Client) session.load(Client.class, idOfClient);
-        List<Long> clientAllBenefits = new ArrayList<>();
+        List<Long> clientAllBenefits = new ArrayList<Long>();
 
         //Ручная загрузка
         String categoriesDiscounts = client.getCategoriesDiscounts();
@@ -175,7 +176,7 @@ public class ClientsEntereventsService {
 
         List<Long> ids = queryDiscount.list();
 
-        List<Long> clientBenefitsNot = new ArrayList<>();
+        List<Long> clientBenefitsNot = new ArrayList<Long>();
 
         for (Object obj : ids) {
             BigInteger idForLong = (BigInteger) obj;
@@ -189,7 +190,7 @@ public class ClientsEntereventsService {
     public static List<DiscountRule> getDiscountRulesByOrg(Session session, Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
         Set<CategoryOrg> categoryOrgSet = org.getCategories();
-        List<DiscountRule> discountRules = new ArrayList<>();
+        List<DiscountRule> discountRules = new ArrayList<DiscountRule>();
         if (!categoryOrgSet.isEmpty()) {
             Object[] arrayCategory = categoryOrgSet.toArray();
             for (Object obj : arrayCategory) {
@@ -234,7 +235,7 @@ public class ClientsEntereventsService {
                 .createSQLQuery("SELECT idofcategorydiscount FROM cf_categorydiscounts cd WHERE categoryType = 1");
         List<BigInteger> result = queryDiscount.list();
 
-        List<Long> idOfCategoryDiscounts = new ArrayList<>();
+        List<Long> idOfCategoryDiscounts = new ArrayList<Long>();
         for (Object ids : result) {
             BigInteger idses = (BigInteger) ids;
             idOfCategoryDiscounts.add(idses.longValue());

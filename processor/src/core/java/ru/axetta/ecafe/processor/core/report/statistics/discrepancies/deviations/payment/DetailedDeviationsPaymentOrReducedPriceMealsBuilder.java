@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,14 +47,14 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         String idOfOrgs = StringUtils
                 .trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
 
-        List<Long> idOfOrgList = new ArrayList<>();
+        List<Long> idOfOrgList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
         Date generateBeginTime = new Date();
 
         /* Параметры для передачи в jasper */
-        Map<String, Object> parameterMap = new HashMap<>();
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
@@ -103,7 +102,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     // Должен был получить бесплатное питание
     private List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
-        List<PlanOrderItem> allItems = new ArrayList<>();
+        List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
         List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, payedDate, orgId);
         // правила для организации
@@ -126,7 +125,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         String complexMap = rule.getComplexesMap();
 
-        List<Integer> allComplexesId = new ArrayList<>();
+        List<Integer> allComplexesId = new ArrayList<Integer>();
 
         if ((complexMap != null) ||(complexMap != "")) {
            String[] complexes = complexMap.split(";");
@@ -150,7 +149,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     // Получает все льготы клиента
     public List<Long> getClientBenefits(String categoriesDiscounts, String groupName) {
-        List<Long> clientAllBenefits = new ArrayList<>();
+        List<Long> clientAllBenefits = new ArrayList<Long>();
         //Ручная загрузка
         if (categoriesDiscounts.equals("") || categoriesDiscounts.equals(null)) {
         } else {
@@ -210,11 +209,11 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     // Выбор правил по льготам
     public static List<DiscountRule> getClientsRules(List<DiscountRule> discountRules, List<Long> clientBenefits) {
-        List<DiscountRule> discountRulesResult = new ArrayList<>();
+        List<DiscountRule> discountRulesResult = new ArrayList<DiscountRule>();
         for (DiscountRule discount : discountRules) {
             String[] categoryDiscounts = discount.getCategoryDiscounts().split(",");
             if (categoryDiscounts.length > 0) {
-                List<Long> categoryDiscountsList = new ArrayList<>();
+                List<Long> categoryDiscountsList = new ArrayList<Long>();
 
                 for (Object idsCategoryDiscounts : categoryDiscounts) {
                     categoryDiscountsList.add(Long.parseLong(StringUtils.trim((String) idsCategoryDiscounts)));
