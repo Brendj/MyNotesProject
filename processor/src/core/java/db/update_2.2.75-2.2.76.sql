@@ -29,3 +29,4 @@ UPDATE cf_sources SET sendall = '0';
 DELETE FROM cf_do_confirms WHERE distributedobjectclassname = 'TypeOfAccompanyingDocument';
 UPDATE cf_typesofaccompanyingdocuments SET sendall = '0';
 
+--! ФИНАЛИЗИРОВАН (Сунгатов, 141009) НЕ МЕНЯТЬ
