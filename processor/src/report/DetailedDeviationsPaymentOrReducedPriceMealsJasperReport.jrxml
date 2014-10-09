@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" language="groovy" pageWidth="1024" pageHeight="842" columnWidth="984" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="eb37c071-d9f1-4429-a81e-20db41200729">
+	<property name="ireport.zoom" value="1.0000000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="startTime" class="java.util.Date"/>
+	<parameter name="endTime" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[select shortname as orgname, address
+from cf_orgs cfo
+group by cfo.idoforg
+order by cfo.idoforg]]>
+	</queryString>
+	<field name="orgname" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<title>
+		<band height="63" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a0bd23e1-3354-45e8-be81-7633d43ddff9" x="0" y="15" width="884" height="48"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Сводный отчет отклонений оплаты льготного питания за указанный период  "
++ new SimpleDateFormat("dd.MM.yyyy").format($P{startTime})  + " - " + new SimpleDateFormat("dd.MM.yyyy").format($P{endTime})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="298bcc36-defa-4efa-9a60-d9841337cbb5" x="0" y="0" width="20" height="20"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[№]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bfc1155d-d269-4556-bc58-843ccacb8949" x="20" y="0" width="135" height="20"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Организация]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8ca4da3f-f072-492c-bfc2-75681134f9f6" x="155" y="0" width="300" height="20"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Адресс]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2861a772-cb53-4560-8602-2e83bae3be3d" x="455" y="0" width="429" height="20"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ФИО учащегося]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="42" splitType="Stretch">
+			<textField>
+				<reportElement uuid="d468250d-7bd3-4c19-80ab-a1f2ae67267c" x="0" y="0" width="20" height="42"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="911224a2-212d-4aeb-b170-87082eb9365f" x="20" y="0" width="135" height="42"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{orgname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c8348aca-5759-4cf8-b953-c436fc2f4ccb" x="155" y="0" width="300" height="42"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

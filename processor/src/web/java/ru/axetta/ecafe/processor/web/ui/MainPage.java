@@ -335,6 +335,8 @@ public class MainPage implements Serializable {
     private final DetailedGoodRequestReportPage detailedGoodRequestReportPage = new DetailedGoodRequestReportPage();
     private final DiscrepanciesDataOnOrdersAndPaymentReportPage discrepanciesDataOnOrdersAndPaymentReportPage
             = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
+    private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
+            = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5331,6 +5333,10 @@ public class MainPage implements Serializable {
         return discrepanciesDataOnOrdersAndPaymentReportPage;
     }
 
+    public DetailedDeviationsPaymentOrReducedPriceMealsReportPage getDetailedDeviationsPaymentOrReducedPriceMealsReportPage() {
+        return detailedDeviationsPaymentOrReducedPriceMealsReportPage;
+    }
+
     public Object showGoodRequestNewReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5493,6 +5499,21 @@ public class MainPage implements Serializable {
         try {
             discrepanciesDataOnOrdersAndPaymentReportPage.fill();
             currentWorkspacePage = discrepanciesDataOnOrdersAndPaymentReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showDetailedDeviationsPaymentOrReducedPriceMealsReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            detailedDeviationsPaymentOrReducedPriceMealsReportPage.fill();
+            currentWorkspacePage = detailedDeviationsPaymentOrReducedPriceMealsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,

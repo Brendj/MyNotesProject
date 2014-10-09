@@ -936,6 +936,13 @@
                             label="Статистика по актам расхождений"
                             action="#{mainPage.showDiscrepanciesDataOnOrdersAndPaymentReportPage}"
                             reRender="workspaceForm" />
+
+        <%--@elvariable id="detailedDeviationsPaymentOrReducedPriceMealsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DetailedDeviationsPaymentOrReducedPriceMealsReportPage"--%>
+        <rich:panelMenuItem id="detailedDeviationsPaymentOrReducedPriceMealsReportMenuItem"
+                            binding="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.mainMenuComponent}"
+                            label="Детализированный отчет отклонений оплаты льготного питания"
+                            action="#{mainPage.showDetailedDeviationsPaymentOrReducedPriceMealsReportPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
