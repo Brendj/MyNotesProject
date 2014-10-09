@@ -130,6 +130,14 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         if ((complexMap != null) ||(complexMap != "")) {
            String[] complexes = complexMap.split(";");
+            for (Object complex: complexes) {
+                String complexItem = (String) complex;
+
+                String [] complexItemSplited = complexItem.split("=");
+                if (Integer.parseInt(complexItemSplited[1]) > 0) {
+                    allComplexesId.add(Integer.parseInt(complexItemSplited[0]));
+                }
+            }
         }
 
         for (Integer complexId : allComplexesId) {
