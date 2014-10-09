@@ -60,14 +60,6 @@ public class BBKDetails extends LibraryDistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
 
-        // Проверка на наличие в базе объекта BBK с указанным guidBBK и инициация исключения если его нет
-        BBK bbkLocal = DAOUtils.findDistributedObjectByRefGUID(BBK.class, session, guidBBK);
-        if (null == bbkLocal) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE BBK");
-        } else {
-            setBbk(bbkLocal);
-        }
-
         // Проверка на наличие в базе объекта BBKDetails с указанным guidParentBBKDetails
         // и установка значения parentBBKDetails
         BBKDetails parentBBKDetails = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, guidParentBBKDetails);
@@ -95,6 +87,14 @@ public class BBKDetails extends LibraryDistributedObject {
             distributedObjectException.setData(bbkDetails.getGuid());
             throw  distributedObjectException;
         }
+
+        // Проверка на наличие в базе объекта BBK с указанным guidBBK и инициация исключения если его нет
+        BBK bbkLocal = DAOUtils.findDistributedObjectByRefGUID(BBK.class, session, guidBBK);
+        if (null == bbkLocal) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE BBK");
+        } else {
+            setBbk(bbkLocal);
+        }
     }
 
     @Override
@@ -109,12 +109,12 @@ public class BBKDetails extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setCode(((BBKDetails) distributedObject).getCode());
+        setName(((BBKDetails) distributedObject).getName());
         setBbk(((BBKDetails) distributedObject).getBbk());
         setGuidBBK(((BBKDetails) distributedObject).getGuidBBK());
         setParentBBKDetails(((BBKDetails) distributedObject).getParentBBKDetails());
         setGuidParentBBKDetails(((BBKDetails) distributedObject).getGuidParentBBKDetails());
-        setCode(((BBKDetails) distributedObject).getCode());
-        setName(((BBKDetails) distributedObject).getName());
     }
 
 

@@ -43,7 +43,7 @@
         <property name="hash" column="Hash" type="integer" not-null="false"/>
         <property name="idOfLang" column="IdOfLang" type="long" not-null="false"/>
 
-        <many-to-one name="bbkDetails" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="true" column="idOfBBKDetails"/>
+        <many-to-one name="bbkDetail" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.BBKDetails" not-null="true" column="idofbbkdetails"/>
 
         <set name="journalInternal" lazy="true" inverse="true">
             <key>

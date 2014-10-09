@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -42,25 +43,25 @@ public class Publication extends LibraryDistributedObject {
     private static final int PUBLISHER = 3;
     private static final int PUBLICATION_DATE = 4;
 
-    private String isbn;
-    private byte[] data;
-    private String author;
-    private String title;
-    private String publisher;
-    private Integer hash;
-    private String title2;
-    private String publicationdate;
-    private Boolean validISBN;
+     private String isbn;
+     private byte[] data;
+     private String author;
+     private String title;
+     private String publisher;
+     private Integer hash;
+     private String title2;
+     private String publicationdate;
+     private Boolean validISBN;
     private Set<Journal> journalInternal;
     private Set<Instance> instanceInternal;
 
-    private BBKDetails bbkDetails;
+    private BBKDetails bbkDetail;
     private String guidBBKDetail;
     private Long idOfLang;
 
     @Override
     public void createProjections(Criteria criteria) {
-        criteria.createAlias("bbkDetails", "de", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("bbkDetail", "de", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
@@ -84,6 +85,8 @@ public class Publication extends LibraryDistributedObject {
     protected void appendAttributes(Element element) {
         String decodedString = Base64AndZip.enCode(data);
         XMLUtils.setAttributeIfNotNull(element, "Data", decodedString);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfLang", getIdOfLang());
+        XMLUtils.setAttributeIfNotNull(element, "GuidBBKDetail", getGuidBBKDetail());
     }
 
     @Override
@@ -116,6 +119,10 @@ public class Publication extends LibraryDistributedObject {
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
+        }
+        BBKDetails bbkDetailsLocal = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, getGuidBBKDetail());
+        if (null != bbkDetailsLocal) {
+            setBbkDetail(bbkDetailsLocal);
         }
     }
 
@@ -161,8 +168,8 @@ public class Publication extends LibraryDistributedObject {
         if (stringPublisher != null) {
             setPublisher(stringPublisher);
         }
-        guidBBKDetail = XMLUtils.getStringAttributeValue(node, "GuidBBKDetail", 36);
-        idOfLang = XMLUtils.getLongAttributeValue(node, "IdOfLang");
+        setGuidBBKDetail(XMLUtils.getStringAttributeValue(node, "GuidBBKDetail", 36));
+        setIdOfLang(XMLUtils.getLongAttributeValue(node, "IdOfLang"));
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
@@ -179,7 +186,8 @@ public class Publication extends LibraryDistributedObject {
         setPublisher(((Publication) distributedObject).getPublisher());
         setHash(((Publication) distributedObject).getHash());
         setValidISBN(((Publication) distributedObject).getValidISBN());
-        setBbkDetails(((Publication) distributedObject).getBbkDetails());
+        setBbkDetail(((Publication) distributedObject).getBbkDetail());
+        setGuidBBKDetail(((Publication) distributedObject).getGuidBBKDetail());
         setIdOfLang(((Publication) distributedObject).getIdOfLang());
     }
 
@@ -271,12 +279,12 @@ public class Publication extends LibraryDistributedObject {
         this.hash = hash;
     }
 
-    public BBKDetails getBbkDetails() {
-        return bbkDetails;
+    public BBKDetails getBbkDetail() {
+        return bbkDetail;
     }
 
-    public void setBbkDetails(BBKDetails bbkDetails) {
-        this.bbkDetails = bbkDetails;
+    public void setBbkDetail(BBKDetails bbkDetails) {
+        this.bbkDetail = bbkDetails;
     }
 
     public String getGuidBBKDetail() {
