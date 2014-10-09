@@ -279,7 +279,7 @@ public class NSIDeltaProcessor {
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, solveField(item.getFamilyName(), cl != null ? cl.getPerson().getSurname() : ""));
         fieldConfig.setValue(ClientManager.FieldId.NAME, solveField(item.getFirstName(), cl != null ? cl.getPerson().getFirstName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, solveField(item.getSecondName(), cl != null ? cl.getPerson().getSecondName() : ""));
-        fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null ? cl.getClientGroup().getGroupName() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null && cl.getClientGroup() != null ? cl.getClientGroup().getGroupName() : ""));
         return fieldConfig;
     }
 
