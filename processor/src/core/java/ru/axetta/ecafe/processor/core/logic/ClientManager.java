@@ -331,6 +331,11 @@ public class ClientManager {
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
+                //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
+                if(client != null && StringUtils.isBlank(client.getMobile()) &&
+                   !client.getMobile().equals(mobilePhone)) {
+                    client.setSsoid("");
+                }
                 client.setMobile(mobilePhone);
             }
             String fax = fieldConfig.getValue(FieldId.FAX);

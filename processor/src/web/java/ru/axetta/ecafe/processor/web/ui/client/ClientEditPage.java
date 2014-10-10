@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -667,6 +668,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFlags(this.flags);
         client.setAddress(this.address);
         client.setPhone(this.phone);
+        //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
+        if(client != null && StringUtils.isBlank(client.getMobile()) &&
+           !client.getMobile().equals(mobile)) {
+            client.setSsoid("");
+        }
         client.setMobile(mobile);
         client.setFax(this.fax);
         client.setEmail(this.email);
