@@ -108,6 +108,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
                 categories.removeAll(onlyPaydAbleCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
                     addPlanOrderItems(allItems, clientInfo.clientId, rule, payedDate);
                 }
