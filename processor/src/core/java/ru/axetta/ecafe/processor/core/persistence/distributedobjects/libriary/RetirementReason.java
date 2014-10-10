@@ -49,6 +49,7 @@ public class RetirementReason extends LibraryDistributedObject {
         Criteria criteria = session.createCriteria(RetirementReason.class);
         criteria.add(Restrictions.eq("hashCode",getHashCode()));
         RetirementReason retirementReason = (RetirementReason) criteria.uniqueResult();
+        session.clear();
         if(!(retirementReason==null || retirementReason.getDeletedState() || guid.equals(retirementReason.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("RetirementReason DATA_EXIST_VALUE");
             distributedObjectException.setData(retirementReason.getGuid());

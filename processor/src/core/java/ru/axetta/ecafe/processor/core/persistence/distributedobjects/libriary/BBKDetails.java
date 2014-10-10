@@ -81,6 +81,7 @@ public class BBKDetails extends LibraryDistributedObject {
         if (bbkDetailsList != null && !bbkDetailsList.isEmpty()) {
             bbkDetails = (BBKDetails) bbkDetailsList.get(0);
         }
+         session.clear();
 
         if(!(bbkDetails==null || bbkDetails.getDeletedState() || guid.equals(bbkDetails.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("BBKDetail DATA_EXIST_VALUE Code and BBK equals");

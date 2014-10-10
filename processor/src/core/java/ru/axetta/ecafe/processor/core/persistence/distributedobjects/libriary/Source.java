@@ -49,6 +49,7 @@ public class Source extends LibraryDistributedObject {
         Criteria criteria = session.createCriteria(Source.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
         Source source = (Source) criteria.uniqueResult();
+        session.clear();
         if(!(source==null || source.getDeletedState() || guid.equals(source.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Source DATA_EXIST_VALUE");
             distributedObjectException.setData(source.getGuid());

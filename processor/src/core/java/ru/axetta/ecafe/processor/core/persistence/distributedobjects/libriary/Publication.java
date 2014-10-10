@@ -66,18 +66,18 @@ public class Publication extends LibraryDistributedObject {
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        projectionList.add(Projections.property("data"), "data");
         projectionList.add(Projections.property("isbn"), "isbn");
-        projectionList.add(Projections.property("validISBN"), "validISBN");
+        projectionList.add(Projections.property("data"), "data");
         projectionList.add(Projections.property("author"), "author");
         projectionList.add(Projections.property("title"), "title");
-        projectionList.add(Projections.property("title2"), "title2");
-        projectionList.add(Projections.property("publicationdate"), "publicationdate");
         projectionList.add(Projections.property("publisher"), "publisher");
         projectionList.add(Projections.property("hash"), "hash");
-        projectionList.add(Projections.property("idOfLang"), "idOfLang");
+        projectionList.add(Projections.property("title2"), "title2");
+        projectionList.add(Projections.property("publicationdate"), "publicationdate");
+        projectionList.add(Projections.property("validISBN"), "validISBN");
 
         projectionList.add(Projections.property("de.guid"), "guidBBKDetail");
+        projectionList.add(Projections.property("idOfLang"), "idOfLang");
         criteria.setProjection(projectionList);
     }
 
@@ -105,8 +105,7 @@ public class Publication extends LibraryDistributedObject {
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
-                String exceptionData = publication.getGuid();
-                distributedObjectException.setData(exceptionData);
+                distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
         } else {
@@ -120,9 +119,9 @@ public class Publication extends LibraryDistributedObject {
                 throw  distributedObjectException;
             }
         }
-        BBKDetails bbkDetailsLocal = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, getGuidBBKDetail());
-        if (null != bbkDetailsLocal) {
-            setBbkDetail(bbkDetailsLocal);
+        BBKDetails bbkDetailLocal = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, getGuidBBKDetail());
+        if (null != bbkDetailLocal) {
+            setBbkDetail(bbkDetailLocal);
         }
     }
 

@@ -51,6 +51,7 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
         Criteria criteria = session.createCriteria(TypeOfAccompanyingDocument.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
         TypeOfAccompanyingDocument typeOfAccompanyingDocument = (TypeOfAccompanyingDocument) criteria.uniqueResult();
+        session.clear();
         if(!(typeOfAccompanyingDocument==null || typeOfAccompanyingDocument.getDeletedState() || guid.equals(typeOfAccompanyingDocument.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("TypeOfAccompanyingDocument DATA_EXIST_VALUE");
             distributedObjectException.setData(typeOfAccompanyingDocument.getGuid());

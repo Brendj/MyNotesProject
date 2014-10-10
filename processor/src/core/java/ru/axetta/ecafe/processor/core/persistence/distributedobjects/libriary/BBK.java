@@ -52,6 +52,7 @@ public class BBK extends LibraryDistributedObject {
         if(bbkList != null && !bbkList.isEmpty()){
             bbk = (BBK) bbkList.get(0);
         }
+        session.clear();
         if(!(bbk==null || bbk.getDeletedState() || guid.equals(bbk.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("BBK DATA_EXIST_VALUE Name equals");
             distributedObjectException.setData(bbk.getGuid());
@@ -61,8 +62,8 @@ public class BBK extends LibraryDistributedObject {
 
     @Override
     public BBK parseAttributes(Node node) throws Exception {
-        name = XMLUtils.getStringAttributeValue(node, "Name", NAME_LENGTH);
-        note = XMLUtils.getStringAttributeValue(node, "Note", NOTE_LENGTH);
+        setName(XMLUtils.getStringAttributeValue(node, "Name", NAME_LENGTH));
+        setNote(XMLUtils.getStringAttributeValue(node, "Note", NOTE_LENGTH));
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
