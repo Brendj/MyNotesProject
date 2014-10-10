@@ -92,12 +92,31 @@ public class BIDataExportService {
         //  Оффициальные данные ОУ (Orgs_official)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs_official",
-                "select o.idoforg, o.guid, o2.officialname "
+                /*"select o.idoforg, o.guid, o2.officialname "
                 + "from cf_orgs o "
                 + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                 + "join cf_orgs o2 on o2.idoforg=f.currentorg "
+                + "where o.shortname<>'' and o2.officialname<>'' and o.state<>0 " //and o2.mainbuilding>0
+                + "order by o2.officialname",*/
+                "select o.idoforg, o.guid, o2.officialname "
+                + "from cf_orgs o "
+                + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
+                + "join cf_orgs o2 on o2.idoforg=f.currentorg and o2.mainbuilding>0 "
                 + "where o.shortname<>'' and o2.officialname<>'' and o.state<>0 "
-                + "order by o2.officialname",
+                + "union "
+                + "select o.idoforg, o.guid, o.officialname "
+                + "from cf_orgs o "
+                + "left join cf_friendly_organization f on o.idoforg=f.friendlyorg and f.currentorg=f.friendlyorg "
+                + "left join cf_orgs o2 on o2.idoforg=f.currentorg and o2.mainbuilding>0 "
+                + "where o.shortname<>'' "
+                + "      and o2.officialname is null "
+                + "      and o.state<>0 "
+                + "      and o.idoforg not in (select o.idoforg "
+                + "                            from cf_orgs o "
+                + "                            join cf_friendly_organization f on o.idoforg=f.friendlyorg "
+                + "                            join cf_orgs o2 on o2.idoforg=f.currentorg and o2.mainbuilding>0 "
+                + "                            where o.shortname<>'' and o2.officialname<>'' and o.state<>0) "
+                + "order by 1, 3",
                 new String[]{"idoforg", "guid", "officialname"}));
 
         //  ------------------------------------------
