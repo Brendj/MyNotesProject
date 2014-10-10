@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,8 +112,8 @@ public class ClientsEntereventsService {
         } else {
             String[] cD = categoriesDiscounts.split(",");
             if (cD.length > 0) {
-                for (Object idsCd : cD) {
-                    clientAllBenefits.add(Long.parseLong(StringUtils.trim((String) idsCd)));
+                for (String idsCd : cD) {
+                    clientAllBenefits.add(Long.parseLong(StringUtils.trim(idsCd)));
                 }
             }
         }
@@ -210,24 +209,33 @@ public class ClientsEntereventsService {
 
 
     public static List<ClientInfo> loadClientsInfoToPay(Session session, Date payedDate, Long orgId) {
+        //Date payedDateAddOneDay = CalendarUtils.addOneDay(payedDate);
 
-        Date payedDateAddOneDay = CalendarUtils.addOneDay(payedDate);
+        List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
 
         org.hibernate.Query clientInfoQuery = session.createSQLQuery(
-                "SELECT DISTINCT cl.idOfClient, cl.categoriesDiscounts, gr.idofclientgroup, gr.groupName "
-                        + "FROM cf_clients cl LEFT JOIN cf_enterevents ce "
-                        + "ON cl.idOfClient = ce.idOfClient "
-                        + "LEFT JOIN cf_cards ON cr.IdOfClient = cl.IdOfClient "
+                "SELECT DISTINCT cl.idOfClient, gr.idofclientgroup,  gr.groupName, cl.categoriesDiscounts  "
+                        + "FROM cf_clients cl LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient "
+                        + "LEFT JOIN cf_cards cr ON cr.IdOfClient = cl.IdOfClient "
                         + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.IdOfClientGroup "
-                        + "WHERE cr.State = 0 AND gr.idOfClientGroup > 1100000000 "
-                        + "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
-                        + "AND gr.idOfOrg = cl.idOfOrg and cl.idOfOrg = :orgId "
+                        + "WHERE cr.State = 0 AND gr.idOfClientGroup < 1100000000 "
+                        //+ "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
+                        + "AND gr.idOfOrg = cl.idOfOrg AND cl.idOfOrg = :orgId "
                         + "GROUP BY cl.idOfClient, gr.idofClientGroup, gr.groupName");
-        clientInfoQuery.setParameter("payedDate", payedDate.getTime());
-        clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
+        //clientInfoQuery.setParameter("payedDate", payedDate.getTime());
+        //clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
         clientInfoQuery.setParameter("orgId", orgId);
 
-        List<ClientInfo> clientInfoList = clientInfoQuery.list();
+        List<Object> result = clientInfoQuery.list();
+
+        for (Object resultClient : result) {
+            Object[] resultClientItem = (Object[]) resultClient;
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
+                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
+                    (String) resultClientItem[3]);
+            clientInfoList.add(clientInfo);
+        }
+
         return clientInfoList;
     }
 
@@ -255,14 +263,15 @@ public class ClientsEntereventsService {
 
     //Получает все категории платные для исключения из плана
     public static List<Long> loadAllPaydAbleCategories(Session session) {
+        List<Long> idOfCategoryDiscounts = new ArrayList<Long>();
+
         org.hibernate.Query queryDiscount = session
                 .createSQLQuery("SELECT idofcategorydiscount FROM cf_categorydiscounts cd WHERE categoryType = 1");
+
         List<BigInteger> result = queryDiscount.list();
 
-        List<Long> idOfCategoryDiscounts = new ArrayList<Long>();
-        for (Object ids : result) {
-            BigInteger idses = (BigInteger) ids;
-            idOfCategoryDiscounts.add(idses.longValue());
+        for (BigInteger idDiscount : result) {
+            idOfCategoryDiscounts.add(idDiscount.longValue());
         }
 
         return idOfCategoryDiscounts;

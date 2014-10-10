@@ -44,8 +44,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         if (StringUtils.isEmpty(this.templateFilename)) {
             throw new Exception("Не найден файл шаблона.");
         }
-        String idOfOrgs = StringUtils
-                .trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
+        String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
 
         List<Long> idOfOrgList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
@@ -69,27 +68,21 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
     @SuppressWarnings("unchecked")
     private JRDataSource buildDataSource(Session session, List<Long> idOfOrgList, Date startTime, Date endTime)
             throws Exception {
-/*        List<DeviationPaymentItem> deviationPaymentItems = new ArrayList<>();
 
-        List<Long> idOfCLients = ClientsEntereventsService.getClientsInsideBuilding(session, 10L, startTime, endTime);
+        List<DeviationPaymentItem> deviationPaymentItemList = new ArrayList<DeviationPaymentItem>();
 
-        List<Long> idOfClientsOutside = ClientsEntereventsService
-                .getClientsOutsideBuilding(session, 10L, startTime, endTime);
+        List<PlanOrderItem> planOrderItemsToPay = new ArrayList<PlanOrderItem>();
 
-        List<DiscountRule> discountRules = ClientsEntereventsService.getDiscountRulesByOrg(session, 10L);
+        for (Long idOfOrg : idOfOrgList) {
+            planOrderItemsToPay = loadPlanOrderItemToPay(session, startTime, idOfOrg);
+        }
 
-*//*        for (Object obj : idOfCLients) {
 
-            BigInteger idofclient = (BigInteger) obj;
 
-            List<Long> longs = ClientsEntereventsService.getClientBenefits(session, idofclient.longValue());
 
-            List<DiscountRule> discount = ClientsEntereventsService.getDiscountRulesByClientBenefits(session, longs);
-        }*//*
+      //  DeviationPaymentItem deviationPaymentItems =
 
-        ClientsEntereventsService.loadAllPaydableCategories(session);*/
 
-        loadPlanOrderItemToPay(session, startTime, 8L);
 
         return null; //new JRBeanCollectionDataSource();
     }
@@ -105,21 +98,23 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
         List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, payedDate, orgId);
-        // правила для организации
-        List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
-        // платные категории
-        List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
+        if (!clientInfoList.isEmpty()) {
+            // правила для организации
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            // платные категории
+            List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
-        for (ClientInfo clientInfo : clientInfoList) {
-            List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
-            categories.removeAll(onlyPaydAbleCategories);
-            List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
-            rules = getRulesByHighPriority(rules);
-            for (DiscountRule rule : rules) {
-                addPlanOrderItems(allItems, clientInfo.clientId, rule, payedDate);
+            for (ClientInfo clientInfo : clientInfoList) {
+                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
+                categories.removeAll(onlyPaydAbleCategories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                for (DiscountRule rule : rules) {
+                    addPlanOrderItems(allItems, clientInfo.clientId, rule, payedDate);
+                }
             }
+            return allItems;
         }
-        return allItems;
+        return null;
     }
 
     private List<DiscountRule> getRulesByHighPriority(List<DiscountRule> rules) {
@@ -144,20 +139,19 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         List<Integer> allComplexesId = new ArrayList<Integer>();
 
-        if ((complexMap != null) ||(complexMap != "")) {
-           String[] complexes = complexMap.split(";");
-            for (Object complex: complexes) {
-                String complexItem = (String) complex;
-
-                String [] complexItemSplited = complexItem.split("=");
-                if (Integer.parseInt(complexItemSplited[1]) > 0) {
-                    allComplexesId.add(Integer.parseInt(complexItemSplited[0]));
+        if ((complexMap != null) || (complexMap != "")) {
+            String[] complexes = complexMap.split(";");
+            for (String complex : complexes) {
+                String[] complexItemSplit = complex.split("=");
+                if (Integer.parseInt(complexItemSplit[1]) > 0) {
+                    allComplexesId.add(Integer.parseInt(complexItemSplit[0]));
                 }
             }
         }
 
         for (Integer complexId : allComplexesId) {
             PlanOrderItem item = new PlanOrderItem(clientId, complexId, rule.getIdOfRule(), payedDate);
+            items.add(item);
             if (rule.getOperationOr()) {
                 return;
             }
@@ -179,9 +173,9 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
 
         //Автоматическая загрузка
-       Pattern patterNumber = Pattern.compile("\\d+");
-       String constant = "";
-       Matcher m = patterNumber.matcher(groupName);
+        Pattern patterNumber = Pattern.compile("\\d+");
+        String constant = "";
+        Matcher m = patterNumber.matcher(groupName);
         if (m.find()) {
             constant = m.group();
         }
@@ -220,7 +214,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             clientAllBenefits.add(-111L);
         }
 
-       return clientAllBenefits;
+        return clientAllBenefits;
     }
 
 
