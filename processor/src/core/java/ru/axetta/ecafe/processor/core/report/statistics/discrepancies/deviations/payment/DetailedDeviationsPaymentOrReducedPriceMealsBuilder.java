@@ -114,11 +114,28 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
             categories.removeAll(onlyPaydAbleCategories);
             List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+            rules = getRulesByHighPriority(rules);
             for (DiscountRule rule : rules) {
                 addPlanOrderItems(allItems, clientInfo.clientId, rule, payedDate);
             }
         }
         return allItems;
+    }
+
+    private List<DiscountRule> getRulesByHighPriority(List<DiscountRule> rules) {
+        List<DiscountRule> resList = new LinkedList<DiscountRule>();
+        int maxPriority = 0;
+        for(DiscountRule rule : rules){
+            if(rule.getPriority() > maxPriority){
+                maxPriority = rule.getPriority();
+                resList.clear();
+                resList.add(rule);
+            }else if( rule.getPriority() == maxPriority){
+                resList.add(rule);
+            }
+        }
+
+        return resList;
     }
 
     private void addPlanOrderItems(List<PlanOrderItem> items, Long clientId, DiscountRule rule, Date payedDate) {

@@ -20,7 +20,7 @@ public class PlanOrderItem  {
     public Long idOfRule;
     public Date orderDate;
 
-    PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate) {
+    public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate) {
         this.idOfClient = idOfClient;
         this.idOfComplex = idOfComplex;
         this.idOfRule = idOfRule;

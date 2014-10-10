@@ -5,10 +5,12 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,6 +231,28 @@ public class ClientsEntereventsService {
         return clientInfoList;
     }
 
+    public static List<ClientInfo> loadClientsInfoToPayShamil(Session session, Date payedDate, Long orgId) {
+
+        Date payedDateAddOneDay = CalendarUtils.addOneDay(payedDate);
+
+        org.hibernate.Query clientInfoQuery = session.createSQLQuery(
+                "SELECT  cl.idOfClient, cl.categoriesDiscounts, gr.idofclientgroup, gr.groupName, ce.evtdatetime "
+                        + "FROM cf_clients cl "
+                        + "LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient and ce.idoforg = cl.idoforg "
+                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.IdOfClientGroup "
+                        + "WHERE gr.idOfClientGroup < 1100000000 "
+                        + "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
+                        + "AND gr.idOfOrg = cl.idOfOrg and cl.idOfOrg = :orgId "
+                        + "AND ce.idofclient != null "
+                        + "GROUP BY cl.idOfClient, gr.idofClientGroup, gr.groupName,ce.evtdatetime");
+        clientInfoQuery.setParameter("payedDate", payedDate.getTime());
+        clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
+        clientInfoQuery.setParameter("orgId", orgId);
+
+        List<ClientInfo> clientInfoList = clientInfoQuery.list();
+        return clientInfoList;
+    }
+
     //Получает все категории платные для исключения из плана
     public static List<Long> loadAllPaydAbleCategories(Session session) {
         org.hibernate.Query queryDiscount = session
@@ -242,5 +266,22 @@ public class ClientsEntereventsService {
         }
 
         return idOfCategoryDiscounts;
+    }
+
+    public static final String orderType_Lgotniki = "6";//План льготного питания, резерв
+
+    //Вернет список клиентов которые были оплачены
+    // в зависимости от параметра
+    public static List<PlanOrderItem> loadPaidClientsInfo (Session session, String orderType, List<Long> idOfOrgList, Date startTime, Date endTime){
+        Query query = session.createSQLQuery("SELECT idofclient, idofrule, orderdate, (cfod.menutype -50) AS complexId, cfod.menudetailname "
+                + "FROM cf_orders cfo "
+                + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                + "WHERE cfo.ordertype IN (:orderType) "
+                + "AND cfo.idoforg in (:idOfOrgList) "
+                + "AND cfod.menutype > 50 AND cfod.menutype <100");
+        query.setParameter("orderType",orderType);
+        query.setParameterList("idOfOrgList", idOfOrgList);
+        List<PlanOrderItem> result = query.list();
+        return result;
     }
 }
