@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FeedingAndVisitReport" pageWidth="1842" pageHeight="595" orientation="Landscape" columnWidth="1802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6571417e-f6fc-44f1-8c7c-e336e63b1b6c">
 	<property name="ireport.zoom" value="1.5"/>
-	<property name="ireport.x" value="14"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="235"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -125,7 +125,7 @@
 		<field name="color" class="java.lang.Integer"/>
 	</subDataset>
 	<parameter name="orgName" class="java.lang.String"/>
-	<parameter name="days" class="java.util.List"/>
+	<parameter name="date" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -161,7 +161,10 @@
 				<text><![CDATA[Директор ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="262" y="75" width="171" height="20" uuid="9d854fe9-4229-45be-b396-fba6a9bcf306"/>
+				<reportElement x="262" y="65" width="243" height="30" uuid="9d854fe9-4229-45be-b396-fba6a9bcf306"/>
+				<textElement textAlignment="Right">
+					<font size="14" isBold="true"/>
+				</textElement>
 				<text><![CDATA[Отчет по льготному плану питания - ]]></text>
 			</staticText>
 			<staticText>
@@ -183,7 +186,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="149" width="100" height="20" uuid="c5f9acc5-92f6-4632-bffa-3561ee6c2528"/>
+				<reportElement mode="Opaque" x="0" y="149" width="100" height="20" forecolor="#000000" backcolor="#FF3333" uuid="c5f9acc5-92f6-4632-bffa-3561ee6c2528"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -222,31 +225,38 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="100" y="129" width="578" height="20" uuid="fe31d41b-8c18-4fd2-a9e2-e1858c4f12df"/>
+				<reportElement x="106" y="129" width="578" height="20" uuid="fe31d41b-8c18-4fd2-a9e2-e1858c4f12df"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[обучающийся не был в ОО (проход через турникет не зафиксирован)
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="100" y="149" width="578" height="20" uuid="aedd2351-97f1-48e7-9957-20b0d77a4293"/>
+				<reportElement x="106" y="149" width="578" height="20" uuid="aedd2351-97f1-48e7-9957-20b0d77a4293"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[обучающийся был в ОО (зафиксирован проход через турникет), в плане льготного питания не оплачен
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="100" y="169" width="578" height="20" uuid="55e904d0-08a8-45db-9ef7-4f99a56fa788"/>
+				<reportElement x="106" y="169" width="578" height="20" uuid="55e904d0-08a8-45db-9ef7-4f99a56fa788"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[обучающийся был в ОО (зафиксирован проход через турникет), в льготном плане питания оплачен
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="100" y="189" width="578" height="20" uuid="93c54f39-5318-49d8-8c0b-08ca12770ee8"/>
+				<reportElement x="106" y="189" width="578" height="20" uuid="93c54f39-5318-49d8-8c0b-08ca12770ee8"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[обучающийся не был в ОО (проход через турникет не зафиксирован), в льготном плане питания оплачен]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="50" y="45" width="100" height="20" uuid="dcc0c290-a07c-49cf-954e-83099eb62867"/>
 				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="518" y="65" width="100" height="30" uuid="03b946af-c7cd-4a34-9802-a5c1e09964ee"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{date}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -356,9 +366,12 @@
 		<band height="92" splitType="Stretch">
 			<textField>
 				<reportElement x="10" y="0" width="193" height="20" uuid="bb72ca8e-59d6-407a-8ced-e5de15470b12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
-			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false">
+			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false" ignoreWidth="false">
 				<reportElement key="" mode="Opaque" x="0" y="40" width="8510" height="42" uuid="cdcb28b0-c0fd-47a8-bb3b-8a975f2faf7e"/>
 				<crosstabDataset>
 					<dataset>
@@ -441,7 +454,7 @@
 					<cellContents mode="Opaque">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 						<textField isBlankWhenNull="true">
-							<reportElement style="red" x="0" y="0" width="80" height="46" forecolor="#000000" backcolor="#FFFFFF" uuid="ac43a4d6-8520-4617-809d-3ae0c63d1008"/>
+							<reportElement style="red" mode="Opaque" x="0" y="0" width="80" height="46" forecolor="#000000" backcolor="#FFFFFF" uuid="ac43a4d6-8520-4617-809d-3ae0c63d1008"/>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -559,7 +572,7 @@
 					<cellContents mode="Opaque">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 						<textField isBlankWhenNull="true">
-							<reportElement style="red" x="0" y="0" width="80" height="46" forecolor="#000000" uuid="f91704c0-631a-4732-bc91-a7e6895b05d2"/>
+							<reportElement style="red" mode="Opaque" x="0" y="0" width="80" height="46" forecolor="#000000" backcolor="#FFFFFF" uuid="f91704c0-631a-4732-bc91-a7e6895b05d2"/>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -673,7 +686,7 @@
 					<cellContents mode="Opaque">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 						<textField isBlankWhenNull="true">
-							<reportElement style="red" x="0" y="0" width="80" height="46" forecolor="#333333" uuid="f6ed2792-875d-428b-9613-236304aed35b"/>
+							<reportElement style="red" mode="Opaque" x="0" y="0" width="80" height="46" forecolor="#333333" backcolor="#FFFFFF" uuid="f6ed2792-875d-428b-9613-236304aed35b"/>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -701,6 +714,15 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band height="83" splitType="Stretch">
+			<staticText>
+				<reportElement x="162" y="19" width="398" height="20" uuid="a13a1bcd-cbff-4c6b-b243-48705022ec42"/>
+				<text><![CDATA[Ответственный за питание /________________________________]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="63" width="398" height="20" uuid="bfad6651-24ad-4e13-a30a-e1aaa38fb864"/>
+				<text><![CDATA[Директор /________________________________]]></text>
+			</staticText>
+		</band>
 	</summary>
 </jasperReport>
