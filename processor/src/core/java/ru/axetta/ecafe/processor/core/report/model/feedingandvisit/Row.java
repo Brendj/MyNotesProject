@@ -15,8 +15,16 @@ public class Row {
 
     private Integer day;
 
-    private String entry;
-    private Integer color;
+    private String entry = "Н";
+    private Integer color = 0;
+
+    public Row() {
+    }
+
+    public Row(String name, Integer day) {
+        this.name = name;
+        this.day = day;
+    }
 
     public Row(Long clientId, String name, Integer day, String entry, Integer color) {
         this.clientId = clientId;

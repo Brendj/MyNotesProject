@@ -9,9 +9,12 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.ClientsEntereventsService;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Data;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Days;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Row;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -28,7 +31,7 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
 
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
-    private static final int DEFAULT_REPORT_WIRTH =  550;
+    private static final int DEFAULT_REPORT_WIDTH =  225;
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
@@ -49,19 +52,17 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgName", org.getOfficialName());
-            Calendar date = Calendar.getInstance();
-            List<Days> days = new LinkedList<Days>();
-            for( int i = 1; i < date.get(Calendar.DAY_OF_MONTH); i++){  //ставить максимально кол-во дней в месяце
-                days.add(new Days(i));
-            }
-            parameterMap.put("days", days);
+            parameterMap.put("date", CalendarUtils.dateMMMMYYYYToString(startTime));
 
-            calendar.setTime(startTime);
-            calendar.set(Calendar.DAY_OF_MONTH,0);
+            startTime = CalendarUtils.getFirstDayOfMonth(startTime);
+            endTime = CalendarUtils.getLastDayOfMonth(startTime);
+
+
+
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
-            //int orgCount = getFriendlyOrgs(session,org.getIdOfOrg()).size() - 1;
-            //jasperPrint.setPageWidth(DEFAULT_REPORT_WIRTH + 400*orgCount );
+
+            jasperPrint.setPageWidth(DEFAULT_REPORT_WIDTH + 80*CalendarUtils.getDifferenceInDays(startTime));
             Date generateEndTime = new Date();
             return new AutoEnterEventV2Report(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
@@ -69,15 +70,16 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
+            findData(session, startTime,org.getIdOfOrg());
 
 
-
-            return new JRBeanCollectionDataSource(prepareBaseData(calendar));
+            return new JRBeanCollectionDataSource(prepareBaseData(startTime));
         }
 
-        private static List<Data> prepareBaseData(Calendar calendar){
+        private static List<Data> prepareBaseData(Date startTime){
             List<Days> days = new LinkedList<Days>();
-            for( int i = 1; i < calendar.getActualMaximum(Calendar.DAY_OF_MONTH); i++){  //ставить максимально кол-во дней в месяце
+            final int daysCount = CalendarUtils.getDifferenceInDays(startTime);
+            for( int i = 1; i <= daysCount; i++){
                 days.add(new Days(i));
             }
 
@@ -87,17 +89,19 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             dataList.add( new Data("3В",days));
 
             dataList.get(0).setReserve(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan1", 1, "10:45 - 15:56", 1));
-                add(new Row(1L, "Ivan2", 3, "10:45 - 15:56", 1));
-                add(new Row(1L, "Ivan2", 4, "10:45 - 15:56", 1));
+                for(int i = 1; i <= daysCount; i++){
+                    add(new Row("Ivan", i));
+                }
             }});
             dataList.get(0).setPlan(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan41", 1, "10:45 - 15:56", 1));
-                add(new Row(1L, "Ivan52", 2, "10:45 - 15:56", 1));
+                for(int i = 1; i <= daysCount; i++){
+                    add(new Row("Ivan", i));
+                }
             }});
             dataList.get(0).setTotal(new LinkedList<Row>() {{
-                add(new Row(1L, "Ivan6", 1, "10:45 - 15:56", 1));
-                add(new Row(1L, "Ivan7", 2, "10:45 - 15:56", 1));
+                for(int i = 1; i <= daysCount; i++){
+                    add(new Row("Завтрак", i));
+                }
             }});
 
 
@@ -133,6 +137,11 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             return dataList;
         }
 
+    }
+
+    private static List<PlanOrderItem> findData(Session session, Date startTime, Long idOfOrg){
+        List<PlanOrderItem> list =  ClientsEntereventsService.loadPlanOrderItemToPay(session, startTime, idOfOrg);
+        return list;
     }
 
 

@@ -30,6 +30,7 @@ public class CalendarUtils {
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
+    private final static SimpleDateFormat MMMMYYYY = new SimpleDateFormat("MMMM yyyy");
     private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
     public final static Date AFTER_DATE = getAfterDate();
 
@@ -195,6 +196,9 @@ public class CalendarUtils {
 
     public static String dateShortToString(Date date) {
         return dateShortFormat.format(date);
+    }
+    public static String dateMMMMYYYYToString(Date date) {
+        return MMMMYYYY.format(date);
     }
 
 
@@ -372,5 +376,15 @@ public class CalendarUtils {
         oneTime = Integer.valueOf(one.replace(":",""));
         twoTime = Integer.valueOf(two.replace(":",""));
         return oneTime > twoTime;
+    }
+
+    public static int getDifferenceInDays(Date data){
+        Long begin = data.getTime();
+        Long end = getLastDayOfMonth(data).getTime();
+        Long current = new Date().getTime();
+        if(end > current){
+            end = current ;
+        }
+        return (int) (( end - begin ) / (1000 * 60 * 60 * 24)) + 1 ;
     }
 }

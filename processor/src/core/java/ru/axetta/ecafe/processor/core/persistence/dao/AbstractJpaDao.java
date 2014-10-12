@@ -1,7 +1,5 @@
 package ru.axetta.ecafe.processor.core.persistence.dao;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.Serializable;
 import java.util.List;
 
@@ -10,12 +8,9 @@ import java.util.List;
  * Date: 14.08.14
  * Time: 13:12
  */
-public abstract class AbstractJpaDao< T extends Serializable> {
+public abstract class AbstractJpaDao< T extends Serializable> extends BaseJpaDao {
 
     private Class< T > clazz;
-
-    @PersistenceContext(unitName = "reportsPU")
-    protected EntityManager entityManager;
 
     public void setClazz( Class< T > clazzToSet ){
         this.clazz = clazzToSet;
