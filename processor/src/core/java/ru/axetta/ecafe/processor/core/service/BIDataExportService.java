@@ -92,13 +92,18 @@ public class BIDataExportService {
         //  Оффициальные данные ОУ (Orgs_official)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs_official",
+                "select o1.idoforg1, o1.guid1, o2.shortname, o2.officialname "
+                + "from( "
+                        + "select o.idoforg idoforg1, o.guid guid1, min(o2.idoforg) idoforg2 "
+                        + "from cf_orgs o "
+                        + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
+                        + "join cf_orgs o2 on o2.idoforg=f.currentorg "
+                        + "where o.shortname<>'' and o.state<>0 "
+                        + "group by idoforg1, guid1 "
+                + " ) as o1 "
+                + "join cf_orgs o2 on o1.idoforg2=o2.idoforg "
+                + "order by 1, 3",
                 /*"select o.idoforg, o.guid, o2.officialname "
-                + "from cf_orgs o "
-                + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
-                + "join cf_orgs o2 on o2.idoforg=f.currentorg "
-                + "where o.shortname<>'' and o2.officialname<>'' and o.state<>0 " //and o2.mainbuilding>0
-                + "order by o2.officialname",*/
-                "select o.idoforg, o.guid, o2.officialname "
                 + "from cf_orgs o "
                 + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                 + "join cf_orgs o2 on o2.idoforg=f.currentorg and o2.mainbuilding>0 "
@@ -116,7 +121,7 @@ public class BIDataExportService {
                 + "                            join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                 + "                            join cf_orgs o2 on o2.idoforg=f.currentorg and o2.mainbuilding>0 "
                 + "                            where o.shortname<>'' and o2.officialname<>'' and o.state<>0) "
-                + "order by 1, 3",
+                + "order by 1, 3",*/
                 new String[]{"idoforg", "guid", "officialname"}));
 
         //  ------------------------------------------
