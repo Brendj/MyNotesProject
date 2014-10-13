@@ -42,11 +42,14 @@ public class RuleCreatePage extends BasicWorkspacePage
         implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
     public static final String SUB_CATEGORIES [] = new String []
             { "",
-              "Многодетные 5-11 кл.(завтрак+обед)",
-              "Бесплатники 5-11 кл.(завтрак+обед)",
+              "Многодетные 5-9 кл.(завтрак+обед)",
+              "Многодетные 10-11 кл.(завтрак+обед)",
+              "Бесплатники 5-9 кл.(завтрак+обед)",
+              "Бесплатники 10-11 кл.(завтрак+обед)",
               "Начальная школа 1-4 кл (завтрак)",
               "Соц./незащищ. 1-4 кл.(завтрак+обед)",            //  Если измениться, необходимо поменять DailyReferReportPage.getReportData : 353
-              "Соц./незащищ. 5-11 кл.(завтрак+обед)",           //  Если измениться, необходимо поменять DailyReferReportPage.getReportData : 354
+              "Соц./незащищ. 5-9 кл.(завтрак+обед)",            //  Если измениться, необходимо поменять DailyReferReportPage.getReportData : 354
+              "Соц./незащищ. 10-11 кл.(завтрак+обед)",          //  Если измениться, необходимо поменять DailyReferReportPage.getReportData : 354
               "Многодетные 1-4 кл.(завтрак+обед)",
               "Бесплатники 1-4 кл.(завтрак+обед)",
 
@@ -56,7 +59,8 @@ public class RuleCreatePage extends BasicWorkspacePage
               "Детский сад 3-7 лет (6-ти разовое питание)",
 
               "Начальные классы 1-4 (завтрак + обед + полдник)",
-              "Средние и  старшие классы 5-11 (завтрак + обед + полдник)"};
+              "Средние и  старшие классы 5-9 (завтрак + обед + полдник)",
+              "Средние и  старшие классы 10-11 (завтрак + обед + полдник)"};
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private String description;
