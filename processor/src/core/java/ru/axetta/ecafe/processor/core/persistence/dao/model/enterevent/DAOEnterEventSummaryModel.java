@@ -19,6 +19,7 @@ public class DAOEnterEventSummaryModel {
     private Long idOfVisitor;
     private String visitorFullName;
     private Long idOfClientGroup;
+    private String groupname;
 
 
     public DAOEnterEventSummaryModel() {
@@ -35,6 +36,21 @@ public class DAOEnterEventSummaryModel {
         this.idOfVisitor = idOfVisitor;
         this.visitorFullName = visitorFullName;
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, Integer passDirection, Integer eventCode,
+            Long idofTempCard, Long evtDateTime, Long idOfVisitor, String visitorFullName, Long idOfClientGroup,
+            String groupname) {
+        this.idOfClient = idOfClient;
+        this.idOfOrg = idOfOrg;
+        this.passDirection = passDirection;
+        this.eventCode = eventCode;
+        this.idofTempCard = idofTempCard;
+        this.evtDateTime = evtDateTime;
+        this.idOfVisitor = idOfVisitor;
+        this.visitorFullName = visitorFullName;
+        this.idOfClientGroup = idOfClientGroup;
+        this.groupname = groupname;
     }
 
     public Long getIdOfClient() {
@@ -107,5 +123,41 @@ public class DAOEnterEventSummaryModel {
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getIdofTempCard() {
+        return idofTempCard;
+    }
+
+    public void setIdofTempCard(Long idofTempCard) {
+        this.idofTempCard = idofTempCard;
+    }
+
+    public Long getEvtDateTime() {
+        return evtDateTime;
+    }
+
+    public void setEvtDateTime(Long evtDateTime) {
+        this.evtDateTime = evtDateTime;
+    }
+
+    public Long getIdOfVisitor() {
+        return idOfVisitor;
+    }
+
+    public void setIdOfVisitor(Long idOfVisitor) {
+        this.idOfVisitor = idOfVisitor;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public String getGroupname() {
+        return groupname;
+    }
+
+    public void setGroupname(String groupname) {
+        this.groupname = groupname;
     }
 }

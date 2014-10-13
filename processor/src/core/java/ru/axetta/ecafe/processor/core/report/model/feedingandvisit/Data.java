@@ -15,9 +15,9 @@ import java.util.List;
 public class Data {
     private String name ;
     private List<Days> daysList = new LinkedList<Days>();
-    List<Row> reserve;
-    List<Row> plan;
-    List<Row> total;
+    List<Row> reserve = new LinkedList<Row>();
+    List<Row> plan = new LinkedList<Row>();
+    List<Row> total = new LinkedList<Row>();
 
     public Data(List<Days> daysList) {
         this.daysList = daysList;

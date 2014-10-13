@@ -52,6 +52,27 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
 
         return parse(tempList);
     }
+    @Transactional(readOnly = true)
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long idOfOrg, Long startTime, Long endTime) {
+        List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
+                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
+                        + " FROM cf_enterevents e "
+                        + " LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + " LEFT JOIN cf_persons p ON p.idofperson = c.idofperson "
+                        + " LEFT JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
+                        + " WHERE e.evtdatetime BETWEEN :startTime AND :endTime "
+                        + " and e.idofclient is not null "
+                        + " and e.idOfOrg = :idOfOrg "
+                        + " ORDER BY g.groupname, e.idofclient, e.evtdatetime DESC ")
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("startTime", startTime)
+                .setParameter("endTime", endTime)
+                        //.setParameter("startDateTime", 1355097600000L)
+                        //.setParameter("endDateTime", 1355183999000L)
+                .getResultList();
+
+        return parseFull(tempList);
+    }
 
     @Transactional(readOnly = true)
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryEmptyClient(Long dateTime) {
@@ -86,6 +107,26 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             entry.setIdofvisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
             entry.setVisitorFullName((String) temp[7]);
             entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
+            result.add(entry);
+        }
+        return result;
+    }
+
+    private static List<DAOEnterEventSummaryModel> parseFull(List<Object[]> tempList){
+        List<DAOEnterEventSummaryModel> result = new ArrayList<DAOEnterEventSummaryModel>();
+        for (Object[] temp : tempList) {
+
+            DAOEnterEventSummaryModel entry = new DAOEnterEventSummaryModel();
+            entry.setIdOfClient(temp[0] != null ? ((BigInteger) temp[0]).longValue() : null);
+            entry.setIdOfOrg(temp[1] != null ? ((BigInteger) temp[1]).longValue() : null);
+            entry.setPassDirection((Integer) temp[2]);
+            entry.setEventCode((Integer) temp[3]);
+            entry.setIdofTempcard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
+            entry.setEvtdatetime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
+            entry.setIdofvisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
+            entry.setVisitorFullName((String) temp[9]);
+            entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
+            entry.setGroupname((String) temp[10]);
             result.add(entry);
         }
         return result;

@@ -213,14 +213,14 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
 
         org.hibernate.Query clientInfoQuery = session.createSQLQuery(
-                "SELECT DISTINCT cl.idOfClient, gr.idofclientgroup,  gr.groupName, cl.categoriesDiscounts  "
+                "SELECT DISTINCT cl.idOfClient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) as fullname, gr.idofclientgroup,  gr.groupName, cl.categoriesDiscounts  "
                         + "FROM cf_clients cl LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient "
                         + "LEFT JOIN cf_cards cr ON cr.IdOfClient = cl.IdOfClient "
+                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
                         + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.IdOfClientGroup "
                         + "WHERE cr.State = 0 AND gr.idOfClientGroup < 1100000000 "
                         //+ "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
-                        + "AND gr.idOfOrg = cl.idOfOrg AND cl.idOfOrg = :orgId "
-                        + "GROUP BY cl.idOfClient, gr.idofClientGroup, gr.groupName");
+                        + "AND gr.idOfOrg = cl.idOfOrg AND cl.idOfOrg = :orgId ");
         //clientInfoQuery.setParameter("payedDate", payedDate.getTime());
         //clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
         clientInfoQuery.setParameter("orgId", orgId);
@@ -230,8 +230,9 @@ public class ClientsEntereventsService {
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
             ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
-                    (String) resultClientItem[3]);
+                    (String) resultClientItem[1],
+                    ((BigInteger) resultClientItem[2]).longValue(), (String) resultClientItem[3],
+                    (String) resultClientItem[4]);
             clientInfoList.add(clientInfo);
         }
 
@@ -310,7 +311,7 @@ public class ClientsEntereventsService {
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo.clientId, rule, payedDate);
+                    addPlanOrderItems(allItems, clientInfo, rule, payedDate);
                 }
             }
             return allItems;
@@ -336,7 +337,7 @@ public class ClientsEntereventsService {
         return resList;
     }
 
-    private static void addPlanOrderItems(List<PlanOrderItem> items, Long clientId, DiscountRule rule, Date payedDate) {
+    private static void addPlanOrderItems(List<PlanOrderItem> items, ClientInfo clientId, DiscountRule rule, Date payedDate) {
 
         String complexMap = rule.getComplexesMap();
 
@@ -353,7 +354,7 @@ public class ClientsEntereventsService {
         }
 
         for (Integer complexId : allComplexesId) {
-            PlanOrderItem item = new PlanOrderItem(clientId, complexId, rule.getIdOfRule(), payedDate);
+            PlanOrderItem item = new PlanOrderItem(clientId.getClientId(), clientId.getClientName(),  complexId, rule.getIdOfRule(), payedDate,clientId.getGroupName());
             items.add(item);
             if (rule.getOperationOr()) {
                 return;

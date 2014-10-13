@@ -16,15 +16,38 @@ import java.util.Date;
 public class PlanOrderItem  {
 
     public Long idOfClient;
+    public String clientName;
+
     public Integer idOfComplex;
     public Long idOfRule;
     public Date orderDate;
+    public String complexName; //complex name
+    public String groupName;
 
     public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate) {
         this.idOfClient = idOfClient;
         this.idOfComplex = idOfComplex;
         this.idOfRule = idOfRule;
         this.orderDate = orderDate;
+    }
+
+    public PlanOrderItem(Long idOfClient,String clientName, Integer idOfComplex, Long idOfRule, Date orderDate, String groupName) {
+        this.idOfClient = idOfClient;
+        this.clientName = clientName;
+        this.idOfComplex = idOfComplex;
+        this.idOfRule = idOfRule;
+        this.orderDate = orderDate;
+        this.groupName = groupName;
+    }
+
+    public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
+            String groupName) {
+        this.idOfClient = idOfClient;
+        this.idOfComplex = idOfComplex;
+        this.idOfRule = idOfRule;
+        this.orderDate = orderDate;
+        this.complexName = complexName;
+        this.groupName = groupName;
     }
 
     Date getOrderDate() {
@@ -57,5 +80,13 @@ public class PlanOrderItem  {
 
     void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
+    }
+
+    public String getComplexName() {
+        return complexName;
+    }
+
+    public void setComplexName(String complexName) {
+        this.complexName = complexName;
     }
 }

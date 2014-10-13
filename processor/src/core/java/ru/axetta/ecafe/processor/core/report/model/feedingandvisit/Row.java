@@ -4,20 +4,35 @@
 
 package ru.axetta.ecafe.processor.core.report.model.feedingandvisit;
 
+import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 /**
  * User: shamil
  * Date: 06.10.14
  * Time: 13:55
  */
 public class Row {
-    private Long clientId;
+
+    private Long clientId; // ид клиента или ид rule если total field
     private String name;
 
     private Integer day;
 
-    private String entry = "Н";
-    private Integer color = 0;
+    public static final String ENTRY_DEFAULT = "Н";
+    public static final String ENTRY_PAID = "X";
+    private String entry = ENTRY_DEFAULT;
+    private Long enter = null;
+    private Long exit = null;
 
+    private String groupname;
+    private boolean totalRow = false; // запись относиться к итого
+    private int totalCount = 0;
+
+
+    private Integer color = 0; //  0 не оплачен . 1 оплачен
+    public static final int COLOR_PAID = 1;   //оплачен
+    public static final int COLOR_NOT_PAID = 0; // не оплачен
     public Row() {
     }
 
@@ -26,12 +41,37 @@ public class Row {
         this.day = day;
     }
 
+    public Row(Long clientId, String name, Integer day, String groupname) {
+        this.clientId = clientId;
+        this.name = name;
+        this.day = day;
+        this.groupname = groupname;
+    }
+
     public Row(Long clientId, String name, Integer day, String entry, Integer color) {
         this.clientId = clientId;
         this.name = name;
         this.day = day;
         this.entry = entry;
         this.color = color;
+    }
+
+    public Row(DAOEnterEventSummaryModel model) {
+        this.clientId = model.getIdOfClient();
+        this.name = model.getVisitorFullName();
+        this.day = CalendarUtils.getDayOfMonth(model.getEvtDateTime());
+        this.groupname = model.getGroupname();
+        switch (model.getPassDirection()) {
+            case 0:
+            case 6:
+                enter = model.getEvtdatetime();
+                break;
+
+            case 1:
+            case 7:
+                exit = model.getEvtdatetime();
+                break;
+        }
     }
 
     public Long getClientId() {
@@ -59,7 +99,13 @@ public class Row {
     }
 
     public String getEntry() {
-        return entry;
+        if(totalRow){
+            return "" + totalCount;
+        }else  if (enter == null && exit == null) {
+            return color == 0 ? ENTRY_DEFAULT : ENTRY_PAID;
+        }
+
+        return "" + ((enter != null) ? CalendarUtils.timeToString(enter): "...") + " - " +((exit != null) ? CalendarUtils.timeToString(exit): "...");
     }
 
     public void setEntry(String entry) {
@@ -72,5 +118,46 @@ public class Row {
 
     public void setColor(Integer color) {
         this.color = color;
+    }
+
+    public void update(DAOEnterEventSummaryModel model) {
+        if(day != CalendarUtils.getDayOfMonth(model.getEvtDateTime())){
+            return;
+        }
+        switch (model.getPassDirection()) {
+            case 0:
+            case 6:
+                if ( (enter == null) || (enter > model.getEvtdatetime()) ) {
+                    enter = model.getEvtdatetime();
+                }
+                break;
+
+            case 1:
+            case 7:
+                if ( (exit == null) || (exit < model.getEvtdatetime()) ) {
+                    exit = model.getEvtdatetime();
+                }
+                break;
+        }
+    }
+
+    public void incrementcount(){
+        totalCount++;
+    }
+
+    public String getGroupname() {
+        return groupname;
+    }
+
+    public void setGroupname(String groupname) {
+        this.groupname = groupname;
+    }
+
+    public boolean isTotalRow() {
+        return totalRow;
+    }
+
+    public void setTotalRow(boolean totalRow) {
+        this.totalRow = totalRow;
     }
 }

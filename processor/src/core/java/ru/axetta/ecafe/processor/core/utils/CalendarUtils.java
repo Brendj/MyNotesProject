@@ -177,9 +177,13 @@ public class CalendarUtils {
             return date;
         }
     }
-
+    // new SimpleDateFormat("HH:mm");
     public static String timeToString(Date date) {
         return timeFormat.format(date);
+    }
+    // new SimpleDateFormat("HH:mm");
+    public static String timeToString(Long date) {
+        return timeFormat.format(new Date(date));
     }
 
     public static Date parseDayInWeek(String validTime) throws ParseException {
@@ -204,6 +208,9 @@ public class CalendarUtils {
 
     public static String dateTimeToString(Date date) {
         return dateTimeFormat.format(date);
+    }
+    public static String dateTimeToString(Long date) {
+        return dateTimeFormat.format(new Date(date));
     }
 
     public static Date getFirstDayOfMonth(Date date) {
@@ -271,6 +278,13 @@ public class CalendarUtils {
         calendar.setTime(date);
         return calendar.get(Calendar.DAY_OF_MONTH);
     }
+
+    public static int getDayOfMonth(Long date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(date);
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
 
     public static Date setDayOfMonth(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
