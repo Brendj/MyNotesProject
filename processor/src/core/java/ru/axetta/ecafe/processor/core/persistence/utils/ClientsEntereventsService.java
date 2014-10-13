@@ -294,6 +294,47 @@ public class ClientsEntereventsService {
         return result;
     }
 
+
+    //Вернет список клиентов которые были оплачены
+    // в зависимости от параметра orderType - строковое, по интервалу от startDate до endTime
+    public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, List<Long> idOfOrgList,
+            Date startTime, Date endTime) {
+
+
+        List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
+
+        String[] orderTypeArray = orderType.split(",");
+        List<Integer> orderTypeList = new ArrayList<Integer>();
+
+        for (String ordType : orderTypeArray) {
+            orderTypeList.add(Integer.parseInt(ordType));
+        }
+
+        Query query = session.createSQLQuery(
+                "SELECT idofclient, (cfod.menutype -50) AS complexid, idofrule, orderdate  " + "FROM cf_orders cfo "
+                        + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                        + "WHERE cfo.ordertype IN (:orderTypeList) " + "AND cfo.idoforg IN (:idOfOrgList) "
+                        + "AND cfo.orderdate >= :startTime AND cfo.orderdate <= :endTime "
+                        + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
+        query.setParameterList("orderTypeList", orderTypeList);
+        query.setParameterList("idOfOrgList", idOfOrgList);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        List result = query.list();
+
+        //Парсим данные
+        for (Object o : result) {
+            Object[] resultPlanOrderItem = (Object[]) o;
+            PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultPlanOrderItem[0]).longValue(),
+                    (Integer) resultPlanOrderItem[1], ((BigInteger) resultPlanOrderItem[2]).longValue(),
+                    new Date(((BigInteger) resultPlanOrderItem[3]).longValue()));
+            resultPlanOrder.add(planOrderItem);
+        }
+        return resultPlanOrder;
+    }
+
+
     // Должен был получить бесплатное питание
     public static List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();

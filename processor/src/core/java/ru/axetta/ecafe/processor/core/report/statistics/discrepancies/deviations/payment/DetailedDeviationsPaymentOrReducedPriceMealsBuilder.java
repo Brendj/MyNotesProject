@@ -74,6 +74,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             planOrderItemsToPay = ClientsEntereventsService.loadPlanOrderItemToPay(session, startTime, idOfOrg);
         }
 
+        List<PlanOrderItem> client = ClientsEntereventsService.loadPaidPlanOrderInfo(session, "4,6,8", idOfOrgList, startTime, endTime);
 
 
 
