@@ -92,7 +92,7 @@ public class BIDataExportService {
         //  Оффициальные данные ОУ (Orgs_official)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs_official",
-                "select o1.idoforg1, o1.guid1, o2.shortname, o2.officialname "
+                "select o1.idoforg1 as idoforg, o1.guid1 as guid, o2.officialname as officialname "
                 + "from( "
                         + "select o.idoforg idoforg1, o.guid guid1, min(o2.idoforg) idoforg2 "
                         + "from cf_orgs o "
