@@ -78,7 +78,8 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             List<Data> dataList = prepareBaseData(startTime);
 
 
-            List<PlanOrderItem> data = findData(session, startTime, org.getIdOfOrg());
+            List<PlanOrderItem> ordersInPlan = ClientsEntereventsService.loadPlanOrderItemToPay(session, startTime, org.getIdOfOrg());
+            List<PlanOrderItem> ordersPaid = ClientsEntereventsService.loadPaidPlanOrders(session,"4,8,9",""+org.getIdOfOrg(),startTime, endTime);
 
 
             List<Long> clientsInsideBuilding = ClientsEntereventsService
@@ -94,7 +95,7 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
 
             Map<Long, List<Row>> rowMap = prepareBaseData(enterEventsSummary, daysCount ); // проходы учеников
 
-            dataList = updateClientsData(rowMap, data, daysCount);
+            dataList = updateClientsData(rowMap, ordersInPlan, daysCount);
             //питание
             return new JRBeanCollectionDataSource(dataList);
         }

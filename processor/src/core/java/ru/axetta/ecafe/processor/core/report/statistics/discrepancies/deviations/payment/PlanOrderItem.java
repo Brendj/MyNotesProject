@@ -39,6 +39,13 @@ public class PlanOrderItem  {
         this.orderDate = orderDate;
         this.groupName = groupName;
     }
+    public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName) {
+        this.idOfClient = idOfClient;
+        this.idOfComplex = idOfComplex;
+        this.idOfRule = idOfRule;
+        this.orderDate = orderDate;
+        this.complexName = complexName;
+    }
 
     public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
             String groupName) {

@@ -6,7 +6,6 @@ import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -41,7 +40,7 @@ public class ClientsEntereventsService {
                 "SELECT c.idofclient FROM cf_enterevents e LEFT JOIN cf_clients c "
                         + "ON c.idofclient = e.idofclient WHERE c.idoforg = :idOfOrg "
                         + "AND e.evtdatetime >= :startDate AND e.evtdatetime <= :endDate "
-                        + "AND c.idOfClientGroup NOT IN (1100001000, 1100001001, 1100000010, 1100000020, 1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) "
+                        + "AND c.idOfClientGroup < 1100000030 "
                         + "GROUP BY c.idofclient ORDER BY c.idofclient");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate.getTime());
@@ -57,7 +56,7 @@ public class ClientsEntereventsService {
         if (!idOfClientsInside.isEmpty()) {
             org.hibernate.Query query = session.createSQLQuery(
                     "SELECT c.idofclient FROM cf_clients c " + "WHERE c.idoforg = :idOfOrg "
-                            + "AND c.idOfClientGroup NOT IN (1100001000, 1100001001, 1100000010, 1100000020, 1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) "
+                            + "AND c.idOfClientGroup < 1100000030 "
                             + "AND c.idofclient NOT IN (:idOfClientsInside) "
                             + "GROUP BY c.idofclient ORDER BY c.idofclient");
             query.setParameter("idOfOrg", idOfOrg);
@@ -184,24 +183,18 @@ public class ClientsEntereventsService {
 
 
     // Должен был получить бесплатное питание, выбор клиентов для составления плана питания
-    public static List<ClientInfo> loadClientsInfoToPay(Session session, Date payedDate, Long orgId) {
-        //Date payedDateAddOneDay = CalendarUtils.addOneDay(payedDate);
-
+    public static List<ClientInfo> loadClientsInfoToPay(Session session, Long orgId) {
         List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
-
         org.hibernate.Query clientInfoQuery = session.createSQLQuery(
                 "SELECT DISTINCT cl.idOfClient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup,  gr.groupName, cl.categoriesDiscounts  "
                         + "FROM cf_clients cl LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient "
                         + "LEFT JOIN cf_cards cr ON cr.IdOfClient = cl.IdOfClient "
                         + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
-                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.IdOfClientGroup "
-                        + "WHERE cr.State = 0 AND gr.idOfClientGroup < 1100000000 "
+                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                        + "WHERE cr.State = 0 AND gr.idOfClientGroup < 1100000030 "
                         //+ "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
-                        + "AND gr.idOfOrg = cl.idOfOrg AND cl.idOfOrg = :orgId ");
-        //clientInfoQuery.setParameter("payedDate", payedDate.getTime());
-        //clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
+                        + " AND cl.idoforg = :orgId ");
         clientInfoQuery.setParameter("orgId", orgId);
-
         List<Object> result = clientInfoQuery.list();
 
         for (Object resultClient : result) {
@@ -211,48 +204,40 @@ public class ClientsEntereventsService {
                     (String) resultClientItem[3], (String) resultClientItem[4]);
             clientInfoList.add(clientInfo);
         }
-
         return clientInfoList;
     }
-
-    public static List<ClientInfo> loadClientsInfoToPayShamil(Session session, Date payedDate, Long orgId) {
-
-        Date payedDateAddOneDay = CalendarUtils.addOneDay(payedDate);
-
-        org.hibernate.Query clientInfoQuery = session.createSQLQuery(
-                "SELECT  cl.idOfClient, cl.categoriesDiscounts, gr.idofclientgroup, gr.groupName, ce.evtdatetime "
-                        + "FROM cf_clients cl "
-                        + "LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient AND ce.idoforg = cl.idoforg "
-                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.IdOfClientGroup "
-                        + "WHERE gr.idOfClientGroup < 1100000000 "
-                        + "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
-                        + "AND gr.idOfOrg = cl.idOfOrg AND cl.idOfOrg = :orgId " + "AND ce.idofclient != null "
-                        + "GROUP BY cl.idOfClient, gr.idofClientGroup, gr.groupName,ce.evtdatetime");
-        clientInfoQuery.setParameter("payedDate", payedDate.getTime());
-        clientInfoQuery.setParameter("payedDateAddOneDay", payedDateAddOneDay.getTime());
-        clientInfoQuery.setParameter("orgId", orgId);
-
-        List<ClientInfo> clientInfoList = clientInfoQuery.list();
-        return clientInfoList;
-    }
-
 
     public static final String orderType_Lgotniki = "6";//План льготного питания, резерв
 
-    //Вернет список клиентов которые были оплачены
+    //Вернет список заказов которые были оплачены
     // в зависимости от параметра
-    public static List<PlanOrderItem> loadPaidClientsInfo(Session session, String orderType, List<Long> idOfOrgList,
+    public static List<PlanOrderItem> loadPaidPlanOrders(Session session, String orderType, String idOfOrgList,
             Date startTime, Date endTime) {
         Query query = session.createSQLQuery(
-                "SELECT idofclient, idofrule, orderdate, (cfod.menutype -50) AS complexId, cfod.menudetailname "
+                "SELECT cfo.idofclient,(cfod.menutype -50) AS complexId, cfod.idofrule, cfo.orderdate,  cfod.menudetailname, g.groupname  "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + "WHERE cfo.ordertype IN (:orderType) " + "AND cfo.idoforg IN (:idOfOrgList) "
-                        + "AND cfod.menutype > 50 AND cfod.menutype <100");
-        query.setParameter("orderType", orderType);
-        query.setParameterList("idOfOrgList", idOfOrgList);
-        List<PlanOrderItem> result = query.list();
-        return result;
+                        + " LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
+                        + " LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
+                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (" + idOfOrgList + ") "
+                        + " AND cfo.orderdate between :startTime AND :endTime "
+                        + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
+
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+
+        List<Object> result = query.list();
+        List<PlanOrderItem> planOrderItemList = new ArrayList<PlanOrderItem>();
+        for (Object resultClient : result) {
+            Object[] resultClientItem = (Object[]) resultClient;
+            PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultClientItem[0]).longValue(),
+                    (Integer) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
+                    new Date(((BigInteger) resultClientItem[3]).longValue()), (String) resultClientItem[4], (String) resultClientItem[5]);
+            planOrderItemList.add(planOrderItem);
+        }
+
+        return planOrderItemList;
     }
 
     //Вернет список клиентов которые были оплачены
@@ -299,7 +284,7 @@ public class ClientsEntereventsService {
     public static List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, payedDate, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
@@ -333,7 +318,6 @@ public class ClientsEntereventsService {
                 resList.add(rule);
             }
         }
-
         return resList;
     }
 
@@ -386,7 +370,9 @@ public class ClientsEntereventsService {
         if (m.find()) {
             constant = m.group();
         }
-
+        if(constant.isEmpty()){
+            return clientAllBenefits;
+        }
         Long number = Long.parseLong(constant);
 
         if (number >= 1L && number <= 4L) {

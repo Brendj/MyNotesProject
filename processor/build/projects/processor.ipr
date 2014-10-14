@@ -1357,7 +1357,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ResourceManagerContainer">
@@ -1585,6 +1585,14 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
+    <library name="apache">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/../lib/apache" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+      <jarDirectory url="file://$PROJECT_DIR$/../lib/apache" recursive="false" />
+    </library>
     <library name="axetta_charset">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_charset.1.jar!/" />
@@ -1661,6 +1669,13 @@
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-collections-3.2.1-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-beanutils-1.8.0-sources.jar!/" />
       </SOURCES>
+    </library>
+    <library name="commons-logging-1.1.1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-logging-1.1.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="cryptopro">
       <CLASSES>

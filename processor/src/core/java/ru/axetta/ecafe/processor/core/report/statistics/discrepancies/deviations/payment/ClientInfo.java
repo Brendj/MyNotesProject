@@ -17,6 +17,7 @@ public class ClientInfo {
       public  String clientName;
       public  Long groupId;
       public  String groupName;
+    public int discountMode;
       public  String categoriesDiscounts;
 
     public ClientInfo(Long clientId, Long groupId, String groupName, String categoriesDiscounts) {
@@ -72,5 +73,13 @@ public class ClientInfo {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+
+    public int getDiscountMode() {
+        return discountMode;
+    }
+
+    public void setDiscountMode(int discountMode) {
+        this.discountMode = discountMode;
     }
 }

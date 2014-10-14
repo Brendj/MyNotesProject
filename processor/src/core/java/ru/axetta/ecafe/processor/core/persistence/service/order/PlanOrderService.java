@@ -30,7 +30,7 @@ public class PlanOrderService {
     private List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, payedDate, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
         // правила для организации
         List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
         // платные категории

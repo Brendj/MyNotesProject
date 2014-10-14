@@ -50,6 +50,35 @@
         </ejbRoots>
       </configuration>
     </facet>
+    <facet type="gwt" name="GWT">
+      <configuration />
+    </facet>
+    <facet type="web" name="Web">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/../../src/web/web/back-office/include/report/online/complex_report.jsp" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/../../src/web/web/back-office/include/report/online" relative="/WEB-INF" />
+        </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/../../src/web/java" />
+        </sourceRoots>
+      </configuration>
+    </facet>
+    <facet type="web" name="Web2">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/../../src/web/web/back-office/include/client/operation_list.jsp" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/../../src/web/web/back-office/include/client" relative="/WEB-INF" />
+        </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/../../src/web/java" />
+        </sourceRoots>
+      </configuration>
+    </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../target/production/web" />
@@ -105,6 +134,26 @@
     <orderEntry type="library" scope="PROVIDED" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jboss_J2EE" level="project" />
     <orderEntry type="library" name="client-room" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../lib/jasper" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../lib/jasper" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../runtime/jboss7/modules/ecafe/main/groovy-all-1.7.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="sass-stdlib" level="application" />
   </component>
 </module>
 
