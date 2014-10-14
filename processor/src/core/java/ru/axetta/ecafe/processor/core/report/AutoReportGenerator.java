@@ -1046,7 +1046,7 @@ public class AutoReportGenerator {
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         jobName,
-                        new TransactionsReport(),
+                        new AutoEnterEventV2Report(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
                         reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
@@ -1055,7 +1055,7 @@ public class AutoReportGenerator {
 
                 JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
-                        .put(TransactionsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        .put(AutoEnterEventV2Report.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));
