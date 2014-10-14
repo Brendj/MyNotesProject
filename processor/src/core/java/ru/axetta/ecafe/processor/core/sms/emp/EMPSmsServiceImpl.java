@@ -91,7 +91,8 @@ public class EMPSmsServiceImpl extends ISmsService {
         //for (Client c : client) {
             RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
         ///}
-        return new SendResponse(1, null, "");// messageId ???
+        String messageId = String.format("EMP/%s/%s/%s", client.getIdOfClient(), client.getMobile(), System.currentTimeMillis());
+        return new SendResponse(1, null, messageId);// messageId ???
     }
 
     @Override
