@@ -17,6 +17,9 @@ public class DeviationPaymentItem {
     private String orgShortName;
     private String address;
     private String groupName; // группа клиента (класс, сотрудники и т.д.)
+    private String personName;
+    private Integer count;
+
 
     public DeviationPaymentItem() {
     }
@@ -58,5 +61,21 @@ public class DeviationPaymentItem {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }
