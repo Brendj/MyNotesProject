@@ -1811,4 +1811,11 @@ public class DAOUtils {
     public static List enterEventsSummary(){
                  return null;
     }
+
+    public static List<Accessory> getAccessories(Session session, Long idOfSourceOrg) {
+        String q = "from Accessory a where a.idOfSourceOrg=:idOfSourceOrg";
+        org.hibernate.Query query = session.createQuery(q);
+        query.setParameter("idOfSourceOrg", idOfSourceOrg);
+        return (List<Accessory>)query.list();
+    }
 }

@@ -69,6 +69,10 @@
                             binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
                             action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="accessoriesView" binding="#{accessoriesListPage.mainMenuComponent}"
+                            action="#{accessoriesListPage.show}" label="Оборудование корпусов"
+                            reRender="workspaceForm" rendered="false" />
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="createOrgMenuItem" binding="#{mainPage.orgCreatePage.mainMenuComponent}" label="Регистрация"

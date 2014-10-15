@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Accessory" table="cf_org_accessories">
+        <id name="idOfAccessory" column="IdOfAccessory" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="idOfSourceOrg" column="IdOfSourceOrg" type="long" not-null="true" update="false"/>
+        <property name="idOfTargetOrg" column="IdOfTargetOrg" type="long" not-null="true" update="false"/>
+        <property name="accessoryType" column="AccessoryType" type="integer" not-null="true"/>
+        <property name="accessoryNumber" column="AccessoryNumber" type="integer" not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+
