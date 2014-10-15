@@ -211,7 +211,7 @@ public class ClientsEntereventsService {
 
     //Вернет список заказов которые были оплачены
     // в зависимости от параметра
-    public static List<PlanOrderItem> loadPaidPlanOrders(Session session, String orderType, String idOfOrgList,
+    public static List<PlanOrderItem> loadPaidPlanOrders(Session session, String orderType, String idOfOrgs,
             Date startTime, Date endTime) {
         Query query = session.createSQLQuery(
                 "SELECT cfo.idofclient,(cfod.menutype -50) AS complexId, cfod.idofrule, cfo.orderdate,  cfod.menudetailname, g.groupname  "
@@ -219,7 +219,7 @@ public class ClientsEntereventsService {
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + " LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + " LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
-                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (" + idOfOrgList + ") "
+                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (" + idOfOrgs + ") "
                         + " AND cfo.orderdate between :startTime AND :endTime "
                         + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
 
