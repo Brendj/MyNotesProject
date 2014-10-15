@@ -89,9 +89,12 @@ public class EMPSmsServiceImpl extends ISmsService {
         EMPEventType empEvent = (EMPEventType) textObject;
         //List<Client> client = DAOService.getInstance().findClientsByMobilePhone(phoneNumber);
         //for (Client c : client) {
-            RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
+            String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
         ///}
-        String messageId = String.format("EMP/%s/%s/%s", client.getIdOfClient(), client.getMobile(), System.currentTimeMillis());
+        if(messageId == null || StringUtils.isBlank(messageId)) {
+            throw new Exception(String.format("Failed tot send EMP event for client [%s]", client.getIdOfClient()));
+        }
+        //String messageId = String.format("EMP/%s/%s/%s", client.getIdOfClient(), client.getMobile(), System.currentTimeMillis());
         return new SendResponse(1, null, messageId);// messageId ???
     }
 
@@ -109,10 +112,10 @@ public class EMPSmsServiceImpl extends ISmsService {
 
 
 
-    public boolean sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
+    public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
-            return false;
+            return null;
         }
 
         //  Вспомогательные значения
@@ -138,7 +141,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
         empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
                 .getMobile() + " доставлено");
-        return true;
+        return eventParam.getId();
     }
 
     protected SubscriptionPortType createEventController() {
