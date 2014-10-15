@@ -12,7 +12,7 @@ import java.util.List;
  * Date: 03.10.14
  * Time: 11:55
  */
-public class Data {
+public class Data  implements Comparable<Data> {
     private String name ;
     private List<Days> daysList = new LinkedList<Days>();
     List<Row> reserve = new LinkedList<Row>();
@@ -83,4 +83,21 @@ public class Data {
         this.total = total;
     }
 
+    @Override
+    public int compareTo(Data o) {
+        String numThisString = getName().replaceAll("[^\\d]", "");
+        String numOString = o.getName().replaceAll("[^\\d]", "");
+        if(numThisString.length() < 1) return -1;
+        if(numOString.length() < 1) return 1;
+
+
+        Integer numThis = Integer.valueOf(numThisString);
+        Integer numO = Integer.valueOf(numOString);
+        String sThis = getName().replaceAll("[^\\D]", "").toUpperCase();
+        String sO = o.getName().replaceAll("[^\\D]", "").toUpperCase();
+        if ( numThis.compareTo(numO) != 0) {
+            return numThis.compareTo(numO);
+        }
+        return Character.getNumericValue(sThis.charAt(0)) > Character.getNumericValue(sO.charAt(0)) ? 1 : -1;
+    }
 }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report.model.feedingandvisit;
 
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 /**
@@ -19,7 +20,7 @@ public class Row {
 
     private Integer day;
 
-    public static final String ENTRY_DEFAULT = "Н";
+    public static final String ENTRY_DEFAULT = "H";
     public static final String ENTRY_PAID = "X";
     private String entry = ENTRY_DEFAULT;
     private Long enter = null;
@@ -60,16 +61,16 @@ public class Row {
         this.clientId = model.getIdOfClient();
         this.name = model.getVisitorFullName();
         this.day = CalendarUtils.getDayOfMonth(model.getEvtDateTime());
-        this.groupname = model.getGroupname();
+        this.groupname = model.getGroupName();
         switch (model.getPassDirection()) {
             case 0:
             case 6:
-                enter = model.getEvtdatetime();
+                enter = model.getEvtDateTime();
                 break;
 
             case 1:
             case 7:
-                exit = model.getEvtdatetime();
+                exit = model.getEvtDateTime();
                 break;
         }
     }
@@ -127,15 +128,15 @@ public class Row {
         switch (model.getPassDirection()) {
             case 0:
             case 6:
-                if ( (enter == null) || (enter > model.getEvtdatetime()) ) {
-                    enter = model.getEvtdatetime();
+                if ( (enter == null) || (enter > model.getEvtDateTime()) ) {
+                    enter = model.getEvtDateTime();
                 }
                 break;
 
             case 1:
             case 7:
-                if ( (exit == null) || (exit < model.getEvtdatetime()) ) {
-                    exit = model.getEvtdatetime();
+                if ( (exit == null) || (exit < model.getEvtDateTime()) ) {
+                    exit = model.getEvtDateTime();
                 }
                 break;
         }
@@ -143,6 +144,10 @@ public class Row {
 
     public void incrementcount(){
         totalCount++;
+    }
+
+    public void decrementcount(){
+        totalCount--;
     }
 
     public String getGroupname() {
@@ -159,5 +164,23 @@ public class Row {
 
     public void setTotalRow(boolean totalRow) {
         this.totalRow = totalRow;
+    }
+
+    public void update(PlanOrderItem item) {
+        setColor(COLOR_PAID);
+    }
+
+    public void updateTotal(PlanOrderItem item) {
+        switch (item.getOrderType()){
+            case 4:
+                incrementcount();
+                break;
+            case  8:
+                decrementcount();
+                break;
+            default:
+                System.out.print("orderType " +item.getOrderType());
+                break;
+        }
     }
 }

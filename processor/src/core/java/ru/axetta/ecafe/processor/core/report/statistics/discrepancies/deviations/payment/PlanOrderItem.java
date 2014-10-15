@@ -23,6 +23,8 @@ public class PlanOrderItem  {
     public Date orderDate;
     public String complexName; //complex name
     public String groupName;
+    public Integer orderType;
+
 
     public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate) {
         this.idOfClient = idOfClient;
@@ -55,6 +57,27 @@ public class PlanOrderItem  {
         this.orderDate = orderDate;
         this.complexName = complexName;
         this.groupName = groupName;
+    }
+    public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
+            String groupName, Integer orderType) {
+        this.idOfClient = idOfClient;
+        this.idOfComplex = idOfComplex;
+        this.idOfRule = idOfRule;
+        this.orderDate = orderDate;
+        this.complexName = complexName;
+        this.groupName = groupName;
+        this.orderType = orderType;
+    }
+    public PlanOrderItem(Long idOfClient, String clientName, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
+            String groupName, Integer orderType) {
+        this.idOfClient = idOfClient;
+        this.clientName = clientName;
+        this.idOfComplex = idOfComplex;
+        this.idOfRule = idOfRule;
+        this.orderDate = orderDate;
+        this.complexName = complexName;
+        this.groupName = groupName;
+        this.orderType = orderType;
     }
 
     Date getOrderDate() {
@@ -95,5 +118,29 @@ public class PlanOrderItem  {
 
     public void setComplexName(String complexName) {
         this.complexName = complexName;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public Integer getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
     }
 }

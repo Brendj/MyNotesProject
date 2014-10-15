@@ -19,7 +19,7 @@ public class DAOEnterEventSummaryModel {
     private Long idOfVisitor;
     private String visitorFullName;
     private Long idOfClientGroup;
-    private String groupname;
+    private String groupName;
 
 
     public DAOEnterEventSummaryModel() {
@@ -40,7 +40,7 @@ public class DAOEnterEventSummaryModel {
 
     public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, Integer passDirection, Integer eventCode,
             Long idofTempCard, Long evtDateTime, Long idOfVisitor, String visitorFullName, Long idOfClientGroup,
-            String groupname) {
+            String groupName) {
         this.idOfClient = idOfClient;
         this.idOfOrg = idOfOrg;
         this.passDirection = passDirection;
@@ -50,7 +50,7 @@ public class DAOEnterEventSummaryModel {
         this.idOfVisitor = idOfVisitor;
         this.visitorFullName = visitorFullName;
         this.idOfClientGroup = idOfClientGroup;
-        this.groupname = groupname;
+        this.groupName = groupName;
     }
 
     public Long getIdOfClient() {
@@ -85,46 +85,6 @@ public class DAOEnterEventSummaryModel {
         this.eventCode = eventCode;
     }
 
-    public Long getIdoftempcard() {
-        return idofTempCard;
-    }
-
-    public void setIdofTempcard(Long idofTempCard) {
-        this.idofTempCard = idofTempCard;
-    }
-
-    public Long getEvtdatetime() {
-        return evtDateTime;
-    }
-
-    public void setEvtdatetime(Long evtDateTime) {
-        this.evtDateTime = evtDateTime;
-    }
-
-    public Long getIdofvisitor() {
-        return idOfVisitor;
-    }
-
-    public void setIdofvisitor(Long idOfVisitor) {
-        this.idOfVisitor = idOfVisitor;
-    }
-
-    public String getVisitorFullName() {
-        return visitorFullName;
-    }
-
-    public void setVisitorFullName(String visitorFullName) {
-        this.visitorFullName = visitorFullName;
-    }
-
-    public Long getIdofclientgroup() {
-        return idOfClientGroup;
-    }
-
-    public void setIdOfClientGroup(Long idOfClientGroup) {
-        this.idOfClientGroup = idOfClientGroup;
-    }
-
     public Long getIdofTempCard() {
         return idofTempCard;
     }
@@ -149,15 +109,27 @@ public class DAOEnterEventSummaryModel {
         this.idOfVisitor = idOfVisitor;
     }
 
+    public String getVisitorFullName() {
+        return visitorFullName;
+    }
+
+    public void setVisitorFullName(String visitorFullName) {
+        this.visitorFullName = visitorFullName;
+    }
+
     public Long getIdOfClientGroup() {
         return idOfClientGroup;
     }
 
-    public String getGroupname() {
-        return groupname;
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
     }
 
-    public void setGroupname(String groupname) {
-        this.groupname = groupname;
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

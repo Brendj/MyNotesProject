@@ -207,21 +207,25 @@ public class ClientsEntereventsService {
         return clientInfoList;
     }
 
-    public static final String orderType_Lgotniki = "6";//План льготного питания, резерв
+    public static final String REDUCED_PRICE_PLAN_RESERVE = "6";//План льготного питания, резерв
 
     //Вернет список заказов которые были оплачены
     // в зависимости от параметра
     public static List<PlanOrderItem> loadPaidPlanOrders(Session session, String orderType, String idOfOrgs,
             Date startTime, Date endTime) {
         Query query = session.createSQLQuery(
-                "SELECT cfo.idofclient,(cfod.menutype -50) AS complexId, cfod.idofrule, cfo.orderdate,  cfod.menudetailname, g.groupname  "
+                "SELECT cfo.idofclient,(p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname,(cfod.menutype -50) AS complexId, cfod.idofrule, cfo.orderdate,  cfod.menudetailname, g.groupname,cfo.ordertype  "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + " LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
+                        + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson "
                         + " LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
                         + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (" + idOfOrgs + ") "
                         + " AND cfo.orderdate between :startTime AND :endTime "
-                        + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
+                        //+ " AND cfo.state=1 "
+                        + " AND cfod.socdiscount > 0 "
+                        //+ " AND cfod.guidofgoods IS NOT NULL "
+                        + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
 
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -232,8 +236,8 @@ public class ClientsEntereventsService {
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
             PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultClientItem[0]).longValue(),
-                    (Integer) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
-                    new Date(((BigInteger) resultClientItem[3]).longValue()), (String) resultClientItem[4], (String) resultClientItem[5]);
+                    (String) resultClientItem[1], (Integer) resultClientItem[2], ((BigInteger) resultClientItem[3]).longValue(),
+                    new Date(((BigInteger) resultClientItem[4]).longValue()), (String) resultClientItem[5], (String) resultClientItem[6],(Integer)resultClientItem[7]);
             planOrderItemList.add(planOrderItem);
         }
 
@@ -459,7 +463,7 @@ public class ClientsEntereventsService {
             }
             return discountRules;
         }
-        return null;
+        return new ArrayList<DiscountRule>();
     }
 
 }

@@ -102,9 +102,9 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             entry.setIdOfOrg(temp[1] != null ? ((BigInteger) temp[1]).longValue() : null);
             entry.setPassDirection((Integer) temp[2]);
             entry.setEventCode((Integer) temp[3]);
-            entry.setIdofTempcard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
-            entry.setEvtdatetime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
-            entry.setIdofvisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
+            entry.setIdofTempCard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
+            entry.setEvtDateTime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
+            entry.setIdOfVisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
             entry.setVisitorFullName((String) temp[7]);
             entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
             result.add(entry);
@@ -121,12 +121,12 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             entry.setIdOfOrg(temp[1] != null ? ((BigInteger) temp[1]).longValue() : null);
             entry.setPassDirection((Integer) temp[2]);
             entry.setEventCode((Integer) temp[3]);
-            entry.setIdofTempcard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
-            entry.setEvtdatetime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
-            entry.setIdofvisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
+            entry.setIdofTempCard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
+            entry.setEvtDateTime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
+            entry.setIdOfVisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
             entry.setVisitorFullName((String) temp[9]);
             entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
-            entry.setGroupname((String) temp[10]);
+            entry.setGroupName((String) temp[10]);
             result.add(entry);
         }
         return result;
