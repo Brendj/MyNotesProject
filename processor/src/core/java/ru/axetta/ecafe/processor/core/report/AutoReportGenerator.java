@@ -1037,8 +1037,7 @@ public class AutoReportGenerator {
                 return jobDetail;
             }
         }));
-
-        REPORT_DEFS.add(new ReportDef(AutoEnterEventV2Report.class, TransactionsReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(AutoEnterEventV2Report.class, AutoEnterEventV2Report.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
@@ -1053,7 +1052,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(AutoEnterEventV2Report.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
