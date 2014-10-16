@@ -13,7 +13,6 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -43,6 +42,9 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
     private Date endDate;
     protected List<TransactionsReportItem> items;
     private String htmlReport;
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+    }
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
         private final String templateFilename;
