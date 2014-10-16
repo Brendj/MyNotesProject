@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutoEnterEventV2Report" pageWidth="550" pageHeight="1500" whenNoDataType="NoDataSection" columnWidth="510" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="304c4c4e-c99a-4399-8081-748d3b7c0b8c">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutoEnterEventV2Report" pageWidth="550" pageHeight="1500" whenNoDataType="NoDataSection" columnWidth="510" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isTitleNewPage="true" uuid="304c4c4e-c99a-4399-8081-748d3b7c0b8c">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="9"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -359,7 +359,7 @@
 				</crosstabCell>
 			</crosstab>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="0" width="524" height="29" uuid="2348220d-26c1-4395-91f6-df2cace48cee"/>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="524" height="29" uuid="2348220d-26c1-4395-91f6-df2cace48cee"/>
 				<textElement textAlignment="Center">
 					<font size="16" isBold="true"/>
 				</textElement>
