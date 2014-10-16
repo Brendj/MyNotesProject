@@ -1022,7 +1022,7 @@ public class AutoReportGenerator {
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + TransactionsReport.class.getSimpleName() + ".jasper";
 
-                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new TransactionsReport.AutoReportBuildJob.ExecuteEnvironment(
                         jobName,
                         new TransactionsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1037,6 +1037,7 @@ public class AutoReportGenerator {
                 return jobDetail;
             }
         }));
+
         REPORT_DEFS.add(new ReportDef(AutoEnterEventV2Report.class, AutoEnterEventV2Report.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
