@@ -249,11 +249,11 @@ public class ClientsEntereventsService {
         Query query = session.createSQLQuery(
                 "SELECT idofclient, (cfod.menutype -50) AS complexid, idofrule, orderdate  " + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + "WHERE cfo.ordertype IN (" + orderType + ") " + "AND cfo.idoforg IN (:idOfOrgs) "
+                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (:idOfOrgs) "
                         + "AND cfo.orderdate >= :startTime AND cfo.orderdate < :endTime "
                         + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
         query.setParameter("startTime", startTime.getTime());
-        query.setParameter("idOfOrgs", idOfOrgs);
+        query.setParameterList("idOfOrgs", idOfOrgs);
         query.setParameter("endTime", endTime.getTime());
 
         List result = query.list();
@@ -293,6 +293,66 @@ public class ClientsEntereventsService {
             return allItems;
         }
         return null;
+    }
+
+    // Те кто должен был получить | Проход по карте не зафиксирован
+    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startDate, Long orgId) {
+        List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
+        // клиенты которые в здании
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayNotDetected(session, orgId);
+        if (!clientInfoList.isEmpty()) {
+            // правила для организации
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            // платные категории
+            List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
+
+            for (ClientInfo clientInfo : clientInfoList) {
+                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
+                categories.removeAll(onlyPaydAbleCategories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                rules = getRulesByHighPriority(rules);
+                for (DiscountRule rule : rules) {
+                    addPlanOrderItems(allItems, clientInfo, rule, startDate);
+                }
+            }
+            return allItems;
+        }
+        return null;
+    }
+
+    // Проход по карте не зафиксирован
+    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Long orgId) {
+        return null;  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    // Те кто должен был получить | Проход по карте зафиксирован
+    public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startDate, Long orgId) {
+        List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
+        // клиенты которые в здании
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayDetected(session, orgId);
+        if (!clientInfoList.isEmpty()) {
+            // правила для организации
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            // платные категории
+            List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
+
+            for (ClientInfo clientInfo : clientInfoList) {
+                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
+                categories.removeAll(onlyPaydAbleCategories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                rules = getRulesByHighPriority(rules);
+                for (DiscountRule rule : rules) {
+                    addPlanOrderItems(allItems, clientInfo, rule, startDate);
+                }
+            }
+            return allItems;
+        }
+        return null;
+    }
+
+    // Проход по карте зафиксирован
+    private static List<ClientInfo> loadClientsInfoToPayDetected(Session session, Long orgId) {
+        return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
     // Отбирает все правила с высоким приорететом

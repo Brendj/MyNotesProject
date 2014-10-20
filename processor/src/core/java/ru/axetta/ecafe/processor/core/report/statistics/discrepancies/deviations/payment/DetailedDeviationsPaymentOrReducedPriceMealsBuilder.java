@@ -73,9 +73,12 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         List<DeviationPaymentItem> deviationPaymentItemList = new ArrayList<DeviationPaymentItem>();
 
-        // Те кто были в здании
-        // Те кто дожны были получить бесплатное питание
-        List<PlanOrderItem> planOrderItemsToPay = new ArrayList<PlanOrderItem>();
+        // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
+        List<PlanOrderItem> planOrderItemsToPayDetected = new ArrayList<PlanOrderItem>();
+
+        // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
+        List<PlanOrderItem> planOrderItemsToPayNotDetected = new ArrayList<PlanOrderItem>();
+
         // Те кто получил бесплатное питание
         List<PlanOrderItem> planOrderItemsPayd /*= new ArrayList<PlanOrderItem>()*/;
 
@@ -84,16 +87,19 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
-            for (Long idOfOrg : idOfOrgList) {
-                planOrderItemsToPay = ClientsEntereventsService.loadPlanOrderItemToPay(session, startTime, idOfOrg);
-            }
+/*            for (Long idOfOrg : idOfOrgList) {
+                planOrderItemsToPayDetected = ClientsEntereventsService.loadPlanOrderItemToPayDetected(session, startTime, idOfOrg);
+                planOrderItemsToPayNotDetected = ClientsEntereventsService.loadPlanOrderItemToPayNotDetected(session, startTime, idOfOrg);
+            }*/
 
-            Date addOneDayEndTime = CalendarUtils.addOneDay(endTime);
+            Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
+
+            CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
 
             planOrderItemsPayd = ClientsEntereventsService
                     .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
 
-            if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPay.isEmpty()) {
+            if (!planOrderItemsPayd.isEmpty() /*&& !planOrderItemsToPayDetected.isEmpty()*/) {
                 for (PlanOrderItem planOrderItem : planOrderItemsPayd) {
                     planOrderItem.getOrderDate();
                 }
