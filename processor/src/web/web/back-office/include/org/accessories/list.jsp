@@ -33,7 +33,7 @@
         <a4j:region>
             <c:forEach items="#{accessoriesListPage.accessories}" var="it" varStatus="loop">
                 <h:panelGrid id="accessories" columns="6">
-                    <h:outputText value="Тип оборудоания: " style="font: 12px Arial"/>
+                    <h:outputText value="Тип оборудования: " style="font: 12px Arial"/>
                     <h:selectOneMenu value="#{it.accessoryType}" styleClass="input-text" style="width: 150px">
                         <f:selectItems value="#{accessoriesListPage.accessoryTypes}" />
                     </h:selectOneMenu>
