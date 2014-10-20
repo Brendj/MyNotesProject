@@ -18,7 +18,7 @@
         <property name="idOfSourceOrg" column="IdOfSourceOrg" type="long" not-null="true" update="false"/>
         <property name="idOfTargetOrg" column="IdOfTargetOrg" type="long" not-null="true"/>
         <property name="accessoryType" column="AccessoryType" type="integer" not-null="true"/>
-        <property name="accessoryNumber" column="AccessoryNumber" type="integer" not-null="true"/>
+        <property name="accessoryNumber" column="AccessoryNumber" type="string" length="40" not-null="true"/>
     </class>
 </hibernate-mapping>
 

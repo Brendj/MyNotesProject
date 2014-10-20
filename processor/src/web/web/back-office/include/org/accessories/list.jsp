@@ -38,7 +38,7 @@
                         <f:selectItems value="#{accessoriesListPage.accessoryTypes}" />
                     </h:selectOneMenu>
                     <h:outputText value="Id оборудования: " style="padding-left: 20px; font: 12px Arial"/>
-                    <h:inputText size="3" value="#{it.accessoryNumber}"/>
+                    <h:inputText size="15" value="#{it.accessoryNumber}"/>
                     <h:outputText value="Id корпуса: " style="padding-left: 50px; font: 12px Arial"/>
                     <h:inputText size="3" value="#{it.idOfTargetOrg}"/>
                 </h:panelGrid>

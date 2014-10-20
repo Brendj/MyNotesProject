@@ -18,7 +18,7 @@ public class Accessory implements Serializable {
     protected Long idOfSourceOrg;
     protected Long idOfTargetOrg;
     protected Integer accessoryType;
-    protected Integer accessoryNumber;
+    protected String accessoryNumber;
 
     public static final int BANK_ACCESSORY_TYPE = 1;
     public static final int GATE_ACCESSORY_TYPE = 2;
@@ -29,7 +29,7 @@ public class Accessory implements Serializable {
     }
 
     public Accessory(Long idOfAccessory, Long idOfSourceOrg, Long idOfTargetOrg, Integer accessoryType,
-            Integer accessoryNumber) {
+            String accessoryNumber) {
         this.idOfAccessory = idOfAccessory;
         this.idOfSourceOrg = idOfSourceOrg;
         this.idOfTargetOrg = idOfTargetOrg;
@@ -69,11 +69,11 @@ public class Accessory implements Serializable {
         this.accessoryType = accessoryType;
     }
 
-    public Integer getAccessoryNumber() {
+    public String getAccessoryNumber() {
         return accessoryNumber;
     }
 
-    public void setAccessoryNumber(Integer accessoryNumber) {
+    public void setAccessoryNumber(String accessoryNumber) {
         this.accessoryNumber = accessoryNumber;
     }
 
