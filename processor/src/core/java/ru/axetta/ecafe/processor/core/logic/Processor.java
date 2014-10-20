@@ -2119,7 +2119,7 @@ public class Processor implements SyncProcessor,
             if (clientParamItem.getMobilePhone() != null) {
                 String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
                 //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
-                if(client != null && StringUtils.isBlank(client.getMobile()) &&
+                if(client != null && client.getMobile() != null && StringUtils.isBlank(client.getMobile()) &&
                     !client.getMobile().equals(mobile)) {
                     client.setSsoid("");
                 }

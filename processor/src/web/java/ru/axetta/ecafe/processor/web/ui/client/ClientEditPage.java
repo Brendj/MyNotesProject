@@ -669,7 +669,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setAddress(this.address);
         client.setPhone(this.phone);
         //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
-        if(client != null && StringUtils.isBlank(client.getMobile()) &&
+        if(client != null && client.getMobile() != null && StringUtils.isBlank(client.getMobile()) &&
            !client.getMobile().equals(mobile)) {
             client.setSsoid("");
         }
