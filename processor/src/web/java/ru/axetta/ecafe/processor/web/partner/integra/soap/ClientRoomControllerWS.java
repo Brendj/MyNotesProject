@@ -5930,78 +5930,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private static Map<Long,VisitorsSummary> parseVisitorsSummary (Map<Long,VisitorsSummary> visitorsSummaryList,List<DAOEnterEventSummaryModel> data){
-        List<String> extraEmployeesGroup = new ArrayList<String>(){{
-            add("ВСП.ПЕРСОНАЛ");
-            add("БУХГАЛТЕРИЯ");
-            add("ОХРАНА");
-            add("ПЕДСОСТАВ");
-            add("МЕД.РАБОТНИК");
-            add("СОТРУДНИКИ");
-            add("РАБОТНИКИ(КРОМЕПЕД.СОСТАВА)");
-            add("РАБОТНИКИ");
-            add("СТАЛОВАЯ");
-            add("Охрана");
-            add("МЕД.ПЕРСОНАЛ");
-            add("СПЕЦИЛИЗИРОВАННЫЕСОТРУДНИКИ");
-            add("Педсостав");
-            add("УЧИТЕЛЬИЗО");
-            add("ПРЕПОДАВАТЕЛИ");
-            add("РАБОТНИКИ_СТОЛОВОЙ");
-            add("СОТРУДНИКИ");
-            add("Преподаватели");
-            add("Руководители");
-            add("Бухгалтерия");
-            add("Учитель ИЗО и материальных технологий");
-            add("Учитель музыки");
-            add("Учитель физкультуры");
-            add("Учитель русского языка и литературы");
-            add("Учитель математики");
-            add("Педагог-библиотекарь");
-            add("Воспитатель ГПД, учитель физкультуры");
-            add("Учитель информатики и ИКТ, методист ИКТ");
-            add("Учитель английского языка");
-            add("Учитель начальных классов");
-            add("Дворник");
-            add("Учитель биологии");
-            add("Социальный педагог");
-            add("Секретарь");
-            add("Воспитатель ГПД, соц. педагог");
-            add("ЕРАБОТНИКИ");
-            add("ЧОО");
-            add("СИС.АДМИН");
-            add("БУХГАЛТЕР");
-            add("УЧИТЕЛЬ");
-            add("ВОСПИТАТЕЛЬ");
-            add("Психологическая служба");
-            add("БУХГАЛТЕРИЯ");
-            add("УЧЕБНО-ВСПОМОГАТЕЛЬНЫЙ");
-            add("РАБОЧИЕ");
-            add("ПЕД.СОСТАВ(ОСНОВНОЕЗДАНИЕ)");
-            add("ПЕРСОНАЛ.ГОЛОВНОЕЗДАНИЕ");
-            add("ТЕХ.ПЕРСОНАЛ(ОСНОВНОЕЗДАНИЕ)");
-            add("ИНЫЕПЕДАГОГИ");
-            add("МЕДИЦИНСКИЕРАБОТНИКИ");
-            add("СТОЛОВАЯ");
-            add("Секретарь");
-            add("Воспитатель ГПД, соц. педагог");
-            add("Учитель истории и обществознания, методист");
-            add("Учитель химии и биологии");
-            add("Учитель истории");
-            add("Учитель географии");
-            add("Главный бухгалтер");
-            add("Документовед");
-            add("Учитель информатики и ИКТ");
-            add("Учитель математики и физики");
-            add("Педагог-психолог");
-            add("Учитель-логопед");
-            add("Педагог-библиотекарь, учитель немецкого языка");
-            add("Учитель физической культуры");
-            add("Педагог организатор ОБ");
-            add("Заместитель директора по УВР");
-            add("Учитель ИЗО, МХК и материальных технологий");
-            add("Учитель  английского языка");
-
-        }};
         VisitorsSummary visitorsSummary = null;
         for (DAOEnterEventSummaryModel model : data) {
             if( visitorsSummary == null || !model.getIdOfOrg().equals(visitorsSummary.id)){
@@ -6015,17 +5943,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if(model.getIdOfClient() == null){
                 if (model.getIdOfVisitor() != null ) {
                     if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
-                        if( extraEmployeesGroup.contains(model.getGroupName()) ){
-                            visitorsSummary.employee++;
-                        }else{
                             visitorsSummary.others++;
-                        }
                     }
                 } else {
                     if (model.getEventCode() == 112) {
                         visitorsSummary.cardless++;
                     }
-
                     if((model.getPassDirection() == 1) || (model.getPassDirection() == 7)){
                         visitorsSummary.exitsCardless++;
                     }
@@ -6038,23 +5961,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (model.getIdOfClientGroup() != null) {
                         if (model.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() ) {
                             visitorsSummary.studentsInside++;
-                        } else if ((model.getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) && (model.getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())) {
+                        } else if ((model.getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+                                && (model.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
                             visitorsSummary.employee++;
                         } else{
-                            if( extraEmployeesGroup.contains(model.getGroupName()) ){
-                                visitorsSummary.employee++;
-                            }else{
-                                visitorsSummary.others++;
-                            }
+                            visitorsSummary.others++;
                         }
                     } else {
-
                         visitorsSummary.others++;
                     }
-
                 }
             }
         }
+        visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
         return visitorsSummaryList;
     }
 }
