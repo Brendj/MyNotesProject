@@ -3075,7 +3075,7 @@ public class Processor implements SyncProcessor,
 
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
-                final long idOfOrg = org.getIdOfOrg();
+                long idOfOrg = org.getIdOfOrg();
                 if (existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
                     EnterEvent ee = findEnterEvent(persistenceSession,
                           new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
@@ -3109,6 +3109,9 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             continue;
                         }
                     }
+                    //  Применяем фильтр оборудования
+                    idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
+
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));

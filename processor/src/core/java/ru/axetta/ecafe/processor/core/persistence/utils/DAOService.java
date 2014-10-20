@@ -1538,4 +1538,13 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid='-1'");
         return Long.parseLong("" + q.getSingleResult());
     }
+
+    public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
+        Query q = entityManager.createNativeQuery("SELECT idoftargetorg FROM cf_org_accessories where idofsourceorg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber");
+        List res = q.getResultList();
+        if(res == null || res.size() < 1) {
+            return idoforg;
+        }
+        return ((BigInteger) res.get(0)).longValue();
+    }
 }
