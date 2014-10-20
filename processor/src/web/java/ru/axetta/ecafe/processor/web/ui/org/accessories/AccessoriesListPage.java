@@ -45,7 +45,7 @@ public class AccessoriesListPage extends OnlineReportPage {
 
     protected List<SelectItem> accessoryTypes;
     protected List<Accessory> accessories;
-    @PersistenceContext(unitName = "reportsPU")
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
 
@@ -73,6 +73,7 @@ public class AccessoriesListPage extends OnlineReportPage {
 
     public void save() {
         RuntimeContext.getAppContext().getBean(AccessoriesListPage.class).refreshAccessories();
+        RuntimeContext.getAppContext().getBean(AccessoriesListPage.class).updateAccessories();
     }
 
     @Transactional
@@ -97,21 +98,52 @@ public class AccessoriesListPage extends OnlineReportPage {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            for(Accessory a : accessories) {
-                if(a.getIdOfTargetOrg() == null || a.getAccessoryType() == null || a.getAccessoryNumber() == null) {
-                    continue;
-                }
-                session.save(a);
-            }
-            /*clearAccessories(session);
-            saveAccessories(session);
-            accessories = loadAccessories(session);*/
+            List<Accessory> currentAccessories = DAOUtils.getAccessories(session, selectedIdOfOrg);
+            saveAccessories(session, currentAccessories);
         } catch (Exception e) {
             logger.error("Failed to load clients data", e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
     }
+
+    public void saveAccessories(Session session, List<Accessory> currentAccessories) {
+        //  удаление оборудования
+        if(currentAccessories != null && currentAccessories.size() > 0) {
+            for(Accessory ca : currentAccessories) {
+                boolean found = false;
+                for(Accessory a : accessories) {
+                    if(ca.getIdOfAccessory().equals(a.getIdOfAccessory()) &&
+                       (a.getAccessoryType() == Accessory.BANK_ACCESSORY_TYPE || a.getAccessoryType() == Accessory.GATE_ACCESSORY_TYPE)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found) {
+                    session.delete(ca);
+                    session.flush();
+                    session.evict(ca);
+                }
+            }
+        }
+
+        //  сохранение оборудования
+        for(Accessory a : accessories) {
+            if(a.getIdOfTargetOrg() == null || a.getAccessoryType() == null || a.getAccessoryNumber() == null ||
+               (a.getAccessoryType() != Accessory.BANK_ACCESSORY_TYPE && a.getAccessoryType() != Accessory.GATE_ACCESSORY_TYPE)) {
+                continue;
+            }
+            a = (Accessory) session.merge(a);
+            session.flush();
+            session.evict(a);
+            /*if(a.getIdOfAccessory() == null) {
+                a = (Accessory) session.merge(a);
+            } else {
+                session.save(a);
+            }*/
+        }
+        }
 
     public void update() {
         RuntimeContext.getAppContext().getBean(AccessoriesListPage.class).updateAccessories();
