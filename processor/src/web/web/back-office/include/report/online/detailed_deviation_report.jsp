@@ -49,4 +49,20 @@
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+    <h:panelGrid styleClass="borderless-grid">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
+
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent"> ${mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.htmlReport} </div>
+            </f:verbatim>
+
+        </c:if>
+    </h:panelGrid>
 </h:panelGrid>

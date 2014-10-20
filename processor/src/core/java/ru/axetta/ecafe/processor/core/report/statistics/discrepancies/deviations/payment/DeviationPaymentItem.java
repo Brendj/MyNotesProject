@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -13,38 +15,28 @@ package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviation
 
 public class DeviationPaymentItem {
 
-    private Long idOfOrg;
-    private String orgShortName;
+    private String orgName;    //Название организации
     private String address;
-    private String groupName; // группа клиента (класс, сотрудники и т.д.)
-    private String personName;
-    private Integer count;
+
+    private List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList;
 
 
     public DeviationPaymentItem() {
     }
 
-    public DeviationPaymentItem(Long idOfOrg, String orgShortName, String address, String groupName) {
-        this.idOfOrg = idOfOrg;
-        this.orgShortName = orgShortName;
+    public DeviationPaymentItem(String orgName, String address,
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+        this.orgName = orgName;
         this.address = address;
-        this.groupName = groupName;
+        this.deviationPaymentSubReportItemList = deviationPaymentSubReportItemList;
     }
 
-    public Long getIdOfOrg() {
-        return idOfOrg;
+    public String getOrgName() {
+        return orgName;
     }
 
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
-
-    public String getOrgShortName() {
-        return orgShortName;
-    }
-
-    public void setOrgShortName(String orgShortName) {
-        this.orgShortName = orgShortName;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getAddress() {
@@ -55,27 +47,12 @@ public class DeviationPaymentItem {
         this.address = address;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public List<DeviationPaymentSubReportItem> getDeviationPaymentSubReportItemList() {
+        return deviationPaymentSubReportItemList;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public String getPersonName() {
-        return personName;
-    }
-
-    public void setPersonName(String personName) {
-        this.personName = personName;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
+    public void setDeviationPaymentSubReportItemList(
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+        this.deviationPaymentSubReportItemList = deviationPaymentSubReportItemList;
     }
 }

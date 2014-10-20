@@ -1,109 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" language="groovy" pageWidth="1024" pageHeight="842" columnWidth="984" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="eb37c071-d9f1-4429-a81e-20db41200729">
-	<property name="ireport.zoom" value="1.0000000000000004"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" language="groovy" pageWidth="770" pageHeight="10000" columnWidth="730" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+	<property name="ireport.zoom" value="1.3310000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="startTime" class="java.util.Date"/>
-	<parameter name="endTime" class="java.util.Date"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#E6F3FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="beginDate" class="java.lang.String" isForPrompting="false"/>
 	<queryString>
-		<![CDATA[select shortname as orgname, address
-from cf_orgs cfo
-group by cfo.idoforg
-order by cfo.idoforg]]>
+		<![CDATA[]]>
 	</queryString>
-	<field name="orgname" class="java.lang.String"/>
+	<field name="orgName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
+	<field name="deviationPaymentSubReportItemList" class="java.util.List"/>
+	<group name="ByOrgName">
+		<groupExpression><![CDATA[$F{deviationPaymentSubReportItemList}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<rectangle>
+					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="184" y="0" width="546" height="50"/>
+				</rectangle>
+				<subreport>
+					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="414" y="0" width="316" height="50"/>
+					<subreportParameter name="orgName">
+						<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{deviationPaymentSubReportItemList})]]></dataSourceExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DetailedDeviationsPaymentOrReducedPriceMealsJasperReport_Subreport.jasper"]]></subreportExpression>
+				</subreport>
+				<textField>
+					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="144" height="50"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement uuid="c17aa3f5-8797-4d7a-bd8f-104e4acc11ae" stretchType="RelativeToBandHeight" x="184" y="0" width="230" height="50"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="8bef9b0a-3619-4fba-96a4-116612e0370b" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="50"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
 	<title>
-		<band height="63" splitType="Stretch">
+		<band height="100" splitType="Prevent">
 			<textField>
-				<reportElement uuid="a0bd23e1-3354-45e8-be81-7633d43ddff9" x="0" y="15" width="884" height="48"/>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" x="0" y="0" width="730" height="100"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Сводный отчет отклонений оплаты льготного питания за указанный период  "
-+ new SimpleDateFormat("dd.MM.yyyy").format($P{startTime})  + " - " + new SimpleDateFormat("dd.MM.yyyy").format($P{endTime})]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Сводный отчет отклонений оплаты льготного питания (выборка по 1 дню) ( " + $P{beginDate} + " года)"]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="20">
+		<band height="25">
 			<staticText>
-				<reportElement uuid="298bcc36-defa-4efa-9a60-d9841337cbb5" x="0" y="0" width="20" height="20"/>
+				<reportElement uuid="743f4a73-1a52-49df-baaf-5c08b1c2e024" x="0" y="0" width="40" height="25"/>
 				<box>
+					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
 				<text><![CDATA[№]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="bfc1155d-d269-4556-bc58-843ccacb8949" x="20" y="0" width="135" height="20"/>
+				<reportElement uuid="3c1392c0-6031-4e93-bbe5-84ef58b9bd0e" x="40" y="0" width="144" height="25"/>
 				<box>
+					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8ca4da3f-f072-492c-bfc2-75681134f9f6" x="155" y="0" width="300" height="20"/>
+				<reportElement uuid="76f484c6-68b4-418f-bf3c-a3d6dcfdc459" x="184" y="0" width="230" height="25"/>
 				<box>
+					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Адресс]]></text>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2861a772-cb53-4560-8602-2e83bae3be3d" x="455" y="0" width="429" height="20"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="414" y="0" width="316" height="25"/>
 				<box>
+					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[ФИО учащегося]]></text>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ФИО Учащегося]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
-	<detail>
-		<band height="42" splitType="Stretch">
-			<textField>
-				<reportElement uuid="d468250d-7bd3-4c19-80ab-a1f2ae67267c" x="0" y="0" width="20" height="42"/>
-				<box>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="911224a2-212d-4aeb-b170-87082eb9365f" x="20" y="0" width="135" height="42"/>
-				<box>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{orgname}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="c8348aca-5759-4cf8-b953-c436fc2f4ccb" x="155" y="0" width="300" height="42"/>
-				<box>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
-			</textField>
-		</band>
-	</detail>
 </jasperReport>
