@@ -31,6 +31,10 @@ public class EnterEventsService {
         return enterEventsRepository.getEnterEventsSummaryNotEmptyClient(dateTime);
     }
 
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummaryVisitors(Long dateTime){
+        return enterEventsRepository.getEnterEventsSummaryVisitors(dateTime);
+    }
+
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryEmptyClient(Long dateTime){
         return enterEventsRepository.getEnterEventsSummaryEmptyClient(dateTime);
     }

@@ -34,7 +34,7 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         return RuntimeContext.getAppContext().getBean(EnterEventsRepository.class);
     }
 
-    @Transactional(readOnly = true)
+
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryNotEmptyClient(Long endTime){
         long begin = CalendarUtils.truncateToDayOfMonth(new Date(endTime)).getTime();
         return getEnterEventsSummaryNotEmptyClient(begin,endTime);
@@ -46,7 +46,7 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
                 "SELECT DISTINCT ON(e) e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, ( e.idoforg || ' ' || e.idofclient )as e  "
                         + "FROM cf_enterevents e "
-                        + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + "INNER JOIN cf_clients c ON e.idofclient = c.idofclient   "
                         + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
                         + "and e.idofclient is not null "
                         + "ORDER BY e, e.evtdatetime DESC")
@@ -58,16 +58,38 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
 
         return parse(tempList);
     }
+
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummaryVisitors(Long endTime){
+        long begin = CalendarUtils.truncateToDayOfMonth(new Date(endTime)).getTime();
+        return getEnterEventsSummaryVisitors(begin,endTime);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummaryVisitors(Long startTime,Long endTime) {
+
+        List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
+                "SELECT DISTINCT ON(e) e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, ( e.idoforg || ' ' || e.idofclient )as e  "
+                        + "FROM cf_enterevents e "
+                        + "INNER JOIN cf_clients c ON e.idofvisitor = c.idofclient   "
+                        + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
+                        + "and e.idofclient is not null "
+                        + "ORDER BY e, e.evtdatetime DESC")
+                .setParameter("startDateTime", startTime)
+                .setParameter("endDateTime", endTime)
+                        //.setParameter("startDateTime", 1355097600000L)
+                        //.setParameter("endDateTime", 1355183999000L)
+                .getResultList();
+
+        return parse(tempList);
+    }
+
     @Transactional(readOnly = true)
     public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long idOfOrg, Long startTime, Long endTime) {
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
-                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
+                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname "
                         + " FROM cf_enterevents e "
-                        + " LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
-                        + " LEFT JOIN cf_persons p ON p.idofperson = c.idofperson "
-                        + " LEFT JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
                         + " WHERE e.evtdatetime BETWEEN :startTime AND :endTime "
-                        + " and e.idofclient is not null "
+                        + " and e.idofclient is null and e.idofvisitor is not null "
                         + " and e.idOfOrg = :idOfOrg "
                         + " ORDER BY g.groupname, e.idofclient, e.evtdatetime DESC ")
                 .setParameter("idOfOrg", idOfOrg)
@@ -84,9 +106,8 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryEmptyClient(Long dateTime) {
         long begin = CalendarUtils.truncateToDayOfMonth(new Date(dateTime)).getTime();
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
-                "SELECT e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup "
+                "SELECT e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname "
                         + "FROM cf_enterevents e "
-                        + "LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
                         + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
                         + "and e.idofclient is null "
                         + "ORDER BY  e.evtdatetime DESC")
@@ -110,9 +131,12 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             entry.setEventCode((Integer) temp[3]);
             entry.setIdofTempCard(temp[4] != null ? ((BigInteger) temp[4]).longValue() : null);
             entry.setEvtDateTime(temp[5] != null ? ((BigInteger) temp[5]).longValue() : null);
-            entry.setIdOfVisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
-            entry.setVisitorFullName((String) temp[7]);
-            entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
+            if(temp.length >= 6)
+                entry.setIdOfVisitor(temp[6] != null ? ((BigInteger) temp[6]).longValue() : null);
+            if(temp.length >= 7)
+                entry.setVisitorFullName(temp[7] != null ? (String) temp[7] : null);
+            if(temp.length > 8)
+                entry.setIdOfClientGroup(temp[8] != null ? ((BigInteger) temp[8]).longValue() : null);
             result.add(entry);
         }
         return result;

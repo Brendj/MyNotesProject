@@ -24,8 +24,12 @@ public class VisitorsSummary {
     public Long studentsInside = 0L;
     @XmlAttribute(name = "employee")
     public Long employee = 0L;
-    @XmlAttribute(name = "others")
-    public Long others = 0L;
+    @XmlAttribute(name = "others1")
+    public Long others1 = 0L;
+    @XmlAttribute(name = "others2")
+    public Long others2 = 0L;
+    @XmlAttribute(name = "others3")
+    public Long others3 = 0L;
     @XmlAttribute(name = "cardless")
     public Long cardless = 0L;
     @XmlAttribute(name = "exitsCardless")
@@ -45,7 +49,13 @@ public class VisitorsSummary {
         if(employee != 0){
             return false;
         }
-        if(others != 0){
+        if(others1 != 0){
+            return false;
+        }
+        if(others2 != 0){
+            return false;
+        }
+        if(others3 != 0){
             return false;
         }
         if(cardless != 0){

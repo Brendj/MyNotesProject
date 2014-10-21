@@ -5905,9 +5905,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getBean(EnterEventsService.class);
         List<DAOEnterEventSummaryModel> dataClients = new ArrayList<DAOEnterEventSummaryModel>();
         List<DAOEnterEventSummaryModel> dataOthers = new ArrayList<DAOEnterEventSummaryModel>();
+        List<DAOEnterEventSummaryModel> dataVisitors = new ArrayList<DAOEnterEventSummaryModel>();
         try{
             dataClients = enterEventsService.getEnterEventsSummaryNotEmptyClient(datetime);
             dataOthers = enterEventsService.getEnterEventsSummaryEmptyClient(datetime);
+            dataVisitors = enterEventsService.getEnterEventsSummaryVisitors(datetime);
         } catch (Exception i) {
             result.resultCode = ResultConst.CODE_INTERNAL_ERROR;
             result.description = ResultConst.DESCR_INTERNAL_ERROR;
@@ -5917,6 +5919,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         parseVisitorsSummary(visitorsSummaryList,dataClients);
         parseVisitorsSummary(visitorsSummaryList,dataOthers);
+        parseVisitorsSummary(visitorsSummaryList,dataVisitors);
 
         //visitorsSummaryList.addAll( parseVisitorsSummary(dataOthers) );
 
@@ -5942,8 +5945,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if(model.getIdOfClient() == null){
                 if (model.getIdOfVisitor() != null ) {
-                    if ((model.getPassDirection() == 0) || (model.getPassDirection() == 6)){
-                            visitorsSummary.others++;
+                    if ((model.getPassDirection() != 1) || (model.getPassDirection() != 7)){
+                            visitorsSummary.others3++;
                     }
                 } else {
                     if (model.getEventCode() == 112) {
@@ -5964,16 +5967,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         } else if ((model.getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
                                 && (model.getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
                             visitorsSummary.employee++;
-                        } else{
-                            visitorsSummary.others++;
+                        } else if(model.getIdOfClientGroup()>= ClientGroup.Predefined.CLIENT_PARENTS.getValue()){
+                            visitorsSummary.others1++;
                         }
                     } else {
-                        visitorsSummary.others++;
+                        visitorsSummary.others2++;
                     }
                 }
             }
         }
-        visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
+      // visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
         return visitorsSummaryList;
     }
 }
