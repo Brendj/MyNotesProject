@@ -34,38 +34,6 @@ public class ClientsEntereventsService {
     private ClientsEntereventsService() {
     }
 
-    // Получаем список учеников внутри здания по организации и по дате
-    public static List<Long> getClientsInsideBuilding(Session session, Long idOfOrg, Date startDate, Date endDate)
-            throws Exception {
-        org.hibernate.Query query = session.createSQLQuery(
-                "SELECT c.idofclient FROM cf_enterevents e LEFT JOIN cf_clients c "
-                        + "ON c.idofclient = e.idofclient WHERE c.idoforg = :idOfOrg "
-                        + "AND e.evtdatetime >= :startDate AND e.evtdatetime <= :endDate "
-                        + "AND c.idOfClientGroup < 1100000030 " + "GROUP BY c.idofclient ORDER BY c.idofclient");
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("startDate", startDate.getTime());
-        query.setParameter("endDate", endDate.getTime());
-        List<Long> idsOfClients = query.list();
-        return idsOfClients;
-    }
-
-    // Получаем список учеников вне здания по организации и по дате
-    public static List<Long> getClientsOutsideBuilding(Session session, Long idOfOrg, Date startDate, Date endDate)
-            throws Exception {
-        List<Long> idOfClientsInside = getClientsInsideBuilding(session, idOfOrg, startDate, endDate);
-        if (!idOfClientsInside.isEmpty()) {
-            org.hibernate.Query query = session.createSQLQuery(
-                    "SELECT c.idofclient FROM cf_clients c " + "WHERE c.idoforg = :idOfOrg "
-                            + "AND c.idOfClientGroup < 1100000030 " + "AND c.idofclient NOT IN (:idOfClientsInside) "
-                            + "GROUP BY c.idofclient ORDER BY c.idofclient");
-            query.setParameter("idOfOrg", idOfOrg);
-            query.setParameterList("idOfClientsInside", idOfClientsInside);
-            List<Long> idsOfClients = query.list();
-            return idsOfClients;
-        }
-        return new ArrayList<Long>();
-    }
-
     // Выбор правил по льготам
     public static List<DiscountRule> getDiscountRulesByClientBenefits(Session session, List<Long> clientBenefits) {
         List<DiscountRule> discountRulesResult = new ArrayList<DiscountRule>();
@@ -248,12 +216,13 @@ public class ClientsEntereventsService {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT c.idofclient, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname "
+                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
-                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (:idOfOrgs) "
+                        + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson " + "WHERE cfo.ordertype IN ("
+                        + orderType + ") AND cfo.idoforg IN (:idOfOrgs) "
                         + "AND cfo.orderdate >= :startTime AND cfo.orderdate < :endTime "
                         + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
         query.setParameter("startTime", startTime.getTime());
@@ -266,7 +235,10 @@ public class ClientsEntereventsService {
         for (Object o : result) {
             Object[] resultPlanOrderItem = (Object[]) o;
             PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultPlanOrderItem[0]).longValue(),
-                    (Integer) resultPlanOrderItem[1], ((BigInteger) resultPlanOrderItem[2]).longValue(), CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[3]).longValue())), (String) resultPlanOrderItem[4]);
+                    (String) resultPlanOrderItem[1], (Integer) resultPlanOrderItem[2],
+                    ((BigInteger) resultPlanOrderItem[3]).longValue(),
+                    CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
+                    (String) resultPlanOrderItem[5]);
             resultPlanOrder.add(planOrderItem);
         }
         return resultPlanOrder;
@@ -299,11 +271,12 @@ public class ClientsEntereventsService {
     }
 
     // Те кто должен был получить | Проход по карте не зафиксирован
-    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime, Long orgId) {
+    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
+            Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayNotDetected(session, startTime,
-                endTime, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService
+                .loadClientsInfoToPayNotDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
@@ -325,26 +298,21 @@ public class ClientsEntereventsService {
     }
 
     // Проход по карте не зафиксирован
-    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime, Long idOfOrg) {
+    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime,
+            Long idOfOrg) {
         List<ClientInfo> clientInfoListNot = new ArrayList<ClientInfo>();
 
-        Query query = session.createSQLQuery("SELECT cl.idofclient, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
-                + "LEFT JOIN cf_clientgroups gr "
-                + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
-                + "WHERE cl.idoforg = :idOfOrg "
-                + "AND cl.idOfClientGroup < 1100000030 "
-                + "AND cl.idofclient NOT IN (SELECT cl.idofclient "
-                + "FROM cf_enterevents e INNER JOIN cf_clients cl "
-                + "ON cl.idOfClient = e.idOfClient "
-                + "LEFT JOIN cf_clientgroups gr "
-                + "ON gr.idofclientgroup = cl.idofclientgroup "
-                + "AND gr.idoforg = cl.idoforg "
-                + "WHERE e.evtdatetime "
-                + "BETWEEN  :startTime AND :endTime "
-                + "AND e.idoforg = :idOfOrg "
-                + "AND e.idofclient IS NOT null "
-                + "AND e.passdirection NOT IN (2, 5, 8, 9) "
-                + "AND gr.idOfClientGroup < 1100000030)");
+        Query query = session.createSQLQuery(
+                "SELECT cl.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
+                        + "LEFT JOIN cf_clientgroups gr "
+                        + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson " + "WHERE cl.idoforg = :idOfOrg "
+                        + "AND cl.idOfClientGroup < 1100000030 " + "AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                        + "FROM cf_enterevents e INNER JOIN cf_clients cl " + "ON cl.idOfClient = e.idOfClient "
+                        + "LEFT JOIN cf_clientgroups gr " + "ON gr.idofclientgroup = cl.idofclientgroup "
+                        + "AND gr.idoforg = cl.idoforg " + "WHERE e.evtdatetime " + "BETWEEN  :startTime AND :endTime "
+                        + "AND e.idoforg = :idOfOrg " + "AND e.idofclient IS NOT null "
+                        + "AND e.passdirection NOT IN (2, 5, 8, 9) " + "AND gr.idOfClientGroup < 1100000030)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -354,19 +322,20 @@ public class ClientsEntereventsService {
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
             ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
-                    (String) resultClientItem[3]);
+                    (String) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
+                    (String) resultClientItem[3], (String) resultClientItem[4]);
             clientInfoListNot.add(clientInfo);
         }
         return clientInfoListNot;
     }
 
     // Те кто должен был получить | Проход по карте зафиксирован
-    public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime, Long orgId) {
+    public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime,
+            Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayDetected(session, startTime,
-                endTime, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService
+                .loadClientsInfoToPayDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
@@ -393,10 +362,11 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
 
         Query query = session.createSQLQuery(
-                "SELECT DISTINCT cl.idofclient, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts "
+                "SELECT DISTINCT cl.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts "
                         + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
                         + "LEFT JOIN cf_clientgroups gr "
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
                         + "WHERE e.evtdatetime BETWEEN :startTime AND :endTime AND e.idoforg = :idOfOrg AND e.idofclient IS NOT null "
                         + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030");
         query.setParameter("startTime", startTime.getTime());
@@ -408,8 +378,8 @@ public class ClientsEntereventsService {
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
             ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
-                    (String) resultClientItem[3]);
+                    (String) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
+                    (String) resultClientItem[3], (String) resultClientItem[4]);
             clientInfoList.add(clientInfo);
         }
         return clientInfoList;
@@ -439,7 +409,7 @@ public class ClientsEntereventsService {
 
         List<Integer> allComplexesId = new ArrayList<Integer>();
 
-        if ((complexMap != null) || (complexMap != "")) {
+        if ((complexMap != null) && (complexMap != "")) {
             String[] complexes = complexMap.split(";");
             for (String complex : complexes) {
                 String[] complexItemSplit = complex.split("=");
