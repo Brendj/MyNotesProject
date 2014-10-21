@@ -52,6 +52,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -3567,12 +3568,14 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(eventDate);
         //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
-                guardianName};
+                guardianName, "empTime", empTime};
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
@@ -3594,11 +3597,14 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         if(payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
            contractId=contractId+"01";
         }
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(payment.getTime());
         return new String[] {
                 "date", date,
                 "contractId", contractId,
                 "others", CurrencyStringUtils.copecksToRubles(others),
-                "complexes", CurrencyStringUtils.copecksToRubles(complexes) };
+                "complexes", CurrencyStringUtils.copecksToRubles(complexes),
+                "empTime", empTime};
     }
 
     private static boolean isDateToday(Date date) {

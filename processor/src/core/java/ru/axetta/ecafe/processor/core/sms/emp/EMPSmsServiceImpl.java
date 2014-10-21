@@ -171,7 +171,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         SendSubscriptionStreamEventsRequestType sending = new SendSubscriptionStreamEventsRequestType();
         try {
             GregorianCalendar gcal = new GregorianCalendar();
-            gcal.setTimeInMillis(System.currentTimeMillis());
+            gcal.setTimeInMillis(eventType.getTime());
             XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
             String uuid = UUID.randomUUID().toString();
 

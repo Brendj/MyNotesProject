@@ -24,7 +24,9 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.StringReader;
 import java.math.BigInteger;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -390,7 +392,7 @@ public class EventNotificationService {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
 
-            Object textObject = getTextObject(text, type, client, direction, guardian);
+            Object textObject = getTextObject(text, type, client, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
                     smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, textObject);
@@ -407,7 +409,7 @@ public class EventNotificationService {
         return result;
     }
 
-    private Object getTextObject(String text, String type, Client client, Integer direction, Client guardian) {
+    private Object getTextObject(String text, String type, Client client, Integer direction, Client guardian, String[] values) {
         ISmsService smsService = runtimeContext.getSmsService();
         if(smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
@@ -420,6 +422,14 @@ public class EventNotificationService {
                 putGuardianParams(guardian, empType);
             } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, client);
+                String amount = findValueInParams(new String [] {"paySum"}, values);
+                String balance = findValueInParams(new String [] {"balance"}, values);
+                if(amount != null && amount.length() > 0) {
+                    empType.getParameters().put("amount", amount);
+                }
+                if(balance != null && balance.length() > 0) {
+                    empType.getParameters().put("balance", balance);
+                }
             } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, client);
@@ -430,10 +440,70 @@ public class EventNotificationService {
             } /*else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
             }*/
+
+            //  Устанавливаем дату
+            String empDateStr = findValueInParams(new String [] {"empTime"}, values);
+            String dateStr = findValueInParams(new String [] {"date", "eventTime", "time"}, values);
+            if(dateStr != null && !StringUtils.isBlank(dateStr)) {
+                try {
+                    long ts = Date.parse(dateStr);
+                    empType.setTime(ts);
+                } catch (Exception e) {
+                    logger.info("Failed to parse EMP date using simple date parser", e);
+                }
+            }
+            if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+                try {
+                    DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                    Date eventDate = df.parse(empDateStr);
+                    empType.setTime(eventDate.getTime());
+                } catch (Exception e) {
+                    logger.error("Failed to parse EMP date", e);
+                }
+            }
+            /*for(int i=0; i<values.length-1; i+=2) {
+                String name = values [i];
+                String val = values[i+1];
+                if(name.equals("empTime")) {
+                    try {
+                        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                        Date eventDate = df.parse(val);
+                        empType.setTime(eventDate.getTime());
+                        break;
+                    } catch (Exception e) {
+                        logger.error("Failed to parse EMP date", e);
+                    }
+                }
+                if(name.equals("date") || name.equals("eventTime")) {
+                    try {
+                        long ts = Date.parse(val);
+                        empType.setTime(ts);
+                    } catch (Exception e) {
+                        logger.info("Failed to parse EMP date using simple date parser", e);
+                    }
+                }
+            }*/
+
             return empType;
         } else {
             return text;
         }
+    }
+
+    protected String findValueInParams(String valueNames[], String values[]) {
+        if(valueNames == null || valueNames.length < 1) {
+            return "";
+        }
+        for(int i=0; i<values.length-1; i+=2) {
+            String name = values [i];
+            String val = values[i+1];
+            for(String vn : valueNames) {
+                if(name.equals(vn)) {
+                    return val;
+                }
+            }
+        }
+        return "";
     }
 
     private static final void putGuardianParams(Client guardian, EMPEventType empType) {

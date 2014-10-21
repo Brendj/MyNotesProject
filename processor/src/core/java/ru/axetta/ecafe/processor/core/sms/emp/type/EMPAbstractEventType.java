@@ -38,9 +38,21 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     protected int stream;
     protected String ssoid;
     protected Long msisdn;
+    protected long time;
     protected Map<String, String> params;
 
     public EMPAbstractEventType() {
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+        if(params != null) {
+            params.put("time", new SimpleDateFormat("HH:mm").format(new Date(time)));
+        }
     }
 
     public int getPreviousId() {

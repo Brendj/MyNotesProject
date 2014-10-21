@@ -20,6 +20,9 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 @Component
 @Scope("session")
 public class OtherActionsPage extends BasicWorkspacePage {
@@ -88,8 +91,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runSendEMPEvent() throws Exception {
         //Client client = DAOService.getInstance().getClientByGuid("e5000805-29a9-1388-e043-a2997e0ab714");
         Client client = DAOService.getInstance().findClientById(1069L);
+
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(new Date(System.currentTimeMillis()));
+        String [] vals = new String[]{"aa", "11", "bb", "22", "empTime", empTime, "cc", "33"};
+
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT, new String[]{}, true,
+                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT, vals, true,
                         EnterEvent.ENTRY); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }

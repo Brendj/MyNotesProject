@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.DateFormat;
 import java.util.Date;
 
 @Component
@@ -256,12 +257,16 @@ public class FinancialOpsManager {
         getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, clientPayment.getContragentReceiver());
         session.save(clientPayment);
 
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(clientPayment.getCreateTime());
+
         eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
                 "contractId",String.valueOf(client.getContractId()),
                 "surname",client.getPerson().getSurname(),
-                "firstName",client.getPerson().getFirstName()
+                "firstName",client.getPerson().getFirstName(),
+                "empTime", empTime
             });
     }
 
@@ -275,12 +280,17 @@ public class FinancialOpsManager {
         session.save(clientPayment);
         final String contractId = String.valueOf(client.getContractId())+"01";
         final Long balance = client.getSubBalance1()==null?0L:client.getSubBalance1();
+
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(clientPayment.getCreateTime());
+
         eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
                 "balance", CurrencyStringUtils.copecksToRubles(balance),
                 "contractId", contractId,
                 "surname",client.getPerson().getSurname(),
-                "firstName",client.getPerson().getFirstName()
+                "firstName",client.getPerson().getFirstName(),
+                "empTime", empTime
         });
     }
 

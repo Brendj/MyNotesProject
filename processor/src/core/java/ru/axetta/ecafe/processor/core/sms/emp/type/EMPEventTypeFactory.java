@@ -49,6 +49,7 @@ public class EMPEventTypeFactory {
                 throw new IllegalArgumentException("Unknown type");
         }
         event.parse(client, additionalParams);
+        event.setTime(System.currentTimeMillis());
         return event;
     }
 }

@@ -37,4 +37,8 @@ public interface EMPEventType {
     public Long getMsisdn();
 
     public String buildText();
+
+    public long getTime();
+
+    public void setTime(long time);
 }
