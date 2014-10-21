@@ -9,14 +9,30 @@
              binding="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.startDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false" />
+        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+        <rich:calendar value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text"
+                       showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar"
+                         actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar"
+                         actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
+        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+        <rich:calendar id="endDateCalendar" value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter"
+                       inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                         actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onEndDateSpecified}" />
+        </rich:calendar>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>

@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -247,8 +248,11 @@ public class ClientsEntereventsService {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT idofclient, (cfod.menutype -50) AS complexid, idofrule, orderdate  " + "FROM cf_orders cfo "
+                "SELECT c.idofclient, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname "
+                        + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                        + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
+                        + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
                         + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (:idOfOrgs) "
                         + "AND cfo.orderdate >= :startTime AND cfo.orderdate < :endTime "
                         + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
@@ -262,8 +266,7 @@ public class ClientsEntereventsService {
         for (Object o : result) {
             Object[] resultPlanOrderItem = (Object[]) o;
             PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultPlanOrderItem[0]).longValue(),
-                    (Integer) resultPlanOrderItem[1], ((BigInteger) resultPlanOrderItem[2]).longValue(),
-                    new Date(((BigInteger) resultPlanOrderItem[3]).longValue()));
+                    (Integer) resultPlanOrderItem[1], ((BigInteger) resultPlanOrderItem[2]).longValue(), CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[3]).longValue())), (String) resultPlanOrderItem[4]);
             resultPlanOrder.add(planOrderItem);
         }
         return resultPlanOrder;
@@ -296,10 +299,11 @@ public class ClientsEntereventsService {
     }
 
     // Те кто должен был получить | Проход по карте не зафиксирован
-    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startDate, Long orgId) {
+    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime, Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayNotDetected(session, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayNotDetected(session, startTime,
+                endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
@@ -312,7 +316,7 @@ public class ClientsEntereventsService {
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo, rule, startDate);
+                    addPlanOrderItems(allItems, clientInfo, rule, startTime);
                 }
             }
             return allItems;
@@ -321,15 +325,48 @@ public class ClientsEntereventsService {
     }
 
     // Проход по карте не зафиксирован
-    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Long orgId) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        List<ClientInfo> clientInfoListNot = new ArrayList<ClientInfo>();
+
+        Query query = session.createSQLQuery("SELECT cl.idofclient, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
+                + "LEFT JOIN cf_clientgroups gr "
+                + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                + "WHERE cl.idoforg = :idOfOrg "
+                + "AND cl.idOfClientGroup < 1100000030 "
+                + "AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                + "FROM cf_enterevents e INNER JOIN cf_clients cl "
+                + "ON cl.idOfClient = e.idOfClient "
+                + "LEFT JOIN cf_clientgroups gr "
+                + "ON gr.idofclientgroup = cl.idofclientgroup "
+                + "AND gr.idoforg = cl.idoforg "
+                + "WHERE e.evtdatetime "
+                + "BETWEEN  :startTime AND :endTime "
+                + "AND e.idoforg = :idOfOrg "
+                + "AND e.idofclient IS NOT null "
+                + "AND e.passdirection NOT IN (2, 5, 8, 9) "
+                + "AND gr.idOfClientGroup < 1100000030)");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        List result = query.list();
+
+        for (Object resultClient : result) {
+            Object[] resultClientItem = (Object[]) resultClient;
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
+                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
+                    (String) resultClientItem[3]);
+            clientInfoListNot.add(clientInfo);
+        }
+        return clientInfoListNot;
     }
 
     // Те кто должен был получить | Проход по карте зафиксирован
-    public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startDate, Long orgId) {
+    public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime, Long orgId) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayDetected(session, orgId);
+        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPayDetected(session, startTime,
+                endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
@@ -342,7 +379,7 @@ public class ClientsEntereventsService {
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo, rule, startDate);
+                    addPlanOrderItems(allItems, clientInfo, rule, startTime);
                 }
             }
             return allItems;
@@ -351,8 +388,31 @@ public class ClientsEntereventsService {
     }
 
     // Проход по карте зафиксирован
-    private static List<ClientInfo> loadClientsInfoToPayDetected(Session session, Long orgId) {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+    private static List<ClientInfo> loadClientsInfoToPayDetected(Session session, Date startTime, Date endTime,
+            Long idOfOrg) {
+        List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
+
+        Query query = session.createSQLQuery(
+                "SELECT DISTINCT cl.idofclient, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts "
+                        + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
+                        + "LEFT JOIN cf_clientgroups gr "
+                        + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                        + "WHERE e.evtdatetime BETWEEN :startTime AND :endTime AND e.idoforg = :idOfOrg AND e.idofclient IS NOT null "
+                        + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030");
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("endTime", endTime.getTime());
+
+        List result = query.list();
+
+        for (Object resultClient : result) {
+            Object[] resultClientItem = (Object[]) resultClient;
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
+                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
+                    (String) resultClientItem[3]);
+            clientInfoList.add(clientInfo);
+        }
+        return clientInfoList;
     }
 
     // Отбирает все правила с высоким приорететом

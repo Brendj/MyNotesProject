@@ -143,4 +143,40 @@ public class PlanOrderItem  {
     public void setOrderType(Integer orderType) {
         this.orderType = orderType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PlanOrderItem that = (PlanOrderItem) o;
+
+        if (!idOfClient.equals(that.idOfClient)) {
+            return false;
+        }
+        if (!idOfComplex.equals(that.idOfComplex)) {
+            return false;
+        }
+        if (!idOfRule.equals(that.idOfRule)) {
+            return false;
+        }
+        if (!orderDate.equals(that.orderDate)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = idOfClient.hashCode();
+        result = 31 * result + idOfComplex.hashCode();
+        result = 31 * result + idOfRule.hashCode();
+        result = 31 * result + orderDate.hashCode();
+        return result;
+    }
 }

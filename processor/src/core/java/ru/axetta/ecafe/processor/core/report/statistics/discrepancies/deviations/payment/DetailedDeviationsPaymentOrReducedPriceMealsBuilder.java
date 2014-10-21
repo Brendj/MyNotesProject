@@ -80,32 +80,44 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         List<PlanOrderItem> planOrderItemsToPayNotDetected = new ArrayList<PlanOrderItem>();
 
         // Те кто получил бесплатное питание
-        List<PlanOrderItem> planOrderItemsPayd /*= new ArrayList<PlanOrderItem>()*/;
+        List<PlanOrderItem> planOrderItemsPayd;
 
         // План питания льготники
         String orderTypeLgotnick = "4,6,8";
 
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
-/*            for (Long idOfOrg : idOfOrgList) {
-                planOrderItemsToPayDetected = ClientsEntereventsService.loadPlanOrderItemToPayDetected(session, startTime, idOfOrg);
-                planOrderItemsToPayNotDetected = ClientsEntereventsService.loadPlanOrderItemToPayNotDetected(session, startTime, idOfOrg);
-            }*/
-
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
-
             CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
 
-            planOrderItemsPayd = ClientsEntereventsService
-                    .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
+            for (Long idOfOrg : idOfOrgList) {
+                planOrderItemsToPayDetected.addAll(ClientsEntereventsService.loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg));
+                planOrderItemsToPayNotDetected.addAll(ClientsEntereventsService.loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg));
+            }
 
-            if (!planOrderItemsPayd.isEmpty() /*&& !planOrderItemsToPayDetected.isEmpty()*/) {
-                for (PlanOrderItem planOrderItem : planOrderItemsPayd) {
-                    planOrderItem.getOrderDate();
+            planOrderItemsPayd = ClientsEntereventsService.loadPaidPlanOrderInfo(session, orderTypeLgotnick,
+                    idOfOrgList, startTime, addOneDayEndTime);
+
+            List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>();
+            if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayDetected.isEmpty()) {
+                for (PlanOrderItem planOrderItem: planOrderItemsToPayDetected) {
+                    if (!planOrderItemsPayd.contains(planOrderItem)){
+                        resultSubtraction.add(planOrderItem);
+                    }
+                }
+            }
+
+            List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>();
+            if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayNotDetected.isEmpty()) {
+
+                for (PlanOrderItem planOrderItem: planOrderItemsToPayNotDetected) {
+                    if (planOrderItemsPayd.contains(planOrderItem)){
+                        resultIntersection.add(planOrderItem);
+                    }
                 }
             }
         }
-        //для тестов
+/*        //для тестов
         Integer i = new Integer(10);
         Long l = new Long(30L);
         Long l1 = new Long(50L);
@@ -147,7 +159,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         DeviationPaymentItem deviationPaymentItem4 = new DeviationPaymentItem("Новая организация3", "Улица новая1",
                 deviationPaymentSubReportItemList);
-        deviationPaymentItemList.add(deviationPaymentItem4);
+        deviationPaymentItemList.add(deviationPaymentItem4);*/
 
         return new JRBeanCollectionDataSource(deviationPaymentItemList);
     }
