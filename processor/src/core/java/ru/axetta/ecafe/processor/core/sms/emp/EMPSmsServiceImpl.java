@@ -110,13 +110,62 @@ public class EMPSmsServiceImpl extends ISmsService {
         return new DeliveryResponse(DeliveryResponse.DELIVERED, null, null);
     }
 
+    public void updateIncome(int incomeIncrease, int outcomeIncrease, int failedIncrease) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
 
+        Integer in = 0;
+        Integer out = 0;
+        Integer fail = 0;
+
+        String optionValue = runtimeContext.getOptionValueString(Option.OPTION_EMP_COUNTER);//"1/100/200/300;2/400/500/600";
+        if(!StringUtils.isBlank(optionValue)) {
+            String nodes [] = optionValue.split(";");
+            for(String n : nodes) {
+                String [] oValues = n.split("/");
+                if(oValues.length < 3) {
+                    continue;
+                }
+                String oInstance  = oValues[0];
+                String oIncome    = oValues[1];
+                String oOutcome   = oValues[2];
+                String oFailed    = oValues[3];
+
+                if(oInstance.equals(instance)) {
+                    optionValue = optionValue.replaceAll(";" + n, "");
+                    optionValue = optionValue.replaceAll(n, "");
+                    in = NumberUtils.toInt(oIncome);
+                    out = NumberUtils.toInt(oOutcome);
+                    fail = NumberUtils.toInt(oFailed);
+                    break;
+                }
+            }
+        }
+
+        in += incomeIncrease;
+        out += outcomeIncrease;
+        fail += failedIncrease;
+        if(optionValue.length() > 0) {
+            optionValue = optionValue + ";";
+        }
+        optionValue = optionValue + String.format("%s/%s/%s/%s", instance, in, out, fail);
+        runtimeContext.setOptionValueWithSave(Option.OPTION_EMP_COUNTER, optionValue);
+    }
 
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
+        if(1 == 1) {
+            updateIncome(1, 0, 0);
+            updateIncome(0, 1, 0);
+            updateIncome(0, 0, 1);
+            return null;
+        }
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
             return null;
         }
+
+
+        updateIncome(1, 0, 0);
 
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
@@ -135,12 +184,14 @@ public class EMPSmsServiceImpl extends ISmsService {
         if (response.getErrorCode() != 0) {
             empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
+            updateIncome(0, 0, 1);
             throw new EMPException(
                     String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
                             response.getErrorMessage()));
         }
         empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
                 .getMobile() + " доставлено");
+        updateIncome(0, 1, 0);
         return eventParam.getId();
     }
 

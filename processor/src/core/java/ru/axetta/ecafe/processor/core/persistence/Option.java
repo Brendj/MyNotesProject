@@ -99,7 +99,8 @@ public class Option {
             OPTION_EMP_PROCESSOR_INSTANCE=100052,
             OPTION_EMP_BINDED_CLIENTS_COUNT=100053,
             OPTION_EMP_NOT_BINDED_CLIENTS_COUNT=100054,
-            OPTION_EMP_BIND_WAITING_CLIENTS_COUNT=100055
+            OPTION_EMP_BIND_WAITING_CLIENTS_COUNT=100055,
+            OPTION_EMP_COUNTER=100056
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -177,7 +178,8 @@ public class Option {
             OPTION_EMP_PROCESSOR_INSTANCE, "2",
             OPTION_EMP_BINDED_CLIENTS_COUNT, "0",
             OPTION_EMP_NOT_BINDED_CLIENTS_COUNT, "0",
-            OPTION_EMP_BIND_WAITING_CLIENTS_COUNT, "0"
+            OPTION_EMP_BIND_WAITING_CLIENTS_COUNT, "0",
+            OPTION_EMP_COUNTER, ""
 };
 
     private Long idOfOption;
