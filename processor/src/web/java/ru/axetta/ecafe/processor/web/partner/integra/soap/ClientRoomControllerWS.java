@@ -5945,7 +5945,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if(model.getIdOfClient() == null){
                 if (model.getIdOfVisitor() != null ) {
-                    if ((model.getPassDirection() != 1) || (model.getPassDirection() != 7)){
+                    if ((model.getPassDirection() != 1) && (model.getPassDirection() != 7)){
                             visitorsSummary.others3++;
                     }
                 } else {
