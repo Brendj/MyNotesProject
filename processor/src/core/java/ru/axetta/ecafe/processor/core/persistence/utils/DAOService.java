@@ -1541,7 +1541,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
         try {
-            Query q = entityManager.createQuery("FROM Accessory where idofsourceorg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);
+            Query q = entityManager.createQuery("FROM Accessory where idOfSourceOrg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);
             q.setParameter("idoforg", idoforg);
             q.setParameter("accessoryType", accessoryType);
             q.setParameter("accessoryNumber", accessoryNumber);

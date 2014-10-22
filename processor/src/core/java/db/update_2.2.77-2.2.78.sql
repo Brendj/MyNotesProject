@@ -4,7 +4,8 @@
 
 -- Пакет обновлений 2.2.78
 
+alter table cf_org_accessories alter column AccessoryNumber type VARCHAR(40);
+
 -- Добавление генератора идентифиактора для оборудования корпусов
 ALTER TABLE CF_Generators ADD COLUMN IdOfAccessory BIGINT NOT NULL DEFAULT 0;
-
 --! ФИНАЛИЗИРОВАН (Сунгатов, 141021) НЕ МЕНЯТЬ
