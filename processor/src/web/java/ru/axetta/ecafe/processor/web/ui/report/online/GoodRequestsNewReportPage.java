@@ -456,7 +456,10 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         Properties properties = new Properties();
         String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, sourceMenuOrgId);
-        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        String idOfOrgString = "";
+        if(idOfOrgList == null) {
+            idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty(GoodRequestsNewReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(hideGeneratePeriod));
         if(hideGeneratePeriod){
