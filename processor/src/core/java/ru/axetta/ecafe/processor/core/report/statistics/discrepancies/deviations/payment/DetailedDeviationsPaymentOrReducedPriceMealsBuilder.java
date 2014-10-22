@@ -137,35 +137,39 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                if (!resultIntersection.isEmpty() || !resultSubtraction.isEmpty()) {
 
-                if (!resultIntersection.isEmpty()) {
-                    Client client = (Client) session.load(Client.class, resultIntersection.get(0).getIdOfClient());
-                    Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                    deviationPaymentItem.setAddress(org.getAddress());
-                    deviationPaymentItem.setOrgName(org.getShortName());
-                } else if (!resultSubtraction.isEmpty()) {
-                    Client client = (Client) session.load(Client.class, resultSubtraction.get(0).getIdOfClient());
-                    Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                    deviationPaymentItem.setAddress(org.getAddress());
-                    deviationPaymentItem.setOrgName(org.getShortName());
+                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+
+                    if (!resultIntersection.isEmpty()) {
+                        Client client = (Client) session.load(Client.class, resultIntersection.get(0).getIdOfClient());
+                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
+                        deviationPaymentItem.setAddress(org.getAddress());
+                        deviationPaymentItem.setOrgName(org.getShortName());
+                    } else if (!resultSubtraction.isEmpty()) {
+                        Client client = (Client) session.load(Client.class, resultSubtraction.get(0).getIdOfClient());
+                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
+                        deviationPaymentItem.setAddress(org.getAddress());
+                        deviationPaymentItem.setOrgName(org.getShortName());
+                    }
+
+                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+
+                    if (!resultSubtraction.isEmpty()) {
+                        fill(resultSubtraction, conditionDetectedNotEat, complexInfoForPlanList,
+                                deviationPaymentSubReportItemList);
+
+                    }
+
+                    if (!resultIntersection.isEmpty()) {
+                        fill(resultIntersection, conditionNotDetectedEat, complexInfoForPlanList,
+                                deviationPaymentSubReportItemList);
+                    }
+
+                    deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+
+                    deviationPaymentItemList.add(deviationPaymentItem);
                 }
-
-                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-
-                if (!resultSubtraction.isEmpty()) {
-                    fill(resultSubtraction, conditionDetectedNotEat, complexInfoForPlanList, deviationPaymentSubReportItemList);
-
-                }
-
-                if (!resultIntersection.isEmpty()) {
-                    fill(resultIntersection, conditionNotDetectedEat, complexInfoForPlanList,
-                            deviationPaymentSubReportItemList);
-                }
-
-                deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-
-                deviationPaymentItemList.add(deviationPaymentItem);
             }
         }
 
@@ -175,7 +179,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
     public void fill(List<PlanOrderItem> result, String condition, List<ComplexInfoForPlan> complexInfoList,
             List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
 
-        for (PlanOrderItem planOrderItem: result) {
+        for (PlanOrderItem planOrderItem : result) {
 
             DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem();
 
@@ -183,15 +187,14 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             deviationPaymentSubReportItem.setGroupName(planOrderItem.getGroupName());
             deviationPaymentSubReportItem.setPersonName(planOrderItem.getClientName());
 
-                for (ComplexInfoForPlan complexInfoForPlan : complexInfoList) {
-                    if (complexInfoForPlan.getIdOfClient().equals(planOrderItem.getIdOfClient())
-                            && complexInfoForPlan.getIdOfComplex()
-                            .equals(planOrderItem.getIdOfComplex())) {
+            for (ComplexInfoForPlan complexInfoForPlan : complexInfoList) {
+                if (complexInfoForPlan.getIdOfClient().equals(planOrderItem.getIdOfClient()) && complexInfoForPlan
+                        .getIdOfComplex().equals(planOrderItem.getIdOfComplex())) {
 
-                        deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
-                        break;
-                    }
+                    deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
+                    break;
                 }
+            }
             deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
         }
     }
