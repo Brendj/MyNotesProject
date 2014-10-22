@@ -45,7 +45,12 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class EMPProcessor {
+    //  service instance
     protected StoragePortType storageService;
+    //  jaxb contexts
+    JAXBContext dataChangesRequestContext;
+    JAXBContext eventsRequestContext;
+
     //  errors
     public static final int EMP_ERROR_CODE_NOTHING_FOUND = 504;
 
@@ -543,18 +548,29 @@ public class EMPProcessor {
     }
 
     protected void logRequest(SendSubscriptionStreamEventsRequestType request) {
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance("generated.emp_events");
-            logRequest(jaxbContext, request);
-        } catch (Exception e) {
+        if (!getConfigLogging()) {
+            return;
+        }
 
+        try {
+            if(eventsRequestContext == null) {
+                eventsRequestContext = JAXBContext.newInstance("generated.emp_events");
+            }
+            logRequest(eventsRequestContext, request);
+        } catch (Exception e) {
         }
     }
 
     protected void logRequest(ReceiveDataChangesRequest request) {
+        if (!getConfigLogging()) {
+            return;
+        }
+
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(ReceiveDataChangesRequest.class);
-            logRequest(jaxbContext, request);
+            if(dataChangesRequestContext == null) {
+                dataChangesRequestContext = JAXBContext.newInstance(ReceiveDataChangesRequest.class);
+            }
+            logRequest(dataChangesRequestContext, request);
         } catch (Exception e) {
         }
     }
