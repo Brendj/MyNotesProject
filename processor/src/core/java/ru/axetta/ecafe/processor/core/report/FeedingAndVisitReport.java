@@ -10,7 +10,9 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
+import ru.axetta.ecafe.processor.core.persistence.service.clients.SubFeedingService;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.ClientsEntereventsService;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Data;
@@ -54,8 +56,8 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("date", CalendarUtils.dateMMMMYYYYToString(startTime));
 
-            startTime = CalendarUtils.getFirstDayOfMonth(startTime);
-            endTime = CalendarUtils.getLastDayOfMonth(startTime);
+            //startTime = CalendarUtils.getFirstDayOfMonth(startTime);
+            //endTime = CalendarUtils.getLastDayOfMonth(startTime);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
@@ -68,9 +70,15 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
-            final int daysCount = CalendarUtils.getDifferenceInDays(startTime);
 
             Map<String,Data> dataMap = new HashMap<String, Data>();
+
+
+            SubFeedingService subFeedingService = (SubFeedingService) RuntimeContext.getAppContext()
+                    .getBean(SubFeedingService.class);
+
+            List<ClientItem> clientItemList = subFeedingService.getClientItems(org.getIdOfOrg());
+
 
 
             List<PlanOrderItem> ordersInPlan = ClientsEntereventsService.loadPlanOrderItemToPay(session, startTime, org.getIdOfOrg());
@@ -78,12 +86,12 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
                     "" + org.getIdOfOrg(), startTime, endTime);
             List<PlanOrderItem> ordersReservePaid = ClientsEntereventsService.loadPaidPlanOrders(session,ClientsEntereventsService.REDUCED_PRICE_PLAN_RESERVE,""+org.getIdOfOrg(),startTime, endTime);
 
-            dataMap = fillDataPlanWithOrders(dataMap, ordersInPlan, daysCount);
+            dataMap = fillDataPlanWithOrdersV(dataMap, clientItemList, startTime, endTime);
 
             fillDataPlanWithPaidOrders(dataMap, ordersPlanPaid);
-            fillDataTotalWithPaidOrders(dataMap,ordersPlanPaid,daysCount);
-            fillDataReserveWithPaidOrders(dataMap,ordersReservePaid,daysCount);
-            fillDataTotalWithPaidOrders(dataMap,ordersReservePaid,daysCount);
+            fillDataTotalWithPaidOrders(dataMap,ordersPlanPaid,startTime,endTime);
+            fillDataReserveWithPaidOrders(dataMap,ordersReservePaid,startTime,endTime);
+            fillDataTotalWithPaidOrders(dataMap,ordersReservePaid,startTime,endTime);
 
 
             EnterEventsService enterEventsService = (EnterEventsService) RuntimeContext.getAppContext()
@@ -99,7 +107,7 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             return new JRBeanCollectionDataSource(dataList);
         }
 
-        private void fillDataReserveWithPaidOrders(Map<String, Data> dataMap, List<PlanOrderItem> ordersReservePaid, int daysCount) {
+        private void fillDataReserveWithPaidOrders(Map<String, Data> dataMap, List<PlanOrderItem> ordersReservePaid, Date startTime, Date endTime) {
             Data data;
             for (PlanOrderItem item : ordersReservePaid) {
                 if(item.idOfClient == null){
@@ -109,40 +117,31 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
                 if(data == null){
                     continue;
                 }
-                updateReserveListWithOrder(data.getReserve(), item, daysCount);
+                updateReserveListWithOrder(data.getReserve(), item);
             }
         }
 
-        private void updateReserveListWithOrder(List<Row> reserveList, PlanOrderItem item, int daysCount) {
-            boolean found = false;
-            final int itemDay = CalendarUtils.getDayOfMonth(item.orderDate);
-            for (Row row : reserveList) {
-                if( (row.getClientId().equals(item.idOfClient))&&(row.getDay().equals(itemDay)) ){
-                    found = true;
-                    row.update(item);
+        private void updateReserveListWithOrder(List<Row> reserveList, PlanOrderItem item) {
+            int eventDay = CalendarUtils.getDayOfMonth(item.orderDate);
+            for (Row groupItem : reserveList) {
+                if( ( groupItem.getClientId().equals(item.idOfClient) )&& (groupItem.getDay().equals(eventDay)) ){
+                    groupItem.update(item);
                 }
-            }
-
-            if (!found){
-                for( int i = 1; i <= daysCount; i++){
-                    reserveList.add(new Row(item.idOfClient, item.getClientName(), i, item.getGroupName()));
-                }
-                updateReserveListWithOrder(reserveList, item, daysCount);
             }
         }
 
-        private static void fillDataTotalWithPaidOrders(Map<String, Data> dataMap, List<PlanOrderItem> orderItemList, int daysCount) {
+        private static void fillDataTotalWithPaidOrders(Map<String, Data> dataMap, List<PlanOrderItem> orderItemList, Date startTime, Date endTime) {
             Data data;
             for (PlanOrderItem item : orderItemList) {
                 data = dataMap.get(item.getGroupName());
                 if(data == null){
                     continue;
                 }
-                updateTotalListWithOrder(data, item, daysCount);
+                updateTotalListWithOrder(data, item, startTime, endTime);
             }
         }
 
-        private static void updateTotalListWithOrder(Data data, PlanOrderItem item, int daysCount) {
+        private static void updateTotalListWithOrder(Data data, PlanOrderItem item, Date startTime, Date endTime) {
             if(data.getTotal() == null){
                 data.setTotal(new ArrayList<Row>());
             }
@@ -156,10 +155,11 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             }
 
             if (!foundItemNameInTotal){
-                for( int i = 1; i <= daysCount; i++){
+
+                for(int i : CalendarUtils.daysBetween(startTime,endTime)){
                     data.getTotal().add(new Row((long)item.idOfComplex, item.getComplexName(), i, item.getGroupName()){{setTotalRow(true);}});
                 }
-                updateTotalListWithOrder(data, item, daysCount);
+                updateTotalListWithOrder(data, item, startTime, endTime);
             }
         }
 
@@ -205,9 +205,9 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
             }
         }
 
-        private static  Map<String,Data> fillDataPlanWithOrders(Map<String, Data> dataMap,List<PlanOrderItem> ordersInPlan, int daysCount){
+        private static  Map<String,Data> fillDataPlanWithOrders(Map<String, Data> dataMap,List<PlanOrderItem> ordersInPlan, Date start, Date end){
             List<Days> days = new ArrayList<Days>();
-            for( int i = 1; i <= daysCount; i++){
+            for(int i : CalendarUtils.daysBetween(start,end)){
                 days.add(new Days(i));
             }
             List<Long> idsInList = new LinkedList<Long>();
@@ -222,12 +222,42 @@ public class FeedingAndVisitReport  extends BasicReportForOrgJob {
                     dataItem.setPlan(new ArrayList<Row>());
                     dataMap.put(dataItem.getName(),dataItem);
                 }
-
-                for( int i = 1; i <= daysCount; i++){
+                for(int i : CalendarUtils.daysBetween(start,end)){
                     dataItem.getPlan().add(new Row(item.idOfClient, item.getClientName(), i, item.getGroupName()));
                 }
 
                 idsInList.add(item.idOfClient);
+            }
+
+            return dataMap;
+        }
+        private static  Map<String,Data> fillDataPlanWithOrdersV(Map<String, Data> dataMap,List<ClientItem> clientItems,Date start, Date end){
+            List<Days> days = new ArrayList<Days>();
+            for(int i : CalendarUtils.daysBetween(start,end)){
+                days.add(new Days(i));
+            }
+            List<Long> idsInList = new LinkedList<Long>();
+
+            for(ClientItem item : clientItems){
+                if(idsInList.contains(item.getId())){
+                    continue;
+                }
+                Data dataItem = dataMap.get(item.getGroupName());
+                if(dataItem == null) {
+                    dataItem = new Data(item.getGroupName(),days);
+                    dataItem.setPlan(new ArrayList<Row>());
+                    dataItem.setReserve(new ArrayList<Row>());
+                    dataMap.put(dataItem.getName(),dataItem);
+                }
+                for(int i : CalendarUtils.daysBetween(start,end)){
+                    if(item.getPlanType() == ClientItem.IN_PLAN_TYPE){
+                        dataItem.getPlan().add(new Row(item.getId(), item.getFullName(), i, item.getGroupName()));
+                    }else if(item.getPlanType() == ClientItem.IN_RESERVE_TYPE){
+                        dataItem.getReserve().add(new Row(item.getId(), item.getFullName(), i, item.getGroupName()));
+                    }
+                }
+
+                idsInList.add(item.getId());
             }
 
             return dataMap;

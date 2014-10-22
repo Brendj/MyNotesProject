@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: shamil
@@ -23,5 +25,11 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
     public static OrgRepository getInstance() {
         return RuntimeContext.getAppContext().getBean(OrgRepository.class);
+    }
+
+    public List<Long> findOrgCategories(Long id) {
+        return entityManager.createNativeQuery("select idofcategoryorg from cf_categoryorg_orgs where idoforg = :idoforg ")
+                .setParameter("idoforg", id)
+                .getResultList();
     }
 }

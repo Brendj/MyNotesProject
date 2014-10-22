@@ -401,4 +401,20 @@ public class CalendarUtils {
         }
         return (int) (( end - begin ) / (1000 * 60 * 60 * 24)) + 1 ;
     }
+
+    public static int getDifferenceInDays(Date start, Date end){
+        long temp = end.getTime() - start.getTime();
+        return  (int) (temp / (1000 * 60 * 60 * 24)) + 1;
+    }
+
+    public static List<Integer> daysBetween( Date start, Date end ){
+        Date startLocal = (Date) start.clone();
+        int i = getDifferenceInDays(startLocal,end);
+        List<Integer> result = new ArrayList<Integer>();
+        for(int j = 1; j <= i ; j++){
+            result.add(getDayOfMonth(startLocal));
+            startLocal = addOneDay(startLocal);
+        }
+        return result;
+    }
 }
