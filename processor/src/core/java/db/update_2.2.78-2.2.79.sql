@@ -1,3 +1,10 @@
+--! Пока скрипт не финализирован рекомендовано писать очистку добавляемых колонок таблиц.
+--! после финализации они уберутся
+--! Информация для разработчика -- информация для пользователя
+
+-- Пакет обновлений 2.2.79
+
+
 -- Регистрация ОУ, не планируемых к эксплуатации в ИС ПП
 CREATE TABLE cf_not_planned_orgs
 (
@@ -14,3 +21,6 @@ CREATE TABLE cf_not_planned_orgs
   additionalidbuilding bigint,
   CONSTRAINT cf_not_planned_orgs_unique UNIQUE (shortname, additionalidbuilding)
 );
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 141022) НЕ МЕНЯТЬ
