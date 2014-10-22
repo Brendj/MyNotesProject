@@ -1541,15 +1541,17 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
         try {
-            Query q = entityManager.createNativeQuery("SELECT idoftargetorg FROM cf_org_accessories where idofsourceorg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber");
+            Query q = entityManager.createQuery("FROM Accessory where idofsourceorg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);
             q.setParameter("idoforg", idoforg);
             q.setParameter("accessoryType", accessoryType);
             q.setParameter("accessoryNumber", accessoryNumber);
+
             List res = q.getResultList();
             if(res == null || res.size() < 1) {
                 return idoforg;
             }
-            return ((BigInteger) res.get(0)).longValue();
+            Accessory acc = (Accessory) res.get(0);
+            return acc.getIdOfTargetOrg();
         } catch (Exception e) {
             logger.error("Failed to receive accessory", e);
             return idoforg;
