@@ -134,11 +134,11 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
             List res = query.list();
             for (Object entry : res) {
                 Object e[]        = (Object[]) entry;
-                long idoforg      = ((BigInteger) e[0]).longValue();
-                String orgName    = (String) e[1];
-                String orgAddress = (String) e[2];
-                String district   = (String) e[3];
-                long eventsCount  = ((BigInteger) e[4]).longValue();
+                long idoforg      = ((BigInteger) e[1]).longValue();
+                String orgName    = (String) e[2];
+                String orgAddress = (String) e[3];
+                String district   = (String) e[4];
+                long eventsCount  = ((BigInteger) e[5]).longValue();
 
                 TransactionsReportItem item = items.get(idoforg);
                 if(item == null) {
