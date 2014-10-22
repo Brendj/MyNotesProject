@@ -9,6 +9,7 @@
 	<field name="groupName" class="java.lang.String"/>
 	<field name="personName" class="java.lang.String"/>
 	<field name="condition" class="java.lang.String"/>
+	<field name="complexName" class="java.lang.String"/>
 	<variable name="conditionCount" class="java.lang.String" resetType="None">
 		<variableExpression><![CDATA["Итого:   " + $V{byCondition_COUNT}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
@@ -82,7 +83,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{personName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{personName} + "   ("+$F{complexName} +")"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -109,6 +109,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             planOrderItemsPayd = ClientsEntereventsService
                     .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
 
+            List<ComplexInfoForPlan> complexInfoForPlanList = ClientsEntereventsService.getComplexInfoForPlanList();
+
             String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
             String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
 
@@ -120,14 +122,14 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                DeviationPaymentItem deviationPaymentItem = null;
+                DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
 
                 List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                 if (!resultSubtraction.isEmpty()) {
                     for (PlanOrderItem planOrderItemResult : resultSubtraction) {
                         Client client = (Client) session.load(Client.class, planOrderItemResult.getIdOfClient());
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItem = new DeviationPaymentItem();
+
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getShortName());
 
@@ -135,6 +137,16 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                         deviationPaymentSubReportItem.setCondition(conditionDetectedNotEat);
                         deviationPaymentSubReportItem.setGroupName(planOrderItemResult.getGroupName());
                         deviationPaymentSubReportItem.setPersonName(planOrderItemResult.getClientName());
+
+                        for (ComplexInfoForPlan complexInfoForPlan : complexInfoForPlanList) {
+                            if (complexInfoForPlan.getIdOfClient().equals(planOrderItemResult.getIdOfClient())
+                                    && complexInfoForPlan.getIdOfComplex().equals(planOrderItemResult.getIdOfComplex())
+                                    && complexInfoForPlan.getIdOfOrg().equals(org.getIdOfOrg())) {
+
+                                deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
+                                break;
+                            }
+                        }
 
                         deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
 
@@ -153,21 +165,32 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                DeviationPaymentItem deviationPaymentItemNot = null;
+                DeviationPaymentItem deviationPaymentItemNot = new DeviationPaymentItem();
 
                 List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemNotList = new ArrayList<DeviationPaymentSubReportItem>();
                 if (!resultIntersection.isEmpty()) {
-                    for (PlanOrderItem planOrderItemResult : resultIntersection) {
-                        Client client = (Client) session.load(Client.class, planOrderItemResult.getIdOfClient());
+                    for (PlanOrderItem planOrderItemResultNot : resultIntersection) {
+                        Client client = (Client) session.load(Client.class, planOrderItemResultNot.getIdOfClient());
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItemNot = new DeviationPaymentItem();
+
                         deviationPaymentItemNot.setAddress(org.getAddress());
                         deviationPaymentItemNot.setOrgName(org.getShortName());
 
                         DeviationPaymentSubReportItem deviationPaymentSubReportItemNot = new DeviationPaymentSubReportItem();
                         deviationPaymentSubReportItemNot.setCondition(conditionNotDetectedEat);
-                        deviationPaymentSubReportItemNot.setGroupName(planOrderItemResult.getGroupName());
-                        deviationPaymentSubReportItemNot.setPersonName(planOrderItemResult.getClientName());
+                        deviationPaymentSubReportItemNot.setGroupName(planOrderItemResultNot.getGroupName());
+                        deviationPaymentSubReportItemNot.setPersonName(planOrderItemResultNot.getClientName());
+
+                        for (ComplexInfoForPlan complexInfoForPlan : complexInfoForPlanList) {
+                            if (complexInfoForPlan.getIdOfClient().equals(planOrderItemResultNot.getIdOfClient())
+                                    && complexInfoForPlan.getIdOfComplex()
+                                    .equals(planOrderItemResultNot.getIdOfComplex()) && complexInfoForPlan.getIdOfOrg()
+                                    .equals(org.getIdOfOrg())) {
+
+                                deviationPaymentSubReportItemNot.setComplexName(complexInfoForPlan.getComplexName());
+                                break;
+                            }
+                        }
 
                         deviationPaymentSubReportItemNotList.add(deviationPaymentSubReportItemNot);
 

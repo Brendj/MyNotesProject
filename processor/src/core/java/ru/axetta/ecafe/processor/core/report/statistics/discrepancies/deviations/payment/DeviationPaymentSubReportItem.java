@@ -16,14 +16,16 @@ public class DeviationPaymentSubReportItem {
     public String groupName;    // группа клиента (класс, сотрудники и т.д.)
     public String personName;
     public String condition;
+    public String complexName;
 
     public DeviationPaymentSubReportItem() {
     }
 
-    public DeviationPaymentSubReportItem(String groupName, String personName, String condition) {
+    public DeviationPaymentSubReportItem(String groupName, String personName, String condition, String complexName) {
         this.groupName = groupName;
         this.personName = personName;
         this.condition = condition;
+        this.complexName = complexName;
     }
 
     public String getGroupName() {
@@ -48,5 +50,13 @@ public class DeviationPaymentSubReportItem {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    public String getComplexName() {
+        return complexName;
+    }
+
+    public void setComplexName(String complexName) {
+        this.complexName = complexName;
     }
 }

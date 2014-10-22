@@ -1,10 +1,8 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoForPlan;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -12,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +29,8 @@ import java.util.regex.Pattern;
 public class ClientsEntereventsService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientsEntereventsService.class);
+
+    public static List<ComplexInfoForPlan> complexInfoForPlanList = new ArrayList<ComplexInfoForPlan>();
 
     private ClientsEntereventsService() {
     }
@@ -214,14 +215,15 @@ public class ClientsEntereventsService {
     public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, List<Long> idOfOrgs,
             Date startTime, Date endTime) {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
+        List<ComplexInfoForPlan> complexInfoForPlans = new ArrayList<ComplexInfoForPlan>();
 
         Query query = session.createSQLQuery(
-                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname "
+                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname, cfod.menudetailname, c.idoforg "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
-                        + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson " + "WHERE cfo.ordertype IN ("
+                        + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson WHERE cfo.ordertype IN ("
                         + orderType + ") AND cfo.idoforg IN (:idOfOrgs) "
                         + "AND cfo.orderdate >= :startTime AND cfo.orderdate < :endTime "
                         + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
@@ -240,10 +242,24 @@ public class ClientsEntereventsService {
                     CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
                     (String) resultPlanOrderItem[5]);
             resultPlanOrder.add(planOrderItem);
+
+            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan(
+                    ((BigInteger) resultPlanOrderItem[0]).longValue(), (Integer) resultPlanOrderItem[2],
+                    ((BigInteger) resultPlanOrderItem[3]).longValue(), (String) resultPlanOrderItem[6],
+                    ((BigInteger) resultPlanOrderItem[7]).longValue());
+            complexInfoForPlans.add(complexInfoForPlan);
         }
+        setComplexInfoForPlanList(complexInfoForPlans);
         return resultPlanOrder;
     }
 
+    public static List<ComplexInfoForPlan> getComplexInfoForPlanList() {
+        return complexInfoForPlanList;
+    }
+
+    public static void setComplexInfoForPlanList(List<ComplexInfoForPlan> complexInfoForPlanList) {
+        ClientsEntereventsService.complexInfoForPlanList = complexInfoForPlanList;
+    }
 
     // Должен был получить бесплатное питание
     public static List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
@@ -306,13 +322,13 @@ public class ClientsEntereventsService {
                 "SELECT cl.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
                         + "LEFT JOIN cf_clientgroups gr "
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
-                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson " + "WHERE cl.idoforg = :idOfOrg "
-                        + "AND cl.idOfClientGroup < 1100000030 " + "AND cl.idofclient NOT IN (SELECT cl.idofclient "
-                        + "FROM cf_enterevents e INNER JOIN cf_clients cl " + "ON cl.idOfClient = e.idOfClient "
-                        + "LEFT JOIN cf_clientgroups gr " + "ON gr.idofclientgroup = cl.idofclientgroup "
-                        + "AND gr.idoforg = cl.idoforg " + "WHERE e.evtdatetime " + "BETWEEN  :startTime AND :endTime "
-                        + "AND e.idoforg = :idOfOrg " + "AND e.idofclient IS NOT null "
-                        + "AND e.passdirection NOT IN (2, 5, 8, 9) " + "AND gr.idOfClientGroup < 1100000030)");
+                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg = :idOfOrg "
+                        + "AND cl.idOfClientGroup < 1100000030 AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                        + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
+                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
+                        + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
+                        + "AND e.idoforg = :idOfOrg AND e.idofclient IS NOT null "
+                        + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -402,7 +418,7 @@ public class ClientsEntereventsService {
     }
 
     // Заполнение плана кто должен был получить питание на основе комплексов
-    private static void addPlanOrderItems(List<PlanOrderItem> items, ClientInfo clientId, DiscountRule rule,
+    private static void addPlanOrderItems(List<PlanOrderItem> items, ClientInfo clientInfo, DiscountRule rule,
             Date payedDate) {
 
         String complexMap = rule.getComplexesMap();
@@ -420,8 +436,8 @@ public class ClientsEntereventsService {
         }
 
         for (Integer complexId : allComplexesId) {
-            PlanOrderItem item = new PlanOrderItem(clientId.getClientId(), clientId.getClientName(), complexId,
-                    rule.getIdOfRule(), payedDate, clientId.getGroupName());
+            PlanOrderItem item = new PlanOrderItem(clientInfo.getClientId(), clientInfo.getClientName(), complexId,
+                    rule.getIdOfRule(), payedDate, clientInfo.getGroupName());
             items.add(item);
             if (rule.getOperationOr()) {
                 return;
@@ -529,17 +545,37 @@ public class ClientsEntereventsService {
     // Получает все правила по организации
     public static List<DiscountRule> getDiscountRulesByOrg(Session session, Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
-        Set<CategoryOrg> categoryOrgSet = org.getCategories();
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
+
         List<DiscountRule> discountRules = new ArrayList<DiscountRule>();
-        if (!categoryOrgSet.isEmpty()) {
-            Object[] arrayCategory = categoryOrgSet.toArray();
+        if (!categoryDiscounts.isEmpty()) {
+            Object[] arrayCategory = categoryDiscounts.toArray();
             for (Object obj : arrayCategory) {
-                CategoryOrg categoryOrg = (CategoryOrg) obj;
-                discountRules.addAll(categoryOrg.getDiscountRules());
+                CategoryDiscount categoryDiscount = (CategoryDiscount) obj;
+                discountRules.addAll(categoryDiscount.getDiscountsRules());
             }
+
+            List<DiscountRule> resultDisc = new ArrayList<DiscountRule>();
+
+            for(DiscountRule rule: discountRules) {
+                if (!IsExistRule(resultDisc, rule)) {
+                    resultDisc.add(rule);
+                }
+            }
+
             return discountRules;
         }
         return new ArrayList<DiscountRule>();
+    }
+
+    private static boolean IsExistRule(List<DiscountRule> resultDisc, DiscountRule rule) {
+        for (DiscountRule itemRule:resultDisc){
+            if (itemRule.getIdOfRule() == rule.getIdOfRule())
+                return true;
+
+        }
+        return false;
     }
 
 }
