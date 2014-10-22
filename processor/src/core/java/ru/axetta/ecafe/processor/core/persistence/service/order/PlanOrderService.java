@@ -32,7 +32,7 @@ public class PlanOrderService {
         // клиенты которые в здании
         List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
         // правила для организации
-        List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+        List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
         // платные категории
         List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 

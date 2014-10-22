@@ -16,7 +16,7 @@ import java.util.List;
 public class DeviationPaymentItem {
 
     private String orgName;    //Название организации
-    private String address;
+    private String address;    // Адресс организации
 
     private List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList;
 

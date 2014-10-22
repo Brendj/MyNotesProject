@@ -87,121 +87,112 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         // План питания льготники
         String orderTypeLgotnick = "4,6,8";
 
+        String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
+        String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
+
+        List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
+        List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
+
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
             CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
 
+            // Оплаченные Заказы
+            planOrderItemsPayd = ClientsEntereventsService
+                    .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
+
+            // Имена комплексов по заказам
+            List<ComplexInfoForPlan> complexInfoForPlanList = ClientsEntereventsService.getComplexInfoForPlanList();
+
             for (Long idOfOrg : idOfOrgList) {
+                // План по тем кто отметился в здании
                 List<PlanOrderItem> planOrderItemToPayDetectedList = ClientsEntereventsService
                         .loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg);
                 if (planOrderItemToPayDetectedList != null) {
                     planOrderItemsToPayDetected.addAll(planOrderItemToPayDetectedList);
                 }
 
+                // План по тем кто не в здании
                 List<PlanOrderItem> planOrderItemToPayNotDetectedList = ClientsEntereventsService
                         .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg);
                 if (planOrderItemToPayNotDetectedList != null) {
                     planOrderItemsToPayNotDetected.addAll(planOrderItemToPayNotDetectedList);
                 }
-            }
 
-            planOrderItemsPayd = ClientsEntereventsService
-                    .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
+                if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayDetected.isEmpty()) {
+                    for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
+                        if (!planOrderItemsPayd.contains(planOrderItem)) {
+                            resultSubtraction.add(planOrderItem);
+                        }
+                    }
+                }
 
-            List<ComplexInfoForPlan> complexInfoForPlanList = ClientsEntereventsService.getComplexInfoForPlanList();
+                if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayNotDetected.isEmpty()) {
 
-            String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
-            String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
-
-            List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>();
-            if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayDetected.isEmpty()) {
-                for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
-                    if (!planOrderItemsPayd.contains(planOrderItem)) {
-                        resultSubtraction.add(planOrderItem);
+                    for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
+                        if (planOrderItemsPayd.contains(planOrderItem)) {
+                            resultIntersection.add(planOrderItem);
+                        }
                     }
                 }
 
                 DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
 
-                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-                if (!resultSubtraction.isEmpty()) {
-                    for (PlanOrderItem planOrderItemResult : resultSubtraction) {
-                        Client client = (Client) session.load(Client.class, planOrderItemResult.getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-
-                        deviationPaymentItem.setAddress(org.getAddress());
-                        deviationPaymentItem.setOrgName(org.getShortName());
-
-                        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem();
-                        deviationPaymentSubReportItem.setCondition(conditionDetectedNotEat);
-                        deviationPaymentSubReportItem.setGroupName(planOrderItemResult.getGroupName());
-                        deviationPaymentSubReportItem.setPersonName(planOrderItemResult.getClientName());
-
-                        for (ComplexInfoForPlan complexInfoForPlan : complexInfoForPlanList) {
-                            if (complexInfoForPlan.getIdOfClient().equals(planOrderItemResult.getIdOfClient())
-                                    && complexInfoForPlan.getIdOfComplex().equals(planOrderItemResult.getIdOfComplex())
-                                    && complexInfoForPlan.getIdOfOrg().equals(org.getIdOfOrg())) {
-
-                                deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
-                                break;
-                            }
-                        }
-
-                        deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
-
-                        deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-                    }
-                    deviationPaymentItemList.add(deviationPaymentItem);
-                }
-            }
-
-            List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>();
-            if (!planOrderItemsPayd.isEmpty() && !planOrderItemsToPayNotDetected.isEmpty()) {
-
-                for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
-                    if (planOrderItemsPayd.contains(planOrderItem)) {
-                        resultIntersection.add(planOrderItem);
-                    }
-                }
-
-                DeviationPaymentItem deviationPaymentItemNot = new DeviationPaymentItem();
-
-                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemNotList = new ArrayList<DeviationPaymentSubReportItem>();
                 if (!resultIntersection.isEmpty()) {
-                    for (PlanOrderItem planOrderItemResultNot : resultIntersection) {
-                        Client client = (Client) session.load(Client.class, planOrderItemResultNot.getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-
-                        deviationPaymentItemNot.setAddress(org.getAddress());
-                        deviationPaymentItemNot.setOrgName(org.getShortName());
-
-                        DeviationPaymentSubReportItem deviationPaymentSubReportItemNot = new DeviationPaymentSubReportItem();
-                        deviationPaymentSubReportItemNot.setCondition(conditionNotDetectedEat);
-                        deviationPaymentSubReportItemNot.setGroupName(planOrderItemResultNot.getGroupName());
-                        deviationPaymentSubReportItemNot.setPersonName(planOrderItemResultNot.getClientName());
-
-                        for (ComplexInfoForPlan complexInfoForPlan : complexInfoForPlanList) {
-                            if (complexInfoForPlan.getIdOfClient().equals(planOrderItemResultNot.getIdOfClient())
-                                    && complexInfoForPlan.getIdOfComplex()
-                                    .equals(planOrderItemResultNot.getIdOfComplex()) && complexInfoForPlan.getIdOfOrg()
-                                    .equals(org.getIdOfOrg())) {
-
-                                deviationPaymentSubReportItemNot.setComplexName(complexInfoForPlan.getComplexName());
-                                break;
-                            }
-                        }
-
-                        deviationPaymentSubReportItemNotList.add(deviationPaymentSubReportItemNot);
-
-                        deviationPaymentItemNot
-                                .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemNotList);
-                    }
-                    deviationPaymentItemList.add(deviationPaymentItemNot);
+                    Client client = (Client) session.load(Client.class, resultIntersection.get(0).getIdOfClient());
+                    Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
+                    deviationPaymentItem.setAddress(org.getAddress());
+                    deviationPaymentItem.setOrgName(org.getShortName());
+                } else if (!resultSubtraction.isEmpty()) {
+                    Client client = (Client) session.load(Client.class, resultSubtraction.get(0).getIdOfClient());
+                    Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
+                    deviationPaymentItem.setAddress(org.getAddress());
+                    deviationPaymentItem.setOrgName(org.getShortName());
                 }
+
+                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+
+                if (!resultSubtraction.isEmpty()) {
+                    fill(resultSubtraction, conditionDetectedNotEat, complexInfoForPlanList, deviationPaymentSubReportItemList);
+
+                }
+
+                if (!resultIntersection.isEmpty()) {
+                    fill(resultIntersection, conditionNotDetectedEat, complexInfoForPlanList,
+                            deviationPaymentSubReportItemList);
+                }
+
+                deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+
+                deviationPaymentItemList.add(deviationPaymentItem);
             }
         }
 
         return new JRBeanCollectionDataSource(deviationPaymentItemList);
+    }
+
+    public void fill(List<PlanOrderItem> result, String condition, List<ComplexInfoForPlan> complexInfoList,
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+
+        for (PlanOrderItem planOrderItem: result) {
+
+            DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem();
+
+            deviationPaymentSubReportItem.setCondition(condition);
+            deviationPaymentSubReportItem.setGroupName(planOrderItem.getGroupName());
+            deviationPaymentSubReportItem.setPersonName(planOrderItem.getClientName());
+
+                for (ComplexInfoForPlan complexInfoForPlan : complexInfoList) {
+                    if (complexInfoForPlan.getIdOfClient().equals(planOrderItem.getIdOfClient())
+                            && complexInfoForPlan.getIdOfComplex()
+                            .equals(planOrderItem.getIdOfComplex())) {
+
+                        deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
+                        break;
+                    }
+                }
+            deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
+        }
     }
 }

@@ -268,7 +268,7 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -295,7 +295,7 @@ public class ClientsEntereventsService {
                 .loadClientsInfoToPayNotDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -354,7 +354,7 @@ public class ClientsEntereventsService {
                 .loadClientsInfoToPayDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -543,37 +543,31 @@ public class ClientsEntereventsService {
     }
 
     // Получает все правила по организации
-    public static List<DiscountRule> getDiscountRulesByOrg(Session session, Long idOfOrg) {
-        Org org = (Org) session.load(Org.class, idOfOrg);
+    public static List<DiscountRule> getDiscountRulesByOrg(Session session) {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        List<DiscountRule> discountRules = new ArrayList<DiscountRule>();
+
         List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
 
-        List<DiscountRule> discountRules = new ArrayList<DiscountRule>();
-        if (!categoryDiscounts.isEmpty()) {
-            Object[] arrayCategory = categoryDiscounts.toArray();
-            for (Object obj : arrayCategory) {
-                CategoryDiscount categoryDiscount = (CategoryDiscount) obj;
-                discountRules.addAll(categoryDiscount.getDiscountsRules());
-            }
-
-            List<DiscountRule> resultDisc = new ArrayList<DiscountRule>();
-
-            for(DiscountRule rule: discountRules) {
-                if (!IsExistRule(resultDisc, rule)) {
-                    resultDisc.add(rule);
-                }
-            }
-
-            return discountRules;
+        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
+            discountRules.addAll(categoryDiscount.getDiscountsRules());
         }
-        return new ArrayList<DiscountRule>();
+
+        List<DiscountRule> resultDisc = new ArrayList<DiscountRule>();
+
+        for (DiscountRule rule : discountRules) {
+            if (!IsExistRule(resultDisc, rule)) {
+                resultDisc.add(rule);
+            }
+        }
+        return resultDisc;
     }
 
     private static boolean IsExistRule(List<DiscountRule> resultDisc, DiscountRule rule) {
-        for (DiscountRule itemRule:resultDisc){
-            if (itemRule.getIdOfRule() == rule.getIdOfRule())
+        for (DiscountRule itemRule : resultDisc) {
+            if (itemRule.getIdOfRule() == rule.getIdOfRule()) {
                 return true;
-
+            }
         }
         return false;
     }
