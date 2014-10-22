@@ -70,9 +70,8 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
                 "SELECT DISTINCT ON(e) e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, ( e.idoforg || ' ' || e.idofclient )as e  "
                         + "FROM cf_enterevents e "
-                        + "INNER JOIN cf_clients c ON e.idofvisitor = c.idofclient   "
                         + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
-                        + "and e.idofclient is not null "
+                        + "and e.idofclient is  null and e.idofvisitor is not null "
                         + "ORDER BY e, e.evtdatetime DESC")
                 .setParameter("startDateTime", startTime)
                 .setParameter("endDateTime", endTime)
@@ -86,10 +85,13 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
     @Transactional(readOnly = true)
     public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long idOfOrg, Long startTime, Long endTime) {
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
-                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname "
+                "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
                         + " FROM cf_enterevents e "
+                        + " LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + " LEFT JOIN cf_persons p ON p.idofperson = c.idofperson "
+                        + " LEFT JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
                         + " WHERE e.evtdatetime BETWEEN :startTime AND :endTime "
-                        + " and e.idofclient is null and e.idofvisitor is not null "
+                        + " and e.idofclient is not null "
                         + " and e.idOfOrg = :idOfOrg "
                         + " ORDER BY g.groupname, e.idofclient, e.evtdatetime DESC ")
                 .setParameter("idOfOrg", idOfOrg)
@@ -109,7 +111,7 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                 "SELECT e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname "
                         + "FROM cf_enterevents e "
                         + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
-                        + "and e.idofclient is null "
+                        + "and e.idofclient is null and e.idofvisitor is  null "
                         + "ORDER BY  e.evtdatetime DESC")
                 .setParameter("startDateTime", begin)
                 .setParameter("endDateTime", dateTime)
