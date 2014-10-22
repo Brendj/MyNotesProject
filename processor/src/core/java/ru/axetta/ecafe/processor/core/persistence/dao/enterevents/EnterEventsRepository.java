@@ -68,11 +68,11 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryVisitors(Long startTime,Long endTime) {
 
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
-                "SELECT DISTINCT ON(e) e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, ( e.idoforg || ' ' || e.idofclient )as e  "
+                "SELECT DISTINCT ON(e.idofvisitor) e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname "
                         + "FROM cf_enterevents e "
                         + "WHERE e.evtdatetime BETWEEN :startDateTime AND :endDateTime "
                         + "and e.idofclient is  null and e.idofvisitor is not null "
-                        + "ORDER BY e, e.evtdatetime DESC")
+                        + "ORDER BY e.idofvisitor, e.evtdatetime DESC")
                 .setParameter("startDateTime", startTime)
                 .setParameter("endDateTime", endTime)
                         //.setParameter("startDateTime", 1355097600000L)
