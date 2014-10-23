@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.OrgListLoader;
@@ -154,10 +151,12 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 logger.warn("Failed", e);
                 result = new OrgEntry(lineNo, 500, e.getMessage(), null);
             }
-            if (result.getResultCode() == 0) {
+            if (result != null && result.getResultCode() == 0) {
                 ++successLineNumber;
             }
-            lineResults.add(result);
+            if(result != null) {
+                lineResults.add(result);
+            }
             currLine = reader.readLine();
             if (lineNo == MAX_LINE_NUMBER) {
                 break;
@@ -209,10 +208,13 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     }
 
     private OrgEntry createOrg(RuntimeContext runtimeContext, String line, int lineNo, Session session, Map<String, Integer> columns) throws Exception {
-        if(columns == null || columns.size() < 1) {
-            return new OrgEntry(lineNo, 1, "Not enought data", null);
+        if(columns == null || columns.size() < 1 || line == null || StringUtils.isBlank(line)) {
+            return new OrgEntry(lineNo, 1, "Not enough data", null);
         }
         String[] tokens = line.split(";");
+        if(tokens.length != columns.size()) {
+            return null;
+        }
 
         String guid = toStr(getFromColumn(tokens, columns, "guid"));
         String shortName = toStr(getFromColumn(tokens, columns, "shortName"));
@@ -243,6 +245,25 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
 
 
             try {
+                String orgNumber = getOrgNumber(shortName);
+                Org currentOrg = DAOUtils.findOrgByShortname(session, shortName);
+                if(currentOrg != null) {
+                    Set<Client> clients = currentOrg.getClients();
+                    if((clients != null && clients.size() > 0) || currentOrg.getStatus().equals(OrganizationStatus.ACTIVE)) {
+                        return new OrgEntry(lineNo, 0, "Org is already registered", currentOrg.getIdOfOrg());
+                    }
+                    currentOrg.setAddress(address);
+                    currentOrg.setTag(tags);
+                    currentOrg.setCity(city);
+                    currentOrg.setDistrict(region);
+                    currentOrg.setBtiUnom(btiUnom);
+                    currentOrg.setBtiUnad(btiUnad);
+                    currentOrg.setIntroductionQueue(introductionQueue);
+                    currentOrg.setAdditionalIdBuilding(additionalId);
+                    session.update(currentOrg);
+                    return new OrgEntry(lineNo, 0, "Org has been modified", currentOrg.getIdOfOrg());
+                }
+
                 Org org = new Org(shortName, officialName, address, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
@@ -256,12 +277,25 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 org.setPhone("");
                 org.setSmsSender("");
                 org.setTag(tags);
+                org.setStatus(OrganizationStatus.PLANNED);
+                org.setState(0);
                 /*if (StringUtils.isNotEmpty("")) {
                     org.setSsoPassword(plainSsoPassword);
                 }*/
-                org.setRefectoryType(null);
+                /*org.setRefectoryType(null);
+                if(org.getFriendlyOrg() == null) {
+                    org.setFriendlyOrg(new HashSet<Org>());
+                }
+                org.getFriendlyOrg().add(org);*/
                 session.save(org);
-                // TODO: Помещать дружественные орги
+
+                org.setRefectoryType(null);
+                if(org.getFriendlyOrg() == null) {
+                    org.setFriendlyOrg(new HashSet<Org>());
+                }
+                org.getFriendlyOrg().add(org);
+                session.save(org);
+
                 return new OrgEntry(lineNo, 0, "Ok", org.getIdOfOrg());
             } catch (Exception e) {
                 logger.debug("Failed to create org", e);
@@ -269,10 +303,20 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             }
         } else {
             try {
-                String sql = "INSERT INTO cf_not_planned_orgs "
-                + "(guid, shortName, officialName, tag, city, district, address, btiUnom, btiUnad, introductionQueue, additionalIdBuilding) "
-                + "VALUES "
-                + "(:guid, :shortName, :officialName, :tags, :city, :region, :address, :btiUnom, :btiUnad, :introductionQueue, :additionalId)";
+                String sql = "";
+                boolean exists = DAOUtils.isNotPlannedOrgExists(session, shortName, additionalId);
+                if(exists) {
+                    sql = "UPDATE cf_not_planned_orgs SET  "
+                            + "guid=:guid, officialName=:officialName, tag=:tags, city=:city, district=:region, "
+                            + "address=:address, btiUnom=:btiUnom, btiUnad=:btiUnad, introductionQueue=:introductionQueue "
+                        + "WHERE shortName=:shortName AND additionalIdBuilding=:additionalId";
+                } else {
+                    sql = "INSERT INTO cf_not_planned_orgs "
+                            + "(guid, shortName, officialName, tag, city, district, address, btiUnom, btiUnad, introductionQueue, additionalIdBuilding) "
+                            + "VALUES "
+                            + "(:guid, :shortName, :officialName, :tags, :city, :region, :address, :btiUnom, :btiUnad, :introductionQueue, :additionalId)";
+                }
+
                 Query q = session.createSQLQuery(sql);
                 q.setParameter("guid", guid);
                 q.setParameter("shortName", shortName);
@@ -286,7 +330,11 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 q.setParameter("introductionQueue", introductionQueue);
                 q.setParameter("additionalId", additionalId);
                 q.executeUpdate();
-                return new OrgEntry(lineNo, 0, "Ok", additionalId);
+                if(exists) {
+                    return new OrgEntry(lineNo, 0, "Not planned org has been modified", additionalId);
+                } else {
+                    return new OrgEntry(lineNo, 0, "Ok", additionalId);
+                }
             } catch (Exception e) {
                 logger.debug("Failed to create org", e);
                 return new OrgEntry(lineNo, 1, e.getMessage(), null);
@@ -294,8 +342,18 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         }
     }
 
-
-
+    public String getOrgNumber(String shortname) {
+        int numPos = shortname.indexOf("№");
+        if(numPos < 0) {
+            return shortname;
+        }
+        /*int spacePos = shortname.indexOf(" ", numPos);
+        if(spacePos < 0) {*/
+            return shortname.substring(numPos + 1).trim();
+        /*} else {
+            return shortname.substring(numPos + 1, spacePos);
+        }*/
+    }
 
     protected String getFromColumn(String[] tokens, Map<String, Integer> columns, String colName) {
         int colPos = columns.get(colName);

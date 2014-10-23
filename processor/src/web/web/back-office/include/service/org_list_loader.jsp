@@ -62,8 +62,9 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор ОУ в БД (IdOfOrg)" />
             </f:facet>
+            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
             <%--<a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.idOfCard}" styleClass="output-text" />
+
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
             </a4j:commandLink>--%>
         </rich:column>

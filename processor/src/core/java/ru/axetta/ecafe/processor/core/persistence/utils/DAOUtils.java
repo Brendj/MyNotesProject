@@ -238,6 +238,39 @@ public class DAOUtils {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
     }
 
+    public static Org findOrgByShortname(Session session, String shortname) {
+        Query query = session.createQuery(
+                "from Org o where o.shortName=:shortName");
+        query.setParameter("shortName", shortname);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Org) res.get(0);
+        }
+        return null;
+    }
+
+    public static Org findOrgByOrgNumber(Session session, String orgNumber) {
+        String sql = "from Org o where o.shortName like '%" + orgNumber + "%'";
+        Query query = session.createQuery(sql);
+        //query.setParameter("shortName", orgNumber);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Org) res.get(0);
+        }
+        return null;
+    }
+
+    public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
+        Query q = session.createSQLQuery("select 1 from cf_not_planned_orgs where shortName=:shortName and additionalIdBuilding=:additionalIdBuilding");
+        q.setParameter("shortName", shortName);
+        q.setParameter("additionalIdBuilding", additionalIdBuilding);
+        List res = q.list();
+        if(res != null && res.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
     /*
     * Обновляет орг. Ставит признак mainbuilding = 0
     * */
