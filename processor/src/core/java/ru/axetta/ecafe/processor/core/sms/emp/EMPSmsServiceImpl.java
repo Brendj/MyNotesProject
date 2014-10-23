@@ -154,12 +154,6 @@ public class EMPSmsServiceImpl extends ISmsService {
 
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
-        if(1 == 1) {
-            updateIncome(1, 0, 0);
-            updateIncome(0, 1, 0);
-            updateIncome(0, 0, 1);
-            return null;
-        }
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
             return null;
         }
