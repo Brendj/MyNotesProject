@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -17,15 +19,17 @@ public class DeviationPaymentSubReportItem {
     public String personName;
     public String condition;
     public String complexName;
+    public Date orderDate;
 
     public DeviationPaymentSubReportItem() {
     }
 
-    public DeviationPaymentSubReportItem(String groupName, String personName, String condition, String complexName) {
+    public DeviationPaymentSubReportItem(String groupName, String personName, String condition, String complexName, Date orderDate) {
         this.groupName = groupName;
         this.personName = personName;
         this.condition = condition;
         this.complexName = complexName;
+        this.orderDate = orderDate;
     }
 
     public String getGroupName() {
@@ -58,5 +62,13 @@ public class DeviationPaymentSubReportItem {
 
     public void setComplexName(String complexName) {
         this.complexName = complexName;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
     }
 }
