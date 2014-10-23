@@ -141,6 +141,9 @@
                         label="Правила распространения" action="#{distributionRulesPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToEditOrgs}" />
 
+    <rich:panelMenuItem id="orgListLoaderMenuItem" binding="#{orgListLoaderPage.mainMenuComponent}"
+                        label="Загрузить из файла" action="#{orgListLoaderPage.show}" reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="contragentGroupMenu" label="Контрагенты"
@@ -715,9 +718,6 @@
 
     <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
                         label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="orgListLoaderMenuItem" binding="#{orgListLoaderPage.mainMenuComponent}"
-                        label="Пакетная загрузка организаций" action="#{orgListLoaderPage.show}" reRender="workspaceForm" />
 
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
     <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
