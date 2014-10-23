@@ -51,6 +51,17 @@ public class BIDataExportService {
         /* Новый тип */
         List<BIDataExportType> TYPES = new ArrayList<BIDataExportType>();
 
+
+        //  ------------------------------------------
+        //  ОУ, не планируемые к анедрению (Orgs_not_planned)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orgs_not_planned",
+                "select guid, shortName, officialName, tag, city, district, address, btiUnom, btiUnad, introductionQueue, additionalIdBuilding "
+                        + "from cf_not_planned_orgs "
+                        + "order by shortName",
+                new String[]{"guid", "shortName", "officialName", "tag", "city", "district", "address",
+                             "btiUnom", "btiUnad", "introductionQueue", "additionalIdBuilding"}));
+
         //  ------------------------------------------
         //  Категория ОУ (CategoryOrg)
         //  ------------------------------------------
