@@ -87,9 +87,9 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(
                 "SELECT  e.idofclient, e.idoforg, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
                         + " FROM cf_enterevents e "
-                        + " LEFT JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
-                        + " LEFT JOIN cf_persons p ON p.idofperson = c.idofperson "
-                        + " LEFT JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
+                        + " INNER JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
+                        + " INNER JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
                         + " WHERE e.evtdatetime BETWEEN :startTime AND :endTime "
                         + " and e.idofclient is not null "
                         + " and e.idOfOrg = :idOfOrg "

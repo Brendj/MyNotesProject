@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,19 +57,19 @@ public class SubFeedingService {
     *
     * */
     public List<ClientItem> getClientItems(long orgId){
-        List<Long> orgTypes = orgService.findOrgCategories(orgId);
+        List<BigInteger> orgTypes = orgService.findOrgCategories(orgId);
         List<ClientItem> result = new ArrayList<ClientItem>();
         if(orgTypes.size() > 1){
             new Exception("У организации обнаруженно две и более категории");
         }if(orgTypes.size() == 1){
-        switch (orgTypes.get(0).intValue()){
-            case 1:
-            case 2:
-            case 3:
-            case 7:
-            case 8:
-                result.addAll(subFeedingRepository.getClientAllClientsInOrg(orgId));
-                result.addAll(subFeedingRepository.getClientAllClientsInOrgReserve(orgId));
+            switch (orgTypes.get(0).intValue()) {
+                case 1:
+                case 2:
+                case 3:
+                case 7:
+                case 8:
+                    result.addAll(subFeedingRepository.getClientAllClientsInOrg(orgId));
+                    result.addAll(subFeedingRepository.getClientAllClientsInOrgReserve(orgId));
                 return  result;
 
             case 9:
@@ -82,24 +83,6 @@ public class SubFeedingService {
             result.addAll(subFeedingRepository.getClientInPlan(orgId));
             result.addAll(subFeedingRepository.getClientInReserve(orgId));
         }
-        //return removeClientsWithoutCategories(result);
         return result;
     }
-    //
-    //private List<ClientItem> removeClientsWithoutCategories (List<ClientItem> clientItemList) {
-    //    List<ClientItem> result = new ArrayList<ClientItem>();
-    //
-    //    for (ClientItem item : clientItemList){
-    //        if(item.getPlanType() == ClientItem.IN_PLAN_TYPE){
-    //            //remove
-    //            String[] strings = item.g
-    //        }else if (item.getPlanType() == ClientItem.IN_RESERVE_TYPE){
-    //
-    //        }
-    //    }
-    //
-    //    return result;
-    //}
-    //
-
 }

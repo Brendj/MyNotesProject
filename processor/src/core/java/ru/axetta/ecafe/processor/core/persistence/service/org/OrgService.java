@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class OrgService {
         return dao.findOne(id);
     }
 
-    public List<Long> findOrgCategories(Long id){
+    public List<BigInteger> findOrgCategories(Long id){
         return dao.findOrgCategories(id);
     }
 

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report.model.feedingandvisit;
 
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -34,6 +35,7 @@ public class Row {
     private Integer color = 0; //  0 не оплачен . 1 оплачен
     public static final int COLOR_PAID = 1;   //оплачен
     public static final int COLOR_NOT_PAID = 0; // не оплачен
+
     public Row() {
     }
 
@@ -100,13 +102,14 @@ public class Row {
     }
 
     public String getEntry() {
-        if(totalRow){
+        if (totalRow) {
             return "" + totalCount;
-        }else  if (enter == null && exit == null) {
+        } else if (enter == null && exit == null) {
             return color == 0 ? ENTRY_DEFAULT : ENTRY_PAID;
         }
 
-        return "" + ((enter != null) ? CalendarUtils.timeToString(enter): "...") + " - " +((exit != null) ? CalendarUtils.timeToString(exit): "...");
+        return "" + ((enter != null) ? CalendarUtils.timeToString(enter) : "...") + " - " + ((exit != null)
+                ? CalendarUtils.timeToString(exit) : "...");
     }
 
     public void setEntry(String entry) {
@@ -122,31 +125,31 @@ public class Row {
     }
 
     public void update(DAOEnterEventSummaryModel model) {
-        if(day != CalendarUtils.getDayOfMonth(model.getEvtDateTime())){
+        if (day != CalendarUtils.getDayOfMonth(model.getEvtDateTime())) {
             return;
         }
         switch (model.getPassDirection()) {
             case 0:
             case 6:
-                if ( (enter == null) || (enter > model.getEvtDateTime()) ) {
+                if ((enter == null) || (enter > model.getEvtDateTime())) {
                     enter = model.getEvtDateTime();
                 }
                 break;
 
             case 1:
             case 7:
-                if ( (exit == null) || (exit < model.getEvtDateTime()) ) {
+                if ((exit == null) || (exit < model.getEvtDateTime())) {
                     exit = model.getEvtDateTime();
                 }
                 break;
         }
     }
 
-    public void incrementcount(){
+    public void incrementcount() {
         totalCount++;
     }
 
-    public void decrementcount(){
+    public void decrementcount() {
         totalCount--;
     }
 
@@ -170,17 +173,21 @@ public class Row {
         setColor(COLOR_PAID);
     }
 
-    public void updateTotal(PlanOrderItem item) {
-        switch (item.getOrderType()){
+    public void updateTotal(OrderItem item) {
+        switch (item.getOrdertype()) {
             case 4:
                 incrementcount();
                 break;
-            case  8:
+            case 8:
                 decrementcount();
                 break;
             default:
-                System.out.print("orderType " +item.getOrderType());
+                System.out.print("orderType " + item.getOrdertype());
                 break;
         }
+    }
+
+    public void update(OrderItem item) {
+        setColor(COLOR_PAID);
     }
 }
