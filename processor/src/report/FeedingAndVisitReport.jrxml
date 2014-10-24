@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FeedingAndVisitReport" pageWidth="1842" pageHeight="595" orientation="Landscape" columnWidth="1802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6571417e-f6fc-44f1-8c7c-e336e63b1b6c">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FeedingAndVisitReport" pageWidth="742" pageHeight="595" orientation="Landscape" columnWidth="702" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6571417e-f6fc-44f1-8c7c-e336e63b1b6c">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="397"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -120,7 +120,8 @@
 		<field name="color" class="java.lang.Integer"/>
 	</subDataset>
 	<parameter name="orgName" class="java.lang.String"/>
-	<parameter name="date" class="java.lang.String"/>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -152,21 +153,21 @@
 				<text><![CDATA[Утверждаю]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="45" width="50" height="20" uuid="6fe6ad3f-179d-4838-8430-7607c348983b"/>
+				<reportElement x="0" y="45" width="64" height="20" uuid="6fe6ad3f-179d-4838-8430-7607c348983b"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Директор ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="162" y="65" width="343" height="56" uuid="9d854fe9-4229-45be-b396-fba6a9bcf306"/>
-				<textElement textAlignment="Right">
+				<reportElement x="243" y="66" width="340" height="25" uuid="9d854fe9-4229-45be-b396-fba6a9bcf306"/>
+				<textElement textAlignment="Center">
 					<font size="18" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Отчет по льготному плану питания - ]]></text>
+				<text><![CDATA[Отчет по льготному плану питания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="104" width="123" height="17" uuid="2abd4e6b-4612-4d4b-b3e2-109db6fd20fd"/>
+				<reportElement x="0" y="112" width="123" height="17" uuid="2abd4e6b-4612-4d4b-b3e2-109db6fd20fd"/>
 				<text><![CDATA[Значения в ячейках:
 ]]></text>
 			</staticText>
@@ -246,18 +247,11 @@
 				<text><![CDATA[обучающийся не был в ОО (проход через турникет не зафиксирован), в льготном плане питания оплачен]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="50" y="45" width="100" height="20" uuid="dcc0c290-a07c-49cf-954e-83099eb62867"/>
+				<reportElement x="64" y="45" width="257" height="20" uuid="dcc0c290-a07c-49cf-954e-83099eb62867"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="505" y="65" width="100" height="56" uuid="03b946af-c7cd-4a34-9802-a5c1e09964ee"/>
-				<textElement>
-					<font size="18" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{date}]]></textFieldExpression>
 			</textField>
 			<crosstab>
 				<reportElement x="0" y="231" width="8510" height="40" uuid="c7ffb7b4-6eee-4c8f-8899-673eab9eb3ec"/>
@@ -357,6 +351,27 @@
 					<cellContents mode="Opaque" style="Crosstab 4_CT"/>
 				</crosstabCell>
 			</crosstab>
+			<textField>
+				<reportElement x="300" y="91" width="100" height="20" uuid="783822a4-8ca1-4deb-ab07-db5929572b12"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="417" y="91" width="100" height="20" uuid="4be37314-6dca-49b1-8306-421f60548c2b"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="400" y="91" width="17" height="20" uuid="a0604dcb-90f7-4462-be57-81696ffd78cb"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
