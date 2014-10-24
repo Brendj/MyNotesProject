@@ -92,7 +92,7 @@ public class BIDataExportService {
                         + ", cf_orgs.statusDetailing, cf_orgs.btiUnom, cf_orgs.btiUnad, cf_orgs.introductionQueue, cf_orgs.additionalIdBuilding "
                         + "from cf_orgs "
                         + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
-                        + "where cf_orgs.state<>0 "
+                        //+ "where cf_orgs.state<>0 "
                         + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district "
                         + "order by cf_orgs.shortname",
                 new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm",
@@ -109,7 +109,8 @@ public class BIDataExportService {
                         + "from cf_orgs o "
                         + "join cf_friendly_organization f on o.idoforg=f.friendlyorg "
                         + "join cf_orgs o2 on o2.idoforg=f.currentorg "
-                        + "where o.shortname<>'' and o.state<>0 "
+                        + "where o.shortname<>'' "
+                        //+ "and o.state<>0 "
                         + "group by idoforg1, guid1 "
                 + " ) as o1 "
                 + "join cf_orgs o2 on o1.idoforg2=o2.idoforg "
