@@ -38,7 +38,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
-    private static final int DEFAULT_REPORT_WIDTH = 225;
+    private static final int DEFAULT_REPORT_WIDTH = 350;
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
 
@@ -57,7 +57,8 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("orgName", org.getOfficialName());
-            parameterMap.put("date", CalendarUtils.dateMMMMYYYYToString(startTime));
+            parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
+            parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
             //startTime = CalendarUtils.getFirstDayOfMonth(startTime);
             //endTime = CalendarUtils.getLastDayOfMonth(startTime);
@@ -66,7 +67,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
 
-            jasperPrint.setPageWidth(DEFAULT_REPORT_WIDTH + 80 * CalendarUtils.getDifferenceInDays(startTime));
+            jasperPrint.setPageWidth(DEFAULT_REPORT_WIDTH + 70 * CalendarUtils.getDifferenceInDays(startTime,endTime));
             Date generateEndTime = new Date();
             return new AutoEnterEventV2Report(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
