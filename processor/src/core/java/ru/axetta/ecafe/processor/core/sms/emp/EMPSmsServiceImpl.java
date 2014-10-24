@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
+import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +27,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
 
 import javax.annotation.Resource;
@@ -87,14 +89,10 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
 
         EMPEventType empEvent = (EMPEventType) textObject;
-        //List<Client> client = DAOService.getInstance().findClientsByMobilePhone(phoneNumber);
-        //for (Client c : client) {
-            String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
-        ///}
+        String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
         if(messageId == null || StringUtils.isBlank(messageId)) {
             throw new Exception(String.format("Failed tot send EMP event for client [%s]", client.getIdOfClient()));
         }
-        //String messageId = String.format("EMP/%s/%s/%s", client.getIdOfClient(), client.getMobile(), System.currentTimeMillis());
         return new SendResponse(1, null, messageId);// messageId ???
     }
 
@@ -110,7 +108,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         return new DeliveryResponse(DeliveryResponse.DELIVERED, null, null);
     }
 
-    public void updateIncome(int incomeIncrease, int outcomeIncrease, int failedIncrease) {
+    /*public void updateIncome(int incomeIncrease, int outcomeIncrease, int failedIncrease) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
 
@@ -150,16 +148,41 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
         optionValue = optionValue + String.format("%s/%s/%s/%s", instance, in, out, fail);
         runtimeContext.setOptionValueWithSave(Option.OPTION_EMP_COUNTER, optionValue);
+    }*/
+
+    protected ExternalSystemStats stats;
+    public static final int INCOME_STATS_ID = 1;
+    public static final int OUTCOME_STATS_ID = 2;
+    public static final int FAILED_STATS_ID = 3;
+
+
+    public void updateStats(int type, int inc) {
+        String instance = RuntimeContext.getInstance().getNodeName();
+        if(stats == null) {
+            stats = DAOService.getInstance().getAllPreviousStatsForExternalSystem("emp_event", instance);
+        }
+
+        stats.setValue(type, stats.getValue(type) + inc);
+
+        if(System.currentTimeMillis() >= stats.getCreateDate().getTime() + empProcessor.getConfigStatsLifetime()) {
+            stats = DAOService.getInstance().saveStatsForExtermalSystem(stats);
+        }
     }
 
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
+        /*if(1 == 1) {
+            updateStats(1, 0, 0);       //  TEST ONLY!!!!!!
+            updateStats(0, 1, 0);       //  TEST ONLY!!!!!!
+            updateStats(0, 0, 1);       //  TEST ONLY!!!!!!
+            return null;                //  TEST ONLY!!!!!!
+        }*/
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
             return null;
         }
 
 
-        updateIncome(1, 0, 0);
+        updateStats(INCOME_STATS_ID, 1);
 
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
@@ -178,14 +201,14 @@ public class EMPSmsServiceImpl extends ISmsService {
         if (response.getErrorCode() != 0) {
             empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
-            updateIncome(0, 0, 1);
+            updateStats(FAILED_STATS_ID, 1);
             throw new EMPException(
                     String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
                             response.getErrorMessage()));
         }
         empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
                 .getMobile() + " доставлено");
-        updateIncome(0, 1, 0);
+        updateStats(OUTCOME_STATS_ID, 1);
         return eventParam.getId();
     }
 

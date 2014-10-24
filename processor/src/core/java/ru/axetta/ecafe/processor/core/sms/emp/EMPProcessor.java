@@ -8,13 +8,13 @@ import generated.emp_events.*;
 import generated.emp_storage.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -75,6 +75,7 @@ public class EMPProcessor {
     String token, systemId, catalogName, subscriptionServiceUrl, storageServiceUrl, syncServiceNode;
     Integer packageSize;
     Boolean logging;
+    Long statsLifetime;
     
     protected String getConfigToken() {
         if (token!=null) return token;
@@ -103,6 +104,10 @@ public class EMPProcessor {
     protected Boolean getConfigLogging() {
         if (logging!=null) return logging;
         return logging=Boolean.parseBoolean(RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".logging", "false"));
+    }
+    protected long getConfigStatsLifetime() {
+        if (statsLifetime!=null) return statsLifetime;
+        return statsLifetime=Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".statsLifetime", "600000"));
     }
     
     public boolean isAllowed() {
@@ -139,7 +144,7 @@ public class EMPProcessor {
         }
 
         //  Загружаем статистику
-        EMPStatistics statistics = loadEMPStatistics();
+        //EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Привязка клиентов ИСПП к ЕМП " + date + "]: ";
@@ -147,8 +152,8 @@ public class EMPProcessor {
         //  Загрузка клиентов для связки
         List<ru.axetta.ecafe.processor.core.persistence.Client> notBindedClients = DAOService.getInstance()
                 .getNotBindedEMPClients(getConfigPackageSize());
-        //notBindedClients.clear();                                                 !! TEST ONLY
-        //notBindedClients.add(DAOService.getInstance().findClientById(1069L));     !! TEST ONLY
+        /*notBindedClients.clear();                                                 //!! TEST ONLY
+        notBindedClients.add(DAOService.getInstance().findClientById(585664L));     //!! TEST ONLY*/
         log(synchDate + "Количество клиентов к привязке: " + notBindedClients.size());
 
         //  Отправка запроса на привязку
@@ -158,14 +163,14 @@ public class EMPProcessor {
         }
         for (ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
-                bindClient(storage, c, synchDate, statistics);
+                bindClient(storage, c, synchDate/*, statistics*/);
             } catch (EMPException empe) {
                 logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()),
                         empe);
             }
         }
         //  Обновляем изменившуюся статистику
-        saveEMPStatistics(statistics);
+        //saveEMPStatistics(statistics);
     }
 
     public void runReceiveUpdates() throws EMPException {
@@ -174,7 +179,7 @@ public class EMPProcessor {
         }
 
         //  Загружаем статистику
-        EMPStatistics statistics = loadEMPStatistics();
+        //EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Получение изменений из ЕМП " + date + "]: ";
@@ -240,17 +245,26 @@ public class EMPProcessor {
                         .getClientByContractId(NumberUtils.toLong(ruleId));
                 if (client != null) {
                     //  Обновляем статистику
-                    statistics.addBinded();
+                    /*statistics.addBinded();
                     if (!StringUtils.isBlank(client.getSsoid()) && client.getSsoid()
                             .equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA)) {
                         statistics.removeWaitBinding();
                     } else {
                         statistics.removeNotBinded();
+                    }*/
+                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+                    String idsList = getClientIdsAsString(clients);
+                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId +
+                        "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
+                        client.getMobile() + "], изменения будут применены");
+                    for(Client cl : clients) {
+                        cl.setSsoid(ssoid);
+                        DAOService.getInstance().saveEntity(cl);
                     }
-                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId
+                    /*log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId
                             + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile());
                     client.setSsoid(ssoid);
-                    DAOService.getInstance().saveEntity(client);
+                    DAOService.getInstance().saveEntity(client);*/
                 }
             } else {
                 log(synchDate + "Полученное изменение из ЕМП не удалось связать: " + logStr.toString());
@@ -265,17 +279,17 @@ public class EMPProcessor {
             RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
         }
         //  Обновляем изменившуюся статистику
-        saveEMPStatistics(statistics);
+        //saveEMPStatistics(statistics);
     }
 
     protected void bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
-            String synchDate, EMPStatistics statistics) throws EMPException {
+            String synchDate/*, EMPStatistics statistics*/) throws EMPException {
         if (bindThrowSelect(storage, client, synchDate)) {
-            statistics.addBinded();
-            statistics.removeNotBinded();
+            /*statistics.addBinded();
+            statistics.removeNotBinded();*/
         } else if (bindThrowAdd(storage, client, synchDate)) {
-            statistics.addWaitBinding();
-            statistics.removeNotBinded();
+            /*statistics.addWaitBinding();
+            statistics.removeNotBinded();*/
         }
     }
 
@@ -312,7 +326,8 @@ public class EMPProcessor {
         Entry e = entries.get(0);
         boolean found = false;
         ///
-        client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
+        String newSsoid = SSOID_REGISTERED_AND_WAITING_FOR_DATA;
+        String newEmail = null;
         List<EntryAttribute> attributes = e.getAttribute();
         for (EntryAttribute attr : attributes) {
             if (attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
@@ -321,7 +336,8 @@ public class EMPProcessor {
                     && !attr.getValue().get(0).equals(client.getSsoid())) {
                 try {
                     String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
-                    client.setSsoid(val);
+                    //client.setSsoid(val);
+                    newSsoid = val;
                     found = true;
                 } catch (Exception e1) {
                     logger.error("Failed to process existing object", e1);
@@ -334,7 +350,8 @@ public class EMPProcessor {
                     && !attr.getValue().get(0).equals(client.getEmail())) {
                 try {
                     String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
-                    client.setEmail(val);
+                    //client.setEmail(val);
+                    newEmail = val;
                     found = true;
                 } catch (Exception e1) {
                     logger.error("Failed to process existing object");
@@ -342,15 +359,32 @@ public class EMPProcessor {
                 }
             }
         }
-        //if(found) {
-            log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
-                    + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid()
-                    + "}");
-            DAOService.getInstance().saveEntity(client);
-            return true;
-        /*} else {
-            return false;
-        }*/
+
+        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+        String idsList = getClientIdsAsString(clients);
+        log(synchDate + "С телефоном {SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size() + " клиентов [" +
+            idsList + "]. Для всех них будут обновлены следующие параметры: {Email: " + newEmail + "}, {SSOID: " + newSsoid + "}");
+        for(Client cl : clients) {
+            cl.setSsoid(newSsoid);
+            cl.setEmail(newEmail);
+            DAOService.getInstance().saveEntity(cl);
+        }
+        /*log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
+                + " найден по телефону и обновлен. {Email: " + client.getEmail() + "}, {SSOID: " + client.getSsoid()
+                + "}");
+        DAOService.getInstance().saveEntity(client);*/
+        return true;
+    }
+
+    protected String getClientIdsAsString(List<Client> clients) {
+        StringBuilder idsList = new StringBuilder();
+        for(Client cl : clients) {
+            if(idsList.length() > 0) {
+                idsList.append(", ");
+            }
+            idsList.append(cl.getIdOfClient());
+        }
+        return idsList.toString();
     }
 
     protected boolean bindThrowAdd(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
@@ -365,10 +399,16 @@ public class EMPProcessor {
         }
 
         if (response.getResult().getAffected().intValue() > 0) {
-            log(synchDate + "Запрос выполнен, клиенту [" + client.getIdOfClient() + "] " + client.getMobile()
-                    + " установлено SSOID = -1");
-            client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
-            DAOService.getInstance().saveEntity(client);
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            String idsList = getClientIdsAsString(clients);
+            log(synchDate + "Запрос выполнен, найдено " + clients.size() + " клиентов с телефоном " + client.getMobile() +
+                " [" + idsList + "] установлено {SSOID: -1}");
+            for(Client cl : clients) {
+                cl.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
+                DAOService.getInstance().saveEntity(cl);
+            }
+            /*client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
+            DAOService.getInstance().saveEntity(client);*/
             return true;
         }
         log(synchDate + "Не удалось зарегистрировать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + ", либо клиент уже зарегистрирован в ЕМП");

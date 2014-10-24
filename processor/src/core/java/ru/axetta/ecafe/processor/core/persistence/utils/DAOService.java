@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
@@ -724,6 +726,14 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public Client getClientByMobilePhone (String mobile) {
         return DAOUtils.getClientByMobilePhone(entityManager, mobile);
+    }
+
+    public List<Client> getClientsListByMobilePhone(String mobile) {
+        List res = DAOUtils.getClientsListByMobilePhone(entityManager, mobile);
+        if(res == null || res.size() < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        return (List<Client>) res;
     }
 
     public ReportHandleRule getReportHandleRule (long idOfReportHandleRule) {
@@ -1556,5 +1566,55 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             logger.error("Failed to receive accessory", e);
             return idoforg;
         }
+    }
+
+    public ExternalSystemStats getAllPreviousStatsForExternalSystem(String systemName, String instance) {
+        Query q = entityManager.createNativeQuery("select CreateDate, StatisticId, StatisticValue "
+                + "from cf_external_system_stats "
+                + "where CreateDate=(select max(CreateDate) from cf_external_system_stats where SystemName=:systemName AND Instance=:instance);");
+        q.setParameter("systemName", systemName);
+        q.setParameter("instance", instance);
+        List res = q.getResultList();
+        ExternalSystemStats result = null;
+        for(Object o : res) {
+            Object entry [] = (Object[]) o;
+            BigInteger createDate = (BigInteger) entry[0];
+            Integer typeId = (Integer) entry[1];
+            BigDecimal value = (BigDecimal) entry[2];
+            if(result == null) {
+                result = new ExternalSystemStats(new Date(createDate.longValue()), systemName, instance);
+            }
+            result.setValue(typeId.intValue(), value.doubleValue());
+        }
+        if(result == null) {
+            result = new ExternalSystemStats(new Date(System.currentTimeMillis()), systemName, instance);
+        }
+        return result;
+    }
+
+    public ExternalSystemStats saveStatsForExtermalSystem(ExternalSystemStats stats) {
+        if(stats == null || stats.getCreateDate() == null || stats.getName() == null ||
+           StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+            return null;
+        }
+        try {
+            long newDate = System.currentTimeMillis();
+            Query q = entityManager.createNativeQuery(
+                    "INSERT INTO cf_external_system_stats (SystemName, Instance, CreateDate, StatisticId, StatisticValue) VALUES "
+                    + "(:systemName, :instance, :createDate, :statisticId, :statisticValue)");
+            q.setParameter("systemName", stats.getName());
+            q.setParameter("instance", stats.getInstance());
+            q.setParameter("createDate", newDate);
+            for(Integer typeId : stats.getValues().keySet()) {
+                q.setParameter("statisticId", typeId);
+                q.setParameter("statisticValue", stats.getValue(typeId));
+                q.executeUpdate();
+            }
+            stats.setCreateDate(new Date(newDate));
+            return stats;
+        } catch (Exception e) {
+            logger.error("Failed to update external system statistics", e);
+        }
+        return stats;
     }
 }
