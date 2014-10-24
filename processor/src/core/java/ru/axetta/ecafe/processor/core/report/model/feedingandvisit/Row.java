@@ -174,17 +174,7 @@ public class Row {
     }
 
     public void updateTotal(OrderItem item) {
-        switch (item.getOrdertype()) {
-            case 4:
-                incrementcount();
-                break;
-            case 8:
-                decrementcount();
-                break;
-            default:
-                System.out.print("orderType " + item.getOrdertype());
-                break;
-        }
+        totalCount += item.getQty();
     }
 
     public void update(OrderItem item) {

@@ -93,11 +93,14 @@ public class Data  implements Comparable<Data> {
 
         Integer numThis = Integer.valueOf(numThisString);
         Integer numO = Integer.valueOf(numOString);
-        String sThis = getName().replaceAll("[^\\D]", "").toUpperCase();
-        String sO = o.getName().replaceAll("[^\\D]", "").toUpperCase();
-        if ( numThis.compareTo(numO) != 0) {
+        if(numThis.equals(numO)){
+            String sThis = getName().replaceAll("[^\\D]", "").toUpperCase();
+            String sO = o.getName().replaceAll("[^\\D]", "").toUpperCase();
+            Integer letterThis = Character.getNumericValue(sThis.charAt(0));
+            Integer letterO = Character.getNumericValue(sO.charAt(0));
+            return  letterThis.compareTo(letterO);
+        }else{
             return numThis.compareTo(numO);
         }
-        return Character.getNumericValue(sThis.charAt(0)) > Character.getNumericValue(sO.charAt(0)) ? 1 : -1;
     }
 }

@@ -38,7 +38,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
-    private static final int DEFAULT_REPORT_WIDTH = 350;
+    private static final int DEFAULT_REPORT_WIDTH = 550;
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
 
