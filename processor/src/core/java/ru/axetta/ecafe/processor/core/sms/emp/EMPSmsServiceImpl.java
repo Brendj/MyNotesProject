@@ -91,7 +91,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         EMPEventType empEvent = (EMPEventType) textObject;
         String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
         if(messageId == null || StringUtils.isBlank(messageId)) {
-            throw new Exception(String.format("Failed tot send EMP event for client [%s]", client.getIdOfClient()));
+            throw new Exception(String.format("Failed tot send EMP event for client [%s] - EMP system failed to send", client.getIdOfClient()));
         }
         return new SendResponse(1, null, messageId);// messageId ???
     }
@@ -172,13 +172,12 @@ public class EMPSmsServiceImpl extends ISmsService {
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
         /*if(1 == 1) {
-            updateStats(1, 0, 0);       //  TEST ONLY!!!!!!
-            updateStats(0, 1, 0);       //  TEST ONLY!!!!!!
-            updateStats(0, 0, 1);       //  TEST ONLY!!!!!!
+            updateStats(INCOME_STATS_ID, 10000);       //  TEST ONLY!!!!!!
             return null;                //  TEST ONLY!!!!!!
         }*/
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
-            return null;
+            //return null;
+            throw new EMPException(String.format("Failed tot send EMP event for client [%s] - ssoid is required", client.getIdOfClient()));
         }
 
 
