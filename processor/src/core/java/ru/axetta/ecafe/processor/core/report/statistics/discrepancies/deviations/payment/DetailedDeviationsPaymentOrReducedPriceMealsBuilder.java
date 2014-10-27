@@ -141,7 +141,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     planOrderItemsToPayNotDetected.addAll(planOrderItemToPayNotDetectedList);
                 }
 
-                if (!planOrderItemsPaidByOneDay.isEmpty() && !planOrderItemsToPayDetected.isEmpty()) {
+                if (!planOrderItemsToPayDetected.isEmpty()) {
                     for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
                         if (!planOrderItemsPaidByOneDay.contains(planOrderItem)) {
                             resultSubtraction.add(planOrderItem);
@@ -149,8 +149,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                if (!planOrderItemsPaidByOneDay.isEmpty() && !planOrderItemsToPayNotDetected.isEmpty()) {
-
+                if (!planOrderItemsToPayNotDetected.isEmpty()) {
                     for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
                         if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
                             resultIntersection.add(planOrderItem);
@@ -243,7 +242,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                if (!planOrderItemsPaidByInterval.isEmpty() && !planOrderItemsToPayDetectedInterval.isEmpty()) {
+                if (!planOrderItemsToPayDetectedInterval.isEmpty()) {
                     for (PlanOrderItem planOrderItem : planOrderItemsToPayDetectedInterval) {
                         if (!planOrderItemsPaidByInterval.contains(planOrderItem)) {
                             resultSubtractionInterval.add(planOrderItem);
@@ -251,8 +250,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 }
 
-                if (!planOrderItemsPaidByInterval.isEmpty() && !planOrderItemsToPayNotDetectedInterval.isEmpty()) {
-
+                if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
                     for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetectedInterval) {
                         if (planOrderItemsPaidByInterval.contains(planOrderItem)) {
                             resultIntersectionInterval.add(planOrderItem);
@@ -312,11 +310,10 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             deviationPaymentSubReportItem.setGroupName(planOrderItem.getGroupName());
             deviationPaymentSubReportItem.setPersonName(planOrderItem.getClientName());
             deviationPaymentSubReportItem.setOrderDate(planOrderItem.getOrderDate());
+            deviationPaymentSubReportItem.setRuleId(planOrderItem.getIdOfRule());
 
             for (ComplexInfoForPlan complexInfoForPlan : complexInfoList) {
-                if (complexInfoForPlan.getIdOfClient().equals(planOrderItem.getIdOfClient()) && complexInfoForPlan
-                        .getIdOfComplex().equals(planOrderItem.getIdOfComplex())) {
-
+                if (complexInfoForPlan.getIdOfComplex().equals(planOrderItem.getIdOfComplex())) {
                     deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
                     break;
                 }

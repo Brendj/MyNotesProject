@@ -1,6 +1,9 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoForPlan;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
@@ -10,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -224,9 +226,9 @@ public class ClientsEntereventsService {
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
                         + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson WHERE cfo.ordertype IN (" + orderType
-                        + ") AND cfo.idoforg IN (:idOfOrgs) "
-                        + "AND cfo.orderdate >= :startTime AND cfo.orderdate < :endTime "
-                        + "AND cfod.menutype > 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
+                        + ") AND cfo.idoforg IN (:idOfOrgs) " + "AND cfo.state = 0 "
+                        + "AND cfo.createddate >= :startTime AND cfo.createddate < :endTime "
+                        + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
         query.setParameter("startTime", startTime.getTime());
         query.setParameterList("idOfOrgs", idOfOrgs);
         query.setParameter("endTime", endTime.getTime());
@@ -243,8 +245,7 @@ public class ClientsEntereventsService {
                     (String) resultPlanOrderItem[5]);
             resultPlanOrder.add(planOrderItem);
 
-            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan(
-                    ((BigInteger) resultPlanOrderItem[0]).longValue(), (Integer) resultPlanOrderItem[2],
+            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan((Integer) resultPlanOrderItem[2],
                     ((BigInteger) resultPlanOrderItem[3]).longValue(), (String) resultPlanOrderItem[6],
                     ((BigInteger) resultPlanOrderItem[7]).longValue());
             complexInfoForPlans.add(complexInfoForPlan);
@@ -268,7 +269,7 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -295,7 +296,7 @@ public class ClientsEntereventsService {
                 .loadClientsInfoToPayNotDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -354,7 +355,7 @@ public class ClientsEntereventsService {
                 .loadClientsInfoToPayDetected(session, startTime, endTime, orgId);
         if (!clientInfoList.isEmpty()) {
             // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session);
+            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
 
@@ -543,33 +544,37 @@ public class ClientsEntereventsService {
     }
 
     // Получает все правила по организации
-    public static List<DiscountRule> getDiscountRulesByOrg(Session session) {
-        Criteria criteria = session.createCriteria(CategoryDiscount.class);
-        List<DiscountRule> discountRules = new ArrayList<DiscountRule>();
-
-        List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
-
-        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
-            discountRules.addAll(categoryDiscount.getDiscountsRules());
-        }
-
-        List<DiscountRule> resultDisc = new ArrayList<DiscountRule>();
-
-        for (DiscountRule rule : discountRules) {
-            if (!IsExistRule(resultDisc, rule)) {
-                resultDisc.add(rule);
-            }
-        }
-        return resultDisc;
+    public static List<DiscountRule> getDiscountRulesByOrg(Session session, long idOfOrg) {
+        return loadRulesForOrg(session, idOfOrg);
     }
 
-    private static boolean IsExistRule(List<DiscountRule> resultDisc, DiscountRule rule) {
-        for (DiscountRule itemRule : resultDisc) {
-            if (itemRule.getIdOfRule() == rule.getIdOfRule()) {
-                return true;
+    private static List<DiscountRule> loadRulesForOrg(Session persistenceSession, long idOfOrg) {
+        Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
+        Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+        Set<CategoryOrg> categoryOrgSet = org.getCategories();
+        List<DiscountRule> rules = new ArrayList<DiscountRule>();
+        if (!categoryOrgSet.isEmpty()) {
+            for (Object object : criteriaDiscountRule.list()) {
+                DiscountRule discountRule = (DiscountRule) object;
+                boolean bIncludeRule = false;
+                if (discountRule.getCategoryOrgs().isEmpty()) {
+                    bIncludeRule = true;
+                } else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())) {
+                    bIncludeRule = true;
+                }
+                if (bIncludeRule) {
+                    rules.add(discountRule);
+                }
+            }
+        } else {
+            for (Object object : criteriaDiscountRule.list()) {
+                DiscountRule discountRule = (DiscountRule) object;
+                    /* если правила не установлены категории организаций то отправляем*/
+                if (discountRule.getCategoryOrgs().isEmpty()) {
+                    rules.add(discountRule);
+                }
             }
         }
-        return false;
+        return rules;
     }
-
 }

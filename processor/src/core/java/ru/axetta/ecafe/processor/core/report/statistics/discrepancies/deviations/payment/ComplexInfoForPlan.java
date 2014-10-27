@@ -12,26 +12,16 @@ package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviation
  */
 
 public class ComplexInfoForPlan {
-    public Long idOfClient;
     public Integer idOfComplex;
     public Long idOfRule;
     public String complexName;
     public Long idOfOrg;
 
-    public ComplexInfoForPlan(Long idOfClient, Integer idOfComplex, Long idOfRule, String complexName, Long idOfOrg) {
-        this.idOfClient = idOfClient;
+    public ComplexInfoForPlan(Integer idOfComplex, Long idOfRule, String complexName, Long idOfOrg) {
         this.idOfComplex = idOfComplex;
         this.idOfRule = idOfRule;
         this.complexName = complexName;
         this.idOfOrg = idOfOrg;
-    }
-
-    public Long getIdOfClient() {
-        return idOfClient;
-    }
-
-    public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
     }
 
     public Integer getIdOfComplex() {
