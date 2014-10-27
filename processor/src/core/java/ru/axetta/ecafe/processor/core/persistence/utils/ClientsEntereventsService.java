@@ -32,8 +32,6 @@ public class ClientsEntereventsService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientsEntereventsService.class);
 
-    public static List<ComplexInfoForPlan> complexInfoForPlanList = new ArrayList<ComplexInfoForPlan>();
-
     private ClientsEntereventsService() {
     }
 
@@ -217,7 +215,6 @@ public class ClientsEntereventsService {
     public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, List<Long> idOfOrgs,
             Date startTime, Date endTime) {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
-        List<ComplexInfoForPlan> complexInfoForPlans = new ArrayList<ComplexInfoForPlan>();
 
         Query query = session.createSQLQuery(
                 "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname, cfod.menudetailname, c.idoforg "
@@ -244,22 +241,33 @@ public class ClientsEntereventsService {
                     CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
                     (String) resultPlanOrderItem[5]);
             resultPlanOrder.add(planOrderItem);
-
-            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan((Integer) resultPlanOrderItem[2],
-                    ((BigInteger) resultPlanOrderItem[3]).longValue(), (String) resultPlanOrderItem[6],
-                    ((BigInteger) resultPlanOrderItem[7]).longValue());
-            complexInfoForPlans.add(complexInfoForPlan);
         }
-        setComplexInfoForPlanList(complexInfoForPlans);
         return resultPlanOrder;
     }
 
-    public static List<ComplexInfoForPlan> getComplexInfoForPlanList() {
-        return complexInfoForPlanList;
-    }
+    public static List<ComplexInfoForPlan> loadComplexName(Session session, Long idOfOrg, String orderType) {
+        List<ComplexInfoForPlan> complexInfoForPlans = new ArrayList<ComplexInfoForPlan>();
 
-    public static void setComplexInfoForPlanList(List<ComplexInfoForPlan> complexInfoForPlanList) {
-        ClientsEntereventsService.complexInfoForPlanList = complexInfoForPlanList;
+        Query query = session.createSQLQuery(
+                "SELECT (cfod.menutype - 50) AS complexid, "
+                        + "cfod.idofrule, cfod.menudetailname, cfo.idoforg "
+                        + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod "
+                        + "ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType + ") AND cfod.menutype >= 50 AND cfod.menutype < 100 AND "
+                        + "cfod.idofrule >= 0 GROUP BY complexid, cfod.idofrule, cfod.menudetailname, cfo.idoforg");
+        query.setParameter("idOfOrg", idOfOrg);
+
+        List result = query.list();
+
+        //парсим данные
+        for (Object o: result) {
+            Object[] resultComp = (Object[]) o;
+            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan((Integer) resultComp[0],
+                    ((BigInteger) resultComp[1]).longValue(), (String) resultComp[2],
+                    ((BigInteger) resultComp[3]).longValue());
+            complexInfoForPlans.add(complexInfoForPlan);
+        }
+        return complexInfoForPlans;
     }
 
     // Должен был получить бесплатное питание

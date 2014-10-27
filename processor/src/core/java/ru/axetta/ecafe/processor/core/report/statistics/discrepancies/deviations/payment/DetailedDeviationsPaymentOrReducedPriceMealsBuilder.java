@@ -115,7 +115,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
 
         // Имена комплексов по заказам
-        List<ComplexInfoForPlan> complexInfoForPlanList = ClientsEntereventsService.getComplexInfoForPlanList();
+        List<ComplexInfoForPlan> complexInfoForPlanList = new ArrayList<ComplexInfoForPlan>();
 
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
@@ -127,6 +127,9 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
 
             for (Long idOfOrg : idOfOrgList) {
+
+                complexInfoForPlanList = ClientsEntereventsService.loadComplexName(session, idOfOrg, orderTypeLgotnick);
+
                 // План по тем кто отметился в здании
                 List<PlanOrderItem> planOrderItemToPayDetectedList = ClientsEntereventsService
                         .loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg);
@@ -196,6 +199,9 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, endTime);
 
             for (Long idOfOrg : idOfOrgList) {
+
+                complexInfoForPlanList = ClientsEntereventsService.loadComplexName(session, idOfOrg, orderTypeLgotnick);
+
                 // План по тем кто отметился в здании за интервал
                 List<PlanOrderItem> planOrderItemToPayDetectedIntervalList;
 
