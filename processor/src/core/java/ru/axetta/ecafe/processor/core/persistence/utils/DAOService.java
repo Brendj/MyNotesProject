@@ -1606,15 +1606,16 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             q.setParameter("instance", stats.getInstance());
             q.setParameter("createDate", newDate);
             for(Integer typeId : stats.getValues().keySet()) {
+                BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(5);
                 q.setParameter("statisticId", typeId);
-                q.setParameter("statisticValue", stats.getValue(typeId));
+                q.setParameter("statisticValue", val);
                 q.executeUpdate();
             }
             stats.setCreateDate(new Date(newDate));
-            return stats;
-        } catch (Exception e) {
-            logger.error("Failed to update external system statistics", e);
-        }
+        return stats;
+    } catch (Exception e) {
+        logger.error("Failed to update external system statistics", e);
+    }
         return stats;
     }
 }
