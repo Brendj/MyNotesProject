@@ -133,7 +133,7 @@ public class DashboardServiceBean {
             //ISmsService smsService = RuntimeContext.getInstance().getSmsService();
             if(empProcessor!= null) {
                 if(empProcessor.isAllowed()) {
-                    EMPProcessor.EMPStatistics empStatistics = EMPProcessor.loadEMPStatistics();
+                    EMPProcessor.EMPStatistics empStatistics = empProcessor.recalculateEMPClientsCount();
                     params.add(new DashboardResponse.NamedParams("Не связано учеников с ЕМП", empStatistics.getNotBindedCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников ожидает связки с ЕМП", empStatistics.getWaitBindingCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников связанных с ЕМП", empStatistics.getBindedCount()));

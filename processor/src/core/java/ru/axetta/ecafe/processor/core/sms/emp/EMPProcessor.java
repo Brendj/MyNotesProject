@@ -122,7 +122,7 @@ public class EMPProcessor {
         return true;
     }
 
-    public void recalculateEMPClientsCount() {
+    public EMPStatistics recalculateEMPClientsCount() {
         EMPStatistics statistics = loadEMPStatistics();
         long notBinded = DAOService.getInstance().getNotBindedEMPClientsCount();
         long waitBind = DAOService.getInstance().getBindWaitingEMPClients();
@@ -130,7 +130,8 @@ public class EMPProcessor {
         statistics.setNotBindedCount(notBinded);
         statistics.setWaitBindingCount(waitBind);
         statistics.setBindedCount(binded);
-        saveEMPStatistics(statistics);
+        return statistics;
+        //saveEMPStatistics(statistics);
     }
 
     public void runStorageMerge() throws EMPException {
