@@ -854,6 +854,9 @@
         <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
         <rich:panelMenuItem id="registerStampReportMenuItem" binding="#{registerStampPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPage.show}" reRender="workspaceForm" />
+                            <%--@elvariable id="feedingAndVisitPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitPage"--%>
+        <rich:panelMenuItem id="feedingAndVisitReportMenuItem" binding="#{feedingAndVisitPage.mainMenuComponent}"
+                            label="Отчет по питанию и посещению" action="#{feedingAndVisitPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Отчет по оказанным услугам"

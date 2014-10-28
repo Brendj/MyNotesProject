@@ -26,6 +26,10 @@ public class OrderService {
     @Autowired
     private OrdersRepository ordersRepository;
 
+    public List<OrderItem> findOrders(long idOfOrg,  Date startTime, Date endTime) {
+        return ordersRepository.findOrdersByClientIds(idOfOrg, startTime, endTime);
+    }
+
     public List<OrderItem> findOrdersByClientIds(long idOfOrg, String clientIds, Date startTime, Date endTime) {
         return ordersRepository.findOrdersByClientIds(idOfOrg, clientIds, startTime, endTime);
     }

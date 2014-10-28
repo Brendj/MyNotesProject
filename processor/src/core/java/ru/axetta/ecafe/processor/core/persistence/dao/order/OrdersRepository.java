@@ -44,12 +44,19 @@ public class OrdersRepository extends BaseJpaDao {
                         + " INNER JOIN cf_orderdetails od on o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
                         + " INNER JOIN cf_clients c on c.idofclient = o.idofclient "
                         + " INNER JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
-                        + " WHERE o.idoforg = " + idOfOrg
-                        + " AND od.menutype >= 50 AND od.menutype<=99  AND c.idofclient in ( " + clientIds + ") "
-                        + " AND o.createddate between " + startTime.getTime() + " AND " + endTime.getTime() + " "
-                        + " AND o.state = 0 " + " AND o.ordertype in (4,6,8) AND c.idofclientgroup < 1100000000 "
-                        + " ORDER BY g.groupname,  c.idofclient, o.createddate, o.ordertype, od.menudetailname ";
+                        + " WHERE o.idoforg = " + idOfOrg + " AND od.menutype >= 50 AND od.menutype<=99 ";
+        if (clientIds != null) {
+            sql += " AND c.idofclient in ( " + clientIds + ") ";
+
+        }
+        sql += " AND o.socdiscount > 0 " + " AND o.createddate between " + startTime.getTime()
+                + " AND " + endTime.getTime() + " " + " AND o.state = 0 "
+                + " AND o.ordertype in (4,6,8) AND c.idofclientgroup < 1100000000 "
+                + " ORDER BY g.groupname,  c.idofclient, o.createddate, o.ordertype, od.menudetailname ";
         return getOrderItemBySQL(sql);
     }
 
+    public List<OrderItem> findOrdersByClientIds(long idOfOrg, Date startTime, Date endTime) {
+        return findOrdersByClientIds(idOfOrg, null, startTime, endTime);
+    }
 }
