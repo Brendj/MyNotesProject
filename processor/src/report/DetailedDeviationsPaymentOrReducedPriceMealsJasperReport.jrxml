@@ -33,6 +33,7 @@
 	<field name="orgName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
 	<field name="deviationPaymentSubReportItemList" class="java.util.List"/>
+	<field name="rowNum" class="java.lang.Long"/>
 	<group name="ByOrgName">
 		<groupExpression><![CDATA[$F{deviationPaymentSubReportItemList}]]></groupExpression>
 		<groupHeader>
@@ -82,6 +83,7 @@
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

@@ -15,7 +15,8 @@ import java.util.List;
 
 public class DeviationPaymentItem {
 
-    private String orgName;    //Название организации
+    private Long rowNum;       // Номер по порядку
+    private String orgName;    // Название организации
     private String address;    // Адресс организации
 
     private List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList;
@@ -24,11 +25,20 @@ public class DeviationPaymentItem {
     public DeviationPaymentItem() {
     }
 
-    public DeviationPaymentItem(String orgName, String address,
+    public DeviationPaymentItem(Long rowNum, String orgName, String address,
             List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+        this.rowNum = rowNum;
         this.orgName = orgName;
         this.address = address;
         this.deviationPaymentSubReportItemList = deviationPaymentSubReportItemList;
+    }
+
+    public Long getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(Long rowNum) {
+        this.rowNum = rowNum;
     }
 
     public String getOrgName() {

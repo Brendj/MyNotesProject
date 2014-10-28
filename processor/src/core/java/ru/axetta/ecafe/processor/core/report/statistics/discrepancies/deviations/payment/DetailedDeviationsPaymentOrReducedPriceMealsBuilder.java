@@ -105,6 +105,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
             CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
+            Long rowNum = 0L;
 
             for (Long idOfOrg : idOfOrgList) {
 
@@ -154,11 +155,13 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getShortName());
+                        deviationPaymentItem.setRowNum(++rowNum);
                     } else if (!resultSubtraction.isEmpty()) {
                         Client client = (Client) session.load(Client.class, resultSubtraction.get(0).getIdOfClient());
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getShortName());
+                        deviationPaymentItem.setRowNum(++rowNum);
                     }
 
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
@@ -180,6 +183,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 }
             }
         } else {
+
+            Long rowNum = 0L;
 
             for (Long idOfOrg : idOfOrgList) {
 
@@ -263,12 +268,14 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getShortName());
+                        deviationPaymentItem.setRowNum(++rowNum);
                     } else if (!resultSubtractionInterval.isEmpty()) {
                         Client client = (Client) session
                                 .load(Client.class, resultSubtractionInterval.get(0).getIdOfClient());
                         Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getShortName());
+                        deviationPaymentItem.setRowNum(++rowNum);
                     }
 
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
