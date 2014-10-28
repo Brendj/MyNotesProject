@@ -212,22 +212,22 @@ public class ClientsEntereventsService {
 
     //Вернет список клиентов которые были оплачены
     // в зависимости от параметра orderType - строковое, по интервалу от startDate до endTime
-    public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, List<Long> idOfOrgs,
+    public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, Long idOfOrg,
             Date startTime, Date endTime) {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, orderdate, g.groupname, cfod.menudetailname, c.idoforg "
+                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, cfo.createddate, g.groupname, cfod.menudetailname, c.idoforg "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
                         + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson WHERE cfo.ordertype IN (" + orderType
-                        + ") AND cfo.idoforg IN (:idOfOrgs) " + "AND cfo.state = 0 "
+                        + ") AND cfo.idoforg = :idOfOrg " + "AND cfo.state = 0 "
                         + "AND cfo.createddate >= :startTime AND cfo.createddate < :endTime "
                         + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
         query.setParameter("startTime", startTime.getTime());
-        query.setParameterList("idOfOrgs", idOfOrgs);
+        query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("endTime", endTime.getTime());
 
         List result = query.list();

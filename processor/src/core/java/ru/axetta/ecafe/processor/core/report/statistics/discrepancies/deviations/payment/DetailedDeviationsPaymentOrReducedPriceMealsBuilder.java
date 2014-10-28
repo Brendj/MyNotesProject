@@ -86,16 +86,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         //Результирующиц лист по которому строиться отчет
         List<DeviationPaymentItem> deviationPaymentItemList = new ArrayList<DeviationPaymentItem>();
 
-        // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
-        List<PlanOrderItem> planOrderItemsToPayDetected = new ArrayList<PlanOrderItem>();
-        // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
-        List<PlanOrderItem> planOrderItemsToPayNotDetected = new ArrayList<PlanOrderItem>();
-
-        // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован - за интервал
-        List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
-        // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
-        List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
-
         // Те кто получил бесплатное питание за один день
         List<PlanOrderItem> planOrderItemsPaidByOneDay;
 
@@ -108,12 +98,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
 
-        List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
-        List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
-
-        List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
-        List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
-
         // Имена комплексов по заказам
         List<ComplexInfoForPlan> complexInfoForPlanList = new ArrayList<ComplexInfoForPlan>();
 
@@ -122,40 +106,41 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
             CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
 
-            // Оплаченные Заказы
-            planOrderItemsPaidByOneDay = ClientsEntereventsService
-                    .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
-
             for (Long idOfOrg : idOfOrgList) {
+
+                List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
+                List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
+
+                // Оплаченные Заказы
+                planOrderItemsPaidByOneDay = ClientsEntereventsService
+                        .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
 
                 complexInfoForPlanList = ClientsEntereventsService.loadComplexName(session, idOfOrg, orderTypeLgotnick);
 
-                // План по тем кто отметился в здании
-                List<PlanOrderItem> planOrderItemToPayDetectedList = ClientsEntereventsService
+                // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
+                List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
                         .loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg);
-                if (planOrderItemToPayDetectedList != null) {
-                    planOrderItemsToPayDetected.addAll(planOrderItemToPayDetectedList);
-                }
 
-                // План по тем кто не в здании
-                List<PlanOrderItem> planOrderItemToPayNotDetectedList = ClientsEntereventsService
+                // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
+                List<PlanOrderItem> planOrderItemsToPayNotDetected = ClientsEntereventsService
                         .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg);
-                if (planOrderItemToPayNotDetectedList != null) {
-                    planOrderItemsToPayNotDetected.addAll(planOrderItemToPayNotDetectedList);
-                }
 
-                if (!planOrderItemsToPayDetected.isEmpty()) {
-                    for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
-                        if (!planOrderItemsPaidByOneDay.contains(planOrderItem)) {
-                            resultSubtraction.add(planOrderItem);
+                if (planOrderItemsToPayDetected != null) {
+                    if (!planOrderItemsToPayDetected.isEmpty()) {
+                        for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
+                            if (!planOrderItemsPaidByOneDay.contains(planOrderItem)) {
+                                resultSubtraction.add(planOrderItem);
+                            }
                         }
                     }
                 }
 
-                if (!planOrderItemsToPayNotDetected.isEmpty()) {
-                    for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
-                        if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
-                            resultIntersection.add(planOrderItem);
+                if (planOrderItemsToPayNotDetected != null) {
+                    if (!planOrderItemsToPayNotDetected.isEmpty()) {
+                        for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
+                            if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
+                                resultIntersection.add(planOrderItem);
+                            }
                         }
                     }
                 }
@@ -195,18 +180,21 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 }
             }
         } else {
-            planOrderItemsPaidByInterval = ClientsEntereventsService
-                    .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, endTime);
 
             for (Long idOfOrg : idOfOrgList) {
 
+                List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
+                List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
+
+                // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован - за интервал
+                List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
+                // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
+                List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
+
+                planOrderItemsPaidByInterval = ClientsEntereventsService
+                        .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
+
                 complexInfoForPlanList = ClientsEntereventsService.loadComplexName(session, idOfOrg, orderTypeLgotnick);
-
-                // План по тем кто отметился в здании за интервал
-                List<PlanOrderItem> planOrderItemToPayDetectedIntervalList;
-
-                // План по тем кто не в здании за интервал
-                List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList;
 
                 Date sTt = startTime;
                 CalendarUtils.truncateToDayOfMonth(sTt);
@@ -214,14 +202,15 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 Date eTt = CalendarUtils.addOneDay(startTime);
                 CalendarUtils.truncateToDayOfMonth(eTt);
 
-                planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
+                // План по тем кто отметился в здании за интервал
+                List<PlanOrderItem> planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
                         .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrg);
                 if (planOrderItemToPayDetectedIntervalList != null) {
                     planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
                 }
 
-                // План по тем кто не в здании
-                planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
+                // План по тем кто не в здании за интервал
+                List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
                         .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
                 if (planOrderItemToPayNotDetectedIntervalList != null) {
                     planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
