@@ -308,7 +308,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             deviationPaymentSubReportItem.setRuleId(planOrderItem.getIdOfRule());
 
             for (ComplexInfoForPlan complexInfoForPlan : complexInfoList) {
-                if (complexInfoForPlan.getIdOfComplex().equals(planOrderItem.getIdOfComplex())&&complexInfoForPlan.getIdOfRule().equals(planOrderItem.getIdOfRule())) {
+                if (complexInfoForPlan.getIdOfComplex().equals(planOrderItem.getIdOfComplex())) {
                     deviationPaymentSubReportItem.setComplexName(complexInfoForPlan.getComplexName());
                     break;
                 }
