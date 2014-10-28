@@ -12,6 +12,7 @@
 	<field name="complexName" class="java.lang.String"/>
 	<field name="orderDate" class="java.util.Date"/>
 	<field name="ruleId" class="java.lang.Long"/>
+	<field name="orderDateShortFormat" class="java.lang.String"/>
 	<variable name="conditionCount" class="java.lang.String" resetType="None">
 		<variableExpression><![CDATA["Итого:   " + $V{byCondition_COUNT}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
@@ -97,7 +98,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[new SimpleDateFormat("dd MMMM").format($F{orderDate})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{orderDateShortFormat}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 import java.util.Date;
 
 /**
@@ -69,6 +71,10 @@ public class DeviationPaymentSubReportItem {
 
     public Date getOrderDate() {
         return orderDate;
+    }
+
+    public String getOrderDateShortFormat() {
+        return CalendarUtils.dateShortToStringFullYear(orderDate);
     }
 
     public void setOrderDate(Date orderDate) {
