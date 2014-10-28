@@ -46,6 +46,20 @@ public class FinancialOpsManager {
     }
 
     @Transactional
+    public ClientSms createClientFailedSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
+            String textContents, Date serviceSendTime) throws Exception {
+
+        Session session = em.unwrap(Session.class);
+
+        long priceOfSms = client.getOrg().getPriceOfSms();
+        ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsType, textContents,
+                serviceSendTime, priceOfSms);
+        clientSms.setDeliveryStatus(ClientSms.NOT_DELIVERED_TO_RECIPENT);
+        session.save(clientSms);
+        return clientSms;
+    }
+
+    @Transactional
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
 
