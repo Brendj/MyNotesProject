@@ -89,11 +89,21 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
 
         EMPEventType empEvent = (EMPEventType) textObject;
-        String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
-        if(messageId == null || StringUtils.isBlank(messageId)) {
-            throw new Exception(String.format("Failed tot send EMP event for client [%s] - EMP system failed to send", client.getIdOfClient()));
+        try {
+            String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
+            if(messageId == null || StringUtils.isBlank(messageId)) {
+                throw new Exception(String.format("Failed tot send EMP event for client [%s] - EMP system failed to send", client.getIdOfClient()));
+            }
+            return new SendResponse(1, null, messageId);// messageId ???
+        } catch(EMPException empe) {
+            if(empe.getMessageId() != null && !StringUtils.isBlank(empe.getMessageId())) {
+                return new SendResponse(empe.getCode() < SendResponse.MIN_SUCCESS_STATUS ? empe.getCode() : -empe.getCode(),
+                                        String.format("E: [%s] %s", "" + empe.getCode(), empe.getError()), empe.getMessageId());
+            }
+        } catch (Exception e) {
+            throw e;
         }
-        return new SendResponse(1, null, messageId);// messageId ???
+        throw new Exception("Nor error neither success while sending EMP event");
     }
 
     @Override
@@ -175,9 +185,12 @@ public class EMPSmsServiceImpl extends ISmsService {
             updateStats(INCOME_STATS_ID, 10000);       //  TEST ONLY!!!!!!
             return null;                //  TEST ONLY!!!!!!
         }*/
+        if(event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn())) {
+            throw new EMPException(String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required", client.getIdOfClient()));
+        }
         if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
             //return null;
-            throw new EMPException(String.format("Failed tot send EMP event for client [%s] - ssoid is required", client.getIdOfClient()));
+            throw new EMPException(String.format("Failed to send EMP event for client [%s] - ssoid is required", client.getIdOfClient()));
         }
 
 
@@ -201,9 +214,9 @@ public class EMPSmsServiceImpl extends ISmsService {
             empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
             updateStats(FAILED_STATS_ID, 1);
-            throw new EMPException(
+            throw new EMPException(response.getErrorCode(),
                     String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
-                            response.getErrorMessage()));
+                            response.getErrorMessage())).setMessageId(eventParam.getId());
         }
         empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
                 .getMobile() + " доставлено");

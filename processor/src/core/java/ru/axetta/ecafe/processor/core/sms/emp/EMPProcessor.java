@@ -127,9 +127,11 @@ public class EMPProcessor {
         long notBinded = DAOService.getInstance().getNotBindedEMPClientsCount();
         long waitBind = DAOService.getInstance().getBindWaitingEMPClients();
         long binded = DAOService.getInstance().getBindedEMPClientsCount();
+        long errors = DAOService.getInstance().getBindEMPErrorsCount();
         statistics.setNotBindedCount(notBinded);
         statistics.setWaitBindingCount(waitBind);
         statistics.setBindedCount(binded);
+        statistics.setBindingErrors(errors);
         return statistics;
         //saveEMPStatistics(statistics);
     }
@@ -311,6 +313,16 @@ public class EMPProcessor {
             return false;
         }
         if (response.getErrorCode() != 0) {
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            String idsList = getClientIdsAsString(clients);
+            String newSsoid = String.format("E:[%s]", response.getErrorCode());
+            log(synchDate + "Произошла ошибка при попытке поиска клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
+                    "]: " + response.getErrorMessage() + ". Всем клиентам " + clients.size() + " [" + idsList +
+                    "] будут обновлены следующие параметры: {SSOID: " + newSsoid + "}");
+            for(Client cl : clients) {
+                cl.setSsoid(newSsoid);
+                DAOService.getInstance().saveEntity(cl);
+            }
             throw new EMPException(response.getErrorCode(), response.getErrorMessage());
         }
 
@@ -363,7 +375,7 @@ public class EMPProcessor {
 
         List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
-        log(synchDate + "С телефоном {SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size() + " клиентов [" +
+        log(synchDate + "С телефоном [SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size() + " клиентов [" +
             idsList + "]. Для всех них будут обновлены следующие параметры: {Email: " + newEmail + "}, {SSOID: " + newSsoid + "}");
         for(Client cl : clients) {
             cl.setSsoid(newSsoid);
@@ -396,6 +408,16 @@ public class EMPProcessor {
         AddEntriesRequest request = buildAddEntryParams(client);
         AddEntriesResponse response = storage.addEntries(request);
         if (response.getErrorCode() != 0) {
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            String idsList = getClientIdsAsString(clients);
+            String newSsoid = String.format("E:[%s]", response.getErrorCode());
+            log(synchDate + "Произошла ошибка при попытке добавления клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
+                    "]: " + response.getErrorMessage() + ". Всем клиентам " + clients.size() + " [" + idsList +
+                    "] будут обновлены следующие параметры: {SSOID: " + newSsoid + "}");
+            for(Client cl : clients) {
+                cl.setSsoid(newSsoid);
+                DAOService.getInstance().saveEntity(cl);
+            }
             throw new EMPException(response.getErrorCode(), response.getErrorMessage());
         }
 
@@ -649,12 +671,21 @@ public class EMPProcessor {
         protected long notBindedCount;
         protected long waitBindingCount;
         protected long bindedCount;
+        protected long bindingErrors;
 
         public EMPStatistics() {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             notBindedCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_NOT_BINDED_CLIENTS_COUNT);
             waitBindingCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_BIND_WAITING_CLIENTS_COUNT);
             bindedCount = runtimeContext.getOptionValueLong(Option.OPTION_EMP_BINDED_CLIENTS_COUNT);
+        }
+
+        public long getBindingErrors() {
+            return bindingErrors;
+        }
+
+        public void setBindingErrors(long bindingErrors) {
+            this.bindingErrors = bindingErrors;
         }
 
         public long getNotBindedCount() {

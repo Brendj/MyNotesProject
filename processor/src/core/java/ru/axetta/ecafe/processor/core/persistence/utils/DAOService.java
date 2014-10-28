@@ -1549,6 +1549,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return Long.parseLong("" + q.getSingleResult());
     }
 
+    public long getBindEMPErrorsCount() {
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid like 'E:%'");
+        return Long.parseLong("" + q.getSingleResult());
+    }
+
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
         try {
             Query q = entityManager.createQuery("FROM Accessory where idOfSourceOrg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);

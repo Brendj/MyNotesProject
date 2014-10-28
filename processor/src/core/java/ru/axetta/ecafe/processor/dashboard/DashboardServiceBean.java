@@ -137,6 +137,7 @@ public class DashboardServiceBean {
                     params.add(new DashboardResponse.NamedParams("Не связано учеников с ЕМП", empStatistics.getNotBindedCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников ожидает связки с ЕМП", empStatistics.getWaitBindingCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников связанных с ЕМП", empStatistics.getBindedCount()));
+                    params.add(new DashboardResponse.NamedParams("Ошибки при связи", empStatistics.getBindingErrors()));
                 }
             }
             return params;

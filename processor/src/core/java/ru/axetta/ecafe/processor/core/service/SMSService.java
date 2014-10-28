@@ -108,6 +108,13 @@ public class SMSService {
                 try {
                     if(smsService instanceof EMPSmsServiceImpl) {
                         sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
+                        if(sendResponse != null && !sendResponse.isSuccess()) {
+                            String msg = ((EMPEventType) textObject).buildText();
+                            msg = String.format("E:[%s] %s", sendResponse.getStatusCode(), msg);
+                            regisgterClientSMSFailedCharge(client, sendResponse.getMessageId(),
+                                                           phoneNumber, messageType, msg);
+                            return false;
+                        }
                     } else {
                         sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                     }
@@ -126,6 +133,19 @@ public class SMSService {
                                                  sendResponse.getMessageId(), phoneNumber, messageType,
                                                  textObject.toString());
         return result;
+    }
+
+    protected boolean regisgterClientSMSFailedCharge(Client client, String messageId,
+                                                     String phoneNumber, int messageType, String text) throws Exception {
+        if(text == null || StringUtils.isBlank(text)) {
+            return false;
+        }
+        text = text.substring(0, 70);
+        ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
+                .createClientFailedSmsCharge(client, messageId, phoneNumber, messageType, text,
+                        new Date());
+        createdClientSms.set(clientSms);
+        return true;
     }
 
     protected boolean registerClientSMSCharge(boolean success, Client client, String messageId,

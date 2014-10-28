@@ -14,6 +14,7 @@ package ru.axetta.ecafe.processor.core.sms.emp;
 public class EMPException extends Exception {
     protected int code;
     protected String error;
+    protected String messageId;
 
     public EMPException() {
     }
@@ -53,5 +54,14 @@ public class EMPException extends Exception {
 
     public String getError() {
         return error;
+    }
+
+    public EMPException setMessageId(String messageId) {
+        this.messageId = messageId;
+        return this;
+    }
+
+    public String getMessageId() {
+        return messageId;
     }
 }
