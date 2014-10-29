@@ -140,14 +140,14 @@ public class FinancialOpsManager {
         if (payment.getIdOfPOS() != null) {
             pos = (POS) session.get(POS.class, payment.getIdOfPOS());
             if (pos == null) {
-                throw new Exception("POS with id " + payment.getIdOfPOS() + " not found");
+                //throw new Exception("POS with id " + payment.getIdOfPOS() + " not found");
+                supplier = getDefaultSupplier(session, idOfOrg);
             } else {
                 supplier = pos.getContragent();
             }
         } else {
             // Использовать поставщика по умолчанию из организации
-            Org org = (Org) session.get(Org.class, idOfOrg);
-            supplier = org.getDefaultSupplier();
+            supplier = getDefaultSupplier(session, idOfOrg);
         }
 
         //idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.BANK_ACCESSORY_TYPE, "" + payment.getIdOfPOS());
@@ -178,6 +178,12 @@ public class FinancialOpsManager {
                 }
             }
         }
+    }
+
+    protected Contragent getDefaultSupplier(Session session, long idoforg) {
+        Org org = (Org) session.get(Org.class, idoforg);
+        Contragent supplier = org.getDefaultSupplier();
+        return supplier;
     }
 
     public void cancelOrder(Session session, Order order) throws Exception {

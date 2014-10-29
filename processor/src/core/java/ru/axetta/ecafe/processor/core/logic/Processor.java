@@ -1743,6 +1743,9 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            //  Применяем фильтр оборудования
+            idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.BANK_ACCESSORY_TYPE, payment.getIdOfPOS());
+
             //SyncHistory syncHistory = (SyncHistory) persistenceSession.load(SyncHistory.class, idOfSync);
             //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Long idOfOrganization = getIdOfOrg(persistenceSession, idOfOrg);
@@ -3077,6 +3080,10 @@ public class Processor implements SyncProcessor,
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
                 long idOfOrg = org.getIdOfOrg();
+
+                //  Применяем фильтр оборудования
+                idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
+
                 if (existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
                     EnterEvent ee = findEnterEvent(persistenceSession,
                           new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
@@ -3110,8 +3117,6 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             continue;
                         }
                     }
-                    //  Применяем фильтр оборудования
-                    idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
 
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(

@@ -1554,7 +1554,18 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return Long.parseLong("" + q.getSingleResult());
     }
 
+    public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, Long accessoryNumber) {
+        if(accessoryNumber == null) {
+            return idoforg;
+        }
+        return receiveIdOfOrgByAccessory(idoforg, accessoryType, "" + accessoryNumber);
+    }
+
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
+        if(accessoryNumber == null || StringUtils.isBlank(accessoryNumber)) {
+            return idoforg;
+        }
+
         try {
             Query q = entityManager.createQuery("FROM Accessory where idOfSourceOrg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);
             q.setParameter("idoforg", idoforg);
@@ -1563,6 +1574,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
             List res = q.getResultList();
             if(res == null || res.size() < 1) {
+                createAccessory(idoforg, accessoryType, accessoryNumber);
                 return idoforg;
             }
             Accessory acc = (Accessory) res.get(0);
@@ -1571,6 +1583,16 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             logger.error("Failed to receive accessory", e);
             return idoforg;
         }
+    }
+
+    public Accessory createAccessory(long idoforg, int accessoryType, String accessoryNumber) {
+        Accessory accessory = new Accessory();
+        accessory.setIdOfSourceOrg(idoforg);
+        accessory.setIdOfTargetOrg(idoforg);
+        accessory.setAccessoryType(accessoryType);
+        accessory.setAccessoryNumber(accessoryNumber);
+        entityManager.merge(accessory);
+        return accessory;
     }
 
     public ExternalSystemStats getAllPreviousStatsForExternalSystem(String systemName, String instance) {
