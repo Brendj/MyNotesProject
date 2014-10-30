@@ -1521,7 +1521,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<Client> getNotBindedEMPClients(int clientsPerPackage) {
-        String q = "from Client where (ssoid is null or ssoid='') and (mobile is null or mobile<>'')";//and clientGUID<>''";
+        String q = "from Client where (ssoid is null or ssoid='') and (mobile is not null and mobile<>'')";//and clientGUID<>''";
         TypedQuery<Client> query = entityManager.createQuery(q, Client.class);
         query.setMaxResults(clientsPerPackage);
         return query.getResultList();
