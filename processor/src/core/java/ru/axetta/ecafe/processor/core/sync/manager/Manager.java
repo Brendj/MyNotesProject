@@ -329,6 +329,22 @@ public class Manager {
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
+                if (doSyncClass.getDoClass().getName().contains("Staff")) {
+                    if (distributedObjectsList.get(0).getTagName().equals("M")) {
+
+                        List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(
+                                currentResultDOSet);
+
+                        for (DistributedObject distributedObj: refreshedStaffList) {
+                            if (distributedObj.getGuid().equals(distributedObjectsList.get(0).getGuid())) {
+                                refreshedStaffList.remove(distributedObj);
+                                refreshedStaffList.add(distributedObjectsList.get(0));
+                                break;
+                            }
+                        }
+                        resultDOMap.put(doSyncClass, new ArrayList<DistributedObject>(refreshedStaffList));
+                    }
+                }
             }
         }
         incomeDOMap = currentDOListMap;
