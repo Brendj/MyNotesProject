@@ -34,12 +34,12 @@ import java.util.*;
 public class GoodRequestsNewReportService {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportService.class);
-    final private long OVERALL;
+    final private String OVERALL;
     final private String OVERALL_TITLE;
     final private boolean hideTotalRow;
     final private Session session;
 
-    public GoodRequestsNewReportService(Session session, long OVERALL, String OVERALL_TITLE, boolean hideTotalRow) {
+    public GoodRequestsNewReportService(Session session, String OVERALL, String OVERALL_TITLE, boolean hideTotalRow) {
         this.OVERALL = OVERALL;
         this.OVERALL_TITLE = OVERALL_TITLE;
         this.session = session;
@@ -361,7 +361,7 @@ public class GoodRequestsNewReportService {
 
         final private static String STR_YEAR_DATE_FORMAT = "EE dd.MM";
         final private static DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
-        private Long orgNum;
+        private String orgNum;
         private String officialName;
         private String goodName;
         private Date doneDate;
@@ -386,7 +386,7 @@ public class GoodRequestsNewReportService {
             return Integer.valueOf(hashCode()).compareTo(o.hashCode());
         }
 
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType) {
             this.orgNum = orgNum;
             this.officialName = officialName;
@@ -434,14 +434,14 @@ public class GoodRequestsNewReportService {
             return result;
         }
 
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType ) {
             this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType);
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType) {
-            this(Long.parseLong(Org.extractOrgNumberFromName(item.getOfficialName())), item.getShortName(), goodName,
+            this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName,
                     doneDate, totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue,
                     hideLastValue, feedingPlanType);
 
@@ -452,11 +452,11 @@ public class GoodRequestsNewReportService {
             this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType);
         }
 
-        public Long getOrgNum() {
+        public String getOrgNum() {
             return orgNum;
         }
 
-        public void setOrgNum(Long orgNum) {
+        public void setOrgNum(String orgNum) {
             this.orgNum = orgNum;
         }
 

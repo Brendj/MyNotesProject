@@ -23,7 +23,7 @@ import java.util.*;
 public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
-    final private static long OVERALL = Long.MAX_VALUE - 10;
+    final private static String OVERALL = "";
     final private static long OVERALL_TOTAL = Long.MAX_VALUE - 8;
     final private static String OVERALL_TOTAL_TITLE = "ВСЕГО";
     final private static String OVERALL_TITLE = "ИТОГО";

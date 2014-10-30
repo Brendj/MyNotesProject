@@ -30,7 +30,7 @@
 	<parameter name="overall_all" class="java.lang.Long">
 		<defaultValueExpression><![CDATA[Long.MAX_VALUE - 8]]></defaultValueExpression>
 	</parameter>
-	<field name="orgNum" class="java.lang.Long"/>
+	<field name="orgNum" class="java.lang.String"/>
 	<field name="officialName" class="java.lang.String"/>
 	<field name="goodName" class="java.lang.String"/>
 	<field name="doneDate" class="java.util.Date"/>
@@ -96,7 +96,7 @@
 					</cellContents>
 				</crosstabHeaderCell>
 				<rowGroup name="orgNum" width="36" totalPosition="End" headerPosition="Middle">
-					<bucket class="java.lang.Long">
+					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{orgNum}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
@@ -104,7 +104,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="36" height="49"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[( $V{orgNum}<Long.MAX_VALUE-50 ? $V{orgNum} : null )]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -121,7 +121,7 @@
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="officialName" width="105" totalPosition="End" headerPosition="Middle">
-					<bucket class="java.lang.String">
+					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{officialName}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
