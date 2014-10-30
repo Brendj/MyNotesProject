@@ -188,10 +188,10 @@ public class EMPSmsServiceImpl extends ISmsService {
         if(event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn())) {
             throw new EMPException(String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required", client.getIdOfClient()));
         }
-        if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L*/) {
+        /*if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L/) {
             //return null;
             throw new EMPException(String.format("Failed to send EMP event for client [%s] - ssoid is required", client.getIdOfClient()));
-        }
+        }*/
 
 
         updateStats(INCOME_STATS_ID, 1);
