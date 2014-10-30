@@ -330,19 +330,27 @@ public class Manager {
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
                 if (doSyncClass.getDoClass().getName().contains("Staff")) {
-                    if (distributedObjectsList.size() > 0 && distributedObjectsList.get(0).getTagName().equals("M")) {
+
+                    if (!distributedObjectsList.isEmpty() && distributedObjectsList != null) {
 
                         List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(
                                 currentResultDOSet);
 
-                        for (DistributedObject distributedObj: refreshedStaffList) {
-                            if (distributedObj.getGuid().equals(distributedObjectsList.get(0).getGuid())) {
-                                refreshedStaffList.remove(distributedObj);
-                                refreshedStaffList.add(distributedObjectsList.get(0));
-                                break;
+                        for (DistributedObject distributedObject : distributedObjectsList) {
+
+                            if (distributedObject.getTagName().equals("M")
+                                    && distributedObject.getGlobalVersion() != null) {
+
+                                for (DistributedObject distributedObj : refreshedStaffList) {
+                                    if (distributedObj.getGuid().equals(distributedObject.getGuid())) {
+                                        refreshedStaffList.remove(distributedObj);
+                                        refreshedStaffList.add(distributedObject);
+                                        break;
+                                    }
+                                }
+                                resultDOMap.put(doSyncClass, new ArrayList<DistributedObject>(refreshedStaffList));
                             }
                         }
-                        resultDOMap.put(doSyncClass, new ArrayList<DistributedObject>(refreshedStaffList));
                     }
                 }
             }
