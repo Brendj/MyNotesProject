@@ -330,7 +330,7 @@ public class Manager {
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
                 if (doSyncClass.getDoClass().getName().contains("Staff")) {
-                    if (distributedObjectsList.get(0).getTagName().equals("M")) {
+                    if (distributedObjectsList.size() > 0 && distributedObjectsList.get(0).getTagName().equals("M")) {
 
                         List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(
                                 currentResultDOSet);
