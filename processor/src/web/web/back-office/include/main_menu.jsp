@@ -998,6 +998,10 @@
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                         reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{typesOfCardReportPage.mainMenuComponent}"
+                        label="Отчет по типам карт" action="#{typesOfCardReportPage.show}"
+                        reRender="workspaceForm" />
+
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
