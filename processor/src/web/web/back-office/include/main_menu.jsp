@@ -915,6 +915,11 @@
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
                             label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
                             reRender="workspaceForm" />
+        <%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.types.card.TypesOfCardReportPage"--%>
+        <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{typesOfCardReportPage.mainMenuComponent}"
+                            label="Отчет по типам карт" action="#{typesOfCardReportPage.show}"
+                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
@@ -996,10 +1001,6 @@
 
     <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
-                        reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{typesOfCardReportPage.mainMenuComponent}"
-                        label="Отчет по типам карт" action="#{typesOfCardReportPage.show}"
                         reRender="workspaceForm" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
