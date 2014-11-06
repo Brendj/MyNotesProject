@@ -337,6 +337,7 @@ public class MainPage implements Serializable {
             = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
     private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
             = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
+    private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5321,6 +5322,10 @@ public class MainPage implements Serializable {
         return goodRequestsNewReportPage;
     }
 
+    public RequestsAndOrdersReportPage getRequestsAndOrdersReportPage() {
+        return requestsAndOrdersReportPage;
+    }
+
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
@@ -5350,6 +5355,31 @@ public class MainPage implements Serializable {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = goodRequestsNewReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showRequestsAndOrdersReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            requestsAndOrdersReportPage.fill(persistenceSession, getCurrentUser());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = requestsAndOrdersReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();

@@ -842,6 +842,10 @@
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestNewReportPage}"
                             reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="requestsAndOrdersReportMenuItem" binding="#{mainPage.requestsAndOrdersReportPage.mainMenuComponent}"
+                            label="Расхождение данных по заявкам и заказам" action="#{mainPage.showRequestsAndOrdersReportPage}"
+                            reRender="workspaceForm" />
+
         <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
                             binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
