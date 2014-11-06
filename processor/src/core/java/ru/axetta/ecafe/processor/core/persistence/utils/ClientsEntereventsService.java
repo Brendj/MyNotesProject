@@ -217,13 +217,13 @@ public class ClientsEntereventsService {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT c.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, idofrule, cfo.createddate, g.groupname, cfod.menudetailname, c.idoforg "
+                "SELECT cfo.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, cfod.idofrule, cfo.createddate, g.groupname "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
                         + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
                         + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson WHERE cfo.ordertype IN (" + orderType
-                        + ") AND cfo.idoforg = :idOfOrg " + "AND cfo.state = 0 "
+                        + ") AND cfo.idoforg = :idOfOrg AND cfo.state = 0 "
                         + "AND cfo.createddate >= :startTime AND cfo.createddate < :endTime "
                         + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
         query.setParameter("startTime", startTime.getTime());
@@ -249,18 +249,18 @@ public class ClientsEntereventsService {
         List<ComplexInfoForPlan> complexInfoForPlans = new ArrayList<ComplexInfoForPlan>();
 
         Query query = session.createSQLQuery(
-                "SELECT (cfod.menutype - 50) AS complexid, "
-                        + "cfod.idofrule, cfod.menudetailname, cfo.idoforg "
+                "SELECT (cfod.menutype - 50) AS complexid, cfod.idofrule, cfod.menudetailname, cfo.idoforg "
                         + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod "
                         + "ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType + ") AND cfod.menutype >= 50 AND cfod.menutype < 100 AND "
+                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType
+                        + ") AND cfod.menutype >= 50 AND cfod.menutype < 100 AND "
                         + "cfod.idofrule >= 0 GROUP BY complexid, cfod.idofrule, cfod.menudetailname, cfo.idoforg");
         query.setParameter("idOfOrg", idOfOrg);
 
         List result = query.list();
 
         //парсим данные
-        for (Object o: result) {
+        for (Object o : result) {
             Object[] resultComp = (Object[]) o;
             ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan((Integer) resultComp[0],
                     ((BigInteger) resultComp[1]).longValue(), (String) resultComp[2],
