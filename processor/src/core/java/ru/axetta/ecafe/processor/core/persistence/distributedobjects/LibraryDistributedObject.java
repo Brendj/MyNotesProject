@@ -2,7 +2,6 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import java.util.List;
@@ -15,6 +14,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class LibraryDistributedObject extends DistributedObject {
+
+    public DistributedObject mergedDistributedObject;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -30,4 +31,5 @@ public abstract class LibraryDistributedObject extends DistributedObject {
         return criteria.list();
 
     }
+
 }

@@ -33,5 +33,6 @@ public class LibraryGroup extends AbstractGroup {
         doClassMap.put("JournalItem", new DOSyncClass(JournalItem.class, 3));
         doClassMap.put("Issuable", new DOSyncClass(Issuable.class, 4));
         doClassMap.put("Circulation", new DOSyncClass(Circulation.class, 5));
+        doClassMap.put("ExchangeBook", new DOSyncClass(ExchangeBook.class, 6));
     }
 }

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -620,11 +621,12 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria currentDOCriteria = persistenceSession.createCriteria(aClass);
-            currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
+            /*currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
             distributedObject.createProjections(currentDOCriteria);
             currentDOCriteria.setResultTransformer(Transformers.aliasToBean(aClass));
             currentDOCriteria.setMaxResults(1);
-            currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
+            currentDO = (DistributedObject) currentDOCriteria.uniqueResult();*/
+            currentDO = distributedObject.getCurrentDistributedObject(currentDOCriteria);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -645,6 +647,23 @@ public class Manager {
             distributedObject.setDistributedObjectException(new DistributedObjectException(message));
             return distributedObject;
         }
+        if (LibraryDistributedObject.class.isInstance(distributedObject))
+        {
+            distributedObject = makePreprocessAndProcessDOLibrary(sessionFactory, (LibraryDistributedObject)distributedObject, (LibraryDistributedObject)currentDO, currentMaxVersion);
+        }
+        else
+        {
+            distributedObject = makePreprocessAndProcessDO(sessionFactory, distributedObject, currentDO,
+                    currentMaxVersion);
+        }
+        return distributedObject;
+    }
+
+    private DistributedObject makePreprocessAndProcessDO(SessionFactory sessionFactory, DistributedObject distributedObject,
+            DistributedObject currentDO, Long currentMaxVersion) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        String errorMessage = null;
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -673,6 +692,71 @@ public class Manager {
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
             LOGGER.error(errorMessage);
+        } catch (Exception e) {
+            distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+            LOGGER.error(distributedObject.toString(), e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, LOGGER);
+            HibernateUtils.close(persistenceSession, LOGGER);
+            if (StringUtils.isNotEmpty(errorMessage)) {
+                saveException(sessionFactory, errorMessage);
+            }
+        }
+        return distributedObject;
+    }
+
+    private LibraryDistributedObject makePreprocessAndProcessDOLibrary(SessionFactory sessionFactory, LibraryDistributedObject distributedObject,
+            LibraryDistributedObject currentDO, Long currentMaxVersion) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        String errorMessage = null;
+        try {
+            persistenceSession = sessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (distributedObject.getDistributedObjectException() == null) {
+                String tagName = distributedObject.getTagName();
+                if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
+                    distributedObject.mergedDistributedObject = null;
+                    distributedObject.preProcess(persistenceSession, idOfOrg);
+                    distributedObject = (LibraryDistributedObject)processDistributedObject(persistenceSession, distributedObject,
+                            currentMaxVersion, currentDO);
+                } else {
+                    distributedObject = (LibraryDistributedObject)updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
+                }
+                distributedObject.setTagName(tagName);
+            } else {
+                Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+                DistributedObjectException de = distributedObject.getDistributedObjectException();
+                SyncHistoryException syncHistoryException = new SyncHistoryException(org, syncHistory,
+                        "Error processCurrentObject: " + de.getMessage());
+                persistenceSession.save(syncHistoryException);
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (DistributedObjectException e) {
+            // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
+            distributedObject.setDistributedObjectException(e);
+            errorMessage = "Error processCurrentObject: " + e.getMessage();
+            LOGGER.error(errorMessage);
+            if (distributedObject.mergedDistributedObject != null) {
+                try {
+                    distributedObject.mergedDistributedObject.setGlobalVersion(currentMaxVersion);
+                    persistenceSession.update(distributedObject.mergedDistributedObject);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    //теперь добавим слитую запись БЗ в коллекцию для отправки клиенту в этой же сессии
+                    List<DistributedObject> list = new ArrayList<DistributedObject>();
+                    list.add(distributedObject.mergedDistributedObject);
+                    DOSyncClass syncClass = new DOSyncClass(distributedObject.mergedDistributedObject.getClass(), 0);
+                    resultDOMap.put(syncClass, list);
+                }
+                catch (Exception e2) {
+                    distributedObject.mergedDistributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+                    LOGGER.error(distributedObject.mergedDistributedObject.toString(), e);
+                }
+            }
         } catch (Exception e) {
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             LOGGER.error(distributedObject.toString(), e);

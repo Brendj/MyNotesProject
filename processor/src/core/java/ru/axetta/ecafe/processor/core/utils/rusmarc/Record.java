@@ -81,6 +81,43 @@ public class Record {
         }
     }
 
+    public Record MergeRecords(Record recNew, Record recOld) {
+        Record rec = recNew;
+        if (recOld == null) {
+            return recNew;
+        }
+        for (int i = 0; i < recOld.fields.size(); i++)
+        {
+            boolean found = false;
+            for (int j = 0; j < recNew.fields.size(); j++)
+            {
+                if (recOld.fields.get(i).tag.equals(recNew.fields.get(j).tag))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                recNew.fields.add(recOld.fields.get(i));
+            }
+        }
+        rec.SortFields();
+        return rec;
+    }
+
+    private void SortFields()
+    {
+        for (int i = 0, max = fields.size() - 1; i < max; ++i)
+            for (int j = max-1; j >= i; --j)
+                if (Integer.parseInt(fields.get(j).tag) > Integer.parseInt(fields.get(j+1).tag))
+                {
+                    RecordField f = fields.get(j);
+                    fields.remove(j);
+                    fields.add(j + 1, f);
+                }
+    }
+
     private static String expand(String str, int needLen) {
         StringBuilder sb = new StringBuilder(str);
         while (sb.length() < needLen)

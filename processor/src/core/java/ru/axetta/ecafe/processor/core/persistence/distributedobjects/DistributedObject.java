@@ -187,6 +187,14 @@ public abstract class DistributedObject{
         return criteria.list();
     }
 
+    public DistributedObject getCurrentDistributedObject(Criteria criteria) {
+        criteria.add(Restrictions.eq("guid", this.getGuid()));
+        this.createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(this.getClass()));
+        criteria.setMaxResults(1);
+        return (DistributedObject) criteria.uniqueResult();
+    }
+
     ///* идентификатор синхронизируемой организации*/
     private Long idOfSyncOrg;
 

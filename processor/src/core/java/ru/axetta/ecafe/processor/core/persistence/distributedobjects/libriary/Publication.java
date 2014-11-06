@@ -25,6 +25,7 @@ import org.w3c.dom.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -95,7 +96,7 @@ public class Publication extends LibraryDistributedObject {
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("isbn",isbn));
             criteria.add(Restrictions.eq("publicationdate",publicationdate));
-            criteria.add(Restrictions.eq("validISBN",true));
+            criteria.add(Restrictions.eq("validISBN", true));
             criteria.add(Restrictions.ne("guid", guid));
             Publication publication = null;
             List publicationList = criteria.list();
@@ -104,6 +105,18 @@ public class Publication extends LibraryDistributedObject {
             }
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
+                //Попытаемся слить записи Publication.Data по полям Русмарк.
+                try
+                {
+                    mergeRecords(publication);
+                    if (this.guidBBKDetail != null)
+                        publication.setGuidBBKDetail(this.getGuidBBKDetail());
+                    if (this.idOfLang != null)
+                        publication.setIdOfLang(this.getIdOfLang());
+
+                    mergedDistributedObject = publication;
+                }
+                catch(IOException exception){ }
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
@@ -114,15 +127,39 @@ public class Publication extends LibraryDistributedObject {
             Publication publication = (Publication) criteria.uniqueResult();
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
+                try {
+                    mergeRecords(publication);
+                    if (this.guidBBKDetail != null)
+                        publication.setGuidBBKDetail(this.getGuidBBKDetail());
+                    if (this.idOfLang != null)
+                        publication.setIdOfLang(this.getIdOfLang());
+                    mergedDistributedObject = publication;
+                }
+                catch (IOException exception) { }
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE hash equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
         }
+        /*if (mergedDistributedObject == null) {
+            Criteria ucriteria = session.createCriteria(Publication.class);
+            ucriteria.add(Restrictions.eq("guid",guid));
+            Publication upublication = (Publication)ucriteria.uniqueResult();
+            session.clear();
+            mergeRecords(upublication);
+        }*/
         BBKDetails bbkDetailLocal = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, getGuidBBKDetail());
         if (null != bbkDetailLocal) {
             setBbkDetail(bbkDetailLocal);
         }
+    }
+
+    private void mergeRecords(Publication publication) throws IOException{
+        DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(publication.getData()));
+        Record recordOnServer = new Record(dataInputStream); //получили поле Data из записи, сохраненной в таблице сервера
+        Record recordFromPacket = new Record(new DataInputStream(new ByteArrayInputStream(data))); //поле Data из клиентского пакета
+        Record recordToSave = recordOnServer.MergeRecords(recordFromPacket, recordOnServer);
+        publication.setData(recordToSave.getRUSMARCRecord());
     }
 
     @Override
