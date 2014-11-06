@@ -2,12 +2,11 @@
  * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online.types.card;
+package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListPage;
-import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -38,9 +37,9 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private final ClientListPage clientListPage = new ClientListPage();
 
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
+    private final boolean includeSummaryByDistrict = false;
 
+    private String htmlReport = null;
 
     public String getPageFilename() {
         return "report/online/types_of_card_report";
@@ -50,28 +49,14 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         return report;
     }
 
-    public void doGenerate() {
-        RuntimeContext.getAppContext().getBean(TypesOfCardReportPage.class).generate();
+    public Object buildReportHTML() {
+        return null;
     }
 
-    public void doGenerateXLS(ActionEvent actionEvent) {
-        RuntimeContext.getAppContext().getBean(TypesOfCardReportPage.class).generateXLS();
+    public Object doGenerateXLS() {
+        return null;
     }
 
-    @Transactional
-    public void generate() {
-    }
-
-    @Transactional
-    public void generateXLS() {
-    }
-
-    public void generateReport(Session session, String templateFile) throws Exception {
-    }
-
-    public void generateXLS(Session session) {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-    }
 
     public ClientListPage getClientListPage() {
         return clientListPage;
@@ -81,4 +66,14 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         return new Date();
     }
 
+    public boolean isIncludeSummaryByDistrict() {
+        return includeSummaryByDistrict;
+    }
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public void onShow() throws Exception {
+    }
 }

@@ -25,6 +25,9 @@ import java.util.*;
  */
 public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
+
+    private String htmlReport;
+
     @Override
     public BasicReportForAllOrgJob createInstance() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
@@ -47,5 +50,14 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
     public TypesOfCardReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
          return null;
+    }
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public TypesOfCardReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
     }
 }

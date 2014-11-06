@@ -919,7 +919,7 @@
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
                             label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
                             reRender="workspaceForm" />
-        <%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.types.card.TypesOfCardReportPage"--%>
+        <%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TypesOfCardReportPage"--%>
         <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{typesOfCardReportPage.mainMenuComponent}"
                             label="Отчет по типам карт" action="#{typesOfCardReportPage.show}"
                             reRender="workspaceForm" />

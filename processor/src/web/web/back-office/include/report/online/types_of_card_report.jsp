@@ -19,8 +19,8 @@
         background-color: #D5E7F0;
     }
 </style>
-<%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.types.card.TypesOfCardReportPage"--%>
-<h:panelGrid id="reportPanelGrid" binding="#{typesOfCardReportPage.pageComponent}" styleClass="borderless-grid">
+<%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TypesOfCardReportPage"--%>
+<h:panelGrid id="typesOfCardReportPanel" binding="#{typesOfCardReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
 
         <h:outputText styleClass="output-text" escape="true" value="Дата" />
@@ -31,11 +31,15 @@
         <h:selectOneMenu value="#{typesOfCardReportPage.clientListPage.clientFilter.clientGroupId}"
                          styleClass="input-text">
             <f:selectItems value="#{typesOfCardReportPage.clientListPage.clientFilter.clientGroupItems}" />
-            <a4j:support event="onchange" reRender="showDeletedClients" />
+            <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
         </h:selectOneMenu>
 
-        <a4j:commandButton value="Генерировать отчет" action="#{typesOfCardReportPage.doGenerate}"
-                           reRender="workspaceTogglePanel, reportPanel" styleClass="command-button"
+        <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{typesOfCardReportPage.includeSummaryByDistrict}" readonly="true" styleClass="output-text" />
+
+
+        <a4j:commandButton value="Генерировать отчет" action="#{typesOfCardReportPage.buildReportHTML}"
+                           reRender="typesOfCardReportPanel" styleClass="command-button"
                            status="reportGenerateStatus" />
         <h:commandButton value="Выгрузить в Excel" actionListener="#{typesOfCardReportPage.doGenerateXLS}"
                          styleClass="command-button" />
@@ -46,7 +50,7 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
-        <c:if test="${not empty transactionsReportPage.report && not empty typesOfCardReportPage.report.htmlReport}">
+        <c:if test="${not empty typesOfCardReportPage.report && not empty typesOfCardReportPage.report.htmlReport}">
             <h:outputText escape="true" value="Отчет по транзакциям" styleClass="output-text" />
 
             <f:verbatim>
