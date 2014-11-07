@@ -45,6 +45,8 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class EMPProcessor {
+
+    public static final String EMP_OUTPUT_FILE = "/emp.out.signed.xml";
     //  service instance
     protected StoragePortType storageService;
     //  jaxb contexts
@@ -645,7 +647,7 @@ public class EMPProcessor {
 
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
-            FileWriter fw = new FileWriter("C:/out.signed.xml");
+            FileWriter fw = new FileWriter(EMP_OUTPUT_FILE);
             marshaller.marshal(obj, fw);
         } catch (Exception e) {
             logger.error("Failed to log", e);
