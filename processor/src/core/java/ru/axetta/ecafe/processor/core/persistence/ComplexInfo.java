@@ -16,7 +16,7 @@ public class ComplexInfo {
     private int modeFree; //Режим бесплатного питания (0-выключен, 1-включен)
     private int modeGrant; // Режим дотации (0-выключен, 1 - включен)
     private int modeOfAdd; //Режим добавления блюд из комплекса ( 0 – режим добавления всех блюд, 1 – режи добавления по 1 блюду, 2 – режим фиксированная цена,3 – режим свободный выбор)
-    private Integer useTrDiscount;
+    private Integer useTrDiscount = 0;
     private String complexName;
     private Date menuDate;
     private ComplexInfoDiscountDetail discountDetail;
