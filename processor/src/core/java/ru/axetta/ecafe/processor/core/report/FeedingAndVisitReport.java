@@ -66,7 +66,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
             jasperPrint.setPageWidth(DEFAULT_REPORT_WIDTH + 70 * CalendarUtils.getDifferenceInDays(startTime,endTime));
             Date generateEndTime = new Date();
-            return new AutoEnterEventV2Report(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new FeedingAndVisitReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
@@ -234,14 +234,14 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(AutoEnterEventV2Report.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeedingAndVisitReport.class);
 
     public FeedingAndVisitReport() {
     }
 
     @Override
     public BasicReportForOrgJob createInstance() {
-        return new AutoEnterEventV2Report();
+        return new FeedingAndVisitReport();
     }
 
     @Override
