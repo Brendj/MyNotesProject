@@ -27,8 +27,9 @@
     <a4j:commandButton value="Перестроить таблицу опекунов" action="#{otherActionsPage.runClientGuardSANRebuild}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
-    <%--<a4j:commandButton value="Иморт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />--%>
+    <a4j:commandButton value="Иморт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
     <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
