@@ -116,6 +116,23 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
 
+    protected void info(String str, Object ... args) {
+        //if(logger.isInfoEnabled()) {
+        try {
+            logger.info(String.format(str, args));
+        } catch (Exception e) {
+            StringBuilder argsStr = new StringBuilder();
+            for(Object arg : args) {
+                if(argsStr.length() > 0) {
+                    argsStr.append(", ");
+                }
+                argsStr.append(arg.toString());
+            }
+            logger.info(str + "{" + argsStr + "}");
+        }
+        //}
+    }
+
     public static boolean isOn() {
         return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
     }
@@ -143,10 +160,12 @@ public class RNIPLoadPaymentsService {
 
     private Date getLastUpdateDate() {
         try {
+            info("Получение даты последней выгрузки..");
             String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
             if (d == null || d.length() < 1) {
                 return new Date(0);
             }
+            info("Последняя выгрузка состоялась %s", d);
             return dateFormat.parse(d);
         } catch (Exception e) {
             logger.error("Failed to parse date from options", e);
@@ -166,10 +185,14 @@ public class RNIPLoadPaymentsService {
 
     private Date getLastUpdateDate(Contragent contragent) {
         try {
+            info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             String d = contragent.getLastRNIPUpdate();//RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
+            info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             if (d == null || d.length() < 1) {
+                info("Для контрагента %s загрузок не было, используется 0 мс.", contragent.getContragentName());
                 return new Date(0);
             }
+            info("Последняя дата выгрузки для контрагента %s состоялась %s", contragent.getContragentName(), d);
             return dateFormat.parse(d);
         } catch (Exception e) {
             logger.error("Failed to parse date from options", e);
@@ -179,10 +202,12 @@ public class RNIPLoadPaymentsService {
 
 
     public void createCatalogForContragent (Contragent contragent) throws IllegalStateException, Exception {
+        info("Попытка создания каталога для контрагента %s..", contragent.getContragentName());
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
-            logger.error("Попытка подключить контрагента " + contragent + " к сервису загрузк платежей из РНИП. Ошибка: необходимо "
+            logger.error("Попытка подключить контрагента " + contragent + " к сервису загрузок платежей из РНИП. Ошибка: необходимо "
                          + "указать идентификатор контрагента в ИС ПП - в Ремарки добавить {RNIP=id_контрагента_в_РНИП}");
+            return;
         }
 
         //  Отправка запроса на получение платежей
@@ -194,18 +219,23 @@ public class RNIPLoadPaymentsService {
             throw new IllegalStateException("Failed to access RNIP service", e);
         }
 
+        info("Ответ на попытку создания каталога для контрагента %s получен, разбор..", contragent.getContragentName());
         String soapError = checkError (response);
         if (soapError != null && soapError.length () > 1) {
+            logger.error(String.format("Ошибка при добавлении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
+        info("Каталог для контрагента %s создан", contragent.getContragentName());
     }
 
 
     public void modifyCatalogForContragent (Contragent contragent) throws IllegalStateException, Exception {
+        info("Попытка изменения каталога для контрагента %s..", contragent.getContragentName());
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
             logger.error("Попытка подключить контрагента " + contragent + " к сервису загрузки платежей из РНИП. Ошибка: необходимо "
                     + "указать идентификатор контрагента в ИС ПП - в Заметки добавить {RNIP=id_контрагента_в_РНИП}");
+            return;
         }
 
         //  Отправка запроса на получение платежей
@@ -217,11 +247,13 @@ public class RNIPLoadPaymentsService {
             throw new IllegalStateException("Failed to access RNIP service", e);
         }
 
+        info("Ответ на попытку изменения каталога для контрагента %s получен, разбор..", contragent.getContragentName());
         String soapError = checkError (response);
         if (soapError != null) {
+            logger.error(String.format("Ошибка при изменении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-
+        info("Каталог для контрагента %s изменен", contragent.getContragentName());
     }
 
 
@@ -230,6 +262,7 @@ public class RNIPLoadPaymentsService {
             return;
         }
 
+        info("Загрузка платежей РНИП..");
         for (Contragent contragent : DAOService.getInstance().getContragentsList()) {
             try {
                 RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).receiveContragentPayments(contragent);
@@ -237,6 +270,7 @@ public class RNIPLoadPaymentsService {
                 logger.error("Failed to receive or proceed payments", e);
             }
         }
+        info("Загрузка платежей РНИП завершена");
     }
 
     @Transactional
@@ -249,6 +283,7 @@ public class RNIPLoadPaymentsService {
         }
 
 
+        info("Попытка получения платежей для контрагента %s", contragent.getContragentName());
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
@@ -261,29 +296,35 @@ public class RNIPLoadPaymentsService {
             return;
         }
 
+        info("Ответ на получение платежей для контрагента %s получен, разбор..", contragent.getContragentName());
         try {
             String soapError = checkError (response);
             if (soapError != null) {
-                logger.error("An error occurred while parsing RNIP result: " + soapError);
+                logger.error("Произошла ошибка при запросе в РНИП на получение платежей: " + soapError);
                 return;
             }
         } catch (Exception e) {
             return;
         }
 
+        info("Разбор новых платежей для контрагента %s..", contragent.getContragentName());
         // Если платежи есть, то обрабатываем их
         List<Map<String, String>> payments = null;
         try {
             payments = parsePayments(response);
         } catch (Exception e) {
-            logger.error("Failed to parse payments from soap message", e);
+            logger.error(
+                    String.format("Не удалось разобрать платежи для контрагента %s", contragent.getContragentName()), e);
+            return;
         }
+        info("Получено %s новых платежей для контрагента %s, применение..", payments.size(), contragent.getContragentName());
         //  И записываем в БД
         addPaymentsToDb(payments);
 
 
         //  Обновляем дату последней загрузки платежей
         setLastUpdateDate(contragent, updateTime);
+        info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
     }
 
 
@@ -617,11 +658,15 @@ public class RNIPLoadPaymentsService {
             String paymentDate    = p.get("PaymentDate").trim();
             String contragentKey  = p.get("Srv_Code").substring(5, 10).trim();
             String bic            = p.get("BIK");
+            String amount         = p.get("Amount");
             long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
             if (idOfContragent == 0) {
                 continue;
             }
-            Client client = DAOUtils.findClientByContractId(session, Long.parseLong(p.get("NUM_DOGOVOR")));
+            String contractId = p.get("NUM_DOGOVOR");
+            Client client = DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
+            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, Srv_Code=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
+                    paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
                 throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
             }
@@ -637,7 +682,7 @@ public class RNIPLoadPaymentsService {
                     idOfContragent = rnipContragent.getIdOfContragent();
                 }
             }
-            long amt = Long.parseLong(p.get("Amount"));
+            long amt = Long.parseLong(amount);
             OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
                     OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
                     ClientPayment.ATM_PAYMENT_METHOD,
@@ -647,6 +692,7 @@ public class RNIPLoadPaymentsService {
                     false);
             OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
                     .processPayRequest(req);
+            info("Платеж SystemIdentifier=%s обработан", paymentID);
             /*logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
                     resp == null ? "null" : resp.toString()));*/
         }
