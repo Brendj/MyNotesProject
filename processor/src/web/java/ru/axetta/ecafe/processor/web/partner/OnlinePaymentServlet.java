@@ -41,6 +41,8 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                 }
             } catch (Exception e) {
                 getLogger().error("Failed to authenticate request", e);
+                getLogger().error("Request string",  httpRequest.getAttribute("javamelody.request"));
+
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -54,6 +56,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                 getLogger().error("Card not found for request", e);
             } catch (Exception e) {
                 getLogger().error("Failed to parse request", e);
+                getLogger().error("Request string: " +  requestParser.getQueryString(httpRequest));
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -63,6 +66,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                     response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
                 } catch (Exception e) {
                     getLogger().error("Failed to process request", e);
+                    getLogger().error("Request string: " +  requestParser.getQueryString(httpRequest));
                     httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
