@@ -132,6 +132,9 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", start.getTime());
             query.setParameter("endDate", end.getTime());
             List res = query.list();
+            if(res == null) {
+                return Collections.EMPTY_MAP;
+            }
             for (Object entry : res) {
                 Object e[]        = (Object[]) entry;
                 long idoforg      = ((BigInteger) e[1]).longValue();
