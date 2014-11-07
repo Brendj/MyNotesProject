@@ -1,4 +1,6 @@
-package ru.axetta.ecafe.processor.web.ui.card;
+package ru.axetta.ecafe.processor.core.card;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,8 +11,6 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 public class TypesOfCardReportItem {
 
-    private String orgName;
-    private String address;
     private String region;
 
     private Long servActCount;
@@ -22,10 +22,13 @@ public class TypesOfCardReportItem {
     private Long othActCount;
     private Long othBlockCount;
 
-    public TypesOfCardReportItem(String orgName, String address, String region, Long servActCount, Long servBlockCount,
+    private Long allActCount;
+    private Long allBlockCount;
+
+    private List<TypesOfCardSubreportItem> typesOfCardSubeportItems;
+
+    public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount,
             Long skuActCount, Long skuBlockCount, Long othActCount, Long othBlockCount) {
-        this.orgName = orgName;
-        this.address = address;
         this.region = region;
         this.servActCount = servActCount;
         this.servBlockCount = servBlockCount;
@@ -36,22 +39,6 @@ public class TypesOfCardReportItem {
     }
 
     public TypesOfCardReportItem() {
-    }
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getRegion() {
@@ -108,5 +95,29 @@ public class TypesOfCardReportItem {
 
     public void setOthBlockCount(Long othBlockCount) {
         this.othBlockCount = othBlockCount;
+    }
+
+    public Long getAllActCount() {
+        return allActCount;
+    }
+
+    public void setAllActCount(Long allActCount) {
+        this.allActCount = allActCount;
+    }
+
+    public Long getAllBlockCount() {
+        return allBlockCount;
+    }
+
+    public void setAllBlockCount(Long allBlockCount) {
+        this.allBlockCount = allBlockCount;
+    }
+
+    public List<TypesOfCardSubreportItem> getTypesOfCardSubeportItems() {
+        return typesOfCardSubeportItems;
+    }
+
+    public void setTypesOfCardSubeportItems(List<TypesOfCardSubreportItem> typesOfCardSubeportItems) {
+        this.typesOfCardSubeportItems = typesOfCardSubeportItems;
     }
 }
