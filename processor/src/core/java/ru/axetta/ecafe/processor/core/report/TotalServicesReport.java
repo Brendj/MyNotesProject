@@ -7,9 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
@@ -61,9 +59,9 @@ public class TotalServicesReport extends BasicReport {
                                       + "order by cf_orgs.idoforg ");
             queryLauncher.loadValue(entries, "currentClientsCount",
                     "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
-                            "from cf_enterevents " +
-                            "left join cf_clients on cf_enterevents.idofclient=cf_enterevents.idofclient " +
-                            "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " +
+                            "from cf_orgs " +
+                            "left join cf_clients on cf_clients.idoforg=cf_orgs.idoforg " +
+                            "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient " +
                             "where cf_orgs.state=1 "
                             //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                             + " AND " + orgCondition + " and " +
