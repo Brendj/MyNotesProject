@@ -658,11 +658,17 @@ public class RNIPLoadPaymentsService {
             String paymentID = "";
             paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
             String paymentDate    = p.get("PaymentDate").trim();
-            String contragentKey  = p.get("Srv_Code").substring(5, 10).trim();
-            String bic            = p.get("BIK");
-            String amount         = p.get("Amount");
+            String contragentKey  = p.get("Srv_Code");
+            if(contragentKey == null || contragentKey.length() < 1) {
+                logger.error(String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID));
+                continue;
+            }
+            contragentKey        = contragentKey.substring(5, 10).trim();
+            String bic           = p.get("BIK");
+            String amount        = p.get("Amount");
             long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
             if (idOfContragent == 0) {
+                logger.error(String.format("Неудалось обработать платеж %s - не удалось найти контрагента по коду = %s", paymentID, contragentKey));
                 continue;
             }
             String contractId = p.get("NUM_DOGOVOR");
