@@ -1624,8 +1624,10 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
            StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
             return null;
         }
+
+        long newDate = System.currentTimeMillis();
+        deleteStatsFromExternalSystem(stats, newDate);
         try {
-            long newDate = System.currentTimeMillis();
             Query q = entityManager.createNativeQuery(
                     "INSERT INTO cf_external_system_stats (SystemName, Instance, CreateDate, StatisticId, StatisticValue) VALUES "
                     + "(:systemName, :instance, :createDate, :statisticId, :statisticValue)");
@@ -1633,16 +1635,41 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             q.setParameter("instance", stats.getInstance());
             q.setParameter("createDate", newDate);
             for(Integer typeId : stats.getValues().keySet()) {
-                BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(5);
+                BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(4);
                 q.setParameter("statisticId", typeId);
                 q.setParameter("statisticValue", val);
                 q.executeUpdate();
             }
             stats.setCreateDate(new Date(newDate));
+            return stats;
+        } catch (Exception e) {
+            logger.error("Failed to update external system statistics", e);
+        }
         return stats;
-    } catch (Exception e) {
-        logger.error("Failed to update external system statistics", e);
     }
-        return stats;
+
+    public boolean deleteStatsFromExternalSystem(ExternalSystemStats stats, long date) {
+        if(stats == null || stats.getCreateDate() == null || stats.getName() == null ||
+           StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+            return false;
+        }
+        try {
+            Query q = entityManager.createNativeQuery(
+                    "DELETE FROM cf_external_system_stats "
+                    + "WHERE SystemName=:systemName AND Instance=:instance AND "
+                    + "CreateDate=:createDate AND StatisticId=:statisticId");
+            q.setParameter("systemName", stats.getName());
+            q.setParameter("instance", stats.getInstance());
+            q.setParameter("createDate", date);
+            for(Integer typeId : stats.getValues().keySet()) {
+                BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(4);
+                q.setParameter("statisticId", typeId);
+                q.executeUpdate();
+            }
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to update external system statistics", e);
+            return false;
+        }
     }
 }
