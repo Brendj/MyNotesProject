@@ -102,10 +102,6 @@ public class DashboardServiceBean {
                             //+ "deliverystatus=:deliveredSMSStatus and "
                             + "servicesenddate>:maxDate "
                             + "union all "
-                            /*+ "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
-                         + "from cf_clientsms "
-                         + "where deliverystatus=:notDeliveredSMSStatus "
-                         + "union all "*/
                             + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
                             + "from cf_clientsms "
                             + "union all "
@@ -115,18 +111,7 @@ public class DashboardServiceBean {
             //q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
             q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
-            List queryResult = q.getResultList();
-            for (Object object : queryResult) {
-                Object[] result = (Object[]) object;
-                String name = ((String) result[0]).trim();
-                long value  = ((BigInteger) result[1]).longValue();
-                String type = ((String) result[2]).trim();
-                if (type.equals("long")) {
-                    params.add(new DashboardResponse.NamedParams(name, value));
-                } else if (type.equals("date")) {
-                    params.add(new DashboardResponse.NamedParams(name, new Date(value)));
-                }
-            }
+            proceedSQLToNamedParams(q, params);
 
             //  добавляем статистику по емп только если инстанс соответствует установкам в конфигурации, а так же для отправки смс используется ЕМП
             EMPProcessor empProcessor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
@@ -138,6 +123,13 @@ public class DashboardServiceBean {
                     params.add(new DashboardResponse.NamedParams("Учеников ожидает связки с ЕМП", empStatistics.getWaitBindingCount()));
                     params.add(new DashboardResponse.NamedParams("Учеников связанных с ЕМП", empStatistics.getBindedCount()));
                     params.add(new DashboardResponse.NamedParams("Ошибки при связи", empStatistics.getBindingErrors()));
+
+                    Query q2 = entityManager.createNativeQuery(
+                            "select 'Ошибок при отправке SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                            + "from cf_clientsms "
+                            + "where DeliveryStatus=:smsType and textcontents like 'E: %'");
+                    q2.setParameter("smsType", ClientSms.NOT_DELIVERED_TO_RECIPENT);
+                    proceedSQLToNamedParams(q, params);
                 }
             }
             return params;
@@ -148,6 +140,21 @@ public class DashboardServiceBean {
             /*try {
                 if (session != null) { HibernateUtils.close(session, logger); }
             } catch (Exception e) { }*/
+        }
+    }
+
+    protected void proceedSQLToNamedParams(Query q, List<DashboardResponse.NamedParams> params) {
+        List queryResult = q.getResultList();
+        for (Object object : queryResult) {
+            Object[] result = (Object[]) object;
+            String name = ((String) result[0]).trim();
+            long value  = ((BigInteger) result[1]).longValue();
+            String type = ((String) result[2]).trim();
+            if (type.equals("long")) {
+                params.add(new DashboardResponse.NamedParams(name, value));
+            } else if (type.equals("date")) {
+                params.add(new DashboardResponse.NamedParams(name, new Date(value)));
+            }
         }
     }
 
