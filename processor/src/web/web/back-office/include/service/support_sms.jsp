@@ -14,7 +14,7 @@
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
         <h:panelGrid styleClass="borderless-grid" columns="2">
-            <h:outputText escape="true" value="Кому (для ЕМП - idofclient)" styleClass="output-text" />
+            <h:outputText escape="true" value="Кому (номер лицевого счета)" styleClass="output-text" />
             <h:inputText value="#{supportSMSPage.address}" size="11" maxlength="11" styleClass="input-text" />
             <h:outputText escape="true" value="Текст" styleClass="output-text" />
             <h:inputTextarea rows="10" cols="40" value="#{supportSMSPage.text}" styleClass="input-text" />
