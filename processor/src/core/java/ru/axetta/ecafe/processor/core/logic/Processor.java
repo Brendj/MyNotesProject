@@ -2115,16 +2115,20 @@ public class Processor implements SyncProcessor,
                 client.setAddress(clientParamItem.getAddress());
             }
             if (clientParamItem.getEmail() != null) {
-                client.setEmail(clientParamItem.getEmail());
+                String email = clientParamItem.getEmail();
+                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
+                    client.setSsoid("");
+                }
+                client.setEmail(email);
                 if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
                     client.setNotifyViaEmail(true);
                 }
             }
             if (clientParamItem.getMobilePhone() != null) {
                 String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
-                //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
-                if(client != null && client.getMobile() != null && StringUtils.isBlank(client.getMobile()) &&
-                    !client.getMobile().equals(mobile)) {
+                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                if(client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
                     client.setSsoid("");
                 }
                 client.setMobile(mobile);

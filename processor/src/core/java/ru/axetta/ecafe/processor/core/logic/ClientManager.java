@@ -331,9 +331,8 @@ public class ClientManager {
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
-                //  если у клиента есть мобильный, кот. отличается от нового, то сбрсываем ССОИД для ЕМП
-                if(client != null && StringUtils.isBlank(client.getMobile()) &&
-                   !client.getMobile().equals(mobilePhone)) {
+                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                if(client != null && client.getMobile() != null && !client.getMobile().equals(mobilePhone)) {
                     client.setSsoid("");
                 }
                 client.setMobile(mobilePhone);
@@ -347,8 +346,13 @@ public class ClientManager {
                 client.setFax(fax);
             }
             //tokens[15]);
-            if (fieldConfig.getValue(FieldId.EMAIL) != null) {
-                client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));
+            String email = fieldConfig.getValue(ClientManager.FieldId.EMAIL);
+            if (email != null && StringUtils.isNotEmpty(email)) {
+                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
+                    client.setSsoid("");
+                }
+                client.setEmail(email);
             }
             //tokens[16])
             if (fieldConfig.getValue(FieldId.PAY_FOR_SMS) != null) {
