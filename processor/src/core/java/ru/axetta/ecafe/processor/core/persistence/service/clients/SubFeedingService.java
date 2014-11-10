@@ -23,6 +23,7 @@ import java.util.List;
  */
 @Service
 public class SubFeedingService {
+
     @Autowired
     OrgService orgService;
 
@@ -57,37 +58,53 @@ public class SubFeedingService {
     *
     *
     * */
-    public List<ClientItem> getClientItems(long orgId){
+    public List<ClientItem> getClientItems(long orgId) {
         List<BigInteger> orgTypes = orgService.findOrgCategories(orgId);
         List<ClientItem> result = new ArrayList<ClientItem>();
-        if(orgTypes.size() > 1){
+        if (orgTypes.size() > 1) {
             new Exception("У организации обнаруженно две и более категории");
-        }if(orgTypes.size() == 1){
+        }
+        if (orgTypes.size() == 1) {
             switch (orgTypes.get(0).intValue()) {
                 case 1:
                 case 2:
                 case 3:
                 case 7:
                 case 8:
-                    result.addAll(subFeedingRepository.getClientAllClientsInOrg(orgId));
-                    result.addAll(subFeedingRepository.getClientAllClientsInOrgReserve(orgId));
-                return  result;
-
-            case 9:
-                result.addAll(subFeedingRepository.getClientInPlan(orgId));
-                result.addAll(subFeedingRepository.getClientInReserve(orgId));
-                break;
-            default:
-                new Exception("У организации не поддерживаемая категория");
-        }
-        }else {
-            result.addAll(subFeedingRepository.getClientInPlan(orgId));
-            result.addAll(subFeedingRepository.getClientInReserve(orgId));
+                case 9:
+                    addClientItems(result, subFeedingRepository.getClientAllClientsInOrg(orgId));
+                    addClientItems(result, subFeedingRepository.getClientAllClientsInOrgReserve(orgId));
+                    return new ArrayList<ClientItem>(result);
+                default:
+                    new Exception("У организации не поддерживаемая категория");
+            }
+        } else {
+            addClientItems(result, subFeedingRepository.getPrimarySchoolClients(orgId));
+            addClientItems(result, subFeedingRepository.getClientInPlan(orgId));
+            addClientItems(result, subFeedingRepository.getClientInReserve(orgId));
         }
         return result;
     }
 
     public ClientItem getClientItem(Long idOfOrg, OrderItem orderItem) {
         return subFeedingRepository.getClient(idOfOrg, orderItem.getIdOfClient());
+    }
+
+    private List<ClientItem> addClientItems(List<ClientItem> all , List<ClientItem> add){
+        boolean flag;
+        for (ClientItem clientItem : add) {
+            flag = false;
+            for (ClientItem item : all) {
+                if(item.getId() == clientItem.getId() && item.getPlanType() == clientItem.getPlanType() ){
+                    flag= true;
+                    break;
+                }
+            }
+
+            if(!flag){
+                all.add(clientItem);
+            }
+        }
+        return all;
     }
 }

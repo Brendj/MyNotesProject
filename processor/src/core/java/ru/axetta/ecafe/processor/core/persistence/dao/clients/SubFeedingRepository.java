@@ -211,4 +211,15 @@ public class SubFeedingRepository  extends BaseJpaDao {
                 + " WHERE c.idoforg = :idOfOrg and c.idofclient = "  +idOfClient;
         return getClientBySQL(idOfOrg, sql);
     }
+
+    public List<ClientItem> getPrimarySchoolClients(Long idOfOrg){
+        String sql = "SELECT c.idofClient,(p.surname || ' ' || p.firstname || ' ' || p.secondname) as fullname,"
+                + " g.groupname ," + ClientItem.IN_PLAN_TYPE +" as plantype"
+                + " FROM cf_clients c "
+                + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
+                + " INNER JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND g.idoforg = c.idoforg "
+                + " WHERE c.idoforg = :idOfOrg  "
+                + " AND g.groupname SIMILAR TO '[1-4](\\D)%'\n ";
+        return getClientsBySQL(idOfOrg, sql);
+    }
 }

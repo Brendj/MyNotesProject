@@ -111,9 +111,13 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal()) {
                     notfoundItem = updateRowListWithOrder(currentData.getPlan(), orderItem);
                     if(notfoundItem != null){
+                        try{
                         ClientItem clientItem = subFeedingService.getClientItem(org.getIdOfOrg(), orderItem);
                         fillRowListWithClient(currentData.getPlan(), clientItem, startTime, endTime, orderItem);
                         notfoundItem = null;
+                        }catch (Exception e){
+                            logger.error("dd "+orderItem.getIdOfClient());
+                        }
                     }
                 } else if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()) {
                     notfoundItem = updateRowListWithOrder(currentData.getReserve(), orderItem);
@@ -123,6 +127,8 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                         notfoundItem = null;
                     }
                 }
+
+                //todo 8 handle
                 updateTotalListWithOrder(currentData, orderItem, startTime, endTime);
             }
         }
@@ -222,7 +228,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 if(i == CalendarUtils.getDayOfMonth(orderItem.getOrderDate())){
                     row.update(orderItem);
                 }
-                row.setName( row.getName() + " ! " + row.getGroupname());
+                row.setName( row.getName() + " ! ");
             }
             dataItem.add(row);
         }

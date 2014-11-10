@@ -39,14 +39,14 @@ public class OrdersRepository extends BaseJpaDao {
 
     public List<OrderItem> findOrdersByClientIds(long idOfOrg, String clientIds, Date startTime, Date endTime) {
         String sql =
-                " SELECT c.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
+                " SELECT o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
                         + " FROM cf_orders o "
                         + " INNER JOIN cf_orderdetails od on o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
-                        + " INNER JOIN cf_clients c on c.idofclient = o.idofclient "
+                        + " INNER JOIN cf_clients c on c.idofclient = o.idofclient and o.idoforg = c.idoforg "
                         + " INNER JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
                         + " WHERE o.idoforg = " + idOfOrg + " AND od.menutype >= 50 AND od.menutype<=99 ";
         if (clientIds != null) {
-            sql += " AND c.idofclient in ( " + clientIds + ") ";
+            sql += " AND o.idofclient in ( " + clientIds + ") ";
 
         }
         sql += " AND o.socdiscount > 0 " + " AND o.createddate between " + startTime.getTime()
