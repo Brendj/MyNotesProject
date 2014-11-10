@@ -161,7 +161,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsReportPage extends Onli
                 ServletOutputStream servletOutputStream = response.getOutputStream();
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=discrepancies.xls");
+                response.setHeader("Content-disposition", "inline;filename=detailedDeviationPaymentReport.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);

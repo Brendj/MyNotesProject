@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -11,18 +13,25 @@ package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviation
  * Time: 15:01
  */
 
-public class ComplexInfoForPlan {
+public class ComplexInfoItem {
+
     public Integer idOfComplex;
     public Long idOfRule;
     public String complexName;
-    public Long idOfOrg;
+    public Date menuDate;
 
-    public ComplexInfoForPlan(Integer idOfComplex, Long idOfRule, String complexName, Long idOfOrg) {
+    public ComplexInfoItem(Integer idOfComplex, Long idOfRule, String complexName) {
         this.idOfComplex = idOfComplex;
         this.idOfRule = idOfRule;
         this.complexName = complexName;
-        this.idOfOrg = idOfOrg;
     }
+
+    public ComplexInfoItem(Integer idOfComplex, Date menuDate, String complexName) {
+        this.idOfComplex = idOfComplex;
+        this.menuDate = menuDate;
+        this.complexName = complexName;
+    }
+
 
     public Integer getIdOfComplex() {
         return idOfComplex;
@@ -30,14 +39,6 @@ public class ComplexInfoForPlan {
 
     public void setIdOfComplex(Integer idOfComplex) {
         this.idOfComplex = idOfComplex;
-    }
-
-    public Long getIdOfRule() {
-        return idOfRule;
-    }
-
-    public void setIdOfRule(Long idOfRule) {
-        this.idOfRule = idOfRule;
     }
 
     public String getComplexName() {
@@ -48,11 +49,19 @@ public class ComplexInfoForPlan {
         this.complexName = complexName;
     }
 
-    public Long getIdOfOrg() {
-        return idOfOrg;
+    public Date getMenuDate() {
+        return menuDate;
     }
 
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
+    public void setMenuDate(Date menuDate) {
+        this.menuDate = menuDate;
+    }
+
+    public Long getIdOfRule() {
+        return idOfRule;
+    }
+
+    public void setIdOfRule(Long idOfRule) {
+        this.idOfRule = idOfRule;
     }
 }

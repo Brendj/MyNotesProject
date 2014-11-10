@@ -5,7 +5,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoForPlan;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -245,16 +245,40 @@ public class ClientsEntereventsService {
         return resultPlanOrder;
     }
 
-    public static List<ComplexInfoForPlan> loadComplexName(Session session, Long idOfOrg, String orderType) {
-        List<ComplexInfoForPlan> complexInfoForPlans = new ArrayList<ComplexInfoForPlan>();
+    public static List<ComplexInfoItem> loadComplexNameByPlan(Session session, Long idOfOrg, Date startTime,
+            Date endTime) {
+        List<ComplexInfoItem> complexInfoItems = new ArrayList<ComplexInfoItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT (cfod.menutype - 50) AS complexid, cfod.idofrule, cfod.menudetailname, cfo.idoforg "
+                "SELECT idofcomplex, menudate, complexname FROM cf_complexinfo WHERE idoforg = :idOfOrg"
+                        + " AND menudate BETWEEN :startTime AND :endTime "
+                        + "GROUP BY idofcomplex, complexname, menudate ORDER BY menudate, idofcomplex ");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        List result = query.list();
+
+        for (Object o : result) {
+            Object[] resultPlanOrderItem = (Object[]) o;
+            ComplexInfoItem complexInfoItem = new ComplexInfoItem((Integer) resultPlanOrderItem[0],
+                    CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[1]).longValue())),
+                    (String) resultPlanOrderItem[2]);
+            complexInfoItems.add(complexInfoItem);
+        }
+        return complexInfoItems;
+    }
+
+    public static List<ComplexInfoItem> loadComplexNameByOrders(Session session, Long idOfOrg, String orderType) {
+        List<ComplexInfoItem> complexInfoItems = new ArrayList<ComplexInfoItem>();
+
+        Query query = session.createSQLQuery(
+                "SELECT (cfod.menutype - 50) AS complexid, cfod.idofrule, cfod.menudetailname "
                         + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod "
                         + "ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType
-                        + ") AND cfod.menutype >= 50 AND cfod.menutype < 100 AND "
-                        + "cfod.idofrule >= 0 GROUP BY complexid, cfod.idofrule, cfod.menudetailname, cfo.idoforg");
+                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType + ") "
+                        + "AND cfod.menutype >= 50 AND cfod.menutype < 100 "
+                        + "AND cfod.idofrule >= 0 GROUP BY complexid, cfod.menudetailname, cfod.idofrule");
         query.setParameter("idOfOrg", idOfOrg);
 
         List result = query.list();
@@ -262,12 +286,11 @@ public class ClientsEntereventsService {
         //парсим данные
         for (Object o : result) {
             Object[] resultComp = (Object[]) o;
-            ComplexInfoForPlan complexInfoForPlan = new ComplexInfoForPlan((Integer) resultComp[0],
-                    ((BigInteger) resultComp[1]).longValue(), (String) resultComp[2],
-                    ((BigInteger) resultComp[3]).longValue());
-            complexInfoForPlans.add(complexInfoForPlan);
+            ComplexInfoItem complexInfoItem = new ComplexInfoItem((Integer) resultComp[0],
+                    ((BigInteger) resultComp[1]).longValue(), (String) resultComp[2]);
+            complexInfoItems.add(complexInfoItem);
         }
-        return complexInfoForPlans;
+        return complexInfoItems;
     }
 
     // Должен был получить бесплатное питание
