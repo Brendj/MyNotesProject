@@ -114,7 +114,7 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("Amount");               //  Сумма платежа
         PAYMENT_PARAMS.add("PaymentDate");          // Дата платежа
         PAYMENT_PARAMS.add("NUM_DOGOVOR");          // Это номер договора в нашей БД
-        PAYMENT_PARAMS.add("Srv_Code");             // Здесь содержится
+        PAYMENT_PARAMS.add("SRV_CODE");             // Здесь содержится идентификатор контрагента
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
 
@@ -658,7 +658,7 @@ public class RNIPLoadPaymentsService {
             String paymentID = "";
             paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
             String paymentDate    = p.get("PaymentDate").trim();
-            String contragentKey  = p.get("Srv_Code");
+            String contragentKey  = p.get("SRV_CODE");
             if(contragentKey == null || contragentKey.length() < 1) {
                 logger.error(String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID));
                 continue;
@@ -673,7 +673,7 @@ public class RNIPLoadPaymentsService {
             }
             String contractId = p.get("NUM_DOGOVOR");
             Client client = DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
-            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, Srv_Code=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
+            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
                     paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
                 throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
