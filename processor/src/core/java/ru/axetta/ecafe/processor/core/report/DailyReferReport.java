@@ -364,6 +364,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
                 + "     where cf_orderdetails.socdiscount<>0 and " + orgClause
                 + "           cf_orderdetails.state=0 and cf_orders.state=0 and cf_orders.createddate between :start and :end "
+                //+ "           and subcategory='Обучающиеся из многодетных семей 5-9 кл. (завтрак+обед)' "                         //   !! TEST_ONLY
                 + "           " + regionClause
                 + "           " + orderTypeClause
                 + "           " + categoryClause +

@@ -132,13 +132,22 @@ public class ReferReport extends BasicReportForAllOrgJob {
             int workDaysCount = counts [0];
             int weekendsCount = counts [1];
             //  Загрузка данных из БД
+            /*
+            ! Бывший алгоритм начало !
             List<DailyReferReportItem> items = findReferItems(session, startTime, endTime, o != null ? (String) o : null);
             List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
             DailyReferReportItem samples [] = Builder.getSampleItems(session, org, startTime, endTime, o != null ? (String) o : null);    //  Хранится 2 объекта с данными по пробе
             //  Соединение всего вместе
             List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, items, categories,
                     samples[0], samples[1], periodResult);
-            //  Добавляем массив как параметр отчета
+            ! Бывший алгоритм конец !
+            */
+
+            List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
+            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session);
+            solveCategories(total, categories);
+
+                    //  Добавляем массив как параметр отчета
             parameterMap.put("reports", total);
             parameterMap.put("periodChildren", periodResult.getPeriodChildren());
             parameterMap.put("periodTotal", periodResult.getPeriodTotal());
@@ -342,6 +351,105 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
             return result;
         }
+    }
+
+    protected static void solveCategories(List<List<ReferReportItem>> items, List<String> categories) {
+        for(String cat : categories) {
+            for(List<ReferReportItem> items2: items) {
+                boolean found = false;
+
+                int i=0;
+                for(int c=0; c<items2.size(); c++) {
+                    ReferReportItem it = items2.get(c);
+                    i = Math.max(it.getLineId(), i);
+                    if(it.getName() != null && it.getName().equals(cat)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found) {
+                    ReferReportItem item = new ReferReportItem();
+                    item.setLineId(i + 1);
+                    item.setChildren(0);
+                    item.setTotal(0);
+                    item.setName(cat);
+                    item.setSummary(0D);
+                    items2.add(item);
+                }
+            }
+        }
+    }
+
+    protected static final List<List<ReferReportItem>> getTotalItems(int workDaysCount, int weekendsCount,
+                                                                   Session session) {
+        List<List<ReferReportItem>> result = new ArrayList<List<ReferReportItem>>();
+
+        Query q = session.createSQLQuery(
+                  "select clients.idoforg, clients.subcategory, clients.clientsCount, events.entersCount, orders.ordersCount "
+                + "from "
+                        //Количество учеников
+                + "     (select idoforg, subcategory, count(idofclient) as clientsCount "
+                + "      from (select distinct cl.idoforg, cl.idofclient, dr.subcategory "
+                + "            from cf_orgs o "
+                + "            left join cf_clients cl on o.idoforg=cl.idoforg "
+                + "            join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
+                + "                 (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
+                + "            join cf_discountrules dr on ccd.idofrule=dr.idofrule "
+                + "            where cl.idoforg=225 and cl.idofclientgroup<1100000000) as data "
+                + "      where subcategory<>'' "
+                + "      group by idoforg, subcategory) as clients, "
+
+                         //Уникальные проходы
+                + "      (select idoforg, subcategory, count(cnt) as entersCount "
+                + "       from (select distinct cl.idoforg, evt.idofclient as cnt, dr.subcategory "
+                + "             from cf_orgs o "
+                + "             left join cf_enterevents evt on o.idoforg=evt.idoforg "
+                + "             join cf_clients cl on evt.idofclient=cl.idofclient "
+                + "             join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
+                + "                  (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
+                + "             join cf_discountrules dr on ccd.idofrule=dr.idofrule "
+                + "             where cl.idoforg=225 and cl.idofclientgroup<1100000000 and evt.evtdatetime>=1391198400000 and evt.evtdatetime<1393617600000) as data "
+                + "       where subcategory<>'' "
+                + "       group by idoforg, subcategory) as events, "
+
+                          //Сумма покупок
+                + "       (SELECT o.idoforg, dr.subcategory, SUM(od.Qty*(od.RPrice+od.socdiscount)) / 100 as ordersCount "
+                + "        FROM CF_ORDERS o,CF_ORDERDETAILS od  "
+                + "        left join cf_discountrules dr on dr.idofrule=od.idofrule  "
+                + "        WHERE (o.idOfOrg=225 AND od.idOfOrg=225) AND (o.IdOfOrder=od.IdOfOrder) AND  "
+                + "              (od.MenuType>=50 OR od.MenuType<=99) AND (od.RPrice=0 AND od.Discount>0) AND  "
+                + "              (o.CreatedDate>=1391198400000 AND o.CreatedDate<=1393617600000) and o.state=0 and od.state=0 and dr.subcategory<>'' "
+                + "        GROUP BY o.idoforg, dr.subcategory) as  orders "
+                + "where clients.idoforg=events.idoforg and clients.idoforg=orders.idoforg and  "
+                + "      clients.subcategory=events.subcategory and clients.subcategory=orders.subcategory "
+                + "order by 1, 2");
+        List sqlRes = q.list();
+
+        int i=1;
+        List<ReferReportItem> items = new ArrayList<ReferReportItem>();
+        if(sqlRes != null && sqlRes.size() > 0) {
+            for (Object entry : sqlRes) {
+                Object e[] = (Object[]) entry;
+                long idoforg = ((BigInteger) e[0]).longValue();
+                String category = (String) e[1];
+                long clientsCount = ((BigInteger) e[2]).longValue();
+                double eventsCount = ((BigInteger) e[3]).longValue() / workDaysCount;
+                double ordersSummary = ((BigDecimal) e[4]).doubleValue();
+
+                ReferReportItem item = new ReferReportItem();
+                item.setLineId(i);
+                item.setChildren(clientsCount);
+                item.setTotal((long) eventsCount);
+                item.setName(category);
+                item.setSummary(ordersSummary);
+                items.add(item);
+                i++;
+            }
+        }
+        result.add(items);
+        result.add(new ArrayList<ReferReportItem>());
+        return result;
     }
 
     private static final List<List<ReferReportItem>> getTotalItems(int workDaysCount,
