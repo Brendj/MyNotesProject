@@ -124,8 +124,10 @@ public class SMSService {
                         break;
                     }
                 } catch (Exception e) {
-                    logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                            new Object[]{sender, phoneNumber, textObject.toString(), e});
+                    /*logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
+                            new Object[]{sender, phoneNumber, textObject.toString(), e});*/
+                    logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}",
+                            new Object[]{sender, phoneNumber, textObject.toString()}, e);
                 }
             }
         }
@@ -140,7 +142,6 @@ public class SMSService {
         if(text == null || StringUtils.isBlank(text)) {
             return false;
         }
-        text = text.substring(0, 70);
         ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
                 .createClientFailedSmsCharge(client, messageId, phoneNumber, messageType, text,
                         new Date());

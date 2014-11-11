@@ -51,6 +51,7 @@ public class FinancialOpsManager {
 
         Session session = em.unwrap(Session.class);
 
+        textContents = textContents.substring(0, 70);
         long priceOfSms = client.getOrg().getPriceOfSms();
         ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsType, textContents,
                 serviceSendTime, priceOfSms);
@@ -85,6 +86,7 @@ public class FinancialOpsManager {
                     .changeCurrentPosition(-priceOfSms, operatorContragent, clientContragent);
         }
 
+        textContents = textContents.substring(0, 70);
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsType, textContents,
                 serviceSendTime, priceOfSms);
         session.save(clientSms);

@@ -3166,15 +3166,16 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             } break;
                             case KINDERGARTEN: {
                                 if(guardianId!=null){
-                                    List<Client> clients = findGuardiansByClient(persistenceSession, idOfClient, guardianId);
-                                    if(!(clients==null || clients.isEmpty())){
-                                        for (Client cl: clients){
+                                    List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);//guardianId);
+                                    Client guardian = DAOService.getInstance().findClientById(guardianId);
+                                    if(!(guardians==null || guardians.isEmpty())){
+                                        for (Client cl: guardians){
                                             notificationService.sendNotificationAsync(cl,
-                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection());
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardian);
                                         }
                                     } else {
                                         notificationService.sendNotificationAsync(client,
-                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection());
+                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardian);
                                     }
                                 }
                             } break;

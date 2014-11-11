@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
@@ -510,8 +511,14 @@ public class EventNotificationService {
         String sn = "-";
         String n = "-";
         if(guardian != null) {
-            sn = guardian.getPerson().getSurname();
-            n = guardian.getPerson().getFirstName();
+            try {
+                sn = guardian.getPerson().getSurname();
+                n = guardian.getPerson().getFirstName();
+            } catch (Exception e) {
+                Person p = DAOService.getInstance().getPersonByClient(guardian);
+                sn = p.getSurname();
+                n = p.getFirstName();
+            }
         }
         empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_SURNAME_PARAM, sn);
         empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_NAME_PARAM, n);
