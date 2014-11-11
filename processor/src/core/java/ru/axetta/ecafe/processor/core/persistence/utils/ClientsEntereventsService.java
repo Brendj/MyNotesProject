@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ClientInfo;
@@ -35,181 +34,6 @@ public class ClientsEntereventsService {
     private ClientsEntereventsService() {
     }
 
-    // Выбор правил по льготам
-    public static List<DiscountRule> getDiscountRulesByClientBenefits(Session session, List<Long> clientBenefits) {
-        List<DiscountRule> discountRulesResult = new ArrayList<DiscountRule>();
-
-        Criteria discountRulesCriteria = session.createCriteria(DiscountRule.class);
-        List<DiscountRule> discountRules = discountRulesCriteria.list();
-
-        for (DiscountRule discount : discountRules) {
-            String[] categoryDiscounts = discount.getCategoryDiscounts().split(",");
-            if (categoryDiscounts.length > 0) {
-                List<Long> categoryDiscountsList = new ArrayList<Long>();
-
-                for (Object idsCategoryDiscounts : categoryDiscounts) {
-                    categoryDiscountsList.add(Long.parseLong(StringUtils.trim((String) idsCategoryDiscounts)));
-                }
-
-                if (clientBenefits.containsAll(categoryDiscountsList)) {
-                    discountRulesResult.add(discount);
-                }
-            }
-        }
-        return discountRulesResult;
-    }
-
-    // Получает все льготы клиента
-    public static List<Long> getClientBenefits(Session session, Long idOfClient) {
-        Client client = (Client) session.load(Client.class, idOfClient);
-        List<Long> clientAllBenefits = new ArrayList<Long>();
-
-        //Ручная загрузка
-        String categoriesDiscounts = client.getCategoriesDiscounts();
-        if (client.getCategoriesDiscounts().equals("") || client.getCategoriesDiscounts().equals(null)) {
-        } else {
-            String[] cD = categoriesDiscounts.split(",");
-            if (cD.length > 0) {
-                for (String idsCd : cD) {
-                    clientAllBenefits.add(Long.parseLong(StringUtils.trim(idsCd)));
-                }
-            }
-        }
-
-        //Автоматическая загрузка
-        org.hibernate.Query query = session.createSQLQuery("SELECT g.groupname "
-                + "FROM cf_clients c LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup  "
-                + "WHERE c.idofclientgroup = :idOfClientGroup " + "AND c.idoforg = :idOfOrg "
-                + "AND g.idoforg= c.idoforg " + "GROUP BY g.groupname");
-        query.setParameter("idOfClientGroup", client.getIdOfClientGroup());
-        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
-        String groupName = (String) query.uniqueResult();
-
-        Pattern patterNumber = Pattern.compile("\\d+");
-
-        String constant = "";
-
-        Matcher m = patterNumber.matcher(groupName);
-        if (m.find()) {
-            constant = m.group();
-        }
-
-        Long number = Long.parseLong(constant);
-
-        if (number >= 1L && number <= 4L) {
-            clientAllBenefits.add(-90L);
-        } else if (number > 4L && number <= 9L) {
-            clientAllBenefits.add(-91L);
-        } else if (number > 9L && number <= 11L) {
-            clientAllBenefits.add(-92L);
-        }
-
-        if (number == 1L) {
-            clientAllBenefits.add(-101L);
-        } else if (number == 2L) {
-            clientAllBenefits.add(-102L);
-        } else if (number == 3L) {
-            clientAllBenefits.add(-103L);
-        } else if (number == 4L) {
-            clientAllBenefits.add(-104L);
-        } else if (number == 5L) {
-            clientAllBenefits.add(-105L);
-        } else if (number == 6L) {
-            clientAllBenefits.add(-106L);
-        } else if (number == 7L) {
-            clientAllBenefits.add(-107L);
-        } else if (number == 8L) {
-            clientAllBenefits.add(-108L);
-        } else if (number == 9L) {
-            clientAllBenefits.add(-109L);
-        } else if (number == 10L) {
-            clientAllBenefits.add(-110L);
-        } else if (number == 11L) {
-            clientAllBenefits.add(-111L);
-        }
-
-        org.hibernate.Query queryDiscount = session.createSQLQuery(
-                "SELECT idofcategorydiscount FROM cf_categorydiscounts cd "
-                        + "WHERE cd.idofcategorydiscount IN (:idOfDiscountRules) AND categoryType != 1");
-        queryDiscount.setParameterList("idOfDiscountRules", clientAllBenefits);
-
-        List<Long> ids = queryDiscount.list();
-
-        List<Long> clientBenefitsNot = new ArrayList<Long>();
-
-        for (Object obj : ids) {
-            BigInteger idForLong = (BigInteger) obj;
-            clientBenefitsNot.add(idForLong.longValue());
-        }
-
-        return clientBenefitsNot;
-    }
-
-
-    // Должен был получить бесплатное питание, выбор клиентов для составления плана питания
-    public static List<ClientInfo> loadClientsInfoToPay(Session session, Long orgId) {
-        List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
-        org.hibernate.Query clientInfoQuery = session.createSQLQuery(
-                "SELECT DISTINCT cl.idOfClient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup,  gr.groupName, cl.categoriesDiscounts  "
-                        + "FROM cf_clients cl LEFT JOIN cf_enterevents ce ON cl.idOfClient = ce.idOfClient "
-                        + "LEFT JOIN cf_cards cr ON cr.IdOfClient = cl.IdOfClient "
-                        + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
-                        + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
-                        + "WHERE cr.State = 0 AND gr.idOfClientGroup < 1100000030 "
-                        //+ "AND ce.evtdatetime >= :payedDate AND ce.evtdatetime < :payedDateAddOneDay "
-                        + " AND cl.idoforg = :orgId ");
-        clientInfoQuery.setParameter("orgId", orgId);
-        List<Object> result = clientInfoQuery.list();
-
-        for (Object resultClient : result) {
-            Object[] resultClientItem = (Object[]) resultClient;
-            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    (String) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
-                    (String) resultClientItem[3], (String) resultClientItem[4]);
-            clientInfoList.add(clientInfo);
-        }
-        return clientInfoList;
-    }
-
-    public static final String REDUCED_PRICE_PLAN_RESERVE = "6";//План льготного питания, резерв
-
-    //Вернет список заказов которые были оплачены
-    // в зависимости от параметра
-    public static List<PlanOrderItem> loadPaidPlanOrders(Session session, String orderType, String idOfOrgs,
-            Date startTime, Date endTime) {
-        Query query = session.createSQLQuery(
-                "SELECT cfo.idofclient,(p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname,(cfod.menutype -50) AS complexId, cfod.idofrule, cfo.orderdate,  cfod.menudetailname, g.groupname,cfo.ordertype  "
-                        + "FROM cf_orders cfo "
-                        + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + " LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
-                        + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson "
-                        + " LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup and cfod.idoforg = g.idoforg "
-                        + "WHERE cfo.ordertype IN (" + orderType + ") AND cfo.idoforg IN (" + idOfOrgs + ") "
-                        + " AND cfo.orderdate between :startTime AND :endTime "
-                        //+ " AND cfo.state=1 "
-                        + " AND cfod.socdiscount > 0 "
-                        //+ " AND cfod.guidofgoods IS NOT NULL "
-                        + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
-
-        query.setParameter("startTime", startTime.getTime());
-        query.setParameter("endTime", endTime.getTime());
-
-
-        List<Object> result = query.list();
-        List<PlanOrderItem> planOrderItemList = new ArrayList<PlanOrderItem>();
-        for (Object resultClient : result) {
-            Object[] resultClientItem = (Object[]) resultClient;
-            PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultClientItem[0]).longValue(),
-                    (String) resultClientItem[1], (Integer) resultClientItem[2],
-                    ((BigInteger) resultClientItem[3]).longValue(),
-                    new Date(((BigInteger) resultClientItem[4]).longValue()), (String) resultClientItem[5],
-                    (String) resultClientItem[6], (Integer) resultClientItem[7]);
-            planOrderItemList.add(planOrderItem);
-        }
-
-        return planOrderItemList;
-    }
-
     //Вернет список клиентов которые были оплачены
     // в зависимости от параметра orderType - строковое, по интервалу от startDate до endTime
     public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, Long idOfOrg,
@@ -217,7 +41,7 @@ public class ClientsEntereventsService {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
         Query query = session.createSQLQuery(
-                "SELECT cfo.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, cfod.idofrule, cfo.createddate, g.groupname "
+                "SELECT cfo.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, cfod.idofrule, cfo.createddate, g.groupname, cfod.menudetailname "
                         + "FROM cf_orders cfo "
                         + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                         + "LEFT JOIN cf_clients c ON  cfo.idofclient = c.idofclient and cfod.idoforg = c.idoforg "
@@ -239,7 +63,7 @@ public class ClientsEntereventsService {
                     (String) resultPlanOrderItem[1], (Integer) resultPlanOrderItem[2],
                     ((BigInteger) resultPlanOrderItem[3]).longValue(),
                     CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
-                    (String) resultPlanOrderItem[5]);
+                    (String) resultPlanOrderItem[5], (String) resultPlanOrderItem[6]);
             resultPlanOrder.add(planOrderItem);
         }
         return resultPlanOrder;
@@ -269,55 +93,6 @@ public class ClientsEntereventsService {
         return complexInfoItems;
     }
 
-    public static List<ComplexInfoItem> loadComplexNameByOrders(Session session, Long idOfOrg, String orderType) {
-        List<ComplexInfoItem> complexInfoItems = new ArrayList<ComplexInfoItem>();
-
-        Query query = session.createSQLQuery(
-                "SELECT (cfod.menutype - 50) AS complexid, cfod.idofrule, cfod.menudetailname "
-                        + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod "
-                        + "ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                        + "WHERE cfo.idoforg = :idOfOrg AND cfo.ordertype IN (" + orderType + ") "
-                        + "AND cfod.menutype >= 50 AND cfod.menutype < 100 "
-                        + "AND cfod.idofrule >= 0 GROUP BY complexid, cfod.menudetailname, cfod.idofrule");
-        query.setParameter("idOfOrg", idOfOrg);
-
-        List result = query.list();
-
-        //парсим данные
-        for (Object o : result) {
-            Object[] resultComp = (Object[]) o;
-            ComplexInfoItem complexInfoItem = new ComplexInfoItem((Integer) resultComp[0],
-                    ((BigInteger) resultComp[1]).longValue(), (String) resultComp[2]);
-            complexInfoItems.add(complexInfoItem);
-        }
-        return complexInfoItems;
-    }
-
-    // Должен был получить бесплатное питание
-    public static List<PlanOrderItem> loadPlanOrderItemToPay(Session session, Date payedDate, Long orgId) {
-        List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
-        // клиенты которые в здании
-        List<ClientInfo> clientInfoList = ClientsEntereventsService.loadClientsInfoToPay(session, orgId);
-        if (!clientInfoList.isEmpty()) {
-            // правила для организации
-            List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
-            // платные категории
-            List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
-
-            for (ClientInfo clientInfo : clientInfoList) {
-                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
-                categories.removeAll(onlyPaydAbleCategories);
-                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
-                rules = getRulesByHighPriority(rules);
-                for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo, rule, payedDate);
-                }
-            }
-            return allItems;
-        }
-        return null;
-    }
-
     // Те кто должен был получить | Проход по карте не зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
             Long orgId) {
@@ -330,14 +105,15 @@ public class ClientsEntereventsService {
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
-
+            List<ComplexInfoItem> complexInfoItemListByPlan = ClientsEntereventsService
+                    .loadComplexNameByPlan(session, orgId, startTime, endTime);
             for (ClientInfo clientInfo : clientInfoList) {
                 List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
                 categories.removeAll(onlyPaydAbleCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlan, clientInfo, rule, startTime);
                 }
             }
             return allItems;
@@ -389,14 +165,15 @@ public class ClientsEntereventsService {
             List<DiscountRule> rulesForOrg = ClientsEntereventsService.getDiscountRulesByOrg(session, orgId);
             // платные категории
             List<Long> onlyPaydAbleCategories = ClientsEntereventsService.loadAllPaydAbleCategories(session);
-
+            List<ComplexInfoItem> complexInfoItemListByPlan = ClientsEntereventsService
+                    .loadComplexNameByPlan(session, orgId, startTime, endTime);
             for (ClientInfo clientInfo : clientInfoList) {
                 List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
                 categories.removeAll(onlyPaydAbleCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlan, clientInfo, rule, startTime);
                 }
             }
             return allItems;
@@ -450,8 +227,8 @@ public class ClientsEntereventsService {
     }
 
     // Заполнение плана кто должен был получить питание на основе комплексов
-    private static void addPlanOrderItems(List<PlanOrderItem> items, ClientInfo clientInfo, DiscountRule rule,
-            Date payedDate) {
+    private static void addPlanOrderItems(List<PlanOrderItem> items, List<ComplexInfoItem> complexInfoItemList,
+            ClientInfo clientInfo, DiscountRule rule, Date payedDate) {
 
         String complexMap = rule.getComplexesMap();
 
@@ -468,13 +245,23 @@ public class ClientsEntereventsService {
         }
 
         for (Integer complexId : allComplexesId) {
+            String complexName = getComplexName(complexInfoItemList, payedDate, complexId);
             PlanOrderItem item = new PlanOrderItem(clientInfo.getClientId(), clientInfo.getClientName(), complexId,
-                    rule.getIdOfRule(), payedDate, clientInfo.getGroupName());
+                    rule.getIdOfRule(), payedDate, clientInfo.getGroupName(), complexName);
             items.add(item);
             if (rule.getOperationOr()) {
                 return;
             }
         }
+    }
+
+    private static String getComplexName(List<ComplexInfoItem> complexInfoItemList, Date payedDate, Integer complexId) {
+        for (ComplexInfoItem complexInfoItem : complexInfoItemList) {
+            if (complexInfoItem.getIdOfComplex().equals(complexId) && complexInfoItem.getMenuDate().equals(payedDate)) {
+                return complexInfoItem.getComplexName();
+            }
+        }
+        return "";
     }
 
     // Получает все льготы клиента

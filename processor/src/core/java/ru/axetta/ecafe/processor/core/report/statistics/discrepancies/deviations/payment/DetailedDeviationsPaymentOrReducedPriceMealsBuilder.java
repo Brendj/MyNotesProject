@@ -98,12 +98,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
 
-        // Имена комплексов по заказам
-        List<ComplexInfoItem> complexInfoItemListByOrders;
-
-        // Имена комплексов по плану
-        List<ComplexInfoItem> complexInfoItemListByPlan;
-
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
@@ -118,12 +112,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 // Оплаченные Заказы
                 planOrderItemsPaidByOneDay = ClientsEntereventsService
                         .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
-
-                complexInfoItemListByOrders = ClientsEntereventsService
-                        .loadComplexNameByOrders(session, idOfOrg, orderTypeLgotnick);
-
-                complexInfoItemListByPlan = ClientsEntereventsService
-                        .loadComplexNameByPlan(session, idOfOrg, startTime, endTime);
 
                 // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
                 List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
@@ -174,13 +162,11 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
                     if (!resultSubtraction.isEmpty()) {
-                        fillByPlan(resultSubtraction, conditionDetectedNotEat, complexInfoItemListByPlan,
-                                deviationPaymentSubReportItemList);
+                        fillByPlan(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
                     }
 
                     if (!resultIntersection.isEmpty()) {
-                        fill(resultIntersection, conditionNotDetectedEat, complexInfoItemListByOrders,
-                                deviationPaymentSubReportItemList);
+                        fill(resultIntersection, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
 
                     deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
@@ -204,12 +190,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
                 planOrderItemsPaidByInterval = ClientsEntereventsService
                         .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
-
-                complexInfoItemListByOrders = ClientsEntereventsService
-                        .loadComplexNameByOrders(session, idOfOrg, orderTypeLgotnick);
-
-                complexInfoItemListByPlan = ClientsEntereventsService
-                        .loadComplexNameByPlan(session, idOfOrg, startTime, endTime);
 
                 Date sTt = startTime;
                 CalendarUtils.truncateToDayOfMonth(sTt);
@@ -291,14 +271,12 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
                     if (!resultSubtractionInterval.isEmpty()) {
-                        fillByPlan(resultSubtractionInterval, conditionDetectedNotEat, complexInfoItemListByPlan,
+                        fillByPlan(resultSubtractionInterval, conditionDetectedNotEat,
                                 deviationPaymentSubReportItemList);
-
                     }
 
                     if (!resultIntersectionInterval.isEmpty()) {
-                        fill(resultIntersectionInterval, conditionNotDetectedEat, complexInfoItemListByOrders,
-                                deviationPaymentSubReportItemList);
+                        fill(resultIntersectionInterval, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
 
                     deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
@@ -311,59 +289,34 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         return new JRBeanCollectionDataSource(deviationPaymentItemList);
     }
 
-    public void fill(List<PlanOrderItem> result, String condition, List<ComplexInfoItem> complexInfoList,
+    public void fill(List<PlanOrderItem> result, String condition,
             List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
         for (PlanOrderItem planOrderItem : result) {
-            DeviationPaymentSubReportItem deviationPaymentSubReportItem = createReportItem(condition, complexInfoList,
+            DeviationPaymentSubReportItem deviationPaymentSubReportItem = createReportItem(condition, planOrderItem);
+            deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
+        }
+    }
+
+    public DeviationPaymentSubReportItem createReportItem(String condition, PlanOrderItem planOrderItem) {
+        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
+                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
+                planOrderItem.getIdOfRule(), planOrderItem.getComplexName());
+        return deviationPaymentSubReportItem;
+    }
+
+    public void fillByPlan(List<PlanOrderItem> result, String condition,
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+        for (PlanOrderItem planOrderItem : result) {
+            DeviationPaymentSubReportItem deviationPaymentSubReportItem = createReportItemByPlan(condition,
                     planOrderItem);
             deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
         }
     }
 
-    public DeviationPaymentSubReportItem createReportItem(String condition, List<ComplexInfoItem> complexInfoList,
-            PlanOrderItem planOrderItem) {
-        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem();
-        deviationPaymentSubReportItem.setCondition(condition);
-        deviationPaymentSubReportItem.setGroupName(planOrderItem.getGroupName());
-        deviationPaymentSubReportItem.setPersonName(planOrderItem.getClientName());
-        deviationPaymentSubReportItem.setOrderDate(planOrderItem.getOrderDate());
-        deviationPaymentSubReportItem.setRuleId(planOrderItem.getIdOfRule());
-        for (ComplexInfoItem complexInfoItem : complexInfoList) {
-            if (complexInfoItem.getIdOfComplex().equals(planOrderItem.getIdOfComplex()) && complexInfoItem.getIdOfRule()
-                    .equals(planOrderItem.getIdOfRule())) {
-                deviationPaymentSubReportItem.setComplexName(complexInfoItem.getComplexName());
-                break;
-            }
-        }
-        return deviationPaymentSubReportItem;
-    }
-
-    public void fillByPlan(List<PlanOrderItem> result, String condition, List<ComplexInfoItem> complexInfoList,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
-        for (PlanOrderItem planOrderItem : result) {
-            DeviationPaymentSubReportItem deviationPaymentSubReportItem = createReportItemByPlan(condition,
-                    complexInfoList, planOrderItem);
-            deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
-        }
-    }
-
-    public DeviationPaymentSubReportItem createReportItemByPlan(String condition, List<ComplexInfoItem> complexInfoList,
-            PlanOrderItem planOrderItem) {
-        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem();
-        deviationPaymentSubReportItem.setCondition(condition);
-        deviationPaymentSubReportItem.setGroupName(planOrderItem.getGroupName());
-        deviationPaymentSubReportItem.setPersonName(planOrderItem.getClientName());
-        deviationPaymentSubReportItem.setOrderDate(planOrderItem.getOrderDate());
-        deviationPaymentSubReportItem.setRuleId(planOrderItem.getIdOfRule());
-
-        // По плану др. реализация
-        for (ComplexInfoItem complexInfoItem : complexInfoList) {
-            if (complexInfoItem.getIdOfComplex().equals(planOrderItem.getIdOfComplex()) && complexInfoItem.getMenuDate()
-                    .equals(planOrderItem.getOrderDate())) {
-                deviationPaymentSubReportItem.setComplexName(complexInfoItem.getComplexName());
-                break;
-            }
-        }
+    public DeviationPaymentSubReportItem createReportItemByPlan(String condition, PlanOrderItem planOrderItem) {
+        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
+                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
+                planOrderItem.getIdOfRule(), planOrderItem.getComplexName());
         return deviationPaymentSubReportItem;
     }
 

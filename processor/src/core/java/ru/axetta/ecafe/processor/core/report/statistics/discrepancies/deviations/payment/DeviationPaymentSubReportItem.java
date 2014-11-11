@@ -27,14 +27,14 @@ public class DeviationPaymentSubReportItem {
     public DeviationPaymentSubReportItem() {
     }
 
-    public DeviationPaymentSubReportItem(String groupName, String personName, String condition, String complexName,
-            Date orderDate, Long ruleId) {
+    public DeviationPaymentSubReportItem(String condition, String groupName, String personName, Date orderDate,
+            Long ruleId, String complexName) {
+        this.condition = condition;
         this.groupName = groupName;
         this.personName = personName;
-        this.condition = condition;
-        this.complexName = complexName;
         this.orderDate = orderDate;
         this.ruleId = ruleId;
+        this.complexName = complexName;
     }
 
     public String getGroupName() {

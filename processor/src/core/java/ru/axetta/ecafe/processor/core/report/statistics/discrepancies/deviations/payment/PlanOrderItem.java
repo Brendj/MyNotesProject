@@ -13,15 +13,14 @@ import java.util.Date;
  * Time: 13:44
  */
 
-public class PlanOrderItem  {
+public class PlanOrderItem {
 
     public Long idOfClient;
     public String clientName;
-
     public Integer idOfComplex;
     public Long idOfRule;
     public Date orderDate;
-    public String complexName; //complex name
+    public String complexName;
     public String groupName;
     public Integer orderType;
 
@@ -33,14 +32,17 @@ public class PlanOrderItem  {
         this.orderDate = orderDate;
     }
 
-    public PlanOrderItem(Long idOfClient,String clientName, Integer idOfComplex, Long idOfRule, Date orderDate, String groupName) {
+    public PlanOrderItem(Long idOfClient, String clientName, Integer idOfComplex, Long idOfRule, Date orderDate,
+            String groupName, String complexName) {
         this.idOfClient = idOfClient;
         this.clientName = clientName;
         this.idOfComplex = idOfComplex;
         this.idOfRule = idOfRule;
         this.orderDate = orderDate;
         this.groupName = groupName;
+        this.complexName = complexName;
     }
+
     public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName) {
         this.idOfClient = idOfClient;
         this.idOfComplex = idOfComplex;
@@ -58,6 +60,7 @@ public class PlanOrderItem  {
         this.complexName = complexName;
         this.groupName = groupName;
     }
+
     public PlanOrderItem(Long idOfClient, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
             String groupName, Integer orderType) {
         this.idOfClient = idOfClient;
@@ -68,8 +71,9 @@ public class PlanOrderItem  {
         this.groupName = groupName;
         this.orderType = orderType;
     }
-    public PlanOrderItem(Long idOfClient, String clientName, Integer idOfComplex, Long idOfRule, Date orderDate, String complexName,
-            String groupName, Integer orderType) {
+
+    public PlanOrderItem(Long idOfClient, String clientName, Integer idOfComplex, Long idOfRule, Date orderDate,
+            String complexName, String groupName, Integer orderType) {
         this.idOfClient = idOfClient;
         this.clientName = clientName;
         this.idOfComplex = idOfComplex;
