@@ -52,7 +52,7 @@ public class BenefitsRecalculationService {
                     + "where cf_clients_categorydiscounts.idofcategorydiscount<>0 and cf_clients.idOfClientGroup<:leavingClientGroup "
                     //+ "and cf_clients.idofclient=1244 "  Для проверок, не удалять
                     + "union all "
-                    + "select cf_clients.idofclient, cf_categoryorg_orgs.idofcategoryorg, case when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 then-90  "
+                    + "select cf_clients.idofclient, cf_categoryorg_orgs.idofcategoryorg, case when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 then -90  "
                     + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=8 then -91 "
                     + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=9 then -92 else -999999 end "
                     + "from cf_clients "
