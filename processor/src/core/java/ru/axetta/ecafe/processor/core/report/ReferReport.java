@@ -143,9 +143,9 @@ public class ReferReport extends BasicReportForAllOrgJob {
             ! Бывший алгоритм конец !
             */
 
-            List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
+            //List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
             List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session);
-            solveCategories(total, categories);
+            //solveCategories(total, categories);
 
                     //  Добавляем массив как параметр отчета
             parameterMap.put("reports", total);
