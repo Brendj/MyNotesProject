@@ -99,8 +99,8 @@ public class DashboardServiceBean {
                     "select 'Доставлено SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
                             + "from cf_clientsms "
                             + "where "
-                            //+ "deliverystatus=:deliveredSMSStatus and "
-                            + "servicesenddate>:maxDate "
+                            + "deliverystatus=:deliveredSMSStatus "
+                            //+ "servicesenddate>:maxDate "
                             + "union all "
                             + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
                             + "from cf_clientsms "
@@ -108,8 +108,8 @@ public class DashboardServiceBean {
                             + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
                             + "from cf_registrychange_errors "
                             + "where comment is null or comment=''");
-            //q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
-            q.setParameter("maxDate", now.getTimeInMillis());
+            q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
+            //q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
             proceedSQLToNamedParams(q, params);
 

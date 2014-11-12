@@ -157,6 +157,9 @@ public class SMSService {
             clientSms = RuntimeContext.getFinancialOpsManager()
                     .createClientSmsCharge(client, messageId, phoneNumber, messageType, text,
                             new Date());
+            if(runtimeContext.getSmsService() instanceof EMPSmsServiceImpl) {
+                clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
+            }
             result = true;
         }
         createdClientSms.set(clientSms);
