@@ -257,6 +257,13 @@ public class EMPProcessor {
                     } else {
                         statistics.removeNotBinded();
                     }*/
+                    if(client.getMobile() == null || StringUtils.isBlank(client.getMobile())) {
+                        //logger.error(String.format("Внимание! При попытке синхронизации с ЕМП, у клиента %s [%s] не был обнаружен мобильный телефон. Синхронизацию по нему произвести невозможно.", ruleId, client.getIdOfClient()));
+                        client.setSsoid("E: no mobile");
+                        DAOService.getInstance().saveEntity(client);
+                        changeSequence = e.getChangeSequence();
+                        continue;
+                    }
                     List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
                     String idsList = getClientIdsAsString(clients);
                     log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId +

@@ -729,6 +729,9 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<Client> getClientsListByMobilePhone(String mobile) {
+        if(mobile == null || mobile.length() < 1) {
+            return Collections.EMPTY_LIST;
+        }
         List res = DAOUtils.getClientsListByMobilePhone(entityManager, mobile);
         if(res == null || res.size() < 1) {
             return Collections.EMPTY_LIST;
