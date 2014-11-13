@@ -103,17 +103,17 @@
                 <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
 
-            <%--<h:outputText escape="true" value="Использовать цветовую раскраску изменений" styleClass="output-text" />--%>
-            <%--<h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.useColorAccent}"--%>
-                                     <%--styleClass="output-text">--%>
-                <%--<a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />--%>
-            <%--</h:selectBooleanCheckbox>--%>
+            <h:outputText escape="true" value="Использовать цветовую раскраску изменений" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.useColorAccent}"
+                                     styleClass="output-text">
+                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
+            </h:selectBooleanCheckbox>
 
-            <%--<h:outputText escape="true" value="Отображать данные только по ОО с наличием расхождений" styleClass="output-text" />--%>
-            <%--<h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.showOnlyDivergence}"--%>
-                                     <%--styleClass="output-text">--%>
-                <%--<a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />--%>
-            <%--</h:selectBooleanCheckbox>--%>
+            <h:outputText escape="true" value="Отображать данные только по ОО с наличием расхождений" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.showOnlyDivergence}"
+                                     styleClass="output-text">
+                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
+            </h:selectBooleanCheckbox>
         </h:panelGrid>
     </rich:simpleTogglePanel>
 

@@ -77,15 +77,23 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            return build(session, startTime, endTime, calendar, false, false);  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
+                                Boolean useColorAccent, Boolean showOnlyDivergence) throws Exception {
 
             Date generateTime = new Date();
 
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("useColorAccent", useColorAccent);
+            parameterMap.put("showOnlyDivergence", showOnlyDivergence);
 
-            calendar.setTime(startTime);
-            calendar.setTime(endTime);
+            // todo need complete testing - maybe useles code
+            //calendar.setTime(startTime);
+            //calendar.setTime(endTime);
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap);
 
@@ -96,6 +104,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
             return new GoodRequestsNewReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
+
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
                 Map<String, Object> parameterMap) throws Exception {
@@ -129,7 +138,5 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(
                     service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, useColorAccent, showOnlyDivergence));
         }
-
-
     }
 }

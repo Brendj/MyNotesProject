@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.model.requestsandorders;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -20,7 +21,7 @@ public class Complex extends HashMap<String, DateElement> {
         if (this.containsKey(key)) {
             DateElement oldDateElement = this.get(key);
             for (Object obj: dateElement.keySet()) {
-                String keyString = (String) obj;
+                Date keyString = (Date) obj;
                 oldDateElement.put(keyString, dateElement.get(keyString));
             }
             return super.put(key, oldDateElement);

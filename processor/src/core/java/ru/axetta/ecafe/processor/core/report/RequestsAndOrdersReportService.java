@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -36,13 +37,17 @@ import java.util.*;
 public class RequestsAndOrdersReportService {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportService.class);
-    private static HashMap<FeedingPlanType, String> priority = new HashMap<FeedingPlanType, String>();
+    public static final String STATE_STRING_ORDERED = "Заказано";
+    public static final String STATE_STRING_REQUESTED = "Оплачено";
 
-    static {
-        priority.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
-        priority.put(FeedingPlanType.PAY_PLAN, "Платное питание");
-        priority.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
-    }
+    // todo delete - not need anymore
+    //private static HashMap<FeedingPlanType, String> priority = new HashMap<FeedingPlanType, String>();
+    //
+    //static {
+    //    priority.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
+    //    priority.put(FeedingPlanType.PAY_PLAN, "Платное питание");
+    //    priority.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
+    //}
 
     final private long OVERALL;
     final private String OVERALL_TITLE;
@@ -114,64 +119,61 @@ public class RequestsAndOrdersReportService {
             reportDataMap.complement(beginDate, endDate);
         }
 
-        populateDataList(reportDataMap, itemList);
+        populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence);
 
         if (itemList.size() <= 0) {
             BasicReportJob.OrgShortItem orgShortItem = (BasicReportJob.OrgShortItem) orgMap.values().toArray()[0];
-            String goodName = "";
+            String orgName = orgShortItem.getOfficialName();
+            String orgNum = Org.extractOrgNumberFromName(orgName);
+            String feedingPlanTypeString = FeedingPlanType.PAY_PLAN.toString();
+            String complexName = "Не найдено";
+            String stateString = STATE_STRING_ORDERED;
             Date date = CalendarUtils.truncateToDayOfMonth(startTime);
-            FeedingPlanType feedingPlanType = FeedingPlanType.PAY_PLAN;
-            itemList.add(new Item(orgShortItem, "", CalendarUtils.truncateToDayOfMonth(startTime), 0, 0, feedingPlanType));
+
+            itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, stateString, date, 0L, false));
         }
 
         return itemList;
     }
 
-    private void populateDataList(ReportDataMap reportDataMap, List<Item> itemList) {
+    private void populateDataList(ReportDataMap reportDataMap, List<Item> itemList, Boolean useColorAccent, Boolean showOnlyDivergence) {
         for (String orgName : reportDataMap.keySet()) {
             for (FeedingPlanType feedingPlanType: reportDataMap.get(orgName).keySet()) {
+                String feedingPlanTypeString = feedingPlanType.toString();
                 for (String complexName: reportDataMap.get(orgName).get(feedingPlanType).keySet()){
-                    for (String dateString: reportDataMap.get(orgName).get(feedingPlanType).get(complexName).keySet()) {
-                        Long requested = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(dateString).get(State.Requested);
-                        Long ordered = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(dateString).get(State.Ordered);
+                    for (Date date: reportDataMap.get(orgName).get(feedingPlanType).get(complexName).keySet()) {
+                        Long requested = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).get(State.Requested);
+
+                        Long ordered = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).get(State.Ordered);
+
                         String orgNum = Org.extractOrgNumberFromName(orgName);
-                        Date date = null;
-                        try {
-                            date = new SimpleDateFormat("EE dd.MM", new Locale("ru")).parse(dateString);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            //throw new Exception("Ошибка парсера строки даты: " + dateString);
+                        Boolean differState = getDifferState(useColorAccent, requested, ordered);
+                        if (!showOnlyDivergence || differState) {
+                            if (requested != null) {
+                                itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Заказано", date, requested, differState));
+                            }
+                            if (ordered != null) {
+                                itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Оплачено", date, ordered, differState));
+                            }
                         }
-                        itemList.add(
-                                new Item(
-                                        orgNum,
-                                        orgName,
-                                        complexName,
-                                        date,
-                                        requested,
-                                        0L,
-                                        0L,
-                                        0L,
-                                        0,
-                                        0,
-                                        feedingPlanType,
-                                        "Заказано"));
-                        itemList.add(
-                                new Item(
-                                        orgNum,
-                                        orgName,
-                                        complexName,
-                                        date,
-                                        ordered,
-                                        0L,
-                                        0L,
-                                        0L,
-                                        0,
-                                        0,
-                                        feedingPlanType,
-                                        "Оплачено"));
                     }
                 }
+            }
+        }
+    }
+
+    private boolean getDifferState(Boolean useColorAccent, Long requested, Long ordered) {
+        if (requested == null) {
+            if (ordered == null) {
+                return false;
+            } else {
+                return useColorAccent ? true : false;
+            }
+        } else {
+            if (ordered == null) {
+                return useColorAccent ? true : false;
+            } else {
+                return useColorAccent && ((requested - ordered) != 0L);
             }
         }
     }
@@ -189,7 +191,6 @@ public class RequestsAndOrdersReportService {
 
         List goodRequestPositionList = goodRequestPositionCriteria.list();
 
-        SimpleDateFormat simpleDateFormat =  new SimpleDateFormat("EE dd.MM", new Locale("ru"));
         for (Object obj : goodRequestPositionList) {
             GoodRequestPosition position = (GoodRequestPosition) obj;
             BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
@@ -205,7 +206,7 @@ public class RequestsAndOrdersReportService {
                                     : FeedingPlanType.PAY_PLAN)
                             : FeedingPlanType.PAY_PLAN;
             String complexName = position.getGood().getFullName() != null ? position.getGood().getFullName() : position.getGood().getNameOfGood();
-            String dateString = simpleDateFormat.format(position.getGoodRequest().getDoneDate());
+            Date date = position.getGoodRequest().getDoneDate();
             State state = State.Requested;
             Long count = totalCount + dailySampleCount;
 
@@ -215,7 +216,7 @@ public class RequestsAndOrdersReportService {
             Element element = new Element();
 
             element.put(state, count);
-            dateElement.put(dateString, element);
+            dateElement.put(date, element);
             complex.put(complexName, dateElement);
             feedingPlan.put(feedingPlanType, complex);
 
@@ -256,8 +257,6 @@ public class RequestsAndOrdersReportService {
 
         List orderDetailsList = orderDetailsCriteria.list();
 
-        SimpleDateFormat simpleDateFormat =  new SimpleDateFormat("EE dd.MM", new Locale("ru"));
-
         for (Object obj : orderDetailsList) {
             OrderDetail detail = (OrderDetail) obj;
             BasicReportJob.OrgShortItem org = orgMap.get(detail.getOrg().getIdOfOrg());
@@ -278,7 +277,7 @@ public class RequestsAndOrdersReportService {
                                 : FeedingPlanType.PAY_PLAN)
                             : FeedingPlanType.PAY_PLAN;
             String complexName = detail.getGood().getFullName() != null ? detail.getGood().getFullName() : detail.getGood().getNameOfGood();
-            String dateString = simpleDateFormat.format(detail.getOrder().getCreateTime());
+            Date date = detail.getOrder().getCreateTime();
             State state = State.Ordered;
             Long count = totalCount + dailySampleCount;
 
@@ -288,7 +287,7 @@ public class RequestsAndOrdersReportService {
             Element element = new Element();
 
             element.put(state, count);
-            dateElement.put(dateString, element);
+            dateElement.put(date, element);
             complex.put(complexName, dateElement);
             feedingPlan.put(feedingPlanType, complex);
 
@@ -320,7 +319,7 @@ public class RequestsAndOrdersReportService {
                         .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
         List orgList = orgCriteria.list();
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap;
-        orgMap = new HashMap<>(orgList.size());
+        orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
         for (Object obj : orgList) {
             Object[] row = (Object[]) obj;
             long idOfOrg = Long.parseLong(row[0].toString());
@@ -386,137 +385,48 @@ public class RequestsAndOrdersReportService {
 
         final private static String STR_YEAR_DATE_FORMAT = "EE dd.MM";
         final private static DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
+        final private static SimpleDateFormat simpleDateFormat =  new SimpleDateFormat("EE dd.MM", new Locale("ru"));
         private String orgNum;
-        private String officialName;
-        private String goodName;
-        private Date doneDate;
-        private String doneDateStr;
-        private int hideDailySample = 0;
-        private int hideLastValue = 0;
-        private FeedingPlanType feedingPlanType;  // План питания льготный, платный, абонимент
-        private String feedingPlanTypeStr;
-        private Integer feedingPlanTypeNum;
-        private Long totalCount;
-        private Long dailySample;
-        private Long newTotalCount;
-        private Long newDailySample;
-        private String state;
+        private String orgName;
+        private String feedingPlanTypeString;
+        private String complexName;
+        private String stateString;
+        private Date date;
+        private String dateString;
+        private Long count;
+        private Boolean differState;
 
-        protected Item(Item item, Date doneDate) {
-            this(Long.parseLong(item.getOrgNum()), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L,
-                    item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType());
-        }
-
-        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, String state) {
+        protected Item(String orgNum, String orgName, String feedingPlanTypeString, String complexName,
+                String stateString, String dateString, Long count, Boolean differState) {
             this.orgNum = orgNum;
-            this.officialName = officialName;
-            this.goodName = goodName;
-            this.doneDate = doneDate;
-            this.doneDateStr = YEAR_DATE_FORMAT.format(doneDate);
-            this.totalCount = totalCount;
-            this.dailySample = dailySample;
-            this.newTotalCount = newTotalCount;
-            this.newDailySample = newDailySample;
-            this.hideDailySample = hideDailySampleValue;
-            this.hideLastValue = hideLastValue;
-            this.feedingPlanType = feedingPlanType;
-            if (feedingPlanType == null) {
-                feedingPlanTypeStr = "";
-                feedingPlanTypeNum = -1;
-            } else {
-                feedingPlanTypeStr = priority.get(feedingPlanType);
-                feedingPlanTypeNum = feedingPlanType.ordinal();
+            this.orgName = orgName;
+            this.feedingPlanTypeString = feedingPlanTypeString;
+            this.complexName = complexName;
+            this.stateString = stateString;
+            try {
+                this.date = simpleDateFormat.parse(dateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            this.state = state;
+            this.dateString = dateString;
+            this.count = count;
+            this.differState = differState;
         }
 
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, String state) {
-            this.orgNum = orgNum.toString();
-            this.officialName = officialName;
-            this.goodName = goodName;
-            this.doneDate = doneDate;
-            this.doneDateStr = YEAR_DATE_FORMAT.format(doneDate);
-            this.totalCount = totalCount;
-            this.dailySample = dailySample;
-            this.newTotalCount = newTotalCount;
-            this.newDailySample = newDailySample;
-            this.hideDailySample = hideDailySampleValue;
-            this.hideLastValue = hideLastValue;
-            this.feedingPlanType = feedingPlanType;
-            if (feedingPlanType == null) {
-                feedingPlanTypeStr = "";
-                feedingPlanTypeNum = -1;
-            } else {
-                feedingPlanTypeStr = priority.get(feedingPlanType);
-                feedingPlanTypeNum = feedingPlanType.ordinal();
+        protected Item(String orgNum, String orgName, String feedingPlanTypeString, String complexName,
+                String stateString, Date date, Long count, Boolean differState) {
+            if (dateString == "Вт 06.05") {
+                Long a = 0L;
             }
-            this.state = state;
-        }
-
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType) {
-            this.orgNum = orgNum.toString();
-            this.officialName = officialName;
-            this.goodName = goodName;
-            this.doneDate = doneDate;
-            this.doneDateStr = YEAR_DATE_FORMAT.format(doneDate);
-            this.totalCount = totalCount;
-            this.dailySample = dailySample;
-            this.newTotalCount = newTotalCount;
-            this.newDailySample = newDailySample;
-            this.hideDailySample = hideDailySampleValue;
-            this.hideLastValue = hideLastValue;
-            this.feedingPlanType = feedingPlanType;
-            if (feedingPlanType == null) {
-                feedingPlanTypeStr = "";
-                feedingPlanTypeNum = -1;
-            } else {
-                feedingPlanTypeStr = priority.get(feedingPlanType);
-                feedingPlanTypeNum = feedingPlanType.ordinal();
-            }
-            this.state = "Не определено";
-        }
-
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType) {
-            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
-                    feedingPlanType);
-        }
-
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, String state) {
-            this(Long.parseLong(Org.extractOrgNumberFromName(item.getOfficialName())), item.getShortName(), goodName,
-                    doneDate, totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue,
-                    hideLastValue, feedingPlanType, state);
-
-        }
-
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType) {
-            this(Long.parseLong(Org.extractOrgNumberFromName(item.getOfficialName())), item.getShortName(), goodName,
-                    doneDate, totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue,
-                    hideLastValue, feedingPlanType);
-
-        }
-
-        public Item(BasicReportJob.OrgShortItem org, String goodName, Date date, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType) {
-            this(org, goodName, date, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType);
-        }
-
-        public String getState() {
-            return state;
-        }
-
-        public void setState(String state) {
-            this.state = state;
+            this.orgNum = orgNum;
+            this.orgName = orgName;
+            this.feedingPlanTypeString = feedingPlanTypeString;
+            this.complexName = complexName;
+            this.stateString = stateString;
+            this.date = CalendarUtils.truncateToDayOfMonth(date);
+            this.dateString = simpleDateFormat.format(date);
+            this.count = count;
+            this.differState = differState;
         }
 
         @Override
@@ -526,6 +436,7 @@ public class RequestsAndOrdersReportService {
 
         @Override
         public boolean equals(Object o) {
+            // todo needs refactoring - maybe incomplete
             if (this == o) {
                 return true;
             }
@@ -535,129 +446,90 @@ public class RequestsAndOrdersReportService {
 
             Item item = (Item) o;
 
-            return doneDate.equals(item.doneDate) && goodName.equals(item.goodName) && officialName
-                    .equals(item.officialName);
+            return dateString.equals(item.dateString) && complexName.equals(item.complexName) && orgName
+                    .equals(item.orgName);
 
         }
 
         @Override
         public int hashCode() {
-            int result = officialName.hashCode();
-            result = 31 * result + goodName.hashCode();
-            result = 31 * result + doneDate.hashCode();
+            int result = orgName.hashCode();
+            result = 31 * result + complexName.hashCode();
+            result = 31 * result + dateString.hashCode();
             return result;
         }
 
         public String getOrgNum() {
-            return this.orgNum;
+            return orgNum;
         }
 
         public void setOrgNum(String orgNum) {
             this.orgNum = orgNum;
         }
 
-        public String getOfficialName() {
-            return officialName;
+        public String getOrgName() {
+            return orgName;
         }
 
-        public void setOfficialName(String officialName) {
-            this.officialName = officialName;
+        public void setOrgName(String orgName) {
+            this.orgName = orgName;
         }
 
-        public String getGoodName() {
-            return goodName;
+        public String getFeedingPlanTypeString() {
+            return feedingPlanTypeString;
         }
 
-        public void setGoodName(String goodName) {
-            this.goodName = goodName;
+        public void setFeedingPlanTypeString(String feedingPlanTypeString) {
+            this.feedingPlanTypeString = feedingPlanTypeString;
         }
 
-        public Date getDoneDate() {
-            return doneDate;
+        public String getComplexName() {
+            return complexName;
         }
 
-        public void setDoneDate(Date doneDate) {
-            this.doneDate = doneDate;
+        public void setComplexName(String complexName) {
+            this.complexName = complexName;
         }
 
-        public String getDoneDateStr() {
-            return doneDateStr;
+        public String getStateString() {
+            return stateString;
         }
 
-        public void setDoneDateStr(String doneDateStr) {
-            this.doneDateStr = doneDateStr;
+        public void setStateString(String stateString) {
+            this.stateString = stateString;
         }
 
-        public Long getTotalCount() {
-            return totalCount;
+        public Date getDate() {
+            return date;
         }
 
-        public void setTotalCount(Long totalCount) {
-            this.totalCount = totalCount;
+        public void setDate(Date date) {
+            this.date = date;
         }
 
-        public Long getDailySample() {
-            return dailySample;
+        public String getDateString() {
+            return dateString;
         }
 
-        public void setDailySample(Long dailySample) {
-            this.dailySample = dailySample;
+        public void setDateString(String dateString) {
+            this.dateString = dateString;
         }
 
-        public Long getNewTotalCount() {
-            return newTotalCount;
+
+        public Long getCount() {
+            return count;
         }
 
-        public void setNewTotalCount(Long newTotalCount) {
-            this.newTotalCount = newTotalCount;
+        public void setCount(Long count) {
+            count = count;
         }
 
-        public Long getNewDailySample() {
-            return newDailySample;
+        public Boolean getDifferState() {
+            return differState;
         }
 
-        public void setNewDailySample(Long newDailySample) {
-            this.newDailySample = newDailySample;
-        }
-
-        public int getHideDailySample() {
-            return hideDailySample;
-        }
-
-        public void setHideDailySample(int hideDailySample) {
-            this.hideDailySample = hideDailySample;
-        }
-
-        public int getHideLastValue() {
-            return hideLastValue;
-        }
-
-        public void setHideLastValue(int hideLastValue) {
-            this.hideLastValue = hideLastValue;
-        }
-
-        public FeedingPlanType getFeedingPlanType() {
-            return feedingPlanType;
-        }
-
-        public void setFeedingPlanType(FeedingPlanType feedingPlanType) {
-            this.feedingPlanType = feedingPlanType;
-        }
-
-        public String getFeedingPlanTypeStr() {
-            return feedingPlanTypeStr;
-        }
-
-        public void setFeedingPlanTypeStr(String feedingPlanTypeStr) {
-            this.feedingPlanTypeStr = feedingPlanTypeStr;
-        }
-
-        public Integer getFeedingPlanTypeNum() {
-            return feedingPlanTypeNum;
-        }
-
-        public void setFeedingPlanTypeNum(Integer feedingPlanTypeNum) {
-            this.feedingPlanTypeNum = feedingPlanTypeNum;
+        public void setDifferState(Boolean differState) {
+            this.differState = differState;
         }
     }
 }

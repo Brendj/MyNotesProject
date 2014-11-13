@@ -38,7 +38,7 @@ public class ReportDataMap extends HashMap<String, FeedingPlan> {
                 Element element = new Element();
                 element.put(State.Requested, 0L);
                 element.put(State.Ordered, 0L);
-                dateElement.put(simpleDateFormat.format(date), element);
+                dateElement.put(date, element);
             }
             complex.put(complexInfo.getComplexName(), dateElement);
         }
@@ -73,10 +73,10 @@ public class ReportDataMap extends HashMap<String, FeedingPlan> {
                 String orgName = this.keySet().iterator().next();
                 FeedingPlanType feedingPlanType = this.get(orgName).keySet().iterator().next();
                 String complex = this.get(orgName).get(feedingPlanType).keySet().iterator().next();
-                String dateString = simpleDateFormat.format(midDate);
+                Date date = midDate;
                 Element element = new Element();
                 element.put(State.Ordered, 0L);
-                this.get(orgName).get(feedingPlanType).get(complex).put(dateString, element);
+                this.get(orgName).get(feedingPlanType).get(complex).put(date, element);
             }
             midDate = CalendarUtils.addDays(midDate, 1);
         } while (endDate.getTime() >= midDate.getTime());
@@ -87,8 +87,8 @@ public class ReportDataMap extends HashMap<String, FeedingPlan> {
         for (String orgName: this.keySet()) {
             for (FeedingPlanType feedingPlanType: this.get(orgName).keySet()) {
                 for (String complex: this.get(orgName).get(feedingPlanType).keySet()) {
-                    for (String dateString: this.get(orgName).get(feedingPlanType).get(complex).keySet()) {
-                        if (simpleDateFormat.format(date).equals(dateString)) {
+                    for (Date dateForCheck: this.get(orgName).get(feedingPlanType).get(complex).keySet()) {
+                        if (date.equals(dateForCheck)) {
                             return true;
                         }
                     }

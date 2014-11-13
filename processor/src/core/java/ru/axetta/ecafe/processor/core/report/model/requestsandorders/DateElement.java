@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.model.requestsandorders;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -14,10 +15,10 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 
-public class DateElement extends HashMap<String, Element> {
+public class DateElement extends HashMap<Date, Element> {
 
     @Override
-    public Element put(String key, Element element) {
+    public Element put(Date key, Element element) {
         if (this.containsKey(key)) {
             Element oldElement = this.get(key);
             for (Object obj: element.keySet()) {
