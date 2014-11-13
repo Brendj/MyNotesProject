@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
@@ -85,6 +86,7 @@ public class DashboardServiceBean {
         return dashboardResponse;
     }
 
+    @Transactional
     public List<DashboardResponse.NamedParams> getNamedParams() {
         //Session session = null;
         try {
