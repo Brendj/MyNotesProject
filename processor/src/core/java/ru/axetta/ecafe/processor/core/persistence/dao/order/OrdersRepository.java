@@ -30,21 +30,21 @@ public class OrdersRepository extends BaseJpaDao {
     private List<OrderItem> parse(List<Object[]> temList) {
         List<OrderItem> resultList = new ArrayList<OrderItem>();
         for (Object[] result : temList) {
-            resultList.add(new OrderItem(((BigInteger) result[0]).longValue(), ((BigInteger) result[1]).longValue(),
-                    (Integer) result[2], (Integer) result[3], (String) result[4], (String) result[5],
-                    (Integer) result[6]));
+            resultList.add(new OrderItem(((BigInteger) result[0]).longValue(),((BigInteger) result[1]).longValue(), ((BigInteger) result[2]).longValue(),
+                    (Integer) result[3], (Integer) result[4], (String) result[5], (String) result[6],
+                    (Integer) result[7]));
         }
         return resultList;
     }
 
-    public List<OrderItem> findOrdersByClientIds(long idOfOrg, String clientIds, Date startTime, Date endTime) {
+    public List<OrderItem> findOrdersByClientIds(String orgsIdsString, String clientIds, Date startTime, Date endTime) {
         String sql =
-                " SELECT o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
+                " SELECT o.idoforg, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
                         + " FROM cf_orders o "
                         + " INNER JOIN cf_orderdetails od on o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
                         + " INNER JOIN cf_clients c on c.idofclient = o.idofclient and o.idoforg = c.idoforg "
                         + " INNER JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
-                        + " WHERE o.idoforg = " + idOfOrg + " AND od.menutype >= 50 AND od.menutype<=99 ";
+                        + " WHERE o.idoforg in ( " + orgsIdsString + " ) AND od.menutype >= 50 AND od.menutype<=99 ";
         if (clientIds != null) {
             sql += " AND o.idofclient in ( " + clientIds + ") ";
 
@@ -57,6 +57,14 @@ public class OrdersRepository extends BaseJpaDao {
     }
 
     public List<OrderItem> findOrdersByClientIds(long idOfOrg, Date startTime, Date endTime) {
-        return findOrdersByClientIds(idOfOrg, null, startTime, endTime);
+        return findOrdersByClientIds("" + idOfOrg, null, startTime, endTime);
+    }
+
+    public List<OrderItem> findOrdersByClientIds(String orgsIdsString, Date startTime, Date endTime) {
+        return findOrdersByClientIds(orgsIdsString, null, startTime, endTime);
+    }
+
+    public List<OrderItem> findOrdersByClientIds(long idOfOrg, String clientIds, Date startTime, Date endTime) {
+        return findOrdersByClientIds("" + idOfOrg, clientIds, startTime, endTime);
     }
 }

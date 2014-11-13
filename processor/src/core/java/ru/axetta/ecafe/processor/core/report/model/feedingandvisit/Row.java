@@ -18,7 +18,7 @@ public class Row {
 
     private Long clientId; // ид клиента или ид rule если total field
     private String name;
-
+    private Long idOfOrg;
     private Integer day;
 
     public static final String ENTRY_DEFAULT = "H";
@@ -91,6 +91,14 @@ public class Row {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
     public Integer getDay() {

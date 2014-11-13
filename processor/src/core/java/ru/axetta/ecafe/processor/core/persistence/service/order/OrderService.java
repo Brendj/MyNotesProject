@@ -46,4 +46,8 @@ public class OrderService {
         clientIds.deleteCharAt(clientIds.length() - 1);
         return findOrdersByClientIds(idOfOrg, clientIds.toString(), startTime, endTime);
     }
+
+    public List<OrderItem> findOrders(String orgsIdsString, Date startTime, Date endTime) {
+        return ordersRepository.findOrdersByClientIds(orgsIdsString, startTime, endTime);
+    }
 }

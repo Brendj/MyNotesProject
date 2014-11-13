@@ -508,12 +508,23 @@ public class DAOUtils {
                 .setParameter("idOfOrg", orgId);
         return (List<Long>) query.list();
     }
-
     public static List<Org> findFriendlyOrgs(EntityManager em, Org organization) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds((Session) em.getDelegate(), organization.getIdOfOrg());
         List<Org> res = new ArrayList<Org>();
         for (Long idoforg : orgIds) {
-            if (idoforg.equals(organization.getIdOfOrg())) {
+            if (idoforg.equals(organization)) {
+                continue;
+            }
+            res.add(DAOService.getInstance().getOrg(idoforg));
+        }
+        return res;
+    }
+
+    public static List<Org> findFriendlyOrgs(Session session, long organization) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, organization);
+        List<Org> res = new ArrayList<Org>();
+        for (Long idoforg : orgIds) {
+            if (idoforg.equals(organization)) {
                 continue;
             }
             res.add(DAOService.getInstance().getOrg(idoforg));

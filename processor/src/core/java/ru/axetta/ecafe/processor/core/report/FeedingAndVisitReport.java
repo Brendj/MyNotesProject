@@ -11,12 +11,15 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.SubFeedingService;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.service.order.OrderService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Data;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Days;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Row;
@@ -72,13 +75,17 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
             Map<String, Data> dataMap = new HashMap<String, Data>();
+
+            List<Org> orgs = DAOUtils.findFriendlyOrgs(session, org.getIdOfOrg());
+            String orgsIdsString = OrgUtils.extractIdsAsString(orgs);
+
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
 
             OrderService orderService =  RuntimeContext.getAppContext().getBean(OrderService.class);
 
             List<ClientItem> clientItemList = subFeedingService.getClientItems(org.getIdOfOrg());
             List<OrderItem> orderItemList = orderService
-                    .findOrders(org.getIdOfOrg(), startTime, endTime);
+                    .findOrders(orgsIdsString, startTime, endTime);
 
             dataMap = fillDataPlanWithOrders(dataMap, clientItemList, startTime, endTime);
 

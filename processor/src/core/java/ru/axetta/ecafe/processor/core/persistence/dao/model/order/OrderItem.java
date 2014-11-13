@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.model.order;
  */
 public class OrderItem {
 
+    public long idOfOrg;
     public long idOfClient;
     public long orderDate;
     public int ordertype;
@@ -14,6 +15,18 @@ public class OrderItem {
     public String complexName; //complex name
     public String groupName;
     private int qty;
+
+    public OrderItem(long idOfOrg, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
+            String groupName, int qty) {
+        this.idOfOrg = idOfOrg;
+        this.idOfClient = idOfClient;
+        this.orderDate = orderDate;
+        this.ordertype = ordertype;
+        this.idOfComplex = idOfComplex;
+        this.complexName = complexName;
+        this.groupName = groupName;
+        this.qty = qty;
+    }
 
     public OrderItem(long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty) {
@@ -24,6 +37,14 @@ public class OrderItem {
         this.complexName = complexName;
         this.groupName = groupName;
         this.qty = qty;
+    }
+
+    public long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
     public long getIdOfClient() {
