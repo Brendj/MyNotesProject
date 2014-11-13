@@ -1622,6 +1622,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return result;
     }
 
+    @Transactional
     public ExternalSystemStats saveStatsForExtermalSystem(ExternalSystemStats stats) {
         if(stats == null || stats.getCreateDate() == null || stats.getName() == null ||
            StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
@@ -1646,7 +1647,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             stats.setCreateDate(new Date(newDate));
             return stats;
         } catch (Exception e) {
-            logger.error("Failed to update external system statistics", e);
+            //logger.error("Failed to update external system statistics", e);
         }
         return stats;
     }
@@ -1665,13 +1666,12 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             q.setParameter("instance", stats.getInstance());
             q.setParameter("createDate", date);
             for(Integer typeId : stats.getValues().keySet()) {
-                BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(4);
                 q.setParameter("statisticId", typeId);
                 q.executeUpdate();
             }
             return true;
         } catch (Exception e) {
-            logger.error("Failed to update external system statistics", e);
+            //logger.error("Failed to update external system statistics", e);
             return false;
         }
     }
