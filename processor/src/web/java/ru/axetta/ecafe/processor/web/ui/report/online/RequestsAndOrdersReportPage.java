@@ -51,6 +51,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     private final static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReportPage.class);
     private String htmlReport = null;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private Boolean applyUserSettings = false; // todo delete - not necessary
     private Boolean hideMissedColumns = true;
     private Boolean showOnlyDivergence = false;
     private Boolean useColorAccent = false;
