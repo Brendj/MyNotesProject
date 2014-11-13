@@ -55,25 +55,22 @@
 
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
             <h:panelGroup id="orgFilter">
-                <a4j:commandButton value="..." action="#{mainPage.requestsAndOrdersReportPage.showOrgListSelectPage}"
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.requestsAndOrdersReportPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    disabled="#{mainPage.requestsAndOrdersReportPage.applyUserSettings}"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
-                    <f:setPropertyActionListener value="#{mainPage.requestsAndOrdersReportPage.getStringIdOfOrgList}"
-                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    <f:setPropertyActionListener
+                            value="#{mainPage.requestsAndOrdersReportPage.getStringIdOfOrgList}"
+                            target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.requestsAndOrdersReportPage.filter}}" />
             </h:panelGroup>
-            <h:outputText escape="true" value="Формировать по Списку организаций рассылки" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.applyUserSettings}"
-                                     styleClass="output-text">
-                <a4j:support event="onclick" reRender="contragetFilter, orgFilter"
-                             actionListener="#{mainPage.requestsAndOrdersReportPage.applyOfOrgList}" ajaxSingle="true" />
-            </h:selectBooleanCheckbox>
+
             <%--Добавить варниг сообщ--%>
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.requestsAndOrdersReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -102,53 +99,21 @@
 
             <h:outputText escape="true" value="Скрывать даты с пустыми значениями" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideMissedColumns}"
-                                     styleClass="output-text" />
-
-            <h:outputText escape="true" value="Скрывать значения суточной пробы" styleClass="output-text"/>
-            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideDailySamplesCount}"
-                                     styleClass="output-text"/>
-
-            <h:outputText escape="true" value="Фильтры по заявкам" styleClass="output-text" />
-            <h:selectOneMenu value="#{mainPage.requestsAndOrdersReportPage.orgRequest.orgRequestFilterEnum}"
-                             styleClass="output-text">
-                <f:converter converterId="orgRequestFilterConverter" />
-                <f:selectItems value="#{mainPage.requestsAndOrdersReportPage.orgRequest.items}" />
-            </h:selectOneMenu>
-
-            <h:outputText escape="true" value="Наименование товара" styleClass="output-text" />
-            <h:inputText value="#{mainPage.requestsAndOrdersReportPage.nameFiler}" styleClass="input-text" size="50" />
-
-            <h:outputText escape="true" value="Использовать цветовую раскраску изменений" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"
                                      styleClass="output-text">
                 <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
 
-            <a4j:commandButton value="Обновить время генерации" action="#{mainPage.showRequestsAndOrdersReportPage}"
-                               reRender="requestsAndOrdersReportPanelGrid"
-                               styleClass="command-button mleft20px" status="requestsAndOrdersReportGenerateStatus"
-                               rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
-            <rich:spacer rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
-            <h:outputText escape="true" value="Время генерации от" styleClass="output-text mleft20px"
-                          rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
-            <rich:calendar value="#{mainPage.requestsAndOrdersReportPage.generateBeginDate}"
-                           datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text"
-                           showWeeksBar="false" rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}">
-                <a4j:support event="onchanged" reRender="generateEndDateCal"
-                             actionListener="#{mainPage.requestsAndOrdersReportPage.onGeneratePeriodChanged}" />
-            </rich:calendar>
-            <h:outputText escape="true" value="Время генерации до" styleClass="output-text mleft20px"
-                          rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
-            <rich:calendar id="generateEndDateCal" value="#{mainPage.requestsAndOrdersReportPage.generateEndDate}"
-                           datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text"
-                           showWeeksBar="false" rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
-            <h:outputText escape="true" styleClass="output-text mleft20px"
-                          rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"
-                          value="Скрыть предыдущее значение в скобках при изменении"  />
-            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideLastValue}"
-                                     styleClass="output-text"
-                                     rendered="#{mainPage.requestsAndOrdersReportPage.hideGeneratePeriod}"/>
+            <%--<h:outputText escape="true" value="Использовать цветовую раскраску изменений" styleClass="output-text" />--%>
+            <%--<h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.useColorAccent}"--%>
+                                     <%--styleClass="output-text">--%>
+                <%--<a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />--%>
+            <%--</h:selectBooleanCheckbox>--%>
 
+            <%--<h:outputText escape="true" value="Отображать данные только по ОО с наличием расхождений" styleClass="output-text" />--%>
+            <%--<h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.showOnlyDivergence}"--%>
+                                     <%--styleClass="output-text">--%>
+                <%--<a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />--%>
+            <%--</h:selectBooleanCheckbox>--%>
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
@@ -180,6 +145,4 @@
             </f:verbatim>
         </c:if>
     </h:panelGrid>
-
-
 </h:panelGrid>

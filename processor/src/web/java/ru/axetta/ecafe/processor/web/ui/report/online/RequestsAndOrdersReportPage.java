@@ -15,15 +15,12 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RequestsAndOrdersReport;
-import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -33,7 +30,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
@@ -53,22 +49,12 @@ import java.util.Properties;
 public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage {
 
     private final static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReportPage.class);
-    private final static String generateBeginDateKey = "requestsAndOrdersReport.generateBeginDate";
-    //private final static String generateEndDateKey = "requestsAndOrdersReport.generateEndDate";
     private String htmlReport = null;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-    private Date generateBeginDate = new Date();
-    private Date generateEndDate = new Date();
     private Boolean hideMissedColumns = true;
-    private Boolean hideDailySamplesCount = false;
-    private Boolean applyUserSettings = false;
-    private Boolean hideGeneratePeriod = false;
-    private Boolean hideLastValue = false;
-    private String nameFiler;
-    private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
+    private Boolean showOnlyDivergence = false;
+    private Boolean useColorAccent = false;
     private User currentUser;
-    //private String lastGoodRequestUpdateDateTiem;
-    private Date lastGoodRequestUpdateDateTime;
 
     public RequestsAndOrdersReportPage() {
         super();
@@ -87,7 +73,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                     persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
 
-                    //persistenceSession.refresh(currentUser);
                     User user = (User) persistenceSession.get(User.class, currentUser.getIdOfUser());
 
                     idOfOrgList = new ArrayList<Long>();
@@ -95,7 +80,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                         filter = "Не выбрано";
                         printMessage("Список организаций рассылки не заполнен");
                         idOfOrgList = null;
-
                     } else {
                         filter = "";
                         for (UserOrgs userOrgs : user.getUserOrgses()) {
@@ -123,21 +107,8 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     @Override
     public void fill(Session persistenceSession, User currentUser) throws Exception {
         this.currentUser = currentUser;
-        generateBeginDate = new Date();
-        generateEndDate = new Date();
         Properties properties = DAOUtils.extractPropertiesByUserReportSetting(persistenceSession, currentUser,
                 UserReportSetting.GOOD_REQUEST_REPORT);
-        if (!properties.isEmpty()) {
-            Date dateTime = new Date();
-            String generateBeginDateStr = properties
-                    .getProperty(generateBeginDateKey, CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateTime));
-            generateBeginDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(generateBeginDateStr);
-            //String generateEndDateStr = properties.getProperty(generateEndDateKey, CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateTime));
-            //generateBeginDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(generateEndDateStr);
-            generateEndDate = new Date();
-        }
-        //periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-        //orgRequest = new OrgRequestFilterConverter();
         htmlReport = null;
     }
 
@@ -161,10 +132,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             }
             break;
         }
-    }
-
-    public void onGeneratePeriodChanged(ActionEvent event) {
-        generateEndDate = new Date(generateBeginDate.getTime() + 60 * 60 * 1000);
     }
 
     public void onEndDateSpecified(ActionEvent event) {
@@ -206,7 +173,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile("_notify.jasper");
-        //String templateFilename = checkIsExistFile("_summary.jasper");
 
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
@@ -242,17 +208,10 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 exporter1.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
                 exporter1.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
                 exporter1.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                //exporter1.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
                 exporter1.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter1.exportReport();
                 String[] values = {
                         "address", "Адрес орга", "shortOrgName", "Моя орга", "reportValues", os.toString("UTF-8")};
-                EventNotificationService eventNotificationService = RuntimeContext.getAppContext()
-                        .getBean(EventNotificationService.class);
-                //eventNotificationService.sendEmailAsync("kadyrov@axetta.ru",
-                //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                //eventNotificationService.sendEmailAsync("dizzarg@mail.ru",
-                //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
             } catch (Exception e) {
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
@@ -306,24 +265,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 exporter.exportReport();
                 htmlReport = os.toString("UTF-8");
                 os.close();
-                if (hideGeneratePeriod) {
-                    try {
-                        // идет запись
-                        persistenceSession = runtimeContext.createPersistenceSession();
-                        persistenceTransaction = persistenceSession.beginTransaction();
-                        Properties properties = new Properties();
-                        String endGenerateDateStr = CalendarUtils
-                                .toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                        properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                        DAOUtils.saveReportSettings(persistenceSession, currentUser,
-                                UserReportSetting.GOOD_REQUEST_REPORT, properties);
-                        persistenceTransaction.commit();
-                        persistenceTransaction = null;
-                    } finally {
-                        HibernateUtils.rollback(persistenceTransaction, logger);
-                        HibernateUtils.close(persistenceSession, logger);
-                    }
-                }
             } catch (Exception e) {
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
@@ -359,20 +300,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
             return true;
-        }
-        if (hideGeneratePeriod) {
-            if (generateBeginDate == null) {
-                printError("Не указано время генерации от");
-                return true;
-            }
-            if (generateEndDate == null) {
-                printError("Не указано время генерации до");
-                return true;
-            }
-            if (generateBeginDate.after(generateEndDate)) {
-                printError("Время генерации от меньше время генерации до");
-                return true;
-            }
         }
         return false;
     }
@@ -428,24 +355,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 xlsExport.exportReport();
                 servletOutputStream.flush();
                 servletOutputStream.close();
-                if (hideGeneratePeriod) {
-                    try {
-                        // идет запись
-                        persistenceSession = runtimeContext.createPersistenceSession();
-                        persistenceTransaction = persistenceSession.beginTransaction();
-                        Properties properties = new Properties();
-                        String endGenerateDateStr = CalendarUtils
-                                .toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                        properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                        DAOUtils.saveReportSettings(persistenceSession, currentUser,
-                                UserReportSetting.GOOD_REQUEST_REPORT, properties);
-                        persistenceTransaction.commit();
-                        persistenceTransaction = null;
-                    } finally {
-                        HibernateUtils.rollback(persistenceTransaction, logger);
-                        HibernateUtils.close(persistenceSession, logger);
-                    }
-                }
                 printMessage("Сводный отчет по заявкам построен");
             } catch (Exception e) {
                 logger.error("Failed export report : ", e);
@@ -454,25 +363,26 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
-    public Object clear() {
-        idOfOrg = null;
-        filter = null;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        localCalendar = runtimeContext
-                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
-
-        localCalendar.setTime(new Date());
-        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
-
-        localCalendar.setTime(this.startDate);
-        localCalendar.add(Calendar.DATE, 1);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.endDate = localCalendar.getTime();
-        htmlReport = null;
-        return null;
-    }
+    // todo delete - not used
+    //public Object clear() {
+    //    idOfOrg = null;
+    //    filter = null;
+    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
+    //
+    //    FacesContext facesContext = FacesContext.getCurrentInstance();
+    //    localCalendar = runtimeContext
+    //            .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+    //
+    //    localCalendar.setTime(new Date());
+    //    this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+    //
+    //    localCalendar.setTime(this.startDate);
+    //    localCalendar.add(Calendar.DATE, 1);
+    //    localCalendar.add(Calendar.SECOND, -1);
+    //    this.endDate = localCalendar.getTime();
+    //    htmlReport = null;
+    //    return null;
+    //}
 
     private Properties buildProperties() {
         Properties properties = new Properties();
@@ -483,25 +393,9 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-        properties.setProperty(RequestsAndOrdersReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(hideGeneratePeriod));
-        if (hideGeneratePeriod) {
-            properties.setProperty(RequestsAndOrdersReport.P_GENERATE_BEGIN_DATE,
-                    Long.toString(generateBeginDate.getTime()));
-            properties.setProperty(RequestsAndOrdersReport.P_GENERATE_END_DATE, Long.toString(generateEndDate.getTime()));
-        } else {
-            // ставит текущее значение оно все равно не участвет в выборке и формировании отчета
-            properties.setProperty(RequestsAndOrdersReport.P_GENERATE_BEGIN_DATE,
-                    Long.toString(System.currentTimeMillis()));
-            properties
-                    .setProperty(RequestsAndOrdersReport.P_GENERATE_END_DATE, Long.toString(System.currentTimeMillis()));
-        }
         properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS, Boolean.toString(hideMissedColumns));
-        properties
-                .setProperty(RequestsAndOrdersReport.P_HIDE_DAILY_SAMPLE_COUNT, Boolean.toString(hideDailySamplesCount));
-        properties.setProperty(RequestsAndOrdersReport.P_HIDE_LAST_VALUE, Boolean.toString(hideLastValue));
-        properties.setProperty(RequestsAndOrdersReport.P_NAME_FILTER, nameFiler);
-        properties.setProperty(RequestsAndOrdersReport.P_ORG_REQUEST_FILTER,
-                Integer.toString(orgRequest.getOrgRequestFilterEnum().ordinal()));
+        properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, Boolean.toString(useColorAccent));
+        properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, Boolean.toString(showOnlyDivergence));
         return properties;
     }
 
@@ -518,21 +412,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     }
 
     /* Getter and Setters */
-    public OrgRequestFilterConverter getOrgRequest() {
-        return orgRequest;
-    }
-
-    public Boolean getHideDailySamplesCount() {
-        return hideDailySamplesCount;
-    }
-
-    public void setHideDailySamplesCount(Boolean hideDailySamplesCount) {
-        this.hideDailySamplesCount = hideDailySamplesCount;
-    }
-
-    public Date getLastGoodRequestUpdateDateTime() {
-        return lastGoodRequestUpdateDateTime;
-    }
 
     public String getHtmlReport() {
         return htmlReport;
@@ -540,22 +419,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
-    }
-
-    public Date getGenerateBeginDate() {
-        return generateBeginDate;
-    }
-
-    public void setGenerateBeginDate(Date generateBeginDate) {
-        this.generateBeginDate = generateBeginDate;
-    }
-
-    public Date getGenerateEndDate() {
-        return generateEndDate;
-    }
-
-    public void setGenerateEndDate(Date generateEndDate) {
-        this.generateEndDate = generateEndDate;
     }
 
     public Boolean getHideMissedColumns() {
@@ -566,14 +429,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         this.hideMissedColumns = hideMissedColumns;
     }
 
-    public String getNameFiler() {
-        return nameFiler;
-    }
-
-    public void setNameFiler(String nameFiler) {
-        this.nameFiler = nameFiler;
-    }
-
     public Boolean getApplyUserSettings() {
         return applyUserSettings;
     }
@@ -582,19 +437,19 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         this.applyUserSettings = applyUserSettings;
     }
 
-    public Boolean getHideGeneratePeriod() {
-        return hideGeneratePeriod;
+    public Boolean getShowOnlyDivergence() {
+        return showOnlyDivergence;
     }
 
-    public void setHideGeneratePeriod(Boolean hideGeneratePeriod) {
-        this.hideGeneratePeriod = hideGeneratePeriod;
+    public void setShowOnlyDivergence(Boolean showOnlyDivergence) {
+        this.showOnlyDivergence = showOnlyDivergence;
     }
 
-    public Boolean getHideLastValue() {
-        return hideLastValue;
+    public Boolean getUseColorAccent() {
+        return useColorAccent;
     }
 
-    public void setHideLastValue(Boolean hideLastValue) {
-        this.hideLastValue = hideLastValue;
+    public void setUseColorAccent(Boolean useColorAccent) {
+        this.useColorAccent = useColorAccent;
     }
 }

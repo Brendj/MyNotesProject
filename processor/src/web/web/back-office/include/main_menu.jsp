@@ -842,10 +842,6 @@
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestNewReportPage}"
                             reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="requestsAndOrdersReportMenuItem" binding="#{mainPage.requestsAndOrdersReportPage.mainMenuComponent}"
-                            label="Расхождение данных по заявкам и заказам" action="#{mainPage.showRequestsAndOrdersReportPage}"
-                            reRender="workspaceForm" />
-
         <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
                             binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
@@ -948,6 +944,10 @@
                             label="Статистика расхождения данных по заказам и оплате"
                             action="#{mainPage.showDiscrepanciesOnOrdersAndAttendanceReportPage}"
                             reRender="workspaceForm"/>
+
+        <rich:panelMenuItem id="requestsAndOrdersReportMenuItem" binding="#{mainPage.requestsAndOrdersReportPage.mainMenuComponent}"
+                            label="Расхождение данных по заявкам и заказам" action="#{mainPage.showRequestsAndOrdersReportPage}"
+                            reRender="workspaceForm" />
 
         <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
         <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"

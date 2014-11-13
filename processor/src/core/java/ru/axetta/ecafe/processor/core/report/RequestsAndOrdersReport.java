@@ -17,7 +17,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -30,15 +29,9 @@ import java.util.*;
 public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
     final public static String P_HIDE_MISSED_COLUMNS = "hideMissedColumns";
-    final public static String P_HIDE_GENERATE_PERIOD = "hideGeneratePeriod";
-    final public static String P_NAME_FILTER = "nameFilter";
-    final public static String P_ORG_REQUEST_FILTER = "orgRequestFilter";
-    final public static String P_HIDE_DAILY_SAMPLE_COUNT = "hideDailySampleCount";
-    final public static String P_HIDE_LAST_VALUE = "hideLastValue";
-    final public static String P_GENERATE_BEGIN_DATE = "generateBeginDate";
-    final public static String P_GENERATE_END_DATE = "generateEndDate";
-    final public static String P_LAST_CREATE_OR_UPDATE_DATE = "lastCreateOrUpdateDate";
-    final public static String P_HIDE_TOTAL_ROW = "hideTotalRow";
+    final public static String P_USE_COLOR_ACCENT = "useColorAccent";
+    final public static String P_SHOW_ONLY_DIVERGENCE = "showOnlyDivergence";
+
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
     final private static long OVERALL = Long.MAX_VALUE - 10;
     final private static long OVERALL_TOTAL = Long.MAX_VALUE - 8;
@@ -107,45 +100,6 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
                 Map<String, Object> parameterMap) throws Exception {
 
-            boolean hideMissedColumns = Boolean
-                    .parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
-
-            boolean hideGeneratePeriod = Boolean
-                    .parseBoolean(reportProperties.getProperty(P_HIDE_GENERATE_PERIOD, "false"));
-
-            String nameFilter = StringUtils.trim(reportProperties.getProperty(P_NAME_FILTER, ""));
-
-            int orgFilter = Integer.parseInt(reportProperties.getProperty(P_ORG_REQUEST_FILTER, "1"));
-
-            String hideDailySampleProperty = reportProperties.getProperty(P_HIDE_DAILY_SAMPLE_COUNT, "false");
-            final int hideDailySampleValue = Boolean.parseBoolean(hideDailySampleProperty) ? 0 : 1;
-
-            String fillDayOffProperty = reportProperties.getProperty(P_HIDE_DAILY_SAMPLE_COUNT, "false");
-            final int fillDayOffValue = Boolean.parseBoolean(fillDayOffProperty) ? 0 : 1;
-
-            String hideLastValueProperty = reportProperties.getProperty(P_HIDE_LAST_VALUE, "false");
-            final int hideLastValue = Boolean.parseBoolean(hideLastValueProperty) ? 0 : 1;
-
-            String hideTotalRowProperty = reportProperties.getProperty(P_HIDE_TOTAL_ROW, "false");
-            final boolean hideTotalRow = Boolean.parseBoolean(hideTotalRowProperty);
-
-            String defaultGenerateTime = Long.toString(System.currentTimeMillis());
-            long generateBeginDate = Long
-                    .parseLong(reportProperties.getProperty(P_GENERATE_BEGIN_DATE, defaultGenerateTime));
-            Date generateBeginTime = new Date(generateBeginDate);
-
-            // на час
-            long generateEndDate = Long.parseLong(reportProperties
-                    .getProperty(P_GENERATE_END_DATE, Long.toString(System.currentTimeMillis() + 60 * 60 * 1000)));
-            Date generateEndTime = new Date(generateEndDate);
-
-            long lastCreateOrUpdateDate = Long
-                    .parseLong(reportProperties.getProperty(P_LAST_CREATE_OR_UPDATE_DATE, defaultGenerateTime));
-            Date lastCreateOrUpdateTime = new Date(lastCreateOrUpdateDate);
-
-            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
-            parameterMap.put(P_GENERATE_END_DATE, format.format(lastCreateOrUpdateTime));
-
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
@@ -161,17 +115,19 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
 
-            // пока нет необходимости
-            //parameterMap.put("overall",Long.toString(OVERALL));
-            //parameterMap.put("overall_all",Long.toString(OVERALL_TOTAL));
-            //GoodRequestsNewReportService service = new GoodRequestsNewReportService(session,
-            //        OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
+            boolean hideMissedColumns = Boolean
+                    .parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
+
+            boolean useColorAccent = Boolean
+                    .parseBoolean(reportProperties.getProperty(P_USE_COLOR_ACCENT, "false"));
+
+            boolean showOnlyDivergence = Boolean
+                    .parseBoolean(reportProperties.getProperty(P_SHOW_ONLY_DIVERGENCE, "false"));
+
             RequestsAndOrdersReportService service;
-            service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE, hideTotalRow);
+            service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE);
             return new JRBeanCollectionDataSource(
-                    service.buildReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue,
-                            generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns,
-                            hideGeneratePeriod, hideLastValue));
+                    service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, useColorAccent, showOnlyDivergence));
         }
 
 
