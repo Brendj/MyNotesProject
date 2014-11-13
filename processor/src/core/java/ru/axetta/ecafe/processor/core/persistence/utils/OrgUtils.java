@@ -41,24 +41,35 @@ public class OrgUtils {
     // 'Id орг - для которой собирается информация', 'Имя гл корп' - если есть, 'адрес гл корп' - если есть, и set (дружественных орг)
     public static Set<FriendlyOrganizationsInfoModel> getMainBuildingAndFriendlyOrgsList(Session session,
             List<Long> idOfOrgList) {
-        Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModelList = new HashSet<FriendlyOrganizationsInfoModel>();
-
+        Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModelSet = new HashSet<FriendlyOrganizationsInfoModel>();
         for (Long idOfOrg : idOfOrgList) {
-
             Org org = (Org) session.load(Org.class, idOfOrg);
             if (org.isMainBuilding()) {
                 Set<Org> friendlyOrg = org.getFriendlyOrg();
-                FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(org.getIdOfOrg(),
-                        org.getOfficialName(), org.getAddress(), friendlyOrg);
-                friendlyOrganizationsInfoModelList.add(friendlyOrganizationsInfoModel);
+                FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(
+                        org.getIdOfOrg(), org.getOfficialName(), org.getAddress(), friendlyOrg);
+                friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
             } else {
                 Set<Org> friendlyOrg = org.getFriendlyOrg();
-                FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(org.getIdOfOrg(),
-                        friendlyOrg);
-                friendlyOrganizationsInfoModelList.add(friendlyOrganizationsInfoModel);
+                if (!friendlyOrganizationsInfoModelSet.isEmpty()) {
+                    boolean isExists = false;
+                    for (FriendlyOrganizationsInfoModel model : friendlyOrganizationsInfoModelSet) {
+                        if (model.getFriendlyOrganizationsSet().containsAll(friendlyOrg)) {
+                            isExists = true;
+                        }
+                    }
+                    if (isExists == false) {
+                        FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(
+                                org.getIdOfOrg(), friendlyOrg);
+                        friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
+                    }
+                } else {
+                    FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(
+                            org.getIdOfOrg(), friendlyOrg);
+                    friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
+                }
             }
         }
-
-        return friendlyOrganizationsInfoModelList;
+        return friendlyOrganizationsInfoModelSet;
     }
 }
