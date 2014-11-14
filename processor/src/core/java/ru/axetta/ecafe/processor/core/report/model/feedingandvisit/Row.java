@@ -19,6 +19,7 @@ public class Row {
     private Long clientId; // ид клиента или ид rule если total field
     private String name;
     private Long idOfOrg;
+    private String orgName;
     private Integer day;
 
     public static final String ENTRY_DEFAULT = "H";
@@ -50,6 +51,20 @@ public class Row {
         this.day = day;
         this.groupname = groupname;
     }
+    public Row(Long clientId, String orgName, String name, Integer day, String groupname) {
+        this.clientId = clientId;
+        this.orgName = orgName;
+        this.name = name;
+        this.day = day;
+        this.groupname = groupname;
+    }    public Row(Long clientId, long idOfOrg, String orgName, String name, Integer day, String groupname) {
+        this.clientId = clientId;
+        this.idOfOrg = idOfOrg;
+        this.orgName = orgName;
+        this.name = name;
+        this.day = day;
+        this.groupname = groupname;
+    }
 
     public Row(Long clientId, String name, Integer day, String entry, Integer color) {
         this.clientId = clientId;
@@ -77,6 +92,8 @@ public class Row {
         }
     }
 
+
+
     public Long getClientId() {
         return clientId;
     }
@@ -99,6 +116,14 @@ public class Row {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public Integer getDay() {

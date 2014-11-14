@@ -76,20 +76,23 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
             Map<String, Data> dataMap = new HashMap<String, Data>();
 
-            List<Org> orgs = DAOUtils.findFriendlyOrgs(session, org.getIdOfOrg());
-            String orgsIdsString = OrgUtils.extractIdsAsString(orgs);
+            List<Org> orgList = DAOUtils.findFriendlyOrgs(session, org.getIdOfOrg());
+            String orgsIdsString = OrgUtils.extractIdsAsString(orgList);
 
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
 
             OrderService orderService =  RuntimeContext.getAppContext().getBean(OrderService.class);
 
-            List<ClientItem> clientItemList = subFeedingService.getClientItems(org.getIdOfOrg());
+            List<ClientItem> clientItemList = new ArrayList<ClientItem>();
+            for (Org org1 : orgList) {
+                clientItemList.addAll(subFeedingService.getClientItems(org1.getIdOfOrg()));
+            }
             List<OrderItem> orderItemList = orderService
                     .findOrders(orgsIdsString, startTime, endTime);
 
-            dataMap = fillDataPlanWithOrders(dataMap, clientItemList, startTime, endTime);
+            dataMap = fillDataPlanWithClients(dataMap, clientItemList, startTime, endTime,orgList);
 
-            updataDataWithOrders(dataMap, orderItemList, startTime, endTime);
+            updataDataWithOrders(dataMap, orderItemList, startTime, endTime, orgList);
 
             //clientItemList = subFeedingService.getClientItems(org.getIdOfOrg(),notFoundOrderItems);
             EnterEventsService enterEventsService = RuntimeContext.getAppContext().getBean(EnterEventsService.class);
@@ -104,17 +107,17 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             return new JRBeanCollectionDataSource(dataList);
         }
 
-        private void updataDataWithOrders(Map<String, Data> dataMap, List<OrderItem> orderItemList,
-                Date startTime, Date endTime) {
+        private void updataDataWithOrders(Map<String, Data> dataMap, List<OrderItem> orderItemList, Date startTime,
+                Date endTime, List<Org> orgList) {
             Data currentData;
             OrderItem notfoundItem = null;
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
 
             for (OrderItem orderItem : orderItemList) {
-                if (StringUtils.isBlank(orderItem.getGroupName())) {
+                if (StringUtils.isBlank( prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg) ) ) {
                     continue;
                 }
-                currentData = dataMap.get(orderItem.getGroupName());
+                currentData = dataMap.get(prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg));
                 if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal()) {
                     notfoundItem = updateRowListWithOrder(currentData.getPlan(), orderItem);
                     if(notfoundItem != null){
@@ -157,7 +160,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
                 for (int i : CalendarUtils.daysBetween(startTime, endTime)) {
                     data.getTotal()
-                            .add(new Row((long) item.idOfComplex, item.getComplexName(), i, item.getGroupName()) {{
+                            .add(new Row( (long) item.idOfComplex, item.getIdOfOrg(),item.getOrgName(), item.getComplexName(), i, item.getGroupName()) {{
                                 setTotalRow(true);
                             }});
                 }
@@ -202,16 +205,16 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         }
 
 
-        private static Map<String, Data> fillDataPlanWithOrders(Map<String, Data> dataMap, List<ClientItem> clientItems,
-                Date start, Date end) {
+        private static Map<String, Data> fillDataPlanWithClients(Map<String, Data> dataMap,
+                List<ClientItem> clientItems, Date start, Date end, List<Org> orgList) {
             List<Days> days = new ArrayList<Days>();
             for (int i : CalendarUtils.daysBetween(start, end)) {
                 days.add(new Days(i));
             }
             for (ClientItem item : clientItems) {
-                Data dataItem = dataMap.get(item.getGroupName());
+                Data dataItem = dataMap.get( prepareGroupName(orgList, item.getGroupName(), item.getIdOfOrg()) );
                 if (dataItem == null) {
-                    dataItem = new Data(item.getGroupName(), days);
+                    dataItem = new Data(prepareGroupName(orgList,item.getGroupName(),item.getIdOfOrg()), days);
                     dataItem.setPlan(new ArrayList<Row>());
                     dataItem.setReserve(new ArrayList<Row>());
                     dataMap.put(dataItem.getName(), dataItem);
@@ -227,10 +230,20 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         }
     }
 
+    private static String prepareGroupName(List<Org> orgList, String groupname, long idOfOrg){
+        StringBuilder result = new StringBuilder();
+        for (Org org : orgList) {
+            if(idOfOrg == org.getIdOfOrg()){
+                result.append( groupname + " (" + org.getShortName()+ ")");
+            }
+        }
+        return result.toString();
+    }
+
     private static void fillRowListWithClient(List<Row> dataItem, ClientItem item, Date start, Date end,OrderItem orderItem) {
         Row row;
         for (int i : CalendarUtils.daysBetween(start, end)) {
-            row =new Row(item.getId(), item.getFullName(), i, item.getGroupName());
+            row =new Row(item.getId(), item.getIdOfOrg(),item.getOrgName(), item.getFullName(), i, item.getGroupName());
             if(orderItem != null){
                 if(i == CalendarUtils.getDayOfMonth(orderItem.getOrderDate())){
                     row.update(orderItem);

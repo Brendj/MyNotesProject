@@ -30,20 +30,22 @@ public class OrdersRepository extends BaseJpaDao {
     private List<OrderItem> parse(List<Object[]> temList) {
         List<OrderItem> resultList = new ArrayList<OrderItem>();
         for (Object[] result : temList) {
-            resultList.add(new OrderItem(((BigInteger) result[0]).longValue(),((BigInteger) result[1]).longValue(), ((BigInteger) result[2]).longValue(),
-                    (Integer) result[3], (Integer) result[4], (String) result[5], (String) result[6],
-                    (Integer) result[7]));
+            resultList.add(new OrderItem(((BigInteger) result[0]).longValue(), (String) result[1],((BigInteger) result[2]).longValue(),
+                    ((BigInteger) result[3]).longValue(),
+                    (Integer) result[4], (Integer) result[5], (String) result[6], (String) result[7],
+                    (Integer) result[8]));
         }
         return resultList;
     }
 
     public List<OrderItem> findOrdersByClientIds(String orgsIdsString, String clientIds, Date startTime, Date endTime) {
         String sql =
-                " SELECT o.idoforg, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
+                " SELECT o.idoforg, og.shortname, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
                         + " FROM cf_orders o "
-                        + " INNER JOIN cf_orderdetails od on o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
-                        + " INNER JOIN cf_clients c on c.idofclient = o.idofclient and o.idoforg = c.idoforg "
-                        + " INNER JOIN cf_clientgroups g on c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
+                        + " INNER JOIN cf_orderdetails od ON o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
+                        + " INNER JOIN cf_clients c ON c.idofclient = o.idofclient and o.idoforg = c.idoforg "
+                        + " INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
+                        + " INNER JOIN cf_orgs og ON o.idoforg =ogc.idoforg "
                         + " WHERE o.idoforg in ( " + orgsIdsString + " ) AND od.menutype >= 50 AND od.menutype<=99 ";
         if (clientIds != null) {
             sql += " AND o.idofclient in ( " + clientIds + ") ";
