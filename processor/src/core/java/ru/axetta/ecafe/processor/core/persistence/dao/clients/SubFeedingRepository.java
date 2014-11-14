@@ -31,6 +31,11 @@ public class SubFeedingRepository  extends BaseJpaDao {
         return parse(temp).get(0);
     }
 
+    private ClientItem getClientBySQL(String query){
+        List<Object[]> temp = entityManager.createNativeQuery(query).getResultList();
+        return parse(temp).get(0);
+    }
+
     private List<ClientItem> parse(List<Object[]> temList) {
         List<ClientItem> resultList = new ArrayList<ClientItem>();
         for (Object[] result : temList) {
@@ -208,15 +213,15 @@ public class SubFeedingRepository  extends BaseJpaDao {
         return getClientsBySQL(idOfOrg, sql);
     }
 
-    public ClientItem getClient(Long idOfOrg, long idOfClient) {
+    public ClientItem getClient(String orgsIdsString, long idOfClient) {
         String sql = "SELECT c.idofClient, c.idoforg, o.shortname, (p.surname || ' ' || p.firstname || ' ' || p.secondname) as fullname,"
                 + " g.groupname ," + ClientItem.IN_PLAN_TYPE +" as plantype "
                 + " FROM cf_clients c "
                 + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                 + " INNER JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND g.idoforg = c.idoforg "
                 + " INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
-                + " WHERE c.idoforg = :idOfOrg and c.idofclient = "  +idOfClient;
-        return getClientBySQL(idOfOrg, sql);
+                + " WHERE c.idoforg  IN ( " + orgsIdsString + " ) and c.idofclient = "  +idOfClient;
+        return getClientBySQL( sql);
     }
 
     public List<ClientItem> getPrimarySchoolClients(Long idOfOrg){

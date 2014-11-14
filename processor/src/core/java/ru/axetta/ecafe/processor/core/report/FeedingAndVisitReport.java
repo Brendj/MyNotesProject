@@ -76,7 +76,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
             Map<String, Data> dataMap = new HashMap<String, Data>();
 
-            List<Org> orgList = DAOUtils.findFriendlyOrgs(session, org.getIdOfOrg());
+            List<Org> orgList = DAOUtils.findAllFriendlyOrgs(session, org.getIdOfOrg());
             String orgsIdsString = OrgUtils.extractIdsAsString(orgList);
 
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
@@ -90,17 +90,17 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             List<OrderItem> orderItemList = orderService
                     .findOrders(orgsIdsString, startTime, endTime);
 
-            dataMap = fillDataPlanWithClients(dataMap, clientItemList, startTime, endTime,orgList);
+            dataMap = fillDataPlanWithClients(dataMap, clientItemList, startTime, endTime, orgList);
 
-            updataDataWithOrders(dataMap, orderItemList, startTime, endTime, orgList);
+            updataDataWithOrders(dataMap, orderItemList, startTime, endTime, orgList, orgsIdsString);
 
             //clientItemList = subFeedingService.getClientItems(org.getIdOfOrg(),notFoundOrderItems);
             EnterEventsService enterEventsService = RuntimeContext.getAppContext().getBean(EnterEventsService.class);
 
             List<DAOEnterEventSummaryModel> enterEventsSummary = enterEventsService
-                    .getEnterEventsSummary(org.getIdOfOrg(), startTime.getTime(), endTime.getTime());
+                    .getEnterEventsSummary(orgsIdsString, startTime.getTime(), endTime.getTime());
 
-            fillDataWithEnterEvents(dataMap, enterEventsSummary);
+            fillDataWithEnterEvents(dataMap, enterEventsSummary, orgList);
 
             List<Data> dataList = new ArrayList<Data>(dataMap.values());
             Collections.sort(dataList);
@@ -108,7 +108,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         }
 
         private void updataDataWithOrders(Map<String, Data> dataMap, List<OrderItem> orderItemList, Date startTime,
-                Date endTime, List<Org> orgList) {
+                Date endTime, List<Org> orgList, String orgsIdsString) {
             Data currentData;
             OrderItem notfoundItem = null;
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
@@ -122,7 +122,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                     notfoundItem = updateRowListWithOrder(currentData.getPlan(), orderItem);
                     if(notfoundItem != null){
                         try{
-                        ClientItem clientItem = subFeedingService.getClientItem(org.getIdOfOrg(), orderItem);
+                        ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem);
                         fillRowListWithClient(currentData.getPlan(), clientItem, startTime, endTime, orderItem);
                         notfoundItem = null;
                         }catch (Exception e){
@@ -132,7 +132,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 } else if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()) {
                     notfoundItem = updateRowListWithOrder(currentData.getReserve(), orderItem);
                     if(notfoundItem != null){
-                        ClientItem clientItem = subFeedingService.getClientItem(org.getIdOfOrg(), orderItem);
+                        ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem);
                         fillRowListWithClient(currentData.getReserve(), clientItem, startTime, endTime, orderItem);
                         notfoundItem = null;
                     }
@@ -181,10 +181,10 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
         //Заполняет проходами резерв и план льготного питания
         private static void fillDataWithEnterEvents(Map<String, Data> dataMap,
-                List<DAOEnterEventSummaryModel> enterEventsSummary) {
+                List<DAOEnterEventSummaryModel> enterEventsSummary, List<Org> orgList) {
             Data data;
             for (DAOEnterEventSummaryModel enterEvent : enterEventsSummary) {
-                data = dataMap.get(enterEvent.getGroupName());
+                data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getIdOfOrg()));
                 if (data == null) {
                     continue;
                 }
@@ -212,9 +212,12 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 days.add(new Days(i));
             }
             for (ClientItem item : clientItems) {
+                if(item.getGroupName().equals("1Б") && item.getIdOfOrg() == 5){
+                    System.out.print("d");
+                }
                 Data dataItem = dataMap.get( prepareGroupName(orgList, item.getGroupName(), item.getIdOfOrg()) );
                 if (dataItem == null) {
-                    dataItem = new Data(prepareGroupName(orgList,item.getGroupName(),item.getIdOfOrg()), days);
+                    dataItem = new Data(prepareGroupName(orgList, item.getGroupName(), item.getIdOfOrg()), days);
                     dataItem.setPlan(new ArrayList<Row>());
                     dataItem.setReserve(new ArrayList<Row>());
                     dataMap.put(dataItem.getName(), dataItem);

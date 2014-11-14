@@ -87,7 +87,11 @@ public class SubFeedingService {
     }
 
     public ClientItem getClientItem(Long idOfOrg, OrderItem orderItem) {
-        return subFeedingRepository.getClient(idOfOrg, orderItem.getIdOfClient());
+        return subFeedingRepository.getClient("" + idOfOrg, orderItem.getIdOfClient());
+    }
+
+    public ClientItem getClientItem(String orgsIdsString, OrderItem orderItem) {
+        return subFeedingRepository.getClient(orgsIdsString, orderItem.getIdOfClient());
     }
 
     private List<ClientItem> addClientItems(List<ClientItem> all , List<ClientItem> add){

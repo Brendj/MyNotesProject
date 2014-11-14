@@ -12,6 +12,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent;
 public class DAOEnterEventSummaryModel {
     private Long idOfClient;
     private Long idOfOrg;
+    private String orgName;
     private Integer passDirection;
     private Integer eventCode;
     private Long idofTempCard;
@@ -25,10 +26,11 @@ public class DAOEnterEventSummaryModel {
     public DAOEnterEventSummaryModel() {
     }
 
-    public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, Integer passDirection, Integer eventCode, Long idofTempCard,
+    public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, String orgName, Integer passDirection, Integer eventCode, Long idofTempCard,
             Long evtDateTime, Long idOfVisitor, String visitorFullName, Long idOfClientGroup) {
         this.idOfClient = idOfClient;
         this.idOfOrg = idOfOrg;
+        this.orgName = orgName;
         this.passDirection = passDirection;
         this.eventCode = eventCode;
         this.idofTempCard = idofTempCard;
@@ -38,11 +40,12 @@ public class DAOEnterEventSummaryModel {
         this.idOfClientGroup = idOfClientGroup;
     }
 
-    public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, Integer passDirection, Integer eventCode,
+    public DAOEnterEventSummaryModel(Long idOfClient, Long idOfOrg, String orgName, Integer passDirection, Integer eventCode,
             Long idofTempCard, Long evtDateTime, Long idOfVisitor, String visitorFullName, Long idOfClientGroup,
             String groupName) {
         this.idOfClient = idOfClient;
         this.idOfOrg = idOfOrg;
+        this.orgName = orgName;
         this.passDirection = passDirection;
         this.eventCode = eventCode;
         this.idofTempCard = idofTempCard;
@@ -67,6 +70,14 @@ public class DAOEnterEventSummaryModel {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public Integer getPassDirection() {

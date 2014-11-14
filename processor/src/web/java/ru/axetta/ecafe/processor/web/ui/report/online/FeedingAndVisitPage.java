@@ -147,7 +147,7 @@ public class FeedingAndVisitPage extends OnlineReportPage{
                 htmlReport = os.toString("UTF-8");
                 os.close();
             }
-            printMessage("Реестр талонов построен");
+            printMessage("Отчет по питанию и посещению построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
             logger.error("Failed build report ",e);

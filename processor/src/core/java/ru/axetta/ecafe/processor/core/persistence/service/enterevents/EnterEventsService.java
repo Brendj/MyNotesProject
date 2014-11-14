@@ -24,8 +24,12 @@ public class EnterEventsService {
     @Autowired
     EnterEventsRepository enterEventsRepository;
 
+    public List<DAOEnterEventSummaryModel> getEnterEventsSummary(String orgList, Long startTime, Long endTime){
+        return enterEventsRepository.getEnterEventsSummary(orgList,startTime,endTime);
+    }
+
     public List<DAOEnterEventSummaryModel> getEnterEventsSummary(Long idOfOrg, Long startTime, Long endTime){
-        return enterEventsRepository.getEnterEventsSummary(idOfOrg,startTime,endTime);
+        return enterEventsRepository.getEnterEventsSummary("" + idOfOrg,startTime,endTime);
     }
     public List<DAOEnterEventSummaryModel> getEnterEventsSummaryNotEmptyClient(Long dateTime){
         return enterEventsRepository.getEnterEventsSummaryNotEmptyClient(dateTime);

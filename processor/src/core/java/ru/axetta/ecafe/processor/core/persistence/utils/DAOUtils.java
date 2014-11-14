@@ -519,7 +519,7 @@ public class DAOUtils {
         }
         return res;
     }
-
+    //находит только корпуса, за исключением текущего
     public static List<Org> findFriendlyOrgs(Session session, long organization) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds(session, organization);
         List<Org> res = new ArrayList<Org>();
@@ -527,6 +527,15 @@ public class DAOUtils {
             if (idoforg.equals(organization)) {
                 continue;
             }
+            res.add(DAOService.getInstance().getOrg(idoforg));
+        }
+        return res;
+    }
+    //Находит все включая текущую.
+    public static List<Org> findAllFriendlyOrgs(Session session, long organization) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, organization);
+        List<Org> res = new ArrayList<Org>();
+        for (Long idoforg : orgIds) {
             res.add(DAOService.getInstance().getOrg(idoforg));
         }
         return res;
