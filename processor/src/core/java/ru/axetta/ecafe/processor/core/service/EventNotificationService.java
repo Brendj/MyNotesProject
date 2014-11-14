@@ -438,9 +438,11 @@ public class EventNotificationService {
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, client);
                 putGuardianParams(guardian, empType);
-            } /*else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
-                EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
-            }*/
+            } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
+                String token = findValueInParams(new String [] {"linkingToken"}, values);
+                empType.getParameters().put("token", token);
+            }
 
             //  Устанавливаем дату
             String empDateStr = findValueInParams(new String [] {"empTime"}, values);
