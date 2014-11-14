@@ -448,10 +448,10 @@ public class ContragentEditPage extends BasicWorkspacePage {
 
 
         try {
-            if (isEmpty(prevId) || !prevId.equals(id)) {
+            if (isEmpty(prevId)) {
                 RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
             }
-            else {
+            else if(!prevId.equals(id)) {
                 RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
             }
             return Boolean.TRUE;
