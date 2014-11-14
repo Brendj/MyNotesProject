@@ -163,6 +163,24 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
+    public void onHideMissedColumnsChange(ActionEvent event) {
+        htmlReport = null;
+        if (!hideMissedColumns) {
+            showOnlyDivergence = false;
+        }
+    }
+
+    public void onUseColorAccentChange(ActionEvent event) {
+        htmlReport = null;
+    }
+
+    public void onShowOnlyDivergenceChange(ActionEvent event) {
+        htmlReport = null;
+        if (showOnlyDivergence) {
+            hideMissedColumns = true;
+        }
+    }
+
     @Override
     public String getContragentStringIdOfOrgList() {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]", "");
@@ -236,19 +254,17 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar, useColorAccent, showOnlyDivergence);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar, useColorAccent, showOnlyDivergence);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
 
         if (report != null) {

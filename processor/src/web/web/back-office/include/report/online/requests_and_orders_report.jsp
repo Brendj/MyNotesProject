@@ -100,19 +100,22 @@
             <h:outputText escape="true" value="Скрывать даты с пустыми значениями" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.hideMissedColumns}"
                                      styleClass="output-text">
-                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
+                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
+                        actionListener="#{mainPage.requestsAndOrdersReportPage.onHideMissedColumnsChange}"/>
             </h:selectBooleanCheckbox>
 
-            <h:outputText escape="true" value="Использовать цветовую раскраску изменений" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить цветовую индикацию расхождений" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.useColorAccent}"
                                      styleClass="output-text">
-                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
+                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
+                        actionListener="#{mainPage.requestsAndOrdersReportPage.onUseColorAccentChange}"/>
             </h:selectBooleanCheckbox>
 
-            <h:outputText escape="true" value="Отображать данные только по ОО с наличием расхождений" styleClass="output-text" />
+            <h:outputText escape="true" value="Отображать только расхождения" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.showOnlyDivergence}"
                                      styleClass="output-text">
-                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true" />
+                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
+                        actionListener="#{mainPage.requestsAndOrdersReportPage.onShowOnlyDivergenceChange}"/>
             </h:selectBooleanCheckbox>
         </h:panelGrid>
     </rich:simpleTogglePanel>

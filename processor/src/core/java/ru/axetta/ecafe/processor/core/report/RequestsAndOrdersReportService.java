@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.requestsandorders.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
@@ -62,16 +64,18 @@ public class RequestsAndOrdersReportService {
     public List<Item> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
             List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean useColorAccent, boolean showOnlyDivergence) {
 
-        boolean isNew = false;
-        boolean isUpdate = false;
+        //boolean isNew = false;
+        //boolean isUpdate = false;
 
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getOrgMap(idOfOrgList, idOfMenuSourceOrgList);
+
+        //orgMap = complementOrgMap(session, orgMap);
 
         List<Item> itemList = new LinkedList<Item>();
 
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date endDate = CalendarUtils.endOfDay(endTime);
-        TreeSet<Date> dates = new TreeSet<Date>();
+        //TreeSet<Date> dates = new TreeSet<Date>();
 
         List complexList = getComplexList(orgMap, beginDate, endDate);
 
@@ -121,19 +125,82 @@ public class RequestsAndOrdersReportService {
 
         populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence);
 
-        if (itemList.size() <= 0) {
-            BasicReportJob.OrgShortItem orgShortItem = (BasicReportJob.OrgShortItem) orgMap.values().toArray()[0];
-            String orgName = orgShortItem.getOfficialName();
-            String orgNum = Org.extractOrgNumberFromName(orgName);
-            String feedingPlanTypeString = FeedingPlanType.PAY_PLAN.toString();
-            String complexName = "Не найдено";
-            String stateString = STATE_STRING_ORDERED;
-            Date date = CalendarUtils.truncateToDayOfMonth(startTime);
-
-            itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, stateString, date, 0L, false));
-        }
+        //if (itemList.size() <= 0) {
+        //    BasicReportJob.OrgShortItem orgShortItem = (BasicReportJob.OrgShortItem) orgMap.values().toArray()[0];
+        //    String orgName = orgShortItem.getOfficialName();
+        //    String orgNum = Org.extractOrgNumberFromName(orgName);
+        //    String feedingPlanTypeString = FeedingPlanType.PAY_PLAN.toString();
+        //    String complexName = "Не найдено";
+        //    String stateString = STATE_STRING_ORDERED;
+        //    Date date = CalendarUtils.truncateToDayOfMonth(startTime);
+        //
+        //    itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, stateString, date, 0L, false));
+        //}
 
         return itemList;
+    }
+
+    private HashMap<Long, BasicReportJob.OrgShortItem> complementOrgMap(Session session, HashMap<Long, BasicReportJob.OrgShortItem> orgMap) {
+
+        List<Long> idOfOrgList = null;
+        for (Long idOfOrg: orgMap.keySet()){
+            idOfOrgList.add(idOfOrg);
+        }
+
+        Set<Long> idOfOrgSet = null;
+        Set<FriendlyOrganizationsInfoModel> organizationsInfoModelSet = OrgUtils.getMainBuildingAndFriendlyOrgsList(session, idOfOrgList);
+        for (FriendlyOrganizationsInfoModel org: organizationsInfoModelSet) {
+            idOfOrgSet.add(org.getIdOfOrg());
+            Set<Org> friends = org.getFriendlyOrganizationsSet();
+            if (friends != null) {
+                for (Org friend: friends) {
+                    idOfOrgSet.add(friend.getIdOfOrg());
+                }
+            }
+        }
+
+        HashMap<Long, BasicReportJob.OrgShortItem> completeOrgMap = null;
+        for(Long idOfOrg: idOfOrgSet) {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            BasicReportJob.OrgShortItem educationItem = new BasicReportJob.OrgShortItem();
+            educationItem.setIdOfOrg(org.getIdOfOrg());
+            educationItem.setShortName(org.getShortName());
+            educationItem.setOfficialName(org.getOfficialName());
+            educationItem.setAddress(org.getAddress());
+            completeOrgMap.put(educationItem.getIdOfOrg(), educationItem);
+        }
+
+        return completeOrgMap;
+    }
+
+    private HashMap<Long, BasicReportJob.OrgShortItem> getOrgMap(List<Long> idOfOrgList,
+            List<Long> idOfMenuSourceOrgList) {
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        if (!CollectionUtils.isEmpty(idOfOrgList)) {
+            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+        }
+        orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
+        if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
+            orgCriteria.add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
+        }
+        orgCriteria.setProjection(
+                Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
+                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
+        List orgList = orgCriteria.list();
+        HashMap<Long, BasicReportJob.OrgShortItem> orgMap;
+        orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
+        for (Object obj : orgList) {
+            Object[] row = (Object[]) obj;
+            long idOfOrg = Long.parseLong(row[0].toString());
+            BasicReportJob.OrgShortItem educationItem;
+            educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
+            if (row[3] != null) {
+                Long sourceMenuOrg = Long.parseLong(row[3].toString());
+                educationItem.setSourceMenuOrg(sourceMenuOrg);
+            }
+            orgMap.put(idOfOrg, educationItem);
+        }
+        return orgMap;
     }
 
     private void populateDataList(ReportDataMap reportDataMap, List<Item> itemList, Boolean useColorAccent, Boolean showOnlyDivergence) {
@@ -143,37 +210,22 @@ public class RequestsAndOrdersReportService {
                 for (String complexName: reportDataMap.get(orgName).get(feedingPlanType).keySet()){
                     for (Date date: reportDataMap.get(orgName).get(feedingPlanType).get(complexName).keySet()) {
                         Long requested = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).get(State.Requested);
-
+                        requested = requested == null ? 0L : requested;
                         Long ordered = reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).get(State.Ordered);
-
+                        ordered = ordered == null ? 0L : ordered;
                         String orgNum = Org.extractOrgNumberFromName(orgName);
-                        Boolean differState = getDifferState(useColorAccent, requested, ordered);
+                        Boolean differState = (requested - ordered) != 0L;
                         if (!showOnlyDivergence || differState) {
-                            if (requested != null) {
+                            if (useColorAccent) {
                                 itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Заказано", date, requested, differState));
-                            }
-                            if (ordered != null) {
                                 itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Оплачено", date, ordered, differState));
+                            } else {
+                                itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Заказано", date, requested, false));
+                                itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, "Оплачено", date, ordered, false));
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private boolean getDifferState(Boolean useColorAccent, Long requested, Long ordered) {
-        if (requested == null) {
-            if (ordered == null) {
-                return false;
-            } else {
-                return useColorAccent ? true : false;
-            }
-        } else {
-            if (ordered == null) {
-                return useColorAccent ? true : false;
-            } else {
-                return useColorAccent && ((requested - ordered) != 0L);
             }
         }
     }
@@ -261,13 +313,7 @@ public class RequestsAndOrdersReportService {
             OrderDetail detail = (OrderDetail) obj;
             BasicReportJob.OrgShortItem org = orgMap.get(detail.getOrg().getIdOfOrg());
 
-            Long totalCount = 0L;
-            Long dailySampleCount = 0L;
-            if (detail.getOrder().getOrderType() != OrderTypeEnumType.DAILY_SAMPLE) {
-                totalCount = detail.getQty();
-            } else {
-                dailySampleCount = detail.getQty();
-            }
+            Long totalCount = detail.getQty();;
 
             String orgName = org.getOfficialName() != null ? org.getOfficialName() : org.getShortName();
             FeedingPlanType feedingPlanType =
@@ -279,7 +325,7 @@ public class RequestsAndOrdersReportService {
             String complexName = detail.getGood().getFullName() != null ? detail.getGood().getFullName() : detail.getGood().getNameOfGood();
             Date date = detail.getOrder().getCreateTime();
             State state = State.Ordered;
-            Long count = totalCount + dailySampleCount;
+            Long count = totalCount;
 
             FeedingPlan feedingPlan = new FeedingPlan();
             Complex complex = new Complex();
@@ -302,36 +348,6 @@ public class RequestsAndOrdersReportService {
         criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
         criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
         return criteriaComplex.list();
-    }
-
-    private HashMap<Long, BasicReportJob.OrgShortItem> getOrgMap(List<Long> idOfOrgList,
-            List<Long> idOfMenuSourceOrgList) {
-        Criteria orgCriteria = session.createCriteria(Org.class);
-        if (!CollectionUtils.isEmpty(idOfOrgList)) {
-            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-        }
-        orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
-        if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
-            orgCriteria.add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
-        }
-        orgCriteria.setProjection(
-                Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
-                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
-        List orgList = orgCriteria.list();
-        HashMap<Long, BasicReportJob.OrgShortItem> orgMap;
-        orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
-        for (Object obj : orgList) {
-            Object[] row = (Object[]) obj;
-            long idOfOrg = Long.parseLong(row[0].toString());
-            BasicReportJob.OrgShortItem educationItem;
-            educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
-            if (row[3] != null) {
-                Long sourceMenuOrg = Long.parseLong(row[3].toString());
-                educationItem.setSourceMenuOrg(sourceMenuOrg);
-            }
-            orgMap.put(idOfOrg, educationItem);
-        }
-        return orgMap;
     }
 
     private static class ComplexInfoItem {
@@ -415,9 +431,6 @@ public class RequestsAndOrdersReportService {
 
         protected Item(String orgNum, String orgName, String feedingPlanTypeString, String complexName,
                 String stateString, Date date, Long count, Boolean differState) {
-            if (dateString == "Вт 06.05") {
-                Long a = 0L;
-            }
             this.orgNum = orgNum;
             this.orgName = orgName;
             this.feedingPlanTypeString = feedingPlanTypeString;

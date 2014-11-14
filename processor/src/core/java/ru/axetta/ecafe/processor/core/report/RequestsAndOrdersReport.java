@@ -89,7 +89,6 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             parameterMap.put("useColorAccent", useColorAccent);
-            parameterMap.put("showOnlyDivergence", showOnlyDivergence);
 
             // todo need complete testing - maybe useles code
             //calendar.setTime(startTime);
