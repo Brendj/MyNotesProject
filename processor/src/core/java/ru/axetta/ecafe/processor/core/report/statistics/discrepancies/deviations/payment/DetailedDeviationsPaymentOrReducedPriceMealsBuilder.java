@@ -6,9 +6,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.ClientsEntereventsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -58,6 +59,10 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
+
+        Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModels = OrgUtils
+                .getMainBuildingAndFriendlyOrgsList(session, idOfOrgList);
+
         Date generateBeginTime = new Date();
 
         /* Параметры для передачи в jasper */
@@ -66,7 +71,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
         parameterMap.put("SUBREPORT_DIR", subReportDir);
-        JRDataSource dataSource = buildDataSource(session, idOfOrgList, startTime, endTime);
+        JRDataSource dataSource = buildDataSource(session, friendlyOrganizationsInfoModels, startTime, endTime);
         JasperPrint jasperPrint;
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
             jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
@@ -80,7 +85,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
     }
 
     @SuppressWarnings("unchecked")
-    private JRDataSource buildDataSource(Session session, List<Long> idOfOrgList, Date startTime, Date endTime)
+    private JRDataSource buildDataSource(Session session,
+            Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModels, Date startTime, Date endTime)
             throws Exception {
 
         //Результирующиц лист по которому строиться отчет
@@ -104,184 +110,126 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             CalendarUtils.truncateToDayOfMonth(addOneDayEndTime);
             Long rowNum = 0L;
 
-            for (Long idOfOrg : idOfOrgList) {
-
-                List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
-                List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
-
-                // Оплаченные Заказы
-                planOrderItemsPaidByOneDay = ClientsEntereventsService
-                        .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
-
-                // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
-                List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
-                        .loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg);
-
-                // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
-                List<PlanOrderItem> planOrderItemsToPayNotDetected = ClientsEntereventsService
-                        .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg);
-
-                if (planOrderItemsToPayDetected != null) {
-                    if (!planOrderItemsToPayDetected.isEmpty()) {
-                        for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
-                            if (!planOrderItemsPaidByOneDay.contains(planOrderItem)) {
-                                resultSubtraction.add(planOrderItem);
-                            }
-                        }
+            for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
+                Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
+                if (orgSet.size() > 0) {
+                    List<Long> idOfOrgList = new ArrayList<Long>();
+                    for (Org org : orgSet) {
+                        idOfOrgList.add(org.getIdOfOrg());
                     }
-                }
-
-                if (planOrderItemsToPayNotDetected != null) {
-                    if (!planOrderItemsToPayNotDetected.isEmpty()) {
-                        for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
-                            if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
-                                resultIntersection.add(planOrderItem);
-                            }
-                        }
-                    }
-                }
-
-                if (!resultIntersection.isEmpty() || !resultSubtraction.isEmpty()) {
-
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-
-                    if (!resultIntersection.isEmpty()) {
-                        Client client = (Client) session.load(Client.class, resultIntersection.get(0).getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItem.setAddress(org.getAddress());
-                        deviationPaymentItem.setOrgName(org.getShortName());
-                        deviationPaymentItem.setRowNum(++rowNum);
-                    } else if (!resultSubtraction.isEmpty()) {
-                        Client client = (Client) session.load(Client.class, resultSubtraction.get(0).getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItem.setAddress(org.getAddress());
-                        deviationPaymentItem.setOrgName(org.getShortName());
-                        deviationPaymentItem.setRowNum(++rowNum);
-                    }
-
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-
-                    if (!resultSubtraction.isEmpty()) {
-                        fillByPlan(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+                    for (Long idOfOrg : idOfOrgList) {
+                        collectingReportItems(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime,
+                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
-
-                    if (!resultIntersection.isEmpty()) {
-                        fill(resultIntersection, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    if (!deviationPaymentSubReportItemList.isEmpty()) {
+                        if (organizationsInfoModel.getAddress() != null
+                                && organizationsInfoModel.getOfficialName() != null) {
+                            deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
+                            deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
+                            deviationPaymentItem.setRowNum(++rowNum);
+                            deviationPaymentItem
+                                    .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                            deviationPaymentItemList.add(deviationPaymentItem);
+                        } else {
+                            for (Org orgSetItem : orgSet) {
+                                if (orgSetItem.isMainBuilding()) {
+                                    deviationPaymentItem.setAddress(orgSetItem.getAddress());
+                                    deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
+                                    deviationPaymentItem.setRowNum(++rowNum);
+                                    deviationPaymentItem
+                                            .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                                    deviationPaymentItemList.add(deviationPaymentItem);
+                                }
+                            }
+                            if (deviationPaymentItem.getAddress() == null
+                                    && deviationPaymentItem.getOrgName() == null) {
+                                Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+                                deviationPaymentItem.setAddress(org.getAddress());
+                                deviationPaymentItem.setOrgName(org.getOfficialName());
+                                deviationPaymentItem.setRowNum(++rowNum);
+                                deviationPaymentItem
+                                        .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                                deviationPaymentItemList.add(deviationPaymentItem);
+                            }
+                        }
                     }
-
-                    deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-
-                    deviationPaymentItemList.add(deviationPaymentItem);
+                } else {
+                    Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+                    collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, addOneDayEndTime,
+                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    if (!deviationPaymentSubReportItemList.isEmpty()) {
+                        deviationPaymentItem.setAddress(org.getAddress());
+                        deviationPaymentItem.setOrgName(org.getOfficialName());
+                        deviationPaymentItem.setRowNum(++rowNum);
+                        deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                        deviationPaymentItemList.add(deviationPaymentItem);
+                    }
                 }
             }
         } else {
-
             Long rowNum = 0L;
-
-            for (Long idOfOrg : idOfOrgList) {
-
-                List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
-                List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
-
-                // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован - за интервал
-                List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
-                // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
-                List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
-
-                planOrderItemsPaidByInterval = ClientsEntereventsService
-                        .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
-
-                Date sTt = startTime;
-                CalendarUtils.truncateToDayOfMonth(sTt);
-
-                Date eTt = CalendarUtils.addOneDay(startTime);
-                CalendarUtils.truncateToDayOfMonth(eTt);
-
-                // План по тем кто отметился в здании за интервал
-                List<PlanOrderItem> planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
-                        .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrg);
-                if (planOrderItemToPayDetectedIntervalList != null) {
-                    planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
-                }
-
-                // План по тем кто не в здании за интервал
-                List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
-                        .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
-                if (planOrderItemToPayNotDetectedIntervalList != null) {
-                    planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
-                }
-
-                Date nextDateEndTime = CalendarUtils.addOneDay(endTime);
-                CalendarUtils.truncateToDayOfMonth(nextDateEndTime);
-
-                while (eTt.before(CalendarUtils.truncateToDayOfMonth(nextDateEndTime))) {
-                    sTt = CalendarUtils.addOneDay(sTt);
-                    eTt = CalendarUtils.addOneDay(eTt);
-
-                    planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
-                            .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrg);
-                    if (planOrderItemToPayDetectedIntervalList != null) {
-                        planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
+            for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
+                Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
+                if (orgSet.size() > 0) {
+                    List<Long> idOfOrgList = new ArrayList<Long>();
+                    for (Org org : orgSet) {
+                        idOfOrgList.add(org.getIdOfOrg());
                     }
-
-                    // План по тем кто не в здании
-                    planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
-                            .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
-                    if (planOrderItemToPayNotDetectedIntervalList != null) {
-                        planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
-                    }
-                }
-
-                if (!planOrderItemsToPayDetectedInterval.isEmpty()) {
-                    for (PlanOrderItem planOrderItem : planOrderItemsToPayDetectedInterval) {
-                        if (!planOrderItemsPaidByInterval.contains(planOrderItem)) {
-                            resultSubtractionInterval.add(planOrderItem);
-                        }
-                    }
-                }
-
-                if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
-                    for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetectedInterval) {
-                        if (planOrderItemsPaidByInterval.contains(planOrderItem)) {
-                            resultIntersectionInterval.add(planOrderItem);
-                        }
-                    }
-                }
-
-                if (!resultIntersectionInterval.isEmpty() || !resultSubtractionInterval.isEmpty()) {
-
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-
-                    if (!resultIntersectionInterval.isEmpty()) {
-                        Client client = (Client) session
-                                .load(Client.class, resultIntersectionInterval.get(0).getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItem.setAddress(org.getAddress());
-                        deviationPaymentItem.setOrgName(org.getShortName());
-                        deviationPaymentItem.setRowNum(++rowNum);
-                    } else if (!resultSubtractionInterval.isEmpty()) {
-                        Client client = (Client) session
-                                .load(Client.class, resultSubtractionInterval.get(0).getIdOfClient());
-                        Org org = (Org) session.load(Org.class, client.getOrg().getIdOfOrg());
-                        deviationPaymentItem.setAddress(org.getAddress());
-                        deviationPaymentItem.setOrgName(org.getShortName());
-                        deviationPaymentItem.setRowNum(++rowNum);
-                    }
-
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-
-                    if (!resultSubtractionInterval.isEmpty()) {
-                        fillByPlan(resultSubtractionInterval, conditionDetectedNotEat,
-                                deviationPaymentSubReportItemList);
+                    for (Long idOfOrg : idOfOrgList) {
+                        collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, startTime, endTime,
+                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
-
-                    if (!resultIntersectionInterval.isEmpty()) {
-                        fill(resultIntersectionInterval, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    if (!deviationPaymentSubReportItemList.isEmpty()) {
+                        if (organizationsInfoModel.getAddress() != null
+                                && organizationsInfoModel.getOfficialName() != null) {
+                            deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
+                            deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
+                            deviationPaymentItem.setRowNum(++rowNum);
+                            deviationPaymentItem
+                                    .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                            deviationPaymentItemList.add(deviationPaymentItem);
+                        } else {
+                            for (Org orgSetItem : orgSet) {
+                                if (orgSetItem.isMainBuilding()) {
+                                    deviationPaymentItem.setAddress(orgSetItem.getAddress());
+                                    deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
+                                    deviationPaymentItem.setRowNum(++rowNum);
+                                    deviationPaymentItem
+                                            .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                                    deviationPaymentItemList.add(deviationPaymentItem);
+                                }
+                            }
+                            if (deviationPaymentItem.getAddress() == null
+                                    && deviationPaymentItem.getOrgName() == null) {
+                                Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+                                deviationPaymentItem.setAddress(org.getAddress());
+                                deviationPaymentItem.setOrgName(org.getOfficialName());
+                                deviationPaymentItem.setRowNum(++rowNum);
+                                deviationPaymentItem
+                                        .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                                deviationPaymentItemList.add(deviationPaymentItem);
+                            }
+                        }
                     }
-
-                    deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-
-                    deviationPaymentItemList.add(deviationPaymentItem);
+                } else {
+                    Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+                    collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, endTime,
+                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    if (!deviationPaymentSubReportItemList.isEmpty()) {
+                        deviationPaymentItem.setAddress(org.getAddress());
+                        deviationPaymentItem.setOrgName(org.getOfficialName());
+                        deviationPaymentItem.setRowNum(++rowNum);
+                        deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
+                        deviationPaymentItemList.add(deviationPaymentItem);
+                    }
                 }
             }
         }
@@ -320,4 +268,128 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         return deviationPaymentSubReportItem;
     }
 
+    public void collectingReportItems(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
+            Date addOneDayEndTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+
+        List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
+        List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
+
+        // Оплаченные Заказы
+        List<PlanOrderItem> planOrderItemsPaidByOneDay = ClientsEntereventsService
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
+
+        // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
+        List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
+                .loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrg);
+
+        // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
+        List<PlanOrderItem> planOrderItemsToPayNotDetected = ClientsEntereventsService
+                .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg);
+
+        if (planOrderItemsToPayDetected != null) {
+            if (!planOrderItemsToPayDetected.isEmpty()) {
+                for (PlanOrderItem planOrderItem : planOrderItemsToPayDetected) {
+                    if (!planOrderItemsPaidByOneDay.contains(planOrderItem)) {
+                        resultSubtraction.add(planOrderItem);
+                    }
+                }
+            }
+        }
+
+        if (planOrderItemsToPayNotDetected != null) {
+            if (!planOrderItemsToPayNotDetected.isEmpty()) {
+                for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
+                    if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
+                        resultIntersection.add(planOrderItem);
+                    }
+                }
+            }
+        }
+
+        if (!resultSubtraction.isEmpty()) {
+            fillByPlan(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+        }
+
+        if (!resultIntersection.isEmpty()) {
+            fill(resultIntersection, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+        }
+    }
+
+    public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
+            Date endTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+        List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
+        List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
+
+        // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован - за интервал
+        List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
+
+        // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
+
+        List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
+        List<PlanOrderItem> planOrderItemsPaidByInterval = ClientsEntereventsService
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
+
+        Date sTt = startTime;
+        CalendarUtils.truncateToDayOfMonth(sTt);
+
+        Date eTt = CalendarUtils.addOneDay(startTime);
+        CalendarUtils.truncateToDayOfMonth(eTt);
+
+        // План по тем кто отметился в здании за интервал
+        List<PlanOrderItem> planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
+                .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrg);
+
+        if (planOrderItemToPayDetectedIntervalList != null) {
+            planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
+        }
+        // План по тем кто не в здании за интервал
+        List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
+                .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
+
+        if (planOrderItemToPayNotDetectedIntervalList != null) {
+            planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
+        }
+
+        Date nextDateEndTime = CalendarUtils.addOneDay(endTime);
+        CalendarUtils.truncateToDayOfMonth(nextDateEndTime);
+
+        while (eTt.before(CalendarUtils.truncateToDayOfMonth(nextDateEndTime))) {
+            sTt = CalendarUtils.addOneDay(sTt);
+            eTt = CalendarUtils.addOneDay(eTt);
+            planOrderItemToPayDetectedIntervalList = ClientsEntereventsService
+                    .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrg);
+            if (planOrderItemToPayDetectedIntervalList != null) {
+                planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
+            }
+            // План по тем кто не в здании
+            planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
+                    .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
+            if (planOrderItemToPayNotDetectedIntervalList != null) {
+                planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
+            }
+        }
+        if (!planOrderItemsToPayDetectedInterval.isEmpty()) {
+            for (PlanOrderItem planOrderItem : planOrderItemsToPayDetectedInterval) {
+                if (!planOrderItemsPaidByInterval.contains(planOrderItem)) {
+                    resultSubtractionInterval.add(planOrderItem);
+                }
+            }
+        }
+        if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
+            for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetectedInterval) {
+                if (planOrderItemsPaidByInterval.contains(planOrderItem)) {
+                    resultIntersectionInterval.add(planOrderItem);
+                }
+            }
+        }
+
+        if (!resultSubtractionInterval.isEmpty()) {
+            fillByPlan(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+        }
+        if (!resultIntersectionInterval.isEmpty()) {
+            fill(resultIntersectionInterval, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+        }
+    }
 }

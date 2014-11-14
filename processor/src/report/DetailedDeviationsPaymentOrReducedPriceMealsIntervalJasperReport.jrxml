@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="870" pageHeight="10000" columnWidth="830" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="940" pageHeight="10000" columnWidth="900" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
 	<property name="ireport.zoom" value="1.3310000000000006"/>
-	<property name="ireport.x" value="143"/>
+	<property name="ireport.x" value="47"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -40,10 +40,10 @@
 		<groupHeader>
 			<band height="50">
 				<rectangle>
-					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="184" y="0" width="646" height="50"/>
+					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="184" y="0" width="716" height="50"/>
 				</rectangle>
 				<subreport>
-					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="414" y="0" width="416" height="50"/>
+					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="414" y="0" width="486" height="50"/>
 					<subreportParameter name="orgName">
 						<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 					</subreportParameter>
@@ -95,7 +95,7 @@
 	<title>
 		<band height="100" splitType="Prevent">
 			<textField>
-				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" x="0" y="0" width="830" height="100"/>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" x="0" y="0" width="900" height="100"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -148,7 +148,7 @@
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="414" y="0" width="347" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="414" y="0" width="416" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -162,7 +162,7 @@
 				<text><![CDATA[ФИО Учащегося]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b6a16611-554d-46a5-9313-de24ff2ff182" x="761" y="0" width="69" height="25"/>
+				<reportElement uuid="b6a16611-554d-46a5-9313-de24ff2ff182" x="830" y="0" width="70" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

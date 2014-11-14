@@ -20,7 +20,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="1bb790f8-67c7-42f0-9801-c07df0f73530" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="416" height="20" backcolor="#999999"/>
+					<reportElement uuid="1bb790f8-67c7-42f0-9801-c07df0f73530" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="416" height="20" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
