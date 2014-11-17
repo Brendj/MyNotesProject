@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.SubFeedingRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,12 +85,12 @@ public class SubFeedingService {
         return result;
     }
 
-    public ClientItem getClientItem(Long idOfOrg, OrderItem orderItem) {
-        return subFeedingRepository.getClient("" + idOfOrg, orderItem.getIdOfClient());
+    public ClientItem getClientItem(Long idOfOrg, long idOfClient) {
+        return subFeedingRepository.getClient("" + idOfOrg, idOfClient);
     }
 
-    public ClientItem getClientItem(String orgsIdsString, OrderItem orderItem) {
-        return subFeedingRepository.getClient(orgsIdsString, orderItem.getIdOfClient());
+    public ClientItem getClientItem(String orgsIdsString, long idOfClient) {
+        return subFeedingRepository.getClient(orgsIdsString, idOfClient);
     }
 
     private List<ClientItem> addClientItems(List<ClientItem> all , List<ClientItem> add){

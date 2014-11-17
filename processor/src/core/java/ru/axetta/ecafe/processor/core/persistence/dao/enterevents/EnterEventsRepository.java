@@ -77,8 +77,6 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                         + "ORDER BY e.idofvisitor, e.evtdatetime DESC")
                 .setParameter("startDateTime", startTime)
                 .setParameter("endDateTime", endTime)
-                        //.setParameter("startDateTime", 1355097600000L)
-                        //.setParameter("endDateTime", 1355183999000L)
                 .getResultList();
 
         return parse(tempList);
@@ -89,7 +87,7 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         String sql =
                 "SELECT  e.idofclient, e.idoforg, og.shortname, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
                         + " FROM cf_enterevents e "
-                        + " INNER JOIN cf_clients c ON e.idofclient = c.idofclient  and e.idoforg = c.idoforg "
+                        + " INNER JOIN cf_clients c ON e.idofclient = c.idofclient   and c.idOfOrg IN (" + orgList + ") "
                         + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                         + " INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
                         + " INNER JOIN cf_orgs og ON e.idoforg = og.idoforg "
@@ -99,8 +97,6 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                         + " ORDER BY g.groupname, e.idofclient, e.evtdatetime DESC ";
         List<Object[]> tempList = (ArrayList) entityManager.createNativeQuery(sql).setParameter("startTime", startTime)
                 .setParameter("endTime", endTime)
-                        //.setParameter("startDateTime", 1355097600000L)
-                        //.setParameter("endDateTime", 1355183999000L)
                 .getResultList();
 
         return parseFull(tempList);
@@ -118,8 +114,6 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                         + " ORDER BY  e.evtdatetime DESC")
                 .setParameter("startDateTime", begin)
                 .setParameter("endDateTime", dateTime)
-                        //.setParameter("startDateTime", 1355097600000L)
-                        //.setParameter("endDateTime", 1355183999000L)
                 .getResultList();
 
         return parse(tempList);
@@ -183,8 +177,6 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
                         + "ORDER BY e, e.evtdatetime DESC")
                 .setParameter("startDateTime", begin)
                 .setParameter("endDateTime", dateTime)
-                        //.setParameter("startDateTime", 1398027420000L)
-                        //.setParameter("endDateTime", 1398106620000L)
                 .getResultList();
 
         Map<Long, Map<Long, List<DAOEnterEventSummaryModel> > > resultMap = new HashMap<Long, Map<Long, List<DAOEnterEventSummaryModel> > >();

@@ -100,7 +100,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             List<DAOEnterEventSummaryModel> enterEventsSummary = enterEventsService
                     .getEnterEventsSummary(orgsIdsString, startTime.getTime(), endTime.getTime());
 
-            fillDataWithEnterEvents(dataMap, enterEventsSummary, orgList);
+            fillDataWithEnterEvents(dataMap, enterEventsSummary, orgList, orgsIdsString);
 
             List<Data> dataList = new ArrayList<Data>(dataMap.values());
             Collections.sort(dataList);
@@ -114,33 +114,84 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
 
             for (OrderItem orderItem : orderItemList) {
-                if (StringUtils.isBlank( prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg) ) ) {
+                if (StringUtils.isBlank(prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg))) {
                     continue;
                 }
                 currentData = dataMap.get(prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg));
-                if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal()) {
-                    notfoundItem = updateRowListWithOrder(currentData.getPlan(), orderItem);
-                    if(notfoundItem != null){
-                        try{
-                        ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem);
-                        fillRowListWithClient(currentData.getPlan(), clientItem, startTime, endTime, orderItem);
-                        notfoundItem = null;
-                        }catch (Exception e){
-                            logger.error("dd "+orderItem.getIdOfClient());
+                if (currentData == null) {
+                    //Пришел человек из другого корпуса
+                    System.out.print("d");
+                    currentData = handleOrderInAnotherBuilding(dataMap, orderItem, orgsIdsString, startTime, endTime,
+                            orgList);
+
+                } else {
+                    List<Row> rowList = getRowListByOrderType(dataMap, orderItem,prepareGroupName(orgList, orderItem.getGroupName(), orderItem.idOfOrg));
+
+
+                    notfoundItem = updateRowListWithOrder(rowList, orderItem);
+                    if (notfoundItem != null) {
+                        try {
+                            ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem.idOfClient);
+                            if(clientItem.getIdOfOrg()!= orderItem.getIdOfOrg()){
+                                currentData = dataMap.get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+                                rowList = getRowListByOrderType(dataMap, orderItem,prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+                            }
+                            fillRowListWithClient(rowList, clientItem, startTime, endTime, orderItem);
+                            notfoundItem = null;
+                        } catch (Exception e) {
+                            logger.error("Не удалось найти клиента: " + orderItem.getIdOfClient());
                         }
-                    }
-                } else if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()) {
-                    notfoundItem = updateRowListWithOrder(currentData.getReserve(), orderItem);
-                    if(notfoundItem != null){
-                        ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem);
-                        fillRowListWithClient(currentData.getReserve(), clientItem, startTime, endTime, orderItem);
-                        notfoundItem = null;
                     }
                 }
 
                 //todo 8 handle
                 updateTotalListWithOrder(currentData, orderItem, startTime, endTime);
             }
+        }
+
+        private List<Row> getRowListByOrderType(Map<String, Data> dataMap, OrderItem orderItem, String groupName){
+            List<Row> rowList = null;
+            Data currentData = dataMap.get(groupName);
+
+            if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal()) {
+                rowList = currentData.getPlan();
+            } else if (orderItem.getOrdertype() == OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()) {
+                rowList = currentData.getReserve();
+            } else if (orderItem.getOrdertype() == OrderTypeEnumType.CORRECTION_TYPE.ordinal()) {
+                rowList = null; //todo /????
+            }
+            return rowList;
+        }
+
+        private static Data handleOrderInAnotherBuilding(Map<String, Data> dataMap, OrderItem orderItem,
+                String orgsIdsString, Date startTime, Date endTime, List<Org> orgList) {
+            SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
+            ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem.idOfClient);
+
+            Data currentData = dataMap.get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+            List<Row> dataItem;
+            switch (orderItem.getOrdertype()){
+                case 4:
+                    dataItem = currentData.getPlan();
+                    break;
+                case 6:
+                    dataItem = currentData.getReserve();
+                    break;
+                default:
+                    dataItem = new ArrayList<Row>();
+            }
+            Row row;
+            for (int i : CalendarUtils.daysBetween(startTime, endTime)) {
+                row = new Row(clientItem.getId(), clientItem.getIdOfOrg(), orderItem.getOrgName(),
+                        clientItem.getFullName() + " ! ", i, clientItem.getGroupName());
+                row.setEntry(" ");
+                if (i == CalendarUtils.getDayOfMonth(orderItem.getOrderDate())) {
+                    row.update(orderItem);
+                }
+
+                dataItem.add(row);
+            }
+            return currentData;
         }
 
         private static void updateTotalListWithOrder(Data data, OrderItem item, Date startTime, Date endTime) {
@@ -181,27 +232,43 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
 
         //Заполняет проходами резерв и план льготного питания
         private static void fillDataWithEnterEvents(Map<String, Data> dataMap,
-                List<DAOEnterEventSummaryModel> enterEventsSummary, List<Org> orgList) {
+                List<DAOEnterEventSummaryModel> enterEventsSummary, List<Org> orgList, String orgsIdsString) {
             Data data;
+            SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
+            List<Row> rowList;
             for (DAOEnterEventSummaryModel enterEvent : enterEventsSummary) {
                 data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getIdOfOrg()));
                 if (data == null) {
-                    continue;
+                    ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, enterEvent.getIdOfClient());
+                    if(clientItem.getIdOfOrg()!= enterEvent.getIdOfOrg()){
+                        data = dataMap.get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+
+                    }
+                    if (data == null){
+                        continue;
+                    }
                 }
 
-                updateRowListWithEnterEvent(data.getPlan(), enterEvent);
-                updateRowListWithEnterEvent(data.getReserve(), enterEvent);
+                boolean foundInPlan = updateRowListWithEnterEvent(data.getPlan(), enterEvent);
+                boolean foundInReserve = updateRowListWithEnterEvent(data.getReserve(), enterEvent);
+                if(!foundInPlan && !foundInReserve){
+                    System.out.print("Не найден человек с событием прохода: " + enterEvent.getIdOfClient() );
+                }
             }
         }
 
-        private static void updateRowListWithEnterEvent(List<Row> rowList, DAOEnterEventSummaryModel enterEvent) {
+        private static boolean updateRowListWithEnterEvent(List<Row> rowList,
+                DAOEnterEventSummaryModel enterEvent) {
             int eventDay = CalendarUtils.getDayOfMonth(enterEvent.getEvtDateTime());
+            boolean flag = false;
             for (Row groupItem : rowList) {
                 if ((groupItem.getClientId().equals(enterEvent.getIdOfClient())) && (groupItem.getDay()
-                        .equals(eventDay))) {
+                        .equals(eventDay)) && groupItem.getOrgName().equals(enterEvent.getOrgName()) ) {
                     groupItem.update(enterEvent);
+                    flag= true;
                 }
             }
+            return flag;
         }
 
 
@@ -246,7 +313,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
     private static void fillRowListWithClient(List<Row> dataItem, ClientItem item, Date start, Date end,OrderItem orderItem) {
         Row row;
         for (int i : CalendarUtils.daysBetween(start, end)) {
-            row =new Row(item.getId(), item.getIdOfOrg(),item.getOrgName(), item.getFullName(), i, item.getGroupName());
+            row = new Row(item.getId(), item.getIdOfOrg(),item.getOrgName(), item.getFullName(), i, item.getGroupName());
             if(orderItem != null){
                 if(i == CalendarUtils.getDayOfMonth(orderItem.getOrderDate())){
                     row.update(orderItem);

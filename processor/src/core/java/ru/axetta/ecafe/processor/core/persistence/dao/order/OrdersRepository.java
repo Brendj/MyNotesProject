@@ -43,7 +43,7 @@ public class OrdersRepository extends BaseJpaDao {
                 " SELECT o.idoforg, og.shortname, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
                         + " FROM cf_orders o "
                         + " INNER JOIN cf_orderdetails od ON o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
-                        + " INNER JOIN cf_clients c ON c.idofclient = o.idofclient and o.idoforg = c.idoforg "
+                        + " INNER JOIN cf_clients c ON c.idofclient = o.idofclient and o.idoforg in (" + orgsIdsString+ ") "
                         + " INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
                         + " INNER JOIN cf_orgs og ON o.idoforg =og.idoforg "
                         + " WHERE o.idoforg in ( " + orgsIdsString + " ) AND od.menutype >= 50 AND od.menutype<=99 ";

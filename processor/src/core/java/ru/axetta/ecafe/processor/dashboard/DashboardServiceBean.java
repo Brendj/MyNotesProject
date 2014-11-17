@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.dashboard;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
@@ -26,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -86,7 +85,7 @@ public class DashboardServiceBean {
         return dashboardResponse;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<DashboardResponse.NamedParams> getNamedParams() {
         //Session session = null;
         try {
@@ -178,13 +177,9 @@ public class DashboardServiceBean {
     }
 
     //public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg, int orgStatus) throws Exception {
+    @Transactional(readOnly = true,propagation = Propagation.SUPPORTS,timeout = 600*1000)
     public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dayStartDate, Date dayEndDate, Long idOfOrg,
             int orgStatus) throws Exception {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
-        def.setReadOnly(true);
-        TransactionStatus status = txManager.getTransaction(def);
-        def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
             String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
@@ -597,10 +592,10 @@ public class DashboardServiceBean {
                 basicStats.getOrgBasicStatItems().add(e.getValue());
             }
         } catch (Exception e) {
-            txManager.rollback(status);
+
             throw e;
         }
-        txManager.commit(status);
+
         return basicStats;
     }
 
@@ -616,6 +611,7 @@ public class DashboardServiceBean {
         return new BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
+    @Transactional(readOnly = true)
     public DashboardResponse getOrgInfo(DashboardResponse dashboardResponse, Date dt, Long idOfOrg) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
@@ -732,6 +728,7 @@ public class DashboardServiceBean {
         return dashboardResponse;
     }
 
+    @Transactional(readOnly = true)
     public DashboardResponse.PaymentSystemStats getPaymentSystemInfo(Date dt) {
         DashboardResponse.PaymentSystemStats paymentSystemStats = new DashboardResponse.PaymentSystemStats();
         //// получение данных по платежам
@@ -773,6 +770,7 @@ public class DashboardServiceBean {
         return paymentSystemStats;
     }
 
+    @Transactional(readOnly = true)
     public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
         DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
         ///// получение данных по сихронизации
@@ -837,29 +835,22 @@ public class DashboardServiceBean {
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<DashboardResponse.MenuLastLoadItem> getMenuLastLoad() {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
-        def.setReadOnly(true);
-        TransactionStatus status = txManager.getTransaction(def);
         List<DashboardResponse.MenuLastLoadItem> items = new ArrayList<DashboardResponse.MenuLastLoadItem>();
-        try {
-            // Извлекаем посл.дату загрузки меню по орг-ям с типом "Комбинат питания".
-            Query query = entityManager.createQuery("select o.idOfOrg, o.shortName, max(m.createTime) \n"
-                    + "from Menu m join m.org o where o.refectoryType = :type group by o.idOfOrg, o.shortName")
-                    .setParameter("type", Org.REFECTORY_TYPE_FOOD_FACTORY);
-            List<Object[]> res = query.getResultList();
-            for (Object[] record : res) {
-                DashboardResponse.MenuLastLoadItem item = new DashboardResponse.MenuLastLoadItem();
-                item.setContragent((String) record[1]);
-                item.setLastLoadTime((Date) record[2]);
-                items.add(item);
-            }
-            txManager.commit(status);
-        } catch (Exception e) {
-            txManager.rollback(status);
-            throw new RuntimeException(e.getMessage());
+
+        // Извлекаем посл.дату загрузки меню по орг-ям с типом "Комбинат питания".
+        Query query = entityManager.createQuery("select o.idOfOrg, o.shortName, max(m.createTime) \n"
+                + "from Menu m join m.org o where o.refectoryType = :type group by o.idOfOrg, o.shortName")
+                .setParameter("type", Org.REFECTORY_TYPE_FOOD_FACTORY);
+        List<Object[]> res = query.getResultList();
+        for (Object[] record : res) {
+            DashboardResponse.MenuLastLoadItem item = new DashboardResponse.MenuLastLoadItem();
+            item.setContragent((String) record[1]);
+            item.setLastLoadTime((Date) record[2]);
+            items.add(item);
         }
+
         return items;
     }
 }
