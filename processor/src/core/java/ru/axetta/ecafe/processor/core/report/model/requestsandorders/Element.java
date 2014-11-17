@@ -17,7 +17,11 @@ public class Element extends HashMap<State, Long> {
 
     @Override
     public Long put(State key, Long value) {
-        Long newValue = value + (this.containsKey(key) ? this.get(key) : 0L);
-        return super.put(key, newValue);
+        if (value != null) {
+            Long newValue = value + (this.containsKey(key) ? this.get(key) : 0L);
+            return super.put(key, newValue);
+        } else {
+            return super.put(key, this.containsKey(key) ? this.get(key) : 0L);
+        }
     }
 }

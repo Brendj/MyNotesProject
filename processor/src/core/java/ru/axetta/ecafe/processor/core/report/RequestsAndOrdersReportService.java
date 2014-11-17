@@ -39,17 +39,6 @@ import java.util.*;
 public class RequestsAndOrdersReportService {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportService.class);
-    public static final String STATE_STRING_ORDERED = "Заказано";
-    public static final String STATE_STRING_REQUESTED = "Оплачено";
-
-    // todo delete - not need anymore
-    //private static HashMap<FeedingPlanType, String> priority = new HashMap<FeedingPlanType, String>();
-    //
-    //static {
-    //    priority.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
-    //    priority.put(FeedingPlanType.PAY_PLAN, "Платное питание");
-    //    priority.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
-    //}
 
     final private long OVERALL;
     final private String OVERALL_TITLE;
@@ -62,38 +51,28 @@ public class RequestsAndOrdersReportService {
     }
 
     public List<Item> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
-            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean useColorAccent, boolean showOnlyDivergence) {
-
-        //boolean isNew = false;
-        //boolean isUpdate = false;
-
+            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean useColorAccent,
+            boolean showOnlyDivergence) throws Exception {
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getOrgMap(idOfOrgList, idOfMenuSourceOrgList);
-
-        //orgMap = complementOrgMap(session, orgMap);
-
         List<Item> itemList = new LinkedList<Item>();
-
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date endDate = CalendarUtils.endOfDay(endTime);
-        //TreeSet<Date> dates = new TreeSet<Date>();
-
         List complexList = getComplexList(orgMap, beginDate, endDate);
-
         if (complexList.size() <= 0) {
-            InputMismatchException e = new InputMismatchException("В выбранный период для выбранных организаций комплексы не представлены: выберите другой период или измените набор ОО.");
+            InputMismatchException e = new InputMismatchException(
+                    "В выбранный период для выбранных организаций комплексы не представлены: выберите другой период или измените набор ОО.");
             throw e;
         }
-
         ReportDataMap reportDataMap;
         reportDataMap = new ReportDataMap();
-
         Map<Long, ComplexInfoItem> orgsComplexDictionary = new HashMap<Long, ComplexInfoItem>();
         Map<Long, GoodInfo> complexGoodsDictionary = new HashMap<Long, GoodInfo>();
         for (Object complexObj : complexList) {
             ComplexInfo complexInfo = (ComplexInfo) complexObj;
             FeedingPlanType complexFeedingPlanType = null;
             if (complexInfo != null) {
-                if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding() == 1)) {
+                if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
+                        == 1)) {
                     complexFeedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING; //complexFeedingPlanType = "Абонементное питание";
                 } else {
                     if (complexInfo.getModeFree() == 1) {
@@ -114,30 +93,20 @@ public class RequestsAndOrdersReportService {
             orgsComplexDictionary.put(complexOrgId, complexInfoItem);
             complexGoodsDictionary.put(complexGoodGlobalId, complexGoodInfo);
         }
-
         getRequestGoodsInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
-
         getPaidOrdersInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
-
         if (!hideMissedColumns) {
             reportDataMap.complement(beginDate, endDate);
+        } else {
+            reportDataMap.complement();
         }
-
         populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence);
-
-        //if (itemList.size() <= 0) {
-        //    BasicReportJob.OrgShortItem orgShortItem = (BasicReportJob.OrgShortItem) orgMap.values().toArray()[0];
-        //    String orgName = orgShortItem.getOfficialName();
-        //    String orgNum = Org.extractOrgNumberFromName(orgName);
-        //    String feedingPlanTypeString = FeedingPlanType.PAY_PLAN.toString();
-        //    String complexName = "Не найдено";
-        //    String stateString = STATE_STRING_ORDERED;
-        //    Date date = CalendarUtils.truncateToDayOfMonth(startTime);
-        //
-        //    itemList.add(new Item(orgNum, orgName, feedingPlanTypeString, complexName, stateString, date, 0L, false));
-        //}
-
-        return itemList;
+        if ((itemList == null) || (itemList.size() == 0)) {
+            Exception e = new Exception("Ошибка выборки данных: попробуйте изменить параметры отчета.");
+            throw e;
+        } else {
+            return itemList;
+        }
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> complementOrgMap(Session session, HashMap<Long, BasicReportJob.OrgShortItem> orgMap) {

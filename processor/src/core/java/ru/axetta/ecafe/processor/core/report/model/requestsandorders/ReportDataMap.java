@@ -68,33 +68,49 @@ public class ReportDataMap extends HashMap<String, FeedingPlan> {
 
     public ReportDataMap complement(Date beginDate, Date endDate) {
         Date midDate = beginDate;
+        List<Date> dateList = new ArrayList<Date>();
         do {
-            if (!hasDate(midDate)) {
-                String orgName = this.keySet().iterator().next();
-                FeedingPlanType feedingPlanType = this.get(orgName).keySet().iterator().next();
-                String complex = this.get(orgName).get(feedingPlanType).keySet().iterator().next();
-                Date date = midDate;
-                Element element = new Element();
-                element.put(State.Ordered, 0L);
-                this.get(orgName).get(feedingPlanType).get(complex).put(date, element);
-            }
+            dateList.add(midDate);
             midDate = CalendarUtils.addDays(midDate, 1);
         } while (endDate.getTime() >= midDate.getTime());
+        complement_from_list(dateList, this);
         return this;
     }
 
-    private Boolean hasDate(Date date) {
-        for (String orgName: this.keySet()) {
-            for (FeedingPlanType feedingPlanType: this.get(orgName).keySet()) {
-                for (String complex: this.get(orgName).get(feedingPlanType).keySet()) {
-                    for (Date dateForCheck: this.get(orgName).get(feedingPlanType).get(complex).keySet()) {
-                        if (date.equals(dateForCheck)) {
-                            return true;
+    public ReportDataMap complement() {
+        List<Date> dateList = new ArrayList<Date>();
+        for (String orgName : this.keySet()) {
+            for (FeedingPlanType feedingPlanType : this.get(orgName).keySet()) {
+                for (String complexName : this.get(orgName).get(feedingPlanType).keySet()) {
+                    for (Date date: this.get(orgName).get(feedingPlanType).get(complexName).keySet()) {
+                        if (!dateList.contains(date)) dateList.add(date);
+                    }
+                }
+            }
+        }
+        complement_from_list(dateList, this);
+        return this;
+    }
+
+    private void complement_from_list(List<Date> dateList, ReportDataMap reportDataMap) {
+        for (String orgName : reportDataMap.keySet()) {
+            for (FeedingPlanType feedingPlanType : reportDataMap.get(orgName).keySet()) {
+                for (String complexName : reportDataMap.get(orgName).get(feedingPlanType).keySet()) {
+                    for (Date date: dateList) {
+                        if (!reportDataMap.get(orgName).get(feedingPlanType).get(complexName).containsKey(date)) {
+                            Element element = new Element();
+                            element.put(State.Ordered, 0L);
+                            element.put(State.Requested, 0L);
+                            reportDataMap.get(orgName).get(feedingPlanType).get(complexName).put(date, element);
+                        } else {
+                            if (!reportDataMap.get(orgName).get(feedingPlanType).get(complexName).containsKey(State.Ordered))
+                                reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).put(State.Ordered, 0L);
+                            if (!reportDataMap.get(orgName).get(feedingPlanType).get(complexName).containsKey(State.Ordered))
+                                reportDataMap.get(orgName).get(feedingPlanType).get(complexName).get(date).put(State.Ordered, 0L);
                         }
                     }
                 }
             }
         }
-        return false;
     }
 }
