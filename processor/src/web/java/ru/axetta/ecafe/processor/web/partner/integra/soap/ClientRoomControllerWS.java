@@ -2665,6 +2665,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public EnterEventListResult getNEnterEventList(@WebParam(name = "startDate") final Date startDate,
+            @WebParam(name = "N") final int n) {
+        Data data = null;
+        try {
+            data = processNEnterEventList( startDate, n);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        EnterEventListResult enterEventListResult = new EnterEventListResult();
+        enterEventListResult.enterEventList = data.getEnterEventList();
+        enterEventListResult.resultCode = data.getResultCode();
+        enterEventListResult.description = data.getDescription();
+        return enterEventListResult;
+    }
+
+    @Override
     public EnterEventWithRepListResult getEnterEventWithRepList(Long contractId, final Date startDate, final Date endDate) {
         authenticateRequest(contractId);
 
@@ -2792,6 +2810,61 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
+                //Client guardian = DAOUtils.findClient(session, guardianId);                                                session
+                //enterEventItem.setGuardianSan(guardian.getSan());
+                enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
+            }
+            enterEventList.getE().add(enterEventItem);
+        }
+        data.setEnterEventList(enterEventList);
+    }
+
+    private Data processNEnterEventList(Date date, int n) throws Exception {
+
+        Data data = new Data();
+        RuntimeContext runtimeContext = null;
+        Session session = null;
+        List<EnterEvent> enterEvents = null;
+
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+        Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
+
+            enterEventCriteria.add(Restrictions.lt("evtDateTime", date));
+            enterEventCriteria.add(Restrictions.ne("passDirection", 4));
+            enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+            enterEventCriteria.setMaxResults(n);
+            enterEvents = enterEventCriteria.list();
+        } catch (Exception e) {
+            log("Ошибка при получении событий прохода");
+        }
+        finally {
+            if(session != null){
+                session.close();
+
+            }
+
+        }
+        Locale locale = new Locale("ru", "RU");
+        Calendar calendar = Calendar.getInstance(locale);
+
+
+        EnterEventList enterEventList =new EnterEventList();
+        int nRecs = 0;
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+            EnterEventItem enterEventItem = new EnterEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
+            calendar.setTime(enterEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setEnterName(enterEvent.getEnterName());
+            enterEventItem.setDirection(enterEvent.getPassDirection());
+            enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
+            final Long guardianId = enterEvent.getGuardianId();
+            if (guardianId != null) {
                 //Client guardian = DAOUtils.findClient(session, guardianId);
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
@@ -2799,6 +2872,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);
+
+        return data;
     }
 
     private Integer translateDayOfWeek(int i) {
