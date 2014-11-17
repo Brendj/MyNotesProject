@@ -2665,11 +2665,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public EnterEventListResult getNEnterEventList(@WebParam(name = "startDate") final Date startDate,
+    public EnterEventListResult getNEnterEventList(@WebParam(name = "orgId") long orgId,@WebParam(name = "startDate") final Date startDate,
             @WebParam(name = "N") final int n) {
         Data data = null;
         try {
-            data = processNEnterEventList( startDate, n);
+            data = processNEnterEventList( orgId,startDate, n);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2819,7 +2819,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setEnterEventList(enterEventList);
     }
 
-    private Data processNEnterEventList(Date date, int n) throws Exception {
+    private Data processNEnterEventList(long orgId,Date date, int n) throws Exception {
 
         Data data = new Data();
         RuntimeContext runtimeContext = null;
@@ -2832,12 +2832,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
 
             enterEventCriteria.add(Restrictions.lt("evtDateTime", date));
+            enterEventCriteria.add(Restrictions.eq("org.idOfOrg",orgId ));
             enterEventCriteria.add(Restrictions.ne("passDirection", 4));
             enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
             enterEventCriteria.setMaxResults(n);
             enterEvents = enterEventCriteria.list();
         } catch (Exception e) {
-            log("Ошибка при получении событий прохода");
+            log("Ошибка при получении событий прохода",e);
         }
         finally {
             if(session != null){

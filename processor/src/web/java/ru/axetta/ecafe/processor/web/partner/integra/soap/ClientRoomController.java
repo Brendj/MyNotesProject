@@ -161,7 +161,7 @@ public interface ClientRoomController {
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getNEnterEventList")
-    EnterEventListResult getNEnterEventList(@WebParam(name = "startDate") Date startDate, @WebParam(name = "N") int n);
+    EnterEventListResult getNEnterEventList(@WebParam(name = "orgId") long orgId,@WebParam(name = "startDate") Date startDate, @WebParam(name = "N") int n);
 
     @WebMethod(operationName = "getEnterEventWithRepList")
     EnterEventWithRepListResult getEnterEventWithRepList(@WebParam(name = "contractId") Long contractId,
