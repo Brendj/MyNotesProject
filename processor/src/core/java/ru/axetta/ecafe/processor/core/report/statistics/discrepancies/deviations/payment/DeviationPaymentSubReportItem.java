@@ -22,18 +22,15 @@ public class DeviationPaymentSubReportItem {
     public String condition;
     public String complexName;
     public Date orderDate;
-    public Long ruleId;
 
     public DeviationPaymentSubReportItem() {
     }
 
-    public DeviationPaymentSubReportItem(String condition, String groupName, String personName, Date orderDate,
-            Long ruleId, String complexName) {
+    public DeviationPaymentSubReportItem(String condition, String groupName, String personName, Date orderDate, String complexName) {
         this.condition = condition;
         this.groupName = groupName;
         this.personName = personName;
         this.orderDate = orderDate;
-        this.ruleId = ruleId;
         this.complexName = complexName;
     }
 
@@ -79,13 +76,5 @@ public class DeviationPaymentSubReportItem {
 
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
-    }
-
-    public Long getRuleId() {
-        return ruleId;
-    }
-
-    public void setRuleId(Long ruleId) {
-        this.ruleId = ruleId;
     }
 }

@@ -112,18 +112,23 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
+
+                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
-                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+
                     for (Long idOfOrg : idOfOrgList) {
                         collectingReportItems(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime,
                                 conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
+
+                        DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+
                         if (organizationsInfoModel.getAddress() != null
                                 && organizationsInfoModel.getOfficialName() != null) {
                             deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
@@ -158,7 +163,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, addOneDayEndTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -172,20 +176,25 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             }
         } else {
             Long rowNum = 0L;
+
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
+
+                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
+
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
-                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     for (Long idOfOrg : idOfOrgList) {
                         collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, startTime, endTime,
                                 conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
+
+                        DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+
                         if (organizationsInfoModel.getAddress() != null
                                 && organizationsInfoModel.getOfficialName() != null) {
                             deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
@@ -219,10 +228,9 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
-                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, endTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getOfficialName());
@@ -247,24 +255,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     public DeviationPaymentSubReportItem createReportItem(String condition, PlanOrderItem planOrderItem) {
         DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
-                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
-                planOrderItem.getIdOfRule(), planOrderItem.getComplexName());
-        return deviationPaymentSubReportItem;
-    }
-
-    public void fillByPlan(List<PlanOrderItem> result, String condition,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
-        for (PlanOrderItem planOrderItem : result) {
-            DeviationPaymentSubReportItem deviationPaymentSubReportItem = createReportItemByPlan(condition,
-                    planOrderItem);
-            deviationPaymentSubReportItemList.add(deviationPaymentSubReportItem);
-        }
-    }
-
-    public DeviationPaymentSubReportItem createReportItemByPlan(String condition, PlanOrderItem planOrderItem) {
-        DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
-                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
-                planOrderItem.getIdOfRule(), planOrderItem.getComplexName());
+                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(), planOrderItem.getComplexName());
         return deviationPaymentSubReportItem;
     }
 
@@ -308,7 +299,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
 
         if (!resultSubtraction.isEmpty()) {
-            fillByPlan(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+            fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
         }
 
         if (!resultIntersection.isEmpty()) {
@@ -386,7 +377,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
 
         if (!resultSubtractionInterval.isEmpty()) {
-            fillByPlan(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+            fill(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
         }
         if (!resultIntersectionInterval.isEmpty()) {
             fill(resultIntersectionInterval, conditionNotDetectedEat, deviationPaymentSubReportItemList);

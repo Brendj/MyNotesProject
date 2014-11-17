@@ -10,7 +10,6 @@
 	<field name="personName" class="java.lang.String"/>
 	<field name="condition" class="java.lang.String"/>
 	<field name="complexName" class="java.lang.String"/>
-	<field name="ruleId" class="java.lang.Long"/>
 	<variable name="conditionCount" class="java.lang.String" resetType="None">
 		<variableExpression><![CDATA["Итого:   " + $V{byCondition_COUNT}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>
