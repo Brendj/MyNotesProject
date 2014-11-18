@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="870" pageHeight="10000" columnWidth="830" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="922" pageHeight="10000" columnWidth="882" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
 	<property name="ireport.zoom" value="1.3310000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -34,15 +34,15 @@
 	<field name="address" class="java.lang.String"/>
 	<field name="deviationPaymentSubReportItemList" class="java.util.List"/>
 	<field name="rowNum" class="java.lang.Long"/>
-	<group name="ByOrgName">
+	<group name="byOrgName">
 		<groupExpression><![CDATA[$F{deviationPaymentSubReportItemList}]]></groupExpression>
 		<groupHeader>
 			<band height="50">
 				<rectangle>
-					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="184" y="0" width="646" height="50"/>
+					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="184" y="0" width="698" height="50"/>
 				</rectangle>
 				<subreport>
-					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="414" y="0" width="416" height="50"/>
+					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="332" y="0" width="550" height="50"/>
 					<subreportParameter name="orgName">
 						<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 					</subreportParameter>
@@ -58,11 +58,15 @@
 						<bottomPen lineWidth="1.0"/>
 						<rightPen lineWidth="1.0"/>
 					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement uuid="c17aa3f5-8797-4d7a-bd8f-104e4acc11ae" stretchType="RelativeToBandHeight" x="184" y="0" width="230" height="50"/>
+					<reportElement uuid="c17aa3f5-8797-4d7a-bd8f-104e4acc11ae" stretchType="RelativeToBandHeight" x="184" y="0" width="148" height="50">
+						<property name="net.sf.jasperreports.print.keep.full.text" value="True"/>
+					</reportElement>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -70,7 +74,9 @@
 						<bottomPen lineWidth="1.0"/>
 						<rightPen lineWidth="1.0"/>
 					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
@@ -82,7 +88,9 @@
 						<bottomPen lineWidth="1.0"/>
 						<rightPen lineWidth="1.0"/>
 					</box>
-					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
 					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 				</textField>
 			</band>
@@ -94,9 +102,9 @@
 	<title>
 		<band height="100" splitType="Prevent">
 			<textField>
-				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" x="0" y="0" width="830" height="100"/>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" stretchType="RelativeToBandHeight" x="0" y="0" width="882" height="100"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
+					<font size="18" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Сводный отчет отклонений оплаты льготного питания на " + $P{beginDate} + " года"]]></textFieldExpression>
 			</textField>
@@ -114,7 +122,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
+					<font size="14"/>
 				</textElement>
 				<text><![CDATA[№]]></text>
 			</staticText>
@@ -128,12 +136,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
+					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="76f484c6-68b4-418f-bf3c-a3d6dcfdc459" x="184" y="0" width="230" height="25"/>
+				<reportElement uuid="76f484c6-68b4-418f-bf3c-a3d6dcfdc459" x="184" y="0" width="148" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -142,12 +150,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
+					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="414" y="0" width="416" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="332" y="0" width="550" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -156,7 +164,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
+					<font size="14"/>
 				</textElement>
 				<text><![CDATA[ФИО Учащегося]]></text>
 			</staticText>

@@ -242,6 +242,10 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             }
         }
 
+        for (DeviationPaymentItem dev : deviationPaymentItemList) {
+            Collections.sort(dev.getDeviationPaymentSubReportItemList());
+        }
+
         return new JRBeanCollectionDataSource(deviationPaymentItemList);
     }
 
@@ -255,7 +259,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     public DeviationPaymentSubReportItem createReportItem(String condition, PlanOrderItem planOrderItem) {
         DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
-                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(), planOrderItem.getComplexName());
+                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
+                planOrderItem.getComplexName());
         return deviationPaymentSubReportItem;
     }
 

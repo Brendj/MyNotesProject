@@ -15,7 +15,7 @@ import java.util.Date;
  * Time: 17:14
  */
 
-public class DeviationPaymentSubReportItem {
+public class DeviationPaymentSubReportItem implements Comparable<DeviationPaymentSubReportItem> {
 
     public String groupName;    // группа клиента (класс, сотрудники и т.д.)
     public String personName;
@@ -26,7 +26,8 @@ public class DeviationPaymentSubReportItem {
     public DeviationPaymentSubReportItem() {
     }
 
-    public DeviationPaymentSubReportItem(String condition, String groupName, String personName, Date orderDate, String complexName) {
+    public DeviationPaymentSubReportItem(String condition, String groupName, String personName, Date orderDate,
+            String complexName) {
         this.condition = condition;
         this.groupName = groupName;
         this.personName = personName;
@@ -76,5 +77,14 @@ public class DeviationPaymentSubReportItem {
 
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
+    }
+
+    @Override
+    public int compareTo(DeviationPaymentSubReportItem o) {
+        int retCode = this.condition.compareTo(o.getCondition());
+        if (retCode == 0) {
+            retCode = this.groupName.compareTo(o.getGroupName());
+        }
+        return retCode;
     }
 }
