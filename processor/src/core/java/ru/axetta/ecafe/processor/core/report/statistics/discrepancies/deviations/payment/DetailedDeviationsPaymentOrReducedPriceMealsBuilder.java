@@ -122,7 +122,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
 
                     for (Long idOfOrg : idOfOrgList) {
-                        collectingReportItems(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime,
+                        collectingReportItems(session, orderTypeLgotnick, idOfOrg, idOfOrgList, startTime, addOneDayEndTime,
                                 conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -163,7 +163,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
-                    collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, addOneDayEndTime,
+                    List<Long> idOfOrgList = new ArrayList<Long>();
+                    collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), idOfOrgList, startTime, addOneDayEndTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         deviationPaymentItem.setAddress(org.getAddress());
@@ -188,7 +189,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                         idOfOrgList.add(org.getIdOfOrg());
                     }
                     for (Long idOfOrg : idOfOrgList) {
-                        collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, startTime, endTime,
+                        collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, idOfOrgList, startTime, endTime,
                                 conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     }
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -228,7 +229,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
-                    collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, endTime,
+                    List<Long> idOfOrgList = new ArrayList<Long>();
+                    collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), idOfOrgList, startTime, endTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -264,7 +266,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         return deviationPaymentSubReportItem;
     }
 
-    public void collectingReportItems(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
+    public void collectingReportItems(Session session, String orderTypeLgotnick, Long idOfOrg, List<Long> idOfOrgList, Date startTime,
             Date addOneDayEndTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
             List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
 
@@ -273,7 +275,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         // Оплаченные Заказы
         List<PlanOrderItem> planOrderItemsPaidByOneDay = ClientsEntereventsService
-                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
 
         // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
         List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
@@ -312,7 +314,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
     }
 
-    public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
+    public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Long idOfOrg, List<Long> idOfOrgList, Date startTime,
             Date endTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
             List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
         List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
@@ -322,10 +324,10 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
 
         // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
-
         List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
+
         List<PlanOrderItem> planOrderItemsPaidByInterval = ClientsEntereventsService
-                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, endTime);
 
         Date sTt = startTime;
         CalendarUtils.truncateToDayOfMonth(sTt);

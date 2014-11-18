@@ -85,6 +85,9 @@ public class DeviationPaymentSubReportItem implements Comparable<DeviationPaymen
         if (retCode == 0) {
             retCode = this.groupName.compareTo(o.getGroupName());
         }
+        if (retCode == 0) {
+            retCode = this.orderDate.compareTo(o.getOrderDate());
+        }
         return retCode;
     }
 }
