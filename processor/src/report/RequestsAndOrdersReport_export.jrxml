@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-11-14T18:49:12 -->
+<!-- 2014-11-18T13:09:18 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="ea061f34-4b90-4f63-a802-93f6a1bef31a">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -71,7 +71,7 @@
 	<title>
 		<band height="52">
 			<textField>
-				<reportElement x="0" y="0" width="640" height="52" uuid="ba33f7dd-c12a-4ab1-8ef5-7010e548c2cf"/>
+				<reportElement positionType="Float" mode="Transparent" x="0" y="0" width="842" height="52" uuid="ba33f7dd-c12a-4ab1-8ef5-7010e548c2cf"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -355,13 +355,6 @@
 				<crosstabCell width="60" height="20" rowTotalGroup="orgNum1" columnTotalGroup="date1">
 					<cellContents mode="Opaque" style="Crosstab_CT">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
-						<textField>
-							<reportElement x="0" y="0" width="60" height="20" uuid="cbd03e4a-9af3-4425-9f0a-1d22f7533a89"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="12" isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{count_MEASURE1} == null ? 0L : $V{count_MEASURE1}]]></textFieldExpression>
-						</textField>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="60" height="20" rowTotalGroup="orgNum1" columnTotalGroup="dateString1">
