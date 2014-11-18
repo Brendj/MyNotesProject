@@ -5369,7 +5369,7 @@ public class MainPage implements Serializable {
 
     public Object showRequestsAndOrdersReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -5380,6 +5380,7 @@ public class MainPage implements Serializable {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = requestsAndOrdersReportPage;
+            //facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();

@@ -60,7 +60,7 @@ public class RequestsAndOrdersReportService {
         List complexList = getComplexList(orgMap, beginDate, endDate);
         if (complexList.size() <= 0) {
             InputMismatchException e = new InputMismatchException(
-                    "В выбранный период для выбранных организаций комплексы не представлены: выберите другой период или измените набор ОО.");
+                    "В указанный период времени данные по комплексам отсутствуют: попробуйте изменить параметры отчета.");
             throw e;
         }
         ReportDataMap reportDataMap;
@@ -102,7 +102,7 @@ public class RequestsAndOrdersReportService {
         }
         populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence);
         if ((itemList == null) || (itemList.size() == 0)) {
-            Exception e = new Exception("Ошибка выборки данных: попробуйте изменить параметры отчета.");
+            Exception e = new Exception("В указанный период времени данные по организации отсутствуют: попробуйте изменить параметры отчета.");
             throw e;
         } else {
             return itemList;
