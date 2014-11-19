@@ -83,24 +83,67 @@ public class Data  implements Comparable<Data> {
         this.total = total;
     }
 
+
+    /*
+    * Сортировка
+    * 1) сортируем по организации
+    * */
     @Override
     public int compareTo(Data o) {
-        String numThisString = getName().replaceAll("[^\\d]", "");
-        String numOString = o.getName().replaceAll("[^\\d]", "");
-        if(numThisString.length() < 1) return -1;
+        if(this.getName().length() < 1) {
+            if(o.getName().length() < 1)
+                return 0;
+            else
+                return -1;
+        }
+        if(o.getName().length() < 1) return 1;
+
+
+        String oOrgName = o.name.substring(o.name.indexOf('('));
+        String thisOrgName = this.name.substring(this.name.indexOf('('));
+        Integer oOrgNameIntSum = printSum(oOrgName);
+        Integer thisOrgNameIntSum = printSum(thisOrgName);
+        if(thisOrgNameIntSum.compareTo(oOrgNameIntSum) != 0){
+            return thisOrgNameIntSum.compareTo(oOrgNameIntSum);
+        }
+
+        oOrgName =  o.name.substring(0,o.name.indexOf('('));
+        thisOrgName = this.name.substring(0,this.name.indexOf('('));
+
+
+        String numThisString = thisOrgName.replaceAll("[^\\d]", "");
+        String numOString = oOrgName.replaceAll("[^\\d]", "");
+        if (numThisString.length() < 1) {
+            if (numOString.length() < 1) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
         if(numOString.length() < 1) return 1;
 
 
         Integer numThis = Integer.valueOf(numThisString);
         Integer numO = Integer.valueOf(numOString);
         if(numThis.equals(numO)){
-            String sThis = getName().replaceAll("[^\\D]", "").toUpperCase();
-            String sO = o.getName().replaceAll("[^\\D]", "").toUpperCase();
-            Integer letterThis = Character.getNumericValue(sThis.charAt(0));
-            Integer letterO = Character.getNumericValue(sO.charAt(0));
+            String sThis = thisOrgName.replaceAll("[^\\D]", "").toUpperCase();
+            String sO = oOrgName.replaceAll("[^\\D]", "").toUpperCase();
+            Integer letterThis = printSum(sThis);
+            Integer letterO = printSum(sO);
             return  letterThis.compareTo(letterO);
         }else{
             return numThis.compareTo(numO);
         }
+    }
+
+    private static int printSum(String original){
+        int sum = 0;
+        if(original!=null){
+            char[] arr = original.toLowerCase().toCharArray();
+            for(int x :arr){
+                sum+= (x-96);
+            }
+        }
+        return sum;
     }
 }
