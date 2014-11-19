@@ -49,9 +49,9 @@ public class ReferReport extends BasicReportForAllOrgJob {
     public static DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static final long MILLIS_IN_DAY = 86400000L;
-    public static final String BREAKFAST = "ЗАВТРАК";
-    public static final String LUNCH = "ОБЕД";
-    public static final String SNACK = "ПОЛДНИК";
+    public static final String BREAKFAST = "Завтрак";
+    public static final String LUNCH = "Обед";
+    public static final String SNACK = "Полдник";
 
 
     public List<List<ReferReportItem>> getItems() {

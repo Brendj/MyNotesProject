@@ -47,10 +47,19 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     private String htmlReport;
     public static DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
+    public static final String TEMPLATE_FILE_NAME_JASPER_PART = ".jasper";
     public static final String SUBCATEGORY_PARAMETER = "category";
     public static final String SHOW_DAILY_SALES_PARAMETER = "dailySales";
-    public static final String SUBCATEGORY_ALL = "Все";
     public static final String OVERALL_SUBCATEGORY_NAME = "Сведения о рационах питания, получеченных в отчетном периоде";
+    //  Фильтры категорий
+    public static final CategoryFilter SUBCATEGORY_ALL = new CategoryFilter("Все");
+    public static final CategoryFilter SUBCATEGORY_SHOOL [] = new CategoryFilter[] {
+            new CategoryFilter("Обучающиеся 1-4 кл."),
+            new CategoryFilter("Обучающиеся 5-9 кл."),
+            new CategoryFilter("Обучающиеся 9-11 кл.") };
+    public static final CategoryFilter SUBCATEGORY_KINDERGARTEN [] = new CategoryFilter [] {
+            new CategoryFilter("Ясли 1.5-3 лет"),
+            new CategoryFilter("Детский сад 3-7 лет") };
 
 
     public List<DailyReferReportItem> getItems() {
@@ -121,10 +130,6 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
-            /*parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
-            parameterMap.put("month", month + 1);
-            parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
-            parameterMap.put("year", calendar.get(Calendar.YEAR));*/
             parameterMap.put("startDate", dailyItemsFormat.format(startTime));
             parameterMap.put("endDate", dailyItemsFormat.format(endTime));
             Object o = reportProperties.getProperty("region");
@@ -132,18 +137,24 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 throw new IllegalArgumentException("Не указана организация или регион");
             }
             parameterMap.put("orgName", org == null ? (String) o : org.getShortName());
+            CategoryFilter categoryFilter = getCategoryFilter(category);
+            if(!categoryFilter.equals(SUBCATEGORY_ALL)) {
+                parameterMap.put("category", categoryFilter.getName());
+            }
 
 
             Date generateEndTime = new Date();
-            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category, o != null ? (String) o : null);
+            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, categoryFilter,
+                    o != null ? (String) o : null);//getDailyReferItems(session);//
             if(showDailySample) {
-                addSamples(session, org, startTime, endTime, items, category, o != null ? (String) o : null);
+                addSamples(session, org, startTime, endTime, items, categoryFilter, o != null ? (String) o : null);
+                calculateOverall(items, isOverallReport(categoryFilter));
             }
-            calculateOverall(items, isOverallReport(category));
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
 
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
+            String actualTemplateFilename = resolveTemplateFilename(templateFilename, categoryFilter);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(actualTemplateFilename, parameterMap,
                     createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
@@ -162,6 +173,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 exporter.exportReport();
                 return new DailyReferReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
+            }
+        }
+
+        protected String resolveTemplateFilename(String templateFilename, CategoryFilter categoryFilter) {
+            String base = templateFilename.substring(0, templateFilename.lastIndexOf(TEMPLATE_FILE_NAME_JASPER_PART));
+            if(categoryFilter.equals(SUBCATEGORY_ALL)) {
+                return base + "_byAll" + TEMPLATE_FILE_NAME_JASPER_PART;
+            } else {
+                return base + "_byCat" + TEMPLATE_FILE_NAME_JASPER_PART;
             }
         }
 
@@ -222,8 +242,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
         }
 
-        protected boolean isOverallReport(String category) {
-            if (category == null || category.length() < 1) {
+        protected boolean isOverallReport(CategoryFilter categoryFilter) {
+            if(categoryFilter.equals(SUBCATEGORY_ALL)) {
                 return true;
             }
             return false;
@@ -231,8 +251,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         protected DailyReferReportItem[] addSamples(Session session, OrgShortItem org,
                                                     Date startTime, Date endTime,
-                                                    List<DailyReferReportItem> items, String category, String region) {
-            boolean isOverallReport = isOverallReport(category);
+                                                    List<DailyReferReportItem> items, CategoryFilter categoryFilter, String region) {
+            boolean isOverallReport = isOverallReport(categoryFilter);
             Set<String> groups = new HashSet<String>();
             for(DailyReferReportItem i : items) {
                 String grp = "";
@@ -245,8 +265,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
             ReferReport.DailyReferReportItem samples [] = ReferReport.Builder.getSampleItems(session, org, startTime, endTime, groups, isOverallReport, region);
 
-            String name = category;
-            if (category == null || category.length() < 1) {
+            String name = categoryFilter.getName();
+            if (categoryFilter.equals(SUBCATEGORY_ALL)) {
                 name = OVERALL_SUBCATEGORY_NAME;
             }
             for(ReferReport.DailyReferReportItem it : samples) {
@@ -276,15 +296,45 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, String category, String region) {
+        private List<DailyReferReportItem> getDailyReferItems(Session session) {
+            List<List<ReferReportItem>> result = new ArrayList<List<ReferReportItem>>();
+
+            Query q = session.createSQLQuery(
+                    "");
+            List sqlRes = q.list();
+
+            int i=1;
+            List<ReferReportItem> items = new ArrayList<ReferReportItem>();
+            if(sqlRes != null && sqlRes.size() > 0) {
+                for (Object entry : sqlRes) {
+                    Object e[] = (Object[]) entry;
+                    long idoforg = ((BigInteger) e[0]).longValue();
+                    String category = (String) e[1];
+                    long clientsCount = ((BigInteger) e[2]).longValue();
+                    double eventsCount = ((BigInteger) e[3]).longValue();
+                    double ordersSummary = ((BigDecimal) e[4]).doubleValue();
+
+                    i++;
+                }
+            }
+            result.add(items);
+            result.add(new ArrayList<ReferReportItem>());
+            return null;
+        }
+
+        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, CategoryFilter categoryFilter, String region) {
             String categoryClause = "";
-            if (category != null && category.length() > 0) {
-                categoryClause = " and cf_discountrules.subcategory = '" + category + "' ";
+            if (categoryFilter != null) {
+                //categoryClause = " and cf_discountrules.subcategory = '" + category + "' ";
+                categoryClause = categoryFilter.getSqlCase();
             } else {
                 //categoryClause = " and cf_discountrules.subcategory <> '' ";
             }
 
-            Map<String, DailyReferReportItem> totals = new HashMap<String, DailyReferReportItem>();
+            Map<String, DailyReferReportItem> totals = null;
+            if(!categoryFilter.equals(SUBCATEGORY_ALL)) {
+                totals = new HashMap<String, DailyReferReportItem>();
+            }
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             List res = getReportData(session, org == null ? null : org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
                                      categoryClause, region);
@@ -299,25 +349,29 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 BigDecimal summaryObj = e[5] == null ? new BigDecimal(0D) : (BigDecimal) e[5];
                 summaryObj            = summaryObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
 
-                boolean isOverallReport = isOverallReport(category);
+                boolean isOverallReport = isOverallReport(categoryFilter);
                 DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children, priceObj.doubleValue(), summaryObj.doubleValue(), isOverallReport);
                 totalSumm             += summaryObj.doubleValue();
                 result.add(item);
 
                 //  Обновляем тотал объект для питания
-                DailyReferReportItem total = totals.get(name + " / " + item.getGroup2());
-                if(total == null) {
-                    total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D, isOverallReport);
-                    total.setPrice(item.getPrice());
-                    totals.put(name + " / " + item.getGroup2(), total);
-                    total.setIndex(1);
+                if(totals != null) {
+                    DailyReferReportItem total = totals.get(name + " / " + item.getGroup2());
+                    if(total == null) {
+                        total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D, isOverallReport);
+                        total.setPrice(item.getPrice());
+                        totals.put(name + " / " + item.getGroup2(), total);
+                        total.setIndex(1);
+                    }
+                    total.setChildren(total.getChildren() + item.getChildren());
+                    total.setTotal(total.getTotal() + item.getTotal());
+                    total.setSummary(total.getSummary() + item.getSummary());
                 }
-                total.setChildren(total.getChildren() + item.getChildren());
-                total.setTotal(total.getTotal() + item.getTotal());
-                total.setSummary(total.getSummary() + item.getSummary());
             }
-            for(String k : totals.keySet()) {
-                result.add(totals.get(k));
+            if(totals != null) {
+                for(String k : totals.keySet()) {
+                    result.add(totals.get(k));
+                }
             }
 
             return result;
@@ -371,6 +425,26 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                           ") as data "
                 + "group by subcategory, nameofgood, d, price "
                 + "order by 1, 2";
+        /*String sql = "select subcategory, nameofgood, "
+                + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
+                + "       price, "
+                + "       count(idoforder) as children, "
+                + "       count(idoforder) * (price) as summary "
+                + "from ( "
+                + "      select dr.subcategory, g.nameofgood, ord.idoforder, "
+                + "             date_trunc('day', to_timestamp(ord.createddate / 1000)) as d, "
+                + "             cast (det.rprice + det.socdiscount as decimal) / 100 price "
+                + "      from cf_orgs o "
+                + "      left join cf_orders ord on o.idoforg=ord.idoforg "
+                + "      join cf_orderdetails det on ord.idoforder=det.idoforder and ord.idoforg=det.idoforg "
+                + "      join cf_goods g on det.idofgood=g.idofgood "
+                + "      join cf_discountrules dr on det.idofrule=dr.idofrule "
+                + "      where det.socdiscount<>0 and  o.idoforg=225 and "
+                + "            det.state=0 and ord.state=0 and "
+                + "            ord.createddate between 1391371200000 and 1391975999000 "
+                + "            and ord.ordertype<>5 and dr.subcategory<>'') as data "
+                + "group by subcategory, nameofgood, d, price "
+                + "order by 1, 2";*/
         Query query = session.createSQLQuery(sql);
         //query.setLong("idoforg", idoforg);
         query.setLong("start", start);
@@ -440,6 +514,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         private int orderType;
         private int index;          //  индекс в таблице
         private String day;         //  день
+        private double breakfast;   //  стоимость завтрака, используется только для отчета по категории
+        private double lunch;       //  стоимость обеда, используется только для отчета по категории
+        private String group0;      //  фикс для вывода шапки таблицы - всегда одинаковое значение
         private String group1;      //  наименование правила
         private String group2;      //  завтрак / обед
         private double price;       //  цена
@@ -459,8 +536,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         public DailyReferReportItem(String day, String name, String goodname, long children, double price, double summary, boolean isOverallReport) throws RuntimeException {
             index = 0;
             this.day = day;
+            group0 = "_";
             if(isOverallReport) {
-                this.group1 = findGroupRangeInString(name) + " кл.";
+                this.group1 = String.format("Обучающимся %s классов", findGroupRangeInString(name));
                 if(group1 == null) {
                     throw new RuntimeException("Failed to get group range in string " + name);
                 }
@@ -494,6 +572,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             this.price = price;
             this.summary = summary;
             orderType = 1;
+
+            breakfast = 50;
+            lunch = 100;
         }
 
         public int getOrderType() {
@@ -510,6 +591,14 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         public void setDay(String day) {
             this.day = day;
+        }
+
+        public String getGroup0() {
+            return group0;
+        }
+
+        public void setGroup0(String group0) {
+            this.group0 = group0;
         }
 
         public String getGroup1() {
@@ -542,6 +631,22 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         public void setIndex(int index) {
             this.index = index;
+        }
+
+        public double getBreakfast() {
+            return breakfast;
+        }
+
+        public void setBreakfast(double breakfast) {
+            this.breakfast = breakfast;
+        }
+
+        public double getLunch() {
+            return lunch;
+        }
+
+        public void setLunch(double lunch) {
+            this.lunch = lunch;
         }
     }
 
@@ -609,6 +714,82 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         public void setSummary(double summary) {
             this.summary = summary;
+        }
+    }
+
+    public static CategoryFilter getCategoryFilter(String categoryName) {
+        if(SUBCATEGORY_ALL.getName().equals(categoryName)) {
+            return SUBCATEGORY_ALL;
+        }
+        for(CategoryFilter f : SUBCATEGORY_SHOOL) {
+            if(f.getName().equals(categoryName)) {
+                return f;
+            }
+        }
+        for(CategoryFilter f : SUBCATEGORY_KINDERGARTEN) {
+            if(f.getName().equals(categoryName)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    public static class CategoryFilter {
+        protected String name;
+        protected String sqlCase;
+
+        public CategoryFilter(String name) {
+            this.name = name;
+            sqlCase = "";
+        }
+
+        public CategoryFilter(String name, String sqlCase) {
+            this.name = name;
+            this.sqlCase = sqlCase;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getSqlCase() {
+            return sqlCase;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            CategoryFilter that = (CategoryFilter) o;
+
+            if (name != null ? !name.equals(that.name) : that.name != null) {
+                return false;
+            }
+            if (sqlCase != null ? !sqlCase.equals(that.sqlCase) : that.sqlCase != null) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name != null ? name.hashCode() : 0;
+            result = 31 * result + (sqlCase != null ? sqlCase.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "CategoryFilter{" +
+                    "name='" + name + '\'' +
+                    ", sqlCase='" + sqlCase + '\'' +
+                    '}';
         }
     }
 }

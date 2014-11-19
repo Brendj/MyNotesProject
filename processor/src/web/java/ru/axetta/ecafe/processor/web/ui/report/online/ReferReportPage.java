@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -95,14 +96,36 @@ public class ReferReportPage extends OnlineReportPage {
     }
 
     public List<SelectItem> getCategories() {
-        if(categories == null || categories.size() < 1) {
+        /*if(categories == null || categories.size() < 1) {
             RuntimeContext.getAppContext().getBean(ReferReportPage.class).loadCategories();
         }
-
-        List<SelectItem> items = new ArrayList<SelectItem>();
-        items.add(new SelectItem(DailyReferReport.SUBCATEGORY_ALL));
         for (String cat : categories) {
             items.add(new SelectItem(cat));
+        }*/
+
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        if(idOfOrg != null) {
+            items.add(new SelectItem(DailyReferReport.SUBCATEGORY_ALL.getName()));
+
+            boolean useSchoolTypes = false;
+            boolean useKindergartenTypes = false;
+            Org org = DAOService.getInstance().getOrg(idOfOrg);
+            if(org.getType().ordinal() == OrganizationType.SCHOOL.ordinal()) {
+                useSchoolTypes = true;
+            } else if(org.getType().ordinal() == OrganizationType.KINDERGARTEN.ordinal()) {
+                useKindergartenTypes = true;
+            }
+
+            if(useSchoolTypes) {
+                for(DailyReferReport.CategoryFilter filter : DailyReferReport.SUBCATEGORY_SHOOL) {
+                    items.add(new SelectItem(filter.getName()));
+                }
+            }
+            if(useKindergartenTypes) {
+                for(DailyReferReport.CategoryFilter filter : DailyReferReport.SUBCATEGORY_KINDERGARTEN) {
+                    items.add(new SelectItem(filter.getName()));
+                }
+            }
         }
         return items;
     }

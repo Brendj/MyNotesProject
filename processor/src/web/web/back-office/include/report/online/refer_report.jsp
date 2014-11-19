@@ -58,9 +58,9 @@
                         <f:selectItems value="#{referReportPage.categories}"/>
                     </h:selectOneMenu>
 
-                    <h:outputText escape="true" value="Отображать Суточную пробу" styleClass="output-text" />
+                    <%--<h:outputText escape="true" value="Отображать Суточную пробу" styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{referReportPage.showDailySales}"
-                                             styleClass="output-text" />
+                                             styleClass="output-text" />--%>
                 </h:panelGrid>
 
                 <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateDaily}"
