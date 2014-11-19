@@ -10,6 +10,9 @@ public class OrderItem {
     public long idOfOrg;
     public String orgName;
     public long idOfClient;
+    public String fullname;
+    public long idOfClientOrg;
+    public String clientOrgName;
     public long orderDate;
     public int ordertype;
     public int idOfComplex;
@@ -18,7 +21,7 @@ public class OrderItem {
     private int qty;
 
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
-            String groupName, int qty) {
+            String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname) {
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
         this.idOfClient = idOfClient;
@@ -28,6 +31,9 @@ public class OrderItem {
         this.complexName = complexName;
         this.groupName = groupName;
         this.qty = qty;
+        this.idOfClientOrg = idOfClientOrg;
+        this.clientOrgName = clientOrgName;
+        this.fullname = fullname;
     }
 
     public OrderItem(long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
@@ -63,6 +69,14 @@ public class OrderItem {
 
     public void setIdOfClient(long idOfClient) {
         this.idOfClient = idOfClient;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public long getOrderDate() {
@@ -111,5 +125,21 @@ public class OrderItem {
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public long getIdOfClientOrg() {
+        return idOfClientOrg;
+    }
+
+    public void setIdOfClientOrg(long idOfClientOrg) {
+        this.idOfClientOrg = idOfClientOrg;
+    }
+
+    public String getClientOrgName() {
+        return clientOrgName;
+    }
+
+    public void setClientOrgName(String clientOrgName) {
+        this.clientOrgName = clientOrgName;
     }
 }

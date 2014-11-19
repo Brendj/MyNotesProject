@@ -33,19 +33,22 @@ public class OrdersRepository extends BaseJpaDao {
             resultList.add(new OrderItem(((BigInteger) result[0]).longValue(), (String) result[1],((BigInteger) result[2]).longValue(),
                     ((BigInteger) result[3]).longValue(),
                     (Integer) result[4], (Integer) result[5], (String) result[6], (String) result[7],
-                    (Integer) result[8]));
+                    (Integer) result[8],
+                    ((BigInteger) result[9]).longValue(),(String)result[10],(String)result[11]));
         }
         return resultList;
     }
 
     public List<OrderItem> findOrdersByClientIds(String orgsIdsString, String clientIds, Date startTime, Date endTime) {
         String sql =
-                " SELECT o.idoforg, og.shortname, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty "
+                " SELECT o.idoforg, og.shortname, o.idofclient, o.createddate, o.ordertype, od.menutype, od.menudetailname, g.groupname , od.qty, cog.idoforg as idofclientorg, cog.shortname as cogshort, (p.surname || ' ' || p.firstname || ' ' || p.secondname) as fullname "
                         + " FROM cf_orders o "
                         + " INNER JOIN cf_orderdetails od ON o.idoforder= od.idoforder AND o.idoforg = od.idoforg "
                         + " INNER JOIN cf_clients c ON c.idofclient = o.idofclient and o.idoforg in (" + orgsIdsString+ ") "
+                        + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                         + " INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
                         + " INNER JOIN cf_orgs og ON o.idoforg =og.idoforg "
+                        + " INNER JOIN cf_orgs cog ON c.idoforg=cog.idoforg "
                         + " WHERE o.idoforg in ( " + orgsIdsString + " ) AND od.menutype >= 50 AND od.menutype<=99 ";
         if (clientIds != null) {
             sql += " AND o.idofclient in ( " + clientIds + ") ";

@@ -212,6 +212,5 @@ public class Row {
 
     public void update(OrderItem item) {
         setColor(COLOR_PAID);
-        orgName = item.orgName;
     }
 }
