@@ -217,7 +217,8 @@ public class RequestsAndOrdersReportService {
             BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
 
             Long totalCount = position.getTotalCount() / 1000;
-            Long dailySampleCount = (position.getDailySampleCount() != null) ? position.getDailySampleCount()/1000 : null;
+            // Заявленная суточная проба
+            //Long dailySampleCount = (position.getDailySampleCount() != null) ? position.getDailySampleCount()/1000 : null;
 
             String orgName = org.getOfficialName() != null ? org.getOfficialName() : org.getShortName();
             FeedingPlanType feedingPlanType =
@@ -229,7 +230,7 @@ public class RequestsAndOrdersReportService {
             String complexName = position.getGood().getFullName() != null ? position.getGood().getFullName() : position.getGood().getNameOfGood();
             Date date = position.getGoodRequest().getDoneDate();
             State state = State.Requested;
-            Long count = totalCount + dailySampleCount;
+            Long count = totalCount;
 
             FeedingPlan feedingPlan = new FeedingPlan();
             Complex complex = new Complex();
