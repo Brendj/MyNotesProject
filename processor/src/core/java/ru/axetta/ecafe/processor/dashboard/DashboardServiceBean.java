@@ -100,7 +100,7 @@ public class DashboardServiceBean {
                             + "from cf_clientsms "
                             + "where "
                             + "deliverystatus=:deliveredSMSStatus "
-                            //+ "servicesenddate>:maxDate "
+                            + "and servicesenddate>:maxDate "
                             + "union all "
                             + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
                             + "from cf_clientsms "
@@ -109,7 +109,7 @@ public class DashboardServiceBean {
                             + "from cf_registrychange_errors "
                             + "where comment is null or comment=''");
             q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
-            //q.setParameter("maxDate", now.getTimeInMillis());
+            q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
             proceedSQLToNamedParams(q, params);
 
