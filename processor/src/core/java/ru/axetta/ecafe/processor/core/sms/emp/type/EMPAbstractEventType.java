@@ -95,6 +95,11 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     }
 
     public String buildText() {
+        return buildText(false);
+    }
+
+    @Override
+    public String buildText(boolean buildWithParams) {
         if(text == null || text.trim().length() < 1) {
             return "";
         }
@@ -102,7 +107,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         String result = new String(text);
         for(String k : params.keySet()) {
             String v = params.get(k);
-            result.replaceAll("%" + k + "%", v);
+            result = result.replaceAll("%" + k + "%", v);
         }
         return result;
     }

@@ -38,6 +38,8 @@ public interface EMPEventType {
 
     public String buildText();
 
+    public String buildText(boolean buildWithParams);
+
     public long getTime();
 
     public void setTime(long time);

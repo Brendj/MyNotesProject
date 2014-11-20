@@ -115,6 +115,7 @@ public class SMSService {
                                                            phoneNumber, messageType, msg);
                             return false;
                         }
+                        textObject = ((EMPEventType) textObject).buildText();
                     } else {
                         sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                     }
