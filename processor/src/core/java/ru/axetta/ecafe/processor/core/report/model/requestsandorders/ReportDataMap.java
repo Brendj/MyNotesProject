@@ -113,4 +113,17 @@ public class ReportDataMap extends HashMap<String, FeedingPlan> {
             }
         }
     }
+
+    public boolean hasDate(Date date) {
+        for (String orgName : this.keySet()) {
+            for (FeedingPlanType feedingPlanType : this.get(orgName).keySet()) {
+                for (String complexName : this.get(orgName).get(feedingPlanType).keySet()) {
+                    if (this.get(orgName).get(feedingPlanType).get(complexName).containsKey(date)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
