@@ -112,64 +112,54 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
-
-                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-
+                ++rowNum;
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
-
                     for (Long idOfOrg : idOfOrgList) {
-                        collectingReportItems(session, orderTypeLgotnick, idOfOrg, idOfOrgList, startTime, addOneDayEndTime,
-                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
-                    }
-                    if (!deviationPaymentSubReportItemList.isEmpty()) {
-
                         DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                        List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
-                        if (organizationsInfoModel.getAddress() != null
-                                && organizationsInfoModel.getOfficialName() != null) {
-                            deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
-                            deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
-                            deviationPaymentItem.setRowNum(++rowNum);
+                        collectingReportItems(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime,
+                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
+                                idOfOrgList);
+
+                        if (!deviationPaymentSubReportItemList.isEmpty()) {
+                            if (organizationsInfoModel.getAddress() != null
+                                    && organizationsInfoModel.getOfficialName() != null) {
+                                deviationPaymentItem.setMainBuilding(organizationsInfoModel.getOfficialName());
+                            } else {
+                                for (Org orgSetItem : orgSet) {
+                                    if (orgSetItem.isMainBuilding()) {
+                                        deviationPaymentItem.setMainBuilding(orgSetItem.getOfficialName());
+                                    }
+                                }
+                            }
+                            Org org = (Org) session.load(Org.class, idOfOrg);
+                            deviationPaymentItem.setAddress(org.getAddress());
+                            deviationPaymentItem.setOrgName(org.getShortName());
+                            deviationPaymentItem.setRowNum(rowNum);
                             deviationPaymentItem
                                     .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
                             deviationPaymentItemList.add(deviationPaymentItem);
-                        } else {
-                            for (Org orgSetItem : orgSet) {
-                                if (orgSetItem.isMainBuilding()) {
-                                    deviationPaymentItem.setAddress(orgSetItem.getAddress());
-                                    deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
-                                    deviationPaymentItem.setRowNum(++rowNum);
-                                    deviationPaymentItem
-                                            .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-                                    deviationPaymentItemList.add(deviationPaymentItem);
-                                }
-                            }
-                            if (deviationPaymentItem.getAddress() == null
-                                    && deviationPaymentItem.getOrgName() == null) {
-                                Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
-                                deviationPaymentItem.setAddress(org.getAddress());
-                                deviationPaymentItem.setOrgName(org.getOfficialName());
-                                deviationPaymentItem.setRowNum(++rowNum);
-                                deviationPaymentItem
-                                        .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-                                deviationPaymentItemList.add(deviationPaymentItem);
-                            }
                         }
                     }
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     List<Long> idOfOrgList = new ArrayList<Long>();
-                    collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), idOfOrgList, startTime, addOneDayEndTime,
-                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    idOfOrgList.add(org.getIdOfOrg());
+                    collectingReportItems(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, addOneDayEndTime,
+                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
+                            idOfOrgList);
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
+                        deviationPaymentItem.setMainBuilding(org.getShortName());
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getOfficialName());
-                        deviationPaymentItem.setRowNum(++rowNum);
+                        deviationPaymentItem.setRowNum(rowNum);
                         deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
                         deviationPaymentItemList.add(deviationPaymentItem);
                     }
@@ -180,63 +170,52 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
-
-                List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
-
+                ++rowNum;
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
                     for (Long idOfOrg : idOfOrgList) {
-                        collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, idOfOrgList, startTime, endTime,
-                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
-                    }
-                    if (!deviationPaymentSubReportItemList.isEmpty()) {
-
                         DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
+                        List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
-                        if (organizationsInfoModel.getAddress() != null
-                                && organizationsInfoModel.getOfficialName() != null) {
-                            deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
-                            deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
-                            deviationPaymentItem.setRowNum(++rowNum);
+                        collectingReportItemsInterval(session, orderTypeLgotnick, idOfOrg, startTime, endTime,
+                                conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
+                                idOfOrgList);
+
+                        if (!deviationPaymentSubReportItemList.isEmpty()) {
+                            if (organizationsInfoModel.getAddress() != null
+                                    && organizationsInfoModel.getOfficialName() != null) {
+                                deviationPaymentItem.setMainBuilding(organizationsInfoModel.getOfficialName());
+                            } else {
+                                for (Org orgSetItem : orgSet) {
+                                    if (orgSetItem.isMainBuilding()) {
+                                        deviationPaymentItem.setMainBuilding(orgSetItem.getOfficialName());
+                                    }
+                                }
+                            }
+                            Org org = (Org) session.load(Org.class, idOfOrg);
+                            deviationPaymentItem.setAddress(org.getAddress());
+                            deviationPaymentItem.setOrgName(org.getOfficialName());
+                            deviationPaymentItem.setRowNum(rowNum);
                             deviationPaymentItem
                                     .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
                             deviationPaymentItemList.add(deviationPaymentItem);
-                        } else {
-                            for (Org orgSetItem : orgSet) {
-                                if (orgSetItem.isMainBuilding()) {
-                                    deviationPaymentItem.setAddress(orgSetItem.getAddress());
-                                    deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
-                                    deviationPaymentItem.setRowNum(++rowNum);
-                                    deviationPaymentItem
-                                            .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-                                    deviationPaymentItemList.add(deviationPaymentItem);
-                                }
-                            }
-                            if (deviationPaymentItem.getAddress() == null
-                                    && deviationPaymentItem.getOrgName() == null) {
-                                Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
-                                deviationPaymentItem.setAddress(org.getAddress());
-                                deviationPaymentItem.setOrgName(org.getOfficialName());
-                                deviationPaymentItem.setRowNum(++rowNum);
-                                deviationPaymentItem
-                                        .setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
-                                deviationPaymentItemList.add(deviationPaymentItem);
-                            }
                         }
                     }
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+                    List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     List<Long> idOfOrgList = new ArrayList<Long>();
-                    collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), idOfOrgList, startTime, endTime,
-                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                    idOfOrgList.add(org.getIdOfOrg());
+                    collectingReportItemsInterval(session, orderTypeLgotnick, org.getIdOfOrg(), startTime, endTime,
+                            conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
+                            idOfOrgList);
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         deviationPaymentItem.setAddress(org.getAddress());
                         deviationPaymentItem.setOrgName(org.getOfficialName());
-                        deviationPaymentItem.setRowNum(++rowNum);
                         deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
                         deviationPaymentItemList.add(deviationPaymentItem);
                     }
@@ -266,16 +245,16 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         return deviationPaymentSubReportItem;
     }
 
-    public void collectingReportItems(Session session, String orderTypeLgotnick, Long idOfOrg, List<Long> idOfOrgList, Date startTime,
+    public void collectingReportItems(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
             Date addOneDayEndTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList, List<Long> idOfOrgList) {
 
         List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); // Разность
         List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); // Пересечение
 
         // Оплаченные Заказы
         List<PlanOrderItem> planOrderItemsPaidByOneDay = ClientsEntereventsService
-                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, addOneDayEndTime);
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, addOneDayEndTime);
 
         // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
         List<PlanOrderItem> planOrderItemsToPayDetected = ClientsEntereventsService
@@ -283,7 +262,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
         List<PlanOrderItem> planOrderItemsToPayNotDetected = ClientsEntereventsService
-                .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg);
+                .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrg, idOfOrgList);
 
         if (planOrderItemsToPayDetected != null) {
             if (!planOrderItemsToPayDetected.isEmpty()) {
@@ -314,9 +293,9 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
     }
 
-    public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Long idOfOrg, List<Long> idOfOrgList, Date startTime,
+    public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Long idOfOrg, Date startTime,
             Date endTime, String conditionDetectedNotEat, String conditionNotDetectedEat,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList, List<Long> idOfOrgList) {
         List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
         List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
 
@@ -327,7 +306,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
 
         List<PlanOrderItem> planOrderItemsPaidByInterval = ClientsEntereventsService
-                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, endTime);
+                .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrg, startTime, endTime);
 
         Date sTt = startTime;
         CalendarUtils.truncateToDayOfMonth(sTt);
@@ -344,7 +323,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
         }
         // План по тем кто не в здании за интервал
         List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
-                .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
+                .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg, idOfOrgList);
 
         if (planOrderItemToPayNotDetectedIntervalList != null) {
             planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
@@ -363,7 +342,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             }
             // План по тем кто не в здании
             planOrderItemToPayNotDetectedIntervalList = ClientsEntereventsService
-                    .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg);
+                    .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrg, idOfOrgList);
             if (planOrderItemToPayNotDetectedIntervalList != null) {
                 planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
             }

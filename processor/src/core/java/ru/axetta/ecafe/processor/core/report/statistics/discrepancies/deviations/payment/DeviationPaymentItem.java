@@ -18,6 +18,7 @@ public class DeviationPaymentItem {
     private Long rowNum;       // Номер по порядку
     private String orgName;    // Название организации
     private String address;    // Адресс организации
+    private String mainBuilding; // Главный корпус
 
     private List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList;
 
@@ -25,11 +26,11 @@ public class DeviationPaymentItem {
     public DeviationPaymentItem() {
     }
 
-    public DeviationPaymentItem(Long rowNum, String orgName, String address,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+    public DeviationPaymentItem(Long rowNum, String orgName, String address, String mainBuilding, List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
         this.rowNum = rowNum;
         this.orgName = orgName;
         this.address = address;
+        this.mainBuilding = mainBuilding;
         this.deviationPaymentSubReportItemList = deviationPaymentSubReportItemList;
     }
 
@@ -55,6 +56,14 @@ public class DeviationPaymentItem {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getMainBuilding() {
+        return mainBuilding;
+    }
+
+    public void setMainBuilding(String mainBuilding) {
+        this.mainBuilding = mainBuilding;
     }
 
     public List<DeviationPaymentSubReportItem> getDeviationPaymentSubReportItemList() {
