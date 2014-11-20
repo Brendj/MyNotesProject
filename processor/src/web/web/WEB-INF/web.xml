@@ -188,6 +188,17 @@
         <servlet-name>PaymentControllerWS</servlet-name>
         <url-pattern>/soap/payment</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>NotifyControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.integra.notify.NotifyControllerWS</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotifyControllerWS</servlet-name>
+        <url-pattern>/soap/notify</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>FrontControllerWS</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.internal.FrontController</servlet-class>

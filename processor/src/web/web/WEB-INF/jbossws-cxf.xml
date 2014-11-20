@@ -116,6 +116,11 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             implementor='ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS'>
     </jaxws:endpoint>
     <jaxws:endpoint
+            id="NotifyControllerWS"
+            address='http://localhost:8080/processor/soap/notify'
+            implementor='ru.axetta.ecafe.processor.web.partner.integra.notify.NotifyControllerWS'>
+    </jaxws:endpoint>
+    <jaxws:endpoint
             id="ClientRoomControllerWS"
             address='http://localhost:8080/processor/soap/client'
             implementor='ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS'>
