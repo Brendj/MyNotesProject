@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 5.6.2.final using JasperReports Library version 5.6.1  -->
-<!-- 2014-11-19T15:20:13 -->
+<!-- 2014-11-20T13:26:32 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Blank_A4_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="ea061f34-4b90-4f63-a802-93f6a1bef31a">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -64,7 +64,6 @@
 	<field name="dateString" class="java.lang.String"/>
 	<field name="count" class="java.lang.Long"/>
 	<field name="differState" class="java.lang.Boolean"/>
-	<variable name="useColorAccent" class="java.lang.Boolean"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -360,7 +359,7 @@
 				<measure name="count_MEASURE1" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{count}]]></measureExpression>
 				</measure>
-				<measure name="differState_MEASURE1" class="java.lang.Boolean" calculation="First">
+				<measure name="differState_MEASURE1" class="java.lang.Boolean">
 					<measureExpression><![CDATA[$F{differState}]]></measureExpression>
 				</measure>
 				<measure name="useColorAccent1" class="java.lang.Boolean">
@@ -398,7 +397,7 @@
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="60" height="20" columnTotalGroup="date1">
-					<cellContents mode="Opaque" style="Crosstab_CD">
+					<cellContents mode="Opaque" style="Crosstab_CT">
 						<box>
 							<topPen lineWidth="0.0"/>
 							<bottomPen lineWidth="0.0"/>
