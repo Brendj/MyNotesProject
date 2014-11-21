@@ -356,7 +356,10 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     }
 
     protected String getFromColumn(String[] tokens, Map<String, Integer> columns, String colName) {
-        int colPos = columns.get(colName);
+        Integer colPos = columns.get(colName);
+        if(colPos == null) {
+            return "";
+        }
         return tokens[colPos];
     }
 
