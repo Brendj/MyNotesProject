@@ -144,7 +144,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
             */
 
             //List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
-            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session);
+            DailyReferReportItem samples [] = Builder.getSampleItems(session, org, startTime, endTime, o != null ? (String) o : null);    //  Хранится 2 объекта с данными по пробе
+            workDaysCount = workDaysCount + weekendsCount;
+            weekendsCount = 0;
+            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session, samples[0], samples[1]);
             //solveCategories(total, categories);
 
                     //  Добавляем массив как параметр отчета
@@ -382,7 +385,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
     }
 
     protected static final List<List<ReferReportItem>> getTotalItems(int workDaysCount, int weekendsCount,
-                                                                   Session session) {
+                                                                   Session session, DailyReferReportItem workdaysSample,
+                                                                    DailyReferReportItem weekendsSample) {
         List<List<ReferReportItem>> result = new ArrayList<List<ReferReportItem>>();
 
         Query q = session.createSQLQuery(
@@ -401,17 +405,23 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 + "      group by idoforg, subcategory) as clients, "
 
                          //Уникальные проходы
-                + "      (select idoforg, subcategory, count(cnt) as entersCount "
-                + "       from (select distinct cl.idoforg, evt.idofclient as cnt, dr.subcategory "
-                + "             from cf_orgs o "
-                + "             left join cf_enterevents evt on o.idoforg=evt.idoforg "
-                + "             join cf_clients cl on evt.idofclient=cl.idofclient "
-                + "             join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
-                + "                  (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
-                + "             join cf_discountrules dr on ccd.idofrule=dr.idofrule "
-                + "             where cl.idoforg=225 and cl.idofclientgroup<1100000000 and evt.evtdatetime>=1391198400000 and evt.evtdatetime<1393617600000) as data "
-                + "       where subcategory<>'' "
-                + "       group by idoforg, subcategory) as events, "
+                + "      (select idoforg, subcategory, cast(avg(cnt) as bigint) as entersCount "
+                + "       from ("
+                + "             select idoforg, subcategory, count(distinct idofclient) as cnt, evtday "
+                + "             from ("
+                + "                   select cl.idoforg, dr.subcategory, evt.idofclient, date_trunc('day', to_timestamp(evt.evtdatetime / 1000)) as evtday "
+                + "                   from cf_orgs o "
+                + "                   left join cf_enterevents evt on o.idoforg=evt.idoforg "
+                + "                   join cf_clients cl on evt.idofclient=cl.idofclient "
+                + "                   join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
+                + "                        (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
+                + "                   join cf_discountrules dr on ccd.idofrule=dr.idofrule "
+                + "                   where cl.idoforg=225 and cl.idofclientgroup<1100000000 and evt.evtdatetime>=1391198400000 and evt.evtdatetime<1393617600000 and subcategory<>'' "
+                + "                   ) as aa "
+                + "             group by idoforg, subcategory, evtday "
+                + "             ) as bb "
+                + "       group by idoforg, subcategory "
+                + "       order by subcategory desc) as events, "
 
                           //Сумма покупок
                 + "       (SELECT o.idoforg, dr.subcategory, SUM(od.Qty*(od.RPrice+od.socdiscount)) / 100 as ordersCount "
@@ -434,7 +444,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 long idoforg = ((BigInteger) e[0]).longValue();
                 String category = (String) e[1];
                 long clientsCount = ((BigInteger) e[2]).longValue();
-                double eventsCount = ((BigInteger) e[3]).longValue() / workDaysCount;
+                double eventsCount = ((BigInteger) e[3]).longValue();
                 double ordersSummary = ((BigDecimal) e[4]).doubleValue();
 
                 ReferReportItem item = new ReferReportItem();
@@ -447,6 +457,14 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 i++;
             }
         }
+
+        ReferReportItem workdaysTestItem = new ReferReportItem();
+        workdaysTestItem.setName("СУТОЧНАЯ ПРОБА");
+        workdaysTestItem.setLineId(i);
+        workdaysTestItem.setTotal(workdaysSample.getTotal() + weekendsSample.getTotal());
+        workdaysTestItem.setSummary(workdaysSample.getSummary() + weekendsSample.getSummary());
+        items.add(workdaysTestItem);
+
         result.add(items);
         result.add(new ArrayList<ReferReportItem>());
         return result;

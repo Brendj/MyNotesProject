@@ -53,8 +53,8 @@ public class BenefitsRecalculationService {
                     //+ "and cf_clients.idofclient=1244 "  Для проверок, не удалять
                     + "union all "
                     + "select cf_clients.idofclient, cf_categoryorg_orgs.idofcategoryorg, case when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 then -90  "
-                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=8 then -91 "
-                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=9 then -92 else -999999 end "
+                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=9 then -91 "
+                    + "                                                                        when CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=10 then -92 else -999999 end "
                     + "from cf_clients "
                     + "left join cf_categoryorg_orgs on cf_clients.idoforg=cf_categoryorg_orgs.idoforg "
                     + "left join cf_clientgroups on cf_clientgroups.idofclientgroup=cf_clients.idofclientgroup AND cf_clientgroups.idoforg=cf_clients.idoforg "

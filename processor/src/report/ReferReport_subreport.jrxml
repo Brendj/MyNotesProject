@@ -182,7 +182,7 @@
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="value" height="102">
-					<bucket class="java.lang.Integer">
+					<bucket order="Descending" class="java.lang.Integer">
 						<bucketExpression><![CDATA[$F{value}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
