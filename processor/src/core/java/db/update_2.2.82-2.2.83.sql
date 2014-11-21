@@ -12,3 +12,5 @@ update cf_discountrules set subcategory='Обучающиеся 1-4 кл.(зав
 update cf_discountrules set subcategory='Обучающиеся 5-9 кл.(завтрак+обед)' where subcategory='Бесплатники 5-9 кл.(завтрак+обед)';
 update cf_discountrules set subcategory='Обучающиеся 10-11 кл.(завтрак+обед)' where subcategory='Бесплатники 10-11 кл.(завтрак+обед)';
 
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 141121) НЕ МЕНЯТЬ
