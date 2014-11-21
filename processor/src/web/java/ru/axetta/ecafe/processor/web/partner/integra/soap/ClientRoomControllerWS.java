@@ -838,7 +838,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
             }
-
+// коментарии
             ListOfGoodGroups listOfGoodGroups = new ListOfGoodGroups();
 
             ObjectFactory objectFactory = new ObjectFactory();
@@ -5558,6 +5558,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.fill(subscriptionFeeding);
             sf.setDateActivateSubscription(activateDate);
             sf.setLastDatePauseSubscription(null);
+            sf.setWasSuspended(false);
             sf.setStaff(null);
             sf.setDeletedState(false);
             Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
