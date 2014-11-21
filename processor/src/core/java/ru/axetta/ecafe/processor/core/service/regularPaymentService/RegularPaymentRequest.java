@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientPaymentsDao;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -12,6 +14,8 @@ import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,9 @@ import java.util.Map;
 
 @Service(IRequestOperation.REGULAR_PAYMENT)
 public class RegularPaymentRequest implements IRequestOperation {
+
+    private static Logger logger = LoggerFactory.getLogger(RegularPaymentRequest.class);
+
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -131,8 +138,32 @@ public class RegularPaymentRequest implements IRequestOperation {
             bs.setLastSuccessfulPaymentDate(rp.getPaymentDate());
             bs.setUnsuccessfulPaymentsCount(0);
             bs.setLastPaymentStatus(MfrRequest.PAYMENT_SUCCESSFUL);
+            updateLastClientPayment(mfrRequest);
             return true;
         }
         return false;
+    }
+
+    //Ищет последний, за 5 минут, запрос на платеж от клиента и ставит ему отметку "Автоплатеж с банковской карты"
+    @Transactional
+    public static void updateLastClientPayment(MfrRequest mfrRequest) {
+        logger.warn("Запущена модификация mfrRequest: " + mfrRequest.getIdOfRequest());
+        try {
+            ClientPaymentsDao clientPaymentsDao = RuntimeContext.getAppContext().getBean(ClientPaymentsDao.class);
+
+            ClientPayment clientPayment = clientPaymentsDao.findAllIn5Minutes(mfrRequest.getClient().getIdOfClient());
+
+            if (clientPayment == null){
+                //logger.warn("Не найден платеж клиента : " + (mfrRequest.getClient().getIdOfClient()) ); //убрать после 15,01,15
+                return;
+            }
+            clientPaymentsDao.updatePaymentMethod(clientPayment.getIdOfClientPayment(),
+                    ClientPayment.AUTO_PAYMENT_METHOD);
+        } catch (Exception e) {
+            logger.error("Проблема при модификации платежа: "+ mfrRequest.getIdOfRequest(), e);
+        }
+
+        logger.warn("Успешно модифицирован ClientPayment: " + mfrRequest.getIdOfRequest());
+
     }
 }

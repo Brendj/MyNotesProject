@@ -1,6 +1,5 @@
 package ru.axetta.ecafe.processor.core.persistence.dao;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +7,7 @@ import java.util.List;
  * Date: 14.08.14
  * Time: 13:12
  */
-public abstract class AbstractJpaDao< T extends Serializable> extends BaseJpaDao {
+public abstract class AbstractJpaDao< T> extends BaseJpaDao {
 
     private Class< T > clazz;
 
