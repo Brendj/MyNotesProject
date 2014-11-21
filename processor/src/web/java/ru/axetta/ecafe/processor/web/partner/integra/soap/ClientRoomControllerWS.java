@@ -5549,7 +5549,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if(activateDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Не верная дата активация циклограммы";
+                result.description = "Неправильная дата активация циклограммы";
+                return result;
+            }
+            Date currentDate = new Date();
+            if (subscriptionFeeding.getDateActivateSubscription() == null
+                    && subscriptionFeeding.getLastDatePauseSubscription() == null
+                    && subscriptionFeeding.getWasSuspended() == false) {
+
+                result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                result.description = "Ошибка возобновления подписки в статусе \"Создана\"";
+                return result;
+            }
+            if (subscriptionFeeding.getDateActivateSubscription() != null
+                    && subscriptionFeeding.getLastDatePauseSubscription() == null
+                    && subscriptionFeeding.getWasSuspended() == false
+                    && subscriptionFeeding.getDateActivateSubscription().getTime() > currentDate.getTime()) {
+                result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                result.description = "Ошибка возобновления подписки в статусе \"Ожидает активации\"";
+                return result;
+            }
+            if (subscriptionFeeding.getDateActivateSubscription() != null
+                    && subscriptionFeeding.getLastDatePauseSubscription() == null
+                    && subscriptionFeeding.getWasSuspended() == false
+                    && subscriptionFeeding.getDateActivateSubscription().getTime() <= currentDate.getTime()) {
+                result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                result.description = "Ошибка возобновления подписки в статусе \"Активна\"";
                 return result;
             }
             SubscriptionFeeding sf = new SubscriptionFeeding();
