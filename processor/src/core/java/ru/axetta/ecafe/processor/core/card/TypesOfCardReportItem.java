@@ -28,7 +28,7 @@ public class TypesOfCardReportItem {
     private List<TypesOfCardSubreportItem> typesOfCardSubeportItems;
 
     public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount,
-            Long skuActCount, Long skuBlockCount, Long othActCount, Long othBlockCount) {
+            Long skuActCount, Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount) {
         this.region = region;
         this.servActCount = servActCount;
         this.servBlockCount = servBlockCount;
@@ -36,6 +36,8 @@ public class TypesOfCardReportItem {
         this.skuBlockCount = skuBlockCount;
         this.othActCount = othActCount;
         this.othBlockCount = othBlockCount;
+        this.allActCount = allActCount;
+        this.allBlockCount = allBlockCount;
     }
 
     public TypesOfCardReportItem() {

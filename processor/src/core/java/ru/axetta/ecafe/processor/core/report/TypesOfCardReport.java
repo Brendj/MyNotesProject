@@ -9,8 +9,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
+import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ import java.util.*;
  * Time: 14:08
  * To change this template use File | Settings | File Templates.
  */
-public class TypesOfCardReport {
+public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
     public static final String PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS = "includeSummaryByDistrict";
 
@@ -36,19 +38,21 @@ public class TypesOfCardReport {
 
     private String htmlReport;
 
-    public TypesOfCardReport(Date generateTime, JasperPrint jasperPrint, Date startTime) {
-
+    public TypesOfCardReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime) {
+        super(generateTime, generateDuration, jasperPrint, startTime, null);
     }
 
     public static class Builder extends BasicReportJob.Builder {
 
         private final String templateFilename;
+        private final String subReportDir;
 
-        public Builder(String templateFilename) {
+        public Builder(String templateFilename, String subReportDir) {
             this.templateFilename = templateFilename;
+            this.subReportDir = subReportDir;
         }
 
-        public TypesOfCardReport build(Session session, Date startTime, Calendar calendar) throws Exception {
+        public BasicReportJob build(Session session, Date startTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -58,15 +62,21 @@ public class TypesOfCardReport {
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, startTime, (Calendar) calendar.clone(), parameterMap));
-            return new TypesOfCardReport(generateTime, jasperPrint, startTime);
+            long generateDuration = generateTime.getTime();
+            return new TypesOfCardReport(generateTime, generateDuration, jasperPrint, startTime);
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<TypesOfCardReportItem> result = new ArrayList<TypesOfCardReportItem>();
+
+            int ac = Card.ACTIVE_STATE; // активная карта
+            int lc = Card.LOCKED_STATE; // заблокированная карта
+
             TypesOfCardService service = new TypesOfCardService();
             service.setSession(session);
 
@@ -78,6 +88,20 @@ public class TypesOfCardReport {
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
 
+            TypesOfCardSubreportItem typesOfCardSubreportItem1 = new TypesOfCardSubreportItem("ГОУ ЦО № 2010",
+                    "109382, г. Москва, ул. Белореченская, д. 8 -- 109382, г. Москва, ул. Верхние поля, д.15, к.3",
+                   0L,0L,0L,0L,0L,0L,0L,0L);
+            TypesOfCardSubreportItem typesOfCardSubreportItem2 = new TypesOfCardSubreportItem("ГОУ СОШ № 1716",
+                    "109451, г. Москва, ул. Верхние поля, д. 40, к.2", 0L,0L,0L,0L,0L,0L,0L,0L);
+
+            List<TypesOfCardSubreportItem> typesOfCardSubreportItems = new ArrayList<TypesOfCardSubreportItem>();
+            typesOfCardSubreportItems.add(typesOfCardSubreportItem1);
+            typesOfCardSubreportItems.add(typesOfCardSubreportItem2);
+
+            TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem("САО",0L,0L,0L,0L,0L,0L,0L,0L);
+            typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
+
+            result.add(typesOfCardReportItem);
 
             return new JRBeanCollectionDataSource(result);
         }
@@ -106,7 +130,18 @@ public class TypesOfCardReport {
         return this;
     }
 
-    public static Logger getLogger() {
-        return logger;
+    @Override
+    public BasicReportForAllOrgJob createInstance() {
+        return null;
+    }
+
+    @Override
+    public BasicReportJob.Builder createBuilder(String templateFilename) {
+        return null;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return null;
     }
 }

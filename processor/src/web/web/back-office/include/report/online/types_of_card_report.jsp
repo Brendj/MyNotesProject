@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <style>
     .region {
@@ -41,7 +42,7 @@
         <a4j:commandButton value="Генерировать отчет" action="#{typesOfCardReportPage.buildReportHTML}"
                            reRender="typesOfCardReportPanel" styleClass="command-button"
                            status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{typesOfCardReportPage.doGenerateXLS}"
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{typesOfCardReportPage.generateXLS}"
                          styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -50,8 +51,8 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
-        <c:if test="${not empty typesOfCardReportPage.report && not empty typesOfCardReportPage.report.htmlReport}">
-            <h:outputText escape="true" value="Отчет по транзакциям" styleClass="output-text" />
+        <c:if test="${not empty  typesOfCardReportPage.report.htmlReport}">
+            <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
 
             <f:verbatim>
                 <style type="text/css">
