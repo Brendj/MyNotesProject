@@ -6,3 +6,9 @@
 
 --! расщирим длину колонки до от 10 до 128 символов
 ALTER TABLE cf_users ALTER COLUMN region TYPE character varying(128);
+
+-- Изменение названия некоторых супер-категорий льготников
+update cf_discountrules set subcategory='Обучающиеся 1-4 кл.(завтрак+обед)' where subcategory='Бесплатники 1-4 кл.(завтрак+обед)';
+update cf_discountrules set subcategory='Обучающиеся 5-9 кл.(завтрак+обед)' where subcategory='Бесплатники 5-9 кл.(завтрак+обед)';
+update cf_discountrules set subcategory='Обучающиеся 10-11 кл.(завтрак+обед)' where subcategory='Бесплатники 10-11 кл.(завтрак+обед)';
+
