@@ -150,14 +150,12 @@ public class RegularPaymentRequest implements IRequestOperation {
         logger.warn("Запущена модификация mfrRequest: " + mfrRequest.getIdOfRequest());
         try {
             ClientPaymentsDao clientPaymentsDao = RuntimeContext.getAppContext().getBean(ClientPaymentsDao.class);
-
-            ClientPayment clientPayment = clientPaymentsDao.findAllIn5Minutes(mfrRequest.getClient().getIdOfClient());
-
+            Long clientPayment = clientPaymentsDao.findAllIn5Minutes(mfrRequest.getClient().getIdOfClient());
             if (clientPayment == null){
                 //logger.warn("Не найден платеж клиента : " + (mfrRequest.getClient().getIdOfClient()) ); //убрать после 15,01,15
                 return;
             }
-            clientPaymentsDao.updatePaymentMethod(clientPayment.getIdOfClientPayment(),
+            clientPaymentsDao.updatePaymentMethod(clientPayment,
                     ClientPayment.AUTO_PAYMENT_METHOD);
         } catch (Exception e) {
             logger.error("Проблема при модификации платежа: "+ mfrRequest.getIdOfRequest(), e);

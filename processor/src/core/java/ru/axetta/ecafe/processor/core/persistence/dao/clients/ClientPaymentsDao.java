@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Date;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -25,21 +26,25 @@ public class ClientPaymentsDao  {
     @PersistenceContext(unitName = "processorPU")
     protected EntityManager entityManager;
 
+    public static ClientPaymentsDao getInstance() {
+        return RuntimeContext.getAppContext().getBean(ClientPaymentsDao.class);
+    }
 
-    public ClientPayment findAllIn5Minutes(long idofclient){
-        long requiredTime = ((new Date()).getTime() - 5*60*1000);
-        List<ClientPayment> list =  entityManager.createQuery( "from ClientPayment cp "
-                + " where cp.createTime > :requiredTime "
-                + " and cp.transaction.client.idOfClient = :idofclient "
-                + " and cp.paymentMethod != :paymentMethod "
-                + " order by cp.createTime desc", ClientPayment.class )
+    public Long findAllIn5Minutes(long idofclient){
+        //long requiredTime = ((new Date()).getTime() - 5*60*1000);
+        long requiredTime = 1413919382408L - 5*60*1000;
+        List list =  entityManager.createNativeQuery("select cp.idofclientpayment " + "from cf_clientpayments cp "
+                + "inner join cf_transactions t on cp.idoftransaction = t.idoftransaction "
+                + "where t.idofclient = :idofclient "
+                + " and cp.paymentmethod <> :paymentMethod " + "and cp.createddate > :requiredTime "
+                + "order by createddate desc ")
                 .setParameter("requiredTime", requiredTime)
                 .setParameter("idofclient", idofclient)
-                .setParameter("paymentMethod",ClientPayment.AUTO_PAYMENT_METHOD )
+                .setParameter("paymentMethod", ClientPayment.AUTO_PAYMENT_METHOD)
                 .setMaxResults(1)
                 .getResultList();
 
-        return !list.isEmpty() ? list.get(0) : null;
+        return !list.isEmpty() ? ((BigInteger)list.get(0)).longValue() : null;
     }
 
     public void save( ClientPayment entity) {
