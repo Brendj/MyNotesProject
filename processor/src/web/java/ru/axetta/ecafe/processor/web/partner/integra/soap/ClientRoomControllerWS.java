@@ -5209,7 +5209,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             } else {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
-                result.description = String.format("У вас уже есть подписка, дата ее ативации " + df.format(subscriptionFeeding
+                result.description = String.format("У вас уже есть подписка, дата ее активации " + df.format(subscriptionFeeding
                         .getDateActivateSubscription()));
                 return result;
             }
