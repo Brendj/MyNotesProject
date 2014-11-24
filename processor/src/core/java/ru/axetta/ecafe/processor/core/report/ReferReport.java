@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
@@ -128,7 +129,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
             PeriodResult periodResult = new PeriodResult();
             Date generateEndTime = new Date();
             int counts [] = getDaysCount(session, org == null ? null : org.getIdOfOrg(),
-                                         o == null ? null : (String) o, startTime, endTime);
+                    o == null ? null : (String) o, startTime, endTime);
             int workDaysCount = counts [0];
             int weekendsCount = counts [1];
             //  Загрузка данных из БД
@@ -147,10 +148,11 @@ public class ReferReport extends BasicReportForAllOrgJob {
             DailyReferReportItem samples [] = Builder.getSampleItems(session, org, startTime, endTime, o != null ? (String) o : null);    //  Хранится 2 объекта с данными по пробе
             workDaysCount = workDaysCount + weekendsCount;
             weekendsCount = 0;
-            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session, samples[0], samples[1]);
+            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, session, samples[0], samples[1],
+                    startTime, endTime, org, o != null ? (String) o : null);
             //solveCategories(total, categories);
 
-                    //  Добавляем массив как параметр отчета
+            //  Добавляем массив как параметр отчета
             parameterMap.put("reports", total);
             parameterMap.put("periodChildren", periodResult.getPeriodChildren());
             parameterMap.put("periodTotal", periodResult.getPeriodTotal());
@@ -188,8 +190,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
-                                                            Date startTime, Date endTime,
-                                                            Set<String> groups, boolean isOverallReport, String region) {
+                Date startTime, Date endTime,
+                Set<String> groups, boolean isOverallReport, String region) {
             Map<String, DailyReferReportItem> items = new HashMap<String, DailyReferReportItem>();
             for(String g : groups) {
                 DailyReferReportItem i = new DailyReferReportItem(g);
@@ -238,7 +240,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
-                                                            Date startTime, Date endTime, String region) {
+                Date startTime, Date endTime, String region) {
             List<SampleItem> sampleItems = new ArrayList<SampleItem>();
             List res = executeSampleItemsQuery(session, org, startTime, endTime, region);
             Calendar cal = new GregorianCalendar();
@@ -251,7 +253,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 cal.setTimeInMillis(ts);
                 //  Заносим изменения в соответствующий объект
                 int index = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
-                            cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY ? 0 : 1;
+                        cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY ? 0 : 1;
                 sampleItems.add(new SampleItem(priceObj.doubleValue(), ts, good));
                 /*result[index].setTotal(result[index].getTotal() + 1);
                 result[index].setPrice(priceObj.doubleValue());
@@ -303,7 +305,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         protected static List executeSampleItemsQuery(Session session, OrgShortItem org,
-                                                Date startTime, Date endTime, String region) {
+                Date startTime, Date endTime, String region) {
             String orgJoin = "";
             String regionClause = "";
             String orgClause = "";
@@ -331,12 +333,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
             List res = query.list();
             return res;
         }
-        
+
         private List<DailyReferReportItem> findReferItems(Session session, Date startTime, Date endTime, String region) {
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             List res = DailyReferReport.getReportData(session, org == null ? null : org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
-                                                      " and cf_discountrules.subcategory <> ''", region);
-                        //"and cf_discountrules.subcategory = 'Многодетные 5-11 кл.(завтрак+обед)' and nameofgood='Обед 5-11' ");
+                    " and cf_discountrules.subcategory <> ''", region);
+            //"and cf_discountrules.subcategory = 'Многодетные 5-11 кл.(завтрак+обед)' and nameofgood='Обед 5-11' ");
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
@@ -348,7 +350,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 BigDecimal summaryObj = e[5] == null ? new BigDecimal(0D) : (BigDecimal) e[5];
                 summaryObj            = summaryObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children,
-                                                                     priceObj.doubleValue(), summaryObj.doubleValue());
+                        priceObj.doubleValue(), summaryObj.doubleValue());
                 result.add(item);
             }
 
@@ -385,14 +387,24 @@ public class ReferReport extends BasicReportForAllOrgJob {
     }
 
     protected static final List<List<ReferReportItem>> getTotalItems(int workDaysCount, int weekendsCount,
-                                                                   Session session, DailyReferReportItem workdaysSample,
-                                                                    DailyReferReportItem weekendsSample) {
+            Session session, DailyReferReportItem workdaysSample,
+            DailyReferReportItem weekendsSample,
+            Date startTime, Date endTime,
+            OrgShortItem org, String region) {
         List<List<ReferReportItem>> result = new ArrayList<List<ReferReportItem>>();
+        String regionClause = "";
+        if(region != null && region.trim().length() > 0) {
+            regionClause = " and o.district='" + region + "' ";
+        }
+        String orgClause = "";
+        if(org != null) {
+            orgClause = " and o.idoforg=" + org.getIdOfOrg() + " ";
+        }
 
         Query q = session.createSQLQuery(
                   "select clients.idoforg, clients.subcategory, clients.clientsCount, events.entersCount, orders.ordersCount "
                 + "from "
-                        //Количество учеников
+                //Количество учеников
                 + "     (select idoforg, subcategory, count(idofclient) as clientsCount "
                 + "      from (select distinct cl.idoforg, cl.idofclient, dr.subcategory "
                 + "            from cf_orgs o "
@@ -400,11 +412,11 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 + "            join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
                 + "                 (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
                 + "            join cf_discountrules dr on ccd.idofrule=dr.idofrule "
-                + "            where cl.idoforg=225 and cl.idofclientgroup<1100000000) as data "
+                + "            where cl.idofclientgroup<1100000000 " + regionClause + orgClause + ") as data "
                 + "      where subcategory<>'' "
                 + "      group by idoforg, subcategory) as clients, "
 
-                         //Уникальные проходы
+                //Уникальные проходы
                 + "      (select idoforg, subcategory, cast(avg(cnt) as bigint) as entersCount "
                 + "       from ("
                 + "             select idoforg, subcategory, count(distinct idofclient) as cnt, evtday "
@@ -412,28 +424,35 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 + "                   select cl.idoforg, dr.subcategory, evt.idofclient, date_trunc('day', to_timestamp(evt.evtdatetime / 1000)) as evtday "
                 + "                   from cf_orgs o "
                 + "                   left join cf_enterevents evt on o.idoforg=evt.idoforg "
-                + "                   join cf_clients cl on evt.idofclient=cl.idofclient "
+                + "                   join cf_clients cl on evt.idofclient=cl.idofclient and cl.idoforg=o.idoforg "
                 + "                   join cf_clientscomplexdiscounts ccd on ccd.idofclientcomplexdiscount= "
                 + "                        (select ccd2.idofclientcomplexdiscount from cf_clientscomplexdiscounts ccd2 where cl.idofclient=ccd2.idofclient order by createdate desc limit 1) "
                 + "                   join cf_discountrules dr on ccd.idofrule=dr.idofrule "
-                + "                   where cl.idoforg=225 and cl.idofclientgroup<1100000000 and evt.evtdatetime>=1391198400000 and evt.evtdatetime<1393617600000 and subcategory<>'' "
+                + "                   where cl.idofclientgroup<1100000000 and subcategory<>'' "
+                +                           regionClause + orgClause
+                + "                         and evt.evtdatetime>=:startDate and evt.evtdatetime<:endDate "
                 + "                   ) as aa "
                 + "             group by idoforg, subcategory, evtday "
                 + "             ) as bb "
                 + "       group by idoforg, subcategory "
                 + "       order by subcategory desc) as events, "
 
-                          //Сумма покупок
-                + "       (SELECT o.idoforg, dr.subcategory, SUM(od.Qty*(od.RPrice+od.socdiscount)) / 100 as ordersCount "
-                + "        FROM CF_ORDERS o,CF_ORDERDETAILS od  "
-                + "        left join cf_discountrules dr on dr.idofrule=od.idofrule  "
-                + "        WHERE (o.idOfOrg=225 AND od.idOfOrg=225) AND (o.IdOfOrder=od.IdOfOrder) AND  "
-                + "              (od.MenuType>=50 OR od.MenuType<=99) AND (od.RPrice=0 AND od.Discount>0) AND  "
-                + "              (o.CreatedDate>=1391198400000 AND o.CreatedDate<=1393617600000) and o.state=0 and od.state=0 and dr.subcategory<>'' "
-                + "        GROUP BY o.idoforg, dr.subcategory) as  orders "
+                //Сумма покупок
+                + "       (SELECT ord.idoforg, dr.subcategory, SUM(od.Qty*(od.RPrice+od.socdiscount)) / 100 as ordersCount "
+                + "        FROM CF_ORDERS ord, CF_ORGS o,CF_ORDERDETAILS od "
+                + "        left join cf_discountrules dr on dr.idofrule=od.idofrule "
+                + "        WHERE (ord.IdOfOrder=od.IdOfOrder) " + orgClause
+                + "              AND (ord.idOfOrg=o.idoforg AND od.idOfOrg=o.idoforg) and "
+                + "              (od.MenuType>=" + OrderDetail.TYPE_COMPLEX_MIN + " OR od.MenuType<=" + OrderDetail.TYPE_COMPLEX_MAX + ") AND "
+                + "              (od.RPrice=0 AND od.Discount>0) "
+                + "              and (ord.CreatedDate>=:startDate AND ord.CreatedDate<=:endDate) and ord.state=0 and "
+                + "              od.state=0 and dr.subcategory<>'' "
+                + "        GROUP BY ord.idoforg, dr.subcategory) as  orders "
                 + "where clients.idoforg=events.idoforg and clients.idoforg=orders.idoforg and  "
                 + "      clients.subcategory=events.subcategory and clients.subcategory=orders.subcategory "
                 + "order by 1, 2");
+        q.setParameter("startDate", startTime.getTime());
+        q.setParameter("endDate", endTime.getTime());
         List sqlRes = q.list();
 
         int i=1;
@@ -471,12 +490,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
     }
 
     private static final List<List<ReferReportItem>> getTotalItems(int workDaysCount,
-                                                             int weekendsCount,
-                                                             List<DailyReferReportItem> items,
-                                                             List<String> categories,
-                                                             DailyReferReportItem workdaysSample,
-                                                             DailyReferReportItem weekendsSample,
-                                                             PeriodResult periodResult) {
+            int weekendsCount,
+            List<DailyReferReportItem> items,
+            List<String> categories,
+            DailyReferReportItem workdaysSample,
+            DailyReferReportItem weekendsSample,
+            PeriodResult periodResult) {
         Calendar tmp = new GregorianCalendar();
         List<ReferReportItem> workdays = new ArrayList<ReferReportItem>();
         List<ReferReportItem> weekends = new ArrayList<ReferReportItem>();
@@ -505,11 +524,11 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     continue;
                 }
                 if(i.getGroup2().equals(LUNCH) || cat.indexOf("(завтрак)") > 0 ||
-                   i.getGroup2().equals(BREAKFAST) || i.getGroup2().equals(SNACK)) {
+                        i.getGroup2().equals(BREAKFAST) || i.getGroup2().equals(SNACK)) {
                     prices.add(i.getPrice());
                 }
                 if (i.getGroup2() != null &&
-                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && !i.getGroup2().equals(BREAKFAST)/* && cat.indexOf("(завтрак)") < 1)*/)) {
+                        (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && !i.getGroup2().equals(BREAKFAST)/* && cat.indexOf("(завтрак)") < 1)*/)) {
                     continue;
                 }
                 /*if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
@@ -520,7 +539,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 tmp.setTimeInMillis(i.getTs());
                 //  Если запись относится к рабочему дню, то обновляем итог по рабочим
                 if (tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
-                    tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                        tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                     workdayItem.setChildren(workdayItem.getChildren() + i.getChildren());
                     workdayItem.setTotal(workdayItem.getTotal() + i.getChildren());
                     workdayItem.setSummary(workdayItem.getSummary() + i.getSummary());
@@ -554,11 +573,11 @@ public class ReferReport extends BasicReportForAllOrgJob {
             workdayItem.setChildren((long) Math.round((double) workdayItem.getChildren() / workDaysCount));
             weekendItem.setChildren((long) Math.round((double) weekendItem.getChildren() / weekendsCount));
             periodResult.setPeriodChildren(periodResult.getPeriodChildren() +
-                                           workdayItem.getChildren() + weekendItem.getChildren());
+                    workdayItem.getChildren() + weekendItem.getChildren());
             periodResult.setPeriodTotal(periodResult.getPeriodTotal() +
                     workdayItem.getTotal() + weekendItem.getTotal());
             periodResult.setPeriodSummary(periodResult.getPeriodSummary() +
-                                        workdayItem.getSummary() + weekendItem.getSummary());
+                    workdayItem.getSummary() + weekendItem.getSummary());
             id++;
         }
         //  Калькуляция итого по будням+субб
@@ -646,13 +665,13 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
         Query query = session.createSQLQuery(
                 "select int8(EXTRACT(EPOCH FROM d) * 1000) "
-                + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
-                + "      from cf_orders "
-                + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                + "      join cf_orgs on cf_orders.idoforg=cf_orgs.idoforg "
-                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.state=0 and "+ orgRestrict
-                + "            cf_orders.createddate between :start and :end) as dates "
-                + "order by 1");
+                        + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
+                        + "      from cf_orders "
+                        + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                        + "      join cf_orgs on cf_orders.idoforg=cf_orgs.idoforg "
+                        + "      where cf_orderdetails.socdiscount<>0 and cf_orders.state=0 and "+ orgRestrict
+                        + "            cf_orders.createddate between :start and :end) as dates "
+                        + "order by 1");
         //query.setLong("idoforg", idoforg);
         query.setLong("start", startTime.getTime());
         query.setLong("end", endTime.getTime());
@@ -732,7 +751,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
         private long ts;
         private String name;
         private String goodName;
-        
+
         public DailyReferReportItem() {
 
         }
