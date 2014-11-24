@@ -13,12 +13,13 @@ package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviation
 
 public class ClientInfo {
 
-      public  Long clientId;
-      public  String clientName;
-      public  Long groupId;
-      public  String groupName;
+    public Long clientId;
+    public Long idOfOrg;
+    public String clientName;
+    public Long groupId;
+    public String groupName;
     public int discountMode;
-      public  String categoriesDiscounts;
+    public String categoriesDiscounts;
 
     public ClientInfo(Long clientId, Long groupId, String groupName, String categoriesDiscounts) {
         this.clientId = clientId;
@@ -27,8 +28,10 @@ public class ClientInfo {
         this.categoriesDiscounts = categoriesDiscounts;
     }
 
-    public ClientInfo(Long clientId, String clientName, Long groupId, String groupName, String categoriesDiscounts) {
+    public ClientInfo(Long clientId, Long idOfOrg, String clientName, Long groupId, String groupName,
+            String categoriesDiscounts) {
         this.clientId = clientId;
+        this.idOfOrg = idOfOrg;
         this.clientName = clientName;
         this.groupId = groupId;
         this.groupName = groupName;
@@ -81,5 +84,13 @@ public class ClientInfo {
 
     public void setDiscountMode(int discountMode) {
         this.discountMode = discountMode;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }

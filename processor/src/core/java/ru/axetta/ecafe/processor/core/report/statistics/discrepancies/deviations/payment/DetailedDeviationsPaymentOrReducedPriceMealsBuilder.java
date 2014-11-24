@@ -276,8 +276,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
         if (planOrderItemsToPayNotDetected != null) {
             if (!planOrderItemsToPayNotDetected.isEmpty()) {
-                for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetected) {
-                    if (planOrderItemsPaidByOneDay.contains(planOrderItem)) {
+                for (PlanOrderItem planOrderItem : planOrderItemsPaidByOneDay) {
+                    if (planOrderItemsToPayNotDetected.contains(planOrderItem)) {
                         resultIntersection.add(planOrderItem);
                     }
                 }
@@ -355,8 +355,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
             }
         }
         if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
-            for (PlanOrderItem planOrderItem : planOrderItemsToPayNotDetectedInterval) {
-                if (planOrderItemsPaidByInterval.contains(planOrderItem)) {
+            for (PlanOrderItem planOrderItem : planOrderItemsPaidByInterval) {
+                if (planOrderItemsToPayNotDetectedInterval.contains(planOrderItem)) {
                     resultIntersectionInterval.add(planOrderItem);
                 }
             }

@@ -142,7 +142,7 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoListNot = new ArrayList<ClientInfo>();
 
         Query query = session.createSQLQuery(
-                "SELECT cl.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
+                "SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
                         + "LEFT JOIN cf_clientgroups gr "
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
                         + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg in (:idOfOrgList) "
@@ -160,9 +160,9 @@ public class ClientsEntereventsService {
 
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
-            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    (String) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
-                    (String) resultClientItem[3], (String) resultClientItem[4]);
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(), ((BigInteger) resultClientItem[1]).longValue(),
+                    (String) resultClientItem[2], ((BigInteger) resultClientItem[3]).longValue(),
+                    (String) resultClientItem[4], (String) resultClientItem[5]);
             clientInfoListNot.add(clientInfo);
         }
         return clientInfoListNot;
@@ -183,6 +183,10 @@ public class ClientsEntereventsService {
             List<ComplexInfoItem> complexInfoItemListByPlan = ClientsEntereventsService
                     .loadComplexNameByPlan(session, orgId, startTime, endTime);
             for (ClientInfo clientInfo : clientInfoList) {
+                if (!clientInfo.getIdOfOrg().equals(orgId)) {
+                    complexInfoItemListByPlan = ClientsEntereventsService
+                            .loadComplexNameByPlan(session, clientInfo.getIdOfOrg(), startTime, endTime);
+                }
                 List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
                 categories.removeAll(onlyPaydAbleCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
@@ -202,7 +206,7 @@ public class ClientsEntereventsService {
         List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
 
         Query query = session.createSQLQuery(
-                "SELECT DISTINCT cl.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts "
+                "SELECT DISTINCT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts "
                         + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
                         + "LEFT JOIN cf_clientgroups gr "
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
@@ -217,9 +221,9 @@ public class ClientsEntereventsService {
 
         for (Object resultClient : result) {
             Object[] resultClientItem = (Object[]) resultClient;
-            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    (String) resultClientItem[1], ((BigInteger) resultClientItem[2]).longValue(),
-                    (String) resultClientItem[3], (String) resultClientItem[4]);
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),  ((BigInteger) resultClientItem[1]).longValue(),
+                    (String) resultClientItem[2], ((BigInteger) resultClientItem[3]).longValue(),
+                    (String) resultClientItem[4], (String) resultClientItem[5]);
             clientInfoList.add(clientInfo);
         }
         return clientInfoList;
