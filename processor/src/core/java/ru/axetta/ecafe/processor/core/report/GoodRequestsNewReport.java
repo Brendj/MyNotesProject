@@ -120,7 +120,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             //        OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
             GoodRequestsNewReportService service;
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
-            return new JRBeanCollectionDataSource(service.buildRepotItems(startTime, endTime, nameFilter, orgFilter,
+            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
                     hideMissedColumns, hideGeneratePeriod, hideLastValue));
         }

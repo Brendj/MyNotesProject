@@ -20,6 +20,7 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -46,10 +47,9 @@ public class GoodRequestsNewReportService {
         this.hideTotalRow = hideTotalRow;
     }
 
-    public List<Item> buildRepotItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
+    public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
             int hideDailySampleValue, Date generateBeginTime, Date generateEndTime, List<Long> idOfOrgList,
-            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod,
-            int hideLastValue) {
+            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue) {
         boolean isNew = false;
         boolean isUpdate = false;
 
@@ -91,10 +91,10 @@ public class GoodRequestsNewReportService {
         criteriaComplex.add(Restrictions.isNotNull("good"));
         criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
         criteriaComplex.add(Restrictions.between("menuDate", beginDate,endDate));
-        List list = criteriaComplex.list();
+        List complexList = criteriaComplex.list();
         Map<Long, ComplexInfoItem> complexOrgDictionary = new HashMap<Long, ComplexInfoItem>();
         Map<Long, GoodInfo> allGoodsInfo = new HashMap<Long, GoodInfo>();
-        for (Object obj: list){
+        for (Object obj: complexList){
             ComplexInfo complexInfo = (ComplexInfo) obj;
             FeedingPlanType feedingPlanType = null;
             if(complexInfo!=null){
@@ -586,6 +586,4 @@ public class GoodRequestsNewReportService {
             this.feedingPlanTypeNum = feedingPlanTypeNum;
         }
     }
-
-
 }
