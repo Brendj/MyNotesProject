@@ -125,7 +125,7 @@
 	<summary>
 		<band height="508">
 			<crosstab>
-				<reportElement uuid="516df880-1306-4f37-8df2-132e11bd300b" x="0" y="0" width="802" height="81"/>
+				<reportElement uuid="516df880-1306-4f37-8df2-132e11bd300b" x="0" y="0" width="625" height="81"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -191,23 +191,23 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="7f70a7d8-dc4c-4f1d-89f1-152c8a38bac0" style="Crosstab Data Text" x="0" y="0" width="125" height="102"/>
+								<reportElement uuid="7f70a7d8-dc4c-4f1d-89f1-152c8a38bac0" style="Crosstab Data Text" x="0" y="0" width="50" height="102"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="SansSerif" size="10" isBold="false"/>
+									<font fontName="SansSerif" isBold="false"/>
 								</textElement>
 								<text><![CDATA[Списочная численность по категориям по состоянию на последний рабочий день отчетного месяца, чел.]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="0e487a46-f5e8-4fbe-896f-ada0fb537d8e" style="Crosstab Data Text" x="125" y="0" width="100" height="102"/>
+								<reportElement uuid="0e487a46-f5e8-4fbe-896f-ada0fb537d8e" style="Crosstab Data Text" x="50" y="0" width="100" height="102"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="SansSerif" size="10" isBold="false"/>
+									<font fontName="SansSerif" isBold="false"/>
 								</textElement>
 								<text><![CDATA[Средняя посещаемость чел в день]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="cb80a078-ce29-4775-bf13-30fe3ea1548f" style="Crosstab Data Text" x="225" y="0" width="100" height="102"/>
+								<reportElement uuid="cb80a078-ce29-4775-bf13-30fe3ea1548f" style="Crosstab Data Text" x="150" y="0" width="100" height="102"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="SansSerif" size="10" isBold="false"/>
+									<font fontName="SansSerif" isBold="false"/>
 								</textElement>
 								<text><![CDATA[Объем ден. средств в отчетном периоде, руб.]]></text>
 							</staticText>
@@ -235,27 +235,27 @@
 				<measure name="summaryMeasure" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{summary}]]></measureExpression>
 				</measure>
-				<crosstabCell width="325" height="23">
+				<crosstabCell width="251" height="23">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="125" height="23"/>
+						<textField isBlankWhenNull="false">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="50" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="125" y="0" width="100" height="23"/>
+						<textField isBlankWhenNull="false">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="50" y="0" width="100" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="225" y="0" width="100" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="100" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
@@ -281,24 +281,24 @@
 				<crosstabCell rowTotalGroup="group1" columnTotalGroup="value">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="325" height="25" rowTotalGroup="lineId">
+				<crosstabCell width="251" height="25" rowTotalGroup="lineId">
 					<cellContents>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="125" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="50" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="125" y="0" width="100" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="50" y="0" width="100" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="225" y="0" width="100" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="100" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>

@@ -120,8 +120,8 @@
 				</textElement>
 				<textFieldExpression><![CDATA["Справка о расходе средств бюджета города Москвы на питание обучающихся за период с " + $P{startDate} + " по " + $P{endDate}]]></textFieldExpression>
 			</textField>
-			<subreport>
-				<reportElement uuid="ebebb3fe-3aac-49cc-842d-c0ae035bce22" x="0" y="94" width="713" height="100"/>
+			<subreport isUsingCache="false">
+				<reportElement uuid="ebebb3fe-3aac-49cc-842d-c0ae035bce22" x="0" y="94" width="625" height="100"/>
 				<subreportParameter name="reportType">
 					<subreportParameterExpression><![CDATA["Будние"]]></subreportParameterExpression>
 				</subreportParameter>

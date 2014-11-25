@@ -248,7 +248,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="e8c98786-145a-42c8-ac66-4c9d8d9882a1" x="36" y="1" width="34" height="81"/>
+								<reportElement uuid="e8c98786-145a-42c8-ac66-4c9d8d9882a1" x="0" y="1" width="70" height="81"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="SansSerif" isBold="true" isItalic="false"/>
 								</textElement>
