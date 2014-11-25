@@ -64,8 +64,9 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient " +
                             "where cf_orgs.state=1 "
                             //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            + " AND " + orgCondition + " and " +
-                            " cf_enterevents.evtdatetime>=" + startDate.getTime() + " AND cf_enterevents.evtdatetime<" + endDate.getTime() +
+                            + " AND " + orgCondition +
+                            " AND cf_enterevents.evtdatetime>=" + startDate.getTime() +
+                            " AND cf_enterevents.evtdatetime<" + endDate.getTime() +
                             " group by cf_enterevents.idoforg");
             queryLauncher.loadValue(entries, "realBenefitClientsCount",
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
