@@ -43,7 +43,9 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class ReferReportPage extends OnlineReportPage {
+public class
+
+        ReferReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(ReferReportPage.class);
 

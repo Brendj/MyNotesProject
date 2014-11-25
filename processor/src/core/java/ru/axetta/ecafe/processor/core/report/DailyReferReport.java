@@ -54,9 +54,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     //  Фильтры категорий
     public static final CategoryFilter SUBCATEGORY_ALL = new CategoryFilter("Все");
     public static final CategoryFilter SUBCATEGORY_SHOOL [] = new CategoryFilter[] {
-            new CategoryFilter("Обучающиеся 1-4 кл."),
-            new CategoryFilter("Обучающиеся 5-9 кл."),
-            new CategoryFilter("Обучающиеся 9-11 кл.") };
+            new CategoryFilter("Обучающиеся 1-4 кл.", " and cf_discountrules.subcategory like '%1-4 кл.%' "),
+            new CategoryFilter("Обучающиеся 5-9 кл.", " and cf_discountrules.subcategory like '%5-9 кл.%' "),
+            new CategoryFilter("Обучающиеся 10-11 кл.", " and cf_discountrules.subcategory like '%10-11 кл.%' ") };
     public static final CategoryFilter SUBCATEGORY_KINDERGARTEN [] = new CategoryFilter [] {
             new CategoryFilter("Ясли 1.5-3 лет"),
             new CategoryFilter("Детский сад 3-7 лет") };

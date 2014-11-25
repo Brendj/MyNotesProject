@@ -376,8 +376,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 if(!found) {
                     ReferReportItem item = new ReferReportItem();
                     item.setLineId(i + 1);
-                    item.setChildren(0);
-                    item.setTotal(0);
+                    item.setChildren(0L);
+                    item.setTotal(0L);
                     item.setName(cat);
                     item.setSummary(0D);
                     items2.add(item);
@@ -480,7 +480,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
         ReferReportItem workdaysTestItem = new ReferReportItem();
         workdaysTestItem.setName("СУТОЧНАЯ ПРОБА");
         workdaysTestItem.setLineId(i);
-        workdaysTestItem.setTotal(workdaysSample.getTotal() + weekendsSample.getTotal());
+        workdaysTestItem.setChildren(null);
+        workdaysTestItem.setTotal(null);//workdaysSample.getTotal() + weekendsSample.getTotal());
         workdaysTestItem.setSummary(workdaysSample.getSummary() + weekendsSample.getSummary());
         items.add(workdaysTestItem);
 
@@ -830,8 +831,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
     public static class ReferReportItem {
         protected int lineId;             //  id для категории
         protected String name;            //  наименование правила
-        protected long children;          //  количество детей
-        protected long total;             //  дето/дни
+        protected Long children;          //  количество детей
+        protected Long total;             //  дето/дни
         protected double summary;         //  сумма
         protected int value;              //  поле для группировки, всегда = 1
 
@@ -879,19 +880,19 @@ public class ReferReport extends BasicReportForAllOrgJob {
             this.name = name;
         }
 
-        public long getChildren() {
+        public Long getChildren() {
             return children;
         }
 
-        public void setChildren(long children) {
+        public void setChildren(Long children) {
             this.children = children;
         }
 
-        public long getTotal() {
+        public Long getTotal() {
             return total;
         }
 
-        public void setTotal(long total) {
+        public void setTotal(Long total) {
             this.total = total;
         }
 
