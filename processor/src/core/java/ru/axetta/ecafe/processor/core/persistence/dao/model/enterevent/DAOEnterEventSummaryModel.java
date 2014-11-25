@@ -21,6 +21,8 @@ public class DAOEnterEventSummaryModel {
     private String visitorFullName;
     private Long idOfClientGroup;
     private String groupName;
+    private long clientOrgId;
+    private String clientOrgName;
 
 
     public DAOEnterEventSummaryModel() {
@@ -142,5 +144,21 @@ public class DAOEnterEventSummaryModel {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public void setClientOrgId(long clientOrgId) {
+        this.clientOrgId = clientOrgId;
+    }
+
+    public long getClientOrgId() {
+        return clientOrgId;
+    }
+
+    public void setClientOrgName(String clientOrgName) {
+        this.clientOrgName = clientOrgName;
+    }
+
+    public String getClientOrgName() {
+        return clientOrgName;
     }
 }

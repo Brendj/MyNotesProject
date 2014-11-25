@@ -212,10 +212,13 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
             List<Row> rowList;
             for (DAOEnterEventSummaryModel enterEvent : enterEventsSummary) {
-                data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getIdOfOrg()));
+                if(enterEvent.getGroupName().startsWith("1-Ж")){
+                    System.out.print("dd");
+                }
+                data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getClientOrgId()));
                 if (data == null) {
-                    ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, enterEvent.getIdOfClient());
-                    if(clientItem.getIdOfOrg()!= enterEvent.getIdOfOrg()){
+                    ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, enterEvent.getClientOrgId());
+                    if(clientItem != null && clientItem.getIdOfOrg()!= enterEvent.getIdOfOrg()){
                         data = dataMap.get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
 
                     }

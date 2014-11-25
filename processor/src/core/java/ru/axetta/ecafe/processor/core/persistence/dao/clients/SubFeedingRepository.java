@@ -33,7 +33,7 @@ public class SubFeedingRepository  extends BaseJpaDao {
 
     private ClientItem getClientBySQL(String query){
         List<Object[]> temp = entityManager.createNativeQuery(query).getResultList();
-        return parse(temp).get(0);
+        return temp ==null || temp.size() == 0 ? null : parse(temp).get(0);
     }
 
     private List<ClientItem> parse(List<Object[]> temList) {

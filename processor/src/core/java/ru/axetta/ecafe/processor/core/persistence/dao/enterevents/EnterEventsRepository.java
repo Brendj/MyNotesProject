@@ -85,9 +85,10 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
     @Transactional(readOnly = true)
     public List<DAOEnterEventSummaryModel> getEnterEventsSummary(String orgList, Long startTime, Long endTime) {
         String sql =
-                "SELECT  e.idofclient, e.idoforg, og.shortname, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname "
+                "SELECT  e.idofclient, e.idoforg, og.shortname, e.passdirection, e.eventcode, e.idoftempcard, e.evtdatetime, e.idofvisitor, e.visitorfullname, c.idofclientgroup, (p.surname || ' ' ||p.firstname || ' ' || p.secondname) as fullname, g.groupname , c.idoforg as cidoforg, cg.shortname as cshortname "
                         + " FROM cf_enterevents e "
                         + " INNER JOIN cf_clients c ON e.idofclient = c.idofclient   and c.idOfOrg IN (" + orgList + ") "
+                        + " INNER JOIN cf_orgs cg ON cg.idoforg=c.idoforg "
                         + " INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                         + " INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup and c.idoforg = g.idoforg "
                         + " INNER JOIN cf_orgs og ON e.idoforg = og.idoforg "
@@ -158,6 +159,8 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
             entry.setVisitorFullName((String) temp[10]);
             entry.setIdOfClientGroup(temp[9] != null ? ((BigInteger) temp[9]).longValue() : null);
             entry.setGroupName((String) temp[11]);
+            entry.setClientOrgId( ((BigInteger) temp[12]).longValue() );
+            entry.setClientOrgName((String) temp[13]);
             result.add(entry);
         }
         return result;
