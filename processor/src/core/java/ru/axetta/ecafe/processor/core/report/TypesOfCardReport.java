@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
@@ -36,13 +37,30 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(TypesOfCardReport.class);
 
-    private String htmlReport;
-
     public TypesOfCardReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime) {
         super(generateTime, generateDuration, jasperPrint, startTime, null);
     }
 
-    public static class Builder extends BasicReportJob.Builder {
+    public TypesOfCardReport() {
+    }
+
+    @Override
+    public BasicReportForAllOrgJob createInstance() {
+        return new TypesOfCardReport();
+    }
+
+    @Override
+    public BasicReportJob.Builder createBuilder(String templateFilename) {
+        String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        return new Builder(templateFilename, subReportDir);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
         private final String subReportDir;
@@ -99,49 +117,20 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             typesOfCardSubreportItems.add(typesOfCardSubreportItem2);
 
             TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem("САО",0L,0L,0L,0L,0L,0L,0L,0L);
+            TypesOfCardReportItem typesOfCardReportItem1 = new TypesOfCardReportItem("ЮВАО",10L,20L,30L,40L,50L,60L,70L,80L);
+
             typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
 
             result.add(typesOfCardReportItem);
+            result.add(typesOfCardReportItem1);
 
             return new JRBeanCollectionDataSource(result);
         }
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return build(session, startTime, calendar);
         }
     }
 
-    public TypesOfCardReport build(Session session, Date startTime, Calendar calendar) throws Exception {
-        return doBuild(session, startTime, calendar);
-    }
-
-    public TypesOfCardReport doBuild(Session session, Date startTime, Calendar calendar)
-            throws Exception {
-        return null;
-    }
-
-    public String getHtmlReport() {
-        return htmlReport;
-    }
-
-    public TypesOfCardReport setHtmlReport(String htmlReport) {
-        this.htmlReport = htmlReport;
-        return this;
-    }
-
-    @Override
-    public BasicReportForAllOrgJob createInstance() {
-        return null;
-    }
-
-    @Override
-    public BasicReportJob.Builder createBuilder(String templateFilename) {
-        return null;
-    }
-
-    @Override
-    public Logger getLogger() {
-        return null;
-    }
 }

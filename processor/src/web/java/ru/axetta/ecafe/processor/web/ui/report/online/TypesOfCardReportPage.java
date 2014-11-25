@@ -5,12 +5,12 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.RequestsAndOrdersReport;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListPage;
@@ -113,27 +113,55 @@ public class TypesOfCardReportPage extends OnlineReportPage {
     }
 
     public void generateXLS(ActionEvent event) {
-
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String templateFilename = checkIsExistFile();
+        if (StringUtils.isEmpty(templateFilename)) {
+            printError(String.format("Не найден файл шаблона '%s'", templateFilename));
+            return;
+        }
+        String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
+        builder.setReportProperties(buildProperties());
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
         try {
-            TypesOfCardReport report = buildReport();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
             if (report != null) {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
                 ServletOutputStream servletOutputStream = response.getOutputStream();
                 facesContext.getResponseComplete();
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
                 response.setHeader("Content-disposition", "inline;filename=typesOfCardReport.xls");
+                JRXlsExporter xlsExporter = new JRXlsExporter();
+                xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExporter.exportReport();
+                servletOutputStream.close();
             }
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при выгрузке отчета:", e);
         }
     }
-
-    private TypesOfCardReport buildReport() {
-        return null;
-    }
-
 
     public ClientListPage getClientListPage() {
         return clientListPage;
