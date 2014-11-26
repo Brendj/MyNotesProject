@@ -39,8 +39,6 @@ import java.util.Properties;
  * Time: 14:04
  * To change this template use File | Settings | File Templates.
  */
-@Component
-@Scope("session")
 public class TypesOfCardReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(TypesOfCardReportPage.class);
@@ -65,6 +63,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFileName = checkIsExistFile();
         if (StringUtils.isEmpty(templateFileName)) {
+            printError("Не указана организация");
             return null;
         }
         String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();

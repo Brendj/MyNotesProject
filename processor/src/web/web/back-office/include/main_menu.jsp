@@ -915,9 +915,8 @@
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
                             label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
                             reRender="workspaceForm" />
-        <%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TypesOfCardReportPage"--%>
-        <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{typesOfCardReportPage.mainMenuComponent}"
-                            label="Отчет по типам карт" action="#{typesOfCardReportPage.show}"
+        <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{mainPage.typesOfCardReportPage.mainMenuComponent}"
+                            label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"
                             reRender="workspaceForm" />
 
     </rich:panelMenuGroup>

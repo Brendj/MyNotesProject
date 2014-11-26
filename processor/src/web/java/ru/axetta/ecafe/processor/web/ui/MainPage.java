@@ -338,6 +338,7 @@ public class MainPage implements Serializable {
     private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
             = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
+    private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5324,6 +5325,10 @@ public class MainPage implements Serializable {
 
     public RequestsAndOrdersReportPage getRequestsAndOrdersReportPage() {
         return requestsAndOrdersReportPage;
+    }
+
+    public TypesOfCardReportPage getTypesOfCardReportPage() {
+        return typesOfCardReportPage;
     }
 
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {

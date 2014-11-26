@@ -1,8 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%--
-  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
-  --%>
-
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
@@ -20,29 +16,25 @@
         background-color: #D5E7F0;
     }
 </style>
-<%--@elvariable id="typesOfCardReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TypesOfCardReportPage"--%>
-<h:panelGrid id="typesOfCardReportPanel" binding="#{typesOfCardReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="typesOfCardReportPanel" binding="#{mainPage.typesOfCardReportPage.pageComponent}"
+             styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-
         <h:outputText styleClass="output-text" escape="true" value="Дата" />
-        <rich:calendar value="#{typesOfCardReportPage.startDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false" />
-
+        <rich:calendar value="#{mainPage.typesOfCardReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText escape="true" value="Группа" styleClass="output-text" />
-        <h:selectOneMenu value="#{typesOfCardReportPage.clientListPage.clientFilter.clientGroupId}"
+        <h:selectOneMenu value="#{mainPage.typesOfCardReportPage.clientListPage.clientFilter.clientGroupId}"
                          styleClass="input-text">
-            <f:selectItems value="#{typesOfCardReportPage.clientListPage.clientFilter.clientGroupItems}" />
+            <f:selectItems value="#{mainPage.typesOfCardReportPage.clientListPage.clientFilter.clientGroupItems}" />
             <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
         </h:selectOneMenu>
-
         <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{typesOfCardReportPage.includeSummaryByDistrict}" readonly="true" styleClass="output-text" />
-
-
-        <a4j:commandButton value="Генерировать отчет" action="#{typesOfCardReportPage.buildReportHTML}"
+        <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeSummaryByDistrict}" readonly="true"
+                                 styleClass="output-text" />
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.typesOfCardReportPage.buildReportHTML}"
                            reRender="typesOfCardReportPanel" styleClass="command-button"
                            status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{typesOfCardReportPage.generateXLS}"
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.typesOfCardReportPage.generateXLS}"
                          styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -51,18 +43,16 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
-        <c:if test="${not empty  typesOfCardReportPage.report.htmlReport}">
+        <c:if test="${not empty  mainPage.typesOfCardReportPage.htmlReport}">
             <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
-
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
                         display: none;
                     }
                 </style>
-                <div class="htmlReportContent"> ${typesOfCardReportPage.report.htmlReport} </div>
+                <div class="htmlReportContent"> ${mainPage.typesOfCardReportPage.htmlReport} </div>
             </f:verbatim>
-
         </c:if>
     </h:panelGrid>
 </h:panelGrid>

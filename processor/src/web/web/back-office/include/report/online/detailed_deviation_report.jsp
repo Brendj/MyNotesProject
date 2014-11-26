@@ -10,9 +10,8 @@
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
+        <rich:calendar value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.startDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar"
                          actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -22,14 +21,15 @@
                          value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.periodTypeMenu.periodType}"
                          styleClass="input-text" style="width: 250px;">
             <f:converter converterId="periodTypeConverter" />
-            <f:selectItems value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.periodTypeMenu.items}" />
+            <f:selectItems
+                    value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.periodTypeMenu.items}" />
             <a4j:support event="onchange" reRender="endDateCalendar"
                          actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
+        <rich:calendar id="endDateCalendar"
+                       value="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.onEndDateSpecified}" />
         </rich:calendar>
@@ -53,23 +53,23 @@
                                action="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.buildReportHTML}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
                                status="reportGenerateStatus" />
-            <a4j:status id="reportGenerateStatus">
-                <f:facet name="start">
-                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                </f:facet>
-            </a4j:status>
         </h:panelGrid>
         <h:commandButton value="Выгрузить в Excel"
                          actionListener="#{mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.generateXLS}"
                          styleClass="command-button" />
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.detailedDeviationsPaymentOrReducedPriceMealsReportPage.htmlReport}">
-            <h:outputText escape="true" value="Детализированный отчет отклонений оплаты льготного питания" styleClass="output-text" />
-
+            <h:outputText escape="true" value="Детализированный отчет отклонений оплаты льготного питания"
+                          styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
