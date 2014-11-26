@@ -948,12 +948,14 @@
                             label="Расхождение данных по заявкам и заказам" action="#{mainPage.showRequestsAndOrdersReportPage}"
                             reRender="workspaceForm" />
 
-        <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
-        <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"
-                            binding="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
-                            label="Статистика по актам расхождений"
-                            action="#{mainPage.showDiscrepanciesDataOnOrdersAndPaymentReportPage}"
-                            reRender="workspaceForm" />
+        <%--todo выпилить функционал - реализован некорректно, не работает, не используется--%>
+        <%--отключен в связи с реализацией ECAFE-2169--%>
+        <%--&lt;%&ndash;@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"&ndash;%&gt;--%>
+        <%--<rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"--%>
+                            <%--binding="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"--%>
+                            <%--label="Статистика по актам расхождений"--%>
+                            <%--action="#{mainPage.showDiscrepanciesDataOnOrdersAndPaymentReportPage}"--%>
+                            <%--reRender="workspaceForm" />--%>
 
         <%--@elvariable id="detailedDeviationsPaymentOrReducedPriceMealsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DetailedDeviationsPaymentOrReducedPriceMealsReportPage"--%>
         <rich:panelMenuItem id="detailedDeviationsPaymentOrReducedPriceMealsReportMenuItem"
