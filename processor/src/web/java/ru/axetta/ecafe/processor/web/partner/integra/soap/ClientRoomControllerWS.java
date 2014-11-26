@@ -5158,9 +5158,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
                 return result;
             }
-            Date currentDate = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date dateActivateSubs = CalendarUtils.truncateToDayOfMonth(dateActivateSubscription);
             SubscriptionFeeding subscriptionFeeding = SubscriptionFeedingService
-                    .getCurrentSubscriptionFeedingByClientToDay(session, client, currentDate);
+                    .getCurrentSubscriptionFeedingByClientToDay(session, client, dateActivateSubs);
             if (subscriptionFeeding == null) {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
@@ -5179,6 +5179,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
                             : hoursForbidChange / 24 + 1);
                 }
+                Date currentDate = CalendarUtils.addDays(truncateToDayOfMonth(subscriptionFeeding.getDateCreateService()),1);
 
                 //Вычисление с какой даты можно активировать по поставщику ориентируясь.
                 Date dayForbid = CalendarUtils.addDays(currentDate, dayForbidChange);
@@ -5200,12 +5201,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = "Неверная дата активация подписки";
                     return result;
                 }
-                subscriptionFeeding.setDateActivateSubscription(dayForbid);
+                subscriptionFeeding.setDateActivateSubscription(dateActivateSubscription);
                 session.save(subscriptionFeeding);
                 transaction.commit();
 
                 result.resultCode = RC_OK;
-                result.description = String.format("Подписка успешно активирована, начнет действовать после " + df.format(dayForbid));
+                result.description = String.format("Подписка успешно активирована, начнет действовать после " + df.format(dateActivateSubscription));
                 return result;
             } else {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
