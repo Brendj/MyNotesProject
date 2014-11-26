@@ -56,6 +56,11 @@ public class CycleDiagramOut extends Result implements Serializable {
     private String saturdayPrice;
     @XmlElement(name = "SundayPrice")
     private String sundayPrice;
+    @XmlElement(name = "UpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    private Date updateDate;
+    @XmlElement(name = "ChangesPlace")
+    private Boolean changesPlace;
 
     public CycleDiagramOut() {
     }
@@ -78,6 +83,17 @@ public class CycleDiagramOut extends Result implements Serializable {
         this.fridayPrice = cd.getFridayPrice();
         this.saturdayPrice = cd.getSaturdayPrice();
         this.sundayPrice = cd.getSundayPrice();
+        if (cd.getLastUpdate() == null) {
+            this.updateDate = cd.getCreatedDate();
+        } else {
+            this.updateDate = cd.getLastUpdate();
+        }
+
+        if (cd.getStaff() == null) {
+            this.changesPlace = false;
+        } else {
+            this.changesPlace = true;
+        }
     }
 
     public Long getGlobalId() {
@@ -214,5 +230,21 @@ public class CycleDiagramOut extends Result implements Serializable {
 
     public void setSundayPrice(String sundayPrice) {
         this.sundayPrice = sundayPrice;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public Boolean getChangesPlace() {
+        return changesPlace;
+    }
+
+    public void setChangesPlace(Boolean changesPlace) {
+        this.changesPlace = changesPlace;
     }
 }

@@ -16,16 +16,15 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "CycleDiagramListExt", propOrder = {
-        "c"
-})
+        "c"})
 public class CycleDiagramListExt {
 
     @XmlElement(name = "C")
-    protected List<CycleDiagramExt> c;
+    protected List<CycleDiagramOut> c;
 
-    public List<CycleDiagramExt> getC() {
+    public List<CycleDiagramOut> getC() {
         if (c == null) {
-            c = new ArrayList<CycleDiagramExt>();
+            c = new ArrayList<CycleDiagramOut>();
         }
         return this.c;
     }

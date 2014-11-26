@@ -147,7 +147,7 @@ public class SubFeedingServlet extends HttpServlet {
         }
     }
 
-    private void showHistories(HttpServletRequest req, HttpServletResponse resp) throws Exception{
+    private void showHistories(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         final Date currentDay = new Date();
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
@@ -156,41 +156,41 @@ public class SubFeedingServlet extends HttpServlet {
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
                 : parseDate(req.getParameter("startDate"), df);
-        Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-                : parseDate(req.getParameter("endDate"), df);
+        Date endDate =
+                StringUtils.isBlank(req.getParameter("endDate")) ? null : parseDate(req.getParameter("endDate"), df);
         if (startDate == null || endDate == null) {
             Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
             startDate = week[0];
             endDate = week[1];
         }
         String historyType = req.getParameter("historyType");
-        if(StringUtils.isNotEmpty(historyType)){
+        if (StringUtils.isNotEmpty(historyType)) {
             Long subBalanceNumber = Long.parseLong(contractId + "01");
-            if(historyType.equalsIgnoreCase("payment")) {
+            if (historyType.equalsIgnoreCase("payment")) {
                 final PaymentListResult payments = getPayments(startDate, endDate, subBalanceNumber);
                 boolean paymentsExist = isPaymentsExist(payments);
                 req.setAttribute("paymentsExist", paymentsExist);
                 req.setAttribute("payments", payments);
             }
-            if(historyType.equalsIgnoreCase("purchase")) {
+            if (historyType.equalsIgnoreCase("purchase")) {
                 final PurchaseListResult purchases = getPurchases(startDate, endDate, subBalanceNumber);
                 boolean purchasesExist = isPurchasesExist(purchases);
                 req.setAttribute("purchasesExist", purchasesExist);
                 req.setAttribute("purchases", purchases);
             }
-            if(historyType.equalsIgnoreCase("transfer")) {
+            if (historyType.equalsIgnoreCase("transfer")) {
                 final TransferSubBalanceListResult transfers = getTransfers(contractId, startDate, endDate);
                 boolean transfersExist = isTransfersExist(transfers);
                 req.setAttribute("transfersExist", transfersExist);
                 req.setAttribute("transfers", transfers);
             }
-            if(historyType.equalsIgnoreCase("subfeeding")) {
+            if (historyType.equalsIgnoreCase("subfeeding")) {
                 SubscriptionFeedings feedings;
                 feedings = SubscriptionFeedings.buildHistoryList(clientRoomController, contractId, startDate, endDate);
                 req.setAttribute("subfeedingExist", feedings.isSubscriptionFeedingExist());
                 req.setAttribute("subfeedings", feedings.getSubscriptionFeedings());
             }
-            if(historyType.equalsIgnoreCase("clientdiagram")) {
+            if (historyType.equalsIgnoreCase("clientdiagram")) {
                 CycleDiagrams cycleDiagrams;
                 cycleDiagrams = CycleDiagrams.buildHistoryList(clientRoomController, contractId, startDate, endDate);
                 req.setAttribute("clientdiagramExist", cycleDiagrams.isCycleDiagramExist());
@@ -235,37 +235,39 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("client", client.clientSummary);
         final Date currentDay = new Date();
         SubscriptionFeedingResult result = clientRoomController.getCurrentSubscriptionFeeding(contractId, currentDay);
-        if(result.resultCode!=0){
+        if (result.resultCode != 0) {
             req.setAttribute(ERROR_MESSAGE, result.description);
         }
         SubscriptionFeedingExt subscriptionFeedingExt = result.getSubscriptionFeedingExt();
-        if(subscriptionFeedingExt!=null){
+        if (subscriptionFeedingExt != null) {
             req.setAttribute("subscriptionFeeding", new SubscriptionFeeding(subscriptionFeedingExt));
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         Date activationDate = addDays(currentDay, 1);
-        if(subscriptionFeedingExt!=null && subscriptionFeedingExt.getDateActivateSubscription()!=null){
-            SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
-                    contractId);
+        if (subscriptionFeedingExt != null && subscriptionFeedingExt.getDateActivateSubscription() != null) {
+            SubscriptionFeedingSettingResult settingResult = clientRoomController
+                    .getSubscriptionFeedingSetting(contractId);
             if (settingResult.resultCode == 0) {
                 int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
                 activationDate = addDays(currentDay, dayForbidChange);
-                if(subscriptionFeedingExt.getDateActivateSubscription().after(activationDate)){
-                    activationDate =  subscriptionFeedingExt.getDateActivateSubscription();
+                if (subscriptionFeedingExt.getDateActivateSubscription().after(activationDate)) {
+                    activationDate = subscriptionFeedingExt.getDateActivateSubscription();
                 } else {
-                    if(subscriptionFeedingExt.getDateActivateSubscription().before(currentDay)){
+                    if (subscriptionFeedingExt.getDateActivateSubscription().before(currentDay)) {
                         activationDate = addDays(currentDay, dayForbidChange);
                     } else {
-                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeedingExt.getDateActivateSubscription()), dayForbidChange);
+                        activationDate = addDays(
+                                truncateToDayOfMonth(subscriptionFeedingExt.getDateActivateSubscription()),
+                                dayForbidChange);
                     }
                 }
             } else {
                 req.setAttribute(ERROR_MESSAGE, settingResult.description);
             }
         } else {
-            SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
-                    contractId);
+            SubscriptionFeedingSettingResult settingResult = clientRoomController
+                    .getSubscriptionFeedingSetting(contractId);
             if (settingResult.resultCode == 0) {
                 int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
                 activationDate = addDays(currentDay, dayForbidChange);
@@ -276,12 +278,12 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("activationDate", activationDate);
 
         CycleDiagramList list = clientRoomController.getCycleDiagramList(contractId);
-        CycleDiagramExt currentCycleDiagramExt = null;
-        if(!list.cycleDiagramListExt.getC().isEmpty()){
-            currentCycleDiagramExt = list.cycleDiagramListExt.getC().get(0);
+        CycleDiagramOut currentCycleDiagramOut = null;
+        if (!list.cycleDiagramListExt.getC().isEmpty()) {
+            currentCycleDiagramOut = list.cycleDiagramListExt.getC().get(0);
         }
 
-        req.setAttribute("currentCycleDiagram", currentCycleDiagramExt);
+        req.setAttribute("currentCycleDiagram", currentCycleDiagramOut);
 
         outputPage("view", req, resp);
     }
@@ -345,7 +347,7 @@ public class SubFeedingServlet extends HttpServlet {
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
             Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
-                  : parseDate(req.getParameter("activateDate"), df);
+                    : parseDate(req.getParameter("activateDate"), df);
             cycle.setDateActivationDiagram(activateDate);
             Result result = clientRoomController.putCycleDiagram(contractId, cycle);
             if (result.resultCode == 0) {
@@ -367,11 +369,11 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("client", client.clientSummary);
         Date currentDay = new Date();
         SubscriptionFeedingResult result = clientRoomController.getCurrentSubscriptionFeeding(contractId, currentDay);
-        if(result.resultCode!=0){
+        if (result.resultCode != 0) {
             req.setAttribute(ERROR_MESSAGE, result.description);
         }
         SubscriptionFeedingExt subscriptionFeedingExt = result.getSubscriptionFeedingExt();
-        if(subscriptionFeedingExt!=null){
+        if (subscriptionFeedingExt != null) {
             req.setAttribute("subscriptionFeeding", new SubscriptionFeeding(subscriptionFeedingExt));
         }
         req.setAttribute("complexes",
@@ -391,15 +393,14 @@ public class SubFeedingServlet extends HttpServlet {
         CycleDiagrams cycleDiagrams = CycleDiagrams.buildList(clientRoomController, contractId);
         req.setAttribute("cycleDiagrams", cycleDiagrams.getCycleDiagramList());
 
-        if(!cycleDiagrams.getCycleDiagramList().isEmpty()){
+        if (!cycleDiagrams.getCycleDiagramList().isEmpty()) {
             CycleDiagram cycleDiagram = cycleDiagrams.getCycleDiagramList().get(0);
             req.setAttribute("activeComplexes", cycleDiagram.splitPlanComplexes());
-            if(activationDate.before(cycleDiagram.getDateActivationDiagram())){
+            if (activationDate.before(cycleDiagram.getDateActivationDiagram())) {
                 activationDate = cycleDiagram.getDateActivationDiagram();
             }
         }
         req.setAttribute("dateActivate", df.format(activationDate));
-
 
 
         outputPage("plan", req, resp);
@@ -407,7 +408,7 @@ public class SubFeedingServlet extends HttpServlet {
 
     private CycleDiagramExt buildSubFeedingPlan(HttpServletRequest req) throws Exception {
         CycleDiagramExt cycle = new CycleDiagramExt();
-        for (String key: req.getParameterMap().keySet()){
+        for (String key : req.getParameterMap().keySet()) {
             if (key.contains(COMPLEX_PARAM_PREFIX)) {
                 String[] ids = StringUtils.split(key, '_');
                 String complexId = ids[2];
@@ -422,7 +423,7 @@ public class SubFeedingServlet extends HttpServlet {
 
     private CycleDiagramExt buildSubFeedingPlan(HttpServletRequest req, String id) throws Exception {
         CycleDiagramExt cycle = new CycleDiagramExt();
-        for (String key: req.getParameterMap().keySet()){
+        for (String key : req.getParameterMap().keySet()) {
             if (key.startsWith(COMPLEX_PARAM_PREFIX) && key.endsWith(id)) {
                 String[] ids = StringUtils.split(key, '_');
                 String complexId = ids[2];
@@ -506,8 +507,8 @@ public class SubFeedingServlet extends HttpServlet {
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
                 : parseDate(req.getParameter("startDate"), df);
-        Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-                : parseDate(req.getParameter("endDate"), df);
+        Date endDate =
+                StringUtils.isBlank(req.getParameter("endDate")) ? null : parseDate(req.getParameter("endDate"), df);
         if (startDate == null || endDate == null) {
             Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(new Date());
             startDate = week[0];

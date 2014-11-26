@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.subfeeding;
 
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CycleDiagramExt;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CycleDiagramOut;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -20,7 +20,7 @@ import java.util.*;
  * Time: 17:27
  * To change this template use File | Settings | File Templates.
  */
-public class CycleDiagram implements Serializable{
+public class CycleDiagram implements Serializable {
 
     private Long globalId;
     private String monday;
@@ -44,18 +44,18 @@ public class CycleDiagram implements Serializable{
     private Boolean onChange = false;
     private String changesPlace;
 
-    public String getStartDate(){
-        return dateActivationDiagram==null?"":CalendarUtils.dateShortFullYearToString(dateActivationDiagram);
+    public String getStartDate() {
+        return dateActivationDiagram == null ? "" : CalendarUtils.dateShortFullYearToString(dateActivationDiagram);
     }
 
-    public String getEndDate(){
-        return dateDeactivationDiagram==null?"":CalendarUtils.dateShortFullYearToString(dateDeactivationDiagram);
+    public String getEndDate() {
+        return dateDeactivationDiagram == null ? "" : CalendarUtils.dateShortFullYearToString(dateDeactivationDiagram);
     }
 
-    public String getActivePeriod(){
+    public String getActivePeriod() {
         StringBuilder builder = new StringBuilder();
         builder.append(CalendarUtils.dateShortToString(dateActivationDiagram));
-        if(dateDeactivationDiagram!=null){
+        if (dateDeactivationDiagram != null) {
             builder.append(" &mdash; ");
             builder.append(CalendarUtils.dateShortToString(dateDeactivationDiagram));
         }
@@ -92,12 +92,12 @@ public class CycleDiagram implements Serializable{
         return activeComplexes;
     }
 
-    public String getWeekPrices(){
+    public String getWeekPrices() {
         return CurrencyStringUtils.copecksToRubles(totalSum);
     }
 
-    public String getMonthPrices(){
-        return CurrencyStringUtils.copecksToRubles(totalSum*4);
+    public String getMonthPrices() {
+        return CurrencyStringUtils.copecksToRubles(totalSum * 4);
     }
 
     public String getDayValue(int dayNumber) {
@@ -147,11 +147,11 @@ public class CycleDiagram implements Serializable{
         }
     }
 
-    public String getDiagramNumber(){
+    public String getDiagramNumber() {
         return String.format("Циклограмма_%d", globalId);
     }
 
-    public CycleDiagram(CycleDiagramExt cycleDiagramExt) {
+    public CycleDiagram(CycleDiagramOut cycleDiagramExt) {
         this.globalId = cycleDiagramExt.getGlobalId();
         this.monday = cycleDiagramExt.getMonday();
         this.tuesday = cycleDiagramExt.getTuesday();
@@ -161,11 +161,18 @@ public class CycleDiagram implements Serializable{
         this.saturday = cycleDiagramExt.getSaturday();
         this.sunday = cycleDiagramExt.getSunday();
         this.dateActivationDiagram = cycleDiagramExt.getDateActivationDiagram();
-        switch (cycleDiagramExt.getStateDiagram()){
-            case 0:  this.stateDiagram = "Активная"; break;
-            case 1:  this.stateDiagram = "Ожидает активации"; break;
-            case 2:  this.stateDiagram = "Заблокирована"; break;
-            default: this.stateDiagram = "";
+        switch (cycleDiagramExt.getStateDiagram()) {
+            case 0:
+                this.stateDiagram = "Активная";
+                break;
+            case 1:
+                this.stateDiagram = "Ожидает активации";
+                break;
+            case 2:
+                this.stateDiagram = "Заблокирована";
+                break;
+            default:
+                this.stateDiagram = "";
         }
         this.mondayPrice = cycleDiagramExt.getMondayPrice();
         this.tuesdayPrice = cycleDiagramExt.getTuesdayPrice();

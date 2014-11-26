@@ -5064,7 +5064,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
             List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, startDate, endDate);
             for (CycleDiagram cycleDiagram : cycleDiagrams) {
-                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+                result.cycleDiagramListExt.getC().add(new CycleDiagramOut(cycleDiagram));
             }
             transaction.commit();
             result.resultCode = RC_OK;
@@ -5109,7 +5109,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
             List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client);
             for (CycleDiagram cycleDiagram : cycleDiagrams) {
-                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+                result.cycleDiagramListExt.getC().add(new CycleDiagramOut(cycleDiagram));
             }
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
