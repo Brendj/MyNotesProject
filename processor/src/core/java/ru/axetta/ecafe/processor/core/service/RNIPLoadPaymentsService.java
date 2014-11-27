@@ -43,6 +43,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.X509Security;
 import org.hibernate.Session;
@@ -189,6 +190,9 @@ public class RNIPLoadPaymentsService {
         try {
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             String d = contragent.getLastRNIPUpdate();//RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
+            if(d == null || StringUtils.isBlank(d)) {
+                return new Date(0);
+            }
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             if (d == null || d.length() < 1) {
                 info("Для контрагента %s загрузок не было, используется 0 мс.", contragent.getContragentName());

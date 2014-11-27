@@ -3,3 +3,6 @@
 --! Информация для разработчика -- информация для пользователя
 
 -- Пакет обновлений 2.2.83
+
+--! Отмена ограничения на обязательность заполнения LastRNIPUpdate
+alter table cf_contragents alter column lastrnipupdate DROP NOT NULL;
