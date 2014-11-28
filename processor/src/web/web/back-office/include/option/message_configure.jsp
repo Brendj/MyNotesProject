@@ -101,6 +101,8 @@
                     <h:outputText value="[eventName] - название события" styleClass="output-text" />
                     <h:outputText value="[eventTime] - время события" styleClass="output-text" />
                     <h:outputText value="[guardian] - фамилия и имя представителя" styleClass="output-text"/>
+                    <h:outputText value="[childPassCheckerMark] - признак того, кто сделал отметку о проходе за представителя" styleClass="output-text"/>
+                    <h:outputText value="[childPassCheckerName] - фамилия и имя того, кто сделал отметку о проходе за представителя" styleClass="output-text"/>
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
@@ -222,6 +224,8 @@
                     <h:outputText value="[eventName] - название события" styleClass="output-text" />
                     <h:outputText value="[eventTime] - время события" styleClass="output-text" />
                     <h:outputText value="[guardian] - фамилия и имя представителя" styleClass="output-text" />
+                    <h:outputText value="[childPassCheckerMark] - признак того, кто сделал отметку о проходе за представителя" styleClass="output-text"/>
+                    <h:outputText value="[childPassCheckerName] - фамилия и имя того, кто сделал отметку о проходе за представителя" styleClass="output-text"/>
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

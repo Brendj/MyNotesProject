@@ -124,10 +124,10 @@ public class EventNotificationService {
             "Л/с: [contractId] Сервис АП. Причина: недостаточный баланс субсчета АП.",
             /////
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_SMS,
-            "[eventName] [eventTime] [surname] [firstName] ([guardian])",
+            "[eventName] [eventTime] [surname] [firstName] ([guardian] [childPassCheckerMark] [childPassCheckerName])",
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_TEXT,
             "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
-                    + "[eventName] [eventTime] [surname] [firstName] с представителем [guardian]. <br/>\n"
+                    + "[eventName] [eventTime] [surname] [firstName] с представителем [guardian] [childPassCheckerMark] [childPassCheckerName] . <br/>\n"
                     + "С уважением,<br/>\n"
                     + "Служба поддержки клиентов\n<br/><br/>\n"
                     + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"

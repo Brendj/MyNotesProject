@@ -32,6 +32,8 @@ public class EnterEventItem {
     private final Date issueDocDate;
     private final Date visitDateTime;
     private final Long guardianId;
+    private final Integer childPassChecker;
+    private final Long childPassCheckerId;
 
     public static EnterEventItem build(Node enterEventNode, LoadContext loadContext) throws Exception{
         long idOfEnterEvent = Long
@@ -98,15 +100,25 @@ public class EnterEventItem {
             guardianId = Long.parseLong(
                     enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
         }
+        Integer childPassChecker = null;
+        if (enterEventNode.getAttributes().getNamedItem("ChildPassChecker") != null) {
+            childPassChecker = Integer.parseInt(
+                    enterEventNode.getAttributes().getNamedItem("ChildPassChecker").getTextContent());
+        }
+        Long childPassCheckerId = null;
+        if (enterEventNode.getAttributes().getNamedItem("ChildPassCheckerId") != null) {
+            childPassCheckerId = Long.parseLong(
+                    enterEventNode.getAttributes().getNamedItem("ChildPassCheckerId").getTextContent());
+        }
         return new EnterEventItem(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
                 idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                docSerialNum, issueDocDate, visitDateTime, guardianId);
+                docSerialNum, issueDocDate, visitDateTime, guardianId, childPassChecker, childPassCheckerId);
     }
 
     EnterEventItem(long idOfEnterEvent, String enterName, String turnstileAddr, int passDirection, int eventCode,
             Long idOfCard, Long idOfClient, Long idOfTempCard, Date evtDateTime, Long idOfVisitor,
             String visitorFullName, Integer docType, String docSerialNum, Date issueDocDate, Date visitDateTime,
-            Long guardianId) {
+            Long guardianId, Integer childPassChecker, Long childPassCheckerId) {
         this.idOfEnterEvent = idOfEnterEvent;
         this.enterName = enterName;
         this.turnstileAddr = turnstileAddr;
@@ -123,6 +135,8 @@ public class EnterEventItem {
         this.issueDocDate = issueDocDate;
         this.visitDateTime = visitDateTime;
         this.guardianId = guardianId;
+        this.childPassChecker = childPassChecker;
+        this.childPassCheckerId = childPassCheckerId;
     }
 
     public long getIdOfEnterEvent() {
@@ -187,5 +201,13 @@ public class EnterEventItem {
 
     public Long getGuardianId() {
         return guardianId;
+    }
+
+    public Integer getChildPassChecker() {
+        return childPassChecker;
+    }
+
+    public Long getChildPassCheckerId() {
+        return childPassCheckerId;
     }
 }

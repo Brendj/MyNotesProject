@@ -3141,6 +3141,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     enterEvent.setVisitDateTime(e.getVisitDateTime());
                     final Long guardianId = e.getGuardianId();
                     enterEvent.setGuardianId(guardianId);
+                    enterEvent.setChildPassChecker(e.getChildPassChecker());
+                    enterEvent.setChildPassCheckerId(e.getChildPassCheckerId());
                     persistenceSession.save(enterEvent);
 
 
@@ -3551,6 +3553,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     private String[] generateNotificationParams(Session session, Client client, EnterEventItem event) throws Exception {
         final int passDirection = event.getPassDirection();
         final Long guardianId = event.getGuardianId();
+        final Integer childPassChecker  = event.getChildPassChecker();
+        final Long childPassCheckerId = event.getChildPassCheckerId();
         final Date eventDate = event.getEvtDateTime();
         final String enterEvent = "Вход";
         final String exitEvent = "Выход";
@@ -3572,6 +3576,19 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
             guardianName = StringUtils.join(new Object[]{guardPerson.getSurname(), guardPerson.getFirstName()}, ' ');
         }
+        String childPassCheckerMark = "";
+        if (childPassChecker != null) {
+            if (childPassChecker.longValue() == 0) {
+                childPassCheckerMark = "восп.";
+            } else {
+                childPassCheckerMark = "охр.";
+            }
+        }
+        String childPassCheckerName = "";
+        if (childPassCheckerId != null) {
+            Person childPassCheckerPerson = ((Client) session.load(Client.class, childPassCheckerId)).getPerson();
+            childPassCheckerName = StringUtils.join(new Object[]{childPassCheckerPerson.getSurname(), childPassCheckerPerson.getFirstName()}, ' ');
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(RuntimeContext.getInstance().getDefaultLocalTimeZone(null));
         calendar.setTime(eventDate);
@@ -3585,7 +3602,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
-                guardianName, "empTime", empTime};
+                guardianName, "empTime", empTime, "childPassCheckerMark", childPassCheckerMark, "childPassCheckerName", childPassCheckerName};
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {

@@ -32,6 +32,8 @@ public class EnterEvent {
     private Client client;
     private Org org;
     private Long guardianId;
+    private Integer childPassChecker;
+    private Long childPassCheckerId;
 
 
     //pass direction
@@ -211,6 +213,22 @@ public class EnterEvent {
         this.guardianId = guardianId;
     }
 
+    public Integer getChildPassChecker() {
+        return childPassChecker;
+    }
+
+    public void setChildPassChecker(Integer childPassChecker) {
+        this.childPassChecker = childPassChecker;
+    }
+
+    public Long getChildPassCheckerId() {
+        return childPassCheckerId;
+    }
+
+    public void setChildPassCheckerId(Long childPassCheckerId) {
+        this.childPassCheckerId = childPassCheckerId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -239,6 +257,6 @@ public class EnterEvent {
                 + ", evtDateTime=" + evtDateTime + ", idOfVisitor=" + idOfVisitor + ", visitorFullName='"
                 + visitorFullName + '\'' + ", docType=" + docType + ", docSerialNum='" + docSerialNum + '\''
                 + ", issueDocDate=" + issueDocDate + ", visitDateTime=" + visitDateTime + ", guardianId=" + guardianId
-                + '}';
+                + ", childPassChecker=" + childPassChecker + '\'' + ", childPassCheckerId=" + childPassCheckerId + '\'' + '}';
     }
 }
