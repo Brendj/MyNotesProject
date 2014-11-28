@@ -14,6 +14,9 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -58,8 +61,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             new CategoryFilter("Обучающиеся 5-9 кл.", " and cf_discountrules.subcategory like '%5-9 кл.%' "),
             new CategoryFilter("Обучающиеся 10-11 кл.", " and cf_discountrules.subcategory like '%10-11 кл.%' ") };
     public static final CategoryFilter SUBCATEGORY_KINDERGARTEN [] = new CategoryFilter [] {
-            new CategoryFilter("Ясли 1.5-3 лет"),
-            new CategoryFilter("Детский сад 3-7 лет") };
+            new CategoryFilter("Ясли 1,5-3 лет", " and cf_discountrules.subcategory like '%1,5-3 лет %' "),
+            new CategoryFilter("Детский сад 3-7 лет", " and cf_discountrules.subcategory like '%3-7 лет %' ") };
 
 
     public List<DailyReferReportItem> getItems() {
@@ -141,14 +144,23 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             if(!categoryFilter.equals(SUBCATEGORY_ALL)) {
                 parameterMap.put("category", categoryFilter.getName());
             }
+            Org orgObj = null;
+            if(org != null) {
+                orgObj = DAOService.getInstance().findOrById(org.getIdOfOrg());
+                String totalCaption = "Общая стоимость за 1-11 классы, руб.";
+                if(orgObj.getType().equals(OrganizationType.KINDERGARTEN)) {
+                    totalCaption = "Общая стоимость, руб.";
+                }
+                parameterMap.put("totalCaption", totalCaption);
+            }
 
 
             Date generateEndTime = new Date();
             List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, categoryFilter,
-                    o != null ? (String) o : null);//getDailyReferItems(session);//
+                    o != null ? (String) o : null, orgObj);//getDailyReferItems(session);//
             if(showDailySample) {
-                addSamples(session, org, startTime, endTime, items, categoryFilter, o != null ? (String) o : null);
-                calculateOverall(items, isOverallReport(categoryFilter));
+                addSamples(session, org, startTime, endTime, items, categoryFilter, o != null ? (String) o : null, orgObj);
+                calculateOverall(items, isOverallReport(categoryFilter), orgObj);
             }
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
@@ -185,7 +197,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
         }
 
-        protected void calculateOverall(List<DailyReferReportItem> items, boolean isOverallReport) {
+        protected void calculateOverall(List<DailyReferReportItem> items, boolean isOverallReport, Org orgObj) {
             Map<String, Set<String>> groups = new HashMap<String, Set<String>>();
             for(DailyReferReportItem i : items) {
                 String g1 = i.getGroup1();
@@ -214,7 +226,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
                     String name = g1 + " (" + g2 + ")";
                     DailyReferReportItem newI = new DailyReferReportItem("ВСЕГО", name, name,
-                                                                         children, 0, summary, isOverallReport);
+                                                                         children, 0, summary, isOverallReport, orgObj.getType());
                     newI.setGroup1(g1);
                     newI.setGroup2(g2);
                     newI.setIndex(3);
@@ -251,7 +263,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         protected DailyReferReportItem[] addSamples(Session session, OrgShortItem org,
                                                     Date startTime, Date endTime,
-                                                    List<DailyReferReportItem> items, CategoryFilter categoryFilter, String region) {
+                                                    List<DailyReferReportItem> items,
+                                                    CategoryFilter categoryFilter, String region, Org orgObj) {
             boolean isOverallReport = isOverallReport(categoryFilter);
             Set<String> groups = new HashSet<String>();
             for(DailyReferReportItem i : items) {
@@ -273,11 +286,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 DailyReferReportItem item = null;
                 if(isOverallReport) {
                     item = new DailyReferReportItem("СУТОЧНАЯ ПРОБА", it.getName(), it.getName(),
-                            it.getChildren(), it.getPrice(), it.getSummary(), isOverallReport);
+                            it.getChildren(), it.getPrice(), it.getSummary(), isOverallReport, orgObj.getType());
                     item.setIndex(2);
                 } else {
-                    item = new DailyReferReportItem("СУТОЧНАЯ ПРОБА", name, it.getGoodName(),
-                                                    it.getChildren(), it.getPrice(), it.getSummary(), isOverallReport);
+                    item = new DailyReferReportItem("СУТОЧНАЯ ПРОБА", name, it.getGoodName(), it.getChildren(),
+                                                    it.getPrice(), it.getSummary(), isOverallReport, orgObj.getType());
                     item.setIndex(2);
                 }
                 /*if(category == null || category.length() < 1) {
@@ -322,7 +335,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return null;
         }
 
-        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, CategoryFilter categoryFilter, String region) {
+        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime,
+                                                               CategoryFilter categoryFilter, String region, Org orgObj) {
             String categoryClause = "";
             if (categoryFilter != null) {
                 //categoryClause = " and cf_discountrules.subcategory = '" + category + "' ";
@@ -336,7 +350,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 totals = new HashMap<String, DailyReferReportItem>();
             }
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
-            List res = getReportData(session, org == null ? null : org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
+            List res = getReportData(session, orgObj == null ? null : orgObj.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
                                      categoryClause, region);
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
@@ -350,7 +364,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 summaryObj            = summaryObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
 
                 boolean isOverallReport = isOverallReport(categoryFilter);
-                DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children, priceObj.doubleValue(), summaryObj.doubleValue(), isOverallReport);
+                DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children,
+                                                                     priceObj.doubleValue(), summaryObj.doubleValue(),
+                                                                     isOverallReport, orgObj.getType());
                 totalSumm             += summaryObj.doubleValue();
                 result.add(item);
 
@@ -358,7 +374,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 if(totals != null) {
                     DailyReferReportItem total = totals.get(name + " / " + item.getGroup2());
                     if(total == null) {
-                        total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D, isOverallReport);
+                        total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D,
+                                                         isOverallReport, orgObj.getType());
                         total.setPrice(item.getPrice());
                         totals.put(name + " / " + item.getGroup2(), total);
                         total.setIndex(1);
@@ -525,20 +542,36 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         }
 
-        public DailyReferReportItem(long ts, String name, String goodname, long children, double price, double summary) {
-            this(dailyItemsFormat.format(new Date(ts)), name,  goodname, children, price, summary, false);
+        public DailyReferReportItem(long ts, String name, String goodname, long children,
+                                    double price, double summary, OrganizationType orgType) {
+            this(dailyItemsFormat.format(new Date(ts)), name,  goodname,
+                 children, price, summary, false, orgType);
         }
 
-        public DailyReferReportItem(long ts, String name, String goodname, long children, double price, double summary, boolean isOverallReport) {
-            this(dailyItemsFormat.format(new Date(ts)), name,  goodname, children, price, summary, isOverallReport);
+        public DailyReferReportItem(long ts, String name, String goodname, long children,
+                                    double price, double summary, boolean isOverallReport, OrganizationType orgType) {
+            this(dailyItemsFormat.format(new Date(ts)), name,  goodname,
+                 children, price, summary, isOverallReport, orgType);
         }
 
-        public DailyReferReportItem(String day, String name, String goodname, long children, double price, double summary, boolean isOverallReport) throws RuntimeException {
+        public DailyReferReportItem(String day, String name, String goodname,
+                                    long children, double price, double summary,
+                                    boolean isOverallReport, OrganizationType orgType) throws RuntimeException {
             index = 0;
             this.day = day;
             group0 = "_";
             if(isOverallReport) {
-                this.group1 = String.format("Обучающимся %s классов", findGroupRangeInString(name));
+                String catName = "";
+                if(orgType != null) {
+                    if(orgType.equals(OrganizationType.SCHOOL)) {
+                        catName = "классов";
+                    } else if(orgType.equals(OrganizationType.KINDERGARTEN)) {
+                        catName = "лет";
+                    }
+                } else {
+                    catName = "все";
+                }
+                this.group1 = String.format("Обучающиеся %s %s", findGroupRangeInString(name), catName);
                 if(group1 == null) {
                     throw new RuntimeException("Failed to get group range in string " + name);
                 }
