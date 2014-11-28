@@ -9,8 +9,8 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.210000000000001"/>
-	<property name="ireport.x" value="83"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="48"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -187,7 +187,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement verticalAlignment="Middle"/>
-							<text><![CDATA[Полное уставное наименование учреждения]]></text>
+							<text><![CDATA[Образовательной организации (Получатель услуг)Наименование ]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="46ee7237-4f20-4bf6-902c-43f748713003" style="Crosstab Data Text" x="342" y="0" width="151" height="200"/>
@@ -199,7 +199,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement verticalAlignment="Middle"/>
-							<text><![CDATA[Адрес учреждения (пищеблока)]]></text>
+							<text><![CDATA[Фактический адрес пищеблока организации ]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="e12c50dd-defe-4a4e-a671-0b6c1457e675" style="Crosstab Data Text" x="493" y="0" width="50" height="200"/>
@@ -211,7 +211,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement verticalAlignment="Middle" rotation="Left"/>
-							<text><![CDATA[Тип пищеблока СД/БР/С]]></text>
+							<text><![CDATA[Тип пищеблока]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -245,7 +245,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<staticText>
-								<reportElement uuid="5c623ff4-fbef-4657-a27f-b32ff404187b" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="543" height="39" backcolor="#CCFFFF"/>
+								<reportElement uuid="5c623ff4-fbef-4657-a27f-b32ff404187b" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="543" height="39" backcolor="#CCFFFF"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -461,7 +461,7 @@
 						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
+						<cellContents backcolor="#CCFFCC" mode="Transparent" style="Crosstab Data Text">
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -509,7 +509,7 @@
 						<bucketExpression><![CDATA[$F{level3}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
+						<cellContents backcolor="#CCFFCC" mode="Transparent" style="Crosstab Data Text">
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -554,7 +554,7 @@
 								<textElement verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[ИТОГО]]></text>
+								<text><![CDATA[Общая стоимость за отчетный период]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="70f8df3f-4676-4775-a0e0-2a2ee42418b9" style="Crosstab Data Text" x="73" y="0" width="73" height="170"/>
@@ -578,7 +578,7 @@
 						<bucketExpression><![CDATA[$F{level4}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
+						<cellContents backcolor="#CCFFCC" mode="Transparent" style="Crosstab Data Text">
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -601,7 +601,7 @@
 								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
 							</textField>
 							<staticText>
-								<reportElement uuid="679585b1-2a46-4ee1-8939-17eb20917bd6" style="Crosstab Data Text" x="0" y="30" width="40" height="110"/>
+								<reportElement uuid="679585b1-2a46-4ee1-8939-17eb20917bd6" style="Crosstab Data Text" x="40" y="30" width="36" height="110"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -612,10 +612,10 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Кол-во рационов (шт.) ]]></text>
+								<text><![CDATA[Кол-во, шт]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="b0998b7d-f650-40a7-8709-42bd73d34a4b" style="Crosstab Data Text" x="40" y="30" width="36" height="110"/>
+								<reportElement uuid="b0998b7d-f650-40a7-8709-42bd73d34a4b" style="Crosstab Data Text" x="0" y="30" width="40" height="110"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -626,10 +626,10 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Цена]]></text>
+								<text><![CDATA[Цена по контракту]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="7b1a6658-40fa-4802-a5c2-32c7f92a103e" style="Crosstab Data Text" mode="Opaque" x="76" y="30" width="61" height="110" backcolor="#FFCCCC"/>
+								<reportElement uuid="7b1a6658-40fa-4802-a5c2-32c7f92a103e" style="Crosstab Data Text" mode="Transparent" x="76" y="30" width="61" height="110" backcolor="#FFCCCC"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -640,12 +640,12 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Сумма]]></text>
+								<text><![CDATA[Стоимость, руб.]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
+						<cellContents backcolor="#CCFFCC" mode="Transparent" style="Crosstab Data Text">
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -689,7 +689,7 @@
 							<rightPen lineWidth="0.5"/>
 						</box>
 						<textField pattern="0.00" isBlankWhenNull="true">
-							<reportElement uuid="cfc4e52f-fb25-408e-9cb4-36a854d0829f" style="Crosstab Data Text" x="40" y="0" width="36" height="39"/>
+							<reportElement uuid="cfc4e52f-fb25-408e-9cb4-36a854d0829f" style="Crosstab Data Text" x="0" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -703,7 +703,7 @@
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="18941ecf-8931-4610-9307-8e58bbb004b5" style="Crosstab Data Text" x="0" y="0" width="40" height="39"/>
+							<reportElement uuid="18941ecf-8931-4610-9307-8e58bbb004b5" style="Crosstab Data Text" x="40" y="0" width="36" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1107,7 +1107,7 @@
 							<rightPen lineWidth="0.5"/>
 						</box>
 						<textField>
-							<reportElement uuid="54a8b761-8ae7-483e-a5a3-79c32b6fade4" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="54a8b761-8ae7-483e-a5a3-79c32b6fade4" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1121,7 +1121,7 @@
 							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField pattern="0.00">
-							<reportElement uuid="d707c545-f7af-4309-8ebe-c1023b523f8f" style="Crosstab Data Text" mode="Opaque" x="40" y="0" width="36" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="d707c545-f7af-4309-8ebe-c1023b523f8f" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="36" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1135,7 +1135,7 @@
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField pattern="0.00">
-							<reportElement uuid="5f925592-758e-4be4-9a06-ae681a555ea0" style="Crosstab Data Text" mode="Opaque" x="76" y="0" width="61" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="5f925592-758e-4be4-9a06-ae681a555ea0" style="Crosstab Data Text" mode="Transparent" x="76" y="0" width="61" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1171,7 +1171,7 @@
 							<rightPen lineWidth="0.5"/>
 						</box>
 						<textField pattern="0.00">
-							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="73" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="73" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1185,7 +1185,7 @@
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField pattern="###0">
-							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Opaque" x="73" y="0" width="73" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Transparent" x="73" y="0" width="73" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -1210,7 +1210,7 @@
 							<rightPen lineWidth="0.5"/>
 						</box>
 						<textField pattern="0.00">
-							<reportElement uuid="fac91d92-1347-4836-81b8-e8eeb4874b3e" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="63" height="39" backcolor="#CCFFFF"/>
+							<reportElement uuid="fac91d92-1347-4836-81b8-e8eeb4874b3e" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="63" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
