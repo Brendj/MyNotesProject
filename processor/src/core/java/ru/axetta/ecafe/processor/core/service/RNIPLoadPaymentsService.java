@@ -32,6 +32,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.soap.MessageFactory;
@@ -106,6 +107,7 @@ public class RNIPLoadPaymentsService {
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     public static final String RNIP_INPUT_FILE = "/rnip.in.signed";
     public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
+    public static final String RNIP_DIR = "/rnip/";
 
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
@@ -315,17 +317,23 @@ public class RNIPLoadPaymentsService {
 
         info("Разбор новых платежей для контрагента %s..", contragent.getContragentName());
         // Если платежи есть, то обрабатываем их
-        List<Map<String, String>> payments = null;
+        RNIPPaymentsResponse res = null;
         try {
-            payments = parsePayments(response);
+            res = parsePayments(response);
         } catch (Exception e) {
             logger.error(
                     String.format("Не удалось разобрать платежи для контрагента %s", contragent.getContragentName()), e);
             return;
         }
-        info("Получено %s новых платежей для контрагента %s, применение..", payments.size(), contragent.getContragentName());
+        info("Получено %s новых платежей для контрагента %s, применение..", res.getPayments().size(), contragent.getContragentName());
         //  И записываем в БД
-        addPaymentsToDb(payments);
+        addPaymentsToDb(res.getPayments());
+
+        if(res.getRnipDate() == null || updateTime.before(res.getRnipDate())) {
+            //  updateTime = updateTime;
+        } else {
+            updateTime = res.getRnipDate();
+        }
 
 
         //  Обновляем дату последней загрузки платежей
@@ -348,9 +356,14 @@ public class RNIPLoadPaymentsService {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType);
         String timestamp = "" + System.currentTimeMillis();
-        Array.writeFile(RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+
+        File dir = new File(RNIP_DIR);
+        if(!dir.exists()) {
+            dir.mkdirs();
+        }
+        Array.writeFile(RNIP_DIR + RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
         SOAPMessage in = send(out);
-        Array.writeFile(RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        Array.writeFile(RNIP_DIR + RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
     
@@ -572,7 +585,15 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public List<Map<String, String>> parsePayments(SOAPMessage response) throws Exception {
+    protected Date getRnipDate(XMLGregorianCalendar rnipCal) {
+        if(rnipCal == null) {
+            return null;
+        }
+        return rnipCal.toGregorianCalendar().getTime();
+    }
+
+
+    public RNIPPaymentsResponse parsePayments(SOAPMessage response) throws Exception {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(true);
 
@@ -583,13 +604,15 @@ public class RNIPLoadPaymentsService {
         UnifoTransferMsg m = (UnifoTransferMsg) o;
         jc = JAXBContext.newInstance(PaymentInfoType.class);
         u = jc.createUnmarshaller();
-        if (((ExportPaymentsResponse) m.getMessageData().getAppData().
-                getExportDataResponse().getResponseTemplate()).getPayments() == null) {
-            return Collections.EMPTY_LIST;
+
+
+        ExportPaymentsResponse data =
+                ((ExportPaymentsResponse) m.getMessageData().getAppData().getExportDataResponse().getResponseTemplate());
+        Date rnipDate = getRnipDate(data.getPostBlock().getTimeStamp());
+        if (data.getPayments() == null) {
+            return new RNIPPaymentsResponse(Collections.EMPTY_LIST, rnipDate);
         }
-        List<ExportPaymentsResponse.Payments.PaymentInfo> piList = ((ExportPaymentsResponse) m.getMessageData()
-                .getAppData().
-                        getExportDataResponse().getResponseTemplate()).getPayments().getPaymentInfo();
+        List<ExportPaymentsResponse.Payments.PaymentInfo> piList = data.getPayments().getPaymentInfo();
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         for (ExportPaymentsResponse.Payments.PaymentInfo pi : piList) {
             //String paymentInfoStr = new String(pi.getPaymentData(), "cp1251");        !!!!!!!!!!! БЫЛО !!!!!!!!!!!!!!
@@ -600,7 +623,9 @@ public class RNIPLoadPaymentsService {
             Document doc = builderFactory.newDocumentBuilder().parse(new InputSource(new StringReader(paymentInfoStr)));
             result.add(parsePayment(doc));
         }
-        return result;
+
+        RNIPPaymentsResponse res = new RNIPPaymentsResponse(result, rnipDate);
+        return res;
     }
 
     public Map<String, String> parsePayment(Document doc) {
@@ -865,5 +890,23 @@ public class RNIPLoadPaymentsService {
     public static final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         return getRNIPIdFromRemarks (contragent.getRemarks());
+    }
+
+    private static class RNIPPaymentsResponse {
+        List<Map<String, String>> payments;
+        Date rnipDate;
+
+        private RNIPPaymentsResponse(List<Map<String, String>> payments, Date rnipDate) {
+            this.payments = payments;
+            this.rnipDate = rnipDate;
+        }
+
+        public List<Map<String, String>> getPayments() {
+            return payments;
+        }
+
+        public Date getRnipDate() {
+            return rnipDate;
+        }
     }
 }
