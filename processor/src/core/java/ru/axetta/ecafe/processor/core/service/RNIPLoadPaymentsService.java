@@ -104,8 +104,8 @@ public class RNIPLoadPaymentsService {
     private String URL_ADDR = null;//"http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    public static final String RNIP_INPUT_FILE = "/rnip.in.signed.xml";
-    public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed.xml";
+    public static final String RNIP_INPUT_FILE = "/rnip.in.signed";
+    public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
 
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
@@ -347,9 +347,10 @@ public class RNIPLoadPaymentsService {
         }
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType);
-        Array.writeFile(RNIP_OUTPUT_FILE, RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+        String timestamp = "" + System.currentTimeMillis();
+        Array.writeFile(RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
         SOAPMessage in = send(out);
-        Array.writeFile(RNIP_INPUT_FILE, RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        Array.writeFile(RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
     
