@@ -7,11 +7,9 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
@@ -37,8 +35,6 @@ public class SMSService {
     private static Logger logger = LoggerFactory.getLogger(SMSService.class);
     private static final ThreadLocal<ClientSms> createdClientSms = new ThreadLocal<ClientSms>();
 
-    @Autowired
-    private RuntimeContext runtimeContext;
 
     @PersistenceContext(unitName = "processorPU")
     private javax.persistence.EntityManager em;
@@ -91,7 +87,7 @@ public class SMSService {
         }
 
         SendResponse sendResponse = null;
-        ISmsService smsService = runtimeContext.getSmsService();
+        ISmsService smsService = RuntimeContext.getInstance().getSmsService();
         logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber,
                                                                                        textObject.toString()});
         if(smsService instanceof SMPPClient){
@@ -155,7 +151,7 @@ public class SMSService {
         ClientSms clientSms = null;
         boolean result = false;
         if (success) {
-            boolean delivered = runtimeContext.getSmsService() instanceof EMPSmsServiceImpl;
+            boolean delivered =  RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
             clientSms = RuntimeContext.getFinancialOpsManager()
                     .createClientSmsCharge(client, messageId, phoneNumber, messageType, text,
                             new Date(), delivered);

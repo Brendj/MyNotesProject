@@ -2,10 +2,8 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.83
+-- Пакет обновлений 2.2.84
 
---! Отмена ограничения на обязательность заполнения LastRNIPUpdate
-alter table cf_contragents alter column lastrnipupdate DROP NOT NULL;
-
-
---! ФИНАЛИЗИРОВАН (Сунгатов, 141127) НЕ МЕНЯТЬ
+--! Добавление признаков и инф за кого сделали отметку
+ALTER TABLE cf_enterevents ADD COLUMN childpasschecker INTEGER;
+ALTER TABLE cf_enterevents ADD COLUMN childpasscheckerid BIGINT;
