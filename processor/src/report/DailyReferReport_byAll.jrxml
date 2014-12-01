@@ -159,7 +159,7 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="index" width="0">
+				<rowGroup name="index" width="0" totalPosition="End">
 					<bucket class="java.lang.Integer">
 						<bucketExpression><![CDATA[$F{index}]]></bucketExpression>
 					</bucket>
@@ -173,7 +173,15 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents>
+							<staticText>
+								<reportElement uuid="0056d03f-40f9-4144-9889-3f90733794e9" style="Crosstab Data Text" x="0" y="0" width="75" height="23"/>
+								<textElement verticalAlignment="Middle">
+									<font fontName="SansSerif"/>
+								</textElement>
+								<text><![CDATA[Итого:]]></text>
+							</staticText>
+						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="day" width="75">
@@ -415,14 +423,52 @@
 				<crosstabCell rowTotalGroup="day" columnTotalGroup="group2">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="index">
-					<cellContents/>
+				<crosstabCell height="23" rowTotalGroup="index">
+					<cellContents>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="55" height="23"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+								<font fontName="SansSerif" size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="55" y="0" width="55" height="23"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+								<font fontName="SansSerif" size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{priceMeasure} == null ? 0D : $V{priceMeasure})]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="110" y="0" width="55" height="23"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+								<font fontName="SansSerif" size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="index" columnTotalGroup="group1">
-					<cellContents/>
+				<crosstabCell height="23" rowTotalGroup="index" columnTotalGroup="group1">
+					<cellContents>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="23"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+								<font fontName="SansSerif"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="index" columnTotalGroup="group2">
-					<cellContents/>
+				<crosstabCell height="23" rowTotalGroup="index" columnTotalGroup="group2">
+					<cellContents>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="23"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+								<font fontName="SansSerif"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
 				<crosstabCell columnTotalGroup="group0">
 					<cellContents/>

@@ -31,6 +31,8 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,6 +55,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
     public static final String BREAKFAST = "Завтрак";
     public static final String LUNCH = "Обед";
     public static final String SNACK = "Полдник";
+    public static final String NUMBERS_REGEXP = "([0-9]+,?\\.?[0-9]?)";
 
 
     public List<List<ReferReportItem>> getItems() {
@@ -321,11 +324,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
                             + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                             + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                             + orgJoin
-                            + "where cf_orders.socdiscount<>0 and " + orgClause + regionClause
+                            + "where " + orgClause + regionClause
                             + "  cf_orders.createddate between :start and :end "
                             + "  and cf_orders.ordertype=:ordertype and"
                             + "  cf_orders.state=0 and cf_orderdetails.state=0"
                             + "order by cf_goods.nameofgood, cf_orders.createddate");
+                            //cf_orders.socdiscount<>0 and
             //query.setLong("idoforg", org.getIdOfOrg());
             query.setLong("start", startTime.getTime());
             query.setLong("end", endTime.getTime());
@@ -477,6 +481,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
             }
         }
 
+        Collections.sort(items, new ReferReportComparator());
+        for(i=0; i<items.size(); i++) {
+            items.get(i).setLineId(i);
+        }
         ReferReportItem workdaysTestItem = new ReferReportItem();
         workdaysTestItem.setName("СУТОЧНАЯ ПРОБА");
         workdaysTestItem.setLineId(i);
@@ -963,6 +971,39 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         public String getNameOfGood() {
             return nameOfGood;
+        }
+    }
+
+    public static final class ReferReportComparator implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            ReferReportItem i1 = (ReferReportItem) o1;
+            ReferReportItem i2 = (ReferReportItem) o2;
+
+            String name1 = i1.getName();
+            String name2 = i2.getName();
+            String regexp = NUMBERS_REGEXP;
+            Pattern r = Pattern.compile(regexp);
+            Matcher m1 = r.matcher(name1);
+            Matcher m2 = r.matcher(name2);
+            if(m1.find() && m2.find()) {
+                try {
+                    Integer num11 = Integer.parseInt(m1.group(0));
+                    Integer num12 = Integer.parseInt(m1.group(1));
+
+                    Integer num21 = Integer.parseInt(m2.group(0));
+                    Integer num22 = Integer.parseInt(m2.group(1));
+
+                    int res = num11.compareTo(num21);
+                    if(res == 0) {
+                        return num12.compareTo(num22);
+                    }
+                    return res;
+                } catch (Exception e) {
+                    logger.error("Failed to compare categories numbers", e);
+                }
+            }
+            return name1.compareTo(name2);
         }
     }
 }

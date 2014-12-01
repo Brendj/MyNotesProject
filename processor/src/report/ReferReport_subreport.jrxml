@@ -169,7 +169,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" style="Crosstab Data Text" x="0" y="0" width="300" height="23"/>
+								<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" style="Crosstab Data Text" x="0" y="0" width="300" height="28"/>
 								<textElement>
 									<font fontName="SansSerif"/>
 								</textElement>
@@ -235,27 +235,27 @@
 				<measure name="summaryMeasure" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{summary}]]></measureExpression>
 				</measure>
-				<crosstabCell width="251" height="23">
+				<crosstabCell width="251" height="28">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="false">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="50" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="50" height="28"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="false">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="50" y="0" width="100" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="50" y="0" width="100" height="28"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="100" height="23"/>
+							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="100" height="28"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
@@ -281,7 +281,7 @@
 				<crosstabCell rowTotalGroup="group1" columnTotalGroup="value">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="251" height="25" rowTotalGroup="lineId">
+				<crosstabCell width="251" height="23" rowTotalGroup="lineId">
 					<cellContents>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="50" height="23"/>

@@ -226,7 +226,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
                     String name = g1 + " (" + g2 + ")";
                     DailyReferReportItem newI = new DailyReferReportItem("ВСЕГО", name, name,
-                                                                         children, 0, summary, isOverallReport, orgObj.getType());
+                                                                         children, 0, summary,
+                                                                          isOverallReport, orgObj.getType());
                     newI.setGroup1(g1);
                     newI.setGroup2(g2);
                     newI.setIndex(3);
@@ -362,11 +363,13 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 long children         = ((BigInteger) e[4]).longValue();
                 BigDecimal summaryObj = e[5] == null ? new BigDecimal(0D) : (BigDecimal) e[5];
                 summaryObj            = summaryObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                double breakfast      = 50;
+                double lunch          = 100;
 
                 boolean isOverallReport = isOverallReport(categoryFilter);
                 DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children,
                                                                      priceObj.doubleValue(), summaryObj.doubleValue(),
-                                                                     isOverallReport, orgObj.getType());
+                                                                     isOverallReport, orgObj.getType(), breakfast, lunch);
                 totalSumm             += summaryObj.doubleValue();
                 result.add(item);
 
@@ -389,6 +392,25 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 for(String k : totals.keySet()) {
                     result.add(totals.get(k));
                 }
+            }
+
+
+            //  поиск и подстановка стоимости
+            double breakfast = 0D;
+            double lunch = 0D;
+            for(DailyReferReportItem i : result) {
+                if(i.getGroup2().equals(ReferReport.BREAKFAST)) {
+                    breakfast = i.getPrice();
+                } else if(i.getGroup2().equals(ReferReport.LUNCH)) {
+                    lunch = i.getPrice();
+                }
+                if(breakfast != 0D && lunch != 0D) {
+                    break;
+                }
+            }
+            for(DailyReferReportItem i : result) {
+                i.setBreakfast(breakfast);
+                i.setLunch(lunch);
             }
 
             return result;
@@ -460,7 +482,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "            det.state=0 and ord.state=0 and "
                 + "            ord.createddate between 1391371200000 and 1391975999000 "
                 + "            and ord.ordertype<>5 and dr.subcategory<>'') as data "
-                + "group by subcategory, nameofgood, d, price "
+                + "group by subcatego   ry, nameofgood, d, price "
                 + "order by 1, 2";*/
         Query query = session.createSQLQuery(sql);
         //query.setLong("idoforg", idoforg);
@@ -555,8 +577,23 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         }
 
         public DailyReferReportItem(String day, String name, String goodname,
+                long children, double price, double summary,
+                boolean isOverallReport, OrganizationType orgType) throws RuntimeException {
+            this(day, name, goodname, children, price, summary, isOverallReport, orgType, 0D, 0D);
+        }
+
+        public DailyReferReportItem(long ts, String name, String goodname,
+                long children, double price, double summary,
+                boolean isOverallReport, OrganizationType orgType,
+                double breakfast, double lunch) throws RuntimeException {
+            this(dailyItemsFormat.format(new Date(ts)), name,  goodname, children, price,
+                 summary, isOverallReport, orgType, breakfast, lunch);
+        }
+
+        public DailyReferReportItem(String day, String name, String goodname,
                                     long children, double price, double summary,
-                                    boolean isOverallReport, OrganizationType orgType) throws RuntimeException {
+                                    boolean isOverallReport, OrganizationType orgType,
+                                    double breakfast, double lunch) throws RuntimeException {
             index = 0;
             this.day = day;
             group0 = "_";
@@ -606,8 +643,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             this.summary = summary;
             orderType = 1;
 
-            breakfast = 50;
-            lunch = 100;
+            this.breakfast = breakfast;
+            this.lunch = lunch;
         }
 
         public int getOrderType() {

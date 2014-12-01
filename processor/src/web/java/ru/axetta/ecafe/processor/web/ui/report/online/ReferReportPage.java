@@ -32,6 +32,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -61,6 +64,8 @@ public class
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
+
+    protected static DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
 
     public Date getStart() {
@@ -342,7 +347,29 @@ public class
 
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            response.setHeader("Content-disposition", "inline;filename=refer_report.xls");
+            String reportName = null;
+            if(report instanceof ReferReport) {
+                reportName =
+                        String.format("Справка о расходе средств бюджета города Москвы на питание обучающихся за период с %s по %s",
+                                DATE_FORMAT.format(start), DATE_FORMAT.format(end));
+
+            } else if(report instanceof DailyReferReport) {
+                if(StringUtils.isBlank(category) || category.equals(DailyReferReport.SUBCATEGORY_ALL.getName())) {
+                    reportName =
+                            String.format("Сводная справка об услугах питания за счет средств бюджета города Москвы период с %s по %s",
+                                    DATE_FORMAT.format(start), DATE_FORMAT.format(end));
+                } else {
+                    reportName =
+                            String.format("Справка по предоставлению бесплатного питания для %s за период с %s по %s",
+                                    category, DATE_FORMAT.format(start), DATE_FORMAT.format(end));
+                }
+            } else {
+                reportName =
+                    String.format("Справка о расходе средств бюджета города Москвы на питание обучающихся за период %s по %s",
+                        DATE_FORMAT.format(start), DATE_FORMAT.format(end));
+            }
+            reportName = URLEncoder.encode(reportName, "windows-1251").replace("+", "%20") + ".xls";
+            response.setHeader("Content-disposition", "attachment; filename*=windows-1251'ru-RU'" + reportName);
 
             JRXlsExporter xlsExport = new JRXlsExporter();
             //JRCsvExporter csvExporter = new JRCsvExporter();

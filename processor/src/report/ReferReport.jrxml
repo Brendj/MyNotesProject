@@ -114,7 +114,7 @@
 		<band height="235" splitType="Stretch">
 			<elementGroup/>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="0" y="0" width="713" height="37"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="0" y="0" width="802" height="37"/>
 				<textElement textAlignment="Center">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -132,14 +132,14 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReferReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="20" y="63" width="693" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="20" y="63" width="782" height="20"/>
 				<textElement textAlignment="Left" rotation="None">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="20" y="43" width="693" height="20"/>
+				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="20" y="43" width="782" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
