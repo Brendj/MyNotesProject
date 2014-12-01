@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="1180" pageHeight="10000" columnWidth="1140" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
 	<property name="ireport.zoom" value="1.3310000000000006"/>
-	<property name="ireport.x" value="30"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -79,7 +79,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField isBlankWhenNull="true">
 					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="150" height="50"/>
 					<box>
 						<pen lineWidth="1.0"/>

@@ -132,7 +132,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="150" height="50"/>
 				<box>
 					<pen lineWidth="1.0"/>
