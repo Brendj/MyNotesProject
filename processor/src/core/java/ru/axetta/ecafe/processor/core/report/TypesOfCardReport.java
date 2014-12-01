@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
-            parameterMap.put("startDate", startTime);
+            parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
             parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
@@ -120,6 +121,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             TypesOfCardReportItem typesOfCardReportItem1 = new TypesOfCardReportItem("ЮВАО",10L,20L,30L,40L,50L,60L,70L,80L);
 
             typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
+            typesOfCardReportItem1.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
 
             result.add(typesOfCardReportItem);
             result.add(typesOfCardReportItem1);
