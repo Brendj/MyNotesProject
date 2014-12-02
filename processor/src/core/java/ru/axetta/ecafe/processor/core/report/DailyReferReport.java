@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -158,6 +159,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
             List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, categoryFilter,
                     o != null ? (String) o : null, orgObj);//getDailyReferItems(session);//
+            if(!categoryFilter.equals(SUBCATEGORY_ALL)) {
+                addDailyTotalItem(items);
+            }
             if(showDailySample) {
                 addSamples(session, org, startTime, endTime, items, categoryFilter, o != null ? (String) o : null, orgObj);
                 calculateOverall(items, isOverallReport(categoryFilter), orgObj);
@@ -334,6 +338,49 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             result.add(items);
             result.add(new ArrayList<ReferReportItem>());
             return null;
+        }
+
+        protected void addDailyTotalItem(List<DailyReferReportItem> items) {
+            List<DailyReferReportItem> res = new ArrayList<DailyReferReportItem>();
+            for(DailyReferReportItem i : items) {
+                int index        = i.getIndex();
+                String day       = i.getDay();
+                String group0    = i.getGroup0();
+                String group1    = "Итого";//i.getGroup1();
+                String group2    = i.getGroup2();
+                double breakfast = i.getBreakfast();
+                double lunch     = i.getLunch();
+                long children    = i.getChildren();
+                double summary   = i.getSummary();
+                long total       = i.getTotal();
+
+                DailyReferReportItem totalI = null;
+                for(DailyReferReportItem ii : res) {
+                    if(ii.getDay().equals(day) &&
+                       ii.getGroup0().equals(group0) &&
+                       ii.getGroup1().equals(group1) &&
+                       ii.getGroup2().equals(group2)) {
+                        totalI = ii;
+                        break;
+                    }
+                }
+                if(totalI == null) {
+                    totalI = new DailyReferReportItem();
+                    totalI.setIndex(index);
+                    totalI.setDay(day);
+                    totalI.setGroup0(group0);
+                    totalI.setGroup1(group1);
+                    totalI.setGroup1Index("ЯЯЯ");
+                    totalI.setGroup2(group2);
+                    totalI.setBreakfast(breakfast);
+                    totalI.setLunch(lunch);
+                    res.add(totalI);
+                }
+                totalI.setChildren(totalI.getChildren() + children);
+                totalI.setSummary(totalI.getSummary() + summary);
+                totalI.setTotal(totalI.getTotal() + total);
+            }
+            items.addAll(res);
         }
 
         private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime,
@@ -556,6 +603,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         private double breakfast;   //  стоимость завтрака, используется только для отчета по категории
         private double lunch;       //  стоимость обеда, используется только для отчета по категории
         private String group0;      //  фикс для вывода шапки таблицы - всегда одинаковое значение
+        private String group1Index; //  сортировка для строки
         private String group1;      //  наименование правила
         private String group2;      //  завтрак / обед
         private double price;       //  цена
@@ -608,9 +656,19 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 } else {
                     catName = "все";
                 }
-                this.group1 = String.format("Обучающиеся %s %s", findGroupRangeInString(name), catName);
+                String groupRange = findGroupRangeInString(name);
+                this.group1 = String.format("Обучающиеся %s %s", groupRange, catName);
                 if(group1 == null) {
                     throw new RuntimeException("Failed to get group range in string " + name);
+                }
+
+                //  добавляем сортировку
+                group1Index = getGroup1IndexByGroupRange(groupRange, SUBCATEGORY_SHOOL);
+                if(group1Index == null) {
+                    group1Index = getGroup1IndexByGroupRange(groupRange, SUBCATEGORY_KINDERGARTEN);
+                }
+                if(group1Index == null) {
+                    group1Index = "" + 0;
                 }
             } else {
                 if (name.equals(OVERALL_SUBCATEGORY_NAME)) {
@@ -618,6 +676,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 } else if (name.length() > 0) {
                     this.group1 = name.substring(0, name.indexOf("("));
                 }
+                group1Index = this.group1;
             }
             if (goodname.toLowerCase().indexOf("завтрак") > -1) {
                 this.group2 = ReferReport.BREAKFAST;
@@ -645,6 +704,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             this.breakfast = breakfast;
             this.lunch = lunch;
+        }
+
+        protected String getGroup1IndexByGroupRange(String groupRange, CategoryFilter[] filters) {
+            for(int i=0; i<filters.length; i++) {
+                if(filters[i].getName().indexOf(groupRange) >= 0) {
+                    return "" + i;
+                }
+            }
+            return null;
         }
 
         public int getOrderType() {
@@ -677,6 +745,14 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         public void setGroup1(String group1) {
             this.group1 = group1;
+        }
+
+        public String getGroup1Index() {
+            return group1Index;
+        }
+
+        public void setGroup1Index(String group1Index) {
+            this.group1Index = group1Index;
         }
 
         public String getGroup2() {

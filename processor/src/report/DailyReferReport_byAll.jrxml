@@ -103,6 +103,7 @@
 	<field name="summary" class="java.lang.Double"/>
 	<field name="day" class="java.lang.String"/>
 	<field name="index" class="java.lang.Integer"/>
+	<field name="group1Index" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -151,7 +152,7 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="0056d03f-40f9-4144-9889-3f90733794e9" style="Crosstab Data Text" x="0" y="0" width="75" height="105"/>
+							<reportElement uuid="0056d03f-40f9-4144-9889-3f90733794e9" style="Crosstab Data Text" x="0" y="0" width="75" height="112"/>
 							<textElement verticalAlignment="Middle">
 								<font fontName="SansSerif"/>
 							</textElement>
@@ -236,9 +237,9 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="group1" height="24" totalPosition="End" headerPosition="Stretch">
-					<bucket order="Descending" class="java.lang.String">
-						<bucketExpression><![CDATA[$F{group1}]]></bucketExpression>
+				<columnGroup name="group1Index" height="24" totalPosition="End" headerPosition="Stretch">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{group1Index}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Transparent">
@@ -260,7 +261,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="82"/>
+								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="89"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
 									<font fontName="SansSerif" isBold="true"/>
 								</textElement>
@@ -269,28 +270,28 @@
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="group2" height="58" totalPosition="End">
+				<columnGroup name="group2" height="65" totalPosition="End">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{group2}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Transparent">
 							<staticText>
-								<reportElement uuid="7f70a7d8-dc4c-4f1d-89f1-152c8a38bac0" style="Crosstab Data Text" x="0" y="23" width="55" height="35"/>
+								<reportElement uuid="7f70a7d8-dc4c-4f1d-89f1-152c8a38bac0" style="Crosstab Data Text" x="0" y="23" width="55" height="42"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Кол-во, шт.]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="0e487a46-f5e8-4fbe-896f-ada0fb537d8e" style="Crosstab Data Text" x="55" y="23" width="55" height="35"/>
+								<reportElement uuid="0e487a46-f5e8-4fbe-896f-ada0fb537d8e" style="Crosstab Data Text" x="55" y="23" width="55" height="42"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Цена за ед., руб.]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="cb80a078-ce29-4775-bf13-30fe3ea1548f" style="Crosstab Data Text" x="110" y="23" width="55" height="35"/>
+								<reportElement uuid="cb80a078-ce29-4775-bf13-30fe3ea1548f" style="Crosstab Data Text" x="110" y="23" width="55" height="42"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
@@ -308,7 +309,7 @@
 					<crosstabTotalColumnHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="58"/>
+								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="65"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
 									<font fontName="SansSerif" isBold="true"/>
 								</textElement>
@@ -325,6 +326,9 @@
 				</measure>
 				<measure name="summaryMeasure" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{summary}]]></measureExpression>
+				</measure>
+				<measure name="group1" class="java.lang.String">
+					<measureExpression><![CDATA[$F{group1}]]></measureExpression>
 				</measure>
 				<crosstabCell width="165" height="23">
 					<cellContents>
@@ -381,7 +385,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="70" height="23" columnTotalGroup="group1">
+				<crosstabCell width="70" height="23" columnTotalGroup="group1Index">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -395,7 +399,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="71" rowTotalGroup="day" columnTotalGroup="group1">
+				<crosstabCell width="71" rowTotalGroup="day" columnTotalGroup="group1Index">
 					<cellContents backcolor="#BFE1FF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -448,7 +452,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell height="23" rowTotalGroup="index" columnTotalGroup="group1">
+				<crosstabCell height="23" rowTotalGroup="index" columnTotalGroup="group1Index">
 					<cellContents>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="70" height="23"/>

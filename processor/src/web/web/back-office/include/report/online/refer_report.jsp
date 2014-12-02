@@ -91,7 +91,7 @@
             </f:verbatim>
         </c:if>
 
-        <h:outputText escape="true" value="В данной организации нет учащихся с выбранной категорией" style="font-style: italic"
+        <h:outputText escape="true" value="Не удалось найти данные по указанными параметрами. Попробуйте изменить параметры отчета" style="font-style: italic"
                       styleClass="output-text" rendered="#{referReportPage.showMissReportMessage}"/>
         <%--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />--%>
     </h:panelGrid>

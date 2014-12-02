@@ -46,9 +46,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class
-
-        ReferReportPage extends OnlineReportPage {
+public class ReferReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(ReferReportPage.class);
 
@@ -69,6 +67,15 @@ public class
 
 
     public Date getStart() {
+        if(start == null) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            start = cal.getTime();
+        }
         return start;
     }
 
@@ -77,6 +84,15 @@ public class
     }
 
     public Date getEnd() {
+        if(end == null) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            cal.set(Calendar.HOUR, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            end = cal.getTime();
+        }
         return end;
     }
 

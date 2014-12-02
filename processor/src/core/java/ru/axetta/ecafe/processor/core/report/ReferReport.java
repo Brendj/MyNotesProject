@@ -252,7 +252,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 BigDecimal priceObj   = e[0] == null ? new BigDecimal(0D) : (BigDecimal) e[0];
                 priceObj              = priceObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 long ts               = ((BigInteger) e[1]).longValue();
-                String good           = ((String) e[2]).trim();
+                String good           = "empty";
+                if(e[2] != null && StringUtils.isBlank((String) e[2])) {
+                    good = ((String) e[2]).trim();
+                }
                 cal.setTimeInMillis(ts);
                 //  Заносим изменения в соответствующий объект
                 int index = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
@@ -319,10 +322,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 orgClause = " cf_orders.idoforg=" + org.getIdOfOrg() + " and ";
             }
             Query query = session.createSQLQuery(
-                    "select cast (cf_orderdetails.socdiscount as decimal) / 100 as price, cf_orders.createddate, cf_goods.nameofgood "
+                    "select cast (cf_orderdetails.socdiscount + cf_orderdetails.rprice as decimal) / 100 as price, cf_orders.createddate, cf_goods.nameofgood "
                             + "from cf_orders "
-                            + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                            + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                            + "left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                            + "left join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                             + orgJoin
                             + "where " + orgClause + regionClause
                             + "  cf_orders.createddate between :start and :end "
