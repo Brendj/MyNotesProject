@@ -64,6 +64,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     public static final CategoryFilter SUBCATEGORY_KINDERGARTEN [] = new CategoryFilter [] {
             new CategoryFilter("Ясли 1,5-3 лет", " and cf_discountrules.subcategory like '%1,5-3 лет %' "),
             new CategoryFilter("Детский сад 3-7 лет", " and cf_discountrules.subcategory like '%3-7 лет %' ") };
+    public static Map<String, String> GROUP1_REPLACEMENTS;
+    static {
+        GROUP1_REPLACEMENTS = new HashMap<String, String>();
+        GROUP1_REPLACEMENTS.put("Обучающиеся 1-4 классов", "Обучающиеся, не получающие питание по льготам");
+    }
 
 
     public List<DailyReferReportItem> getItems() {
@@ -704,6 +709,17 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             this.breakfast = breakfast;
             this.lunch = lunch;
+
+            applyReplacements();
+        }
+
+        protected void applyReplacements() {
+            for(String n : GROUP1_REPLACEMENTS.keySet()) {
+                if(group1 != null && !StringUtils.isBlank(group1) && group1.equals(n)) {
+                    group1 = GROUP1_REPLACEMENTS.get(n);
+                    break;
+                }
+            }
         }
 
         protected String getGroup1IndexByGroupRange(String groupRange, CategoryFilter[] filters) {
