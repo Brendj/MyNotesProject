@@ -2454,6 +2454,7 @@ create table CF_ClientMigrationHistory
   IdOfClient bigint not null,
   IdOfOrg bigint not null,
   RegistrationDate bigint not null,
+  balance bigint not null,
   CONSTRAINT CF_ClientMigrationHistory_pk PRIMARY KEY (IdOfClientMigration)
 );
 
@@ -2627,4 +2628,6 @@ create table CF_RegistryChange_Errors (  --v47
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
   VALUES(2, 2, 48, 131031, 0, '');
+
+
 

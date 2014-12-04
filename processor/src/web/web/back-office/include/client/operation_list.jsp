@@ -600,6 +600,213 @@
     </f:facet>
 </rich:dataTable>
 
+
+<h:outputText value="Перемещения внутри ОО:" />
+<rich:dataTable id="clientGroupMigrationHistoriesTable" var="gMig" value="#{mainPage.clientOperationListPage.clientGroupMigrationHistories}"
+               footerClass="data-table-footer" rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
+
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид ОО" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.org.idOfOrg}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Наименование ОО" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.org.shortName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Прежняя группа" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.oldGroupName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Новая группа" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.newGroupName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Дата перемещения" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.registrationDate}" styleClass="output-text" >
+            <f:convertDateTime pattern="dd.MM.yyyy"/>
+        </h:outputText>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Комментарий" />
+        </f:facet>
+        <h:outputText escape="true" value="#{gMig.comment}" styleClass="output-text" />
+    </rich:column>
+
+    <f:facet name="footer">
+        <rich:datascroller for="clientGroupMigrationHistoriesTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
+<h:outputText value="Перемещения между ОО:" />
+<rich:dataTable id="clientMigrationsTable" var="mig" value="#{mainPage.clientOperationListPage.clientMigrations}"
+                rowKeyVar="row" footerClass="data-table-footer" rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
+
+    <f:facet name="header">
+        <rich:columnGroup columnClasses="gray">
+            <rich:column headerClass="column-header gray" colspan="2">
+                <h:outputText value="Данные прежнего поставщика" />
+            </rich:column>
+
+
+            <rich:column headerClass="column-header" colspan="3">
+                <h:outputText value="Данные прежней ОО" />
+            </rich:column>
+
+
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText value="Данные нового поставщика" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" colspan="3">
+                <h:outputText value="Данные новой ОО" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText value="Дата перемещения" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText value="Баланс" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText value="Комментарий" />
+            </rich:column>
+
+
+
+            <rich:column headerClass="column-header" breakBefore="true">
+                <h:outputText value="Ид" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Наименование" />
+            </rich:column>
+
+
+            <rich:column headerClass="column-header">
+                <h:outputText value="Ид" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Наименование" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Группа" />
+            </rich:column>
+
+
+
+            <rich:column headerClass="column-header">
+                <h:outputText value="Ид" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Наименование" />
+            </rich:column>
+
+
+            <rich:column headerClass="column-header">
+                <h:outputText value="Ид" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Наименование" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Группа" />
+            </rich:column>
+
+
+        </rich:columnGroup>
+    </f:facet>
+
+
+    <rich:column  >
+        <h:outputText value="#{mig.oldContragent.idOfContragent}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.oldContragent.contragentName}" styleClass="output-text" />
+    </rich:column>
+
+
+    <rich:column  >
+        <h:outputText value="#{mig.oldOrg.idOfOrg}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.oldOrg.shortName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.oldGroupName}" styleClass="output-text" />
+    </rich:column>
+
+
+    <rich:column >
+        <h:outputText value="#{mig.newContragent.idOfContragent}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.newContragent.contragentName}" styleClass="output-text" />
+    </rich:column>
+
+
+    <rich:column  >
+        <h:outputText value="#{mig.org.idOfOrg}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.org.shortName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column >
+        <h:outputText value="#{mig.newGroupName}" styleClass="output-text" />
+    </rich:column>
+
+
+    <rich:column >
+        <h:outputText value="#{mig.registrationDate}" styleClass="output-text">
+            <f:convertDateTime pattern="dd.MM.yyyy" />
+        </h:outputText>
+    </rich:column>
+
+
+    <rich:column >
+        <h:outputText value="#{mig.balance}" styleClass="output-text" />
+    </rich:column>
+
+
+    <rich:column >
+        <h:outputText value="#{mig.comment}" styleClass="output-text" />
+    </rich:column>
+
+    <f:facet name="footer">
+        <rich:datascroller for="clientMigrationsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
 </h:panelGrid>
 <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 </h:panelGrid>

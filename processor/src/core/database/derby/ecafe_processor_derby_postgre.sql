@@ -2525,6 +2525,7 @@ create table CF_ClientMigrationHistory
   IdOfClientMigration bigserial,
   IdOfClient bigint not null,
   IdOfOrg bigint not null,
+  IdOfOldOrg bigint not null,
   RegistrationDate bigint not null,
   CONSTRAINT CF_ClientMigrationHistory_pk PRIMARY KEY (IdOfClientMigration)
 );

@@ -14,19 +14,17 @@ import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.addGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.removeGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -610,10 +608,27 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
         if (null != idOfClientGroup) {
+            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory();
+            Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
+            Client client = (Client) session.load(Client.class, idOfClient);
+
+            clientGroupMigrationHistory.setOrg(org);
+            clientGroupMigrationHistory.setClient(client);
+            clientGroupMigrationHistory.setRegistrationDate(new Date());
+            clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+            clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+
+
             this.idOfClientGroup = idOfClientGroup;
             this.clientGroupName = DAOUtils
                     .findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup))
                     .getGroupName();
+            clientGroupMigrationHistory.setNewGroupId(this.idOfClientGroup);
+            clientGroupMigrationHistory.setNewGroupName(this.clientGroupName);
+            clientGroupMigrationHistory.setComment(
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+
+            session.save(clientGroupMigrationHistory);
         }
     }
 
@@ -638,6 +653,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void updateClient(Session persistenceSession, Long idOfClient) throws Exception {
         String mobile = Client.checkAndConvertMobile(this.mobile);
+        ClientMigration clientMigration = null;
         if (mobile == null) {
             throw new Exception("Неверный формат мобильного телефона");
         }
@@ -661,6 +677,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         }
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
+        if(isReplaceOrg){
+            clientMigration = new ClientMigration(client.getOrg());
+        }
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
@@ -770,6 +789,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         if (isReplaceOrg) {
+
+            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory();
+            clientGroupMigrationHistory.setOrg(org);
+            clientGroupMigrationHistory.setClient(client);
+            clientGroupMigrationHistory.setRegistrationDate(new Date());
+            clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+            clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+            clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
@@ -785,9 +812,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_DISPLACED);
             }
+
+            clientGroupMigrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            clientGroupMigrationHistory.setNewGroupName(clientGroup.getGroupName());
+            clientMigration.setNewGroupName(clientGroup.getGroupName());
+            persistenceSession.save(clientGroupMigrationHistory);
+
             this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             client.setIdOfClientGroup(this.idOfClientGroup);
-            ClientMigration clientMigration = new ClientMigration(client, org);
+            clientMigration.setClient(client);
+            clientMigration.setOrg(org);
+            clientMigration.setNewContragent(org.getDefaultSupplier());
+            clientMigration.setBalance(client.getBalance());
+            clientMigration.setComment(
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+
             persistenceSession.save(clientMigration);
         } else {
             if (this.idOfClientGroup != null) {

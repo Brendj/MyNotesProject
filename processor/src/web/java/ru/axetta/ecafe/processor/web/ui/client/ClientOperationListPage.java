@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
+import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
@@ -40,6 +43,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
     private List<ClientPassItem> clientPasses = new ArrayList<ClientPassItem>();
     private List<RegularPayment> regularPayments = new ArrayList<RegularPayment>();
+    private List<ClientGroupMigrationHistory> clientGroupMigrationHistories = new ArrayList<ClientGroupMigrationHistory>();
+    private List<ClientMigration> clientMigrations= new ArrayList<ClientMigration>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -111,7 +116,16 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         this.regularPayments = regularPayments;
     }
 
+    public List<ClientGroupMigrationHistory> getClientGroupMigrationHistories() {
+        return clientGroupMigrationHistories;
+    }
+
+    public List<ClientMigration> getClientMigrations() {
+        return clientMigrations;
+    }
+
     @SuppressWarnings("unchecked")
+
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
@@ -160,6 +174,17 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.add(Restrictions.eq("client", client)).add(Restrictions.ge("paymentDate", startTime))
                 .add(Restrictions.le("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
+
+        //// client group migrations
+        ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext().getBean(ClientGroupMigrationHistoryService.class);
+
+        clientGroupMigrationHistories = clientGroupMigrationHistoryService.findAll(client.getOrg(),client);
+
+
+        //// client  migrations
+        ClientMigrationHistoryService clientMigrationHistoryService = RuntimeContext.getAppContext().getBean(ClientMigrationHistoryService.class);
+
+        clientMigrations = clientMigrationHistoryService.findAll(client.getOrg(),client);
     }
 
 }

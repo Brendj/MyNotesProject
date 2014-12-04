@@ -365,3 +365,11 @@
 .orgMenuView .right {
     padding-left: 80px
 }
+
+.gray {
+    background-color: #EAF0F8;
+    color: #474747;
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
+    font-weight: bold;
+}
