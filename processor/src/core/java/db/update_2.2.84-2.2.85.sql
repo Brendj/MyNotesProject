@@ -30,5 +30,5 @@ CREATE TABLE CF_ClientGroup_MigrationHistory (
   newGroupId bigint ,
   newGroupName varchar(255),
   comment varchar(255) ,
-  CONSTRAINT CF_ClientMigrationHistory_pk PRIMARY KEY (idOfGroupClientMigration)
+  CONSTRAINT CF_ClientGroup_MigrationHistory_pk PRIMARY KEY (idOfGroupClientMigration)
 );

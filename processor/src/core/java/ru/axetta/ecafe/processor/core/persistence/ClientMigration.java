@@ -15,6 +15,9 @@ import java.util.Date;
  */
 public class ClientMigration {
 
+    public static final String MODIFY_IN_REGISTRY = "Измененно в Реестрах.";
+
+
     private Long idOfClientMigration;
     private Date registrationDate;
     private Org org;
@@ -40,6 +43,7 @@ public class ClientMigration {
         this.client = client;
         this.balance = client.getBalance();
         this.org = org;
+        this.setNewContragent(org.getDefaultSupplier());
         this.registrationDate = new Date();
     }
 
@@ -48,7 +52,9 @@ public class ClientMigration {
         this.client = client;
         this.balance = client.getBalance();
         this.org = org;
+        this.setNewContragent(org.getDefaultSupplier());
         this.oldOrg = oldOrg;
+        this.setOldContragent(oldOrg.getDefaultSupplier());
         this.registrationDate = new Date();
     }
 
@@ -56,6 +62,7 @@ public class ClientMigration {
         this.client = client;
         this.balance = client.getBalance();
         this.org = org;
+        this.setNewContragent(org.getDefaultSupplier());
         this.registrationDate = registrationDate;
     }
 

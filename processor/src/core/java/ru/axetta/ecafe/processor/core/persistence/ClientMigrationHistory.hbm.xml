@@ -11,7 +11,7 @@
             <generator class="identity"/>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient" not-null="true"/>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         <many-to-one name="oldOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOldOrg" />
         <many-to-one name="oldContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfOldContragent" />
         <many-to-one name="newContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfNewContragent" />

@@ -14,6 +14,8 @@ import java.util.Date;
 public class ClientGroupMigrationHistory{
 
     public static final String MODIFY_IN_WEBAPP = "Измененно в веб.приложении. Пользователь: ";
+    public static final String MODIFY_IN_ARM = "Измененно в АРМ.";
+    public static final String MODIFY_IN_REGISTRY = "Измененно в Реестрах.";
 
     private long idOfGroupClientMigration;
     private Date registrationDate;
@@ -29,6 +31,12 @@ public class ClientGroupMigrationHistory{
 
 
     public ClientGroupMigrationHistory() {
+    }
+
+    public ClientGroupMigrationHistory(Org org, Client client) {
+        this.org = org;
+        this.client = client;
+        this.registrationDate = new Date();
     }
 
     public long getIdOfGroupClientMigration() {

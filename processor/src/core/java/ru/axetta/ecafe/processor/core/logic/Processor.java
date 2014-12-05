@@ -2179,7 +2179,19 @@ public class Processor implements SyncProcessor,
                 }
 
                 if (clientGroup != null) {
-                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    if(!client.getClientGroup().getCompositeIdOfClientGroup().equals(clientGroup.getCompositeIdOfClientGroup())){
+                        ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
+                        migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);
+                        migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+
+                        migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        migrationHistory.setNewGroupName(clientGroup.getGroupName());
+
+                        persistenceSession.save(migrationHistory);
+                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    }
+
                 }
             }
 

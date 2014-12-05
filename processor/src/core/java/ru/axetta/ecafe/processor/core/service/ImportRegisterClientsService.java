@@ -930,8 +930,11 @@ public class ImportRegisterClientsService {
                 break;
             case MOVE_OPERATION:
                 Org newOrg = em.find(Org.class, change.getIdOfMigrateOrgTo());
+                addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
                 dbClient.setOrg(newOrg);
             case MODIFY_OPERATION:
+                Org newOrg1 = em.find(Org.class, change.getIdOfOrg());
+                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
                 String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                 FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                 modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
@@ -940,7 +943,7 @@ public class ImportRegisterClientsService {
                 modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                 ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
-                        em.find(Org.class, change.getIdOfOrg()), String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
+                        newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
                         dbClient, session, true);
                 break;
             default:
@@ -948,6 +951,25 @@ public class ImportRegisterClientsService {
         }
         change.setApplied(true);
         session.update(change);
+    }
+
+    @Transactional
+    private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
+        ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
+        migration.setComment(ClientMigration.MODIFY_IN_REGISTRY);
+        migration.setOldGroupName(client.getClientGroup().getGroupName());
+        migration.setNewGroupName(change.getGroupName());
+        session.save(migration);
+    }
+
+    @Transactional
+    private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
+        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
+        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY);
+        migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+        migration.setOldGroupName(client.getClientGroup().getGroupName());
+        migration.setNewGroupName(change.getGroupName());
+        session.save(migration);
     }
 
     @Transactional

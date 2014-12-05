@@ -694,6 +694,7 @@ public class ClientManager {
 
             logger.debug("save clientMigration");
             ClientMigration clientMigration = new ClientMigration(client, organization, contractDate);
+
             persistenceSession.save(clientMigration);
             logger.debug("return");
             return idOfClient;
@@ -1008,6 +1009,7 @@ public class ClientManager {
             clientMigrationItemInfoList.add(new ClientMigrationItemInfo(clientMigration));
         }
         return clientMigrationItemInfoList;
+
     }
 
 }
