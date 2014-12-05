@@ -10,7 +10,6 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.RequestsAndOrdersReport;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListPage;
@@ -20,8 +19,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -34,10 +31,9 @@ import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Алмаз
+ * User: anvarov
  * Date: 03.11.14
  * Time: 14:04
- * To change this template use File | Settings | File Templates.
  */
 public class TypesOfCardReportPage extends OnlineReportPage {
 
@@ -66,7 +62,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
             printError("Не указана организация");
             return null;
         }
-        String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFileName, subReportDir);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -104,8 +100,8 @@ public class TypesOfCardReportPage extends OnlineReportPage {
                 htmlReport = os.toString("UTF-8");
                 os.close();
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
@@ -118,7 +114,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
             return;
         }
-        String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -185,7 +181,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFileName = TypesOfCardReport.class.getSimpleName() + ".jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
+        if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
             return null;
         }

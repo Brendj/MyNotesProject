@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DailyFormationOfRegistries;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -27,10 +29,9 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: Алмаз
+ * User: anvarov
  * Date: 03.11.14
  * Time: 14:08
- * To change this template use File | Settings | File Templates.
  */
 public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
