@@ -397,6 +397,18 @@ function drawContragentsChart ()
     queryWrapper.sendAndDraw();
 }
 
+function drawCardsChart ()
+{
+    var container = document.getElementById('cardsChart');
+    var chart = new google.visualization.AreaChart(container);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=CardsChart');
+    //&period=' + $("#select_period_02").val() + '&region=' + $("#select_region_04").val());
+    var options = { title: 'Количество активных ОУ по регистрации карт в день', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
+        chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
+    var queryWrapper = new QueryWrapper(query, chart, options, container);
+    queryWrapper.sendAndDraw();
+}
+
 
 
 function drawToolbar() {
@@ -519,6 +531,7 @@ function addPeriod (container, title, value)
         <li><a href="#tabs-7" onclick="drawRatingCharts()">Рейтинг ОУ</a></li>
         <li><a href="#tabs-8" onclick="drawFiscalChart()">Финансовые показатели</a></li>
         <li><a href="#tabs-9" onclick="drawContragentsChart()">Показатели контрагентов</a></li>
+        <li><a href="#tabs-10" onclick="drawCardsChart()">Показатели по картам</a></li>
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
@@ -585,6 +598,11 @@ function addPeriod (container, title, value)
         <!--<div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_09" name="period" onchange="drawContragentsChart()"></select></div>
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_09" name="region" onchange="drawContragentsChart()"><%= regionsStr %></select></div>-->
         <div id="contragentsChart" style="width: 100%; height: 410px;"></div><br/>
+    </div>
+    <div id="tabs-10" style="padding: 0px; margin: 0px">
+        <!--<div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_09" name="period" onchange="drawContragentsChart()"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_09" name="region" onchange="drawContragentsChart()"><%= regionsStr %></select></div>-->
+        <div id="cardsChart" style="width: 100%; height: 410px;"></div><br/>
     </div>
 </div>
 <script>

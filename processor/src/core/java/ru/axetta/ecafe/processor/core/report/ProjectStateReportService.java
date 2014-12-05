@@ -51,6 +51,8 @@ public class ProjectStateReportService {
     private static final int ACTIVE_CHART_2_DATA = 102;
     private static final int ACTIVE_CHART_3_DATA = 103;
     private static final int ACTIVE_CHART_4_DATA = 104;
+    private static final int ACTIVE_CHART_5_DATA = 105;
+    private static final int ACTIVE_CHART_6_DATA = 106;
     private static final int UNIQUE_CHART_DATA = 200;
     private static final int UNIQUE_CHART_1_DATA = 201;
     private static final int UNIQUE_CHART_2_DATA = 202;
@@ -80,7 +82,12 @@ public class ProjectStateReportService {
     private static final int FISCAL_CHART_1_DATA = 2001;
     private static final int FISCAL_CHART_2_DATA = 2002;
     private static final int FISCAL_CHART_3_DATA = 2003;
+    private static final int FISCAL_CHART_4_DATA = 2004;
     private static final int CONTRAGENTS_CHART_DATA = 3000;
+    private static final int CARDS_CHART_DATA = 4000;
+    private static final int CARDS_CHART_1_DATA = 4001;
+    private static final int CARDS_CHART_2_DATA = 4002;
+    private static final int CARDS_CHART_3_DATA = 4003;
     private static final int DISCOUNT_FLOWCHARTS_DATE_INCREMENT = -259200000; // 3 дня
 
 
@@ -176,11 +183,52 @@ public class ProjectStateReportService {
                         +
                         "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
-                        "order by 1", ACTIVE_CHART_4_DATA).setIncremental(true)}, new Object[][]{
-                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Общее количество ОУ в проекте", ACTIVE_CHART_1_DATA},
+                        "order by 1", ACTIVE_CHART_4_DATA).setIncremental(true),
+
+                new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
+                        "from ("
+                        + "select distinct regOrg.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
+                        + "from cf_goods_requests gr "
+                        + "join cf_orgs regOrg on regOrg.idoforg=gr.orgowner "
+                        + "join cf_goods_requests_positions grp on gr.idofgoodsrequest=grp.idofgoodsrequest "
+                        + "join cf_goods g on g.idofgood=grp.idofgood "
+                        + "join cf_goods_groups gg on g.idofgoodsgroup=gg.idofgoodsgroup "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "where lower(gg.nameofgoodsgroup) like '%льготн%' and "
+                        + "      gr.dateofgoodsrequest>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "      gr.dateofgoodsrequest<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE
+                        + ") as oo " +
+                        "group by d " +
+                        "order by 1", ACTIVE_CHART_5_DATA).setIncremental(true),
+
+                new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
+                        "from ("
+                        + "select distinct regOrg.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
+                        + "from cf_goods_requests gr "
+                        + "join cf_orgs regOrg on regOrg.idoforg=gr.orgowner "
+                        + "join cf_goods_requests_positions grp on gr.idofgoodsrequest=grp.idofgoodsrequest "
+                        + "join cf_goods g on g.idofgood=grp.idofgood "
+                        + "join cf_goods_groups gg on g.idofgoodsgroup=gg.idofgoodsgroup "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "where lower(gg.nameofgoodsgroup) not like '%льготн%' and "
+                        + "      gr.dateofgoodsrequest>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "      gr.dateofgoodsrequest<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE
+                        + ") as oo " +
+                        "group by d " +
+                        "order by 1", ACTIVE_CHART_6_DATA).setIncremental(true),
+
+
+                }, new Object[][]{
+                {ValueType.DATE, "Год"},
+                {ValueType.NUMBER, "Общее количество ОУ в проекте", ACTIVE_CHART_1_DATA},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу ПРОХОД", ACTIVE_CHART_2_DATA},
                 {ValueType.NUMBER, "ОУ, оказывающие услугу Платного питания по безналичному расчету", ACTIVE_CHART_3_DATA},
-                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания", ACTIVE_CHART_4_DATA}}, ACTIVE_CHART_DATA));
+                {ValueType.NUMBER, "ОУ, отражающие в системе услугу Льготного питания", ACTIVE_CHART_4_DATA},
+                {ValueType.NUMBER, "ОУ, осуществляющих заказ льготного питания через ИС ПП", ACTIVE_CHART_5_DATA},
+                {ValueType.NUMBER, "ОУ, осуществляющих заказ платного питания через ИС ПП", ACTIVE_CHART_6_DATA}}, ACTIVE_CHART_DATA));
+
         TYPES.put("UniqueChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
@@ -511,14 +559,65 @@ public class ProjectStateReportService {
                         + REGION_SENSITIVE_JOIN + " "
                         + "      where t.transactiondate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
                         + "            t.transactiondate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
-                        + REGION_SENSITIVE_CLAUSE + " and "
-                        + "            t.transactionsum>0) as oo "
-                        + "group by 1", FISCAL_CHART_3_DATA).setIncremental(true) }, new Object[][]{
-                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Остатки на лицевых счетах (тыс. руб.)", FISCAL_CHART_1_DATA},
+                        + REGION_SENSITIVE_CLAUSE
+                        + "            and t.transactionsum>0) as oo "
+                        + "group by 1", FISCAL_CHART_3_DATA).setIncremental(true),
+
+                new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM current_timestamp) * 1000 as d, "
+                        + "       case when sum(cl.subbalance1) is not null THEN int8(sum(cl.subbalance1) / 100) / 1000 "
+                        + "       else 0 end "
+                        + "from cf_clients cl "
+                        + "join cf_subscriber_feeding f on f.idofclient=cl.idofclient "
+                        + "where f.wassuspended=false and lastdatepausesubscription=null and datecreateservice is not null",
+                        FISCAL_CHART_4_DATA).setIncremental(true)
+                }, new Object[][]{
+                {ValueType.DATE, "Год"},
+                {ValueType.NUMBER, "Остатки на лицевых счетах (тыс. руб.)", FISCAL_CHART_1_DATA},
                 {ValueType.NUMBER, "Суммы платных дневных продаж (тыс. руб.)", FISCAL_CHART_2_DATA},
-                {ValueType.NUMBER, "Сумма пополнений (тыс. руб.)", FISCAL_CHART_3_DATA} }, FISCAL_CHART_DATA));
+                {ValueType.NUMBER, "Сумма пополнений (тыс. руб.)", FISCAL_CHART_3_DATA},
+                {ValueType.NUMBER, "Остатки на субсчете (тыс. руб.)", FISCAL_CHART_4_DATA} }, FISCAL_CHART_DATA));
+
+        TYPES.put("CardsChart", new ComplexType(new Type[]{
+                new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard) / 1000 "
+                        + "from cf_cards c "
+                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "group by c.createddate",
+                        CARDS_CHART_1_DATA).setIncremental(true),
+
+                new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard)/1000 "
+                        + "from cf_cards c "
+                        + "join cf_history_card h on c.idofcard=h.idofcard and c.idofclient=h.newowner "
+                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "group by c.createddate",
+                        CARDS_CHART_2_DATA).setIncremental(true),
+
+                new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard)/1000 "
+                        + "from cf_cards c "
+                        + "left join cf_cards c2 on c.idofclient=c2.idofclient and c.idofcard<>c2.idofcard "
+                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "group by c.createddate",
+                        CARDS_CHART_3_DATA).setIncremental(true)
+        }, new Object[][]{
+                {ValueType.DATE, "День"},
+                {ValueType.NUMBER, "Количество новых зарегистрированных карт (тыс. шт.)", CARDS_CHART_1_DATA},
+                {ValueType.NUMBER, "Количество перерегистрированных карт (тыс. шт.)", CARDS_CHART_2_DATA},
+                {ValueType.NUMBER, "Количество новых карт зарегистрированных на клиентов, у которых была карта (тыс. шт.)", CARDS_CHART_3_DATA} },
+                CARDS_CHART_DATA));
         //initContragentsChartType();
     }
+
+
+
+
+
+
 
     private static void initContragetsChartType() {
         if(TYPES.get("ContragentsChart") != null) {
@@ -532,15 +631,15 @@ public class ProjectStateReportService {
             for(int i=0; i<contragents.size(); i++) {
                 types[i] = new SimpleType(
                         "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
-                                + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
-                                + "      from cf_orders regOrgSrc "
-                                + REGION_SENSITIVE_JOIN + " "
-                                + "      where regOrgSrc.socdiscount=0 and regOrgSrc.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
-                                + "            regOrgSrc.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
-                                + "            regOrgSrc.idofcontragent=" + contragents.get(i).getIdOfContragent() + " "
-                                + REGION_SENSITIVE_JOIN + " "
-                                + "      ) as oo "
-                                + "group by d", CONTRAGENTS_CHART_DATA + i + 1).setIncremental(true);
+                        + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
+                        + "      from cf_orders regOrgSrc "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "      where regOrgSrc.socdiscount=0 and regOrgSrc.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                        + "            regOrgSrc.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
+                        + "            regOrgSrc.idofcontragent=" + contragents.get(i).getIdOfContragent() + " "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "      ) as oo "
+                        + "group by d", CONTRAGENTS_CHART_DATA + i + 1).setIncremental(true);
             }
             Object[][] props = new Object[contragents.size() + 1][2];
             props [0] = new Object[] { ValueType.DATE, "Год" };
@@ -1102,7 +1201,7 @@ public class ProjectStateReportService {
                 }
                 r.addCell(DATE_FORMAT.format(d));
             } else if (t.getColumns()[0][0] == ValueType.NUMBER) {
-                r.addCell(Integer.parseInt(k));
+                r.addCell(Long.parseLong(k));
             }
 
 
