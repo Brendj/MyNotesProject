@@ -13,8 +13,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DailyFormationOfRegistries;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
