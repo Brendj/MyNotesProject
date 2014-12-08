@@ -24,13 +24,12 @@ public class CryptoInfoPage extends BasicWorkspacePage {
         return "option/crypto_info_page";
     }
 
-    // падает с ошибкой
     public String getCryptoLibRelease() {
-        return "" /*JCP.getProductRelease()*/;
+        return "" + JCP.getProductRelease();
     }
 
     public String getCryptoLibVersion() {
-        return "" /*+ JCP.getProductVersion()*/;
+        return "" + JCP.getProductVersion();
     }
 
     public String getCryptoLibURL() {
