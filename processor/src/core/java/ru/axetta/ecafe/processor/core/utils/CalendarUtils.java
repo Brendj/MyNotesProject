@@ -263,6 +263,13 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date subOneDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, -1);
+        return calendar.getTime();
+    }
+
     public static Date addDays(Date date, int nDays) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
