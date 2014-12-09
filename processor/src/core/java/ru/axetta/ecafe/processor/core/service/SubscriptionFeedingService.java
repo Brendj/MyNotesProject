@@ -199,7 +199,7 @@ public class SubscriptionFeedingService {
                 + "  and (sf.lastDatePauseSubscription is null or sf.lastDatePauseSubscription>:currentDate) "
                 + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:currentDate) and sf.client=cl and sf.deletedState=false) "
                 + " and not (cl.subBalance1 is null) and "
-                + " cl.subBalance1<=0 and "
+                + " cl.balance<=0 and "
                 + " cd.dateActivationDiagram = ( select max(incd.dateActivationDiagram) from CycleDiagram incd where incd.client=cl "
                 + "and incd.dateActivationDiagram<:currentDate and incd.deletedState=false)";
         Query cycleDiagramTypedQuery = entityManager.createQuery(sql);
