@@ -323,8 +323,30 @@ public class NSIDeltaProcessor {
                 /*else if(attributeName.endsWith("guid")) {
                     guid = getSingleValue(at);
                 }*/
-                else if(attributeName.endsWith("текущий класс или группа")) {
+                else if((group == null || StringUtils.isBlank(group)) &&
+                        attributeName.endsWith("текущий класс или группа")) {
                     group = getSingleValue(at);
+                }
+                if (attributeName.endsWith("класс")) {
+                    List<GroupValue> groupValues = at.getGroupValue();
+                    boolean set = false;
+                    for(GroupValue grpVal : groupValues) {
+                        for(Attribute attr2 : grpVal.getAttribute()) {
+                            if(attr2.getName().equals("Название")) {
+                                group = attr2.getValue().get(0).getValue();
+                                set = true;
+                                break;
+                            }
+                        }
+                        if(set) {
+                            break;
+                        }
+                    }
+                }
+                else if(attributeName.endsWith("класс/название")) {
+                    group = getSingleValue(at);
+
+
                 }
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);

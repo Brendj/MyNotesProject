@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
-import generated.nsiws2.com.rstyle.nsi.beans.Attribute;
-import generated.nsiws2.com.rstyle.nsi.beans.Context;
-import generated.nsiws2.com.rstyle.nsi.beans.Item;
-import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
+import generated.nsiws2.com.rstyle.nsi.beans.*;
 import generated.nsiws2.com.rstyle.nsi.services.NSIService;
 import generated.nsiws2.com.rstyle.nsi.services.NSIServiceService;
 import generated.nsiws2.com.rstyle.nsi.services.in.NSIRequestType;
@@ -451,12 +448,24 @@ public class MskNSIService {
         }
 
         //  Запрет на удаленных
-        SearchPredicate search = new SearchPredicate();
-        search.setAttributeName("Статус записи");
-        search.setAttributeType(TYPE_STRING);
-        search.setAttributeValue("Удален%");
-        search.setAttributeOp("not like");
-        searchPredicateInfo.addSearchPredicate(search);
+        SearchPredicate search1 = new SearchPredicate();
+        search1.setAttributeName("Статус записи");
+        search1.setAttributeType(TYPE_STRING);
+        search1.setAttributeValue("Удален%");
+        search1.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search1);
+        SearchPredicate search2 = new SearchPredicate();
+        search2.setAttributeName("Статус записи");
+        search2.setAttributeType(TYPE_STRING);
+        search2.setAttributeValue("%Отчислен%");
+        search2.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search2);
+        SearchPredicate search3 = new SearchPredicate();
+        search3.setAttributeName("Статус записи");
+        search3.setAttributeType(TYPE_STRING);
+        search3.setAttributeValue("%Выпущен%");
+        search3.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search3);
 
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
@@ -478,8 +487,25 @@ public class MskNSIService {
                 if (attr.getName().equals("Дата рождения")) {
                     pupilInfo.birthDate = attr.getValue().get(0).getValue();
                 }
-                if (attr.getName().equals("Текущий класс или группа")) {
+                if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
+                    attr.getName().equals("Текущий класс или группа")) {
                     pupilInfo.group = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Класс")) {
+                    List<GroupValue> groupValues = attr.getGroupValue();
+                    boolean set = false;
+                    for(GroupValue grpVal : groupValues) {
+                        for(Attribute attr2 : grpVal.getAttribute()) {
+                            if(attr2.getName().equals("Название")) {
+                                pupilInfo.group = attr2.getValue().get(0).getValue();
+                                set = true;
+                                break;
+                            }
+                        }
+                        if(set) {
+                            break;
+                        }
+                    }
                 }
                 /*if (attr.getName().equals("Дата зачисления")) {
                     pupilInfo.created = attr.getValue().get(0).getValue();

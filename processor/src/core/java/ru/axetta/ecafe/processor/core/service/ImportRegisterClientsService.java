@@ -564,12 +564,21 @@ public class ImportRegisterClientsService {
             return;
         }
 
+        String clientGuid = emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+        String registryGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
+        if(registryGroupName != null && StringUtils.isBlank(registryGroupName) && registryGroupName.length() > 64) {
+            String replace = registryGroupName.substring(0, 63);
+            logger.error(String.format("ВНИМАНИЕ! Наименование группы (%s) ученика (%s) в Реестрах "
+                                       + "слишком длинное, будет применено ограничение на длинну "
+                                       + "наименования группы (%s)", registryGroupName, clientGuid, replace));
+            registryGroupName = replace;
+        }
         RegistryChange ch = new RegistryChange();
-        ch.setClientGUID(emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID)));
+        ch.setClientGUID(clientGuid);
         ch.setFirstName(fieldConfig.getValue(ClientManager.FieldId.NAME));
         ch.setSecondName(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME));
         ch.setSurname(fieldConfig.getValue(ClientManager.FieldId.SURNAME));
-        ch.setGroupName(fieldConfig.getValue(ClientManager.FieldId.GROUP));
+        ch.setGroupName(registryGroupName);
         ch.setIdOfClient(currentClient == null ? null : currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
         ch.setOperation(operation);
