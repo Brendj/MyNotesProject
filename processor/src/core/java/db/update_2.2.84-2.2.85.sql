@@ -32,3 +32,6 @@ CREATE TABLE CF_ClientGroup_MigrationHistory (
   comment varchar(255) ,
   CONSTRAINT CF_ClientGroup_MigrationHistory_pk PRIMARY KEY (idOfGroupClientMigration)
 );
+
+
+--//файл больше не трогать!
