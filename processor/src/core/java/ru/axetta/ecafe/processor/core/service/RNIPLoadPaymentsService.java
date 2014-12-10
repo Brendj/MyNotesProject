@@ -671,15 +671,15 @@ public class RNIPLoadPaymentsService {
 
 
     public void addPaymentsToDb(List<Map<String, String>> payments) throws Exception {
-        RuntimeContext runtimeContext = null;
-        Session session = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        /*Session session = null;
         try {
-            runtimeContext = RuntimeContext.getInstance();
+            runtimeContext
             session = runtimeContext.createPersistenceSession();
         } catch (Exception e) {
             logger.error("Failed to receive DB connection", e);
             return;
-        }
+        }*/
 
         List<Contragent> contrgents = DAOService.getInstance().getContragentsList();
 
@@ -702,7 +702,7 @@ public class RNIPLoadPaymentsService {
                 continue;
             }
             String contractId = p.get("NUM_DOGOVOR");
-            Client client = DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
+            Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
             info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
                     paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
