@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DailyFormationRegistries"
+           table="cf_daily_formation_registries">
+        <id name="idOFDailyFormationRegistries" column="idOfDailyFormationRegistries" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="generatedDate" column="generatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <many-to-one name="idOfContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="idOfContragent" not-null="true"
+                     insert="false" update="false"/>
+        <property name="contragentName" column="contragentName" type="string" length="255"/>
+        <property name="orgNum" column="orgnum" type="string" length="30"/>
+        <many-to-one name="idOfOrg" column="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"
+                     insert="false" update="false"/>
+        <property name="officialName" column="officialname" type="string" length="128"/>
+        <property name="address" column="address" type="string" length="128"/>
+        <property name="totalBalance" column="totalbalance" type="long"/>
+        <property name="rechargeAmount" column="rechargeamount" type="long"/>
+        <property name="salesAmount" column="salesamount" type="long"/>
+    </class>
+</hibernate-mapping>

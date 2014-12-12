@@ -2,7 +2,7 @@
  * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.utils;
+package ru.axetta.ecafe.processor.core.persistence.xmlreport;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -114,7 +114,7 @@ public class DailyFormationOfRegistries {
 
     public static Long orgBalance(Session session, Long orgId) {
         Query query = session.createSQLQuery(
-                "SELECT sum(cfc.balance) FROM cf_orgs cfo LEFT JOIN cf_clients cfc ON cfc.idoforg = cfo.idoforg WHERE cfo.idoforg = :idOfOrg ");
+                "SELECT sum(cfc.balance) FROM cf_orgs cfo LEFT JOIN cf_clients cfc ON cfc.idoforg = cfo.idoforg WHERE cfo.idoforg = :idOfOrg AND cfc.balance > 0");
         query.setParameter("idOfOrg", orgId);
         if (query.uniqueResult() != null) {
             return ((BigDecimal) query.uniqueResult()).longValue();
@@ -131,9 +131,8 @@ public class DailyFormationOfRegistries {
 
         Query query = session.createSQLQuery(
                 "SELECT cfo.idoforg, sum(cfcl.paysum) FROM cf_orgs cfo LEFT JOIN cf_clients cfc ON cfc.idoforg = cfo.idoforg LEFT JOIN cf_clientpayments cfcl "
-                        + "ON cfc.idofclient = cfcl.idofclientpayment WHERE cfo.idoforg IN ( :contragentOrgs ) AND cfcl.paytype=1 "
-                        + "AND cfcl.createddate BETWEEN :beforeDate AND :rechargeDate "
-                        + "GROUP BY cfo.idoforg");
+                        + "ON cfc.idofclient = cfcl.idofclientpayment WHERE cfo.idoforg IN ( :contragentOrgs ) AND cfcl.paytype IN (1, 2) "
+                        + "AND cfcl.createddate BETWEEN :beforeDate AND :rechargeDate " + "GROUP BY cfo.idoforg");
         query.setParameterList("contragentOrgs", contragentOrgs);
         query.setParameter("beforeDate", beforeDate.getTime());
         query.setParameter("rechargeDate", rechargeDate.getTime());
