@@ -955,7 +955,7 @@ public class ProjectStateReportService {
     public String applyMacroReplace(String sql, int type, Calendar min, Calendar max, int daysInc, String regionName,
             Integer idOfContragent) {
         if (sql.indexOf("%DATE_CLAUSE%") > -1) {
-            //  Для льготного питания получаем данные на 3 дня раньше текущего, при охранении так же необходимо следить за сохраняемой датой
+            //  Для льготного питания получаем данные на 3 дня раньше текущего, при cохранении так же необходимо следить за сохраняемой датой
             if (type == ACTIVE_CHART_4_DATA || type == UNIQUE_CHART_4_DATA) {
                 Calendar maxD = new GregorianCalendar();
                 Calendar minD = new GregorianCalendar();
