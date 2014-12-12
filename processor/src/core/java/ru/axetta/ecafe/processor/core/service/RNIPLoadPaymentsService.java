@@ -281,7 +281,7 @@ public class RNIPLoadPaymentsService {
         info("Загрузка платежей РНИП завершена");
     }
 
-    @Transactional
+    // @Transactional
     public void receiveContragentPayments(Contragent contragent) throws Exception{
         Date updateTime = new Date(System.currentTimeMillis());
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
@@ -720,6 +720,12 @@ public class RNIPLoadPaymentsService {
                     idOfContragent = rnipContragent.getIdOfContragent();
                 }
             }
+            if(idOfPaymentContragent == null) {
+                logger.error(String.format("По БИК %s не найдено контрагента, так же для ИС ПП не указан контрагент по умолчанию "
+                                           + "(указывается в настройках RNIP_DEFAULT). Платеж не может быть обработан!", bic));
+                continue;
+            }
+
             long amt = Long.parseLong(amount);
             OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
                     OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
