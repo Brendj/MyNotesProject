@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -50,8 +51,8 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
     @Override
     public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-        if (StringUtils.isEmpty(this.templateFilename)) {
-            throw new Exception("Не найден файл шаблона.");
+        if (!(new File(this.templateFilename)).exists()) {
+            throw new Exception(String.format("Не найден файл шаблона '%s'", templateFilename));
         }
         String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
 
