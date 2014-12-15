@@ -41,8 +41,6 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private TypesOfCardReport report;
 
-    private final ClientListPage clientListPage = new ClientListPage();
-
     private final boolean includeSummaryByDistrict = false;
 
     private String htmlReport = null;
@@ -156,10 +154,6 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при выгрузке отчета:", e);
         }
-    }
-
-    public ClientListPage getClientListPage() {
-        return clientListPage;
     }
 
     public Date getStartDate() {

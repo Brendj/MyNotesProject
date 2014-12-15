@@ -13,12 +13,16 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
+import ru.axetta.ecafe.processor.core.persistence.xmlreport.DailyFormationOfRegistries;
+import ru.axetta.ecafe.processor.core.persistence.xmlreport.XmlReportGenerator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -124,6 +128,15 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
             result.add(typesOfCardReportItem);
             result.add(typesOfCardReportItem1);
+
+            List<Contragent> some = DailyFormationOfRegistries.getContragentTSP(session);
+
+            List<DailyFormationOfRegistries.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList =
+                    DailyFormationOfRegistries.getGenerationReportResult(session, some, startTime);
+
+            XmlReportGenerator xmlReportGenerator = new XmlReportGenerator();
+            Document document = xmlReportGenerator.createXmlFile(dailyFormationOfRegistriesModelList);
+            xmlReportGenerator.unloadXmlFile(document, CalendarUtils.dateToString(startTime));
 
             return new JRBeanCollectionDataSource(result);
         }
