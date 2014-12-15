@@ -415,7 +415,10 @@ public class ContragentEditPage extends BasicWorkspacePage {
             return null;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
         }
-        if(isEmpty(prevId) || prevId.equals(id)) {
+        /*if(isEmpty(prevId) || prevId.equals(id)) {
+            return null;
+        }*/
+        if(!isEmpty(prevId) && prevId.equals(id)) {
             return null;
         }
         if (isEmpty (contragent.getContragentName())) {
