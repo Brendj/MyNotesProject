@@ -107,6 +107,7 @@ public class RNIPLoadPaymentsService {
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     public static final String RNIP_INPUT_FILE = "/rnip.in.signed";
     public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
+    public static final String ERRORS_OUTPUT_FILE = "/rnip.errors";
     public static final String RNIP_DIR = "/rnip/";
 
 
@@ -669,6 +670,39 @@ public class RNIPLoadPaymentsService {
         }
     }
 
+    protected File getErrorFile() {
+        File dir = new File(RNIP_DIR);
+        if(!dir.exists()) {
+            if(!dir.mkdirs()) {
+                return null;
+            }
+        }
+        File f = new File(dir, ERRORS_OUTPUT_FILE + ".log");
+        if(!f.exists()) {
+            try {
+                if(!f.createNewFile()) {
+                    return null;
+                }
+            } catch (Exception e) {
+                logger.error("Failed to create file", e);
+                return null;
+            }
+        }
+        return f;
+    }
+
+    protected FileWriter openErrorFile(File f) {
+        if(f == null) {
+            return null;
+        }
+        try {
+            FileWriter fw = new FileWriter(f, true);
+            return fw;
+        } catch (Exception e) {
+            logger.error("Failed to init writer for errors file", e);
+        }
+        return null;
+    }
 
     public void addPaymentsToDb(List<Map<String, String>> payments) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -682,6 +716,8 @@ public class RNIPLoadPaymentsService {
         }*/
 
         List<Contragent> contrgents = DAOService.getInstance().getContragentsList();
+        FileWriter errorWriter = openErrorFile(getErrorFile());
+        String workDate = new SimpleDateFormat("dd.MM.yyy HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
 
         for (Map<String, String> p : payments) {
@@ -690,7 +726,9 @@ public class RNIPLoadPaymentsService {
             String paymentDate    = p.get("PaymentDate").trim();
             String contragentKey  = p.get("SRV_CODE");
             if(contragentKey == null || contragentKey.length() < 1) {
-                logger.error(String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID));
+                String str = String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID);
+                logger.error(str);
+                errorWriter.write(String.format("%s: %s\r\n", workDate, str));
                 continue;
             }
             contragentKey        = contragentKey.substring(5, 10).trim();
@@ -698,7 +736,9 @@ public class RNIPLoadPaymentsService {
             String amount        = p.get("Amount");
             long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
             if (idOfContragent == 0) {
-                logger.error(String.format("Неудалось обработать платеж %s - не удалось найти контрагента по коду = %s", paymentID, contragentKey));
+                String str = String.format("Неудалось обработать платеж %s - не удалось найти контрагента по коду = %s", paymentID, contragentKey);
+                logger.error(str);
+                errorWriter.write(String.format("%s: %s\r\n", workDate, str));
                 continue;
             }
             String contractId = p.get("NUM_DOGOVOR");
@@ -706,7 +746,9 @@ public class RNIPLoadPaymentsService {
             info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
                     paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
-                throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
+                //throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
+                errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("NUM_DOGOVOR")));
+                continue;
             }
             Long idOfPaymentContragent = null;
             Contragent payContragent = DAOService.getInstance().getContragentByBIC(bic);
@@ -715,6 +757,7 @@ public class RNIPLoadPaymentsService {
             }
             else {
                 logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
+                errorWriter.write(String.format("%s: По полученному БИК %s от РНИП, не найдено ни одного контрагента\r\n", workDate, bic));
                 Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
                 if (rnipContragent != null) {
                     idOfContragent = rnipContragent.getIdOfContragent();
