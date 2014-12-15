@@ -51,6 +51,14 @@
                      class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Ksu2Record"
                      not-null="false"/>
 
+        <many-to-one name="exchangeOut" column="idofexchangeout"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.ExchangeOut"
+                     not-null="false"/>
+
+        <many-to-one name="exchangeIn" column="idofexchangein"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.ExchangeIn"
+                     not-null="false"/>
+
         <property name="inGroup" column="InGroup" type="boolean" not-null="true"/>
         <property name="invNumber" column="InvNumber" type="string" length="10" not-null="false"/>
         <property name="cost" column="Cost" type="int" not-null="true"/>

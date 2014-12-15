@@ -38,16 +38,18 @@ public class Instance extends LibraryDistributedObject {
     private Fund fund;
     private String guidFund;
     private InventoryBook inventoryBook;
-    private String guidInventaryBook;
+    private String guidInventoryBook;
     private Ksu1Record ksu1Record;
     private String guidKsu1Record;
     private Ksu2Record ksu2Record;
     private String guidKsu2Record;
-
+    private ExchangeOut exchangeOut;
+    private String guidOfExchangeOut;
+    private ExchangeIn exchangeIn;
+    private String guidOfExchangeIn;
     private boolean inGroup;
     private String invNumber;
     private int cost;
-
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -56,6 +58,9 @@ public class Instance extends LibraryDistributedObject {
         criteria.createAlias("inventoryBook","ib", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("ksu1Record","k1r", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("ksu2Record","k2r", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("exchangeIn","exchangeI", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("exchangeOut","exchangeO", JoinType.LEFT_OUTER_JOIN);
+
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
@@ -65,9 +70,11 @@ public class Instance extends LibraryDistributedObject {
 
         projectionList.add(Projections.property("p.guid"), "guidPublication");
         projectionList.add(Projections.property("f.guid"), "guidFund");
-        projectionList.add(Projections.property("ib.guid"), "guidInventaryBook");
+        projectionList.add(Projections.property("ib.guid"), "guidInventoryBook");
         projectionList.add(Projections.property("k1r.guid"), "guidKsu1Record");
         projectionList.add(Projections.property("k2r.guid"), "guidKsu2Record");
+        projectionList.add(Projections.property("exchangeI.guid"), "guidOfExchangeIn");
+        projectionList.add(Projections.property("exchangeO.guid"), "guidOfExchangeOut");
 
         criteria.setProjection(projectionList);
     }
@@ -79,37 +86,50 @@ public class Instance extends LibraryDistributedObject {
     }
 
     @Override
-    protected void appendAttributes(Element element) {}
+    protected void appendAttributes(Element element) {
+        XMLUtils.setAttributeIfNotNull(element, "GuidPublication", getGuidPublication());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidFund", getGuidFund());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidInventaryBook", getGuidInventoryBook());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidKSU1Record", getGuidKsu1Record());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidKSU2Record", getGuidKsu2Record());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidZajOut", getGuidOfExchangeOut());
+        XMLUtils.setAttributeIfNotNull(element, "GuidZaj", getGuidOfExchangeIn());
+        //XMLUtils.setAttributeIfNotNull(element, "InGroup", isInGroup());
+        //XMLUtils.setAttributeIfNotNull(element, "InvNumber", getInvNumber());
+        XMLUtils.setAttributeIfNotNull(element, "Cost", getCost());
+    }
 
     @Override
     public Instance parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
             setOrgOwner(longOrgOwner);
-        guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
-        guidPublication = XMLUtils.getStringAttributeValue(node, "GuidPublication", 36);
-        guidInventaryBook = XMLUtils.getStringAttributeValue(node, "GuidInventaryBook", 36);
-        guidKsu1Record = XMLUtils.getStringAttributeValue(node, "GuidKsu1Record", 36);
-        guidKsu2Record = XMLUtils.getStringAttributeValue(node, "GuidKsu2Record", 36);
-        inGroup = XMLUtils.getBooleanAttributeValue(node, "InGroup");
-        invNumber = XMLUtils.getStringAttributeValue(node, "InvNumber", 10);
-        cost = XMLUtils.getIntegerAttributeValue(node, "Cost");
+        setGuidFund(XMLUtils.getStringAttributeValue(node, "GuidFund", 36));
+        setGuidPublication(XMLUtils.getStringAttributeValue(node, "GuidPublication", 36));
+        setGuidInventoryBook(XMLUtils.getStringAttributeValue(node, "GuidInventaryBook", 36));
+        setGuidKsu1Record(XMLUtils.getStringAttributeValue(node, "GuidKsu1Record", 36));
+        setGuidKsu2Record(XMLUtils.getStringAttributeValue(node, "GuidKsu2Record", 36));
+        setInGroup(XMLUtils.getBooleanAttributeValue(node, "InGroup"));
+        setInvNumber(XMLUtils.getStringAttributeValue(node, "InvNumber", 10));
+        setCost(XMLUtils.getIntegerAttributeValue(node, "Cost"));
+        setGuidOfExchangeIn(XMLUtils.getStringAttributeValue(node, "GuidZajIn", 36));
+        setGuidOfExchangeOut(XMLUtils.getStringAttributeValue(node, "GuidZajOut", 36));
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        InventoryBook ib = DAOUtils.findDistributedObjectByRefGUID(InventoryBook.class, session, guidInventaryBook);
+        InventoryBook ib = DAOUtils.findDistributedObjectByRefGUID(InventoryBook.class, session, getGuidInventoryBook());
         if(ib!=null){
             setInventoryBook(ib);
         }
 
-        if(ib!=null && invNumber!=null  && !getTagName().equalsIgnoreCase("m")) {
+        if(ib!=null && getInventoryBook()!=null  && !getTagName().equalsIgnoreCase("m")) {
             boolean deleteFlag = false;
             Criteria criteria = session.createCriteria(Instance.class);
             criteria.add(Restrictions.eq("inventoryBook", ib));
-            criteria.add(Restrictions.eq("invNumber", invNumber));
+            criteria.add(Restrictions.eq("invNumber", getInvNumber()));
             criteria.add(Restrictions.eq("deletedState", deleteFlag));
             Instance instance = (Instance) criteria.uniqueResult();
             session.clear();
@@ -121,28 +141,58 @@ public class Instance extends LibraryDistributedObject {
         }
 
 
-        Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
-        if(p==null) {
-            DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
-            distributedObjectException.setData(guidPublication);
-            throw  distributedObjectException;
-        } else {
-            setPublication(p);
+        if ((getGuidPublication() != null) && !getGuidPublication().equals("")) {
+            Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, getGuidPublication());
+            if(p==null) {
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Instance NOT_FOUND_VALUE Publication \"" + getGuidPublication() + "\"");
+                distributedObjectException.setData(getGuidPublication());
+                throw  distributedObjectException;
+            } else {
+                setPublication(p);
+            }
         }
 
-        Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
-        if(f!=null) {
-            setFund(f);
+        if ((getGuidFund() != null) && !getGuidFund().equals("")) {
+            Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, getGuidFund());
+            if(f!=null) {
+                setFund(f);
+            }
         }
 
-        Ksu1Record ksu1 = DAOUtils.findDistributedObjectByRefGUID(Ksu1Record.class, session, guidKsu1Record);
-        if(ksu1!=null){
-            setKsu1Record(ksu1);
+        if ((getGuidKsu1Record() != null) && !getGuidKsu1Record().equals("")) {
+            Ksu1Record ksu1 = DAOUtils.findDistributedObjectByRefGUID(Ksu1Record.class, session, getGuidKsu1Record());
+            if (ksu1 != null) {
+                setKsu1Record(ksu1);
+            }
         }
 
-        Ksu2Record ksu2 = DAOUtils.findDistributedObjectByRefGUID(Ksu2Record.class, session, guidKsu2Record);
-        if(ksu2!=null) {
-            setKsu2Record(ksu2);
+        if ((getGuidKsu2Record() != null) && !getGuidKsu2Record().equals("")) {
+            Ksu2Record ksu2 = DAOUtils.findDistributedObjectByRefGUID(Ksu2Record.class, session, getGuidKsu2Record());
+            if (ksu2 != null) {
+                setKsu2Record(ksu2);
+            }
+        }
+
+        if ((getGuidOfExchangeOut() != null) && !getGuidOfExchangeOut().equals("")) {
+            ExchangeOut exchangeOut = DAOUtils.findDistributedObjectByRefGUID(ExchangeOut.class, session, getGuidOfExchangeOut());
+            if (exchangeOut == null) {
+                DistributedObjectException distributedObjectException = new DistributedObjectException("Instance NOT_FOUND_VALUE ExchangeOut (Outcome) \"" + getGuidOfExchangeOut() + "\"");
+                distributedObjectException.setData(getGuidOfExchangeOut());
+                throw distributedObjectException;
+            } else {
+                setExchangeOut(exchangeOut);
+            }
+        }
+
+        if ((getGuidOfExchangeIn() != null) && !getGuidOfExchangeIn().equals("")) {
+            ExchangeIn exchangeIn = DAOUtils.findDistributedObjectByRefGUID(ExchangeIn.class, session, getGuidOfExchangeIn());
+            if (exchangeIn == null) {
+                DistributedObjectException distributedObjectException = new DistributedObjectException("ExchangeOut (Income) NOT_FOUND_VALUE");
+                distributedObjectException.setData(getGuidOfExchangeIn());
+                throw distributedObjectException;
+            } else {
+                setExchangeIn(exchangeIn);
+            }
         }
     }
 
@@ -154,7 +204,7 @@ public class Instance extends LibraryDistributedObject {
         setPublication(((Instance) distributedObject).getPublication());
         setGuidPublication(((Instance) distributedObject).getGuidPublication());
         setInventoryBook(((Instance) distributedObject).getInventoryBook());
-        setGuidInventaryBook(((Instance) distributedObject).getGuidInventaryBook());
+        setGuidInventoryBook(((Instance) distributedObject).getGuidInventoryBook());
         setKsu1Record(((Instance) distributedObject).getKsu1Record());
         setGuidKsu1Record(((Instance) distributedObject).getGuidKsu1Record());
         setKsu2Record(((Instance) distributedObject).getKsu2Record());
@@ -162,6 +212,10 @@ public class Instance extends LibraryDistributedObject {
         setInGroup(((Instance) distributedObject).isInGroup());
         setInvNumber(((Instance)distributedObject).getInvNumber());
         setCost(((Instance) distributedObject).getCost());
+        setExchangeOut(((Instance) distributedObject).getExchangeOut());
+        setGuidOfExchangeOut(((Instance) distributedObject).getGuidOfExchangeOut());
+        setExchangeIn(((Instance) distributedObject).getExchangeIn());
+        setGuidOfExchangeIn(((Instance) distributedObject).getGuidOfExchangeIn());
     }
 
     public Publication getPublication() {
@@ -236,7 +290,6 @@ public class Instance extends LibraryDistributedObject {
         this.issuableInternal = issuableInternal;
     }
 
-
     public String getGuidPublication() {
         return guidPublication;
     }
@@ -253,12 +306,12 @@ public class Instance extends LibraryDistributedObject {
         this.guidFund = guidFund;
     }
 
-    public String getGuidInventaryBook() {
-        return guidInventaryBook;
+    public String getGuidInventoryBook() {
+        return guidInventoryBook;
     }
 
-    public void setGuidInventaryBook(String guidInventaryBook) {
-        this.guidInventaryBook = guidInventaryBook;
+    public void setGuidInventoryBook(String guidInventoryBook) {
+        this.guidInventoryBook = guidInventoryBook;
     }
 
     public String getGuidKsu1Record() {
@@ -275,5 +328,37 @@ public class Instance extends LibraryDistributedObject {
 
     public void setGuidKsu2Record(String guidKsu2Record) {
         this.guidKsu2Record = guidKsu2Record;
+    }
+
+    public ExchangeOut getExchangeOut() {
+        return exchangeOut;
+    }
+
+    public void setExchangeOut(ExchangeOut exchangeOut) {
+        this.exchangeOut = exchangeOut;
+    }
+
+    public String getGuidOfExchangeOut() {
+        return this.guidOfExchangeOut;
+    }
+
+    public void setGuidOfExchangeOut(String guidOfExchangeOut) {
+        this.guidOfExchangeOut = guidOfExchangeOut;
+    }
+
+    public ExchangeIn getExchangeIn() {
+        return exchangeIn;
+    }
+
+    public void setExchangeIn(ExchangeIn exchangeIn) {
+        this.exchangeIn = exchangeIn;
+    }
+
+    public String getGuidOfExchangeIn() {
+        return this.guidOfExchangeIn;
+    }
+
+    public void setGuidOfExchangeIn(String guidOfExchangeIn) {
+        this.guidOfExchangeIn = guidOfExchangeIn;
     }
 }

@@ -38,14 +38,14 @@ public class Circulation extends LibraryDistributedObject {
     private Date refundDate;
     private Date realRefundDate;
     private int status;
-
     private String guidParentCirculation;
     private Circulation parentCirculation;
     private String guidIssuable;
     private Issuable issuable;
     private Long idOfClient;
     private Client client;
-
+    private String guidExchangeOut;
+    private ExchangeOut exchangeOut;
     private Set<Circulation> circulationInternal;
 
     @Override
@@ -81,47 +81,58 @@ public class Circulation extends LibraryDistributedObject {
     @Override
     protected Circulation parseAttributes(Node node) throws Exception {
         //guidClient = XMLUtils.getStringAttributeValue(node, "idOfClient", 36);
-        idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
-        if(idOfClient==null){
+        setIdOfClient(XMLUtils.getLongAttributeValue(node, "IdOfClient"));
+        if (getIdOfClient() == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE Client");
         }
-        guidParentCirculation = XMLUtils.getStringAttributeValue(node, "GuidParentCirculation", 36);
-        guidIssuable = XMLUtils.getStringAttributeValue(node, "GuidIssuable", 36);
-        issuanceDate = XMLUtils.getDateTimeAttributeValue(node, "IssuanceDate");
-        refundDate = XMLUtils.getDateAttributeValue(node, "RefundDate");
-        realRefundDate = XMLUtils.getDateTimeAttributeValue(node, "RealRefundDate");
-        status = XMLUtils.getIntegerAttributeValue(node, "Status");
+        setGuidParentCirculation(XMLUtils.getStringAttributeValue(node, "GuidParentCirculation", 36));
+        setGuidIssuable(XMLUtils.getStringAttributeValue(node, "GuidIssuable", 36));
+        setIssuanceDate(XMLUtils.getDateTimeAttributeValue(node, "IssuanceDate"));
+        setRefundDate(XMLUtils.getDateAttributeValue(node, "RefundDate"));
+        setRealRefundDate(XMLUtils.getDateTimeAttributeValue(node, "RealRefundDate"));
+        setStatus(XMLUtils.getIntegerAttributeValue(node, "Status"));
+        setGuidExchangeOut(XMLUtils.getStringAttributeValue(node, "GuidZaj", 36));
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException{
-        Issuable iss = DAOUtils.findDistributedObjectByRefGUID(Issuable.class, session, guidIssuable);
-        if(iss==null) throw new DistributedObjectException("NOT_FOUND_VALUE Issuable");
+        Issuable iss = DAOUtils.findDistributedObjectByRefGUID(Issuable.class, session, getGuidIssuable());
+        if(iss==null) throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Issuable\"" + getGuidIssuable() +"\"");
         setIssuable(iss);
 
-        Circulation parentCirculation = DAOUtils.findDistributedObjectByRefGUID(Circulation.class, session, guidParentCirculation);
+        Circulation parentCirculation = DAOUtils.findDistributedObjectByRefGUID(Circulation.class, session, getGuidParentCirculation());
         if(parentCirculation!=null) setParentCirculation(parentCirculation);
 
         //Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
         //if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
         //setClient(cl);
-        if (idOfClient == null) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+        if (getIdOfClient() == null) {
+            throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client=null");
         } else {
-            Client currentClient;
+            Client currentClient = null;
             try{
-                currentClient = DAOUtils.findClient(session, idOfClient);
+                currentClient = DAOUtils.findClient(session, getIdOfClient());
             } catch (Exception e){
-                throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client GUID:\"" + currentClient.getClientGUID() +"\"");
             }
             if(currentClient==null){
-                throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client GUID:\"" + currentClient.getClientGUID() +"");
             }
             setClient(currentClient);
         }
 
+        if ((getGuidExchangeOut() != null) && !getGuidExchangeOut().equals("")) {
+            ExchangeOut exchangeOut = DAOUtils
+                    .findDistributedObjectByRefGUID(ExchangeOut.class, session, getGuidExchangeOut());
+            if (exchangeOut != null) {
+                setExchangeOut(exchangeOut);
+            } else {
+                throw new DistributedObjectException(
+                        "Circulation NOT_FOUND_VALUE ExchangeOut GUID:\"" + getGuidExchangeOut() + "\"");
+            }
+        }
     }
 
     @Override
@@ -136,6 +147,8 @@ public class Circulation extends LibraryDistributedObject {
         setGuidIssuable(((Circulation) distributedObject).getGuidIssuable());
         setClient(((Circulation) distributedObject).getClient());
         setIdOfClient(((Circulation) distributedObject).getIdOfClient());
+        setExchangeOut(((Circulation) distributedObject).getExchangeOut());
+        setGuidExchangeOut(((Circulation) distributedObject).getGuidExchangeOut());
     }
 
     public Circulation getParentCirculation() {
@@ -224,5 +237,21 @@ public class Circulation extends LibraryDistributedObject {
 
     public void setGuidIssuable(String guidIssuable) {
         this.guidIssuable = guidIssuable;
+    }
+
+    public String getGuidExchangeOut() {
+        return this.guidExchangeOut;
+    }
+
+    public void setGuidExchangeOut(String guidExchangeOut) {
+        this.guidExchangeOut = guidExchangeOut;
+    }
+
+    public ExchangeOut getExchangeOut() {
+        return this.exchangeOut;
+    }
+
+    public void setExchangeOut(ExchangeOut exchangeOut) {
+        this.exchangeOut = exchangeOut;
     }
 }

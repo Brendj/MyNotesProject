@@ -51,28 +51,28 @@ public class Manager {
      * Логгер
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(Manager.class);
-
+    /* Максимальное количество объектов используемых в запросах конструкции IN */
+    private static final int maxCount = 1000;
+    private final List<String> doGroupNames;
+    private final DOGroupsFactory doGroupsFactory = new DOGroupsFactory();
     /**
      * Ключи = имена элементов (Пример элемента: <Product>),
      * значения = текущие максимальые версии объектов
      * (Пример версии: атрибут V тега <Product V="20">)
      */
     private HashMap<String, Long> currentMaxVersions = new HashMap<String, Long>();
-
     /**
      * Ключи = имена элементов (Пример элемента: <Product>),
      * значения = максимальное количество запрашиваемое клиентом
      * (Пример версии: атрибут Limit тега <Product Limit="20">)
      */
     private HashMap<String, Integer> currentLimits = new HashMap<String, Integer>();
-
     /**
      * Ключи = имена элементов (Пример элемента: <Product>),
      * значения = UUID последнего объекта успешно обработаноого клиентом
      * (Пример версии: атрибут Limit тега <Product LastGuid="00a7d120-6d6e-41cb-ba0b-2068d3308f68">)
      */
     private HashMap<String, String> currentLastGuids = new HashMap<String, String>();
-
     private SortedMap<DOSyncClass, List<DistributedObject>> resultDOMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
     /**
      * Список глобальных объектов на базе процессинга
@@ -82,17 +82,7 @@ public class Manager {
     private SortedMap<String, List<String>> confirmDOMap = new TreeMap<String, List<String>>();
     private Long idOfOrg;
     private SyncHistory syncHistory;
-    private final List<String> doGroupNames;
-    private final DOGroupsFactory doGroupsFactory = new DOGroupsFactory();
-
-    /* Максимальное количество объектов используемых в запросах конструкции IN */
-    private static final int maxCount = 1000;
-
     private Document conflictDocument;
-
-    public void setSyncHistory(SyncHistory syncHistory) {
-        this.syncHistory = syncHistory;
-    }
 
     public Manager(Long idOfOrg, List<String> doGroupNames) {
         this.idOfOrg = idOfOrg;
@@ -103,6 +93,10 @@ public class Manager {
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         }
+    }
+
+    public void setSyncHistory(SyncHistory syncHistory) {
+        this.syncHistory = syncHistory;
     }
 
     /**
@@ -133,14 +127,14 @@ public class Manager {
         }
     }
 
-    private void buildOneGroup(IDOGroup doGroup, Iterator<Node> iter) {
-        while (iter.hasNext()) {
-            Node doNode = iter.next();
+    private void buildOneGroup(IDOGroup doGroup, Iterator<Node> nodeList) {
+        while (nodeList.hasNext()) {
+            Node doNode = nodeList.next();
             DOSyncClass doSyncClass = doGroup.getDOSyncClass(doNode.getNodeName().trim());
             if (doSyncClass != null) {
                 // Обработка перечня экземпляров РО одного определенного класса.
                 buildDONode(doNode, doSyncClass);
-                iter.remove();
+                nodeList.remove();
             }
         }
     }
@@ -291,8 +285,7 @@ public class Manager {
                 LOGGER.debug("end findResponseResult");
                 resultDOMap.put(doSyncClass, currentResultDOList);
                 LOGGER.debug("init processDistributedObjectsList");
-                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
-                        doSyncClass);
+                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass);
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 LOGGER.debug("init addConfirms");
@@ -300,7 +293,7 @@ public class Manager {
                 LOGGER.debug("end addConfirms");
                 List<DistributedObject> currentConfirmDOList = null;
                 LOGGER.debug("init findConfirmedDO");
-                currentConfirmDOList = findConfirmedDO(sessionFactory, doClass);
+                currentConfirmDOList = findConfirmedDO(sessionFactory, doClass, classSimpleName);
                 LOGGER.debug("end findConfirmedDO");
                 if (!currentConfirmDOList.isEmpty()) {
                     for (DistributedObject distributedObject : currentConfirmDOList) {
@@ -309,10 +302,9 @@ public class Manager {
                         }
                     }
                 }
-
             } else {
                 LOGGER.debug("init findConfirmedDO");
-                Set<DistributedObject>  currentResultDOSet = new HashSet<DistributedObject>(findConfirmedDO(sessionFactory, doClass));
+                Set<DistributedObject> currentResultDOSet = new HashSet<DistributedObject>(findConfirmedDO(sessionFactory, doClass, classSimpleName));
                 LOGGER.debug("end findConfirmedDO");
                 final int newLimit = currentLimit - currentResultDOSet.size();
                 if (newLimit > 0) {
@@ -331,33 +323,32 @@ public class Manager {
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
                 if (doSyncClass.getDoClass().getName().contains("Staff")) {
-
-                    if (!distributedObjectsList.isEmpty() && distributedObjectsList != null) {
-
-                        List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(
-                                currentResultDOSet);
-
-                        for (DistributedObject distributedObject : distributedObjectsList) {
-
-                            if (distributedObject.getTagName().equals("M")
-                                    && distributedObject.getGlobalVersion() != null) {
-
-                                for (DistributedObject distributedObj : refreshedStaffList) {
-                                    if (distributedObj.getGuid().equals(distributedObject.getGuid())) {
-                                        refreshedStaffList.remove(distributedObj);
-                                        refreshedStaffList.add(distributedObject);
-                                        break;
-                                    }
-                                }
-                                resultDOMap.put(doSyncClass, new ArrayList<DistributedObject>(refreshedStaffList));
-                            }
-                        }
-                    }
+                    refreshStaffs(doSyncClass, currentResultDOSet, distributedObjectsList);
                 }
             }
         }
         incomeDOMap = currentDOListMap;
         LOGGER.debug("RO end process section");
+    }
+
+    private void refreshStaffs(DOSyncClass doSyncClass, Set<DistributedObject> currentResultDOSet,
+            List<DistributedObject> distributedObjectsList) {
+
+        if (!distributedObjectsList.isEmpty() && distributedObjectsList != null) {
+            List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(currentResultDOSet);
+            for (DistributedObject distributedObject : distributedObjectsList) {
+                if (distributedObject.getTagName().equals("M") && distributedObject.getGlobalVersion() != null) {
+                    for (DistributedObject distributedObj : refreshedStaffList) {
+                        if (distributedObj.getGuid().equals(distributedObject.getGuid())) {
+                            refreshedStaffList.remove(distributedObj);
+                            refreshedStaffList.add(distributedObject);
+                            break;
+                        }
+                    }
+                    resultDOMap.put(doSyncClass, new ArrayList<DistributedObject>(refreshedStaffList));
+                }
+            }
+        }
     }
 
     private List<DistributedObject> findResponseResult(SessionFactory sessionFactory,
@@ -389,10 +380,13 @@ public class Manager {
     }
 
     private List<DistributedObject> findConfirmedDO(SessionFactory sessionFactory,
-            Class<? extends DistributedObject> doClass) {
+            Class<? extends DistributedObject> doClass, String simpleName) {
         Session persistenceSession = null;
         String errorMessage = null;
         List<DistributedObject> currentConfirmDOList = new ArrayList<DistributedObject>();
+        if (simpleName.equals("ExchangeBook")) {
+            return currentConfirmDOList; // todo ExchangeBooks.class hardcoded
+        }
         try {
             persistenceSession = sessionFactory.openSession();
             DistributedObject refDistributedObject = doClass.newInstance();
@@ -469,6 +463,9 @@ public class Manager {
     @SuppressWarnings("unchecked")
     private void addConfirms(SessionFactory sessionFactory, String simpleName,
             List<DistributedObject> confirmDistributedObjectList) {
+        if (simpleName.equals("ExchangeBook")) {
+            return; // todo ExchangeBooks.class hardcoded
+        }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         String errorMessage = null;
@@ -540,8 +537,6 @@ public class Manager {
                 saveException(sessionFactory, errorMessage);
             }
         }
-
-
     }
 
     private void createConfirm(Session session, String simpleName, String uuid) {
@@ -562,9 +557,11 @@ public class Manager {
             Long currentMaxVersion = updateDOVersion(sessionFactory, doSyncClass.getDoClass().getSimpleName());
             for (DistributedObject distributedObject : distributedObjects) {
                 LOGGER.debug("Process: {}", distributedObject.toString());
-                DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject,
-                        currentMaxVersion);
-                distributedObjectList.add(currentDistributedObject);
+                if (!distributedObject.getClass().getSimpleName().equals("ExchangeBook")) {
+                    DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject,
+                            currentMaxVersion);
+                    distributedObjectList.add(currentDistributedObject);
+                }
             }
             /* generate result list */
             List<DistributedObject> currentResultDOList = resultDOMap.get(doSyncClass);
@@ -621,11 +618,11 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria currentDOCriteria = persistenceSession.createCriteria(aClass);
-            /*currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
-            distributedObject.createProjections(currentDOCriteria);
-            currentDOCriteria.setResultTransformer(Transformers.aliasToBean(aClass));
-            currentDOCriteria.setMaxResults(1);
-            currentDO = (DistributedObject) currentDOCriteria.uniqueResult();*/
+            //currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
+            //distributedObject.createProjections(currentDOCriteria);
+            //currentDOCriteria.setResultTransformer(Transformers.aliasToBean(aClass));
+            //currentDOCriteria.setMaxResults(1);
+            //currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
             currentDO = distributedObject.getCurrentDistributedObject(currentDOCriteria);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -647,14 +644,10 @@ public class Manager {
             distributedObject.setDistributedObjectException(new DistributedObjectException(message));
             return distributedObject;
         }
-        if (LibraryDistributedObject.class.isInstance(distributedObject))
-        {
-            distributedObject = makePreprocessAndProcessDOLibrary(sessionFactory, (LibraryDistributedObject)distributedObject, (LibraryDistributedObject)currentDO, currentMaxVersion);
-        }
-        else
-        {
-            distributedObject = makePreprocessAndProcessDO(sessionFactory, distributedObject, currentDO,
-                    currentMaxVersion);
+        if (LibraryDistributedObject.class.isInstance(distributedObject)) {
+            distributedObject = makePreprocessAndProcessDOLibrary(sessionFactory, (LibraryDistributedObject) distributedObject, (LibraryDistributedObject) currentDO, currentMaxVersion);
+        } else {
+            distributedObject = makePreprocessAndProcessDO(sessionFactory, distributedObject, currentDO, currentMaxVersion);
         }
         return distributedObject;
     }
@@ -705,8 +698,8 @@ public class Manager {
         return distributedObject;
     }
 
-    private LibraryDistributedObject makePreprocessAndProcessDOLibrary(SessionFactory sessionFactory, LibraryDistributedObject distributedObject,
-            LibraryDistributedObject currentDO, Long currentMaxVersion) {
+    private LibraryDistributedObject makePreprocessAndProcessDOLibrary(SessionFactory sessionFactory,
+            LibraryDistributedObject distributedObject, LibraryDistributedObject currentDO, Long currentMaxVersion) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         String errorMessage = null;
@@ -718,10 +711,11 @@ public class Manager {
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.mergedDistributedObject = null;
                     distributedObject.preProcess(persistenceSession, idOfOrg);
-                    distributedObject = (LibraryDistributedObject)processDistributedObject(persistenceSession, distributedObject,
-                            currentMaxVersion, currentDO);
+                    distributedObject = (LibraryDistributedObject) processDistributedObject(persistenceSession,
+                            distributedObject, currentMaxVersion, currentDO);
                 } else {
-                    distributedObject = (LibraryDistributedObject)updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
+                    distributedObject = (LibraryDistributedObject) updateDeleteState(persistenceSession,
+                            distributedObject, currentMaxVersion);
                 }
                 distributedObject.setTagName(tagName);
             } else {
@@ -757,7 +751,11 @@ public class Manager {
                     LOGGER.error(distributedObject.mergedDistributedObject.toString(), e);
                 }
             }
-        } catch (Exception e) {
+        }
+        /*catch (ExchangeBookException e3) {
+            ExchangeOutPos ww = (ExchangeOutPos)distributedObject.
+        }*/
+        catch (Exception e) {
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             LOGGER.error(distributedObject.toString(), e);
         } finally {

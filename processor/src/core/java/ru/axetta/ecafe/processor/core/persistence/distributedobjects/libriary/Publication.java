@@ -116,7 +116,7 @@ public class Publication extends LibraryDistributedObject {
 
                     mergedDistributedObject = publication;
                 }
-                catch(IOException exception){ }
+                catch (IOException exception) {}
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
@@ -135,19 +135,12 @@ public class Publication extends LibraryDistributedObject {
                         publication.setIdOfLang(this.getIdOfLang());
                     mergedDistributedObject = publication;
                 }
-                catch (IOException exception) { }
+                catch (IOException exception) {}
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE hash equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
         }
-        /*if (mergedDistributedObject == null) {
-            Criteria ucriteria = session.createCriteria(Publication.class);
-            ucriteria.add(Restrictions.eq("guid",guid));
-            Publication upublication = (Publication)ucriteria.uniqueResult();
-            session.clear();
-            mergeRecords(upublication);
-        }*/
         BBKDetails bbkDetailLocal = DAOUtils.findDistributedObjectByRefGUID(BBKDetails.class, session, getGuidBBKDetail());
         if (null != bbkDetailLocal) {
             setBbkDetail(bbkDetailLocal);

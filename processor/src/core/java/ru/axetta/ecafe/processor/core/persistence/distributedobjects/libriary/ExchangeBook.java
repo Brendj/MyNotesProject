@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -28,16 +29,6 @@ public class ExchangeBook extends LibraryDistributedObject {
 
     public static final int ORG_NAME_LENGTH = 127;
     public static final int GUID_LENGTH = 36;
-    //public static final int NUMBER_BOOKS_FREE = 3;
-
-    /*private Long globalVersionOnCreate;
-    private Long globalVersion;
-    private Long orgOwner;*/
-    //private Boolean deletedState;
-    /*private String guid;
-    private Date lastUpdate;
-    private Date deleteDate;
-    private Date createdDate;*/
 
     private Integer exchangePrimaryKey;
     private Integer amount;
@@ -45,7 +36,6 @@ public class ExchangeBook extends LibraryDistributedObject {
     private String orgName;
     private String guidPublication;
     public static Integer exchangeBookCondition;
-    //private String guid;
 
     @Override
     protected void appendAttributes(Element element) {
@@ -56,9 +46,7 @@ public class ExchangeBook extends LibraryDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-
-    }
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
 
     @Override
     public DistributedObject build(Node node) throws Exception {
@@ -69,6 +57,7 @@ public class ExchangeBook extends LibraryDistributedObject {
     @Override
     protected ExchangeBook parseAttributes(Node node) throws Exception {
         ExchangeBook.exchangeBookCondition = XMLUtils.getIntegerAttributeValue(node, "ExchangeBookCondition");
+        setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
@@ -84,13 +73,13 @@ public class ExchangeBook extends LibraryDistributedObject {
     @SuppressWarnings("unchecked")
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
-
         String strquery = "select count(ins.IdOfInstance) as amount, row_number() OVER() as exchangePrimaryKey, pub.guid as guidPublication, org.IdOfOrg as orgId, org.ShortName as orgName " +
                 "from cf_publications pub join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication " +
                 "join cf_issuable iss on iss.IdOfInstance = ins.IdOfInstance " +
                 "join cf_orgs org on org.IdOfOrg = ins.OrgOwner " +
                 "where not exists (select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) " +
-                "group by pub.IdOfPublication, org.idOfOrg having count(ins.idOfInstance) > " + String.valueOf(ExchangeBook.exchangeBookCondition);
+                "and org.IdOfOrg <> " + idOfOrg.toString() +
+                " group by pub.IdOfPublication, org.idOfOrg having count(ins.idOfInstance) > " + String.valueOf(ExchangeBook.exchangeBookCondition);
         SQLQuery query = session.createSQLQuery(strquery);
         query.addEntity(ExchangeBook.class);
         return query.list();
@@ -102,9 +91,7 @@ public class ExchangeBook extends LibraryDistributedObject {
     }
 
     @Override
-    public void createProjections(Criteria criteria) {
-
-    }
+    public void createProjections(Criteria criteria) {}
 
     public Integer getExchangePrimaryKey() {
         return exchangePrimaryKey;
@@ -148,19 +135,11 @@ public class ExchangeBook extends LibraryDistributedObject {
 
     @Override
     public Boolean getDeletedState() {
-        return false;   //заглушка
+        return false;
     }
 
     @Override
     public Long getGlobalVersion() {
-        return 0L; //заглушка
+        return 0L;
     }
-
-    /*public String getGuid() {
-        return UUID.randomUUID().toString();
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }*/
 }

@@ -83,12 +83,6 @@ public class BBKDetails extends LibraryDistributedObject {
         }
          session.clear();
 
-        if(!(bbkDetails==null || bbkDetails.getDeletedState() || guid.equals(bbkDetails.getGuid()))){
-            DistributedObjectException distributedObjectException =  new DistributedObjectException("BBKDetail DATA_EXIST_VALUE Code and BBK equals");
-            distributedObjectException.setData(bbkDetails.getGuid());
-            throw  distributedObjectException;
-        }
-
         // Проверка на наличие в базе объекта BBK с указанным guidBBK и инициация исключения если его нет
         BBK bbkLocal = DAOUtils.findDistributedObjectByRefGUID(BBK.class, session, guidBBK);
         if (null == bbkLocal) {
@@ -96,6 +90,13 @@ public class BBKDetails extends LibraryDistributedObject {
         } else {
             setBbk(bbkLocal);
         }
+
+        if (!(bbkDetails==null || bbkDetails.getDeletedState() || !(code.equals(bbkDetails.getCode()) && bbk.equals(bbkDetails.getBbk())))) {
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("BBKDetail DATA_EXIST_VALUE Code and BBK equals");
+            distributedObjectException.setData(bbkDetails.getGuid());
+            throw  distributedObjectException;
+        }
+
     }
 
     @Override

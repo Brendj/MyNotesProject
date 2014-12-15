@@ -53,7 +53,7 @@ public class BBK extends LibraryDistributedObject {
             bbk = (BBK) bbkList.get(0);
         }
         session.clear();
-        if(!(bbk==null || bbk.getDeletedState() || guid.equals(bbk.getGuid()))){
+        if(!(bbk==null || bbk.getDeletedState() || !name.equals(bbk.getName()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("BBK DATA_EXIST_VALUE Name equals");
             distributedObjectException.setData(bbk.getGuid());
             throw  distributedObjectException;

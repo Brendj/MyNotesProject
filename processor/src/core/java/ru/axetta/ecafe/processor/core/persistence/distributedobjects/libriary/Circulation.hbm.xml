@@ -49,6 +49,9 @@
                   not-null="false"/>
         <property name="status" column="Status" type="integer" not-null="true" unique="false" optimistic-lock="true" lazy="false" generated="never" />
 
+        <many-to-one name="exchangeOut" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.ExchangeOut" not-null="false"
+                     column="idofexchangeout"/>
+
         <set name="circulationInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfCirculation"/>

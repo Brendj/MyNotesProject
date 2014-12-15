@@ -318,7 +318,7 @@ public class Processor implements SyncProcessor,
         }
 
         // Build and return response
-        if (request.getSyncType() ==SyncType.TYPE_FULL) {
+        if (request.getSyncType() == SyncType.TYPE_FULL) {
             eventNotificator.fire(new SyncEvent.RawEvent(syncStartTime, request, response));
         }
         return response;
