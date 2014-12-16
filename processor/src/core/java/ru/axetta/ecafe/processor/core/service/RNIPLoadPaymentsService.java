@@ -722,6 +722,10 @@ public class RNIPLoadPaymentsService {
 
         for (Map<String, String> p : payments) {
             String paymentID = "";
+            if(p.size() < 1) {
+                logger.error("Получен пустой платеж от РНИП (без данных) или его данные не удалось обработать");
+                continue;
+            }
             paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
             String paymentDate    = p.get("PaymentDate").trim();
             String contragentKey  = p.get("SRV_CODE");
@@ -760,7 +764,8 @@ public class RNIPLoadPaymentsService {
                 errorWriter.write(String.format("%s: По полученному БИК %s от РНИП, не найдено ни одного контрагента\r\n", workDate, bic));
                 Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
                 if (rnipContragent != null) {
-                    idOfContragent = rnipContragent.getIdOfContragent();
+                    //idOfContragent = rnipContragent.getIdOfContragent();
+                    idOfPaymentContragent = rnipContragent.getIdOfContragent();
                 }
             }
             if(idOfPaymentContragent == null) {
