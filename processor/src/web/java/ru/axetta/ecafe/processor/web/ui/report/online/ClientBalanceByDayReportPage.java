@@ -10,14 +10,14 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.ClientBalanceByDayReport;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +26,6 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
@@ -45,11 +44,14 @@ import java.util.Properties;
  * Time: 12:01
  * To change this template use File | Settings | File Templates.
  */
-public class ClientBalanceByDayReportPage extends OnlineReportPage  implements ContragentSelectPage.CompleteHandler{
+public class ClientBalanceByDayReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
+
     private final static Logger logger = LoggerFactory.getLogger(ClientBalanceByDayReportPage.class);
     private List<ClientBalanceByDayReport.Builder.ClientBalanceInfo> clientsBalance;
     private Contragent contragent;
     private Long totalBalance;
+
+    private final ClientFilter clientFilter = new ClientFilter();
 
     public String getPageFilename() {
         return "report/online/client_balance_by_day_report";
@@ -71,28 +73,34 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
         return totalBalance;
     }
 
+    public ClientFilter getClientFilter() {
+        return clientFilter;
+    }
+
     private boolean validateFormData() {
-        if(startDate==null){
+        if (startDate == null) {
             printError("Не указана дата");
             return true;
         }
-        if((contragent==null || contragent.getIdOfContragent()==null) && CollectionUtils.isEmpty(idOfOrgList)){
+        if ((contragent == null || contragent.getIdOfContragent() == null) && CollectionUtils.isEmpty(idOfOrgList)) {
             printError("Выберите список организаций или поставщика");
             return true;
         }
         return false;
     }
 
-    public Object showOrgListSelectPage () {
-        if(contragent!=null){
+    public Object showOrgListSelectPage() {
+        if (contragent != null) {
             MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(contragent.getIdOfContragent()));
         }
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
     }
 
-    public Object buildReport()  {
-        if (validateFormData())  return null;
+    public Object buildReport() {
+        if (validateFormData()) {
+            return null;
+        }
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -101,13 +109,14 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientBalanceByDayReport.Builder reportBuilder = new ClientBalanceByDayReport.Builder("");
-            final Long idOfContragent = contragent==null? null: contragent.getIdOfContragent();
-            clientsBalance = reportBuilder.buildReportItems(persistenceSession, idOfContragent, idOfOrgList, startDate);
+            final Long idOfContragent = contragent == null ? null : contragent.getIdOfContragent();
+            clientsBalance = reportBuilder.buildReportItems(persistenceSession, idOfContragent, idOfOrgList, startDate,
+                    clientFilter.getClientGroupId());
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            totalBalance=0L;
-            for (ClientBalanceByDayReport.Builder.ClientBalanceInfo item:clientsBalance){
-                totalBalance+=item.getTotalBalance();
+            totalBalance = 0L;
+            for (ClientBalanceByDayReport.Builder.ClientBalanceInfo item : clientsBalance) {
+                totalBalance += item.getTotalBalance();
             }
             SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yyyy");
             printMessage("Состояние баланса лицевых счетов на дату " + dateShortFormat.format(startDate));
@@ -121,15 +130,19 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
         return null;
     }
 
-    public void exportToXLS(ActionEvent actionEvent){
-        if (validateFormData()) return;
+    public void exportToXLS(ActionEvent actionEvent) {
+        if (validateFormData()) {
+            return;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFileName = ClientBalanceByDayReport.class.getSimpleName() + ".jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if (StringUtils.isEmpty(templateFilename)) return ;
+        if (StringUtils.isEmpty(templateFilename)) {
+            return;
+        }
         ClientBalanceByDayReport.Builder builder = new ClientBalanceByDayReport.Builder(templateFilename);
-        if(!CollectionUtils.isEmpty(idOfOrgList)){
+        if (!CollectionUtils.isEmpty(idOfOrgList)) {
             Properties properties = new Properties();
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
@@ -141,10 +154,11 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(contragent!=null){
+            if (contragent != null) {
                 builder.setContragent(contragent);
             }
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder
+                    .build(persistenceSession, startDate, endDate, localCalendar, clientFilter.getClientGroupId());
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -155,7 +169,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
             HibernateUtils.close(persistenceSession, logger);
         }
 
-        if(report!=null){
+        if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -183,7 +197,6 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage  implements C
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
             }
         }
-
 
 
     }

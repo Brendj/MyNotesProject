@@ -8,7 +8,8 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid id="clientBalanceByDayReportPanelGrid" binding="#{mainPage.clientBalanceByDayReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="clientBalanceByDayReportPanelGrid" binding="#{mainPage.clientBalanceByDayReportPage.pageComponent}"
+             styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Дата" />
         <rich:calendar value="#{mainPage.clientBalanceByDayReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -27,14 +28,22 @@
         </h:panelGroup>
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.clientBalanceByDayReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.clientBalanceByDayReportPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
+                               styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="#{mainPage.clientBalanceByDayReportPage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientBalanceByDayReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{mainPage.clientBalanceByDayReportPage.filter}}" />
         </h:panelGroup>
+        <h:outputText escape="true" value="Группа" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientGroupId}"
+                         styleClass="input-text">
+            <f:selectItems value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientGroupItems}" />
+            <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
+        </h:selectOneMenu>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.buildReport}"
@@ -46,17 +55,24 @@
     </h:panelGrid>
     <a4j:status id="clientBalanceByDayReportGenerateStatus">
         <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid">
-        <rich:dataTable id="clientBalanceByDayReportTable" value="#{mainPage.clientBalanceByDayReportPage.clientsBalance}"
-                        var="complex" rowKeyVar="row" rows="20" footerClass="data-table-footer"
+        <rich:dataTable id="clientBalanceByDayReportTable"
+                        value="#{mainPage.clientBalanceByDayReportPage.clientsBalance}" var="complex" rowKeyVar="row"
+                        rows="20" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Наименование ОО" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Наименование группы" />
+                    </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Номер л/с" />
                     </rich:column>
@@ -69,20 +85,28 @@
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Отчество" />
                     </rich:column>
+
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Текущий овердрафт"/>
+                        <h:outputText styleClass="column-header" escape="true" value="Текущий овердрафт" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Баланс" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.orgShortName}" />
+            </rich:column>
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.groupName}" />
+            </rich:column>
             <rich:column styleClass="left-aligned-column">
                 <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link"
                                  reRender="mainMenu, workspaceForm">
                     <h:outputText styleClass="output-text" value="#{complex.contractId}"
                                   converter="contractIdConverter" />
-                    <f:setPropertyActionListener value="#{complex.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+                    <f:setPropertyActionListener value="#{complex.idOfClient}"
+                                                 target="#{mainPage.selectedIdOfClient}" />
                 </a4j:commandLink>
             </rich:column>
             <rich:column styleClass="right-aligned-column">
@@ -95,26 +119,27 @@
                 <h:outputText styleClass="output-text" value="#{complex.secondName}" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.limit}"/>
+                <h:outputText styleClass="output-text" value="#{complex.limit}" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.totalBalance}" converter="copeckSumConverter"/>
+                <h:outputText styleClass="output-text" value="#{complex.totalBalance}" converter="copeckSumConverter" />
             </rich:column>
             <f:facet name="footer">
                 <rich:columnGroup rendered="#{not empty mainPage.clientBalanceByDayReportPage.clientsBalance}">
-                    <rich:column styleClass="right-aligned-column" colspan="5">
+                    <rich:column styleClass="right-aligned-column" colspan="7">
                         <h:outputText styleClass="column-header" escape="true" value="ИТОГО" />
                     </rich:column>
                     <rich:column styleClass="right-aligned-column">
                         <h:outputText value="#{mainPage.clientBalanceByDayReportPage.totalBalance}"
-                                      converter="copeckSumConverter" styleClass="column-header"/>
+                                      converter="copeckSumConverter" styleClass="column-header" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
         </rich:dataTable>
         <rich:datascroller id="clientBalanceByDayReportTableDatascroller" for="clientBalanceByDayReportTable"
                            renderIfSinglePage="false" maxPages="10" fastControls="hide" stepControls="auto"
-                           boundaryControls="hide" style="border: solid 1px #C0C0C0; !important; background-color: white !important">
+                           boundaryControls="hide"
+                           style="border: solid 1px #C0C0C0; !important; background-color: white !important">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
             </f:facet>
