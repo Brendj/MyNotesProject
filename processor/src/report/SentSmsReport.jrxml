@@ -103,41 +103,13 @@
 	<title>
 		<band height="68" splitType="Stretch">
 			<elementGroup/>
-			<staticText>
-				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="802" height="20"/>
+			<textField>
+				<reportElement uuid="23dabc45-4d42-4c37-8607-d6b7401a70f8" x="0" y="0" width="802" height="68"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Статистика отправки СМС]]></text>
-			</staticText>
-			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="83" y="32" width="81" height="20"/>
-				<textElement>
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Статистика отправки СМС период с " + (new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})) + " по " + (new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="32" width="83" height="20"/>
-				<textElement>
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Период отчета:]]></text>
-			</staticText>
-			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="192" y="32" width="102" height="20"/>
-				<textElement>
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="164" y="32" width="28" height="20"/>
-				<textElement textAlignment="Center">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[по]]></text>
-			</staticText>
 		</band>
 	</title>
 	<pageHeader>
