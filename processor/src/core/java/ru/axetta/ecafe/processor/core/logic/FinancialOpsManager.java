@@ -46,14 +46,14 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public ClientSms createClientFailedSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
+    public ClientSms createClientFailedSmsCharge(Client client, String idOfSms, String phone, Long contentsId, Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
 
         Session session = em.unwrap(Session.class);
 
         textContents = textContents.substring(0, 70);
         long priceOfSms = client.getOrg().getPriceOfSms();
-        ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsType, textContents,
+        ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms);
         clientSms.setDeliveryStatus(ClientSms.NOT_DELIVERED_TO_RECIPENT);
         session.save(clientSms);
@@ -61,13 +61,13 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
+    public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
-        return createClientSmsCharge(client, idOfSms, phone, contentsType, textContents, serviceSendTime, false);
+        return createClientSmsCharge(client, idOfSms, phone, contentsId, contentsType, textContents, serviceSendTime, false);
     }
 
     @Transactional
-    public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
+    public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
             String textContents, Date serviceSendTime, boolean isDelivered) throws Exception {
 
         Session session = em.unwrap(Session.class);
@@ -93,7 +93,7 @@ public class FinancialOpsManager {
         }
 
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
-        ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsType, textContents,
+        ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms);
         if(isDelivered) {
             clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
@@ -290,14 +290,16 @@ public class FinancialOpsManager {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(clientPayment.getCreateTime());
 
-        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
+        String[] values = new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
                 "contractId",String.valueOf(client.getContractId()),
                 "surname",client.getPerson().getSurname(),
                 "firstName",client.getPerson().getFirstName(),
                 "empTime", empTime
-            });
+        };
+        values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
+        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
     }
 
     private void registerSubBalance1ClientPayment(Session session,
@@ -314,14 +316,16 @@ public class FinancialOpsManager {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(clientPayment.getCreateTime());
 
-        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
+        String[] values = new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
                 "balance", CurrencyStringUtils.copecksToRubles(balance),
                 "contractId", contractId,
                 "surname",client.getPerson().getSurname(),
                 "firstName",client.getPerson().getFirstName(),
                 "empTime", empTime
-        });
+        };
+        values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
+        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
     }
 
 

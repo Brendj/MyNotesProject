@@ -1942,9 +1942,10 @@ public class Processor implements SyncProcessor,
                 /* в случее если ананимного зака мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировачных заказов */
                 if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
+                    String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
+                    values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
-                                    generatePaymentNotificationParams(persistenceSession, client, payment));
+                            .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,values);
                 }
             } else {
                 // TODO: есть ли необходимость оповещать клиента о сторне?
@@ -3171,10 +3172,12 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                 .getBean(EventNotificationService.class);
                         //final String[] values = generateNotificationParams(persistenceSession, client,
                         //        e.getPassDirection(), e.getEvtDateTime(), guardianId);
-                        final String[] values = generateNotificationParams(persistenceSession, client, e);
+                        String[] values = generateNotificationParams(persistenceSession, client, e);
+                        values = EventNotificationService.attachTargetIdToValues(e.getIdOfEnterEvent(), values);
                         switch (org.getType()){
                             case PROFESSIONAL:
                             case SCHOOL: {
+                                values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
                                 notificationService.sendNotificationAsync(client,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                             } break;
@@ -3182,6 +3185,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                 if(guardianId!=null){
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);//guardianId);
                                     Client guardian = DAOService.getInstance().findClientById(guardianId);
+                                    values = EventNotificationService.attachGuardianIdToValues(guardian.getIdOfClient(), values);
+                                    values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
                                     if(!(guardians==null || guardians.isEmpty())){
                                         for (Client cl: guardians){
                                             notificationService.sendNotificationAsync(cl,

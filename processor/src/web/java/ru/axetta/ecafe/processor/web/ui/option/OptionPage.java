@@ -101,6 +101,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean synchCleanup;
     private String arrayOfFilterText;
     private String synchLoggingFolder;
+    private Boolean smsResending;
 
     private List<BankOptionItem> banks;
 
@@ -631,6 +632,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.synchLoggingFolder = synchLoggingFolder;
     }
 
+    public Boolean getSmsResending() {
+        return smsResending;
+    }
+
+    public void setSmsResending(Boolean smsResending) {
+        this.smsResending = smsResending;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -713,6 +722,7 @@ public class OptionPage extends BasicWorkspacePage {
         frontControllerRequestIpMask = runtimeContext.getOptionValueString(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK);
         synchCleanup = runtimeContext.getOptionValueBool(Option.OPTION_SYNCH_CLEANUP_ON);
         synchLoggingFolder = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_LOGGING_FOLDER);
+        smsResending = runtimeContext.getOptionValueBool(Option.OPTION_SMS_RESENDING_ON);
 
         bankListPage.onShow();
 
@@ -837,6 +847,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SYNCH_CLEANUP_ON, synchCleanup);
             runtimeContext.setOptionValue(Option.OPTION_ARRAY_OF_FILTER_TEXT, arrayOfFilterText);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_LOGGING_FOLDER, synchLoggingFolder);
+            runtimeContext.setOptionValue(Option.OPTION_SMS_RESENDING_ON, smsResending);
 
 
             runtimeContext.saveOptionValues();

@@ -100,7 +100,9 @@ public class Option {
             OPTION_EMP_BINDED_CLIENTS_COUNT=100053,
             OPTION_EMP_NOT_BINDED_CLIENTS_COUNT=100054,
             OPTION_EMP_BIND_WAITING_CLIENTS_COUNT=100055,
-            OPTION_EMP_COUNTER=100056
+            OPTION_EMP_COUNTER=100056,
+
+            OPTION_SMS_RESENDING_ON=100057
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -179,7 +181,8 @@ public class Option {
             OPTION_EMP_BINDED_CLIENTS_COUNT, "0",
             OPTION_EMP_NOT_BINDED_CLIENTS_COUNT, "0",
             OPTION_EMP_BIND_WAITING_CLIENTS_COUNT, "0",
-            OPTION_EMP_COUNTER, ""
+            OPTION_EMP_COUNTER, "",
+            OPTION_SMS_RESENDING_ON, "0"
 };
 
     private Long idOfOption;

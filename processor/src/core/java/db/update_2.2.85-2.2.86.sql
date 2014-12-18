@@ -20,3 +20,30 @@ CREATE TABLE cf_daily_formation_registries (
   salesAmount BIGINT NOT NULL,
   CONSTRAINT cf_daily_formation_registries_pk PRIMARY KEY (idOfDailyFormationRegistries)
 );
+
+
+--  Таблица для хранения СМС, которые необходимо переслать. СМС помещаются в данную таблицу,
+--  если по какой-то причине не удалось их отправить
+--! ContentsId - идентификатор события (продажи, пополнения, прохода и т.п.)
+--! ContentsType - тип события, который можно будет найти по идентификатору (ContentsId)
+--! ServiceName - наименование сервиса, через который осуществлялась попытка отправки СМС
+CREATE TABLE cf_clientsms_resending (
+  IdOfSms                 CHAR(40)         NOT NULL,
+  Version                 BIGINT NOT NULL,
+  idOfClient              BIGINT NOT NULL,
+  Phone                   VARCHAR(32),
+  ServiceName             VARCHAR(10),
+  ContentsId              BIGINT NOT NULL,
+  ContentsType            INTEGER          NOT NULL,
+  TextContents            VARCHAR(120)     NOT NULL,
+  ParamsContents          VARCHAR(255)     NOT NULL,
+  CreateDate              BIGINT,
+  LastResendingDate       BIGINT,
+
+  CONSTRAINT cf_clientsms_resending_pk PRIMARY KEY (IdOfSms, ServiceName),
+  CONSTRAINT cf_clientsms_resending_idofclient_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+CREATE INDEX cf_clientsms_resending_date_idx on cf_clientsms_resending(CreateDate);
+
+-- Добавление указания идентификатора источника события для отправки СМС
+alter table cf_clientsms add column ContentsId BIGINT DEFAULT NULL;

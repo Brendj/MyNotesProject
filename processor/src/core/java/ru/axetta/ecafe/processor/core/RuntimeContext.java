@@ -129,7 +129,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
     private static final String EVENT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".event";
     private static final String AUTO_REPORT_MAIL_PARAM_BASE = AUTO_REPORT_PARAM_BASE + ".mail";
-    private static final String SMS_SERVICE_PARAM_BASE = PROCESSOR_PARAM_BASE + ".sms.service";
+    public static final String SMS_SERVICE_PARAM_BASE = PROCESSOR_PARAM_BASE + ".sms.service";
     private static final String SMS_SERVICE_PARAM_CHECK_DELIVERY = SMS_SERVICE_PARAM_BASE + ".checkDelivery";
     private static final String SUPPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".support";
     private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";

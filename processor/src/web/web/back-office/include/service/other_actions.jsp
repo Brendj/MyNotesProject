@@ -46,6 +46,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Повторная отправка не доставленных СМС" action="#{otherActionsPage.runTest}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
 
 

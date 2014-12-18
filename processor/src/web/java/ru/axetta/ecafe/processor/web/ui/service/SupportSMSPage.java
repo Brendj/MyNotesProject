@@ -60,10 +60,13 @@ public class SupportSMSPage extends BasicWorkspacePage {
             if(RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl) {
                 DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
                 String empTime = df.format(new Date(System.currentTimeMillis()));
-                String [] vals = new String[]{"empTime", empTime};
+                String [] values = new String[]{"empTime", empTime};
+                values = EventNotificationService.attachGuardianIdToValues(client.getIdOfClient(), values);
+                values = EventNotificationService.attachEventDirectionToValues(EnterEvent.ENTRY, values);
+                values = EventNotificationService.attachTargetIdToValues(1L, values);
 
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                        sendSMS(client, EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, vals, true,
+                        sendSMS(client, EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, true,
                                 EnterEvent.ENTRY, client);
             } else {
                 String phone = client.getMobile();

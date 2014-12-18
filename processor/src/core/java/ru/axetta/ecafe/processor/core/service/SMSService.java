@@ -60,11 +60,11 @@ public class SMSService {
     }*/
 
     @Async
-    public void sendSMSAsync(long idOfClient, int messageType, Object textObject) throws Exception {
-        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, textObject);
+    public void sendSMSAsync(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
+        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, messageTargetId, textObject, values);
     }
 
-    public boolean sendSMS(long idOfClient, int messageType, Object textObject) throws Exception {
+    public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = transactionManager.getTransaction(def);
         Client client = null; String phoneNumber, sender;
@@ -90,11 +90,13 @@ public class SMSService {
         ISmsService smsService = RuntimeContext.getInstance().getSmsService();
         logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber,
                                                                                        textObject.toString()});
+        String textMessage = null;
         if(smsService instanceof SMPPClient){
             try {
                 sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                 logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
                         sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(), sendResponse.getStatusCode(), sendResponse.getError()));
+                textMessage = textObject.toString();
             } catch (Exception e) {
                 logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
                         new Object[]{sender, phoneNumber, textObject.toString(), e});
@@ -108,15 +110,17 @@ public class SMSService {
                             String msg = ((EMPEventType) textObject).buildText();
                             msg = String.format("E:[%s] %s", sendResponse.getStatusCode(), msg);
                             regisgterClientSMSFailedCharge(client, sendResponse.getMessageId(),
-                                                           phoneNumber, messageType, msg);
+                                                           phoneNumber, messageTargetId, messageType, msg);
                             return false;
                         }
-                        textObject = ((EMPEventType) textObject).buildText();
+                        //textObject = ((EMPEventType) textObject).buildText();
+                        textMessage = ((EMPEventType) textObject).buildText();
                     } else {
                         sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
+                        textMessage = textObject.toString();
                     }
                     logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                            sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(), sendResponse.getStatusCode(), sendResponse.getError()));
+                            sendResponse.getMessageId(), sender, phoneNumber, textMessage, sendResponse.getStatusCode(), sendResponse.getError()));
                     if (sendResponse.isSuccess()) {
                         break;
                     }
@@ -128,32 +132,44 @@ public class SMSService {
                 }
             }
         }
+
         boolean result = registerClientSMSCharge(null != sendResponse && sendResponse.isSuccess(), client,
-                                                 sendResponse.getMessageId(), phoneNumber, messageType,
-                                                 textObject.toString());
+                                                 sendResponse.getMessageId(), phoneNumber, messageTargetId, messageType,
+                                                 textMessage);
+
+
+        //  Добавление в список не отправленных sms
+        //if(sendResponse != null && !sendResponse.isSuccess()) {
+        if(!result) {
+            String serviceName = RuntimeContext.getInstance().getConfigProperties().
+                    getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
+            SMSResendingService.getInstance().addResending(sendResponse.getMessageId(), client,
+                    phoneNumber, serviceName, messageTargetId, messageType, textObject, values);
+        }
+
         return result;
     }
 
     protected boolean regisgterClientSMSFailedCharge(Client client, String messageId,
-                                                     String phoneNumber, int messageType, String text) throws Exception {
+                                                     String phoneNumber, Long messageTargetId, int messageType, String text) throws Exception {
         if(text == null || StringUtils.isBlank(text)) {
             return false;
         }
         ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
-                .createClientFailedSmsCharge(client, messageId, phoneNumber, messageType, text,
+                .createClientFailedSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
                         new Date());
         createdClientSms.set(clientSms);
         return true;
     }
 
     protected boolean registerClientSMSCharge(boolean success, Client client, String messageId,
-                                              String phoneNumber, int messageType, String text) throws Exception {
+                                              String phoneNumber, Long messageTargetId, int messageType, String text) throws Exception {
         ClientSms clientSms = null;
         boolean result = false;
         if (success) {
             boolean delivered =  RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
             clientSms = RuntimeContext.getFinancialOpsManager()
-                    .createClientSmsCharge(client, messageId, phoneNumber, messageType, text,
+                    .createClientSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
                             new Date(), delivered);
             result = true;
         }

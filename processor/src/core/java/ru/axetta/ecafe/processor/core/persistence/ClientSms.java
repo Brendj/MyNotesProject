@@ -45,6 +45,7 @@ public class ClientSms {
     private Client client;
     private AccountTransaction transaction;
     private String phone;
+    private Long contentsId;
     private Integer contentsType;
     private String textContents;
     private Integer deliveryStatus;
@@ -57,11 +58,12 @@ public class ClientSms {
         // For Hibernate only
     }
 
-    ClientSms(String idOfSms, Client client, String phone, Integer contentsType, String textContents,
+    ClientSms(String idOfSms, Client client, String phone, Long contentsId, Integer contentsType, String textContents,
             Date serviceSendTime, Long price) {
         this.idOfSms = idOfSms;
         this.client = client;
         this.phone = phone;
+        this.contentsId = contentsId;
         this.contentsType = contentsType;
         this.textContents = textContents;
         this.deliveryStatus = SENT_TO_SERVICE;
@@ -69,7 +71,7 @@ public class ClientSms {
         this.price = price;
     }
 
-    public ClientSms(String idOfSms, Client client, AccountTransaction transaction, String phone, Integer contentsType,
+    public ClientSms(String idOfSms, Client client, AccountTransaction transaction, String phone, Long contentsId, Integer contentsType,
             String textContents, Date serviceSendTime, Long price) {
         this.idOfSms = idOfSms;
         this.transaction = transaction;
@@ -80,6 +82,7 @@ public class ClientSms {
         this.deliveryStatus = SENT_TO_SERVICE;
         this.serviceSendTime = serviceSendTime;
         this.price = price;
+        this.contentsId = contentsId;
     }
 
     public String getIdOfSms() {
@@ -116,6 +119,14 @@ public class ClientSms {
     private void setContentsType(Integer contentsType) {
         // For Hibernate only
         this.contentsType = contentsType;
+    }
+
+    public Long getContentsId() {
+        return contentsId;
+    }
+
+    public void setContentsId(Long contentsId) {
+        this.contentsId = contentsId;
     }
 
     public String getTextContents() {
@@ -210,7 +221,7 @@ public class ClientSms {
     @Override
     public String toString() {
         return "ClientSms{" + "idOfSms='" + idOfSms + '\'' + ", version=" + version + ", client=" + client + ", phone='"
-                + phone + '\'' + ", contentsType=" + contentsType + ", textContents='" + textContents + '\''
+                + phone + '\'' + ", contentsType=" + contentsType + ", contentsId=" + contentsId + ", textContents='" + textContents + '\''
                 + ", deliveryStatus=" + deliveryStatus + ", serviceSendTime=" + serviceSendTime + ", sendTime="
                 + sendTime + ", deliveryTime=" + deliveryTime + ", price=" + price + '}';
     }

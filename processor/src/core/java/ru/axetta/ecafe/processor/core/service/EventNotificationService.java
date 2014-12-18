@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class EventNotificationService {
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
+
+    public static final String GUARDIAN_VALUES_KEY = "guardianId";
+    public static final String TARGET_VALUES_KEY   = "targetId";
+    public static final String DIRECTION_VALUES_KEY   = "direction";
 
     @Resource
     SMSService smsService;
@@ -261,19 +266,41 @@ public class EventNotificationService {
     }
 
     public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian) {
+        sendNotification(client, type, values, passDirection, guardian, null);
+    }
+
+    public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
         if (!client.isNotifyViaSMS() && !client.isNotifyViaEmail()) {
             return;
         }
         if (!isNotificationEnabled(client, type)) {
             return;
         }
+        Boolean sms = null;
         if (client.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
-                sendSMS(client, type, values, passDirection, guardian);
+                if(sendAsync != null) {
+                    sms = sendSMS(client, type, values, sendAsync, passDirection, guardian);
+                } else {
+                    sms = sendSMS(client, type, values, passDirection, guardian);
+                }
             }
         }
+        Boolean email = null;
         if (client.isNotifyViaEmail()) {
-            sendEmail(client, type, values);
+            email = sendEmail(client, type, values);
+        }
+
+        if(sms != null || email != null) {
+            if((sms != null && !sms) && (email != null && !email)) {
+                throw new RuntimeException("Failed to send notification via sms and email");
+            }
+            if(sms != null && !sms) {
+                throw new RuntimeException("Failed to send notification via sms");
+            }
+            if(email != null && !email) {
+                throw new RuntimeException("Failed to send notification via email");
+            }
         }
     }
 
@@ -396,10 +423,10 @@ public class EventNotificationService {
             Object textObject = getTextObject(text, type, client, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
-                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, textObject);
+                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                     result = true;
                 } else {
-                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, textObject);
+                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                 }
             }
         } catch (Exception e) {
@@ -408,6 +435,76 @@ public class EventNotificationService {
             return false;
         }
         return result;
+    }
+
+    public static final String[] attachToValues(String key, String val, String [] values) {
+        if(val == null) {
+            return values;
+        }
+        if(values == null || values.length < 2) {
+            values = new String[] { key, "" + val };
+            return values;
+        }
+
+        for(int i=0; i<values.length-1; i+=2) {
+            String name = values [i];
+            if(name.equals(key)) {
+                values[i+1] = "" + val;
+                return values;
+            }
+        }
+
+
+        String[] newValues = new String[values.length + 2];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[newValues.length - 2] = key;
+        newValues[newValues.length - 1] = "" + val;
+        return newValues;
+    }
+
+    public static final String[] attachTargetIdToValues(Long targetId, String[] values) {
+        if(targetId == null) {
+            return values;
+        }
+        return attachToValues(TARGET_VALUES_KEY, "" + targetId, values);
+    }
+
+    public static final String[] attachEventDirectionToValues(Integer direction, String[] values) {
+        if(direction == null) {
+            return values;
+        }
+        return attachToValues(DIRECTION_VALUES_KEY, "" + direction, values);
+    }
+
+    public static final String[] attachGuardianIdToValues(Long guardianId, String[] values) {
+        if(guardianId == null) {
+            return values;
+        }
+        return attachToValues(GUARDIAN_VALUES_KEY, "" + guardianId, values);
+    }
+
+    public static Long getTargetIdFromValues(String[] values) {
+        String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
+        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+            return null;
+        }
+        return Long.parseLong(id);
+    }
+
+    public static Long getGuardianIdFromValues(String[] values) {
+        String id = findValueInParams(new String [] {GUARDIAN_VALUES_KEY}, values);
+        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+            return null;
+        }
+        return Long.parseLong(id);
+    }
+
+    public static Integer getEventDirectionFromValues(String[] values) {
+        String id = findValueInParams(new String [] {DIRECTION_VALUES_KEY}, values);
+        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+            return null;
+        }
+        return Integer.parseInt(id);
     }
 
     private Object getTextObject(String text, String type, Client client, Integer direction, Client guardian, String[] values) {
@@ -447,14 +544,14 @@ public class EventNotificationService {
             //  Устанавливаем дату
             String empDateStr = findValueInParams(new String [] {"empTime"}, values);
             String dateStr = findValueInParams(new String [] {"date", "eventTime", "time"}, values);
-            if(dateStr != null && !StringUtils.isBlank(dateStr)) {
+            /*if(dateStr != null && !StringUtils.isBlank(dateStr)) {
                 try {
                     long ts = Date.parse(dateStr);
                     empType.setTime(ts);
                 } catch (Exception e) {
-                    logger.info("Failed to parse EMP date using simple date parser", e);
+                    logger.debug("Failed to parse EMP date using simple date parser", e);
                 }
-            }
+            }*/
             if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
                 try {
                     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -493,7 +590,19 @@ public class EventNotificationService {
         }
     }
 
-    protected String findValueInParams(String valueNames[], String values[]) {
+    protected static boolean findBooleanValueInParams(String valueNames[], String values[]) {
+        String res = findValueInParams(valueNames, values);
+        if(res == null || StringUtils.isBlank(res)) {
+            return false;
+        }
+        if(NumberUtils.isNumber(res)) {
+            double v = NumberUtils.toDouble(res);
+            return v > 0;
+        }
+        return Boolean.parseBoolean(res);
+    }
+
+    protected static String findValueInParams(String valueNames[], String values[]) {
         if(valueNames == null || valueNames.length < 1) {
             return "";
         }

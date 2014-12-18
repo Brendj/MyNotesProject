@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -94,11 +95,19 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(new Date(System.currentTimeMillis()));
-        String [] vals = new String[]{"aa", "11", "bb", "22", "empTime", empTime, "cc", "33"};
+        String[] values = new String[]{
+                "paySum", CurrencyStringUtils.copecksToRubles(100000),
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
+                "contractId",String.valueOf(client.getContractId()),
+                "surname","Тестеров"/*client.getPerson().getSurname()*/,
+                "firstName","Тест"/*client.getPerson().getFirstName()*/,
+                "empTime", empTime,
+                "targetId", "" + 1
+        };
+        values = EventNotificationService.attachTargetIdToValues(1L, values);
 
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                sendSMS(client, EventNotificationService.NOTIFICATION_ENTER_EVENT, vals, true,
-                        EnterEvent.ENTRY); //DEF
+                sendSMS(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
@@ -110,6 +119,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void repairNSI() throws Exception {
         RuntimeContext.getAppContext().getBean(NSIRepairService.class).run(); //DEF
         printMessage("Записи из Реестров исправлены");
+    }
+
+    public void runTest() throws Exception {
+        RuntimeContext.getAppContext().getBean(SMSResendingService.class).executeResending(); //DEF
+        printMessage("Повторная отправка не доставленных СМС завершена");
     }
 
 
