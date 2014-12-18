@@ -1,9 +1,11 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 
 import org.hibernate.Query;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -27,12 +29,12 @@ public class TypesOfCardService extends AbstractDAOService {
     public List countsByRegionAndOrgs(Date startDate, Integer cardType, Integer cardState) {
         Query query = getSession().createSQLQuery(
                 "SELECT count(cfc.idofclient),cl.idoforg, cfo.shortname, cfo.address, cfo.district, cfc.cardtype, cfc.state "
-                + "FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
-                + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
-                + "where cfo.district like '%САО%' and cfc.cardtype in (:cardType) "
-                + "and cfc.state in (:cardState) and cfc.lastupdate >= :startDate "
-                + "GROUP BY  cfo.district, cl.idoforg, cfo.shortname, cfo.address, cfc.cardtype, cfc.state "
-                + "ORDER BY  cfo.district");
+                        + "FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                        + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
+                        + "WHERE cfo.district LIKE '%САО%' AND cfc.cardtype IN (:cardType) "
+                        + "AND cfc.state IN (:cardState) AND cfc.lastupdate >= :startDate "
+                        + "GROUP BY  cfo.district, cl.idoforg, cfo.shortname, cfo.address, cfc.cardtype, cfc.state "
+                        + "ORDER BY  cfo.district");
         query.setParameter("startDate", startDate);
         query.setParameter("cardType", cardType);
         query.setParameter("cardState", cardState);
@@ -40,6 +42,28 @@ public class TypesOfCardService extends AbstractDAOService {
         return result;
     }
 
+/*    public List<TypesOfCardSubreportItem> generationStatisticsOfOrgByDistrict(String district, String cardType,
+            Integer cardState, Date startDate, Long idofClientGroup) {
+        Query query = getSession().createQuery(
+                "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                        + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg WHERE cfo.idoforg = 177 AND cfc.cardtype IN(0) "
+                        + "AND cfc.state IN(1) AND cfc.lastupdate >=:startDate");
+
+    }*/
 
 
+    public Long getStatByOrgId(Long idOfOrg, String cardType, Integer cardState, Date starDate) {
+        Query query = getSession().createSQLQuery(
+                "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                        + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
+                        + "WHERE cfo.idoforg = :idOfOrg AND cfc.cardtype IN(" + cardType
+                        + ") AND cfc.state IN( :cardState ) AND cfc.lastupdate >= :startDate");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("startDate", starDate.getTime());
+        query.setParameter("cardState", cardState);
+
+        Long result = ((BigInteger) query.uniqueResult() ).longValue() ;
+
+        return result;
+    }
 }
