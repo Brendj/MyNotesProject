@@ -177,6 +177,15 @@ public class DailyFormationOfRegistries {
         return organizationSalesAmounts;
     }
 
+    public static List<StornedOrdersOrganizationSalesAmount> orgStornedOrdersSalesAmount(Session session, List<Long> contragentOrgs,
+            Date salesDate) {
+        Date beforeDate = CalendarUtils.subOneDay(CalendarUtils.truncateToDayOfMonth(salesDate));
+
+        List<StornedOrdersOrganizationSalesAmount> stornedOrdersOrganizationSalesAmounts = new ArrayList<StornedOrdersOrganizationSalesAmount>();
+
+        return stornedOrdersOrganizationSalesAmounts;
+    }
+
     // Данных для выгрузки в xml
     public static class DailyFormationOfRegistriesModel {
 
@@ -244,6 +253,8 @@ public class DailyFormationOfRegistries {
         public Long totalBalance;
         public Long rechargeAmount;
         public Long salesAmount;
+
+        public List<StornedOrdersOrganizationSalesAmount> stornedOrdersOrganizationSalesAmounts = new ArrayList<StornedOrdersOrganizationSalesAmount>();
 
         public OrgItem() {
         }
@@ -314,6 +325,15 @@ public class DailyFormationOfRegistries {
         public void setSalesAmount(Long salesAmount) {
             this.salesAmount = salesAmount;
         }
+
+        public List<StornedOrdersOrganizationSalesAmount> getStornedOrdersOrganizationSalesAmounts() {
+            return stornedOrdersOrganizationSalesAmounts;
+        }
+
+        public void setStornedOrdersOrganizationSalesAmounts(
+                List<StornedOrdersOrganizationSalesAmount> stornedOrdersOrganizationSalesAmounts) {
+            this.stornedOrdersOrganizationSalesAmounts = stornedOrdersOrganizationSalesAmounts;
+        }
     }
 
     public static class OrganizationSalesAmount {
@@ -367,6 +387,56 @@ public class DailyFormationOfRegistries {
 
         public void setRechargeAmount(Long rechargeAmount) {
             this.rechargeAmount = rechargeAmount;
+        }
+    }
+
+    public static class StornedOrdersOrganizationSalesAmount {
+        public Long idOfOrg;
+        public Long stornedSalesAmount;
+        public Date ordersDate;
+        public Date generateStornDate;
+
+        public StornedOrdersOrganizationSalesAmount() {
+        }
+
+        public StornedOrdersOrganizationSalesAmount(Long idOfOrg, Long stornedSalesAmount, Date ordersDate,
+                Date generateStornDate) {
+            this.idOfOrg = idOfOrg;
+            this.stornedSalesAmount = stornedSalesAmount;
+            this.ordersDate = ordersDate;
+            this.generateStornDate = generateStornDate;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public Long getStornedSalesAmount() {
+            return stornedSalesAmount;
+        }
+
+        public void setStornedSalesAmount(Long stornedSalesAmount) {
+            this.stornedSalesAmount = stornedSalesAmount;
+        }
+
+        public Date getOrdersDate() {
+            return ordersDate;
+        }
+
+        public void setOrdersDate(Date ordersDate) {
+            this.ordersDate = ordersDate;
+        }
+
+        public Date getGenerateStornDate() {
+            return generateStornDate;
+        }
+
+        public void setGenerateStornDate(Date generateStornDate) {
+            this.generateStornDate = generateStornDate;
         }
     }
 }
