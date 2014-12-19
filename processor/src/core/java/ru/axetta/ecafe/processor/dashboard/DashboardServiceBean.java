@@ -107,7 +107,10 @@ public class DashboardServiceBean {
                             + "union all "
                             + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
                             + "from cf_registrychange_errors "
-                            + "where comment is null or comment=''");
+                            + "where comment is null or comment=''"
+                            + "union all "
+                            + "select 'СМС, ожидающие повторной отправки' as name, count(cf_clientsms_resending.IdOfSms) as value, 'long' as type "
+                            + "from cf_clientsms_resending");
             q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
             q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);

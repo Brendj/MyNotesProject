@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
@@ -140,6 +141,8 @@ public class SMSService {
 
         //  Добавление в список не отправленных sms
         //if(sendResponse != null && !sendResponse.isSuccess()) {
+        boolean failureTestingMode = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
+        result = result && !failureTestingMode;
         if(!result) {
             String serviceName = RuntimeContext.getInstance().getConfigProperties().
                     getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
