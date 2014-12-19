@@ -49,6 +49,8 @@
     <a4j:commandButton value="Повторная отправка не доставленных СМС" action="#{otherActionsPage.runTest}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
+    <a4j:commandButton value="Запустить Автоплатеж" action="#{otherActionsPage.runRegularPayments}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

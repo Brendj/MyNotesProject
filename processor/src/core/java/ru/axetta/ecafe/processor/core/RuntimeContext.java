@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
+import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
@@ -191,6 +192,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private AcquiropaySystemConfig acquiropaySystemConfig;
     static SessionFactory sessionFactory;
     static SessionFactory reportsSessionFactory;
+    private RegularPaymentSubscriptionService regularPaymentSubscriptionService;
     boolean criticalErrors;
     Properties configProperties;
     SchemaVersionInfo currentSchemaVersionInfo;
@@ -584,6 +586,17 @@ public class RuntimeContext implements ApplicationContextAware {
                     .compareToIgnoreCase("true")) && isMainNode()) {
                 this.clientSmsDeliveryStatusUpdater.start();
             }
+
+            String bkEnabled = (String) getConfigProperties().get("ecafe.autopayment.bk.enabled");
+
+            if(bkEnabled!=null && Boolean.valueOf(bkEnabled) ){
+                regularPaymentSubscriptionService = (RegularPaymentSubscriptionService) RuntimeContext.getAppContext()
+                        .getBean("bk_regularPaymentSubscriptionService");
+            }else{
+                regularPaymentSubscriptionService = (RegularPaymentSubscriptionService) RuntimeContext.getAppContext()
+                        .getBean("regularPaymentSubscriptionService");
+            }
+
 
             //
             if (!isTestRunning()) {
@@ -1553,6 +1566,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public boolean isMainNode() {
         return roleNode == NODE_ROLE_MAIN;
+    }
+
+    public RegularPaymentSubscriptionService getRegularPaymentSubscriptionService() {
+        return regularPaymentSubscriptionService;
     }
 }
 

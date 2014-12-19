@@ -34,8 +34,7 @@
     }
     RuntimeContext runtimeContext = RuntimeContext.getInstance();
     Long bsId = Long.valueOf(StringUtils.trim(request.getParameter("bs")));
-    RegularPaymentSubscriptionService rpService = RuntimeContext.getAppContext()
-            .getBean(RegularPaymentSubscriptionService.class);
+    RegularPaymentSubscriptionService rpService =  RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
     String stage = request.getParameter("stage");
     if ("process".equals(stage)) {
         Long refillAmount;

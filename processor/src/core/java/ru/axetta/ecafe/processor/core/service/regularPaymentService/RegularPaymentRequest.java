@@ -82,6 +82,10 @@ public class RegularPaymentRequest implements IRequestOperation {
         RegularPayment payment = request.getRegularPayment();
         // код операции
         params.put("opcode", "rebill");
+        params.put("clientId", "" + request.getClient().getIdOfClient());
+        params.put("contractId", "" + request.getClient().getContractId());
+        params.put("paymentAmount", "" + request.getBankSubscription().getPaymentAmount());
+        params.put("regular_payment_id", "" +  request.getRegularPayment().getIdOfPayment());
         // сумма платежа
         params.put("amount", CurrencyStringUtils.copecksToRubles(payment.getPaymentAmount(), 0));
         // ID запроса ИС ПП

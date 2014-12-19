@@ -53,8 +53,7 @@
 
 <%
     } else if (stage.equals("process")) {
-        RegularPaymentSubscriptionService cs = RuntimeContext.getAppContext()
-                .getBean(RegularPaymentSubscriptionService.class);
+        RegularPaymentSubscriptionService cs =  RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
         boolean result = false;
         try {
             result = cs.deactivateSubscription(bsId);

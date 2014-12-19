@@ -27,8 +27,8 @@
         throw new ServletException(ex.getMessage());
     }
     RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    RegularPaymentSubscriptionService cs = RuntimeContext.getAppContext()
-            .getBean(RegularPaymentSubscriptionService.class);
+    RegularPaymentSubscriptionService cs = runtimeContext.getRegularPaymentSubscriptionService();
+
     List<BankSubscription> list = cs.findClientBankSubscriptions(ClientAuthToken.loadFrom(session).getContractId());
     if (list.size() > 0) {
 %>

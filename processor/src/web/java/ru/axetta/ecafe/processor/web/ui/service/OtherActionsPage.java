@@ -6,14 +6,11 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -119,6 +116,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void repairNSI() throws Exception {
         RuntimeContext.getAppContext().getBean(NSIRepairService.class).run(); //DEF
         printMessage("Записи из Реестров исправлены");
+    }
+
+    public void runRegularPayments() throws Exception {
+        RegularPaymentSubscriptionService regularPaymentSubscriptionService =  RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
+        regularPaymentSubscriptionService.checkClientBalances();
     }
 
     public void runTest() throws Exception {

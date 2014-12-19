@@ -615,7 +615,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGroupMigrationHistory.setOrg(org);
             clientGroupMigrationHistory.setClient(client);
             clientGroupMigrationHistory.setRegistrationDate(new Date());
-            clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+            if(client.getIdOfClientGroup() != null){
+                clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+            }
             clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
 
 
@@ -794,9 +796,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGroupMigrationHistory.setOrg(org);
             clientGroupMigrationHistory.setClient(client);
             clientGroupMigrationHistory.setRegistrationDate(new Date());
-            clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
-            clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-            clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
+            if(client.getIdOfClientGroup() != null){
+                clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
+            }
+            if(client.getClientGroup() != null){
+                clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+                clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
+            }
+
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());

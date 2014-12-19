@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.notify;
 
+import ru.axetta.ecafe.processor.web.partner.autopayments.AutoPaymentResultRequest;
+import ru.axetta.ecafe.processor.web.partner.autopayments.AutoPaymentResultResponse;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import java.util.List;
 
 /**
  * User: shamil
@@ -16,8 +20,13 @@ import javax.jws.WebService;
 @WebService
 public interface NotifyController {
 
-    @WebMethod(operationName = "refillFunds")
+    @WebMethod(operationName = "NotifyRefill")
     public NotifyResult notify(
             @WebParam(name = "accountN") long accountNumber,
             @WebParam(name = "eventCode") int eventCode);
+
+
+    @WebMethod(action = "AsynchronousPaymentResponse", operationName = "AsynchronousPaymentResponse")
+    public List<AutoPaymentResultResponse> AsynchronousPaymentResponse(
+            @WebParam(name = "opers") List<AutoPaymentResultRequest> autoPaymentResultRequestList);
 }

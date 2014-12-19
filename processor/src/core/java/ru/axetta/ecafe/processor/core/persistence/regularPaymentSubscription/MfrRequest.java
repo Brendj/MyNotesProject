@@ -25,7 +25,8 @@ public class MfrRequest {
     public static final int REQUEST_TYPE_PAYMENT = 3;
     public static final int REQUEST_TYPE_STATUS_CHECK = 4;
 
-    public static final int ACQUIROPAY_SYSTEM = 1;
+    public static final int ACQUIROPAY_SYSTEM = 1; //Банк Москвы
+    public static final int BK_SYSTEM = 2; //Банк Казани
 
     public static final String SUBSCRIPTION_ACTIVATED = "INITIAL";
     public static final String SUBSCRIPTION_DEACTIVATED = "REBILL_CANCEL";

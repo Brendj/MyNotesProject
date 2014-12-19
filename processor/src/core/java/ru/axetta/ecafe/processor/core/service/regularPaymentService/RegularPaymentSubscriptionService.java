@@ -5,13 +5,10 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -140,7 +137,7 @@ public class RegularPaymentSubscriptionService {
         return sendSubscriptionRequest(subscriptionId, statusCheckRequest);
     }
 
-    private PaymentResponse sendRequest(String uri, Map<String, String> params) {
+    protected PaymentResponse sendRequest(String uri, Map<String, String> params) {
         PostMethod httpMethod = new PostMethod(uri);
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -215,7 +212,7 @@ public class RegularPaymentSubscriptionService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Long> findSubscriptions(int rows) {
+    protected List<Long> findSubscriptions(int rows) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
                 "where bs.active = true and bs.client.balance <= bs.thresholdAmount \n" +
@@ -362,4 +359,19 @@ public class RegularPaymentSubscriptionService {
         pr.setAuthCode(StringUtils.trim(request.getParameter("auth_code")));
     }
 
+    protected RegularPaymentRequest getRegularPaymentRequest() {
+        return regularPaymentRequest;
+    }
+
+    protected StatusCheckRequest getStatusCheckRequest() {
+        return statusCheckRequest;
+    }
+
+    protected SubscriptionDeleteRequest getSubscriptionDeleteRequest() {
+        return subscriptionDeleteRequest;
+    }
+
+    protected SubscriptionRegRequest getSubscriptionRegRequest() {
+        return subscriptionRegRequest;
+    }
 }

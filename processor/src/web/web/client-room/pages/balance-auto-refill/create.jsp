@@ -117,8 +117,7 @@
             logger.error(ex.getMessage());
             throw new ServletException(ex.getMessage());
         }
-        RegularPaymentSubscriptionService cs = RuntimeContext.getAppContext()
-                .getBean(RegularPaymentSubscriptionService.class);
+        RegularPaymentSubscriptionService cs = RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
         MfrRequest mfrRequest = cs.createRequestForSubscriptionReg(ct.getContractId(), refillAmount, thresholdAmount, period);
         Map<String, String> params = cs.getParamsForRegRequest(mfrRequest);
 %>

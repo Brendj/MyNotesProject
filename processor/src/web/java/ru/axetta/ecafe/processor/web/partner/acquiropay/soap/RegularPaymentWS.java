@@ -23,6 +23,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.annotation.PostConstruct;
@@ -67,6 +68,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     private WebServiceContext context;
 
     @Autowired
+    @Qualifier("regularPaymentSubscriptionService")
     private RegularPaymentSubscriptionService rpService;
 
     @Autowired
