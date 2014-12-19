@@ -76,8 +76,7 @@ public class XmlReportGenerator {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(
-                    new File("C:\\processor\\templates\\reportXml\\report-" + date + ".xml"));
+            StreamResult result = new StreamResult(new File("/processor/templates/reportXml/report-" + date + ".xml"));
             transformer.transform(source, result);
         } catch (TransformerException tfe) {
             tfe.printStackTrace();

@@ -4,8 +4,7 @@
 
 -- Пакет обновлений 2.2.85
 
---! Добавление признаков и инф за кого сделали отметку
--- Таблица "Агрегирование данных отчет Xml"
+--! Таблица "Агрегирование данных отчет Xml"
 CREATE TABLE cf_daily_formation_registries (
   idOfDailyFormationRegistries BIGSERIAL,
   generatedDate BIGINT NOT NULL,
