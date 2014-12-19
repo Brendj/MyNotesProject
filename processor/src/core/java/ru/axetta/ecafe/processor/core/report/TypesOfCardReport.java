@@ -129,15 +129,6 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             result.add(typesOfCardReportItem);
             result.add(typesOfCardReportItem1);
 
-            List<Contragent> some = DailyFormationOfRegistries.getContragentTSP(session);
-
-            List<DailyFormationOfRegistries.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList =
-                    DailyFormationOfRegistries.getGenerationReportResult(session, some, startTime);
-
-            XmlReportGenerator xmlReportGenerator = new XmlReportGenerator();
-            Document document = xmlReportGenerator.createXmlFile(dailyFormationOfRegistriesModelList);
-            xmlReportGenerator.unloadXmlFile(document, CalendarUtils.dateToString(startTime));
-
             return new JRBeanCollectionDataSource(result);
         }
 

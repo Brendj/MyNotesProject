@@ -1,6 +1,5 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
-import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 
 import org.hibernate.Query;
