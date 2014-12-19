@@ -100,6 +100,11 @@ public class SubscriptionFeedingService {
      * TODO: добавить взятие даты паузы или отключения последней циклограммы для уточнения даты
      */
     public void notifyClients(){
+        //  отключение
+        if(1 == 1) {
+            return;
+        }
+
         SubscriptionFeedingService instance = SubscriptionFeedingService.getInstance();
         final Date currentDay = new Date();
         List list = instance.findNotifyClients(currentDay);
