@@ -28,9 +28,6 @@ public class XmlReportGeneratorService {
 
     public void generateXmlReport() throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        if (!runtimeContext.isMainNode()) {
-            return;
-        }
         Long duration = System.currentTimeMillis();
         Date currentDate = new Date();
         Date endDate = CalendarUtils.truncateToDayOfMonth(currentDate);
