@@ -2020,6 +2020,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 processMenuList(org, data, objectFactory, session, startDate, endDate);
             }
+        } else {
+            processMenuList(org, data, objectFactory, session, startDate, endDate);
         }
     }
 
@@ -2181,6 +2183,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
             }
+        } else {
+            processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
         }
     }
 
