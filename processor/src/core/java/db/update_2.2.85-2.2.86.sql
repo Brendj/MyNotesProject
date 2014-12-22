@@ -46,3 +46,5 @@ CREATE INDEX cf_clientsms_resending_date_idx on cf_clientsms_resending(CreateDat
 
 -- Добавление указания идентификатора источника события для отправки СМС
 alter table cf_clientsms add column ContentsId BIGINT DEFAULT NULL;
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 141222) НЕ МЕНЯТЬ
