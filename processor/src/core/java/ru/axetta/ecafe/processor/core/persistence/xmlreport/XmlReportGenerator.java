@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.xmlreport;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
@@ -76,7 +77,12 @@ public class XmlReportGenerator {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(new File("/processor/templates/reportXml/report-" + date + ".xml"));
+
+            String filePath = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.registries.path");
+
+            File file = new File(filePath + "/registriesReport-" + date + ".xml");
+
+            StreamResult result = new StreamResult(file);
             transformer.transform(source, result);
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
