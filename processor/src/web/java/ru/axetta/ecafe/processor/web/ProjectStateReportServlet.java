@@ -125,7 +125,7 @@ public class ProjectStateReportServlet extends HttpServlet {
         try {
             runtimeContext = RuntimeContext.getInstance();
             String reportType = request.getParameter("type");
-            t = ProjectStateReportService.TYPES.get(reportType);
+            t = ProjectStateReportService.getChartType(reportType);
             if (runtimeContext == null || t == null) {
                 throw new TypeMismatchException("Incorrect type of report was required: '" + reportType + "'");
             }

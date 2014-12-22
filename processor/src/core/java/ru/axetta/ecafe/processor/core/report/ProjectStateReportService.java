@@ -187,9 +187,9 @@ public class ProjectStateReportService {
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from ("
-                        + "select distinct regOrg.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
+                        + "select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
                         + "from cf_goods_requests gr "
-                        + "join cf_orgs regOrg on regOrg.idoforg=gr.orgowner "
+                        + "join cf_orgs regOrgSrc on regOrgSrc.idoforg=gr.orgowner "
                         + "join cf_goods_requests_positions grp on gr.idofgoodsrequest=grp.idofgoodsrequest "
                         + "join cf_goods g on g.idofgood=grp.idofgood "
                         + "join cf_goods_groups gg on g.idofgoodsgroup=gg.idofgoodsgroup "
@@ -204,9 +204,9 @@ public class ProjectStateReportService {
 
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from ("
-                        + "select distinct regOrg.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
+                        + "select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(gr.dateofgoodsrequest / 1000)) as d "
                         + "from cf_goods_requests gr "
-                        + "join cf_orgs regOrg on regOrg.idoforg=gr.orgowner "
+                        + "join cf_orgs regOrgSrc on regOrgSrc.idoforg=gr.orgowner "
                         + "join cf_goods_requests_positions grp on gr.idofgoodsrequest=grp.idofgoodsrequest "
                         + "join cf_goods g on g.idofgood=grp.idofgood "
                         + "join cf_goods_groups gg on g.idofgoodsgroup=gg.idofgoodsgroup "
@@ -580,29 +580,35 @@ public class ProjectStateReportService {
 
         TYPES.put("CardsChart", new ComplexType(new Type[]{
                 new SimpleType(
-                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard) / 1000 "
-                        + "from cf_cards c "
-                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
-                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
-                        + "group by c.createddate",
+                        "select '' || int8(d)*1000, count(idofcard) "
+                        + "from ("
+                                + "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , c.idofcard "
+                                + "from cf_cards c "
+                                + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                                + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as dat "
+                        + "group by dat.d",
                         CARDS_CHART_1_DATA).setIncremental(true),
 
                 new SimpleType(
-                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard)/1000 "
-                        + "from cf_cards c "
-                        + "join cf_history_card h on c.idofcard=h.idofcard and c.idofclient=h.newowner "
-                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
-                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
-                        + "group by c.createddate",
+                        "select '' || int8(d)*1000, count(idofcard) "
+                        + "from ("
+                                + "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , c.idofcard "
+                                + "from cf_cards c "
+                                + "join cf_history_card h on c.idofcard=h.idofcard and c.idofclient=h.newowner "
+                                + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                                + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as dat "
+                        + "group by dat.d",
                         CARDS_CHART_2_DATA).setIncremental(true),
 
                 new SimpleType(
-                        "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , count(c.idofcard)/1000 "
-                        + "from cf_cards c "
-                        + "left join cf_cards c2 on c.idofclient=c2.idofclient and c.idofcard<>c2.idofcard "
-                        + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
-                        + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
-                        + "group by c.createddate",
+                        "select '' || int8(d)*1000, count(idofcard) "
+                        + "from ("
+                                + "select '' || EXTRACT(EPOCH FROM date_trunc('day', to_timestamp(c.createddate / 1000))) as d , c.idofcard "
+                                + "from cf_cards c "
+                                + "left join cf_cards c2 on c.idofclient=c2.idofclient and c.idofcard<>c2.idofcard "
+                                + "where c.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                                + "      c.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as dat "
+                        + "group by dat.d",
                         CARDS_CHART_3_DATA).setIncremental(true)
         }, new Object[][]{
                 {ValueType.DATE, "День"},
@@ -610,14 +616,19 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "Количество перерегистрированных карт (тыс. шт.)", CARDS_CHART_2_DATA},
                 {ValueType.NUMBER, "Количество новых карт зарегистрированных на клиентов, у которых была карта (тыс. шт.)", CARDS_CHART_3_DATA} },
                 CARDS_CHART_DATA));
-        //initContragentsChartType();
+        initContragetsChartType();
     }
 
 
 
 
 
-
+    public static ProjectStateReportService.Type getChartType(String reportType) {
+        if(reportType.equals("ContragentsChart")) {
+            initContragetsChartType();
+        }
+        return TYPES.get(reportType);
+    }
 
     private static void initContragetsChartType() {
         if(TYPES.get("ContragentsChart") != null) {
@@ -693,7 +704,7 @@ public class ProjectStateReportService {
                 runtimeContext = RuntimeContext.getInstance();
                 session = (Session) entityManager.getDelegate();
                 /*session = runtimeContext.createPersistenceSession();*/
-    
+
                 initDictionaries(session);
             } catch (Exception e) {
             }
