@@ -1985,6 +1985,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               });
 
         MenuListResult menuListResult = new MenuListResult();
+        if (data.getMenuListExt() != null) {
+            Collections.sort(data.getMenuListExt().getM());
+        }
         menuListResult.menuList = data.getMenuListExt();
         menuListResult.resultCode = data.getResultCode();
         menuListResult.description = data.getDescription();
@@ -2003,6 +2006,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         });
 
         MenuListResult menuListResult = new MenuListResult();
+        if (data.getMenuListExt() != null) {
+            Collections.sort(data.getMenuListExt().getM());
+        }
         menuListResult.menuList = data.getMenuListExt();
         menuListResult.resultCode = data.getResultCode();
         menuListResult.description = data.getDescription();
@@ -2021,7 +2027,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processMenuList(org, data, objectFactory, session, startDate, endDate);
             }
         } else {
-            processMenuList(org, data, objectFactory, session, startDate, endDate);
+            processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
         }
     }
 
@@ -2148,6 +2154,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         });
 
         MenuListResult menuListResult = new MenuListResult();
+        if (data.getMenuListExt() != null) {
+            Collections.sort(data.getMenuListExt().getM());
+        }
         menuListResult.menuList = data.getMenuListExt();
         menuListResult.resultCode = data.getResultCode();
         menuListResult.description = data.getDescription();
@@ -2173,8 +2182,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return complexListResult;
     }
 
-    private void processMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Date startDate, Date endDate) throws DatatypeConfigurationException {
+    private void processMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
+            Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
         Menu menuByOneDay = getMenuByOneDay(session, startDate, client.getOrg());
 
         if (menuByOneDay != null) {
@@ -2184,7 +2193,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
             }
         } else {
-            processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+            processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
         }
     }
 
@@ -5831,16 +5840,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public MenuListWithProhibitionsResult getMenuListWithProhibitions(Long contractId, final Date startDate,
-          final Date endDate) {
+            final Date endDate) {
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                  Session session, Transaction transaction) throws Exception {
+                    Session session, Transaction transaction) throws Exception {
                 processMenuFirstDayWithProhibitions(client, data, objectFactory, session, startDate, endDate);
             }
         });
         MenuListWithProhibitionsResult menuListWithProhibitionsResult = new MenuListWithProhibitionsResult();
+        if (data.getMenuListExt() != null) {
+            Collections.sort(data.getMenuListExt().getM());
+        }
         menuListWithProhibitionsResult.menuList = data.getMenuListExt();
         menuListWithProhibitionsResult.resultCode = data.getResultCode();
         menuListWithProhibitionsResult.description = data.getDescription();

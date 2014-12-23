@@ -36,7 +36,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlType(name = "MenuDateItemExt", propOrder = {
     "e"
 })
-public class MenuDateItemExt {
+public class MenuDateItemExt implements Comparable<MenuDateItemExt> {
 
     @XmlElement(name = "E")
     protected List<MenuItemExt> e;
@@ -97,4 +97,8 @@ public class MenuDateItemExt {
         this.date = value;
     }
 
+    @Override
+    public int compareTo(MenuDateItemExt o) {
+        return this.date.toGregorianCalendar().compareTo(o.getDate().toGregorianCalendar());
+    }
 }
