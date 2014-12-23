@@ -80,6 +80,9 @@ public class XmlReportGenerator {
 
             String filePath = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.registries.path");
 
+            File dir = new File(filePath);
+            boolean bool = dir.mkdirs();
+
             File file = new File(filePath + "/registriesReport-" + date + ".xml");
 
             StreamResult result = new StreamResult(file);
