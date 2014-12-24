@@ -95,6 +95,7 @@ public class FinancialOpsManager {
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms);
+        clientSms.setContentsId(contentsId);
         if(isDelivered) {
             clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
         }

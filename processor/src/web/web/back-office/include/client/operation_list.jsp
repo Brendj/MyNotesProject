@@ -478,6 +478,18 @@
         </f:facet>
         <h:outputText escape="true" value="#{item.price}" converter="copeckSumConverter" styleClass="output-text" />
     </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Тип события" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.eventType}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Идентификатор события" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.eventId == null ? '-' : item.eventId}" styleClass="output-text" />
+    </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientSmsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">

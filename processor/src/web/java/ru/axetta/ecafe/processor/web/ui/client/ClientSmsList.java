@@ -42,6 +42,8 @@ public class ClientSmsList {
         private final Date deliveryTime;
         private final Long price;
         private final Long idOfTransaction;
+        private final String eventType;
+        private final Long eventId;
 
         public Item(ClientSms clientSms) {
             this.idOfSms = clientSms.getIdOfSms();
@@ -64,7 +66,18 @@ public class ClientSmsList {
                 this.idOfCard = card.getIdOfCard();
                 this.cardNo = card.getCardNo();
             }
+            this.eventType = ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()];
+            this.eventId = clientSms.getContentsId();
         }
+        public static final int TYPE_NEGATIVE_BALANCE = 1;
+        public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
+        public static final int TYPE_PAYMENT_REGISTERED = 3;
+        public static final int TYPE_LINKING_TOKEN = 4;
+        public static final int TYPE_PAYMENT_NOTIFY= 5;
+        public static final int TYPE_SMS_SUBSCRIPTION_FEE = 6;
+        public static final int TYPE_SMS_SUB_FEE_WITHDRAW = 7;
+        public static final int TYPE_SUBSCRIPTION_FEEDING = 8;
+        public static final int TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS = 9;
 
         public String getIdOfSms() {
             return idOfSms;
@@ -116,6 +129,14 @@ public class ClientSmsList {
 
         public Long getIdOfTransaction() {
             return idOfTransaction;
+        }
+
+        public String getEventType() {
+            return eventType;
+        }
+
+        public Long getEventId() {
+            return eventId;
         }
     }
 
