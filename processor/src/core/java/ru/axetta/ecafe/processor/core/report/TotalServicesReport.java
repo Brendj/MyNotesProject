@@ -150,12 +150,17 @@ public class TotalServicesReport extends BasicReport {
     public static class TotalEntry {
 
         private String officialName;          // Название организации
-        private int totalClientsCount;        // Общее количество клиентов
-        private int planBenefitClientsCount;  // Число получающих льготное питание
-        private int currentClientsCount;      // Находящиеся в ОУ в текущий момент
-        private int realBenefitClientsCount;  // Число реально получившие льготное питание
-        private int realPayedClientsCount;    // Получившие платное питание
-        private int uniqueClientsCount;       // Уникальные записи об обучающихся
+        private String totalClientsCount;        // Общее количество клиентов
+        private String planBenefitClientsCount;  // Число получающих льготное питание
+        private String perPlanBenefitClientsCount;
+        private String currentClientsCount;      // Находящиеся в ОУ в текущий момент
+        private String perCurrentClientsCount;
+        private String realBenefitClientsCount;  // Число реально получившие льготное питание
+        private String perRealBenefitClientsCount;
+        private String realPayedClientsCount;    // Получившие платное питание
+        private String perRealPayedClientsCount;
+        private String uniqueClientsCount;       // Уникальные записи об обучающихся
+        private String perUniqueClientsCount;
         private Map<String, Object> data;
 
 
@@ -163,58 +168,97 @@ public class TotalServicesReport extends BasicReport {
             return data;
         }
 
-        public void setTotalClientsCount(int totalClientsCount) {
+        public void setTotalClientsCount(String totalClientsCount) {
             this.totalClientsCount = totalClientsCount;
         }
 
-        public void setPlanBenefitClientsCount(int planBenefitClientsCount) {
+        public void setPlanBenefitClientsCount(String planBenefitClientsCount) {
             this.planBenefitClientsCount = planBenefitClientsCount;
         }
 
-        public void setCurrentClientsCount(int currentClientsCount) {
+        public void setPerPlanBenefitClientsCount(String perPlanBenefitClientsCount) {
+            this.perPlanBenefitClientsCount = perPlanBenefitClientsCount;
+        }
+
+        public void setCurrentClientsCount(String currentClientsCount) {
             this.currentClientsCount = currentClientsCount;
         }
 
-        public void setRealBenefitClientsCount(int realBenefitClientsCount) {
+        public void setPerCurrentClientsCount(String perCurrentClientsCount) {
+            this.perCurrentClientsCount = perCurrentClientsCount;
+        }
+
+        public void setRealBenefitClientsCount(String realBenefitClientsCount) {
             this.realBenefitClientsCount = realBenefitClientsCount;
         }
 
-        public void setRealPayedClientsCount(int realPayedClientsCount) {
+        public void setPerRealBenefitClientsCount(String perRealBenefitClientsCount) {
+            this.perRealBenefitClientsCount = perRealBenefitClientsCount;
+        }
+
+        public void setRealPayedClientsCount(String realPayedClientsCount) {
             this.realPayedClientsCount = realPayedClientsCount;
         }
 
-        public void setUniqueClientsCount(int uniqueClientsCount) {
+        public void setPerRealPayedClientsCount(String perRealPayedClientsCount) {
+            this.perRealPayedClientsCount = perRealPayedClientsCount;
+        }
+
+        public void setUniqueClientsCount(String uniqueClientsCount) {
             this.uniqueClientsCount = uniqueClientsCount;
+        }
+
+        public void setPerUniqueClientsCount(String perUniqueClientsCount) {
+            this.perUniqueClientsCount = perUniqueClientsCount;
         }
 
         public String getOfficialName() {
             return officialName;
         }
 
-        public int getTotalClientsCount() {
+        public String getTotalClientsCount() {
             return totalClientsCount;
         }
 
-        public int getPlanBenefitClientsCount() {
+        public String getPlanBenefitClientsCount() {
             return planBenefitClientsCount;
         }
 
-        public int getCurrentClientsCount() {
+        public String getPerPlanBenefitClientsCount() {
+            return perPlanBenefitClientsCount;
+        }
+
+        public String getCurrentClientsCount() {
             return currentClientsCount;
         }
 
-        public int getRealBenefitClientsCount() {
+        public String getPerCurrentClientsCount() {
+            return perCurrentClientsCount;
+        }
+
+        public String getRealBenefitClientsCount() {
             return realBenefitClientsCount;
         }
 
-        public int getRealPayedClientsCount() {
+        public String getPerRealBenefitClientsCount() {
+            return perRealBenefitClientsCount;
+        }
+
+        public String getRealPayedClientsCount() {
             return realPayedClientsCount;
         }
 
-        public int getUniqueClientsCount() {
+        public String getPerRealPayedClientsCount() {
+            return perRealPayedClientsCount;
+        }
+
+        public String getUniqueClientsCount() {
             return uniqueClientsCount;
         }
 
+        public String getPerUniqueClientsCount() {
+            return perUniqueClientsCount;
+        }
 
         public void put(String k, Object v) {
             data.put(k, v);

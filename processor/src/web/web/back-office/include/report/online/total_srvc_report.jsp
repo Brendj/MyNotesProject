@@ -18,13 +18,14 @@
         <rich:calendar value="#{totalServicesReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
-        <h:panelGroup>
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{totalServicesReportPage.filter}" readonly="true" styleClass="input-text long-field"
+                         style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{totalServicesReportPage.filter}}" />
         </h:panelGroup>
-        <a4j:commandButton value="Генерировать отчет" action="#{totalServicesReportPage.executeReport}"
+        <a4j:commandButton value="Генерировать отчет" action="#{totalServicesReportPage.buildReportHTML}"
                            reRender="workspaceTogglePanel, itemsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
@@ -117,7 +118,7 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в CSV" action="#{totalServicesReportPage.buildReportCSV}" styleClass="command-button" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

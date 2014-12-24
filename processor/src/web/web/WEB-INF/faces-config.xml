@@ -360,6 +360,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showTotalServicesCSVList</from-outcome>
+            <to-view-id>/back-office/totalservices_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showMenuDataXML</from-outcome>
             <to-view-id>/back-office/menu_data_xml.jsp</to-view-id>
             <redirect/>
