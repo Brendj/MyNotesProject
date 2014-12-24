@@ -756,6 +756,14 @@
     <%--<rich:panelMenuItem label="Отправка SMS" action="#{mainPage.showSupportSmsSender}"--%>
     <%--reRender="mainMenu, workspaceForm" />
     --%>
+    <rich:panelMenuGroup id="autorecharge" binding="#{mainPage.autorechargePage.mainMenuComponent}" label="Автопополнение"
+                        rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" action="#{mainPage.showAutorechargeGroupPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="uosStopListPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage"--%>
+        <rich:panelMenuItem id="groupControlSubscriptions" binding="#{groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
+                            action="#{groupControlSubscriptionsPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

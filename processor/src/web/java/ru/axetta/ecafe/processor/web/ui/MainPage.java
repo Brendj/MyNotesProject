@@ -223,6 +223,7 @@ public class MainPage implements Serializable {
     private final PayComplexReportPage payComplexReportPage = new PayComplexReportPage();
     private final BasicWorkspacePage complexGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage uosGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage autorechargePage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
@@ -5015,6 +5016,10 @@ public class MainPage implements Serializable {
         return uosGroupPage;
     }
 
+    public BasicWorkspacePage getAutorechargePage() {
+        return autorechargePage;
+    }
+
     public Object showComplexGroupPage() {
         currentWorkspacePage = complexGroupPage;
         updateSelectedMainMenu();
@@ -5029,6 +5034,12 @@ public class MainPage implements Serializable {
 
     public Object showUOSGroupPage() {
         currentWorkspacePage = uosGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showAutorechargeGroupPage() {
+        currentWorkspacePage = autorechargePage;
         updateSelectedMainMenu();
         return null;
     }
