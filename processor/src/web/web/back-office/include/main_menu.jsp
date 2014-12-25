@@ -935,6 +935,10 @@
                             binding="#{sentSmsReportPage.mainMenuComponent}"
                             label="Статистика отправки СМС по дням"
                             action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="OrgSmsDeliveryReportPageMenuItem"
+                            binding="#{smsDeliveryReportPage.mainMenuComponent}"
+                            label="Отчет по времени доставки СМС"
+                            action="#{smsDeliveryReportPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
                             binding="#{orgSmsStatsReportPage.mainMenuComponent}"
                             label="Общая статистика"
