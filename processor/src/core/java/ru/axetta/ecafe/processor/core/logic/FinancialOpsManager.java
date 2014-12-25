@@ -95,8 +95,10 @@ public class FinancialOpsManager {
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms);
+        clientSms.setSendTime(serviceSendTime);
         clientSms.setContentsId(contentsId);
         if(isDelivered) {
+            clientSms.setDeliveryTime(serviceSendTime);
             clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
         }
         session.save(clientSms);
