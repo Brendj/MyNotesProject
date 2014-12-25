@@ -265,6 +265,9 @@
                     <h:outputText escape="true" value="URL сервиса РНИП"
                                                        styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsURL}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Имя сервера с которого проводить импорт платежей"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.rnipProcessorInstance}" styleClass="input-text" size="40" />
                 </h:panelGrid>
             </rich:panel>
 

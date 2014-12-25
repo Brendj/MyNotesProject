@@ -140,7 +140,20 @@ public class RNIPLoadPaymentsService {
     }
 
     public static boolean isOn() {
-        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
+        boolean isOn = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
+        if(!isOn) {
+            return false;
+        }
+
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
+                .equals(reqInstance.trim())) {
+            return false;
+        }
+        return true;
     }
 
 

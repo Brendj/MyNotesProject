@@ -103,6 +103,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String synchLoggingFolder;
     private Boolean smsResending;
     private Boolean smsFailureTestingMode;
+    private String rnipProcessorInstance;
 
     private List<BankOptionItem> banks;
 
@@ -649,6 +650,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.smsFailureTestingMode = smsFailureTestingMode;
     }
 
+    public String getRnipProcessorInstance() {
+        return rnipProcessorInstance;
+    }
+
+    public void setRnipProcessorInstance(String rnipProcessorInstance) {
+        this.rnipProcessorInstance = rnipProcessorInstance;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -733,6 +742,8 @@ public class OptionPage extends BasicWorkspacePage {
         synchLoggingFolder = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_LOGGING_FOLDER);
         smsResending = runtimeContext.getOptionValueBool(Option.OPTION_SMS_RESENDING_ON);
         smsFailureTestingMode = runtimeContext.getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
+        rnipProcessorInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
+
 
         bankListPage.onShow();
 
@@ -859,6 +870,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_LOGGING_FOLDER, synchLoggingFolder);
             runtimeContext.setOptionValue(Option.OPTION_SMS_RESENDING_ON, smsResending);
             runtimeContext.setOptionValue(Option.OPTION_SMS_FAILURE_TESTING_MODE, smsFailureTestingMode);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, rnipProcessorInstance);
 
 
 

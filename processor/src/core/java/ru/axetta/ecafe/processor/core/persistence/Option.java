@@ -103,7 +103,8 @@ public class Option {
             OPTION_EMP_COUNTER=100056,
 
             OPTION_SMS_RESENDING_ON=100057,
-            OPTION_SMS_FAILURE_TESTING_MODE=100058
+            OPTION_SMS_FAILURE_TESTING_MODE=100058,
+            OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE=100059
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -184,7 +185,8 @@ public class Option {
             OPTION_EMP_BIND_WAITING_CLIENTS_COUNT, "0",
             OPTION_EMP_COUNTER, "",
             OPTION_SMS_RESENDING_ON, "0",
-            OPTION_SMS_FAILURE_TESTING_MODE, "0"
+            OPTION_SMS_FAILURE_TESTING_MODE, "0",
+            OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, "0"
 };
 
     private Long idOfOption;
