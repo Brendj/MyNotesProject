@@ -54,7 +54,7 @@
 
         </c:if>
     </h:panelGrid>
-    <%--<h:commandButton value="Выгрузить в Excel" actionListener="#{smsDeliveryReportPage.showXLS}" styleClass="command-button" />--%>
+    <h:commandButton value="Выгрузить в Excel" actionListener="#{smsDeliveryReportPage.showXLS}" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
