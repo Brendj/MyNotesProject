@@ -616,12 +616,14 @@ public class ProjectStateReportService {
                 {ValueType.NUMBER, "Количество перерегистрированных карт (тыс. шт.)", CARDS_CHART_2_DATA},
                 {ValueType.NUMBER, "Количество новых карт зарегистрированных на клиентов, у которых была карта (тыс. шт.)", CARDS_CHART_3_DATA} },
                 CARDS_CHART_DATA));
-        initContragetsChartType();
+        //initContragetsChartType();
     }
 
 
 
-
+    public void runInitContragetsChartTypeAtStartup() {
+        initContragetsChartType();
+    }
 
     public static ProjectStateReportService.Type getChartType(String reportType) {
         if(reportType.equals("ContragentsChart")) {
@@ -630,7 +632,7 @@ public class ProjectStateReportService {
         return TYPES.get(reportType);
     }
 
-    private static void initContragetsChartType() {
+    public static void initContragetsChartType() {
         if(TYPES.get("ContragentsChart") != null) {
             return;
         }
