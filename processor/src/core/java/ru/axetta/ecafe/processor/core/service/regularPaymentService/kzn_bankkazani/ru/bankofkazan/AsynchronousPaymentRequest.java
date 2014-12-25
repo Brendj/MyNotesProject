@@ -280,6 +280,12 @@ public class AsynchronousPaymentRequest {
 
         }
 
+        @Override
+        public String toString() {
+            return "Requestex{" +
+                    "cards=" + cards +
+                    '}';
+        }
     }
 
 }

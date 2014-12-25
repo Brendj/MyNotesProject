@@ -15,7 +15,8 @@ public class Test {
     public static void main( String[] args )
             throws Exception
     {
-        String url = "CLIENTID=00000026&SUM=100&TIME=1406290983&OPID=7&TERMID=1&PID=test&V=1";   //localhost
+        //String url = "CLIENTID=00000026&SUM=100&TIME=1406290983&OPID=7&TERMID=1&PID=test&V=1";   //localhost
+        String url = "PID=paysys&CLIENTID=200485&OPID=2&TERMID=0&TIME=20120727175502&SUM=1000";   //localhost
 
         //String url = "CLIENTID=00000026&SUM=100&TIME=1407833350000&OPID=4&TERMID=1&PID=test&V=1";
         String singnature = generateSignature(url);
@@ -27,7 +28,8 @@ public class Test {
         // Read keystore
         KeyStore ks = KeyStore.getInstance("pkcs12","SunJSSE");
         //InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\Сертификаты\\ispp_org_pp_test_qiwi8.pfx"));
-        InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\ключ\\qiwi\\ispp_qiwi_test.pfx")); //localhost
+        //InputStream ksin = new FileInputStream(new File("F:\\backup\\utils\\ключ\\qiwi\\ispp_qiwi_test.pfx")); //localhost
+        InputStream ksin = new FileInputStream(new File("C:\\Dropbox\\AXETTA\\utils\\Сертификаты\\200\\paysys\\ispp_org_pp_test_paysys.pfx")); //localhost
         ks.load(ksin, "1".toCharArray());  /// 1 - password for  pfx key
         ksin.close();
 

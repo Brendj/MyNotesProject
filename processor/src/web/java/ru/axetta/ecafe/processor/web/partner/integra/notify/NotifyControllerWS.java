@@ -43,6 +43,7 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
     @Override
     public NotifyResult notify(@WebParam(name = "accountN") long accountNumber,
             @WebParam(name = "eventCode") int eventCode) {
+        logger.warn("NotifyWS notify: " + accountNumber + " | " + eventCode);
         NotifyResult result = new NotifyResult();
         result.resultCode = ResultConst.CODE_OK;
         result.description = ResultConst.DESCR_OK;
@@ -63,6 +64,10 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
     public List<AutoPaymentResultResponse> AsynchronousPaymentResponse(
             @WebParam(name = "opers") List<AutoPaymentResultRequest> autoPaymentResultRequestList
     ) {
+        logger.warn("NotifyWS AsynchronousPaymentResponse: "
+                + " | " + autoPaymentResultRequestList.get(0).getIdaction()
+                + " | " + autoPaymentResultRequestList.get(0).getErrorCode()
+                + " | " + autoPaymentResultRequestList.get(0).getRealAmount());
         MessageContext mc = wsContext.getMessageContext();
         HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         logger.info("Starting process BK callback from {}", req.getRemoteAddr());
@@ -70,14 +75,14 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
 
         try {
             for (AutoPaymentResultRequest autoPaymentResultRequest : autoPaymentResultRequestList) {
+                logger.warn("NotifyWS AsynchronousPaymentResponse: " + autoPaymentResultRequest.getErrorCode() + " | " + autoPaymentResultRequest.getIdaction()
+                        + " | " + autoPaymentResultRequest.getRealAmount());
                 result.add(handleResultRequest(autoPaymentResultRequest, req.getRemoteAddr()));
             }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage());
         }
-        result.add(new AutoPaymentResultResponse());
-        result.add(new AutoPaymentResultResponse());
         logger.info("Stop process BK callback from {}", req.getRemoteAddr());
 
         return result;
@@ -101,7 +106,7 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
                     } else if (payment.isSuccess()) {
                         throw new DuplicatePaymentException();
                     }
-                    OnlinePaymentProcessor.PayResponse payResponse = sendRequestToPayment(
+                    OnlinePaymentProcessor.PayResponse payResponse = sendRequestToPayment(payment.getClient().getIdOfClient(),
                             payment.getClient().getContractId(), "" + autoPaymentResultRequest.getIdaction(),
                             autoPaymentResultRequest.getRealAmount());
 
@@ -148,9 +153,9 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
         return result;
     }
 
-    private  OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long contractId, String paymentId, long realAmount)
+    private  OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long clientId,Long contractId, String paymentId, long realAmount)
             throws DuplicatePaymentException {
-        Long contragentId = (Long) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.contragentId");
+        Long contragentId = Long.valueOf((String)RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.contragentId"));
 
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService.bk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.dao.regularpayments.RegularPaymentsRepository;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.DuplicatePaymentException;
@@ -18,11 +19,9 @@ import ru.axetta.ecafe.processor.core.service.regularPaymentService.kzn_bankkaza
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
@@ -38,15 +37,9 @@ import java.util.Map;
 public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService {
     private static Logger logger = LoggerFactory.getLogger(BKRegularPaymentSubscriptionService.class);
 
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager em;
+    @Autowired
+    private RegularPaymentsRepository regularPaymentsRepository;
 
-
-    public RegularPayment findPayment(Long actionId){
-        return (RegularPayment) em.createQuery("from RegularPayment p left join fetch p.client where p.idOfPayment = :idOfPayment ")
-                .setParameter("idOfPayment", actionId)
-                .getSingleResult();
-    }
 
     private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);
@@ -85,7 +78,7 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
         PaymentResponse paymentResponse = new PaymentResponse();
         try {
             AsynchronousPaymentRequest asynchronousPaymentRequest = prepareForRequest(params);
-
+            logger.info("Request to BK:" +  asynchronousPaymentRequest);
             SchoolCardService schoolCardService  =  new SchoolCardService();
             SchoolCard sc = schoolCardService.getSchoolCardPort();
             asynchronousPaymentResponse = sc.asynchronousPayment(asynchronousPaymentRequest);
@@ -96,8 +89,13 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
                         int statusCode = card.getErrorcode().intValue();
                         paymentResponse.setStatusCode(statusCode);
                         if (statusCode == 0) {
-                            updateRegularPayment(card.getIdaction(), "ReceivedBYBK", null, null);
+                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "ReceivedByBK", null,
+                                    null);
+                        }else{
+                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "KO" + statusCode, null,
+                                    null);
                         }
+                        logger.info("Request to BK statusCode:" +  card.getErrorcode());
                     }
                 }
             }
@@ -109,46 +107,18 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
         return paymentResponse;
     }
 
-    @Transactional
-    public void updateRegularPayment(long idofpayment, String status, Long realAmount, String ip)
-            throws DuplicatePaymentException, NotFoundPaymentException {
-        RegularPayment payment = em.find(RegularPayment.class, idofpayment);
-        if (payment != null) {
-            if ((!payment.isSuccess())) {
-                payment.setStatus(status);
 
-                if (realAmount !=null){
-                    payment.setPaymentAmount(realAmount);
-                }
-                //payment.setAuthCode(ip);
-                em.persist(payment);
-            } else {
-                throw new DuplicatePaymentException();
-            }
-        } else {
-            throw new NotFoundPaymentException();
-        }
+    public void finalizeRegularPayment(Long idaction, String paymentSuccessful, Long realAmount, String ip)
+            throws DuplicatePaymentException, NotFoundPaymentException {
+        regularPaymentsRepository.finalizeRegularPayment(idaction, paymentSuccessful, realAmount, ip);
     }
 
-    @Transactional
-    public void finalizeRegularPayment (long idofpayment, String status, Long realAmount, String ip)
-            throws DuplicatePaymentException, NotFoundPaymentException {
-        RegularPayment payment = em.find(RegularPayment.class, idofpayment);
-        if (payment != null) {
-            if ((!payment.isSuccess())) {
-                payment.setStatus(status);
-                payment.setSuccess(true);
+    public RegularPayment findPayment(Long idaction) {
+        return  regularPaymentsRepository.findPayment(idaction);
+    }
 
-                if (realAmount !=null){
-                    payment.setPaymentAmount(realAmount);
-                }
-                //payment.setAuthCode(ip);
-                em.persist(payment);
-            } else {
-                throw new DuplicatePaymentException();
-            }
-        } else {
-            throw new NotFoundPaymentException();
-        }
+    public void updateRegularPayment(Long idaction, String paymentSuccessful, Long realAmount, String ip)
+            throws DuplicatePaymentException, NotFoundPaymentException {
+        regularPaymentsRepository.updateRegularPayment(idaction,paymentSuccessful,realAmount,ip);
     }
 }

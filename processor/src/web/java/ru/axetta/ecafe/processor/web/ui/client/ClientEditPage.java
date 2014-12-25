@@ -618,8 +618,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if(client.getIdOfClientGroup() != null){
                 clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
             }
-            clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-
+            if(client.getClientGroup() != null){
+                clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+            }
 
             this.idOfClientGroup = idOfClientGroup;
             this.clientGroupName = DAOUtils
