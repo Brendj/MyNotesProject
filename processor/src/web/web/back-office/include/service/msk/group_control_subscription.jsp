@@ -17,7 +17,8 @@
         </f:facet>
     </a4j:status>
 
-    <h:outputText value="Загрузите файл формата .csv, вида: Л/c , сумма" />
+    <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'"/>
+    <h:outputText value= "вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Имя'; 'Фамилия'; 'Отчество'; 'Л/c';"/>
     <rich:fileUpload id="subscriptionFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                      addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                      cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
@@ -55,6 +56,30 @@
                 <h:outputText value="№" styleClass="output-text" />
             </f:facet>
             <h:outputText value="#{row+1}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Наименовани ОУ и адрес" styleClass="output-text" />
+            </f:facet>
+            <h:outputText value="#{item.orgNameWithAddress}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Имя" styleClass="output-text" />
+            </f:facet>
+            <h:outputText value="#{item.firstName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Фамилия" styleClass="output-text" />
+            </f:facet>
+            <h:outputText value="#{item.surname}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Отчество" styleClass="output-text" />
+            </f:facet>
+            <h:outputText value="#{item.secondName}" styleClass="output-text" />
         </rich:column>
         <rich:column>
             <f:facet name="header">

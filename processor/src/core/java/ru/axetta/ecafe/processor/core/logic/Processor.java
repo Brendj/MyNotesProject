@@ -390,7 +390,7 @@ public class Processor implements SyncProcessor,
             throws Exception {
         if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED == orderStatus
                 || ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
-            throw new IllegalArgumentException("Anacceptable orderStatus");
+            throw new IllegalArgumentException("Unacceptable orderStatus");
         }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -402,7 +402,7 @@ public class Processor implements SyncProcessor,
                   idOfClientPaymentOrder);
             Client client = getClientReference(persistenceSession, idOfClient);
             if (!client.getIdOfClient().equals(clientPaymentOrder.getClient().getIdOfClient())) {
-                throw new IllegalArgumentException("Client does't own this order");
+                throw new IllegalArgumentException("Client doesn't own this order");
             }
             if (clientPaymentOrder.canApplyOrderStatus(orderStatus)) {
                 clientPaymentOrder.setOrderStatus(orderStatus);

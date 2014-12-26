@@ -42,12 +42,14 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
     public void subscriptionLoadFileListener(UploadEvent event) {
         UploadItem item = event.getUploadItem();
 
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(133390L, "ok"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(133390L, "204"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(112345L, "200"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(111111L, "95"));
+        getGroupControlSubscriptionsItems()
+                .add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань", "Василова", "Айгуль",
+                        "Наилевна", 133390L, "ok"));
+      /*  getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань"133390L, "204"));
+        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань"112345L, "200"));*/
+       /* getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(111111L, "95"));
         getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(234590L, "104"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(987650L, "some"));
+        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(987650L, "some"));*/
 
         lineResultSize = Long.valueOf(groupControlSubscriptionsItems.size());
 

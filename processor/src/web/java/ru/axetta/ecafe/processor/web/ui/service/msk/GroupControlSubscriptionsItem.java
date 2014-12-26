@@ -13,13 +13,22 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 public class GroupControlSubscriptionsItem {
 
-    public String result;
+    private String orgNameWithAddress;
+    private String firstName;
+    private String surname;
+    private String secondName;
     public Long contractId;
+    public String result;
 
     public GroupControlSubscriptionsItem() {
     }
 
-    public GroupControlSubscriptionsItem(Long contractId, String result) {
+    public GroupControlSubscriptionsItem(String orgNameWithAddress, String firstName, String surname, String secondName,
+            Long contractId, String result) {
+        this.orgNameWithAddress = orgNameWithAddress;
+        this.firstName = firstName;
+        this.surname = surname;
+        this.secondName = secondName;
         this.contractId = contractId;
         this.result = result;
     }
@@ -38,5 +47,37 @@ public class GroupControlSubscriptionsItem {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public String getOrgNameWithAddress() {
+        return orgNameWithAddress;
+    }
+
+    public void setOrgNameWithAddress(String orgNameWithAddress) {
+        this.orgNameWithAddress = orgNameWithAddress;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
     }
 }

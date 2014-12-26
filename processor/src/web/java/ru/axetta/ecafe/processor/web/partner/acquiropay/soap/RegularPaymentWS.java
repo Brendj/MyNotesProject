@@ -131,6 +131,40 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
 
     @Override
     @WebMethod
+    public RequestResult regularPaymentEasyCheckCreateSubscription(@WebParam(name = "contractID") Long contractID,
+            @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency) {
+        Session session = null;
+        Transaction tr = null;
+        RequestResult requestResult = new RequestResult();
+        try {
+            session = runtimeContext.createPersistenceSession();
+            tr = session.beginTransaction();
+            Long contractId = contractID;
+            Client c = DAOUtils.findClientByContractId(session, contractId);
+            int period = 12;
+            MfrRequest mfrRequest = rpService.createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount, period);
+            Map<String, String> params = rpService.getParamsForRegRequest(mfrRequest);
+            requestResult.setParametersList(new ParametersList());
+            requestResult.getParametersList().setList(new ArrayList<ParametersList.Parameter>());
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                requestResult.getParametersList().getList().add(new ParametersList.Parameter(entry.getKey(), entry.getValue()));
+            }
+            requestResult.setErrorCode(0);
+            tr.commit();
+        } catch (Exception ex) {
+            HibernateUtils.rollback(tr, logger);
+            logger.error(ex.getMessage());
+            requestResult.setErrorCode(RC_INTERNAL_SERVER_ERROR);
+            requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return requestResult;
+    }
+
+    @Override
+    @WebMethod
     public RequestResult regularPaymentDeleteSubscription(
             @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
             @WebParam(name = "contractId") Long contractId) {
@@ -209,6 +243,16 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
         }
         return requestResult;
+    }
+
+    @Override
+    public RequestResult regularPaymentEasyCheckEditSubscription(
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
+            @WebParam(name = "subscriptionPeriodOfValidity") int period,
+            @WebParam(name = "contractId") Long contractId) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
