@@ -117,11 +117,12 @@
     </task:scheduled-tasks>
 
     <!-- Оповещение клиента об недостатке средств в субсчет для оплаты АП, срабатывает каждый день в 16 часов вечера -->
-    <task:scheduler id="subscriptionFeedingSchedule"/>
-    <task:scheduled-tasks scheduler="subscriptionFeedingSchedule">
-        <task:scheduled ref="subscriptionFeedingService" method="notifyClients" cron="0 0 16 * * ?"/>
-        <task:scheduled ref="subscriptionFeedingService" method="notifyDeactivateClients" cron="0 0 16 * * ?"/>
-    </task:scheduled-tasks>
+    <!--<task:scheduler id="subscriptionFeedingSchedule"/>-->
+    <!--<task:scheduled-tasks scheduler="subscriptionFeedingSchedule">-->
+        <!--<task:scheduled ref="subscriptionFeedingService" method="notifyClients" cron="0 0 16 * * ?"/>-->
+        <!--<task:scheduled ref="subscriptionFeedingService" method="notifyDeactivateClients" cron="0 0 16 * * ?"/>-->
+    <!--todo При запуске быть проработать, отправляет 5 смс с одинаковым текстом-->
+    <!--</task:scheduled-tasks>-->
 
     <!-- Активация клиентских циклограмм питания. Срабатывает каждый день в 0:30 часа ночи. -->
     <!-- Активация клиентских циклограмм питания производит АРМ в ОУ -->
