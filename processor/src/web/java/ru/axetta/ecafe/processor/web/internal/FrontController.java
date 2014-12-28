@@ -14,25 +14,25 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.security.PublicKey;
-import java.util.*;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -638,6 +638,40 @@ public class FrontController extends HttpServlet {
             }
         }
         return results;
+    }
+
+    @WebMethod(operationName = "getFriendlyOrganizations")
+    public List<SimpleOrganizationItem> getFriendlyOrganizations(@WebParam(name = "orgId")Long orgId)
+            throws FrontControllerException {
+        logger.debug("checkRequestValidity");
+        //checkRequestValidity(orgId);
+
+        List<SimpleOrganizationItem> result = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            result =  new LinkedList<SimpleOrganizationItem>();
+            List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistenceSession, orgId);
+            for (Org item : friendlyOrgs) {
+                result.add(new SimpleOrganizationItem(
+                        item.getIdOfOrg(),
+                        item.getShortName(),
+                        item.getType().ordinal()));
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return result;
     }
 
     protected void checkIpValidity() throws FrontControllerException {
