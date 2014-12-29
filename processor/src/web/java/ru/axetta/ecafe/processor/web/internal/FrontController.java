@@ -644,7 +644,7 @@ public class FrontController extends HttpServlet {
     public List<SimpleOrganizationItem> getFriendlyOrganizations(@WebParam(name = "orgId")Long orgId)
             throws FrontControllerException {
         logger.debug("checkRequestValidity");
-        //checkRequestValidity(orgId);
+        checkRequestValidity(orgId);
 
         List<SimpleOrganizationItem> result = null;
         Session persistenceSession = null;
