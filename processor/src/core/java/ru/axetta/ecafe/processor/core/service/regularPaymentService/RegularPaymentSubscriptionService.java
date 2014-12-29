@@ -211,6 +211,13 @@ public class RegularPaymentSubscriptionService {
         bs.setValidToDate(CalendarUtils.addMonth(new Date(), period));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBankSubscriptionWithoutPeriod(Long bsId, Long paymentAmount, Long thresholdAmount) {
+        BankSubscription bs = em.find(BankSubscription.class, bsId);
+        bs.setPaymentAmount(paymentAmount);
+        bs.setThresholdAmount(thresholdAmount);
+    }
+
     @SuppressWarnings("unchecked")
     protected List<Long> findSubscriptions(int rows) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
@@ -219,11 +226,9 @@ public class RegularPaymentSubscriptionService {
                 "and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) and " +
                 "(bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
                 "and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
-                .setParameter("today", today)
-                .setParameter("cg", Arrays.asList(
-                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                        ClientGroup.Predefined.CLIENT_DELETED.getValue())
-                );
+                .setParameter("today", today).setParameter("cg",
+                        Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                                ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         if (rows != 0) {
             query.setMaxResults(rows);
         }
@@ -294,6 +299,16 @@ public class RegularPaymentSubscriptionService {
         if (san != null) {
             criteria.add(Restrictions.or(Restrictions.eq("san", san), Restrictions.eq("c.san", san)));
         }
+        criteria.addOrder(Order.asc("idOfSubscription"));
+        return (List<Long>) criteria.list();
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    @SuppressWarnings("unchecked")
+    public List<Long> findSubscriptionsIdWithoutActivationDate(Long contractId) throws Exception {
+        Criteria criteria = em.unwrap(Session.class).createCriteria(BankSubscription.class);
+        criteria.setProjection(Projections.property("idOfSubscription")).createAlias("client", "c");
+        criteria.add(Restrictions.eq("c.contractId", contractId));
         criteria.addOrder(Order.asc("idOfSubscription"));
         return (List<Long>) criteria.list();
     }

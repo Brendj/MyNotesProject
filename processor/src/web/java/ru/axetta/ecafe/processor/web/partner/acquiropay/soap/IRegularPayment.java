@@ -34,6 +34,8 @@ public interface IRegularPayment {
     RequestResult regularPaymentReadSubscriptionList(@WebParam(name = "clientID") String clientID,
             @WebParam(name = "clientIDType") int clientIDType);
 
+    RequestResult regularPaymentEasyCheckReadSubscriptionList(@WebParam(name = "contractId") Long contractId);
+
     @WebMethod
     RequestResult regularPaymentReadSubscriptionListWithInfo(@WebParam(name = "clientID") String clientID,
             @WebParam(name = "clientIDType") int clientIDType);
@@ -65,9 +67,8 @@ public interface IRegularPayment {
             @WebParam(name = "contractId") Long contractId);
 
     @WebMethod
-    RequestResult regularPaymentEasyCheckEditSubscription(@WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
-            @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
-            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "contractId") Long contractId);
+    RequestResult regularPaymentEasyCheckEditSubscription(
+            @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId, @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency);
 }

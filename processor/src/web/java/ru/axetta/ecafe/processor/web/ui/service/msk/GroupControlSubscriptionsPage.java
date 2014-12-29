@@ -11,6 +11,7 @@ import org.richfaces.model.UploadItem;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,32 +43,38 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
     public void subscriptionLoadFileListener(UploadEvent event) {
         UploadItem item = event.getUploadItem();
 
-        getGroupControlSubscriptionsItems()
-                .add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань", "Василова", "Айгуль",
-                        "Наилевна", 133390L, "ok"));
-      /*  getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань"133390L, "204"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem("Гимназия 102 Московский р-н г.Казань"112345L, "200"));*/
-       /* getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(111111L, "95"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(234590L, "104"));
-        getGroupControlSubscriptionsItems().add(new GroupControlSubscriptionsItem(987650L, "some"));*/
+        BufferedReader bufferedReader = null;
+        String line;
+        String cvsSplitBy = ";";
 
-        lineResultSize = Long.valueOf(groupControlSubscriptionsItems.size());
-
-        /*try {
-            File file = item.getFile();
-            questionariesRootElement = questionaryService.parseQuestionaryByXML(file);
-        } catch (Exception e){
-            registrationItems.add(new RegistrationItem("Ошибка при загрузке данных: " + e));
-            logger.error("Failed to load from file", e);
-            return;
-        }
         try {
-            registrationItems = questionaryService.registrationQuestionariesFromXML(questionariesRootElement, idOfOrgList);
-            printMessage("Данные загружены и зарегистрированы успешно");
-        } catch (Exception e) {
-            registrationItems.add(new RegistrationItem("Ошибка при регистрации данных: " + e));
-            logger.error("Failed to registration questionaries from file", e);
-        }*/
+            File file = item.getFile();
+
+            bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+            while ((line = bufferedReader.readLine()) != null) {
+
+                // разделитель
+                String[] separatedData = line.split(cvsSplitBy);
+                getGroupControlSubscriptionsItems()
+                        .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
+                                separatedData[4], Long.parseLong(separatedData[5]), "ok"));
+
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        lineResultSize = Long.valueOf(groupControlSubscriptionsItems.size());
     }
 
     public List<GroupControlSubscriptionsItem> getGroupControlSubscriptionsItems() {

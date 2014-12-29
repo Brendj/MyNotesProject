@@ -129,6 +129,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         return requestResult;
     }
 
+    // метод с облегченной проверкой
     @Override
     @WebMethod
     public RequestResult regularPaymentEasyCheckCreateSubscription(@WebParam(name = "contractID") Long contractID,
@@ -246,13 +247,31 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     }
 
     @Override
+    @WebMethod
     public RequestResult regularPaymentEasyCheckEditSubscription(
             @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
+            @WebParam(name = "contractId") Long contractId,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
-            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "contractId") Long contractId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency) {
+        RequestResult requestResult = new RequestResult();
+        try {
+            BankSubscription bs = rpService.findBankSubscription(regularPaymentSubscriptionID);
+            if (bs == null) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(String.format(RC_SUBSCRIPTION_NOT_FOUND_DESC, regularPaymentSubscriptionID));
+                return requestResult;
+            }
+            if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
+                return requestResult;
+            }
+            rpService.updateBankSubscriptionWithoutPeriod(regularPaymentSubscriptionID, paymentAmount, lowerLimitAmount);
+            requestResult.setErrorCode(0);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            requestResult.setErrorCode(RC_INTERNAL_SERVER_ERROR);
+            requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+        }
+        return requestResult;
     }
 
     @Override
@@ -277,6 +296,28 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             requestResult.getSubscriptionList().setIdList(subscriptionList);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
+            requestResult.setErrorCode(RC_INTERNAL_SERVER_ERROR);
+            requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+        }
+        return requestResult;
+    }
+
+    //Выбирает все подписки без учета даты activationDate - даты активации
+    @Override
+    @WebMethod
+    public RequestResult regularPaymentEasyCheckReadSubscriptionList(@WebParam(name = "contractId") Long contractId) {
+        RequestResult requestResult = new RequestResult();
+        List<Long> subscriptionList;
+        try {
+            if (contractId != null) {
+                subscriptionList = rpService.findSubscriptionsIdWithoutActivationDate(contractId);
+            } else {
+                subscriptionList = new ArrayList<Long>();
+            }
+            requestResult.setSubscriptionList(new SubscriptionList());
+            requestResult.getSubscriptionList().setIdList(subscriptionList);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             requestResult.setErrorCode(RC_INTERNAL_SERVER_ERROR);
             requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
         }
