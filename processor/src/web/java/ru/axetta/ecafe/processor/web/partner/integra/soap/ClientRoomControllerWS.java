@@ -3589,6 +3589,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     authorized = true;
                 }
             }
+
+            if (partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_PASSWORD) {
+                if(client.hasEncryptedPasswordSHA1(token)){
+                    authorized = true;
+                }
+            }
+
             if (client.hasEncryptedPasswordSHA1(token)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("hasEncryptedPassword");
