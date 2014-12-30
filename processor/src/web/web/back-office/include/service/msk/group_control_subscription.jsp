@@ -9,16 +9,16 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="groupControlSubscriptionsPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage"--%>
-<h:panelGrid id="groupControlSubscriptionsPage" styleClass="borderless-grid">
+<h:panelGrid id="groupControlSubscriptionsPage" binding="#{mainPage.groupControlSubscriptionsPage.pageComponent}"
+             styleClass="borderless-grid">
     <a4j:status>
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" />
         </f:facet>
     </a4j:status>
 
-    <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'"/>
-    <h:outputText value= "вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Имя'; 'Фамилия'; 'Отчество'; 'Л/c';"/>
+    <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
+    <h:outputText value="вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Имя'; 'Фамилия'; 'Отчество'; 'Л/c';" />
     <rich:fileUpload id="subscriptionFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                      addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                      cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
@@ -30,7 +30,7 @@
                      clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
                      cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
                      uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
-                     fileUploadListener="#{groupControlSubscriptionsPage.subscriptionLoadFileListener}">
+                     fileUploadListener="#{mainPage.subscriptionLoadFileListener}">
         <f:facet name="label">
             <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
         </f:facet>
@@ -39,9 +39,9 @@
     </rich:fileUpload>
 
 
-    <h:outputText escape="true"
-                  value="Обработано: #{groupControlSubscriptionsPage.lineResultSize}. Успешно: #{groupControlSubscriptionsPage.successLineNumber}"
-                  styleClass="output-text" />
+    <%--    <h:outputText escape="true"
+                      value="Обработано: #{groupControlSubscriptionsPage.lineResultSize}. Успешно: #{groupControlSubscriptionsPage.successLineNumber}"
+                      styleClass="output-text" />--%>
 
     <a4j:outputPanel ajaxRendered="true">
         <h:panelGrid styleClass="borderless-grid">
@@ -50,7 +50,7 @@
         </h:panelGrid>
     </a4j:outputPanel>
 
-    <rich:dataTable value="#{groupControlSubscriptionsPage.groupControlSubscriptionsItems}" var="item" rowKeyVar="row">
+    <rich:dataTable value="#{mainPage.groupControlSubscriptionsItems}" var="item" rowKeyVar="row">
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" />

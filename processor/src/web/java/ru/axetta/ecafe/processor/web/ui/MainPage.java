@@ -50,6 +50,10 @@ import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
 import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
 import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
 import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
+import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsItem;
+import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
+import ru.axetta.ecafe.processor.web.ui.service.msk.RegularPaymentEasyCheck;
+import ru.axetta.ecafe.processor.web.ui.service.msk.RequestResultEasyCheck;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -199,6 +203,7 @@ public class MainPage implements Serializable {
     private final TestLogPage testLogPage = new TestLogPage();
     private final BuildSignKeysPage buildSignKeysPage = new BuildSignKeysPage();
     private final OrderRemovePage orderRemovePage = new OrderRemovePage();
+    private final GroupControlSubscriptionsPage groupControlSubscriptionsPage = new GroupControlSubscriptionsPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -342,6 +347,7 @@ public class MainPage implements Serializable {
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
+    private List<GroupControlSubscriptionsItem> groupControlSubscriptionsItems;
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3956,6 +3962,84 @@ public class MainPage implements Serializable {
         }
     }
 
+    public void subscriptionLoadFileListener(UploadEvent event) {
+        UploadItem item = event.getUploadItem();
+
+        groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
+
+        BufferedReader bufferedReader = null;
+        String line;
+        String cvsSplitBy = ";";
+
+        long lowerLimitAmount = 100;
+        long paymentAmount = 200;
+
+        RegularPaymentEasyCheck regularPaymentEasyCheck = new RegularPaymentEasyCheck();
+
+        RuntimeContext runtimeContext;
+        Session persistenceSession;
+        Transaction persistenceTransaction;
+
+        try {
+            File file = item.getFile();
+            bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+
+            while ((line = bufferedReader.readLine()) != null) {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                // разделитель
+                String[] separatedData = line.split(cvsSplitBy);
+
+                RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
+                        .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5]),
+                                persistenceSession);
+
+                if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
+                        || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
+                    RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
+                            regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5]),
+                                    lowerLimitAmount, paymentAmount, persistenceSession, persistenceTransaction,
+                                    runtimeContext);
+
+                    getGroupControlSubscriptionsItems()
+                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
+                                    separatedData[4], Long.parseLong(separatedData[5]),
+                                    requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
+                                            .getErrorDesc() : "add"));
+                } else {
+                    RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
+                            .regularPaymentEasyCheckEdit(
+                                    requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
+                                    Long.parseLong(separatedData[5]), lowerLimitAmount, paymentAmount,
+                                    persistenceSession, persistenceTransaction);
+
+                    getGroupControlSubscriptionsItems()
+                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
+                                    separatedData[4], Long.parseLong(separatedData[5]),
+                                    requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
+                                            .getErrorDesc() : "changed"));
+                    System.out.println();
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public void reportTemplateLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
@@ -4700,6 +4784,10 @@ public class MainPage implements Serializable {
 
     public OrderRemovePage getOrderRemovePage() {
         return orderRemovePage;
+    }
+
+    public GroupControlSubscriptionsPage getGroupControlSubscriptionsPage() {
+        return groupControlSubscriptionsPage;
     }
 
     public Object showOrderRemovePage() {
@@ -7763,5 +7851,9 @@ public class MainPage implements Serializable {
             logger.error("getContragentsListForTooltip Error",e);
             return "";
         }
+    }
+
+    public List<GroupControlSubscriptionsItem> getGroupControlSubscriptionsItems() {
+        return groupControlSubscriptionsItems;
     }
 }
