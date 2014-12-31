@@ -70,6 +70,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
@@ -3963,6 +3964,7 @@ public class MainPage implements Serializable {
     }
 
     public void subscriptionLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
 
         groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
@@ -3977,8 +3979,8 @@ public class MainPage implements Serializable {
         RegularPaymentEasyCheck regularPaymentEasyCheck = new RegularPaymentEasyCheck();
 
         RuntimeContext runtimeContext;
-        Session persistenceSession;
-        Transaction persistenceTransaction;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
 
         try {
             File file = item.getFile();
@@ -3993,48 +3995,58 @@ public class MainPage implements Serializable {
                 String[] separatedData = line.split(cvsSplitBy);
 
                 RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
-                        .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5]),
+                        .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5].trim()),
                                 persistenceSession);
+
 
                 if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
                         || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
                     RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
-                            regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5]),
+                            regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
                                     lowerLimitAmount, paymentAmount, persistenceSession, persistenceTransaction,
-                                    runtimeContext);
+                                    runtimeContext, facesContext);
 
                     getGroupControlSubscriptionsItems()
                             .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
-                                    separatedData[4], Long.parseLong(separatedData[5]),
+                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
                                     requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
-                                            .getErrorDesc() : "add"));
+                                            .getErrorDesc() : "добавлен"));
                 } else {
                     RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
                             .regularPaymentEasyCheckEdit(
                                     requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
-                                    Long.parseLong(separatedData[5]), lowerLimitAmount, paymentAmount,
-                                    persistenceSession, persistenceTransaction);
+                                    Long.parseLong(separatedData[5].trim()), lowerLimitAmount, paymentAmount,
+                                    persistenceSession, persistenceTransaction, facesContext);
 
                     getGroupControlSubscriptionsItems()
                             .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
-                                    separatedData[4], Long.parseLong(separatedData[5]),
+                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
                                     requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
-                                            .getErrorDesc() : "changed"));
+                                            .getErrorDesc() : "редактирован"));
                     System.out.println();
                 }
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл не был найден" + e.getMessage(), null));
+        } catch (PersistenceException ex) {
+            ex.printStackTrace();
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл неверного формата" + ex.getMessage(), null));
         } catch (IOException e) {
             e.printStackTrace();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
         } catch (Exception e) {
             e.printStackTrace();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
                 }
             }
         }

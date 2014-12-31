@@ -24,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,7 +75,7 @@ public class RegularPaymentEasyCheck {
     }
 
     public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractID, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext) {
+            long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext, FacesContext facesContext) {
         RequestResultEasyCheck requestResultEasyCheck = new RequestResultEasyCheck();
         try {
             Long contractId = contractID;
@@ -172,7 +175,7 @@ public class RegularPaymentEasyCheck {
     }
 
     public RequestResultEasyCheck regularPaymentEasyCheckEdit(List<Long> ids, Long contractId, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction) {
+            long paymentAmount, Session session, Transaction transaction, FacesContext facesContext) {
         RequestResultEasyCheck requestResultEasyCheck = null;
 
         try {
@@ -183,6 +186,8 @@ public class RegularPaymentEasyCheck {
             transaction.commit();
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
+        } finally {
+            HibernateUtils.close(session, logger);
         }
 
         return requestResultEasyCheck;
