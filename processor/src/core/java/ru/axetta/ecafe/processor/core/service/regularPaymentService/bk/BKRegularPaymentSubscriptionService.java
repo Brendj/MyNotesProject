@@ -40,6 +40,9 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
     @Autowired
     private RegularPaymentsRepository regularPaymentsRepository;
 
+    public void senRequestOnNotifyAction(long actionId){
+
+    }
 
     private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);

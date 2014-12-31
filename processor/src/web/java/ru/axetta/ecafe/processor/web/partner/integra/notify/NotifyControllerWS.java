@@ -41,13 +41,16 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
     private static final Logger logger = LoggerFactory.getLogger(NotifyControllerWS.class);
 
     @Override
-    public NotifyResult notify(@WebParam(name = "accountN") long accountNumber,
+    public NotifyResult notify(@WebParam(name = "accountN") Long accountNumber,
             @WebParam(name = "eventCode") int eventCode) {
         logger.warn("NotifyWS notify: " + accountNumber + " | " + eventCode);
         NotifyResult result = new NotifyResult();
-        result.resultCode = ResultConst.CODE_OK;
-        result.description = ResultConst.DESCR_OK;
+        if(accountNumber != null){
+            result.resultCode = ResultConst.CODE_OK;
+            result.description = ResultConst.DESCR_OK;
+        }
 
+        rpService.senRequestOnNotifyAction(accountNumber);
 
         return result;
     }
@@ -64,10 +67,6 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
     public List<AutoPaymentResultResponse> AsynchronousPaymentResponse(
             @WebParam(name = "opers") List<AutoPaymentResultRequest> autoPaymentResultRequestList
     ) {
-        logger.warn("NotifyWS AsynchronousPaymentResponse: "
-                + " | " + autoPaymentResultRequestList.get(0).getIdaction()
-                + " | " + autoPaymentResultRequestList.get(0).getErrorCode()
-                + " | " + autoPaymentResultRequestList.get(0).getRealAmount());
         MessageContext mc = wsContext.getMessageContext();
         HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         logger.info("Starting process BK callback from {}", req.getRemoteAddr());
@@ -152,7 +151,9 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
         }
         return result;
     }
-
+    /*
+    * Отправка запроса на оплату внутри ИСПП
+    * */
     private  OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long clientId,Long contractId, String paymentId, long realAmount)
             throws DuplicatePaymentException {
         Long contragentId = Long.valueOf((String)RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.contragentId"));

@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
@@ -51,6 +52,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1001,12 +1003,29 @@ public class Processor implements SyncProcessor,
         updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
         updateFullSyncParam(request.getIdOfOrg());
 
+        runRegularPayments(request);
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+    }
+    /*
+    * Запуск авто пополнения
+    * */
+    @Async
+     private void runRegularPayments(SyncRequest request) {
+        Boolean enabled = Boolean.valueOf(
+                (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
+        if( (enabled != null) && (enabled) ){
+            BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
+                    .getInstance()
+                    .getRegularPaymentSubscriptionService();
+            regularPaymentSubscriptionService.checkClientBalances();
+        }
+
     }
 
     /* Do process full synchronization */
@@ -1381,6 +1400,8 @@ public class Processor implements SyncProcessor,
         }
 
         Date syncEndTime = new Date();
+
+        runRegularPayments(request);
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
