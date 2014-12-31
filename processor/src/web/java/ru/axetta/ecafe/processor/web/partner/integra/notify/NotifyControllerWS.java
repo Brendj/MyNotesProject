@@ -41,14 +41,12 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
     private static final Logger logger = LoggerFactory.getLogger(NotifyControllerWS.class);
 
     @Override
-    public NotifyResult notify(@WebParam(name = "accountN") Long accountNumber,
+    public NotifyResult notify(@WebParam(name = "accountN") long accountNumber,
             @WebParam(name = "eventCode") int eventCode) {
         logger.warn("NotifyWS notify: " + accountNumber + " | " + eventCode);
         NotifyResult result = new NotifyResult();
-        if(accountNumber != null){
-            result.resultCode = ResultConst.CODE_OK;
-            result.description = ResultConst.DESCR_OK;
-        }
+        result.resultCode = ResultConst.CODE_OK;
+        result.description = ResultConst.DESCR_OK;
 
         rpService.senRequestOnNotifyAction(accountNumber);
 
@@ -65,8 +63,7 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
 
 
     public List<AutoPaymentResultResponse> AsynchronousPaymentResponse(
-            @WebParam(name = "opers") List<AutoPaymentResultRequest> autoPaymentResultRequestList
-    ) {
+            @WebParam(name = "opers") List<AutoPaymentResultRequest> autoPaymentResultRequestList) {
         MessageContext mc = wsContext.getMessageContext();
         HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         logger.info("Starting process BK callback from {}", req.getRemoteAddr());
@@ -74,8 +71,8 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
 
         try {
             for (AutoPaymentResultRequest autoPaymentResultRequest : autoPaymentResultRequestList) {
-                logger.warn("NotifyWS AsynchronousPaymentResponse: " + autoPaymentResultRequest.getErrorCode() + " | " + autoPaymentResultRequest.getIdaction()
-                        + " | " + autoPaymentResultRequest.getRealAmount());
+                logger.warn("NotifyWS AsynchronousPaymentResponse: " + autoPaymentResultRequest.getErrorCode() + " | "
+                        + autoPaymentResultRequest.getIdaction() + " | " + autoPaymentResultRequest.getRealAmount());
                 result.add(handleResultRequest(autoPaymentResultRequest, req.getRemoteAddr()));
             }
 
@@ -105,14 +102,14 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
                     } else if (payment.isSuccess()) {
                         throw new DuplicatePaymentException();
                     }
-                    OnlinePaymentProcessor.PayResponse payResponse = sendRequestToPayment(payment.getClient().getIdOfClient(),
-                            payment.getClient().getContractId(), "" + autoPaymentResultRequest.getIdaction(),
-                            autoPaymentResultRequest.getRealAmount());
+                    OnlinePaymentProcessor.PayResponse payResponse = sendRequestToPayment(
+                            payment.getClient().getIdOfClient(), payment.getClient().getContractId(),
+                            "" + autoPaymentResultRequest.getIdaction(), autoPaymentResultRequest.getRealAmount());
 
-                    if(payResponse .getResultCode() != 0){
+                    if (payResponse.getResultCode() != 0) {
                         result.setErrorCode(payResponse.getResultCode());
                         result.setErrorDesc(payResponse.getResultDescription());
-                    }else{
+                    } else {
                         rpService.finalizeRegularPayment(autoPaymentResultRequest.getIdaction(),
                                 MfrRequest.PAYMENT_SUCCESSFUL, autoPaymentResultRequest.getRealAmount(), ip);
                         result.setErrorCode(0);
@@ -151,17 +148,19 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
         }
         return result;
     }
+
     /*
     * Отправка запроса на оплату внутри ИСПП
     * */
-    private  OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long clientId,Long contractId, String paymentId, long realAmount)
-            throws DuplicatePaymentException {
-        Long contragentId = Long.valueOf((String)RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.contragentId"));
+    private OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long clientId, Long contractId, String paymentId,
+            long realAmount) throws DuplicatePaymentException {
+        Long contragentId = Long.valueOf(
+                (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.contragentId"));
 
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
-            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, contragentId, null, ClientPayment.AUTO_PAYMENT_METHOD,
-                    contractId, paymentId, null, realAmount, false);
+            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, contragentId, null,
+                    ClientPayment.AUTO_PAYMENT_METHOD, contractId, paymentId, null, realAmount, false);
         } catch (Exception e) {
             e.printStackTrace(); //todo надо обработать ошибку
         }
