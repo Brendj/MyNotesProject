@@ -3973,8 +3973,8 @@ public class MainPage implements Serializable {
         String line;
         String cvsSplitBy = ";";
 
-        long lowerLimitAmount = 100;
-        long paymentAmount = 200;
+        long lowerLimitAmount = 10000;
+        long paymentAmount = 20000;
 
         RegularPaymentEasyCheck regularPaymentEasyCheck = new RegularPaymentEasyCheck();
 
@@ -4004,7 +4004,7 @@ public class MainPage implements Serializable {
                     RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
                             regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
                                     lowerLimitAmount, paymentAmount, persistenceSession, persistenceTransaction,
-                                    runtimeContext, facesContext);
+                                    runtimeContext);
 
                     getGroupControlSubscriptionsItems()
                             .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
@@ -4016,7 +4016,7 @@ public class MainPage implements Serializable {
                             .regularPaymentEasyCheckEdit(
                                     requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
                                     Long.parseLong(separatedData[5].trim()), lowerLimitAmount, paymentAmount,
-                                    persistenceSession, persistenceTransaction, facesContext);
+                                    persistenceSession, persistenceTransaction);
 
                     getGroupControlSubscriptionsItems()
                             .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],

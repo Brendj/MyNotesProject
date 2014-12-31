@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Mfr
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
@@ -24,9 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,7 +73,7 @@ public class RegularPaymentEasyCheck {
     }
 
     public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractID, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext, FacesContext facesContext) {
+            long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext) {
         RequestResultEasyCheck requestResultEasyCheck = new RequestResultEasyCheck();
         try {
             Long contractId = contractID;
@@ -97,6 +95,8 @@ public class RegularPaymentEasyCheck {
             bs.setClient(client);
             bs.setSan(client.getSan());
             bs.setPaySystem(request.getPaySystem());
+            bs.setActive(true);
+            bs.setValidToDate(CalendarUtils.addMonth(new Date(), period));
             session.persist(bs);
             request.setBankSubscription(bs);
             session.persist(request);
@@ -168,6 +168,9 @@ public class RegularPaymentEasyCheck {
         BankSubscription bs = (BankSubscription) session.load(BankSubscription.class, bsId);
         bs.setPaymentAmount(paymentAmount);
         bs.setThresholdAmount(thresholdAmount);
+        bs.setActive(true);
+        bs.setValidToDate(CalendarUtils.addMonth(new Date(), 12));
+        ;
     }
 
     public BankSubscription findBankSubscription(Long id, Session session) {
@@ -175,7 +178,7 @@ public class RegularPaymentEasyCheck {
     }
 
     public RequestResultEasyCheck regularPaymentEasyCheckEdit(List<Long> ids, Long contractId, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction, FacesContext facesContext) {
+            long paymentAmount, Session session, Transaction transaction) {
         RequestResultEasyCheck requestResultEasyCheck = null;
 
         try {
