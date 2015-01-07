@@ -39,7 +39,7 @@ public class SyncResponse {
         public static class Item {
 
             private final long cardNo;
-            private final long cardPrintedNo;
+            private final Long cardPrintedNo;
             private final int cardType;
             private final long idOfClient;
             private final Date updateTime;
@@ -98,7 +98,7 @@ public class SyncResponse {
                 return cardNo;
             }
 
-            public long cardPrintedNo() {
+            public Long cardPrintedNo() {
                 return cardNo;
             }
 
