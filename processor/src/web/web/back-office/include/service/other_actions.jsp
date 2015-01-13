@@ -50,8 +50,17 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Запустить Автоплатеж" action="#{otherActionsPage.runRegularPayments}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                        styleClass="command-button" />
 
+    <rich:panel>
+        <h:commandButton value="Модифицировать пароли" action="#{otherActionsPage.runPasswordReplacer}"
+                         title="Заменяет все пароли == input на номер договора"
+                            styleClass="command-button" />
+        <h:inputText value="#{otherActionsPage.passwordForSearch}"/>
+        <h:commandButton value="Скачать" action="#{otherActionsPage.download}"
+                         rendered="#{otherActionsPage.downloadable}"
+                         styleClass="command-button" />
+    </rich:panel>
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

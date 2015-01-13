@@ -133,7 +133,9 @@ public class SyncResponse {
             public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
                 Element element = document.createElement("AR");
                 element.setAttribute("CardNo", Long.toString(cardNo));
-                element.setAttribute("CardPrintedNo", Long.toString(cardPrintedNo));
+                if(cardPrintedNo != null){
+                    element.setAttribute("CardPrintedNo", Long.toString(cardPrintedNo));
+                }
                 element.setAttribute("CardType", Integer.toString(cardType));
                 element.setAttribute("IdOfClient", Long.toString(idOfClient));
                 element.setAttribute("LastUpdate", timeFormat.format(updateTime));

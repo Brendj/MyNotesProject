@@ -81,7 +81,7 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
         PaymentResponse paymentResponse = new PaymentResponse();
         try {
             AsynchronousPaymentRequest asynchronousPaymentRequest = prepareForRequest(params);
-            logger.info("Request to BK:" +  asynchronousPaymentRequest);
+            logger.info("Request to BK:" +  params.get("contractId"));
             SchoolCardService schoolCardService  =  new SchoolCardService();
             SchoolCard sc = schoolCardService.getSchoolCardPort();
             asynchronousPaymentResponse = sc.asynchronousPayment(asynchronousPaymentRequest);

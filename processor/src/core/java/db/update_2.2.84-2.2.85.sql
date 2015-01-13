@@ -60,8 +60,7 @@ CREATE TABLE cf_exchangeout
 WITH (
 OIDS=FALSE
 );
-ALTER TABLE cf_exchangeout
-OWNER TO postgres;
+
 
 --! Добавление таблицы позиций исходящих заявок на обмен книгами между школьными библиотеками
 CREATE TABLE cf_exchangeoutpos
@@ -99,8 +98,7 @@ CREATE TABLE cf_exchangeoutpos
 WITH (
 OIDS=FALSE
 );
-ALTER TABLE cf_exchangeoutpos
-OWNER TO postgres;
+
 
 --! Добавление поля idofexchangein и idofexchangeout в таблицу cf_instances
 ALTER TABLE cf_instances ADD COLUMN idofexchangein bigint DEFAULT NULL;

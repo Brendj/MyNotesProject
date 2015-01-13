@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
@@ -18,12 +19,20 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Scope("session")
 public class OtherActionsPage extends BasicWorkspacePage {
+
+    private String passwordForSearch;
+    private List<Long> clientsIds = null;
 
     public void rubBIExport () throws Exception {
         RuntimeContext.getAppContext().getBean(BIDataExportService.class).run(); // DEF
@@ -133,5 +142,83 @@ public class OtherActionsPage extends BasicWorkspacePage {
     @Override
     public String getPageFilename() {
         return "service/other_actions";
+    }
+
+    public void setPasswordForSearch(String passwordForSearch) {
+        this.passwordForSearch = passwordForSearch;
+    }
+
+    public String getPasswordForSearch() {
+        return passwordForSearch;
+    }
+
+    public void runPasswordReplacer() {
+        try {
+            clientsIds = ClientService.getInstance().modifyPasswords(passwordForSearch);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void download() throws IOException {
+        if( (clientsIds == null)||(clientsIds.isEmpty())){
+            return;
+        }
+        FacesContext fc = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) fc.getExternalContext().getResponse();
+
+        response.reset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
+        //response.setContentType(contentType); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ServletContext#getMimeType() for auto-detection based on filename.
+        //response.setContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
+        response.setHeader("Content-Disposition", "attachment; filename=\"text.txt\""); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
+
+
+        // Now you can write the InputStream of the file to the above OutputStream the usual way.
+        // ...
+
+
+        // Prepare streams.
+        BufferedInputStream input = null;
+        BufferedOutputStream output = null;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Long clientsId : clientsIds) {
+            stringBuilder.append(clientsId);
+            stringBuilder.append("\n");
+        }
+        try {
+            // Open streams.
+            input = new BufferedInputStream(new ByteArrayInputStream(stringBuilder.toString().getBytes()), 10240);
+            output = new BufferedOutputStream(response.getOutputStream(), 10240);
+
+            // Write file contents to response.
+            byte[] buffer = new byte[10240];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+        } finally {
+            close(output);
+            close(input);
+            fc.responseComplete(); // Important! Otherwise JSF will attempt to render the response which obviously will fail since it's already written with a file and closed.
+
+        }
+
+    }
+    private static void close(Closeable resource) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public boolean isDownloadable() {
+        return clientsIds!=null&&!clientsIds.isEmpty();
     }
 }
