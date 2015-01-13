@@ -47,22 +47,47 @@ public class ContragentDAOService extends AbstractDAOService {
     @SuppressWarnings("unchecked")
     public ContragentCompletionItem generateReportItem(Long idOfOrg, List<Contragent> contragentList, Date startDate,
             Date endDate){
-        ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
         Org org = (Org) getSession().load(Org.class, idOfOrg);
-        Criteria criteria = getSession().createCriteria(ClientPayment.class);
-        criteria.createAlias("transaction","tr")
-                .createAlias("tr.client","cl")
+        Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
+        criteriaIsNotNull.createAlias("transaction", "tr")
+                    .add(Restrictions.isNotNull("tr.org"))
+                    .add(Restrictions.eq("tr.org", org))
+                .createAlias("tr.client", "cl")
+                .createAlias("contragent", "c")
+                    .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+
+        criteriaIsNotNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
+        List list = criteriaIsNotNull.list();
+
+        ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
+        contragentCompletionItem.setContragentPayItems(list);
+        contragentCompletionItem.setEducationalInstitutionName(org.getShortName());
+        contragentCompletionItem.setEducationalCity(org.getCity());
+        contragentCompletionItem.setEducationalLocation(org.getLocation());
+        contragentCompletionItem.setEducationalTags(org.getTag());
+        return contragentCompletionItem;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ContragentCompletionItem generateReportItemWithTransactionOrgIsNull(Long idOfOrg, List<Contragent> contragentList, Date startDate,
+            Date endDate){
+        Org org = (Org) getSession().load(Org.class, idOfOrg);
+        Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
+        criteriaIsNotNull.createAlias("transaction", "tr")
+                    .add(Restrictions.isNull("tr.org"))
+                .createAlias("tr.client", "cl")
                     .add(Restrictions.eq("cl.org", org))
                 .createAlias("contragent", "c")
                     .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteria.setProjection( Projections.projectionList()
-                .add(Projections.sum("paySum") )
-                .add(Projections.groupProperty("c.idOfContragent"))
-                .add(Projections.count("idOfClientPayment"))
-        );
-        criteria.add(Restrictions.between("createTime",startDate, endDate));
-        List list = criteria.list();
+        criteriaIsNotNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
+        List list = criteriaIsNotNull.list();
+
+        ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
         contragentCompletionItem.setContragentPayItems(list);
         contragentCompletionItem.setEducationalInstitutionName(org.getShortName());
         contragentCompletionItem.setEducationalCity(org.getCity());

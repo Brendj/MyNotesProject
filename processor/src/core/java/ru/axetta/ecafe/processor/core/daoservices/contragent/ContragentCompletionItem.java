@@ -62,7 +62,6 @@ public class ContragentCompletionItem {
     }
 
     public void addContragentPayItems(HashMap<Long, Long> contragentPayItems) {
-        totalSumByOrg = 0L;
         for (Long key: contragentPayItems.keySet()){
             this.contragentPayItems.put(key, this.contragentPayItems.get(key) + contragentPayItems.get(key));
             totalSumByOrg += this.contragentPayItems.get(key);

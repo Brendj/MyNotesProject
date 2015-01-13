@@ -27,6 +27,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.jdbc.SQLWarningException;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
@@ -59,6 +60,8 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
     private Contragent defaultSupplier;
     private Integer contragentListCount = 0;
     private Calendar localCalendar;
+
+    private Boolean transactionsWithoutOrgIsPresented = false;
 
     @Override
     public void onShow() throws Exception {
@@ -104,14 +107,35 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
                     idOfOrgs.add(org.getIdOfOrg());
                 }
             }
+            transactionsWithoutOrgIsPresented = false;
             for (Long idOrg : idOfOrgList) {
                 ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItem(idOrg,
                         contragentList, this.startDate, this.endDate);
+                ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull = contragentDAOService.generateReportItemWithTransactionOrgIsNull(idOrg,
+                        contragentList, this.startDate, this.endDate);
+                if (contragentCompletionItemWithTransactionOrgIsNull.getTotalSumByOrg() != 0L){
+                    ContragentCompletionItem resultContragentCompletionItem = new ContragentCompletionItem(contragentList);
+                    resultContragentCompletionItem.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+                    resultContragentCompletionItem.addContragentPayItems(contragentCompletionItemWithTransactionOrgIsNull.getContragentPayItems());
+                    resultContragentCompletionItem.setEducationalInstitutionName(contragentCompletionItem.getEducationalInstitutionName());
+                    resultContragentCompletionItem.setEducationalCity(contragentCompletionItem.getEducationalCity());
+                    resultContragentCompletionItem.setEducationalLocation(contragentCompletionItem.getEducationalLocation());
+                    resultContragentCompletionItem.setEducationalTags(contragentCompletionItem.getEducationalTags());
+                    resultContragentCompletionItem.appendToPaymentsCount(contragentCompletionItem.getPaymentsCount() + contragentCompletionItemWithTransactionOrgIsNull.getPaymentsCount());
+                    contragentCompletionItem = resultContragentCompletionItem;
+                    transactionsWithoutOrgIsPresented = true;
+                }
                 this.contragentCompletionItems.add(contragentCompletionItem);
                 total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
                 total.appendToPaymentsCount(contragentCompletionItem.getPaymentsCount());
             }
             this.contragentCompletionItems.add(total);
+            if (transactionsWithoutOrgIsPresented) {
+                String warningMessage =
+                        "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
+                                + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
+                printWarn(warningMessage);
+            }
         }
         return null;
     }
