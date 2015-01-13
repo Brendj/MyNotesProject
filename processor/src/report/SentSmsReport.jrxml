@@ -93,7 +93,7 @@
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<field name="uniqueId" class="java.lang.Long"/>
-	<field name="orgNum" class="java.lang.String"/>
+	<field name="orgName" class="java.lang.String"/>
 	<field name="columnId" class="java.lang.Long"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="value" class="java.lang.String"/>
@@ -129,7 +129,7 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="946f92b4-2b50-42b7-a8d0-7ff2e683877b" style="Crosstab Data Text" x="0" y="0" width="80" height="22"/>
+							<reportElement uuid="946f92b4-2b50-42b7-a8d0-7ff2e683877b" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="210" height="22"/>
 							<textElement verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -137,7 +137,7 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="uniqueId" width="80">
+				<rowGroup name="uniqueId" width="210">
 					<bucket class="java.lang.Long">
 						<bucketExpression><![CDATA[$F{uniqueId}]]></bucketExpression>
 					</bucket>
@@ -151,11 +151,11 @@
 								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
 							</textField>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="8270dbff-c129-4dcc-aece-3bb6bb6982ee" style="Crosstab Data Text" x="0" y="0" width="80" height="22"/>
+								<reportElement uuid="8270dbff-c129-4dcc-aece-3bb6bb6982ee" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="210" height="22"/>
 								<textElement verticalAlignment="Middle">
 									<font size="10"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{orgName}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -170,7 +170,7 @@
 					<crosstabColumnHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="72" height="22"/>
+								<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="85" height="22"/>
 								<textElement verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -182,8 +182,8 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="orgNum" class="java.lang.String">
-					<measureExpression><![CDATA[$F{orgNum}]]></measureExpression>
+				<measure name="orgName" class="java.lang.String">
+					<measureExpression><![CDATA[$F{orgName}]]></measureExpression>
 				</measure>
 				<measure name="date" class="java.lang.String">
 					<measureExpression><![CDATA[$F{date}]]></measureExpression>
@@ -191,13 +191,13 @@
 				<measure name="value" class="java.lang.String">
 					<measureExpression><![CDATA[$F{value}]]></measureExpression>
 				</measure>
-				<crosstabCell width="72" height="22">
+				<crosstabCell width="85" height="22">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="72" height="22"/>
+							<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="85" height="22"/>
 							<textElement verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{value}]]></textFieldExpression>
 						</textField>

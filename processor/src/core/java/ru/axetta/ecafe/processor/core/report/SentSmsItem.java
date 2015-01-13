@@ -17,24 +17,24 @@ import java.util.Map;
 public class SentSmsItem implements Serializable {
     private Long uniqueId;
     private Long columnId;
-    private String orgNum;
+    private String orgName;
     private String date;
     private Long ts;
     private String value;
 
-    public SentSmsItem(Long uniqueId, String orgNum, String date, Long ts, String value) {
+    public SentSmsItem(Long uniqueId, String orgName, String date, Long ts, String value) {
         this.uniqueId = uniqueId;
         this.columnId = null;
-        this.orgNum = orgNum;
+        this.orgName = orgName;
         this.date = date;
         this.ts = ts;
         this.value = value;
     }
 
-    public SentSmsItem(Long uniqueId, Long columnId, String orgNum, String date, Long ts, String value) {
+    public SentSmsItem(Long uniqueId, Long columnId, String orgName, String date, Long ts, String value) {
         this.uniqueId = uniqueId;
         this.columnId = columnId;
-        this.orgNum = orgNum;
+        this.orgName = orgName;
         this.date = date;
         this.ts = ts;
         this.value = value;
@@ -56,12 +56,12 @@ public class SentSmsItem implements Serializable {
         this.columnId = columnId;
     }
 
-    public String getOrgNum() {
-        return orgNum;
+    public String getOrgName() {
+        return orgName;
     }
 
-    public void setOrgNum(String orgNum) {
-        this.orgNum = orgNum;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     public String getDate() {

@@ -162,7 +162,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
                 String org = (String) e[0];
-                String orgNum = (String) e[1];
+                String orgName = (String) e[0];
                 long date = ((Double) e[2]).longValue();
                 int value = ((BigInteger) e[3]).intValue();
 
@@ -182,7 +182,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
                 }
 
                 result.add(
-                        new SentSmsItem(uniqueId, orgNum, YEAR_DATE_FORMAT.format(target), target.getTime(), "" + value));
+                        new SentSmsItem(uniqueId, orgName, YEAR_DATE_FORMAT.format(target), target.getTime(), "" + value));
             }
 
             long columnId = 0;
