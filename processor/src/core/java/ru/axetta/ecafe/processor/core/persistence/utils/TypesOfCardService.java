@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TypesOfCardService extends AbstractDAOService {
 
-    public List<String> districtNames() {
+    public List<String> loadDistrictNames() {
         List<String> result;
         Query query = getSession().createSQLQuery(
                 "SELECT district FROM cf_orgs WHERE district IN (SELECT district FROM cf_orgs GROUP BY district) GROUP BY district");
@@ -61,7 +61,22 @@ public class TypesOfCardService extends AbstractDAOService {
         query.setParameter("startDate", starDate.getTime());
         query.setParameter("cardState", cardState);
 
-        Long result = ((BigInteger) query.uniqueResult() ).longValue() ;
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    // Сбор статистики по имени Округа например: САО, ЮВАО.
+    public Long getStatByDistrictName(String districtName, String cardType, Integer cardState, Date startDate) {
+        Query query = getSession().createSQLQuery(
+                "SELECT count(cfc.idofclient) FROM cf_cards cfc left join cf_clients cl on cfc.idofclient = cl.idofclient "
+                        + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg where cfc.cardtype in (" + cardType
+                        + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.lastupdate >= :startDate");
+        query.setString("districtName", districtName);
+        query.setInteger("cardState", cardState);
+        query.setLong("startDate", startDate.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
 
         return result;
     }

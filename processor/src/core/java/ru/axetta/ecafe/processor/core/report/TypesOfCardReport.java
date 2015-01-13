@@ -13,16 +13,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
-import ru.axetta.ecafe.processor.core.persistence.xmlreport.DailyFormationOfRegistries;
-import ru.axetta.ecafe.processor.core.persistence.xmlreport.XmlReportGenerator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -55,7 +51,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
     @Override
     public BasicReportJob.Builder createBuilder(String templateFilename) {
-        String subReportDir =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         return new Builder(templateFilename, subReportDir);
     }
 
@@ -93,7 +89,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             return new TypesOfCardReport(generateTime, generateDuration, jasperPrint, startTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Calendar calendar, Map<String, Object> parameterMap) throws Exception {
+        private JRDataSource createDataSource(Session session, Date startTime, Calendar calendar,
+                Map<String, Object> parameterMap) throws Exception {
             List<TypesOfCardReportItem> result = new ArrayList<TypesOfCardReportItem>();
 
             int ac = Card.ACTIVE_STATE; // активная карта
@@ -102,32 +99,54 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             TypesOfCardService service = new TypesOfCardService();
             service.setSession(session);
 
-            String withOutSummaryByDistrictParam = (String) getReportProperties().get(PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS);
+            String withOutSummaryByDistrictParam = (String) getReportProperties()
+                    .get(PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS);
             boolean withOutSummaryByDistrict = false;
-            if (withOutSummaryByDistrictParam!=null) {
+            if (withOutSummaryByDistrictParam != null) {
                 withOutSummaryByDistrict = withOutSummaryByDistrictParam.trim().equalsIgnoreCase("true");
             }
 
-            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+            List<String> districtNames = service.loadDistrictNames();
+
+            for (String district : districtNames) {
+                Long stateServAct = service.getStatByDistrictName(district, "0", ac, startTime);
+                Long stateServActNot = service.getStatByDistrictName(district, "0", lc, startTime);
+
+                Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime);
+                Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime);
+
+                Long stateOthAct = service.getStatByDistrictName(district, "1,2,4", ac, startTime);
+                Long stateOthActNot = service.getStatByDistrictName(district, "1,2,4", lc, startTime);
+
+                Long sumStateAct = stateServAct + stateScuAct + stateOthAct;
+                Long sumStateNot = stateServActNot + stateScuActNot + stateOthActNot;
+
+                TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem(district, stateServAct, stateServActNot, stateScuAct, stateOthActNot, stateOthAct, stateOthActNot, sumStateAct, sumStateNot);
+                result.add(typesOfCardReportItem);
+            }
+
+/*            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
 
             TypesOfCardSubreportItem typesOfCardSubreportItem1 = new TypesOfCardSubreportItem("ГОУ ЦО № 2010",
-                    "109382, г. Москва, ул. Белореченская, д. 8 -- 109382, г. Москва, ул. Верхние поля, д.15, к.3",
-                   0L,0L,0L,0L,0L,0L,0L,0L);
+                    "109382, г. Москва, ул. Белореченская, д. 8 -- 109382, г. Москва, ул. Верхние поля, д.15, к.3", 0L,
+                    0L, 0L, 0L, 0L, 0L, 0L, 0L);
             TypesOfCardSubreportItem typesOfCardSubreportItem2 = new TypesOfCardSubreportItem("ГОУ СОШ № 1716",
-                    "109451, г. Москва, ул. Верхние поля, д. 40, к.2", 0L,0L,0L,0L,0L,0L,0L,0L);
+                    "109451, г. Москва, ул. Верхние поля, д. 40, к.2", 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
 
             List<TypesOfCardSubreportItem> typesOfCardSubreportItems = new ArrayList<TypesOfCardSubreportItem>();
             typesOfCardSubreportItems.add(typesOfCardSubreportItem1);
             typesOfCardSubreportItems.add(typesOfCardSubreportItem2);
 
-            TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem("САО",0L,0L,0L,0L,0L,0L,0L,0L);
-            TypesOfCardReportItem typesOfCardReportItem1 = new TypesOfCardReportItem("ЮВАО",10L,20L,30L,40L,50L,60L,70L,80L);
+            TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem("САО", 0L, 0L, 0L, 0L, 0L, 0L, 0L,
+                    0L);
+            TypesOfCardReportItem typesOfCardReportItem1 = new TypesOfCardReportItem("ЮВАО", 10L, 20L, 30L, 40L, 50L,
+                    60L, 70L, 80L);
 
             typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
             typesOfCardReportItem1.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
 
             result.add(typesOfCardReportItem);
-            result.add(typesOfCardReportItem1);
+            result.add(typesOfCardReportItem1);*/
 
             return new JRBeanCollectionDataSource(result);
         }
