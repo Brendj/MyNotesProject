@@ -39,6 +39,7 @@ public class ContragentCompletionItem {
             i++;
         }
         totalSumByOrg = 0L;
+        paymentsCount = 0;
     }
 
     public void setContragentPayItems(List list){
@@ -64,7 +65,7 @@ public class ContragentCompletionItem {
         totalSumByOrg = 0L;
         for (Long key: contragentPayItems.keySet()){
             this.contragentPayItems.put(key, this.contragentPayItems.get(key) + contragentPayItems.get(key));
-            totalSumByOrg += this.contragentPayItems.get(key) + contragentPayItems.get(key);
+            totalSumByOrg += this.contragentPayItems.get(key);
         }
     }
 
@@ -106,5 +107,9 @@ public class ContragentCompletionItem {
 
     public int getPaymentsCount() {
         return paymentsCount;
+    }
+
+    public void appendToPaymentsCount(int surplus) {
+        this.paymentsCount += surplus;
     }
 }

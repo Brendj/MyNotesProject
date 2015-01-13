@@ -98,19 +98,18 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
 
         if (!orgItems.isEmpty()) {
             ContragentCompletionItem total = new ContragentCompletionItem(contragentList);
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                for (Long idOrg : idOfOrgList) {
-                    ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(idOrg, contragentList, this.startDate, this.endDate);
-                    this.contragentCompletionItems.add(contragentCompletionItem);
-                    total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
-                }
-            } else {
+            List<Long> idOfOrgs = new ArrayList<Long>();
+            if (CollectionUtils.isEmpty(idOfOrgList)) {
                 for (Org org : orgItems) {
-                    ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(org.getIdOfOrg(), contragentList, this.startDate,
-                            this.endDate);
-                    this.contragentCompletionItems.add(contragentCompletionItem);
-                    total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+                    idOfOrgs.add(org.getIdOfOrg());
                 }
+            }
+            for (Long idOrg : idOfOrgList) {
+                ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItem(idOrg,
+                        contragentList, this.startDate, this.endDate);
+                this.contragentCompletionItems.add(contragentCompletionItem);
+                total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+                total.appendToPaymentsCount(contragentCompletionItem.getPaymentsCount());
             }
             this.contragentCompletionItems.add(total);
         }

@@ -110,7 +110,7 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                 }
             }
 
-            List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateContragentCompletionReportItems(idOfOrgList, contragent.getIdOfContragent(), startTime, endTime);
+            List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateReportItems(idOfOrgList, contragent.getIdOfContragent(), startTime, endTime);
             list.addAll(contragentCompletionReportItems);
             return new JRBeanCollectionDataSource(list);
         }
