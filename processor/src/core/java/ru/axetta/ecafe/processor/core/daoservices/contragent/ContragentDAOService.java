@@ -8,22 +8,12 @@ import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.BigDecimalType;
-import org.hibernate.type.LongType;
-import org.hibernate.type.Type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -46,18 +36,20 @@ public class ContragentDAOService extends AbstractDAOService {
 
     @SuppressWarnings("unchecked")
     public ContragentCompletionItem generateReportItem(Long idOfOrg, List<Contragent> contragentList, Date startDate,
-            Date endDate){
+            Date endDate) {
         Org org = (Org) getSession().load(Org.class, idOfOrg);
         Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
         criteriaIsNotNull.createAlias("transaction", "tr")
-                    .add(Restrictions.isNotNull("tr.org"))
-                    .add(Restrictions.eq("tr.org", org))
+                .add(Restrictions.isNotNull("tr.org"))
+                .add(Restrictions.eq("tr.org", org))
                 .createAlias("tr.client", "cl")
                 .createAlias("contragent", "c")
-                    .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+                .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteriaIsNotNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
-                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        criteriaIsNotNull.setProjection(Projections.projectionList()
+                .add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent"))
+                .add(Projections.count("idOfClientPayment")));
         criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
         List list = criteriaIsNotNull.list();
 
@@ -71,19 +63,21 @@ public class ContragentDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public ContragentCompletionItem generateReportItemWithTransactionOrgIsNull(Long idOfOrg, List<Contragent> contragentList, Date startDate,
-            Date endDate){
+    public ContragentCompletionItem generateReportItemWithTransactionOrgIsNull(Long idOfOrg,
+            List<Contragent> contragentList, Date startDate, Date endDate) {
         Org org = (Org) getSession().load(Org.class, idOfOrg);
         Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
         criteriaIsNotNull.createAlias("transaction", "tr")
-                    .add(Restrictions.isNull("tr.org"))
+                .add(Restrictions.isNull("tr.org"))
                 .createAlias("tr.client", "cl")
-                    .add(Restrictions.eq("cl.org", org))
+                .add(Restrictions.eq("cl.org", org))
                 .createAlias("contragent", "c")
-                    .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+                .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteriaIsNotNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
-                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        criteriaIsNotNull.setProjection(Projections.projectionList()
+                .add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent"))
+                .add(Projections.count("idOfClientPayment")));
         criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
         List list = criteriaIsNotNull.list();
 
@@ -97,15 +91,21 @@ public class ContragentDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ContragentCompletionReportItem> generateReportItems(List<Long> idOfOrgList, Long idOfContragent, Date startDate, Date endDate){
+    public List<ContragentCompletionReportItem> generateReportItems(List<Long> idOfOrgList, Date startDate,
+            Date endDate) {
         List<ContragentCompletionItem> contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
 
         ContragentCompletionItem total = new ContragentCompletionItem(getPayAgentContragent());
 
         for (Long idOrg : idOfOrgList) {
-            ContragentCompletionItem contragentCompletionItem = generateReportItem(idOrg, getPayAgentContragent(), startDate, endDate);
+            ContragentCompletionItem contragentCompletionItem = generateReportItem(idOrg, getPayAgentContragent(),
+                    startDate, endDate);
+            ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull = generateReportItemWithTransactionOrgIsNull(
+                    idOrg, getPayAgentContragent(), startDate, endDate);
             contragentCompletionItems.add(contragentCompletionItem);
+            contragentCompletionItems.add(contragentCompletionItemWithTransactionOrgIsNull);
             total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+            total.addContragentPayItems(contragentCompletionItemWithTransactionOrgIsNull.getContragentPayItems());
         }
         contragentCompletionItems.add(total);
 
@@ -115,9 +115,9 @@ public class ContragentDAOService extends AbstractDAOService {
                 String educationalInstitutionName = contragentCompletionItem.getEducationalInstitutionName();
                 String contragentName = contragent.getContragentName();
                 Long paySum = contragentCompletionItem.getContragentPayValue(contragent.getIdOfContragent());
-                if ((paySum > 0) && (contragentName != null)) {
+                if ((paySum > 0) && (contragentName != null) && (educationalInstitutionName != null)) {
                     ContragentCompletionReportItem contragentCompletionReportItem = new ContragentCompletionReportItem(
-                            educationalInstitutionName, contragentName, paySum);
+                            contragentName, educationalInstitutionName, paySum);
                     contragentCompletionReportItems.add(contragentCompletionReportItem);
                 }
             }
