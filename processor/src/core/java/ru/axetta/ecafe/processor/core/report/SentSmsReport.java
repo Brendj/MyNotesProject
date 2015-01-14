@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -55,6 +54,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
     private Date endDate;
     private String htmlReport;
 
+    private static List<Long> idOfOrgList;
 
     public List<SentSmsItem> getItems() {
         return items;
@@ -129,22 +129,23 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
         public List<SentSmsItem> findSentSms(Session session, Date start, Date end) {
             List<SentSmsItem> result = new ArrayList<SentSmsItem>();
             String orgRestrict = "";
-            if (org != null) {
-                orgRestrict = " and cf_orgs.idoforg=" + org.getIdOfOrg() + " ";
+            String orgIds = "";
+            if (idOfOrgList.size() > 0) {
+                orgRestrict = " and cf_orgs.idoforg in (";
+                for (int i = 0; i < idOfOrgList.size() - 1; i++) {
+                    orgIds = orgIds + idOfOrgList.get(i) + ", ";
+                }
+                orgIds = orgIds + idOfOrgList.get(idOfOrgList.size() - 1);
+                orgRestrict = orgRestrict + orgIds + ")";
             }
-            String sql =
-                      "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) "
-                    + "from ("
-                        + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
-                        + "from CF_ClientSms "
-                        + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
-                        + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
-                        + "where servicesenddate >= :startDate and "
-                        + "      servicesenddate <= :endDate and "
-                        + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
-                        + ") as sms_data "
-                    + "group by sms_data.d, sms_data.org order by 1";
+            String sql = "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) " + "from ("
+                    + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
+                    + "from CF_ClientSms " + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
+                    + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " + "where servicesenddate >= :startDate and "
+                    + "      servicesenddate <= :endDate and "
+                    + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
+                    + ") as sms_data " + "group by sms_data.d, sms_data.org order by 1";
             Query query = session.createSQLQuery(sql);
             query.setLong("startDate", start.getTime());
             query.setLong("endDate", end.getTime());
@@ -152,13 +153,13 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
             query.setInteger("sendStatus", ClientSms.SEND_TO_RECIPENT);
             query.setInteger("deliveredStatus", ClientSms.DELIVERED_TO_RECIPENT);
             List res = query.list();
-            
+
             Date target = new Date();
             Calendar cal = new GregorianCalendar();
             String prevOrg = "";
             long uniqueId = 0;
             Set<Long> dates = new TreeSet<Long>();
-            
+
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
                 String org = (String) e[0];
@@ -166,7 +167,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
                 long date = ((Double) e[2]).longValue();
                 int value = ((BigInteger) e[3]).intValue();
 
-                if(!dates.contains(date)) {
+                if (!dates.contains(date)) {
                     dates.add(date);
                 }
                 cal.setTimeInMillis(date);
@@ -181,15 +182,15 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
                     prevOrg = org;
                 }
 
-                result.add(
-                        new SentSmsItem(uniqueId, orgName, YEAR_DATE_FORMAT.format(target), target.getTime(), "" + value));
+                result.add(new SentSmsItem(uniqueId, orgName, YEAR_DATE_FORMAT.format(target), target.getTime(),
+                        "" + value));
             }
 
             long columnId = 0;
-            for(Long d : dates) {
+            for (Long d : dates) {
                 columnId++;
-                for(SentSmsItem i : result) {
-                    if(i.getTs().equals(d)) {
+                for (SentSmsItem i : result) {
+                    if (i.getTs().equals(d)) {
                         i.setColumnId(columnId);
                     }
                 }
@@ -297,5 +298,13 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
         public String getName() {
             return name;
         }
+    }
+
+    public void setIdOfOrgList(List<Long> idOfOrgList) {
+        this.idOfOrgList = idOfOrgList;
+    }
+
+    public List<Long> getIdOfOrgList() {
+        return idOfOrgList;
     }
 }

@@ -10,11 +10,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
 import ru.axetta.ecafe.processor.core.report.SentSmsReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -34,6 +30,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +42,7 @@ import java.util.GregorianCalendar;
 @Component
 @Scope(value = "session")
 public class SentSmsReportPage extends OnlineReportPage {
+
     @PersistenceContext(unitName = "reportsPU")
     public EntityManager entityManager;
     private final static Logger logger = LoggerFactory.getLogger(SentSmsReportPage.class);
@@ -58,7 +56,7 @@ public class SentSmsReportPage extends OnlineReportPage {
         return report;
     }
 
-    public void buildReport () throws Exception {
+    public void buildReport() throws Exception {
         RuntimeContext.getAppContext().getBean(SentSmsReportPage.class).execute();
     }
 
@@ -74,19 +72,23 @@ public class SentSmsReportPage extends OnlineReportPage {
     }
 
     public void buildReport(Session session) throws Exception {
-        this.report = new SentSmsReport ();
+        this.report = new SentSmsReport();
         SentSmsReport.Builder reportBuilder = new SentSmsReport.Builder();
-        if (idOfOrg != null) {
+
+        List<Long> idOfOrgList = getIdOfOrgList();
+
+        /*if (idOfOrgList.size() > 0) {
             Org org = null;
-            if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
+            for (Long orgId : idOfOrgList) {
+                org = DAOService.getInstance().findOrById(orgId);
+                reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             }
-            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
-        }
-        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+        }*/
+        this.report.setIdOfOrgList(idOfOrgList);
+        this.report = reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
     }
 
-    public void showXLS(ActionEvent actionEvent){
+    public void showXLS(ActionEvent actionEvent) {
         RuntimeContext.getAppContext().getBean(SentSmsReportPage.class).doBuidXLS();
     }
 
@@ -107,7 +109,8 @@ public class SentSmsReportPage extends OnlineReportPage {
         Transaction persistenceTransaction = null;
         try {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-            String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SentSmsReport.class.getSimpleName() + ".jasper";
+            String templateFilename =
+                    autoReportGenerator.getReportsTemplateFilePath() + SentSmsReport.class.getSimpleName() + ".jasper";
             SentSmsReport.Builder builder = new SentSmsReport.Builder(templateFilename);
             SentSmsReport sentSmsReport = builder.build(session, startDate, endDate, new GregorianCalendar());
 
@@ -134,8 +137,8 @@ public class SentSmsReportPage extends OnlineReportPage {
             servletOutputStream.close();
 
         } catch (JRException fnfe) {
-            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
-            logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
+            String message = (fnfe.getCause() == null ? fnfe.getMessage() : fnfe.getCause().getMessage());
+            logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message), fnfe);
         } catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
             facesContext.addMessage(null,
