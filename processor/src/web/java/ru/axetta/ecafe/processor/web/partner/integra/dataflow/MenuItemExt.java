@@ -47,6 +47,8 @@ public class MenuItemExt {
     protected Long price;
     @XmlAttribute(name = "Calories")
     protected Double calories;
+    @XmlAttribute(name = "Output")
+    protected String output;
     @XmlAttribute(name = "VitB1")
     protected Double vitB1;
     @XmlAttribute(name = "VitC")
@@ -112,6 +114,30 @@ public class MenuItemExt {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the output property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public String getOutput() {
+        return output;
+    }
+
+    /**
+     * Sets the value of the output property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setOutput(String value) {
+        this.output = value;
     }
 
     /**

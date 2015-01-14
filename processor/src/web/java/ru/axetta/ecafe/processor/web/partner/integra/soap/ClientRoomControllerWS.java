@@ -2133,6 +2133,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinP(menuDetail.getMinP());
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 
@@ -2306,6 +2307,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinP(menuDetail.getMinP());
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
@@ -2402,6 +2404,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinP(menuDetail.getMinP());
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
@@ -2472,6 +2475,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinP(menuDetail.getMinP());
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 
