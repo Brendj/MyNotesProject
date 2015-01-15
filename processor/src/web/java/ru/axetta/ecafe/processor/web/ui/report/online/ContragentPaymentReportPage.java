@@ -18,7 +18,6 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -37,7 +36,9 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -270,7 +271,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         }
         if (contragentFilter.getContragent().getIdOfContragent() == null
                 || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
-            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
+            printError("Не выбран 'Агент по приему платежей' и 'Контарагент-получатель'");
         }
         return false;
     }
@@ -303,6 +304,13 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+
+        if (builder.isTransactionsWithoutOrgIsPresented()) {
+            String warningMessage =
+                    "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
+                            + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
+            printWarn(warningMessage);
         }
 
         if (report != null) {

@@ -5,7 +5,10 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
@@ -15,12 +18,11 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,12 +251,24 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             }
         }
 
+        private Boolean transactionsWithoutOrgIsPresented = false;
+
         private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
                 Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
+
+            List<Org> orgList =  new ArrayList<Org>();
+            for (Long idOfOrg : idOfOrgList) {
+                Org localOrg = (Org) session.load(Org.class, idOfOrg);
+                orgList.add(localOrg);
+            }
+
+            // Принадлежность транзакции какой-либо организации берем из таблицы транзакций
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
             if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                clientPaymentCriteria.createCriteria("transaction").createCriteria("client").createCriteria("org")
-                        .add(Restrictions.in("idOfOrg", idOfOrgList));
+                clientPaymentCriteria.createCriteria("transaction")
+                        .add(Restrictions.in("org", orgList))
+                        .createCriteria("client")
+                        .createCriteria("org");
             }
             if (contragentReceiver!=null) {
                 clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
@@ -266,6 +280,27 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
             HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");
             List clientPayments = clientPaymentCriteria.list();
+
+            // Принадлежность транзакции получаем через клиента совершившего платеж
+            Criteria clientPaymentCriteriaWithTransactionOrgIsNull = session.createCriteria(ClientPayment.class);
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                clientPaymentCriteriaWithTransactionOrgIsNull.createCriteria("transaction")
+                        .add(Restrictions.isNull("org"))
+                        .createCriteria("client")
+                        .createCriteria("org")
+                        .add(Restrictions.in("idOfOrg", idOfOrgList));
+            }
+            if (contragentReceiver!=null) {
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragentReceiver", contragentReceiver));
+            }
+            if (contragent !=null) {
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragent", contragent));
+            }
+            clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.between("createTime", startTime, endTime));
+            clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+            HibernateUtils.addAscOrder(clientPaymentCriteriaWithTransactionOrgIsNull, "createTime");
+            List clientPaymentsWithTransactionOrgIsNull = clientPaymentCriteriaWithTransactionOrgIsNull.list();
+
             totalSum = 0;
             List<ClientPaymentRow> clientPaymentItems = new LinkedList<ClientPaymentRow>();
             for (Object currObject : clientPayments) {
@@ -274,8 +309,21 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 clientPaymentItems.add(newClientPaymentItem);
                 totalSum += newClientPaymentItem.paySum;
             }
+            if (clientPaymentsWithTransactionOrgIsNull.size() > 0) {
+                transactionsWithoutOrgIsPresented = true;
+                for (Object currObject : clientPaymentsWithTransactionOrgIsNull) {
+                    ClientPayment currClientPayment = (ClientPayment) currObject;
+                    ClientPaymentRow newClientPaymentItem = new ClientPaymentRow(currClientPayment);
+                    clientPaymentItems.add(newClientPaymentItem);
+                    totalSum += newClientPaymentItem.paySum;
+                }
+            }
             parameterMap.put("totalSum", (float) totalSum / 100);
             return new JRBeanCollectionDataSource(clientPaymentItems);
+        }
+
+        public Boolean isTransactionsWithoutOrgIsPresented() {
+            return transactionsWithoutOrgIsPresented;
         }
     }
 
