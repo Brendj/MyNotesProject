@@ -42,7 +42,7 @@
         <h:selectOneMenu value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientGroupId}"
                          styleClass="input-text">
             <f:selectItems value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientGroupItems}" />
-            <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
+            <a4j:support event="onchange" reRender="clientBalanceByDayReportPanelGrid" />
         </h:selectOneMenu>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="3">
