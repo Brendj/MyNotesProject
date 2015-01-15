@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="typesOfCardReport" pageWidth="1240" pageHeight="842" columnWidth="1200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2618c0b2-68a3-472d-b832-de6de3dbb845">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="typesOfCardReport" pageWidth="1240" pageHeight="30000" columnWidth="1200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2618c0b2-68a3-472d-b832-de6de3dbb845">
 	<property name="ireport.zoom" value="1.6105100000000019"/>
-	<property name="ireport.x" value="2"/>
+	<property name="ireport.x" value="819"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -11,12 +11,36 @@
 	<field name="servActCount" class="java.lang.Long"/>
 	<field name="servBlockCount" class="java.lang.Long"/>
 	<field name="skuActCount" class="java.lang.Long"/>
+	<field name="skuBlockCount" class="java.lang.Long"/>
 	<field name="othActCount" class="java.lang.Long"/>
 	<field name="othBlockCount" class="java.lang.Long"/>
 	<field name="allActCount" class="java.lang.Long"/>
 	<field name="allBlockCount" class="java.lang.Long"/>
 	<field name="typesOfCardSubeportItems" class="java.util.List"/>
-	<variable name="variable1" class="java.lang.String"/>
+	<variable name="servActContByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{servActCount}]]></variableExpression>
+	</variable>
+	<variable name="servBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{servBlockCount}]]></variableExpression>
+	</variable>
+	<variable name="skuActCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{skuActCount}]]></variableExpression>
+	</variable>
+	<variable name="skuBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{skuBlockCount}]]></variableExpression>
+	</variable>
+	<variable name="othActCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{othActCount}]]></variableExpression>
+	</variable>
+	<variable name="othBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{othBlockCount}]]></variableExpression>
+	</variable>
+	<variable name="allActCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{allActCount}]]></variableExpression>
+	</variable>
+	<variable name="allBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{allBlockCount}]]></variableExpression>
+	</variable>
 	<title>
 		<band height="40" splitType="Stretch">
 			<textField>
@@ -215,7 +239,7 @@
 	<detail>
 		<band height="60" splitType="Stretch">
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="400" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="400" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -227,7 +251,7 @@
 				<textFieldExpression><![CDATA[$F{servActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="500" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="500" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -239,7 +263,7 @@
 				<textFieldExpression><![CDATA[$F{servBlockCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="600" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="600" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -251,7 +275,7 @@
 				<textFieldExpression><![CDATA[$F{skuActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="700" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="700" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -260,10 +284,10 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{servBlockCount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{skuBlockCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="800" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="800" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -275,7 +299,7 @@
 				<textFieldExpression><![CDATA[$F{othActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" x="900" y="0" width="100" height="30"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="900" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -287,7 +311,7 @@
 				<textFieldExpression><![CDATA[$F{othBlockCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="8ca7a24a-fcfd-4f8f-9cb3-cbed2a326583" x="0" y="0" width="400" height="30"/>
+				<reportElement uuid="8ca7a24a-fcfd-4f8f-9cb3-cbed2a326583" mode="Opaque" x="0" y="0" width="400" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -295,11 +319,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="ab4ea2a1-4004-4810-a691-5ab9fce1b6a7" x="1000" y="0" width="100" height="30"/>
+				<reportElement uuid="ab4ea2a1-4004-4810-a691-5ab9fce1b6a7" mode="Opaque" x="1000" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -311,7 +337,7 @@
 				<textFieldExpression><![CDATA[$F{allActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0e554b23-1746-40c3-807b-b13081cf0bce" x="1100" y="0" width="100" height="30"/>
+				<reportElement uuid="0e554b23-1746-40c3-807b-b13081cf0bce" mode="Opaque" x="1100" y="0" width="100" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -332,7 +358,21 @@
 	<summary>
 		<band height="20" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="77903dfd-4942-4687-beab-41eb150f6732" x="0" y="0" width="400" height="20"/>
+				<reportElement uuid="77903dfd-4942-4687-beab-41eb150f6732" mode="Opaque" x="0" y="0" width="400" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Итого]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="872fe6d9-4d86-4682-a326-79f71f7132a0" mode="Opaque" x="400" y="0" width="100" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -341,8 +381,92 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Итого]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$V{servActContByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4ea01468-d4b3-4579-9eb4-b52da3457fd5" mode="Opaque" x="500" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{servBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="251d5970-a8e7-4a5f-85bc-73e84cab864f" mode="Opaque" x="600" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{skuActCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dfd61c75-9d50-4541-903d-5d20d10a150d" mode="Opaque" x="700" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{skuBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9b81953b-33f1-49aa-ae19-bef3c4a96029" mode="Opaque" x="800" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{othActCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0f764402-c229-46d9-80c7-ba2304734106" mode="Opaque" x="900" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{othBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7c57f8b2-9dff-4caa-b874-dfb1cde2d119" mode="Opaque" x="1000" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{allActCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a7de74b7-6e01-4d74-9933-3b23a053dde3" mode="Opaque" x="1100" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{allBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

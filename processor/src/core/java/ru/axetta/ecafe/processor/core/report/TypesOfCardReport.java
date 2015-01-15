@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardReportItem;
 import ru.axetta.ecafe.processor.core.card.TypesOfCardSubreportItem;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -20,9 +21,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -109,8 +108,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             List<String> districtNames = service.loadDistrictNames();
 
             for (String district : districtNames) {
-                Long stateServAct = service.getStatByDistrictName(district, "0", ac, startTime);
-                Long stateServActNot = service.getStatByDistrictName(district, "0", lc, startTime);
+                Long stateServiceAct = service.getStatByDistrictName(district, "0", ac, startTime);
+                Long stateServiceActNot = service.getStatByDistrictName(district, "0", lc, startTime);
 
                 Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime);
                 Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime);
@@ -118,35 +117,44 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                 Long stateOthAct = service.getStatByDistrictName(district, "1,2,4", ac, startTime);
                 Long stateOthActNot = service.getStatByDistrictName(district, "1,2,4", lc, startTime);
 
-                Long sumStateAct = stateServAct + stateScuAct + stateOthAct;
-                Long sumStateNot = stateServActNot + stateScuActNot + stateOthActNot;
+                Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct;
+                Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot;
 
-                TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem(district, stateServAct, stateServActNot, stateScuAct, stateOthActNot, stateOthAct, stateOthActNot, sumStateAct, sumStateNot);
+                TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem(district, stateServiceAct,
+                        stateServiceActNot, stateScuAct, stateOthActNot, stateOthAct, stateOthActNot, sumStateAct,
+                        sumStateNot);
+
+                if (!withOutSummaryByDistrict) {
+                    //Лист по орг.
+                    List<TypesOfCardSubreportItem> typesOfCardSubreportItemList = new ArrayList<TypesOfCardSubreportItem>();
+
+                    List<Long> idListByDistrict = service.getAllOrgsByDistrictName(district);
+
+                    for (Long idByDistrict : idListByDistrict) {
+                        Org org = (Org) session.load(Org.class, idByDistrict);
+                        Long stateServiceActSub = service.getStatByOrgId(idByDistrict, "0", ac, startTime);
+                        Long stateServiceActNotSub = service.getStatByOrgId(idByDistrict, "0", lc, startTime);
+
+                        Long stateScuActSub = service.getStatByOrgId(idByDistrict, "3", ac, startTime);
+                        Long stateScuActNotSub = service.getStatByOrgId(idByDistrict, "3", lc, startTime);
+
+                        Long stateOthActSub = service.getStatByOrgId(idByDistrict, "1,2,4", ac, startTime);
+                        Long stateOthActNotSub = service.getStatByOrgId(idByDistrict, "1,2,4", lc, startTime);
+
+                        Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub;
+                        Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub;
+
+
+                        TypesOfCardSubreportItem typesOfCardSubreportItem = new TypesOfCardSubreportItem(org.getShortName(), org.getAddress(), stateServiceActSub,
+                                stateServiceActNotSub, stateScuActSub, stateOthActNotSub, stateOthActSub, stateOthActNotSub, sumStateActSub,
+                                sumStateNotSub);
+                        typesOfCardSubreportItemList.add(typesOfCardSubreportItem);
+                    }
+                    //установка листа по округу
+                    typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItemList);
+                }
                 result.add(typesOfCardReportItem);
             }
-
-/*            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-
-            TypesOfCardSubreportItem typesOfCardSubreportItem1 = new TypesOfCardSubreportItem("ГОУ ЦО № 2010",
-                    "109382, г. Москва, ул. Белореченская, д. 8 -- 109382, г. Москва, ул. Верхние поля, д.15, к.3", 0L,
-                    0L, 0L, 0L, 0L, 0L, 0L, 0L);
-            TypesOfCardSubreportItem typesOfCardSubreportItem2 = new TypesOfCardSubreportItem("ГОУ СОШ № 1716",
-                    "109451, г. Москва, ул. Верхние поля, д. 40, к.2", 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
-
-            List<TypesOfCardSubreportItem> typesOfCardSubreportItems = new ArrayList<TypesOfCardSubreportItem>();
-            typesOfCardSubreportItems.add(typesOfCardSubreportItem1);
-            typesOfCardSubreportItems.add(typesOfCardSubreportItem2);
-
-            TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem("САО", 0L, 0L, 0L, 0L, 0L, 0L, 0L,
-                    0L);
-            TypesOfCardReportItem typesOfCardReportItem1 = new TypesOfCardReportItem("ЮВАО", 10L, 20L, 30L, 40L, 50L,
-                    60L, 70L, 80L);
-
-            typesOfCardReportItem.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
-            typesOfCardReportItem1.setTypesOfCardSubeportItems(typesOfCardSubreportItems);
-
-            result.add(typesOfCardReportItem);
-            result.add(typesOfCardReportItem1);*/
 
             return new JRBeanCollectionDataSource(result);
         }

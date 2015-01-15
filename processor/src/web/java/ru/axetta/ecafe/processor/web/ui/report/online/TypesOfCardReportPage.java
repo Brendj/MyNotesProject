@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.client.ClientListPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -41,7 +40,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private TypesOfCardReport report;
 
-    private final boolean includeSummaryByDistrict = false;
+    private Boolean includeSummaryByDistrict = false;
 
     private String htmlReport = null;
 
@@ -160,8 +159,13 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         return new Date();
     }
 
-    public boolean isIncludeSummaryByDistrict() {
+    public Boolean getIncludeSummaryByDistrict() {
         return includeSummaryByDistrict;
+    }
+
+    public void setIncludeSummaryByDistrict(Boolean includeSummaryByDistrict) {
+        htmlReport = null;
+        this.includeSummaryByDistrict = includeSummaryByDistrict;
     }
 
     public String getHtmlReport() {
@@ -184,6 +188,9 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private Properties buildProperties() {
         Properties properties = new Properties();
+        if(includeSummaryByDistrict) {
+            properties.setProperty(TypesOfCardReport.PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS, includeSummaryByDistrict.toString());
+        }
         return properties;
     }
 }

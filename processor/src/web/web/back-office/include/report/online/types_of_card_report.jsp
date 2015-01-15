@@ -29,8 +29,10 @@
             <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeSummaryByDistrict}" readonly="true"
-                                 styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeSummaryByDistrict}"
+                                 styleClass="output-text">
+            <a4j:support event="onchanged" reRender="typesOfCardReportPanel" />
+        </h:selectBooleanCheckbox>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.typesOfCardReportPage.buildReportHTML}"
                            reRender="typesOfCardReportPanel" styleClass="command-button"
                            status="reportGenerateStatus" />
