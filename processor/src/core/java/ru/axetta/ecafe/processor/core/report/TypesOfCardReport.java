@@ -115,7 +115,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             String groupRestrict = "";
             String groupIds = "";
 
-            if (!clientGroup.equals(ClientGroupMenu.CLIENT_ALL)) {
+            if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
                 if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS)) {
                     List<Long> clientGroupIdsList = ClientGroupMenu.getNotStudent();
                     groupRestrict = " and cfcl.idofclientgroup not in (";
