@@ -23,9 +23,8 @@
         <rich:calendar value="#{mainPage.typesOfCardReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText escape="true" value="Группа" styleClass="output-text" />
-        <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientGroupId}"
-                         styleClass="input-text">
-            <f:selectItems value="#{mainPage.clientListPage.clientFilter.clientGroupItems}" />
+        <h:selectOneMenu value="#{mainPage.typesOfCardReportPage.clientFilter.clientGroupId}" styleClass="input-text">
+            <f:selectItems value="#{mainPage.typesOfCardReportPage.clientFilter.clientGroupItems}" />
             <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />

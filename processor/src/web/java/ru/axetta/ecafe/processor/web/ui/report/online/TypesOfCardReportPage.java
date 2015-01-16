@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -38,18 +40,14 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(TypesOfCardReportPage.class);
 
-    private TypesOfCardReport report;
-
     private Boolean includeSummaryByDistrict = false;
 
     private String htmlReport = null;
 
+    private final ClientFilter clientFilter = new ClientFilter();
+
     public String getPageFilename() {
         return "report/online/types_of_card_report";
-    }
-
-    public TypesOfCardReport getReport() {
-        return report;
     }
 
     public Object buildReportHTML() {
@@ -172,6 +170,10 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         return htmlReport;
     }
 
+    public ClientFilter getClientFilter() {
+        return clientFilter;
+    }
+
     public void onShow() throws Exception {
     }
 
@@ -188,9 +190,24 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private Properties buildProperties() {
         Properties properties = new Properties();
-        if(includeSummaryByDistrict) {
-            properties.setProperty(TypesOfCardReport.PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS, includeSummaryByDistrict.toString());
+        if (includeSummaryByDistrict) {
+            properties.setProperty(TypesOfCardReport.PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS,
+                    includeSummaryByDistrict.toString());
         }
+
+        if (clientFilter.getClientGroupId() != null) {
+            properties.setProperty(TypesOfCardReport.PARAM_CLIENT_GROUP, clientFilter.getClientGroupId().toString());
+        }
+
+        String groupName = "";
+        for (Map.Entry<String, Long> entry : clientFilter.getClientGroupItems().entrySet()) {
+            if (entry.getValue().equals(clientFilter.getClientGroupId())) {
+                groupName = entry.getKey();
+            }
+        }
+
+        properties.setProperty(TypesOfCardReport.PARAM_GROUP_NAME, groupName);
+
         return properties;
     }
 }
