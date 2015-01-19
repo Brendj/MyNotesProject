@@ -100,8 +100,8 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер акт о наличии расхождений" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{wayBill.actOfWayBillDifference.number}" action="#{actOfWayBillDifferencePositionListPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{wayBill.actOfWayBillDifference.number}" target="#{actOfWayBillDifferencePositionListPage.filter.number}" />
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{wayBill.actOfWayBillDiffwrenceNumber}" action="#{actOfWayBillDifferencePositionListPage.show}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{wayBill.actOfWayBillDiffwrenceNumber}" target="#{actOfWayBillDifferencePositionListPage.filter.number}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header" sortBy="#{wayBill.orgOwner.idOfOrg}">

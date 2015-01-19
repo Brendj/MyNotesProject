@@ -30,6 +30,7 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
     private Org shipperOrg;
     private Org receiverOrg;
     private ActOfWayBillDifference actOfWayBillDifference;
+    private String actOfWayBillDiffwrenceNumber;
 
     private Org orgOwner;
     private String deletedState;
@@ -51,6 +52,9 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
         actOfWayBillDifference = entity.getActOfWayBillDifference();
         if(entity.getOrgOwner()!=null){
             orgOwner = entityManager.find(Org.class, entity.getOrgOwner());
+        }
+        if (entity.getNumber() !=null) {
+            actOfWayBillDiffwrenceNumber = entity.getNumber();
         }
         if (entity.getDeletedState()){
             deletedState = "Удалено";
@@ -103,6 +107,14 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
 
     public ActOfWayBillDifference getActOfWayBillDifference() {
         return actOfWayBillDifference;
+    }
+
+    public String getActOfWayBillDiffwrenceNumber() {
+        return actOfWayBillDiffwrenceNumber;
+    }
+
+    public void setActOfWayBillDiffwrenceNumber(String actOfWayBillDiffwrenceNumber) {
+        this.actOfWayBillDiffwrenceNumber = actOfWayBillDiffwrenceNumber;
     }
 
     public Org getOrgOwner() {
