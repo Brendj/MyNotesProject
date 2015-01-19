@@ -1017,21 +1017,17 @@ public class Processor implements SyncProcessor,
     * */
     @Async
      private void runRegularPayments(SyncRequest request) {
-        logger.error("runRegularPayments run");
-
         Boolean enabled = Boolean.valueOf(
                 (String) RuntimeContext.getInstance
                         ().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
         if( (enabled != null) && (enabled) ){
-            logger.error("runRegularPayments enter");
-
+            logger.info("runRegularPayments run");
             BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
                     .getInstance()
                     .getRegularPaymentSubscriptionService();
             regularPaymentSubscriptionService.checkClientBalances();
+            logger.info("runRegularPayments stop");
         }
-        logger.error("runRegularPayments stop");
-
     }
 
     /* Do process full synchronization */
