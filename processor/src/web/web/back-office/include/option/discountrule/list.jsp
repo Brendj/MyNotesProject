@@ -72,7 +72,7 @@
             <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
         </rich:column>
         <rich:column>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.entity}" target="#{ruleEditPage.entity}" />
             </a4j:commandLink>
