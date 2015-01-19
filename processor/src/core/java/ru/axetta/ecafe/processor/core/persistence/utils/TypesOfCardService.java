@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.report.TypesOfCardOrgItem;
 
 import org.hibernate.Query;
 
@@ -61,17 +62,25 @@ public class TypesOfCardService extends AbstractDAOService {
         return result;
     }
 
-    public List<Long> getAllOrgsByDistrictName(String districtName) {
-        List<Long> resultList = new ArrayList<Long>();
+    public List<TypesOfCardOrgItem> getAllOrgsByDistrictName(String districtName) {
+        List<TypesOfCardOrgItem> resultList = new ArrayList<TypesOfCardOrgItem>();
+
         Query query = getSession().createSQLQuery(
-                "SELECT idoforg FROM cf_orgs WHERE district LIKE :districtName ORDER BY substring(shortname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)')");
+                "SELECT idoforg, shortname, address FROM cf_orgs WHERE district LIKE :districtName ORDER BY substring(shortname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)')");
         query.setString("districtName", districtName);
 
         List result = query.list();
 
         for (Object res : result) {
-            BigInteger resItem = (BigInteger) res;
-            resultList.add(resItem.longValue());
+            Object[] resItem = (Object[]) res;
+
+            Long idOfOrg = ((BigInteger) resItem[0]).longValue();
+            String shortName = (String) resItem[1];
+            String address = (String) resItem[2];
+
+            TypesOfCardOrgItem typesOfCardOrgItem = new TypesOfCardOrgItem(idOfOrg, shortName, address);
+
+            resultList.add(typesOfCardOrgItem);
         }
 
         return resultList;

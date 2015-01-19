@@ -2,7 +2,7 @@
  * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.card;
+package ru.axetta.ecafe.processor.core.report;
 
 /**
  * Created with IntelliJ IDEA.

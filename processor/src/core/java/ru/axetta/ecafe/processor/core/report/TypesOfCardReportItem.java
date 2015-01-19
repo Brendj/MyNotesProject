@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.core.card;
+package ru.axetta.ecafe.processor.core.report;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ public class TypesOfCardReportItem {
 
     private List<TypesOfCardSubreportItem> typesOfCardSubeportItems;
 
-    public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount,
-            Long skuActCount, Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount) {
+    public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount, Long skuActCount,
+            Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount) {
         this.region = region;
         this.servActCount = servActCount;
         this.servBlockCount = servBlockCount;
