@@ -188,7 +188,7 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
-            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
+            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.orgSync.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
             if (idOfOrg != null) {
                 queryText += " AND org.idOfOrg = :idOfOrg";
             }
@@ -624,8 +624,8 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         try {
             String queryText =
-                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.lastSuccessfulBalanceSync, "
-                            + "org.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
+                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.orgSync.lastSuccessfulBalanceSync, "
+                            + "org.orgSync.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
                             + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
@@ -777,7 +777,7 @@ public class DashboardServiceBean {
     public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
         DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
         ///// получение данных по сихронизации
-        TypedQuery<Org> query = entityManager.createQuery("from Org where state<>0 order by lastSuccessfulBalanceSync ", Org.class);
+        TypedQuery<Org> query = entityManager.createQuery("from Org where state<>0 order by orgSync.lastSuccessfulBalanceSync ", Org.class);
         List<Org> orgs = query.getResultList();
         LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -789,8 +789,8 @@ public class DashboardServiceBean {
             Query q = entityManager.createNativeQuery("select count(idoforg) from cf_synchistory_exceptions where idoforg=:idoforg");
             q.setParameter("idoforg", org.getIdOfOrg());
             Long synchErrorsCount = ((BigInteger) q.getSingleResult()).longValue();
-            items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
-                    org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion(),
+            items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getOrgSync().getLastSuccessfulBalanceSync(),
+                    org.getOrgSync().getLastUnSuccessfulBalanceSync(),org.getOrgSync().getRemoteAddress(), org.getOrgSync().getClientVersion(),
                     synchErrorsCount, org.getDistrict()));
 
         }

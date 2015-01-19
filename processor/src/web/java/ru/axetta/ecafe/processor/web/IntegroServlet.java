@@ -155,7 +155,7 @@ public class IntegroServlet extends HttpServlet {
 
                 try {
                     SyncHistory syncHistory = runtimeContext.getProcessor().createSyncHistory(org.getIdOfOrg(),
-                            org.getIdOfPacket(), new Date(), "1C", request.getRemoteAddr());
+                            org.getOrgSync().getIdOfPacket(), new Date(), "1C", request.getRemoteAddr());
                     manager.setSyncHistory(syncHistory);
                     manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
                 } catch (Exception e) {

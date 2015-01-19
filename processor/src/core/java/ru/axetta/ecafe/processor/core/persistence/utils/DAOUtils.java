@@ -1418,7 +1418,7 @@ public class DAOUtils {
 
     public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession,Long idOfOrg, String clientVersion,
             String remoteAddress) {
-        Query query = persistenceSession.createQuery("update Org set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
+        Query query = persistenceSession.createQuery("update OrgSync set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
         query.setParameter("idOfOrg", idOfOrg);

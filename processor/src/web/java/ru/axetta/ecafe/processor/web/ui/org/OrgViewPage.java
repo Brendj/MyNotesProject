@@ -140,7 +140,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.state = org.getState();
         this.cardLimit = org.getCardLimit();
         this.publicKey = org.getPublicKey();
-        this.idOfPacket = org.getIdOfPacket();
+        this.idOfPacket = org.getOrgSync().getIdOfPacket();
         this.smsSender = org.getSmsSender();
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();

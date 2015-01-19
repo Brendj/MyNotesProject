@@ -488,14 +488,14 @@ public class DAOService {
     }
 
     public void updateLastSuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update OrgSync set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
 
     public void updateLastUnsuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update OrgSync set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -510,7 +510,7 @@ public class DAOService {
         if (excludeDisabled) {
             disabledClause = " where state<>0 ";
         }
-        TypedQuery<Org> query = entityManager.createQuery("from Org " + disabledClause + " order by lastSuccessfulBalanceSync", Org.class);
+        TypedQuery<Org> query = entityManager.createQuery("from Org " + disabledClause + " order by orgSync.lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 

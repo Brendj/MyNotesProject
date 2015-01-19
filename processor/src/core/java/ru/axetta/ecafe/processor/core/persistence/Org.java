@@ -54,7 +54,8 @@ public class Org implements Serializable {
     private Integer state;
     private Long cardLimit;
     private String publicKey;
-    private Long idOfPacket;
+    //@Deprecated
+    //private Long idOfPacket;
     private Long lastClientContractId;
     private String cypheredSsoPassword;
     private String smsSender;
@@ -80,8 +81,10 @@ public class Org implements Serializable {
     private ConfigurationProvider configurationProvider;
     private String guid;
     private Contract contract;
-    private Date lastSuccessfulBalanceSync;
-    private Date lastUnSuccessfulBalanceSync;
+    //@Deprecated
+    //private Date lastSuccessfulBalanceSync;
+    //@Deprecated
+    //private Date lastUnSuccessfulBalanceSync;
     private Set<Org> friendlyOrg;
     private Boolean mainBuilding;
     private String tag;
@@ -92,8 +95,10 @@ public class Org implements Serializable {
     private String latitude;
     private Integer refectoryType;
     private Set<Questionary> questionaries = new HashSet<Questionary>();
-    private String clientVersion;
-    private String remoteAddress;
+    //@Deprecated
+    //private String clientVersion;
+    //@Deprecated
+    //private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
     private Boolean usePlanOrders;
@@ -108,6 +113,8 @@ public class Org implements Serializable {
     private String introductionQueue;
     private Long additionalIdBuilding;
     private String statusDetailing;
+    private OrgSync orgSync;
+
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -124,7 +131,7 @@ public class Org implements Serializable {
         this.state = state;
         this.cardLimit = cardLimit;
         this.publicKey = publicKey;
-        this.idOfPacket = 0L;
+        //this.idOfPacket = 0L;
         this.lastClientContractId = 0L;
         this.priceOfSms = priceOfSms;
         this.subscriptionPrice = subscriptionPrice;
@@ -147,6 +154,10 @@ public class Org implements Serializable {
         this.introductionQueue = introductionQueue;
         this.additionalIdBuilding = additionalIdBuilding;
         this.statusDetailing = statusDetailing;
+        this.orgSync = new OrgSync();
+        this.orgSync.setIdOfPacket(0L);
+        this.orgSync.setOrg(this);
+
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -217,22 +228,22 @@ public class Org implements Serializable {
     public void setClientMigration(Set<ClientMigration> clientMigration) {
         this.clientMigration = clientMigration;
     }
-
-    public String getRemoteAddress() {
-        return remoteAddress;
-    }
-
-    public void setRemoteAddress(String remoteAddress) {
-        this.remoteAddress = remoteAddress;
-    }
-
-    public String getClientVersion() {
-        return clientVersion;
-    }
-
-    public void setClientVersion(String clientVersion) {
-        this.clientVersion = clientVersion;
-    }
+    //@Deprecated
+    //public String getRemoteAddress() {
+    //    return remoteAddress;
+    //}
+    //@Deprecated
+    //public void setRemoteAddress(String remoteAddress) {
+    //    this.remoteAddress = remoteAddress;
+    //}
+    //@Deprecated
+    //public String getClientVersion() {
+    //    return clientVersion;
+    //}
+    //@Deprecated
+    //public void setClientVersion(String clientVersion) {
+    //    this.clientVersion = clientVersion;
+    //}
 
     public Set<Questionary> getQuestionaries() {
         return questionaries;
@@ -451,13 +462,15 @@ public class Org implements Serializable {
         this.publicKey = publicKey;
     }
 
-    public Long getIdOfPacket() {
-        return idOfPacket;
-    }
-
-    public void setIdOfPacket(Long idOfPacket) {
-        this.idOfPacket = idOfPacket;
-    }
+    //@Deprecated
+    //public Long getIdOfPacket() {
+    //    return idOfPacket;
+    //}
+    //
+    //@Deprecated
+    //public void setIdOfPacket(Long idOfPacket) {
+    //    this.idOfPacket = idOfPacket;
+    //}
 
     public Long getLastClientContractId() {
         return lastClientContractId;
@@ -547,22 +560,22 @@ public class Org implements Serializable {
     public void setPriceOfSms(Long priceOfSms) {
         this.priceOfSms = priceOfSms;
     }
-
-    public Date getLastSuccessfulBalanceSync() {
-        return lastSuccessfulBalanceSync;
-    }
-
-    public void setLastSuccessfulBalanceSync(Date lastSuccessfulBalanceSync) {
-        this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
-    }
-
-    public Date getLastUnSuccessfulBalanceSync() {
-        return lastUnSuccessfulBalanceSync;
-    }
-
-    public void setLastUnSuccessfulBalanceSync(Date lastUnSuccessfulBalanceSync) {
-        this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
-    }
+    //@Deprecated
+    //public Date getLastSuccessfulBalanceSync() {
+    //    return lastSuccessfulBalanceSync;
+    //}
+    //@Deprecated
+    //public void setLastSuccessfulBalanceSync(Date lastSuccessfulBalanceSync) {
+    //    this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
+    //}
+    //@Deprecated
+    //public Date getLastUnSuccessfulBalanceSync() {
+    //    return lastUnSuccessfulBalanceSync;
+    //}
+    //@Deprecated
+    //public void setLastUnSuccessfulBalanceSync(Date lastUnSuccessfulBalanceSync) {
+    //    this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
+    //}
 
     public Set<SyncHistory> getSyncHistoriesInternal() {
         // For Hibernate only
@@ -814,6 +827,14 @@ public class Org implements Serializable {
         this.statusDetailing = statusDetailing;
     }
 
+    public OrgSync getOrgSync() {
+        return orgSync;
+    }
+
+    public void setOrgSync(OrgSync orgSync) {
+        this.orgSync = orgSync;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -837,7 +858,7 @@ public class Org implements Serializable {
                 + ", officialName='" + officialName + '\'' + ", address='" + address + '\'' + ", phone='" + phone + '\''
                 + ", officialPerson=" + officialPerson + ", officialPosition='" + officialPosition + '\''
                 + ", contractId='" + contractId + '\'' + ", contractTime=" + contractTime + ", state=" + state
-                + ", cardLimit=" + cardLimit + ", publicKey='" + publicKey + '\'' + ", idOfPacket=" + idOfPacket
+                + ", cardLimit=" + cardLimit + ", publicKey='" + publicKey + '\''// + ", idOfPacket=" + idOfPacket
                 + ", lastClientContractId=" + lastClientContractId + ", cypheredSsoPassword='" + cypheredSsoPassword
                 + '\'' + ", smsSender='" + smsSender + '\'' + ", priceOfSms=" + priceOfSms + ", subscriptionPrice="
                 + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +'}';

@@ -23,7 +23,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -418,7 +417,7 @@ public class ReportDAOService {
 
 
     public void updateLastSuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update Org set orgSync.lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -426,7 +425,7 @@ public class ReportDAOService {
 
 
     public void updateLastUnsuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update Org set orgSync.lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -434,7 +433,7 @@ public class ReportDAOService {
 
 
     public List<Org> getOrderedSynchOrgsList() {
-        TypedQuery<Org> query = entityManager.createQuery("from Org order by lastSuccessfulBalanceSync", Org.class);
+        TypedQuery<Org> query = entityManager.createQuery("from Org order by orgSync.lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 

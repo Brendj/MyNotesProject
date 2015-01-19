@@ -3581,8 +3581,9 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org organization = getOrgReference(persistenceSession, idOfOrg);
-            Long result = organization.getIdOfPacket();
-            organization.setIdOfPacket(result + 1);
+            Long result = organization.getOrgSync().getIdOfPacket();
+            organization.getOrgSync().setIdOfPacket(++result);
+            //organization.setIdOfPacket(result + 1);
             persistenceSession.update(organization);
             persistenceSession.flush();
             persistenceTransaction.commit();

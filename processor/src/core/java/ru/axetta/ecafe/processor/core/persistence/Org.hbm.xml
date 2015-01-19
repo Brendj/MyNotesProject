@@ -35,7 +35,7 @@
         </property>-->
         <property name="cardLimit" column="CardLimit" type="long" not-null="true"/>
         <property name="publicKey" column="PublicKey" type="string" length="1024" not-null="true"/>
-        <property name="idOfPacket" column="IdOfPacket" type="long" not-null="true"/>
+        <!--<property name="idOfPacket" column="IdOfPacket" type="long" not-null="true"/>-->
         <property name="lastClientContractId" column="LastClientContractId" type="long" not-null="true"/>
         <property name="cypheredSsoPassword" column="SSOPassword" type="string" length="128"/>
         <property name="smsSender" column="SmsSender" type="string" length="32"/>
@@ -49,9 +49,9 @@
         <property name="mailingListReports1" column="mailingListReports1" type="string" length="1024"/>
         <property name="mailingListReports2" column="mailingListReports2" type="string" length="1024"/>
         <property name="guid" column="guid" type="string" length="40" unique="true" not-null="false"/>
-        <property name="lastSuccessfulBalanceSync" column="lastSucBalanceSync"
-                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true"/>
+        <!--<property name="lastSuccessfulBalanceSync" column="lastSucBalanceSync"-->
+                  <!--type="ru.axetta.ecafe.processor.core.persistence.DateType"-->
+                  <!--not-null="true"/>-->
         <property name="tag" column="Tag" type="string" length="256" not-null="false"/>
         <property name="city" column="City" type="string" length="128" unique="true" not-null="false"/>
         <property name="district" column="District" type="string" length="128" unique="true" not-null="false"/>
@@ -59,12 +59,12 @@
         <property name="longitude" column="Longitude" type="string" length="12" unique="true" not-null="false"/>
         <property name="latitude" column="Latitude" type="string" length="12" unique="true" not-null="false"/>
 
-        <property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>
-        <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
+        <!--<property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>-->
+        <!--<property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>-->
 
-        <property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync"
-                  type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true"/>
+        <!--<property name="lastUnSuccessfulBalanceSync" column="lastUnSucBalanceSync"-->
+                  <!--type="ru.axetta.ecafe.processor.core.persistence.DateType"-->
+                  <!--not-null="true"/>-->
 
         <property name="fullSyncParam" column="FullSyncParam"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"
@@ -190,6 +190,8 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientMigration"/>
         </set>
+
+        <one-to-one name="orgSync" class="ru.axetta.ecafe.processor.core.persistence.OrgSync" cascade="all"/>
 
     </class>
 </hibernate-mapping>
