@@ -407,6 +407,18 @@ public class FinancialOpsManager {
         session.update(accountTransactionOnBeneficiary);
     }
 
+    @Transactional
+    public boolean defaultSupplierEqual(Client from, Client to) {
+        Session session = (Session) em.getDelegate();
+        Org orgFrom = (Org) session.load(Org.class, from.getOrg().getIdOfOrg());
+        Org orgTo = (Org) session.load(Org.class, to.getOrg().getIdOfOrg());
+
+        Contragent contragentFrom = (Contragent) session.load(Contragent.class, orgFrom.getDefaultSupplier().getIdOfContragent());
+        Contragent contragentTo = (Contragent) session.load(Contragent.class, orgTo.getDefaultSupplier().getIdOfContragent());
+
+        return contragentFrom.getIdOfContragent().equals(contragentTo.getIdOfContragent());
+    }
+
     //TODO: добавить изменение текущих позиций
     @Transactional
     public void createAccountRefund(Client client, Long sum, String reason, User createdBy) throws Exception {

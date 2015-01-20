@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -144,13 +145,15 @@ public class ClientBalanceTransferPage extends BasicWorkspacePage implements Cli
             printError("Не указан плательщик");
         } else if (toClient == null) {
             printError("Не указан получатель");
+        } else if (!RuntimeContext.getFinancialOpsManager().defaultSupplierEqual(fromClient, toClient)) {
+            printError("Операция не может быть проведена, так как организацию получателя обслуживает другой поставщик");
         } else if (sum == null) {
             printError("Не указана сумма");
         } else if (reason == null || reason.length() == 0) {
             printError("Не указана причина");
         } else if (sum <= 0) {
             printError("Сумма должна быть больше нуля");
-        } else if (fromClientBalance<sum) {
+        } else if (fromClientBalance < sum) {
             printError("Недостаточно средств на лицевом счете плательщика");
         } else {
             try {
