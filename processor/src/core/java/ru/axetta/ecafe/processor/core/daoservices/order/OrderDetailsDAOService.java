@@ -36,14 +36,21 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     @SuppressWarnings("unchecked")
     public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, String fullname, boolean includeActDiscrepancies) {
-        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
-                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
-                "   and orderdetail.idoforder = cforder.idoforder" +
-                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and" +
-                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
-                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
+        // todo привести к единому виду способ отнесения заказа к льготной или платной группе
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and good.fullname like '"+fullname+"' "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,5,6) or (cforder.ordertype=8"
                 + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
@@ -151,24 +158,24 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
     public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime){
-        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
         String sql = "select distinct good.globalId as globalId, "
-                //+ " good.pathPart3 as pathPart3, good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, "
-                + " good.parts as parts, "
-                + " good.fullName as fullName "
+                + "     good.parts as parts, "
+                + "     good.fullName as fullName "
                 + " from OrderDetail details "
-                + " left join details.good good left join details.order ord left join ord.org o "
-                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
-                + " ord.createTime between :startDate and :endDate and "
-                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
+                + "     left join details.good good "
+                + "     left join details.order ord "
+                + "     left join ord.org o "
+                + " where ord.state=0 "
+                + "     and details.state=0 "
+                + "     and ord.orderType in :orderType "
+                + "     and details.good is not null "
+                + "     and o.idOfOrg=:idOfOrg "
+                + "     and ord.createTime between :startDate and :endDate "
+                + "     and details.menuType >= :mintype "
+                + "     and details.menuType <=:maxtype "
+                + " order by fullName";
         Query query = getSession().createQuery(sql);
-        query.setParameterList("orderType",orderTypeEnumTypeSet);
+        query.setParameterList("orderType",getReducedPaymentOrderTypesWithDailySample());
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
@@ -176,6 +183,15 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime);
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
+    }
+
+    private Set<OrderTypeEnumType> getReducedPaymentOrderTypesWithDailySample() {
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
+        return orderTypeEnumTypeSet;
     }
 
     /* получаем список всех товаров для платного питания */
