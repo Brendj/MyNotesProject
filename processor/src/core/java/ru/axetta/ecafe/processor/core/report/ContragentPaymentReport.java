@@ -264,18 +264,16 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
             // Принадлежность транзакции какой-либо организации берем из таблицы транзакций
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                clientPaymentCriteria.createCriteria("transaction")
-                        .add(Restrictions.in("org", orgList))
-                        .createCriteria("client")
-                        .createCriteria("org");
-            }
-            if (contragentReceiver!=null) {
+            clientPaymentCriteria.createAlias("transaction", "t");
+            clientPaymentCriteria.add(Restrictions.isNotNull("t.org"));
+            if (!CollectionUtils.isEmpty(idOfOrgList))
+                clientPaymentCriteria.add(Restrictions.in("t.org", orgList));
+            clientPaymentCriteria.createAlias("transaction.client", "cl");
+            clientPaymentCriteria.createAlias("transaction.client.org", "o");
+            if (contragentReceiver!=null)
                 clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
-            }
-            if (contragent !=null) {
+            if (contragent !=null)
                 clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
-            }
             clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
             HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");
@@ -283,19 +281,16 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
             // Принадлежность транзакции получаем через клиента совершившего платеж
             Criteria clientPaymentCriteriaWithTransactionOrgIsNull = session.createCriteria(ClientPayment.class);
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                clientPaymentCriteriaWithTransactionOrgIsNull.createCriteria("transaction")
-                        .add(Restrictions.isNull("org"))
-                        .createCriteria("client")
-                        .createCriteria("org")
-                        .add(Restrictions.in("idOfOrg", idOfOrgList));
-            }
-            if (contragentReceiver!=null) {
+            clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction", "t");
+            clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.isNull("t.org"));
+            clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client", "cl");
+            clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client.org", "o");
+            if (!CollectionUtils.isEmpty(idOfOrgList))
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("transaction.client.org.idOfOrg", idOfOrgList));
+            if (contragentReceiver!=null)
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragentReceiver", contragentReceiver));
-            }
-            if (contragent !=null) {
+            if (contragent !=null)
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragent", contragent));
-            }
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
             HibernateUtils.addAscOrder(clientPaymentCriteriaWithTransactionOrgIsNull, "createTime");
