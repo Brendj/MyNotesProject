@@ -33,7 +33,7 @@ public class TypesOfCardService extends AbstractDAOService {
                         + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
                         + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                         + "WHERE cfo.idoforg = :idOfOrg AND cfc.cardtype IN(" + cardType
-                        + ") AND cfc.state IN(:cardState) AND cfc.createddate >= :startDate " + groupRestrict);
+                        + ") AND cfc.state IN(:cardState) AND cfc.createddate <= :startDate " + groupRestrict);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", starDate.getTime());
         query.setParameter("cardState", cardState);
@@ -51,7 +51,7 @@ public class TypesOfCardService extends AbstractDAOService {
                         + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
                         + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                         + "where cfc.cardtype in (" + cardType
-                        + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate >= :startDate "
+                        + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate "
                         + groupRestrict);
         query.setString("districtName", districtName);
         query.setInteger("cardState", cardState);
