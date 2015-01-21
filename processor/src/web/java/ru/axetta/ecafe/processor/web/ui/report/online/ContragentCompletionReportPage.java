@@ -27,7 +27,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.SQLWarningException;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
@@ -101,10 +100,9 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
 
         if (!orgItems.isEmpty()) {
             ContragentCompletionItem total = new ContragentCompletionItem(contragentList);
-            List<Long> idOfOrgs = new ArrayList<Long>();
             if (CollectionUtils.isEmpty(idOfOrgList)) {
                 for (Org org : orgItems) {
-                    idOfOrgs.add(org.getIdOfOrg());
+                    idOfOrgList.add(org.getIdOfOrg());
                 }
             }
             transactionsWithoutOrgIsPresented = false;
