@@ -286,7 +286,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client", "cl");
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client.org", "o");
             if (!CollectionUtils.isEmpty(idOfOrgList))
-                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("transaction.client.org.idOfOrg", idOfOrgList));
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("o.idOfOrg", idOfOrgList));
             if (contragentReceiver!=null)
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragentReceiver", contragentReceiver));
             if (contragent !=null)

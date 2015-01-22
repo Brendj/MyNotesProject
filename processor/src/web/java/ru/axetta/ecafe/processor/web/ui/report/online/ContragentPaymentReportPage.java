@@ -306,12 +306,12 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
             HibernateUtils.close(persistenceSession, logger);
         }
 
-        if (builder.isTransactionsWithoutOrgIsPresented()) {
-            String warningMessage =
-                    "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
-                            + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
-            printWarn(warningMessage);
-        }
+        //if (builder.isTransactionsWithoutOrgIsPresented()) {
+        //    String warningMessage =
+        //            "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
+        //                    + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
+        //    printWarn(warningMessage);
+        //}
 
         if (report != null) {
             try {
