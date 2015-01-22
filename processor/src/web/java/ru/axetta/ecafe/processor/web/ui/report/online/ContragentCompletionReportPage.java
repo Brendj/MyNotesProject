@@ -128,12 +128,12 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
                 total.appendToPaymentsCount(contragentCompletionItem.getPaymentsCount());
             }
             this.contragentCompletionItems.add(total);
-            if (transactionsWithoutOrgIsPresented) {
-                String warningMessage =
-                        "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
-                                + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
-                printWarn(warningMessage);
-            }
+            //if (transactionsWithoutOrgIsPresented) {
+            //    String warningMessage =
+            //            "Внимание! Если в организации есть клиенты перемещенные с других организаций данные представленные в отчете могут быть некорректны. "
+            //                    + "В наборе данных полученных на выбранный диапазон дат имеются транзакции для которых не указана организация.";
+            //    printWarn(warningMessage);
+            //}
         }
         return null;
     }

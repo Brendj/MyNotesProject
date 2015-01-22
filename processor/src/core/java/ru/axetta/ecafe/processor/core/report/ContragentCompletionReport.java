@@ -106,6 +106,7 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                                     contragentList.get(i).getContragentName(), org.getShortName(), 0L);
                             list.add(contragentCompletionReportItem);
                         }
+                        idOfOrgList.add(org.getIdOfOrg());
                     }
                 }
             }
