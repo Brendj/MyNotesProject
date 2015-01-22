@@ -2203,7 +2203,7 @@ public class Processor implements SyncProcessor,
                 }
 
                 if (clientGroup != null) {
-                    if(!client.getClientGroup().getCompositeIdOfClientGroup().equals(clientGroup.getCompositeIdOfClientGroup())){
+                    if(!clientGroup.getCompositeIdOfClientGroup().equals(client.getClientGroup().getCompositeIdOfClientGroup())){
                         ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
                         migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);
                         migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());

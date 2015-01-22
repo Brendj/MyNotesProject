@@ -10,7 +10,7 @@ CREATE TABLE cf_orgs_sync
   idoforg bigint NOT NULL,
   version bigint NOT NULL,
 
-  idofpacket bigint NOT NULL,
+  idofpacket bigint,
 
   lastsucbalancesync bigint,
   lastunsucbalancesync bigint,
@@ -31,7 +31,7 @@ OIDS=FALSE
 
 insert into cf_orgs_sync
 (idoforg, version, IdOfPacket,lastSucBalanceSync,ClientVersion,RemoteAddress,lastUnSucBalanceSync )
-  select  idoforg, 0,  IdOfPacket,lastSucBalanceSync,ClientVersion,RemoteAddress,lastUnSucBalanceSync
+  select  idoforg, version,  IdOfPacket,lastSucBalanceSync,ClientVersion,RemoteAddress,lastUnSucBalanceSync
   from cf_orgs;
 
 alter table cf_orgs drop column IdOfPacket
