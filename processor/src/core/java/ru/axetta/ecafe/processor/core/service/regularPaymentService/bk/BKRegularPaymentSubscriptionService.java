@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService.bk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.BankSubscritpionDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.regularpayments.RegularPaymentsRepository;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
@@ -39,6 +41,9 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
 
     @Autowired
     private RegularPaymentsRepository regularPaymentsRepository;
+
+    @Autowired
+    private BankSubscritpionDao bankSubscritpionDao;
 
     public void senRequestOnNotifyAction(long actionId){
 
@@ -63,8 +68,7 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
     public AsynchronousPaymentRequest prepareForRequest( Map<String, String> params) {
         AsynchronousPaymentRequest.Requestex.Cards cards = new AsynchronousPaymentRequest.Requestex.Cards();
         cards.setAction(BigInteger.valueOf(0));
-        cards.setAmount(BigInteger.valueOf(Long.valueOf(
-                (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.amount"))));
+        cards.setAmount(BigInteger.valueOf(Long.valueOf(params.get("paymentAmount"))));
         cards.setIdaction(Long.valueOf(params.get("regular_payment_id")));
         cards.setContractid(Long.valueOf(params.get("contractId")));
         AsynchronousPaymentRequest.Requestex requestex = new AsynchronousPaymentRequest.Requestex();
@@ -82,8 +86,16 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
         try {
             AsynchronousPaymentRequest asynchronousPaymentRequest = prepareForRequest(params);
             logger.info("Request to BK:" +  params.get("contractId"));
-            SchoolCardService schoolCardService  =  new SchoolCardService();
+            String wsdlLocationString = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.wsdllocation");
+            SchoolCardService schoolCardService;
+            if(wsdlLocationString == null) {
+                schoolCardService  =  new SchoolCardService();
+            }else{
+                URL wsdlLocationURL = new URL(wsdlLocationString);
+                schoolCardService =  new SchoolCardService(wsdlLocationURL);
+            }
             SchoolCard sc = schoolCardService.getSchoolCardPort();
+            Date date = new Date();
             asynchronousPaymentResponse = sc.asynchronousPayment(asynchronousPaymentRequest);
             if(asynchronousPaymentResponse != null && asynchronousPaymentResponse.getResponseex() != null){
                 if(asynchronousPaymentResponse.getResponseex().getCards() != null ){
@@ -92,11 +104,11 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
                         int statusCode = card.getErrorcode().intValue();
                         paymentResponse.setStatusCode(statusCode);
                         if (statusCode == 0) {
-                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "ReceivedByBK", null,
-                                    null);
+                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "ReceivedByBK", null,null);
+
                         }else{
-                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "KO" + statusCode, null,
-                                    null);
+                            regularPaymentsRepository.updateRegularPayment(card.getIdaction(), "KO" + statusCode, null, null);
+                            bankSubscritpionDao.updateLastUnsuccessfulPayment(Long.valueOf(params.get("bankSubscription_id")), date)   ;
                         }
                         logger.info("Request to BK statusCode:" +  card.getErrorcode());
                     }
@@ -114,6 +126,8 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
     public void finalizeRegularPayment(Long idaction, String paymentSuccessful, Long realAmount, String ip)
             throws DuplicatePaymentException, NotFoundPaymentException {
         regularPaymentsRepository.finalizeRegularPayment(idaction, paymentSuccessful, realAmount, ip);
+        //bankSubscritpionDao.updateLastsuccessfulPayment(Long.valueOf(params.get("bankSubscription_id")), new Date())   ;
+
     }
 
     public RegularPayment findPayment(Long idaction) {
