@@ -16,9 +16,14 @@ import generated.nsiws2.ru.gosuslugi.smev.rev110801.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -292,6 +297,86 @@ public class MskNSIService {
         return pupils;
     }
 
+    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName) throws Exception {
+        /*long[] orgIds = new long[] {0, 3, 4, 5, 6, 7, 8, 10, 11, 13 };
+        List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
+        long ts = System.currentTimeMillis();
+        for(int i=0; i<10; i++) {
+            int c = (int) (Math.random() * 10);
+            int type = OrgRegistryChange.CREATE_OPERATION + (int)(Math.random() *
+                                ((OrgRegistryChange.DELETE_OPERATION - OrgRegistryChange.CREATE_OPERATION) + 1));
+            Org o = null;
+            if(type == OrgRegistryChange.MODIFY_OPERATION || type == OrgRegistryChange.DELETE_OPERATION) {
+                o = DAOService.getInstance().getOrg(orgIds[i]);
+            }
+
+            String officialName = o != null ? o.getOfficialName() : "Official Name #" + c;
+            String shortName = o != null ? o.getShortName() : "Short Name #" + c;
+            String address = o != null ? o.getAddress() : "st. AAA, 1-2, Mos";
+            String city = o != null ? o.getCity() : "Moscow";
+            String region = o != null ? o.getDistrict() : "UAO";
+            long additionalId = o != null ? o.getIdOfOrg() : (long) ((Math.random() + 1) * 2);
+
+            ImportRegisterOrgsService.OrgInfo rc = new ImportRegisterOrgsService.OrgInfo();
+            rc.setIdOfOrg(o == null ? null : o.getIdOfOrg());
+            rc.setCreateDate(ts);
+            rc.setOperationType(type);
+
+            rc.setOfficialName(officialName + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setOfficialNameFrom(officialName);
+            }
+            rc.setShortName(shortName + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setShortNameFrom(shortName);
+            }
+
+            rc.setAddress(address + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setAddressFrom(address);
+            }
+            rc.setCity(city + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setCityFrom(city);
+            }
+            rc.setRegion(region + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setRegionFrom(region);
+            }
+
+            rc.setUnom(1L);
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setUnomFrom(100L);
+            }
+            rc.setUnad(2L);
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setUnadFrom(200L);
+            }
+
+            rc.setGuid("1234-5678" + " (new)");
+            if(type == OrgRegistryChange.MODIFY_OPERATION) {
+                rc.setGuidFrom("1234-5678");
+            }
+            rc.setAdditionalId(additionalId);
+
+            orgs.add(rc);
+        }
+        return orgs;*/
+        List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
+        int importIteration = 1;
+        while (true) {
+            List<ImportRegisterOrgsService.OrgInfo> iterationOrgs = null;
+            iterationOrgs = getOrgs(orgName, importIteration);
+            if (iterationOrgs.size() > 0) {
+                orgs.addAll(iterationOrgs);
+            } else {
+                break;
+            }
+            importIteration++;
+        }
+        return orgs;
+    }
+
     /*    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, int iteration) throws Exception {
         String tbl = getNSIWorkTable ();
         String select = "select item['" + tbl + "/Фамилия'], "
@@ -551,6 +636,139 @@ public class MskNSIService {
 
             list.add(pupilInfo);
         }*/
+        return list;
+    }
+
+
+    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, int importIteration) throws Exception {
+        SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
+
+        //  Название ОУ ограничения
+        if(!StringUtils.isBlank(orgName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Полное название учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue("%" + orgName + "%");
+            search.setAttributeOp("like");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  Запрет на удаленных
+        SearchPredicate search1 = new SearchPredicate();
+        search1.setAttributeName("Статус записи");
+        search1.setAttributeType(TYPE_STRING);
+        search1.setAttributeValue("Удаленный");
+        search1.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search1);
+        /*SearchPredicate search2 = new SearchPredicate();
+        search2.setAttributeName("Статус записи");
+        search2.setAttributeType(TYPE_STRING);
+        search2.setAttributeValue("В процессе открытия");
+        search2.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search2);
+        SearchPredicate search3 = new SearchPredicate();
+        search3.setAttributeName("Статус записи");
+        search3.setAttributeType(TYPE_STRING);
+        search3.setAttributeValue("В процессе закрытия");
+        search3.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search3);*/
+
+        List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
+        LinkedList<ImportRegisterOrgsService.OrgInfo> list = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
+        for(Item i : queryResults) {
+            ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
+            /*for(int cc=0; cc<i.getAttribute().size(); cc++) {
+                logger.error(cc + " :: " + i.getAttribute().get(cc).getName());
+            }*/
+            for(Attribute attr : i.getAttribute()) {
+                if (attr.getName().equals("Типы образовательных учреждений")) {
+                    for(Attribute.Value val : attr.getValue()) {
+                        if(val.getValue().equals("Общеобразовательное учреждение")) {
+                            info.setOrganizationType(OrganizationType.SCHOOL);
+                        } else {
+                            int icec=0;
+                        }
+                    }
+                }
+                if (attr.getName().equals("Краткое наименование учреждения")) {
+                    info.setShortName(attr.getValue().get(0).getValue());
+                }
+                if (attr.getName().equals("Полное название учреждения")) {
+                    info.setOfficialName(attr.getValue().get(0).getValue());
+                }
+
+                if (attr.getName().equals("Официальный адрес")) {
+                    info.setAddress(attr.getValue().get(0).getValue());
+                }
+                info.setCity("Москва");
+                if (attr.getName().equals("Округ")) {
+                    info.setRegion(attr.getValue().get(0).getValue());
+                }
+
+                if (attr.getName().equals("Сведения о БТИ")) {
+                    if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                        info.setGuid(attr.getValue().get(0).getValue());
+                    }
+                }
+                if (attr.getName().equals("Сведения о КЛАДР")) {
+                    if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                        info.setOfficialName(attr.getValue().get(0).getValue());
+                    }
+                }
+
+                if (attr.getName().equals("GUID Образовательного учреждения")) {
+                    info.setGuid(attr.getValue().get(0).getValue());
+                }
+                if (attr.getName().equals("Первичный ключ")) {
+                    String v = attr.getValue().get(0).getValue();
+                    Long registryPrimaryId = null;
+                    if(NumberUtils.isNumber(v)) {
+                        registryPrimaryId = NumberUtils.toLong(v);
+                    }
+                    if(registryPrimaryId == null) {
+                        break;
+                    }
+                    info.setRegisteryPrimaryId(registryPrimaryId);
+                }
+            }
+
+            if(info.getOrganizationType() == null) {
+                logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
+                        + "не имееет тип организации в Реестрах, или "
+                        + "он указан не корректно.", info.getShortName(), info.getGuid()));
+            }
+            else if(info.getRegisteryPrimaryId() == null) {
+                logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
+                                           + "не имееет первичного ключа в Реестрах, или "
+                                           + "он указан не корректно.", info.getShortName(), info.getGuid()));
+            } else {
+                Org existingOrg = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
+                                                                                     info.getGuid());
+                if(existingOrg != null) {
+                    info.setOrganizationTypeFrom(existingOrg.getType());
+
+                    info.setShortNameFrom(existingOrg.getShortName());
+                    info.setOfficialNameFrom(existingOrg.getOfficialName());
+
+                    info.setAddress(existingOrg.getAddress());
+                    info.setCity(existingOrg.getCity());
+                    info.setRegionFrom(existingOrg.getDistrict());
+
+                    info.setUnomFrom(existingOrg.getBtiUnom());
+                    info.setUnadFrom(existingOrg.getBtiUnad());
+
+                    info.setGuidFrom(existingOrg.getGuid());
+
+                    info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                } else {
+                    info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
+                }
+                info.setCreateDate(System.currentTimeMillis());
+                info.setAdditionalId(info.getRegisteryPrimaryId());
+                list.add(info);
+            }
+        }
         return list;
     }
 

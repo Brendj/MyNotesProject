@@ -541,6 +541,16 @@ public class DAOUtils {
         return res;
     }
 
+    public static OrgRegistryChange getOrgRegistryChange(Session session, long idOfOrgRegistryChange) {
+        Query q = session.createQuery("from OrgRegistryChange where idOfOrgRegistryChange=:idOfOrgRegistryChange");
+        q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
+        List res = q.list();
+        if(res == null || res.size() < 1) {
+            return null;
+        }
+        return (OrgRegistryChange) res.get(0);
+    }
+
 
     public static List findClients(Session persistenceSession, Org organization, String firstName, String surname,
             String secondName) throws Exception {

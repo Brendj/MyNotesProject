@@ -741,6 +741,9 @@
         <rich:panelMenuItem id="nsiOrgRegistrySyncOverview" binding="#{NSIOrgRegistrySynchOverviewPage.mainMenuComponent}"
                             label="Статистика сверки" action="#{NSIOrgRegistrySynchOverviewPage.show}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="nsiOrgsRegistrySync" binding="#{NSIOrgsRegistrySynchPage.mainMenuComponent}"
+                            label="Сверка организаций" action="#{NSIOrgsRegistrySynchPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
                          rendered="#{mainPage.eligibleToServiceAdmin}">

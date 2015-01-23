@@ -720,6 +720,17 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return ((Org)l.get(0));
     }
 
+    public Org findOrgByRegistryIdOrGuid (Long registryId, String guid) {
+        javax.persistence.Query q = entityManager.createQuery("from Org where guid=:guid");// or registryId=:registryId");
+        q.setParameter("guid", guid);
+        //q.setParameter("registryId", registryId);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Org)l.get(0));
+    }
+
+
+
     public Client getClientByGuid (String guid) {
         return DAOUtils.findClientByGuid(entityManager, guid);
     }
@@ -1674,5 +1685,53 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             //logger.error("Failed to update external system statistics", e);
             return false;
         }
+    }
+
+    public List<OrgRegistryChange> getOrgRegistryChanges() throws Exception {
+        return getOrgRegistryChanges(null);
+    }
+
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
+        return getOrgRegistryChanges(nameFilter,-1L);
+    }
+
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate) throws Exception{
+        if (revisionDate < 1L) {
+            revisionDate = getLastOrgRegistryChangeRevision();
+        }
+        if (revisionDate < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        String nameStatement = "";
+        if(nameFilter != null && nameFilter.length() > 0) {
+            nameStatement = " and lower(shortname||officialname) like lower('%" + nameFilter + "%') ";
+        }
+        String q = "from OrgRegistryChange where createDate=:lastUpdate" + nameStatement + " order by officialname";
+        TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q,OrgRegistryChange.class);
+        query.setParameter("lastUpdate", revisionDate);
+        return query.getResultList();
+    }
+
+    public long getLastOrgRegistryChangeRevision() throws Exception {
+        Query q = entityManager.createNativeQuery("SELECT max(createDate) FROM cf_orgregistrychange");
+        Object res = q.getSingleResult();
+        return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
+    }
+
+    public List<Long> getOrgRegistryChangeRevisionsList() throws Exception {
+        Query q = entityManager.createNativeQuery("SELECT distinct(createDate) FROM cf_orgregistrychange order by createDate desc limit 200");
+        List<BigInteger> result = q.getResultList();
+        if(result == null || result.size() < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        List<Long> list = new ArrayList<Long>();
+        for(BigInteger bi : result) {
+            list.add(bi.longValue());
+        }
+        return list;
+    }
+
+    public OrgRegistryChange getOrgRegistryChange(long idOfOrgRegistryChange) {
+        return DAOUtils.getOrgRegistryChange((Session) entityManager.unwrap(Session.class), idOfOrgRegistryChange);
     }
 }
