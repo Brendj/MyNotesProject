@@ -1025,7 +1025,7 @@ public class Processor implements SyncProcessor,
             BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
                     .getInstance()
                     .getRegularPaymentSubscriptionService();
-            regularPaymentSubscriptionService.checkClientBalances();
+            regularPaymentSubscriptionService.checkClientBalances(request.getIdOfOrg());
             logger.info("runRegularPayments stop");
         }
     }
@@ -1849,7 +1849,7 @@ public class Processor implements SyncProcessor,
                             if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
                                 logger.warn(
                                         String.format("Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
-                                                client.toString(), card.toString(), newCard.toString()));
+                                                ""+ client.getIdOfClient(), card.toString(), newCard.toString()));
                             }
                         }
                         card = newCard;

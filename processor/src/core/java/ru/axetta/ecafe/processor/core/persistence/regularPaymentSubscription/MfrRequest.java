@@ -31,6 +31,7 @@ public class MfrRequest {
     public static final String SUBSCRIPTION_ACTIVATED = "INITIAL";
     public static final String SUBSCRIPTION_DEACTIVATED = "REBILL_CANCEL";
     public static final String PAYMENT_SUCCESSFUL = "REBILL_OK";
+    public static final String PAYMENT_RECEIVED_BY_BK = "ReceivedByBK";
     public static final String ERROR = "KO";
 
     private Long idOfRequest;

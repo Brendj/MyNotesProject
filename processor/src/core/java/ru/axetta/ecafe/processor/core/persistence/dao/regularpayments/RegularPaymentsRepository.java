@@ -52,7 +52,7 @@ public class RegularPaymentsRepository {
     }
 
     @Transactional(value = "txManager")
-    public void finalizeRegularPayment (long idofpayment, String status, Long realAmount, String ip)
+    public RegularPayment finalizeRegularPayment(long idofpayment, String status, Long realAmount, String ip)
             throws DuplicatePaymentException, NotFoundPaymentException {
         RegularPayment payment = entityManager.find(RegularPayment.class, idofpayment);
         if (payment != null) {
@@ -71,5 +71,7 @@ public class RegularPaymentsRepository {
         } else {
             throw new NotFoundPaymentException();
         }
+
+        return payment;
     }
 }

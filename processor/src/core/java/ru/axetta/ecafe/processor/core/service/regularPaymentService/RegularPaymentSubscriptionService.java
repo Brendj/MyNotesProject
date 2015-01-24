@@ -80,11 +80,15 @@ public class RegularPaymentSubscriptionService {
     }
 
     public void checkClientBalances() {
+        checkClientBalances(null);
+    }
+
+    public void checkClientBalances(Long idOfOrg ) {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
         }
         logger.info("RegularPaymentSubscriptionService work started.");
-        List<Long> subIds = findSubscriptions(0);
+        List<Long> subIds = findSubscriptions(0, idOfOrg);
         Date today = new Date();
         for (Long id : subIds) {
             try {
@@ -219,13 +223,17 @@ public class RegularPaymentSubscriptionService {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<Long> findSubscriptions(int rows) {
+    protected List<Long> findSubscriptions(int rows, Long idOfOrg) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+
+        String orgCondition = (idOfOrg != null)? " and bs.client.org.idOfOrg = " + idOfOrg+ " ":"";
+
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
-                "where bs.active = true and bs.client.balance <= bs.thresholdAmount \n" +
-                "and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) and " +
-                "(bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
-                "and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
+                " where bs.active = true and bs.client.balance <= bs.thresholdAmount \n" +
+                " and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) " +
+                 orgCondition +
+                " and (bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
+                " and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
                 .setParameter("today", today).setParameter("cg",
                         Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                                 ClientGroup.Predefined.CLIENT_DELETED.getValue()));

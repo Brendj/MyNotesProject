@@ -3,10 +3,8 @@
   ~ Copyright (c) 2015. Axetta LLC. All Rights Reserved.
   -->
 
-
-<!DOCTYPE hibernate-mapping PUBLIC
-        "-//Hibernate/Hibernate Mapping DTD//EN"
-        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.OrgSync" table="CF_Orgs_sync" optimistic-lock="version">
 

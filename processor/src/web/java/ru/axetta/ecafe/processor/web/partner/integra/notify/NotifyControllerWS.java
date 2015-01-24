@@ -48,7 +48,14 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
         result.resultCode = ResultConst.CODE_OK;
         result.description = ResultConst.DESCR_OK;
 
-        rpService.senRequestOnNotifyAction(accountNumber);
+        if (rpService == null) {
+            rpService = (BKRegularPaymentSubscriptionService) RuntimeContext.getAppContext()
+                    .getBean("bk_regularPaymentSubscriptionService");
+        }
+        logger.warn("NotifyWS notify rpS: " + accountNumber + " | " + eventCode);
+
+        rpService.sendRequestOnNotifyAction(accountNumber);
+        logger.warn("NotifyWS notify result: " + accountNumber + " | " + eventCode);
 
         return result;
     }
@@ -130,7 +137,7 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
                 result.setErrorCode(9998);
                 try {
                     rpService
-                            .updateRegularPayment(autoPaymentResultRequest.getIdaction(), MfrRequest.PAYMENT_SUCCESSFUL,
+                            .updateRegularPayment(autoPaymentResultRequest.getIdaction(), MfrRequest.ERROR+" " + autoPaymentResultRequest.getErrorCode(),
                                     autoPaymentResultRequest.getRealAmount(), ip);
                 } catch (DuplicatePaymentException e) {
                     logger.warn(e.getMessage());
