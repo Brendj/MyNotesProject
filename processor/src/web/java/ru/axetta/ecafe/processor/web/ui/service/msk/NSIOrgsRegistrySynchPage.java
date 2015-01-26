@@ -318,7 +318,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getOriginName() {
-            return shortName + "<br/>" + officialName;
+            return shortName + "<br/><br/>" + officialName;
         }
 
         public String getNewName() {
@@ -326,11 +326,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                officialNameFrom == null || StringUtils.isBlank(officialNameFrom)) {
                 return "";
             }
-            return shortNameFrom + "<br/>" + officialNameFrom;
+            return shortNameFrom + "<br/><br/>" + officialNameFrom;
         }
 
         public String getOriginAddress() {
-            return address + "<br/>" + city + "<br/>" + region;
+            return address + "<br/><br/>" + city + "<br/><br/>" + region;
         }
 
         public String getNewAddress() {
@@ -339,18 +339,21 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                regionFrom == null || StringUtils.isBlank(regionFrom)) {
                 return "";
             }
-            return addressFrom + "<br/>" + cityFrom + "<br/>" + regionFrom;
+            return addressFrom + "<br/><br/>" + cityFrom + "<br/><br/>" + regionFrom;
         }
 
         public String getOriginSpec() {
-            return "УНОМ: " + unom + "<br/>УНАД: " + unad;
+            if(unom == null || unad == null) {
+                return "";
+            }
+            return "УНОМ: " + unom + "<br/><br/>УНАД: " + unad;
         }
 
         public String getNewSpec() {
             if(unomFrom == null || unadFrom == null) {
                 return "";
             }
-            return "УНОМ: " + unomFrom + "<br/>УНАД: " + unadFrom;
+            return "УНОМ: " + unomFrom + "<br/><br/>УНАД: " + unadFrom;
         }
 
         public Long getIdOfOrgRegistryChange() {

@@ -374,6 +374,7 @@ public class MskNSIService {
             }
             importIteration++;
         }
+        addDeletedOrgs(orgs);
         return orgs;
     }
 
@@ -687,7 +688,8 @@ public class MskNSIService {
                         if(val.getValue().equals("Общеобразовательное учреждение")) {
                             info.setOrganizationType(OrganizationType.SCHOOL);
                         } else {
-                            int icec=0;
+                            info.setOrganizationType(OrganizationType.PROFESSIONAL);
+                            // TODO: solve other org types!!
                         }
                     }
                 }
@@ -746,21 +748,42 @@ public class MskNSIService {
                 Org existingOrg = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
                                                                                      info.getGuid());
                 if(existingOrg != null) {
-                    info.setOrganizationTypeFrom(existingOrg.getType());
+                    boolean requiredUpdate = false;
+                    if(existingOrg.getType().ordinal() != info.getOrganizationType().ordinal() ||
 
-                    info.setShortNameFrom(existingOrg.getShortName());
-                    info.setOfficialNameFrom(existingOrg.getOfficialName());
+                       !existingOrg.getShortName().equals(info.getShortName()) ||
+                       !existingOrg.getOfficialName().equals(info.getOfficialName()) ||
 
-                    info.setAddress(existingOrg.getAddress());
-                    info.setCity(existingOrg.getCity());
-                    info.setRegionFrom(existingOrg.getDistrict());
+                       !existingOrg.getAddress().equals(info.getAddress()) ||
+                       !existingOrg.getCity().equals(info.getCity()) ||
+                       !existingOrg.getDistrict().equals(info.getRegion()) ||
 
-                    info.setUnomFrom(existingOrg.getBtiUnom());
-                    info.setUnadFrom(existingOrg.getBtiUnad());
+                       (info.getUnad() != null && existingOrg.getBtiUnom() != info.getUnad()) ||
+                       (info.getUnad() != null && existingOrg.getBtiUnom() != info.getUnad()) ||
 
-                    info.setGuidFrom(existingOrg.getGuid());
+                       !existingOrg.getGuid().equals(info.getGuid())) {
+                        requiredUpdate = true;
+                    }
 
-                    info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                    if(requiredUpdate) {
+                        info.setOrganizationTypeFrom(existingOrg.getType());
+
+                        info.setShortNameFrom(existingOrg.getShortName());
+                        info.setOfficialNameFrom(existingOrg.getOfficialName());
+
+                        info.setAddress(existingOrg.getAddress());
+                        info.setCity(existingOrg.getCity());
+                        info.setRegionFrom(existingOrg.getDistrict());
+
+                        info.setUnomFrom(existingOrg.getBtiUnom());
+                        info.setUnadFrom(existingOrg.getBtiUnad());
+
+                        info.setGuidFrom(existingOrg.getGuid());
+
+                        info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                    } else {
+                        continue;
+                    }
                 } else {
                     info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
                 }
@@ -769,7 +792,41 @@ public class MskNSIService {
                 list.add(info);
             }
         }
+
         return list;
+    }
+
+    protected void addDeletedOrgs(List<ImportRegisterOrgsService.OrgInfo> list) {
+        List<Org> dbOrgs = DAOService.getInstance().getOrderedSynchOrgsList();
+        for(Org o : dbOrgs) {
+            boolean found = false;
+            for(ImportRegisterOrgsService.OrgInfo oi : list) {
+                if(o.getGuid() != null && oi.getGuid() != null && o.getGuid().equals(oi.getGuid())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(found) {
+                continue;
+            }
+
+            ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
+            info.setOrganizationType(o.getType());
+            info.setShortName(o.getShortName());
+            info.setOfficialNameFrom(o.getOfficialName());
+            info.setAddress(o.getAddress());
+            info.setCity(o.getCity());
+            info.setRegion(o.getDistrict());
+            info.setUnom(o.getBtiUnom());
+            info.setUnad(o.getBtiUnad());
+            info.setGuid(o.getGuid());
+            info.setAdditionalId(o.getAdditionalIdBuilding());
+            info.setCreateDate(System.currentTimeMillis());
+            info.setAdditionalId(info.getRegisteryPrimaryId());
+            info.setOperationType(OrgRegistryChange.DELETE_OPERATION);
+            list.add(info);
+        }
     }
 
 

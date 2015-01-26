@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,29 +160,33 @@ public class ImportRegisterOrgsService {
     public void saveOrgs(String synchDate, String date, long ts, List<OrgInfo> orgs,
             StringBuffer logBuffer) throws Exception {
         log(synchDate + "Сохранение организаций", logBuffer);
-
+        long createDate = System.currentTimeMillis();
         for(OrgInfo oi : orgs) {
             OrgRegistryChange orgRegistryChange = new OrgRegistryChange
                     (oi.getIdOfOrg(),
 
                      oi.getOrganizationType(), oi.getOrganizationTypeFrom(),
-                     oi.getShortName(), oi.getShortNameFrom(),
-                     oi.getOfficialName(), oi.getOfficialNameFrom(),
-                     oi.getCreateDate(), oi.getOperationType(),
+                     solveString(oi.getShortName()), oi.getShortNameFrom(),
+                     solveString(oi.getOfficialName()), oi.getOfficialNameFrom(),
+                     createDate, oi.getOperationType(),
 
                      false,
 
-                     oi.getAddress(), oi.getAddressFrom(),
-                     oi.getCity(), oi.getCityFrom(),
-                     oi.getRegion(), oi.getRegionFrom(),
+                     solveString(oi.getAddress()), oi.getAddressFrom(),
+                     solveString(oi.getCity()), oi.getCityFrom(),
+                     solveString(oi.getRegion()), oi.getRegionFrom(),
 
                      oi.getUnom(), oi.getUnomFrom(),
                      oi.getUnad(), oi.getUnadFrom(),
 
-                     oi.getGuid(), oi.getGuidFrom(),
-                     oi.getAdditionalId() );
+                     solveString(oi.getGuid()), oi.getGuidFrom(),
+                    oi.getAdditionalId() == null ? -1L : oi.getAdditionalId() );
             em.persist(orgRegistryChange);
         }
+    }
+
+    protected String solveString(String v) {
+        return v == null || StringUtils.isBlank(v) ? "" : v;
     }
 
     public static void log(String str, StringBuffer logBuffer) {
