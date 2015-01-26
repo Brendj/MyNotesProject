@@ -41,6 +41,9 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
     @Override
     public void onShow() throws Exception {
         groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
+        files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
+        paymentAmount = null;
+        lowerLimitAmount = null;
     }
 
     public Long getSuccessLineNumber() {
@@ -81,6 +84,7 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
             bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
 
             groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
+            files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
 
             while ((line = bufferedReader.readLine()) != null) {
 
