@@ -908,6 +908,19 @@
         <rich:panelMenuItem id="clientPaymentsReportMenuItem" binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}"
                             label="Отчет по начислениям" action="#{mainPage.showClientPaymentsReportPage}"
                             reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="currentPositionReportMenuItem"
+                            binding="#{mainPage.currentPositionsReportPage.mainMenuComponent}"
+                            label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"
+                            reRender="workspaceForm" />
+        <%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PayStatsPage"--%>
+        <rich:panelMenuItem id="payStatsMenuItem" binding="#{payStatsPage.mainMenuComponent}" label="Отчет по агентам"
+                            action="#{payStatsPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="regularPaymentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegularPaymentsReportPage"--%>
+        <rich:panelMenuItem id="regularPaymentsReportMenuItem" binding="#{regularPaymentsReportPage.mainMenuComponent}"
+                            label="Отчет по регулярным платежам" action="#{regularPaymentsReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="activityReportsGroupMenu" binding="#{mainPage.activityReportsGroupMenu.mainMenuComponent}"
@@ -998,20 +1011,9 @@
     <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
                         label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="currentPositionReportMenuItem"
-                        binding="#{mainPage.currentPositionsReportPage.mainMenuComponent}"
-                        label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"
-                        reRender="workspaceForm" />
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
                         label="Свод по услугам" action="#{totalServicesReportPage.show}" reRender="workspaceForm" />
-    <%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PayStatsPage"--%>
-    <rich:panelMenuItem id="payStatsMenuItem" binding="#{payStatsPage.mainMenuComponent}" label="Отчет по агентам"
-                        action="#{payStatsPage.show}" reRender="workspaceForm" />
-    <%--@elvariable id="regularPaymentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegularPaymentsReportPage"--%>
-    <rich:panelMenuItem id="regularPaymentsReportMenuItem" binding="#{regularPaymentsReportPage.mainMenuComponent}"
-                        label="Отчет по регулярным платежам" action="#{regularPaymentsReportPage.show}"
-                        reRender="workspaceForm" />
     <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"
