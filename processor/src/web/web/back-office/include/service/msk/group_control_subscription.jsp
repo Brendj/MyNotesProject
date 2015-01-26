@@ -16,32 +16,61 @@
             <h:graphicImage value="/images/gif/waiting.gif" />
         </f:facet>
     </a4j:status>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Сумма пополнения (руб.)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.groupControlSubscriptionsPage.paymentAmount}" maxlength="20" size="20"
+                     styleClass="input-text" converter="copeckSumConverter" />
 
-    <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
-    <h:outputText value="вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Имя'; 'Фамилия'; 'Отчество'; 'Л/c';" />
-    <rich:fileUpload id="subscriptionFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
-                     addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
-                     cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
-                     stopButtonClassDisabled="upload-command-button-diasbled" uploadButtonClass="upload-command-button"
-                     uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
-                     fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
-                     fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
-                     stopControlLabel="Остановить" stopEntryControlLabel="Остановить" addControlLabel="Добавить файл"
-                     clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
-                     cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
-                     uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
-                     fileUploadListener="#{mainPage.subscriptionLoadFileListener}">
-        <f:facet name="label">
-            <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
-        </f:facet>
-        <a4j:support event="onuploadcomplete" reRender="groupControlSubscriptionsPage" />
-        <a4j:support event="onclear" reRender="groupControlSubscriptionsPage" />
-    </rich:fileUpload>
+        <h:outputText escape="true" value="Порог баланса для пополнения (руб.)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.groupControlSubscriptionsPage.lowerLimitAmount}" maxlength="20" size="20"
+                     styleClass="input-text" converter="copeckSumConverter" />
+    </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
+        <h:outputText value="вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Имя'; 'Фамилия'; 'Отчество'; 'Л/c';" />
+        <rich:fileUpload id="subscriptionFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
+                         addButtonClassDisabled="upload-command-button-diasbled"
+                         cleanButtonClass="upload-command-button"
+                         cleanButtonClassDisabled="upload-command-button-diasbled"
+                         stopButtonClass="upload-command-button"
+                         stopButtonClassDisabled="upload-command-button-diasbled"
+                         uploadButtonClass="upload-command-button"
+                         uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                         fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                         fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                         stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
+                         addControlLabel="Добавить файл" clearControlLabel="Очистить"
+                         clearAllControlLabel="Очистить все" doneLabel="Готово" cancelEntryControlLabel="Отменить"
+                         transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файла"
+                         progressLabel="Загрузка" listHeight="70px"
+                         fileUploadListener="#{mainPage.subscriptionLoadFileListener}">
+            <f:facet name="label">
+                <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
+            </f:facet>
+            <a4j:support event="onuploadcomplete" reRender="groupControlSubscriptionsPage" />
+            <a4j:support event="onclear" reRender="groupControlSubscriptionsPage" />
+        </rich:fileUpload>
 
-    <%--    <h:outputText escape="true"
-                      value="Обработано: #{groupControlSubscriptionsPage.lineResultSize}. Успешно: #{groupControlSubscriptionsPage.successLineNumber}"
-                      styleClass="output-text" />--%>
+        <h:panelGroup id="info">
+            <rich:panel bodyClass="info">
+                <f:facet name="header">
+                    <h:outputText value="Загруженные файлы" />
+                </f:facet>
+                <rich:dataGrid columns="1" value="#{mainPage.groupControlSubscriptionsPage.files}" var="file"
+                               rowKeyVar="row">
+                    <h:panelGrid columns="1">
+                        <h:outputText value="#{file.fileName}" />
+                    </h:panelGrid>
+                </rich:dataGrid>
+            </rich:panel>
+        </h:panelGroup>
+    </h:panelGrid>
+
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <a4j:commandButton value="Провести" action="#{mainPage.groupControlGenerate}" reRender="workspaceTogglePanel"
+                           styleClass="command-button" />
+    </h:panelGrid>
 
     <a4j:outputPanel ajaxRendered="true">
         <h:panelGrid styleClass="borderless-grid">
@@ -50,7 +79,8 @@
         </h:panelGrid>
     </a4j:outputPanel>
 
-    <rich:dataTable value="#{mainPage.groupControlSubscriptionsItems}" var="item" rowKeyVar="row">
+    <rich:dataTable value="#{mainPage.groupControlSubscriptionsPage.groupControlSubscriptionsItems}" var="item"
+                    rowKeyVar="row">
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" />

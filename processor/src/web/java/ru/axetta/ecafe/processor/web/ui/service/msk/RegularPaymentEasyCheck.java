@@ -72,8 +72,8 @@ public class RegularPaymentEasyCheck {
         return requestResult;
     }
 
-    public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractID, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext) {
+    public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractID, Long lowerLimitAmount,
+            Long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext) {
         RequestResultEasyCheck requestResultEasyCheck = new RequestResultEasyCheck();
         try {
             Long contractId = contractID;
@@ -170,15 +170,14 @@ public class RegularPaymentEasyCheck {
         bs.setThresholdAmount(thresholdAmount);
         bs.setActive(true);
         bs.setValidToDate(CalendarUtils.addMonth(new Date(), 12));
-        ;
     }
 
     public BankSubscription findBankSubscription(Long id, Session session) {
         return (BankSubscription) session.load(BankSubscription.class, id);
     }
 
-    public RequestResultEasyCheck regularPaymentEasyCheckEdit(List<Long> ids, Long contractId, long lowerLimitAmount,
-            long paymentAmount, Session session, Transaction transaction) {
+    public RequestResultEasyCheck regularPaymentEasyCheckEdit(List<Long> ids, Long contractId, Long lowerLimitAmount,
+            Long paymentAmount, Session session, Transaction transaction) {
         RequestResultEasyCheck requestResultEasyCheck = null;
 
         try {

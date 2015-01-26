@@ -4,10 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.richfaces.model.UploadItem;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,20 +23,24 @@ import org.springframework.stereotype.Component;
  * Date: 22.12.14
  * Time: 13:38
  */
-
-@Component
-@Scope("session")
 public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
 
-    private Long successLineNumber;
+    public Long successLineNumber;
+    public Long paymentAmount;
+    public Long lowerLimitAmount;
+    public UploadItem uploadItem;
+    private ArrayList<ru.axetta.ecafe.processor.core.mail.File> files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
 
-    @Override
-    public void onShow() throws Exception {
-    }
+    private List<GroupControlSubscriptionsItem> groupControlSubscriptionsItems;
 
     @Override
     public String getPageFilename() {
         return "service/msk/group_control_subscription";
+    }
+
+    @Override
+    public void onShow() throws Exception {
+        groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
     }
 
     public Long getSuccessLineNumber() {
@@ -37,6 +49,104 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
 
     public void setSuccessLineNumber(Long successLineNumber) {
         this.successLineNumber = successLineNumber;
+    }
+
+    public Long getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public void setPaymentAmount(Long paymentAmount) {
+        this.paymentAmount = paymentAmount;
+    }
+
+    public Long getLowerLimitAmount() {
+        return lowerLimitAmount;
+    }
+
+    public void setLowerLimitAmount(Long lowerLimitAmount) {
+        this.lowerLimitAmount = lowerLimitAmount;
+    }
+
+    public void groupControlGenerate(UploadItem item, RuntimeContext runtimeContext,
+            BufferedReader bufferedReader) throws Exception {
+
+        if (this.lowerLimitAmount != null && this.paymentAmount != null) {
+
+            RegularPaymentEasyCheck regularPaymentEasyCheck = new RegularPaymentEasyCheck();
+
+            String line;
+            String cvsSplitBy = ";";
+
+            File file = item.getFile();
+            bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+
+            groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
+
+            while ((line = bufferedReader.readLine()) != null) {
+
+                Session persistenceSession = runtimeContext.createPersistenceSession();
+                Transaction persistenceTransaction = persistenceSession.beginTransaction();
+
+                // разделитель
+                String[] separatedData = line.split(cvsSplitBy);
+
+                RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
+                        .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5].trim()),
+                                persistenceSession);
+
+                if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
+                        || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
+                    RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
+                            regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
+                                    this.lowerLimitAmount, this.paymentAmount, persistenceSession,
+                                    persistenceTransaction, runtimeContext);
+
+                    groupControlSubscriptionsItems
+                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
+                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
+                                    requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
+                                            .getErrorDesc() : "добавлен"));
+                } else {
+                    RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
+                            .regularPaymentEasyCheckEdit(
+                                    requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
+                                    Long.parseLong(separatedData[5].trim()), this.lowerLimitAmount, this.paymentAmount,
+                                    persistenceSession, persistenceTransaction);
+
+                    groupControlSubscriptionsItems
+                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
+                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
+                                    requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
+                                            .getErrorDesc() : "редактирован"));
+                }
+            }
+        } else {
+            printError("Сумма пополнения (руб.), Порог баланса для пополнения (руб.) - не указаны");
+        }
+    }
+
+    public List<GroupControlSubscriptionsItem> getGroupControlSubscriptionsItems() {
+        return groupControlSubscriptionsItems;
+    }
+
+    public void setGroupControlSubscriptionsItems(List<GroupControlSubscriptionsItem> groupControlSubscriptionsItems) {
+        this.groupControlSubscriptionsItems = groupControlSubscriptionsItems;
+    }
+
+    public UploadItem getUploadItem() {
+        return uploadItem;
+    }
+
+    public void setUploadItem(UploadItem uploadItem) {
+        this.uploadItem = uploadItem;
+    }
+
+    public ArrayList<ru.axetta.ecafe.processor.core.mail.File> getFiles() {
+        return files;
+    }
+
+    public void setFiles(ArrayList<ru.axetta.ecafe.processor.core.mail.File> files) {
+        this.files = files;
     }
 }
 

@@ -763,9 +763,8 @@
                         rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showAutorechargeGroupPage}" reRender="workspaceForm" />
 
-        <%--@elvariable id="uosStopListPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage"--%>
-        <rich:panelMenuItem id="groupControlSubscriptions" binding="#{groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
-                            action="#{groupControlSubscriptionsPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="groupControlSubscriptions" binding="#{mainPage.groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
+                            action="#{mainPage.groupControlSubscriptionsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

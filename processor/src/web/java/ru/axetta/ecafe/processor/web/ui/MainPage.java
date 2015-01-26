@@ -348,7 +348,6 @@ public class MainPage implements Serializable {
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
-    private List<GroupControlSubscriptionsItem> groupControlSubscriptionsItems;
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -3966,66 +3965,33 @@ public class MainPage implements Serializable {
     public void subscriptionLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
+        try {
+            if (item.isTempFile()) {
+                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+                file.setFile(item.getFile());
+                file.setFileName(item.getFileName());
+                file.setContentType(item.getContentType());
+                groupControlSubscriptionsPage.setUploadItem(item);
+                groupControlSubscriptionsPage.getFiles().add(file);
+            } else {
+                throw new Exception("Invalid file");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load file", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
+                            null));
+        }
+    }
 
-        groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
-
+    public void groupControlGenerate(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         BufferedReader bufferedReader = null;
-        String line;
-        String cvsSplitBy = ";";
 
-        long lowerLimitAmount = 10000;
-        long paymentAmount = 20000;
-
-        RegularPaymentEasyCheck regularPaymentEasyCheck = new RegularPaymentEasyCheck();
-
-        RuntimeContext runtimeContext;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
-            File file = item.getFile();
-            bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
-
-            while ((line = bufferedReader.readLine()) != null) {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-
-                // разделитель
-                String[] separatedData = line.split(cvsSplitBy);
-
-                RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
-                        .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5].trim()),
-                                persistenceSession);
-
-
-                if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
-                        || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
-                    RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
-                            regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
-                                    lowerLimitAmount, paymentAmount, persistenceSession, persistenceTransaction,
-                                    runtimeContext);
-
-                    getGroupControlSubscriptionsItems()
-                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
-                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
-                                    requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
-                                            .getErrorDesc() : "добавлен"));
-                } else {
-                    RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
-                            .regularPaymentEasyCheckEdit(
-                                    requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
-                                    Long.parseLong(separatedData[5].trim()), lowerLimitAmount, paymentAmount,
-                                    persistenceSession, persistenceTransaction);
-
-                    getGroupControlSubscriptionsItems()
-                            .add(new GroupControlSubscriptionsItem(separatedData[0], separatedData[2], separatedData[3],
-                                    separatedData[4], Long.parseLong(separatedData[5].trim()),
-                                    requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
-                                            .getErrorDesc() : "редактирован"));
-                    System.out.println();
-                }
-            }
+            groupControlSubscriptionsPage.groupControlGenerate(groupControlSubscriptionsPage.getUploadItem(), runtimeContext, bufferedReader);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             facesContext.addMessage(null,
@@ -7863,9 +7829,5 @@ public class MainPage implements Serializable {
             logger.error("getContragentsListForTooltip Error",e);
             return "";
         }
-    }
-
-    public List<GroupControlSubscriptionsItem> getGroupControlSubscriptionsItems() {
-        return groupControlSubscriptionsItems;
     }
 }
