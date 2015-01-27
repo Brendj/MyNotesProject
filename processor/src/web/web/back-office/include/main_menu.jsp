@@ -1024,6 +1024,10 @@
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                         reRender="workspaceForm" />
 
+    <%--@elvariable id="totalSalesPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalSalesPage"--%>
+    <rich:panelMenuItem id="totalSalesReportMenuItem" binding="#{totalSalesPage.mainMenuComponent}"
+                        label="Сводный отчет по продажам" action="#{totalSalesPage.show}" reRender="workspaceForm" />
+
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"

@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,5 +35,17 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         return entityManager
                 .createNativeQuery("SELECT idofcategoryorg FROM cf_categoryorg_orgs WHERE idoforg = :idoforg ")
                 .setParameter("idoforg", id).getResultList();
+    }
+
+    public List<OrgItem> findAllNames(){
+        List<OrgItem> orgItemList = new ArrayList<OrgItem>();
+        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName FROM CF_Orgs  WHERE State =1 and OrganizationType=0 ORDER BY OfficialName ");
+
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orgItemList.add(new OrgItem(((BigInteger)o[0]).longValue(),(String)o[1]));
+        }
+
+        return orgItemList;
     }
 }

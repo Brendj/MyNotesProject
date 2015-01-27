@@ -19,6 +19,7 @@ public class OrderItem {
     public String complexName; //complex name
     public String groupName;
     private int qty;
+    private long sum;
 
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname) {
@@ -45,6 +46,12 @@ public class OrderItem {
         this.complexName = complexName;
         this.groupName = groupName;
         this.qty = qty;
+    }
+
+    public OrderItem(String orgName, long orderDate, long sum) {
+        this.orgName = orgName;
+        this.orderDate = orderDate;
+        this.sum = sum;
     }
 
     public long getIdOfOrg() {
@@ -141,5 +148,13 @@ public class OrderItem {
 
     public void setClientOrgName(String clientOrgName) {
         this.clientOrgName = clientOrgName;
+    }
+
+    public long getSum() {
+        return sum;
+    }
+
+    public void setSum(long sum) {
+        this.sum = sum;
     }
 }

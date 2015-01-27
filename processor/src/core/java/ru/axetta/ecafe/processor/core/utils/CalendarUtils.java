@@ -199,7 +199,14 @@ public class CalendarUtils {
         return dayInWeekFormat.format(date);
     }
 
+    public static String dateShortToString(long date) {
+        return dateShortFormat.format(new Date(date));
+    }
     public static String dateShortToString(Date date) {
+        return dateShortFormat.format(date);
+    }
+
+    public static String dateShortToString(Calendar date) {
         return dateShortFormat.format(date);
     }
     public static String dateShortToStringFullYear(Date date) {
@@ -428,4 +435,18 @@ public class CalendarUtils {
         }
         return result;
     }
-}
+
+    public static List<String> datesBetween(Date start, Date end) {
+        List<String> dates = new ArrayList<String>();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(start);
+        while (c.getTimeInMillis() < end.getTime() ){
+            dates.add(dateShortToString(c.getTime()));
+            c.add(Calendar.DATE, 1);
+        }
+
+        return dates;
+    }
+
+    }
