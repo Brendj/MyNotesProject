@@ -990,6 +990,12 @@
                             label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsPaymentOrReducedPriceMealsReportPage}"
                             reRender="workspaceForm" />
+        <%--@elvariable id="detailedDeviationsWithoutCorpsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DetailedDeviationsWithoutCorpsReportPage"--%>
+        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsReportMenuItem"
+                            binding="#{mainPage.detailedDeviationsWithoutCorpsReportPage.mainMenuComponent}"
+                            label="Детализированный отчет отклонений оплаты льготного питания (без корпусов)"
+                            action="#{mainPage.showDetailedDeviationsWithoutCorpsReportPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"

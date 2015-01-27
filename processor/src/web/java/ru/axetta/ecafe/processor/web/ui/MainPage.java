@@ -50,10 +50,7 @@ import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
 import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
 import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
 import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
-import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsItem;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
-import ru.axetta.ecafe.processor.web.ui.service.msk.RegularPaymentEasyCheck;
-import ru.axetta.ecafe.processor.web.ui.service.msk.RequestResultEasyCheck;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -344,6 +341,7 @@ public class MainPage implements Serializable {
             = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
     private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
             = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
+    private final DetailedDeviationsWithoutCorpsReportPage detailedDeviationsWithoutCorpsReportPage = new DetailedDeviationsWithoutCorpsReportPage();
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
 
@@ -5424,6 +5422,10 @@ public class MainPage implements Serializable {
         return detailedDeviationsPaymentOrReducedPriceMealsReportPage;
     }
 
+    public DetailedDeviationsWithoutCorpsReportPage getDetailedDeviationsWithoutCorpsReportPage() {
+        return detailedDeviationsWithoutCorpsReportPage;
+    }
+
     public Object showGoodRequestNewReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5627,6 +5629,21 @@ public class MainPage implements Serializable {
         try {
             detailedDeviationsPaymentOrReducedPriceMealsReportPage.fill();
             currentWorkspacePage = detailedDeviationsPaymentOrReducedPriceMealsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showDetailedDeviationsWithoutCorpsReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            detailedDeviationsWithoutCorpsReportPage.fill();
+            currentWorkspacePage = detailedDeviationsWithoutCorpsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
