@@ -58,6 +58,13 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+            org = new OrgShortItem();
+            org.setIdOfOrg(171L);
+            org.setShortName("ГБОУ СОШ № 1125");
+            org.setOfficialName("ГБОУ СОШ № 1125");
+            startTime = new Date(1409515200000L);
+            endTime = new Date(1410119999999L);
+
             parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
@@ -70,7 +77,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             int orgCount = getFriendlyOrgs(session,org.getIdOfOrg()).size() - 1;
-            jasperPrint.setPageWidth(DEFAULT_REPORT_WIRTH + 400*orgCount );
+            //jasperPrint.setPageWidth(DEFAULT_REPORT_WIRTH + 400*orgCount );
             Date generateEndTime = new Date();
             return new AutoEnterEventV2Report(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
@@ -79,6 +86,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
+
 
 
             //Список организаций
@@ -110,8 +118,8 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
             Map<String, StClass> stClassMap = new HashMap<String, StClass>(); //class, List<ClientEnter>
 
-            Long currentClient = -1L;
-
+            List<Data> currentClassList;
+            List<Long> clientIdList = new LinkedList<Long>();
             //парсим данные
             for(Object o: rList){
                 Map<String,Object> row = (Map<String,Object>)o;
@@ -119,11 +127,11 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     stClassMap.put((String) row.get("groupname"),
                             new StClass((String)row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
                 }
-                List<Data> currentClassList = stClassMap.get((String)row.get("groupname")).getDataList();
+                currentClassList = stClassMap.get((String)row.get("groupname")).getDataList();
 
-                if (!currentClient.equals(((BigInteger)row.get("idofclient")).longValue())) {
+                if (!clientIdList.contains(((BigInteger)row.get("idofclient")).longValue())) {
                     currentClassList.addAll(prepareDataList(row, friendlyOrgs, startTime, endTime));
-                    currentClient = ((BigInteger)row.get("idofclient")).longValue();
+                    clientIdList.add(((BigInteger)row.get("idofclient")).longValue());
                 }
                 for (Data event : currentClassList) {
                     if ((event.getF01().equals(((BigInteger)row.get("idofclient")).toString()))

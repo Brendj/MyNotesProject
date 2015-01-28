@@ -139,13 +139,12 @@ public class OrdersRepository extends BaseJpaDao {
     public List<OrderItem> findAllPayComplex(Date startDate, Date endDate){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
 
-        Query nativeQuery = entityManager.createNativeQuery("SELECT org.ShortName AS name, o.createdDate, (od.discount*od.qty)AS sum "
-                + "from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
-                + "where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
-                + "and o.idOfOrg = od.idOfOrg   and org.idOfOrg = od.idOfOrg " + "and o.createdDate >= :startDate "
-                + " and o.createdDate <= :endDate  and (od.menuType >= 50 and od.menuType <= 99) "
-                + " and (od.socDiscount = 0) "
-                + "order by org.officialName")
+        Query nativeQuery = entityManager.createNativeQuery("SELECT org.shortname,o.createdDate , (od.rPrice * od.qty) "
+                + " FROM CF_Orders o, CF_OrderDetails od, CF_Orgs org  WHERE o.idOfOrder = od.idOfOrder   "
+                + " AND o.idOfOrg = od.idOfOrg AND org.idOfOrg = od.idOfOrg  "
+                + " AND o.createdDate >= :startDate AND o.createdDate <= :endDate   AND (od.menuType >= 50 AND od.menuType <= 99) "
+                + "  AND (od.socDiscount = 0) AND o.state=0 AND od.state=0  "
+                + "   ORDER BY org.officialName")
                 .setParameter("startDate", startDate.getTime())
                 .setParameter("endDate",endDate.getTime());
 
