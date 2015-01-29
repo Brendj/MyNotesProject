@@ -10,8 +10,8 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.without.corps.DetailedDeviationsWithoutCorpsBuilder;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.without.corps.DetailedDeviationsWithoutCorpsJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsBuilder;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -35,6 +35,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class DetailedDeviationsWithoutCorpsReportPage extends OnlineReportPage {
+
     private String htmlReport;
 
     public String getHtmlReport() {
@@ -102,10 +103,9 @@ public class DetailedDeviationsWithoutCorpsReportPage extends OnlineReportPage {
         }
         BasicReportJob report = null;
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
-                + "DetailedDeviationsWithoutCorpsJasperReport.jasper";
-        DetailedDeviationsWithoutCorpsBuilder builder = new DetailedDeviationsWithoutCorpsBuilder(
-                templateFilename);
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + "DetailedDeviationsWithoutCorpsJasperReport.jasper";
+        DetailedDeviationsWithoutCorpsBuilder builder = new DetailedDeviationsWithoutCorpsBuilder(templateFilename);
         String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         Session session = null;

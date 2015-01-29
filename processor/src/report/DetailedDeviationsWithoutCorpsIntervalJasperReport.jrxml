@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="1030" pageHeight="10000" columnWidth="990" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+	<property name="ireport.zoom" value="1.1000000000000005"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#E6F3FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="beginDate" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="endDate" class="java.lang.String" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="orgName" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="deviationPaymentSubReportItemList" class="java.util.List"/>
+	<field name="rowNum" class="java.lang.Long"/>
+	<group name="byOrgName">
+		<groupExpression><![CDATA[$F{deviationPaymentSubReportItemList}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<rectangle>
+					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" stretchType="RelativeToTallestObject" x="490" y="0" width="500" height="50"/>
+				</rectangle>
+				<subreport>
+					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" stretchType="RelativeToBandHeight" x="490" y="0" width="500" height="50"/>
+					<subreportParameter name="orgName">
+						<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{deviationPaymentSubReportItemList})]]></dataSourceExpression>
+					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DetailedDeviationsWithoutCorpsIntervalJasperReport_Subreport.jasper"]]></subreportExpression>
+				</subreport>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="225" height="50"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="8bef9b0a-3619-4fba-96a4-116612e0370b" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="50"/>
+					<box>
+						<pen lineWidth="1.0"/>
+						<topPen lineWidth="1.0"/>
+						<leftPen lineWidth="1.0"/>
+						<bottomPen lineWidth="1.0"/>
+						<rightPen lineWidth="1.0"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="10036522-7c1d-4628-b666-70e3a0e0ef50" x="265" y="0" width="225" height="50"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="100" splitType="Prevent">
+			<textField>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" positionType="Float" x="0" y="0" width="990" height="100"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Детализированный отчет отклонений оплаты льготного питания с " + $P{beginDate} + " по " + $P{endDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="25">
+			<staticText>
+				<reportElement uuid="743f4a73-1a52-49df-baaf-5c08b1c2e024" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[№]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3c1392c0-6031-4e93-bbe5-84ef58b9bd0e" stretchType="RelativeToBandHeight" x="40" y="0" width="225" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Организация]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" stretchType="RelativeToBandHeight" x="490" y="0" width="400" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[ФИО Учащегося]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b6a16611-554d-46a5-9313-de24ff2ff182" stretchType="RelativeToBandHeight" x="890" y="0" width="100" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Дата]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c7ab1322-8d73-4e44-9453-86bb9a053d76" x="265" y="0" width="225" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Адрес]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+</jasperReport>
