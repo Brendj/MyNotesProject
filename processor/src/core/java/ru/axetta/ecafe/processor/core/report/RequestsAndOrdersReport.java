@@ -101,7 +101,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
 
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
-            return new GoodRequestsNewReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
+            return new RequestsAndOrdersReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
 
