@@ -7,22 +7,20 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.DailyFormationRegistries"
-           table="cf_daily_formation_registries">
-        <id name="idOFDailyFormationRegistries" column="idOfDailyFormationRegistries" type="long">
+           table="cf_daily_formation_registries" optimistic-lock="version">
+        <id name="idOfRegistries" column="idofregistries" type="long">
             <generator class="identity"/>
         </id>
-        <property name="generatedDate" column="generatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+        <property name="generatedDate" column="generateddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
-        <many-to-one name="idOfContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="idOfContragent" not-null="true"
-                     insert="false" update="false"/>
-        <property name="contragentName" column="contragentName" type="string" length="255"/>
-        <property name="orgNum" column="orgnum" type="string" length="30"/>
-        <many-to-one name="idOfOrg" column="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"
-                     insert="false" update="false"/>
-        <property name="officialName" column="officialname" type="string" length="128"/>
-        <property name="address" column="address" type="string" length="128"/>
-        <property name="totalBalance" column="totalbalance" type="long"/>
-        <property name="rechargeAmount" column="rechargeamount" type="long"/>
-        <property name="salesAmount" column="salesamount" type="long"/>
+        <many-to-one name="idOfContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
+                     column="idofcontragent"
+                     not-null="false"/>
+        <property name="contragentName" column="contragentname" type="string" length="255"/>
+
+        <set name="dailyOrgRegistriesSet" table="cf_daily_org_registries" cascade="all" inverse="true">
+            <key column="idofregistries" not-null="true"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DailyOrgRegistries"/>
+        </set>
     </class>
 </hibernate-mapping>

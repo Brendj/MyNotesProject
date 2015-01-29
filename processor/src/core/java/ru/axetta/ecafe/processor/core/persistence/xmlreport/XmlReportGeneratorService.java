@@ -38,14 +38,18 @@ public class XmlReportGeneratorService {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            List<Contragent> some = DailyFormationOfRegistries.getContragentTSP(persistenceSession);
+            List<Contragent> some = DailyFormationOfRegistriesService.getContragentTSP(persistenceSession);
 
-            List<DailyFormationOfRegistries.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList = DailyFormationOfRegistries
+            List<DailyFormationOfRegistriesService.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList = DailyFormationOfRegistriesService
                     .getGenerationReportResult(persistenceSession, some, startDate);
 
             XmlReportGenerator xmlReportGenerator = new XmlReportGenerator();
             Document document = xmlReportGenerator.createXmlFile(dailyFormationOfRegistriesModelList);
             xmlReportGenerator.unloadXmlFile(document, CalendarUtils.dateToString(startDate));
+
+            DailyFormationOfRegistriesDBExport dailyFormationOfRegistriesDBExport = new DailyFormationOfRegistriesDBExport();
+            dailyFormationOfRegistriesDBExport
+                    .reportToDatabaseExport(dailyFormationOfRegistriesModelList, persistenceSession);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;

@@ -34,7 +34,7 @@ public class XmlReportGenerator {
     }
 
     public Document createXmlFile(
-            List<DailyFormationOfRegistries.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList)
+            List<DailyFormationOfRegistriesService.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList)
             throws ParserConfigurationException {
 
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -50,14 +50,14 @@ public class XmlReportGenerator {
         report.setAttribute("DateOfGeneration",
                 CalendarUtils.dateToString(dailyFormationOfRegistriesModelList.get(0).getGeneratedDate()));
 
-        for (DailyFormationOfRegistries.DailyFormationOfRegistriesModel dailyFormationOfRegistriesModel : dailyFormationOfRegistriesModelList) {
+        for (DailyFormationOfRegistriesService.DailyFormationOfRegistriesModel dailyFormationOfRegistriesModel : dailyFormationOfRegistriesModelList) {
 
             Element contragent = document.createElement("ContragentTSP");
 
             contragent.setAttribute("ContragentId", String.valueOf(dailyFormationOfRegistriesModel.getContragentId()));
             contragent.setAttribute("ContragentName", dailyFormationOfRegistriesModel.getContragentName());
 
-            for (DailyFormationOfRegistries.OrgItem orgItem : dailyFormationOfRegistriesModel.getOrgItemList()) {
+            for (DailyFormationOfRegistriesService.OrgItem orgItem : dailyFormationOfRegistriesModel.getOrgItemList()) {
                 Element organization = document.createElement("Organization");
                 contragent.appendChild(organization);
                 organization.setAttribute("OrganizationId", String.valueOf(orgItem.getIdOfOrg()));
@@ -78,7 +78,8 @@ public class XmlReportGenerator {
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(document);
 
-            String filePath = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.registries.path");
+            String filePath = (String) RuntimeContext.getInstance().getConfigProperties()
+                    .get("ecafe.processor.registries.path");
 
             File dir = new File(filePath);
             boolean bool = dir.mkdirs();

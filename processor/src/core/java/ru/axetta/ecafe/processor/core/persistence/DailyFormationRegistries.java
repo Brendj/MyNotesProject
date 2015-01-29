@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,43 +15,43 @@ import java.util.Date;
  */
 
 public class DailyFormationRegistries {
-    private Long idOFDailyFormationRegistries;
+
+    /**
+     * Номер реестра по показателям
+     */
+    private Long idOfRegistries;
+    /**
+     * Дата начала генерации
+     */
     private Date generatedDate;
+    /**
+     * Контрагент ТСП
+     */
     private Contragent idOfContragent;
+    /**
+     * Имя контрагента ТСП
+     */
     private String contragentName;
-    private String orgNum;
-    private Org idOfOrg;
-    private String officialName;
-    private String address;
-    private Long totalBalance;
-    private Long rechargeAmount;
-    private Long salesAmount;
+
+    private Set<DailyOrgRegistries> dailyOrgRegistriesSet;
 
     public DailyFormationRegistries() {
     }
 
-    public DailyFormationRegistries(Long idOFDailyFormationRegistries, Date generatedDate, Contragent idOfContragent,
-            String contragentName, String orgNum, Org idOfOrg, String officialName, String address, Long totalBalance,
-            Long rechargeAmount, Long salesAmount) {
-        this.idOFDailyFormationRegistries = idOFDailyFormationRegistries;
+    public DailyFormationRegistries(Long idOfRegistries, Date generatedDate, Contragent idOfContragent,
+            String contragentName) {
+        this.idOfRegistries = idOfRegistries;
         this.generatedDate = generatedDate;
         this.idOfContragent = idOfContragent;
         this.contragentName = contragentName;
-        this.orgNum = orgNum;
-        this.idOfOrg = idOfOrg;
-        this.officialName = officialName;
-        this.address = address;
-        this.totalBalance = totalBalance;
-        this.rechargeAmount = rechargeAmount;
-        this.salesAmount = salesAmount;
     }
 
-    public Long getIdOFDailyFormationRegistries() {
-        return idOFDailyFormationRegistries;
+    public Long getIdOfRegistries() {
+        return idOfRegistries;
     }
 
-    public void setIdOFDailyFormationRegistries(Long idOFDailyFormationRegistries) {
-        this.idOFDailyFormationRegistries = idOFDailyFormationRegistries;
+    public void setIdOfRegistries(Long idOFDailyFormationRegistries) {
+        this.idOfRegistries = idOFDailyFormationRegistries;
     }
 
     public Date getGeneratedDate() {
@@ -77,59 +78,11 @@ public class DailyFormationRegistries {
         this.contragentName = contragentName;
     }
 
-    public String getOrgNum() {
-        return orgNum;
+    public Set<DailyOrgRegistries> getDailyOrgRegistriesSet() {
+        return dailyOrgRegistriesSet;
     }
 
-    public void setOrgNum(String orgNum) {
-        this.orgNum = orgNum;
-    }
-
-    public Org getIdOfOrg() {
-        return idOfOrg;
-    }
-
-    public void setIdOfOrg(Org idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
-
-    public String getOfficialName() {
-        return officialName;
-    }
-
-    public void setOfficialName(String officialName) {
-        this.officialName = officialName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Long getTotalBalance() {
-        return totalBalance;
-    }
-
-    public void setTotalBalance(Long totalBalance) {
-        this.totalBalance = totalBalance;
-    }
-
-    public Long getRechargeAmount() {
-        return rechargeAmount;
-    }
-
-    public void setRechargeAmount(Long rechargeAmount) {
-        this.rechargeAmount = rechargeAmount;
-    }
-
-    public Long getSalesAmount() {
-        return salesAmount;
-    }
-
-    public void setSalesAmount(Long salesAmount) {
-        this.salesAmount = salesAmount;
+    public void setDailyOrgRegistriesSet(Set<DailyOrgRegistries> dailyOrgRegistriesSet) {
+        this.dailyOrgRegistriesSet = dailyOrgRegistriesSet;
     }
 }

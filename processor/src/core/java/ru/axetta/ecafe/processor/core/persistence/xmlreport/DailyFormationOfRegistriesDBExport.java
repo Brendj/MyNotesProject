@@ -6,15 +6,17 @@ package ru.axetta.ecafe.processor.core.persistence.xmlreport;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.DailyFormationRegistries;
+import ru.axetta.ecafe.processor.core.persistence.DailyOrgRegistries;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,44 +30,44 @@ public class DailyFormationOfRegistriesDBExport {
     private static final Logger logger = LoggerFactory.getLogger(DailyFormationOfRegistriesDBExport.class);
 
     public void reportToDatabaseExport(
-            List<DailyFormationOfRegistries.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList,
-            Session session,  Transaction persistenceTransaction) {
+            List<DailyFormationOfRegistriesService.DailyFormationOfRegistriesModel> dailyFormationOfRegistriesModelList,
+            Session session) throws Exception {
 
-        for (DailyFormationOfRegistries.DailyFormationOfRegistriesModel dailyFormation : dailyFormationOfRegistriesModelList) {
-            //Transaction persistenceTransaction = null;
-            try {
+       // session.clear();
 
-                persistenceTransaction = session.beginTransaction();
+        for (DailyFormationOfRegistriesService.DailyFormationOfRegistriesModel dailyFormation : dailyFormationOfRegistriesModelList) {
 
-                for (DailyFormationOfRegistries.OrgItem orgItem : dailyFormation.getOrgItemList()) {
+            DailyFormationRegistries dailyFormationRegistries = new DailyFormationRegistries();
+            dailyFormationRegistries.setGeneratedDate(dailyFormation.getGeneratedDate());
 
-                    DailyFormationRegistries dailyFormationRegistries = new DailyFormationRegistries();
+            Contragent contragent = (Contragent) session.load(Contragent.class, dailyFormation.contragentId);
 
-                    dailyFormationRegistries.setGeneratedDate(dailyFormation.getGeneratedDate());
-                    Contragent contragent = (Contragent) session
-                            .load(Contragent.class, dailyFormation.getContragentId());
-                    dailyFormationRegistries.setIdOfContragent(contragent);
-                    dailyFormationRegistries.setContragentName(dailyFormation.getContragentName());
+            dailyFormationRegistries.setIdOfContragent(contragent);
+            dailyFormationRegistries.setContragentName(dailyFormation.getContragentName());
 
-                    dailyFormationRegistries.setOrgNum(orgItem.getOrgNum());
+            Set<DailyOrgRegistries> dailyOrgRegistriesSet = new HashSet<DailyOrgRegistries>();
 
-                    Org org = (Org) session.load(Org.class, orgItem.getIdOfOrg());
-                    dailyFormationRegistries.setIdOfOrg(org);
-                    dailyFormationRegistries.setOfficialName(orgItem.getOfficialName());
-                    dailyFormationRegistries.setAddress(orgItem.getAddress());
-                    dailyFormationRegistries.setTotalBalance(orgItem.getTotalBalance());
-                    dailyFormationRegistries.setRechargeAmount(orgItem.getRechargeAmount());
-                    dailyFormationRegistries.setSalesAmount(orgItem.getSalesAmount());
+            for (DailyFormationOfRegistriesService.OrgItem dayForm : dailyFormation.getOrgItemList()) {
 
-                    session.save(dailyFormationRegistries);
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
-                }
-            } catch (Exception e) {
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(session, logger);
+                DailyOrgRegistries dailyOrgRegistries = new DailyOrgRegistries();
+                dailyOrgRegistries.setOrgNum(dayForm.getOrgNum());
+
+                Org org = (Org) session.load(Org.class, dayForm.getIdOfOrg());
+
+                dailyOrgRegistries.setIdOfOrg(org);
+                dailyOrgRegistries.setOfficialName(dayForm.getOfficialName());
+                dailyOrgRegistries.setAddress(dayForm.getAddress());
+                dailyOrgRegistries.setTotalBalance(dayForm.getTotalBalance());
+                dailyOrgRegistries.setRechargeAmount(dayForm.getRechargeAmount());
+                dailyOrgRegistries.setSalesAmount(dayForm.getSalesAmount());
+                dailyOrgRegistries.setDailyFormationRegistries(dailyFormationRegistries);
+                dailyOrgRegistries.setCreatedDate(new Date());
+
+                dailyOrgRegistriesSet.add(dailyOrgRegistries);
             }
+
+            dailyFormationRegistries.setDailyOrgRegistriesSet(dailyOrgRegistriesSet);
+            session.save(dailyFormationRegistries);
         }
     }
 }

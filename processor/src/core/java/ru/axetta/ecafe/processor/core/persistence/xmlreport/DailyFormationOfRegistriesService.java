@@ -27,7 +27,7 @@ import java.util.Set;
  * Time: 13:25
  */
 
-public class DailyFormationOfRegistries {
+public class DailyFormationOfRegistriesService {
 
     // метод выбора контрагентов ТСП
     public static List<Contragent> getContragentTSP(Session session) {
@@ -177,8 +177,8 @@ public class DailyFormationOfRegistries {
         return organizationSalesAmounts;
     }
 
-    public static List<StornedOrdersOrganizationSalesAmount> orgStornedOrdersSalesAmount(Session session, List<Long> contragentOrgs,
-            Date salesDate) {
+    public static List<StornedOrdersOrganizationSalesAmount> orgStornedOrdersSalesAmount(Session session,
+            List<Long> contragentOrgs, Date salesDate) {
         Date beforeDate = CalendarUtils.subOneDay(CalendarUtils.truncateToDayOfMonth(salesDate));
 
         List<StornedOrdersOrganizationSalesAmount> stornedOrdersOrganizationSalesAmounts = new ArrayList<StornedOrdersOrganizationSalesAmount>();
@@ -186,7 +186,7 @@ public class DailyFormationOfRegistries {
         return stornedOrdersOrganizationSalesAmounts;
     }
 
-    // Данных для выгрузки в xml
+    //Модель данных для выгрузки в xml - DailyFormationOfRegistriesModel
     public static class DailyFormationOfRegistriesModel {
 
         // тег Отчет
@@ -387,56 +387,6 @@ public class DailyFormationOfRegistries {
 
         public void setRechargeAmount(Long rechargeAmount) {
             this.rechargeAmount = rechargeAmount;
-        }
-    }
-
-    public static class StornedOrdersOrganizationSalesAmount {
-        public Long idOfOrg;
-        public Long stornedSalesAmount;
-        public Date ordersDate;
-        public Date generateStornDate;
-
-        public StornedOrdersOrganizationSalesAmount() {
-        }
-
-        public StornedOrdersOrganizationSalesAmount(Long idOfOrg, Long stornedSalesAmount, Date ordersDate,
-                Date generateStornDate) {
-            this.idOfOrg = idOfOrg;
-            this.stornedSalesAmount = stornedSalesAmount;
-            this.ordersDate = ordersDate;
-            this.generateStornDate = generateStornDate;
-        }
-
-        public Long getIdOfOrg() {
-            return idOfOrg;
-        }
-
-        public void setIdOfOrg(Long idOfOrg) {
-            this.idOfOrg = idOfOrg;
-        }
-
-        public Long getStornedSalesAmount() {
-            return stornedSalesAmount;
-        }
-
-        public void setStornedSalesAmount(Long stornedSalesAmount) {
-            this.stornedSalesAmount = stornedSalesAmount;
-        }
-
-        public Date getOrdersDate() {
-            return ordersDate;
-        }
-
-        public void setOrdersDate(Date ordersDate) {
-            this.ordersDate = ordersDate;
-        }
-
-        public Date getGenerateStornDate() {
-            return generateStornDate;
-        }
-
-        public void setGenerateStornDate(Date generateStornDate) {
-            this.generateStornDate = generateStornDate;
         }
     }
 }
