@@ -58,13 +58,6 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            org = new OrgShortItem();
-            org.setIdOfOrg(171L);
-            org.setShortName("ГБОУ СОШ № 1125");
-            org.setOfficialName("ГБОУ СОШ № 1125");
-            startTime = new Date(1409515200000L);
-            endTime = new Date(1410119999999L);
-
             parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
@@ -109,6 +102,8 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                             + " WHERE ee.idoforg IN (" + friendlyOrgsIds + ") AND cs.idoforg IN ("+ friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime()
                             + " AND " + endTime.getTime() + "     AND ee.idofclient IS NOT null "
+                            + " AND ee.PassDirection in (0, 1, 6, 7) "
+
                             + "     AND cs.idofclientgroup != 1100000060 "
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
 
