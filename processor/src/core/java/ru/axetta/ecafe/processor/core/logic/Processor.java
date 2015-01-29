@@ -650,7 +650,7 @@ public class Processor implements SyncProcessor,
             updatedCard.setClient(newCardOwner);
             //updatedCard.setCardType(cardType);
             updatedCard.setUpdateTime(new Date());
-            //updatedCard.setState(state);
+            updatedCard.setState(Card.ACTIVE_STATE);
             updatedCard.setLockReason("");
             updatedCard.setValidTime(validTime);
             updatedCard.setIssueTime(changeTime);
