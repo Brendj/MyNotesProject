@@ -186,6 +186,12 @@ public class ReportRuleConstants {
             new ParamHint(DashboardByAllOrgReport.P_ORG_STATE, "Статус").setDefaultRule(
                     String.format("= %s{0}Не обслуживается,{1}Обслуживается,{2}Все,",
                             RuleProcessor.COMBOBOX_EXPRESSION)),//39
+            new ParamHint(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS, "Скрывать даты с пустыми значениями")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не скрывать,{true}Скрывать"),//40
+            new ParamHint(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, "Включить цветовую индикацию")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не использовать,{true}Включить"),//41
+            new ParamHint(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, "Режим вывода данных")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Все данные,{true}Только расхождения"),//42
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -248,8 +254,8 @@ public class ReportRuleConstants {
             new ReportHint(AutoEnterEventV2Report.class.getCanonicalName(), new int[]{3}),
             new ReportHint(TotalSalesReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(FeedingAndVisitReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(SMSDeliveryReport.class.getCanonicalName(),
-                    new int[]{3})
+            new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 40, 41, 42})
 
     };
 
