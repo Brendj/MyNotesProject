@@ -45,8 +45,7 @@ public class RegularPaymentServlet extends HttpServlet {
         logger.info("Starting process Acquiropay callback from {}", req.getRemoteAddr());
         Long mfrRequestId;
         int error = 0;
-        RegularPaymentSubscriptionService service = (RegularPaymentSubscriptionService) RuntimeContext.getAppContext()
-                .getBean("regularPaymentSubscriptionService");
+        RegularPaymentSubscriptionService service = RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
         try {
             PaymentResponse callback = new PaymentResponse();
             service.fillFromRequest(callback, req);
