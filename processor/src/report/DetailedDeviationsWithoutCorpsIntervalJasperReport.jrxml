@@ -50,7 +50,7 @@
 					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{deviationPaymentSubReportItemList})]]></dataSourceExpression>
 					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DetailedDeviationsWithoutCorpsIntervalJasperReport_Subreport.jasper"]]></subreportExpression>
 				</subreport>
-				<textField isBlankWhenNull="true">
+				<textField isBlankWhenNull="false">
 					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="225" height="50"/>
 					<box>
 						<pen lineWidth="1.0"/>
@@ -78,8 +78,15 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 				</textField>
-				<textField isBlankWhenNull="true">
-					<reportElement uuid="10036522-7c1d-4628-b666-70e3a0e0ef50" x="265" y="0" width="225" height="50"/>
+				<textField isBlankWhenNull="false">
+					<reportElement uuid="10036522-7c1d-4628-b666-70e3a0e0ef50" stretchType="RelativeToBandHeight" x="265" y="0" width="225" height="50"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="14"/>
 					</textElement>
@@ -161,7 +168,14 @@
 				<text><![CDATA[Дата]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c7ab1322-8d73-4e44-9453-86bb9a053d76" x="265" y="0" width="225" height="25"/>
+				<reportElement uuid="c7ab1322-8d73-4e44-9453-86bb9a053d76" stretchType="RelativeToBandHeight" x="265" y="0" width="225" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>

@@ -84,7 +84,7 @@ public class PlanOrderItem {
         this.orderType = orderType;
     }
 
-    Date getOrderDate() {
+    public Date getOrderDate() {
         return orderDate;
     }
 
@@ -108,11 +108,11 @@ public class PlanOrderItem {
         this.idOfComplex = idOfComplex;
     }
 
-    Long getIdOfClient() {
+    public Long getIdOfClient() {
         return idOfClient;
     }
 
-    void setIdOfClient(Long idOfClient) {
+    public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
     }
 

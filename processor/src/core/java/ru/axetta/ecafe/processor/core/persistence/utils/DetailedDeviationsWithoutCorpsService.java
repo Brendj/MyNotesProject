@@ -31,11 +31,11 @@ import java.util.regex.Pattern;
  * Time: 16:42
  */
 
-public class DetailedDeviationWithoutCorpsService {
+public class DetailedDeviationsWithoutCorpsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DetailedDeviationWithoutCorpsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(DetailedDeviationsWithoutCorpsService.class);
 
-    public DetailedDeviationWithoutCorpsService() {
+    public DetailedDeviationsWithoutCorpsService() {
     }
 
     //Вернет список клиентов которые были оплачены (по всем дружественным организациям)
@@ -68,14 +68,14 @@ public class DetailedDeviationWithoutCorpsService {
             String groupName;
 
             if (resultPlanOrderItem[1] == null) {
-                clientName = DetailedDeviationWithoutCorpsService
+                clientName = DetailedDeviationsWithoutCorpsService
                         .getClientNameByClientId(session, ((BigInteger) resultPlanOrderItem[0]).longValue());
             } else {
                 clientName = (String) resultPlanOrderItem[1];
             }
 
             if (resultPlanOrderItem[5] == null) {
-                groupName = DetailedDeviationWithoutCorpsService
+                groupName = DetailedDeviationsWithoutCorpsService
                         .getClientGroupNameByClientId(session, ((BigInteger) resultPlanOrderItem[0]).longValue());
             } else {
                 groupName = (String) resultPlanOrderItem[5];
@@ -90,22 +90,125 @@ public class DetailedDeviationWithoutCorpsService {
         return resultPlanOrder;
     }
 
+    // Те кто должен был получить | Проход по карте не зафиксирован
+    public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
+            List<Long> idOfOrgList) {
+        List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
+        // клиенты которые не в здании
+        List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
+                .loadClientsInfoToPayNotDetected(session, startTime, endTime, idOfOrgList);
+        if (!clientInfoList.isEmpty()) {
+            for (ClientInfo clientInfo : clientInfoList) {
+                // правила для организации
+                List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
+                        .getDiscountRulesByOrg(session, clientInfo.getIdOfOrg());
+                // платные категории
+                List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService
+                        .loadAllPaydAbleCategories(session);
+                List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
+                        .loadComplexNameByPlan(session, clientInfo.getIdOfOrg(), startTime, endTime);
+
+                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
+                categories.removeAll(onlyPaidCategories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                rules = getRulesByHighPriority(rules);
+                for (DiscountRule rule : rules) {
+                    addPlanOrderItems(allItems, complexInfoItemListByPlan, clientInfo, rule, startTime);
+                }
+            }
+            return allItems;
+        }
+        return null;
+    }
+
+    private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime,
+            List<Long> idOfOrgList) {
+        // План питания льготники
+        String orderTypeExempt = "4,6,8";
+
+        List<PlanOrderItem> planOrderItemList = DetailedDeviationsWithoutCorpsService
+                .loadPaidPlanOrderInfo(session, orderTypeExempt, idOfOrgList, startTime, endTime);
+
+        List<Long> idOfClientsList = new ArrayList<Long>();
+
+        for (PlanOrderItem planOrderItem : planOrderItemList) {
+            idOfClientsList.add(planOrderItem.getIdOfClient());
+        }
+
+        List<ClientInfo> clientInfoListNot = new ArrayList<ClientInfo>();
+
+        if (idOfClientsList.size() > 0) {
+            Query query = session.createSQLQuery(
+                    "SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
+                            + "LEFT JOIN cf_clientgroups gr "
+                            + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                            + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg IN (:idOfOrgList) "
+                            + "AND cl.idOfClientGroup < 1100000030 AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                            + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
+                            + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
+                            + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
+                            + "AND e.idoforg IN ( :idOfOrgList) AND e.idofclient IS NOT null AND e.idofclient IN ( :idOfClientsList ) "
+                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030)");
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameterList("idOfClientsList", idOfClientsList);
+            query.setParameter("startTime", startTime.getTime());
+            query.setParameter("endTime", endTime.getTime());
+
+            List result = query.list();
+
+            for (Object resultClient : result) {
+                Object[] resultClientItem = (Object[]) resultClient;
+                ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
+                        ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
+                        ((BigInteger) resultClientItem[3]).longValue(), (String) resultClientItem[4],
+                        (String) resultClientItem[5]);
+                clientInfoListNot.add(clientInfo);
+            }
+        } else {
+            Query query = session.createSQLQuery(
+                    "SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
+                            + "LEFT JOIN cf_clientgroups gr "
+                            + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                            + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg in (:idOfOrgList) "
+                            + "AND cl.idOfClientGroup < 1100000030 AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                            + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
+                            + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
+                            + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
+                            + "AND e.idoforg in ( :idOfOrgList) AND e.idofclient IS NOT null "
+                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030)");
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameter("startTime", startTime.getTime());
+            query.setParameter("endTime", endTime.getTime());
+
+            List result = query.list();
+
+            for (Object resultClient : result) {
+                Object[] resultClientItem = (Object[]) resultClient;
+                ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(), ((BigInteger) resultClientItem[1]).longValue(),
+                        (String) resultClientItem[2], ((BigInteger) resultClientItem[3]).longValue(),
+                        (String) resultClientItem[4], (String) resultClientItem[5]);
+                clientInfoListNot.add(clientInfo);
+            }
+        }
+        return clientInfoListNot;
+    }
+
     // Те кто должен был получить | Проход по карте зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime,
             List<Long> idOfOrgList) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
-        List<ClientInfo> clientInfoList = DetailedDeviationWithoutCorpsService
+        List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
                 .loadClientsInfoToPayDetected(session, startTime, endTime, idOfOrgList);
         if (!clientInfoList.isEmpty()) {
             for (ClientInfo clientInfo : clientInfoList) {
                 // правила для организации
-                List<DiscountRule> rulesForOrg = DetailedDeviationWithoutCorpsService
+                List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
                         .getDiscountRulesByOrg(session, clientInfo.getIdOfOrg());
                 // платные категории
-                List<Long> onlyPaydAbleCategories = DetailedDeviationWithoutCorpsService
+                List<Long> onlyPaydAbleCategories = DetailedDeviationsWithoutCorpsService
                         .loadAllPaydAbleCategories(session);
-                List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationWithoutCorpsService
+                List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
                         .loadComplexNameByPlan(session, clientInfo.getIdOfOrg(), startTime, endTime);
 
                 List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);

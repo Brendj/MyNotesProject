@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="1030" pageHeight="10000" columnWidth="990" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="1080" pageHeight="10000" columnWidth="1040" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
 	<property name="ireport.zoom" value="1.0000000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -37,7 +37,7 @@
 	<title>
 		<band height="100" splitType="Stretch">
 			<textField>
-				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" stretchType="RelativeToBandHeight" x="0" y="0" width="990" height="100"/>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" stretchType="RelativeToBandHeight" x="0" y="0" width="1040" height="100"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="18" isBold="true"/>
 				</textElement>
@@ -62,7 +62,7 @@
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="490" y="0" width="500" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="490" y="0" width="550" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -108,7 +108,7 @@
 	<detail>
 		<band height="50">
 			<subreport>
-				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="490" y="0" width="500" height="50"/>
+				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="490" y="0" width="550" height="50"/>
 				<subreportParameter name="orgName">
 					<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 				</subreportParameter>

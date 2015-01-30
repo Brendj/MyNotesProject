@@ -113,7 +113,7 @@ public class ClientsEntereventsService {
     public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
             Long orgId, List<Long> idOfOrgList) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
-        // клиенты которые в здании
+        // клиенты которые не в здании
         List<ClientInfo> clientInfoList = ClientsEntereventsService
                 .loadClientsInfoToPayNotDetected(session, startTime, endTime, idOfOrgList);
         if (!clientInfoList.isEmpty()) {
