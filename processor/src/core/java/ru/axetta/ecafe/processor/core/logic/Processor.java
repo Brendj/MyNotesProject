@@ -3212,8 +3212,11 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                     values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
                                     if(!(guardians==null || guardians.isEmpty())){
                                         for (Client cl: guardians){
+                                            if(guardians.size() > 1 && cl.getIdOfClient().equals(guardian.getIdOfClient())) {
+                                                continue;
+                                            }
                                             notificationService.sendNotificationAsync(cl,
-                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardian);
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), cl);
                                         }
                                     } else {
                                         notificationService.sendNotificationAsync(client,
