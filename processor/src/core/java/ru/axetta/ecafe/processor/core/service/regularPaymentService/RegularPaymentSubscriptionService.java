@@ -229,7 +229,7 @@ public class RegularPaymentSubscriptionService {
         String orgCondition = (idOfOrg != null)? " and bs.client.org.idOfOrg = " + idOfOrg+ " ":"";
 
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
-                " where bs.active = true and bs.client.balance <= bs.thresholdAmount \n" +
+                " where bs.active = true and bs.client.balance < bs.thresholdAmount \n" +
                 " and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) " +
                  orgCondition +
                 " and (bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
