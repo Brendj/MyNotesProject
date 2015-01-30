@@ -38,4 +38,13 @@ public class ClientDao extends WritableJpaDao {
                 .setParameter("password", password);
         return query.getResultList();    //To change body of overridden methods use File | Settings | File Templates.
     }
+
+
+    @Transactional
+    public List<Client> findAllByOrg(List<Long> orgsIdList ) {
+        TypedQuery<Client> query = entityManager
+                .createQuery("from Client c where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060", Client.class)
+                .setParameter("orgsIdList", orgsIdList);
+        return query.getResultList();
+    }
 }

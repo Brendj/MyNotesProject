@@ -9,6 +9,9 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
@@ -85,9 +88,33 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
             String friendlyOrgsIds = "" + org.getIdOfOrg();
+            List<Long> ids = new ArrayList<Long>();
             for(ShortBuilding building : friendlyOrgs) {
                 friendlyOrgsIds += "," + building.getId();
+                ids.add(building.getId());
             }
+
+            ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
+
+            List<Client> allByOrg = clientDao.findAllByOrg(ids);
+            List<Data> currentClassList;
+            Map<String, StClass> stClassMap = new HashMap<String, StClass>(); //class, List<ClientEnter>
+
+            List<Long> clientIdList = new LinkedList<Long>();
+            for (Client client : allByOrg) {
+                if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
+                    stClassMap.put(client.getClientGroup().getGroupName(),
+                            new StClass(client.getClientGroup().getGroupName(), friendlyOrgs, new LinkedList<Data>()));
+                }
+                currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
+                if (!clientIdList.contains(client.getIdOfClient())) {
+                    currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
+                    clientIdList.add(client.getIdOfClient());
+                }
+
+
+            }
+
 
             //данные для отчета
 
@@ -110,11 +137,6 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
             List rList = query.list();
 
-
-            Map<String, StClass> stClassMap = new HashMap<String, StClass>(); //class, List<ClientEnter>
-
-            List<Data> currentClassList;
-            List<Long> clientIdList = new LinkedList<Long>();
             //парсим данные
             for(Object o: rList){
                 Map<String,Object> row = (Map<String,Object>)o;
@@ -247,6 +269,40 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 eventData.setF01(((BigInteger)rs.get("idofclient")).toString());
                 eventData.setF02(rs.get("surname") + " " + rs.get("firstname") + " " + rs.get("secondname"));
                 eventData.setF03((String) rs.get("groupname"));
+                eventData.setF04(date);
+                eventData.setF05(building.getF05());
+                resultList.add(eventData);
+            }
+        }
+
+        return resultList;
+    }
+
+    //возвращает список Data с заполненными дата-корпусами
+    private static List<Data> prepareDataList(Client client, List<ShortBuilding> friendlyOrgs, Date begin, Date end)
+            throws SQLException {
+        List<Data> resultList = new LinkedList<Data>();
+        List<String> dateList = new LinkedList<String>();
+        dateList.add(CalendarUtils.dateShortToString(begin));
+        Calendar beginC = Calendar.getInstance();
+        beginC.setTime(begin);
+        Calendar endC = Calendar.getInstance();
+        endC.setTime(end);
+        while ( beginC.compareTo(endC) == -1) {
+            beginC.add(Calendar.DAY_OF_MONTH, 1);
+            dateList.add(CalendarUtils.dateShortToString(beginC.getTime()));
+        }
+        if(dateList.size() > 1){
+            dateList.remove(dateList.size()-1);
+        }
+
+        for (String date : dateList) {
+            for (ShortBuilding building : friendlyOrgs) {
+                Data eventData = new Data();
+                eventData.setEventId(0L);
+                eventData.setF01(client.getIdOfClient().toString());
+                eventData.setF02(client.getPerson().getFullName());
+                eventData.setF03(client.getClientGroup().getGroupName());
                 eventData.setF04(date);
                 eventData.setF05(building.getF05());
                 resultList.add(eventData);
