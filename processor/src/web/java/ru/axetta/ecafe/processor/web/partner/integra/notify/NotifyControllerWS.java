@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.service.regularPaymentService.BadSumException;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.DuplicatePaymentException;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.kzn_bankkazani.NotFoundPaymentException;
@@ -103,6 +104,10 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
         if (autoPaymentResultRequest.getIdaction() != null) {
             if (autoPaymentResultRequest.getErrorCode() == 0) {
                 try {
+                    if(autoPaymentResultRequest.getRealAmount() == 0){
+                        throw new BadSumException();
+                    }
+
                     RegularPayment payment = rpService.findPayment(autoPaymentResultRequest.getIdaction());
                     if (payment == null) {
                         throw new NotFoundPaymentException();
@@ -122,7 +127,11 @@ public class NotifyControllerWS extends HttpServlet implements NotifyController 
                         result.setErrorCode(0);
                         result.setErrorDesc("Ok.");
                     }
-                } catch (DuplicatePaymentException e) {
+                } catch (BadSumException e) {
+                    logger.warn(e.getMessage());
+                    result.setErrorCode(150);
+                    result.setErrorDesc(e.getMessage());
+                }catch (DuplicatePaymentException e) {
                     logger.warn(e.getMessage());
                     result.setErrorCode(160);
                     result.setErrorDesc(e.getMessage());
