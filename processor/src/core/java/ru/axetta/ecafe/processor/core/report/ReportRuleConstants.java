@@ -254,9 +254,9 @@ public class ReportRuleConstants {
             new ReportHint(AutoEnterEventV2Report.class.getCanonicalName(), new int[]{3}),
             new ReportHint(TotalSalesReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(FeedingAndVisitReport.class.getCanonicalName(), new int[]{3}),
+            new ReportHint(FeedingAndVisitSReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 40, 41, 42})
-
     };
 
     private ReportRuleConstants() {

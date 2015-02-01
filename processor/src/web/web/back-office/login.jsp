@@ -1,14 +1,16 @@
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%--
-  ~ Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
   --%>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%if (StringUtils.isNotEmpty(request.getRemoteUser())) {
-    String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/index.faces");
-    response.sendRedirect(mainPage);
-    return;
-}%>
+<%
+    if (StringUtils.isNotEmpty(request.getRemoteUser())) {
+        String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/index.faces");
+        response.sendRedirect(mainPage);
+        return;
+    }
+%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
@@ -24,60 +26,37 @@
     <link rel="icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
     <link rel="shortcut icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
     <link rel="stylesheet" href="<c:url value="/back-office/styles.css"/>" type="text/css">
-    <link rel="stylesheet" href="<c:url value="/resources/css/login.css"/>" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../resources/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../resources/css/weather-icons.min.css">
 </head>
-<body style="background: url('../images/1.png')">
-
+<body>
 <f:view>
-
-    <section data-ng-view="" id="content" class="animate-fade-up ng-scope">
-
-        <form id="loginForm" method="post" enctype="application/x-www-form-urlencoded" action="j_security_check"
-              class="borderless-form">
-            <div class="page page-lock ng-scope">
-
-                <div class="lock-centered clearfix">
-                    <div class="lock-container">
-                        <!-- <div ui-time class="lock-time"></div> -->
-
-                        <section class="lock-box">
-                            <div class="lock-user ng-binding">
-                                <div  class="form-group">
-                                    <input type="text" name="j_username" placeholder="username" class="form-control" style="border:0px;height: 50px;" />
-                                </div>
+    <table style="width: 100%; height: 100%">
+        <tr valign="middle">
+            <td align="center">
+                <h:panelGrid cellpadding="0" cellspacing="0">
+                    <rich:panel header="Необходима авторизация" styleClass="login-panel"
+                                headerClass="login-panel-header" bodyClass="login-panel-body">
+                        <form id="loginForm" method="post" enctype="application/x-www-form-urlencoded"
+                              action="j_security_check" class="borderless-form">
+                            <div align="center">
+                                <%if (null != request.getParameter("error")) {%>
+                                <h:outputText styleClass="error-output-text"
+                                              value="#{not empty requestScope['errorMessage'] ? requestScope['errorMessage'] : 'Ошибка аутентификации'}" />
+                                <%}%>
+                                <h:panelGrid columns="2">
+                                    <h:outputText value="Пользователь" styleClass="output-text" />
+                                    <h:inputText id="j_username" size="16" maxlength="64" styleClass="input-text" />
+                                    <h:outputText value="Пароль" styleClass="output-text" />
+                                    <h:inputSecret id="j_password" size="16" maxlength="64" styleClass="input-text" />
+                                </h:panelGrid>
+                                <h:commandButton id="submitBtn" value="Войти" type="submit"
+                                                 styleClass="command-button" />
                             </div>
-                            <div class="lock-img">
-                                <button type="submit" value="fdsaf"  style="border: 0; background: transparent" class="btn-submit">
-                                    <img src="../images/3.png" alt="">
-                                </button>
-                            </div>
-                            <div class="lock-pwd">
-                                <form class="ng-pristine ng-valid" _lpchecked="1">
-                                    <div class="form-group">
-                                        <input type="password" name="j_password"  placeholder="Password" class="form-control" autocomplete="off"
-                                               style="cursor: auto; background-image: url('../images/2.png'); background-attachment: scroll; background-position: 100% 50%; background-repeat: no-repeat;">
-
-
-
-
-                                    </div>
-                                </form>
-                            </div>
-
-                            <%if (null != request.getParameter("error")) {%>
-                            <h:outputText styleClass="error-output-text"
-                                          value="#{not empty requestScope['errorMessage'] ? requestScope['errorMessage'] : 'Ошибка аутентификации'}" />
-                            <%}%>
-                        </section>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-    </section>
+                        </form>
+                    </rich:panel>
+                </h:panelGrid>
+            </td>
+        </tr>
+    </table>
 </f:view>
 </body>
 </html>

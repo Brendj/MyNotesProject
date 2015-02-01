@@ -66,6 +66,14 @@ public class Row {
         this.groupname = groupname;
     }
 
+    public Row(Long clientId, long idOfOrg,  String name, Integer day, String groupname) {
+        this.clientId = clientId;
+        this.idOfOrg = idOfOrg;
+        this.name = name;
+        this.day = day;
+        this.groupname = groupname;
+    }
+
     public Row(Long clientId, String name, Integer day, String entry, Integer color) {
         this.clientId = clientId;
         this.name = name;

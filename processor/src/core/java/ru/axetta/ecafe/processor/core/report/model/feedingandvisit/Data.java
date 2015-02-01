@@ -90,38 +90,16 @@ public class Data  implements Comparable<Data> {
     * */
     @Override
     public int compareTo(Data o) {
-        if(this.getName().length() < 1) {
-            if(o.getName().length() < 1)
-                return 0;
-            else
-                return -1;
-        }
-        if(o.getName().length() < 1) return 1;
-
-
-        String oOrgName = o.name.substring(o.name.indexOf('('));
-        String thisOrgName = this.name.substring(this.name.indexOf('('));
-        Integer oOrgNameIntSum = printSum(oOrgName);
-        Integer thisOrgNameIntSum = printSum(thisOrgName);
-        if(thisOrgNameIntSum.compareTo(oOrgNameIntSum) != 0){
-            return thisOrgNameIntSum.compareTo(oOrgNameIntSum);
+        if(this.getName().length() < o.getName().length()) {
+           return -1;
+        }else if(this.getName().length() < o.getName().length()) {
+            return 1;
         }
 
-        oOrgName =  o.name.substring(0,o.name.indexOf('('));
-        thisOrgName = this.name.substring(0,this.name.indexOf('('));
-
-
+        String oOrgName = o.name;
+        String thisOrgName = this.name;
         String numThisString = thisOrgName.replaceAll("[^\\d]", "");
         String numOString = oOrgName.replaceAll("[^\\d]", "");
-        if (numThisString.length() < 1) {
-            if (numOString.length() < 1) {
-                return 0;
-            } else {
-                return -1;
-            }
-        }
-        if(numOString.length() < 1) return 1;
-
 
         Integer numThis = Integer.valueOf(numThisString);
         Integer numO = Integer.valueOf(numOString);

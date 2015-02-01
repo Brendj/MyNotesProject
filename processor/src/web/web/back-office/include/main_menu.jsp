@@ -867,6 +867,9 @@
                             <%--@elvariable id="feedingAndVisitPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitPage"--%>
         <rich:panelMenuItem id="feedingAndVisitReportMenuItem" binding="#{feedingAndVisitPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitPage.show}" reRender="workspaceForm" />
+                            <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
+        <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
+                            label="Упрощенный отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Отчет по оказанным услугам"
