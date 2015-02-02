@@ -92,24 +92,25 @@ public class DetailedDeviationsWithoutCorpsService {
 
     // Те кто должен был получить | Проход по карте не зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList, List<Long> idOfClientsList, HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
+            List<Long> idOfOrgList, List<Long> idOfClientsList, HashMap<Long, List<DiscountRule>> rulesForOrgMap,
+            HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые не в здании
         List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
                 .loadClientsInfoToPayNotDetected(session, startTime, endTime, idOfOrgList, idOfClientsList);
-        // платные категории
-        List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService.loadAllPaydAbleCategories(session);
+
 
         if (!clientInfoList.isEmpty()) {
             for (ClientInfo clientInfo : clientInfoList) {
-
                 List<Long> categories = getClientBenefits(clientInfo.getCategoriesDiscounts(),
                         clientInfo.getGroupName());
+
                 categories.removeAll(onlyPaidCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrgMap.get(clientInfo.getIdOfOrg()), categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo,
+                            rule, startTime);
                 }
             }
             return allItems;
@@ -155,25 +156,23 @@ public class DetailedDeviationsWithoutCorpsService {
 
     // Те кто должен был получить | Проход по карте зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList, HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
+            List<Long> idOfOrgList, HashMap<Long, List<DiscountRule>> rulesForOrgMap,
+            HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
         List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
                 .loadClientsInfoToPayDetected(session, startTime, endTime, idOfOrgList);
 
-        // платные категории
-        List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService.loadAllPaydAbleCategories(session);
-
         if (!clientInfoList.isEmpty()) {
             for (ClientInfo clientInfo : clientInfoList) {
-
                 List<Long> categories = getClientBenefits(clientInfo.getCategoriesDiscounts(),
                         clientInfo.getGroupName());
                 categories.removeAll(onlyPaidCategories);
                 List<DiscountRule> rules = getClientsRules(rulesForOrgMap.get(clientInfo.getIdOfOrg()), categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo,
+                            rule, startTime);
                 }
             }
             return allItems;
