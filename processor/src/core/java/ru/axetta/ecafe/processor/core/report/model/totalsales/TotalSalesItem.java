@@ -13,15 +13,17 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
  */
 public class TotalSalesItem {
     private String name;
+    private String disctrict;
     private String date;
-    private long summ;
+    private long sum;
     private String type;
 
 
-    public TotalSalesItem(String name, String date, long summ, String type) {
+    public TotalSalesItem(String name,String disctrict , String date, long sum, String type) {
         this.name = name;
+        this.disctrict = disctrict;
         this.date = date;
-        this.summ = summ;
+        this.sum = sum;
         this.type = type;
     }
 
@@ -33,6 +35,14 @@ public class TotalSalesItem {
         this.name = name;
     }
 
+    public String getDisctrict() {
+        return disctrict;
+    }
+
+    public void setDisctrict(String disctrict) {
+        this.disctrict = disctrict;
+    }
+
     public String getDate() {
         return date;
     }
@@ -41,16 +51,16 @@ public class TotalSalesItem {
         this.date = date;
     }
 
-    public long getSumm() {
-        return summ;
+    public long getSum() {
+        return sum;
     }
 
     public String getSummToString() {
-        return CurrencyStringUtils.copecksToRubles(summ);
+        return CurrencyStringUtils.copecksToRubles(sum);
     }
 
-    public void setSumm(long summ) {
-        this.summ = summ;
+    public void setSum(long sum) {
+        this.sum = sum;
     }
 
     public String getType() {

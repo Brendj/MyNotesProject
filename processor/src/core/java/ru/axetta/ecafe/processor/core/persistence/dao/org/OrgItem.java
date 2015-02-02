@@ -13,10 +13,12 @@ public class OrgItem {
 
     private long idOfOrg;
     private String officialName;
+    private String district;
 
-    public OrgItem(long idOfOrg, String officialName) {
+    public OrgItem(long idOfOrg, String officialName, String district) {
         this.idOfOrg = idOfOrg;
         this.officialName = officialName;
+        this.district = district;
     }
 
     public long getIdOfOrg() {
@@ -33,5 +35,13 @@ public class OrgItem {
 
     public void setOfficialName(String officialName) {
         this.officialName = officialName;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 }

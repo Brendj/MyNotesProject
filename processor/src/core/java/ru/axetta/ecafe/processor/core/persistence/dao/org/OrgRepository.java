@@ -39,11 +39,11 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
     public List<OrgItem> findAllNames(){
         List<OrgItem> orgItemList = new ArrayList<OrgItem>();
-        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName FROM CF_Orgs  WHERE State =1 and OrganizationType=0 ORDER BY OfficialName ");
+        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs  WHERE State =1 and OrganizationType=0 ORDER BY OfficialName ");
 
         List<Object[]> temp = nativeQuery.getResultList();
         for(Object[] o : temp){
-            orgItemList.add(new OrgItem(((BigInteger)o[0]).longValue(),(String)o[1]));
+            orgItemList.add(new OrgItem(((BigInteger)o[0]).longValue(),(String)o[1],(String)o[2]));
         }
 
         return orgItemList;
