@@ -10,12 +10,14 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DetailedDeviationsWithoutCorpsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DeviationPaymentItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DeviationPaymentSubReportItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
@@ -96,6 +98,9 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
 
+        HashMap<Long, List<DiscountRule>> rulesForOrgMap = new HashMap<Long, List<DiscountRule>>();
+        HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap = new HashMap<Long, List<ComplexInfoItem>>();
+
         if (CalendarUtils.truncateToDayOfMonth(startTime).equals(CalendarUtils.truncateToDayOfMonth(endTime))) {
 
             Date addOneDayEndTime = CalendarUtils.addOneDay(startTime);
@@ -112,12 +117,25 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
                         idOfOrgList.add(org.getIdOfOrg());
                     }
 
+                    for (Long idOfOrg : idOfOrgList) {
+                        // правила для организации
+                        List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
+                                .getDiscountRulesByOrg(session, idOfOrg);
+                        rulesForOrgMap.put(idOfOrg, rulesForOrg);
+
+                        List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
+                                .loadComplexNameByPlan(session, idOfOrg, startTime, endTime);
+                        complexInfoItemListByPlanMap.put(idOfOrg, complexInfoItemListByPlan);
+                    }
+
+
+
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
                     collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, idOfOrgList,
-                            deviationPaymentSubReportItemList);
+                            deviationPaymentSubReportItemList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         if (organizationsInfoModel.getAddress() != null
@@ -132,13 +150,23 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
 
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+
+                    // правила для организации
+                    List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
+                            .getDiscountRulesByOrg(session, org.getIdOfOrg());
+                    rulesForOrgMap.put(org.getIdOfOrg(), rulesForOrg);
+
+                    List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
+                            .loadComplexNameByPlan(session, org.getIdOfOrg(), startTime, endTime);
+                    complexInfoItemListByPlanMap.put(org.getIdOfOrg(), complexInfoItemListByPlan);
+
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     idOfOrgList.add(org.getIdOfOrg());
                     collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, idOfOrgList,
-                            deviationPaymentSubReportItemList);
+                            deviationPaymentSubReportItemList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         deviationPaymentItem.setAddress(org.getAddress());
@@ -161,12 +189,24 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
                     for (Org org : orgSet) {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
+
+                    for (Long idOfOrg : idOfOrgList) {
+                        // правила для организации
+                        List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
+                                .getDiscountRulesByOrg(session, idOfOrg);
+                        rulesForOrgMap.put(idOfOrg, rulesForOrg);
+
+                        List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
+                                .loadComplexNameByPlan(session, idOfOrg, startTime, endTime);
+                        complexInfoItemListByPlanMap.put(idOfOrg, complexInfoItemListByPlan);
+                    }
+
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
                     collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
-                            idOfOrgList);
+                            idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         if (organizationsInfoModel.getAddress() != null
@@ -180,12 +220,22 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
                     }
                 } else {
                     Org org = (Org) session.load(Org.class, organizationsInfoModel.getIdOfOrg());
+
+                    // правила для организации
+                    List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
+                            .getDiscountRulesByOrg(session, org.getIdOfOrg());
+                    rulesForOrgMap.put(org.getIdOfOrg(), rulesForOrg);
+
+                    List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
+                            .loadComplexNameByPlan(session, org.getIdOfOrg(), startTime, endTime);
+                    complexInfoItemListByPlanMap.put(org.getIdOfOrg(), complexInfoItemListByPlan);
+
                     List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     idOfOrgList.add(org.getIdOfOrg());
                     collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime,
                             conditionDetectedNotEat, conditionNotDetectedEat, deviationPaymentSubReportItemList,
-                            idOfOrgList);
+                            idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap);
                     DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                     if (!deviationPaymentSubReportItemList.isEmpty()) {
                         deviationPaymentItem.setAddress(org.getAddress());
@@ -206,7 +256,8 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
 
     public void collectingReportItems(Session session, String orderType, Date startTime, Date addOneDayEndTime,
             String conditionDetectedNotEat, String conditionNotDetectedEat, List<Long> idOfOrgList,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList) {
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList,
+            HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long,List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
 
         List<PlanOrderItem> resultSubtraction = new ArrayList<PlanOrderItem>(); //Разность
         List<PlanOrderItem> resultIntersection = new ArrayList<PlanOrderItem>(); //Пересечение
@@ -215,13 +266,22 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
         List<PlanOrderItem> planOrderItemsPaidByOneDay = DetailedDeviationsWithoutCorpsService.
                 loadPaidPlanOrderInfo(session, orderType, idOfOrgList, startTime, addOneDayEndTime);
 
+        List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByOneDay;
+
+        List<Long> idOfClientsList = new ArrayList<Long>();
+
+        for (PlanOrderItem planOrderItem : planOrderItemList) {
+            idOfClientsList.add(planOrderItem.getIdOfClient());
+        }
+
         //План тех кто были в школе - Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован
         List<PlanOrderItem> planOrderItemsToPayDetected = DetailedDeviationsWithoutCorpsService.
-                loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrgList);
+                loadPlanOrderItemToPayDetected(session, startTime, addOneDayEndTime, idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
         //План тех кто не был в школе - Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован
         List<PlanOrderItem> planOrderItemsToPayNotDetected = DetailedDeviationsWithoutCorpsService
-                .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrgList);
+                .loadPlanOrderItemToPayNotDetected(session, startTime, addOneDayEndTime, idOfOrgList, idOfClientsList,
+                        rulesForOrgMap, complexInfoItemListByPlanMap);
 
         if (planOrderItemsToPayDetected != null) {
             if (!planOrderItemsToPayDetected.isEmpty()) {
@@ -254,7 +314,8 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
 
     public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Date startTime, Date endTime,
             String conditionDetectedNotEat, String conditionNotDetectedEat,
-            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList, List<Long> idOfOrgList) {
+            List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList, List<Long> idOfOrgList,
+            HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
         List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
         List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
 
@@ -264,8 +325,17 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
         // Те кто дожны были получить бесплатное питание | Проход по карте не зафиксирован - за интервал
         List<PlanOrderItem> planOrderItemsToPayNotDetectedInterval = new ArrayList<PlanOrderItem>();
 
+        // Оплаченные заказы за интервал
         List<PlanOrderItem> planOrderItemsPaidByInterval = DetailedDeviationsWithoutCorpsService
                 .loadPaidPlanOrderInfo(session, orderTypeLgotnick, idOfOrgList, startTime, endTime);
+
+        List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByInterval;
+
+        List<Long> idOfClientsList = new ArrayList<Long>();
+
+        for (PlanOrderItem planOrderItem : planOrderItemList) {
+            idOfClientsList.add(planOrderItem.getIdOfClient());
+        }
 
         Date sTt = startTime;
         CalendarUtils.truncateToDayOfMonth(sTt);
@@ -275,14 +345,14 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
 
         // План по тем кто отметился в здании за интервал
         List<PlanOrderItem> planOrderItemToPayDetectedIntervalList = DetailedDeviationsWithoutCorpsService
-                .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrgList);
+                .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
         if (planOrderItemToPayDetectedIntervalList != null) {
             planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
         }
         // План по тем кто не в здании за интервал
         List<PlanOrderItem> planOrderItemToPayNotDetectedIntervalList = DetailedDeviationsWithoutCorpsService
-                .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrgList);
+                .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrgList, idOfClientsList, rulesForOrgMap, complexInfoItemListByPlanMap);
 
         if (planOrderItemToPayNotDetectedIntervalList != null) {
             planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
@@ -295,13 +365,13 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
             sTt = CalendarUtils.addOneDay(sTt);
             eTt = CalendarUtils.addOneDay(eTt);
             planOrderItemToPayDetectedIntervalList = DetailedDeviationsWithoutCorpsService
-                    .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrgList);
+                    .loadPlanOrderItemToPayDetected(session, sTt, eTt, idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap);
             if (planOrderItemToPayDetectedIntervalList != null) {
                 planOrderItemsToPayDetectedInterval.addAll(planOrderItemToPayDetectedIntervalList);
             }
             // План по тем кто не в здании
             planOrderItemToPayNotDetectedIntervalList = DetailedDeviationsWithoutCorpsService
-                    .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrgList);
+                    .loadPlanOrderItemToPayNotDetected(session, sTt, eTt, idOfOrgList, idOfClientsList, rulesForOrgMap, complexInfoItemListByPlanMap);
             if (planOrderItemToPayNotDetectedIntervalList != null) {
                 planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
             }
@@ -339,7 +409,6 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
 
     public DeviationPaymentSubReportItem createReportItem(String condition, PlanOrderItem planOrderItem) {
         DeviationPaymentSubReportItem deviationPaymentSubReportItem = new DeviationPaymentSubReportItem(condition,
-
                 planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
                 planOrderItem.getComplexName());
         return deviationPaymentSubReportItem;

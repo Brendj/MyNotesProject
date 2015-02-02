@@ -92,28 +92,24 @@ public class DetailedDeviationsWithoutCorpsService {
 
     // Те кто должен был получить | Проход по карте не зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayNotDetected(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList) {
+            List<Long> idOfOrgList, List<Long> idOfClientsList, HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые не в здании
         List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
-                .loadClientsInfoToPayNotDetected(session, startTime, endTime, idOfOrgList);
+                .loadClientsInfoToPayNotDetected(session, startTime, endTime, idOfOrgList, idOfClientsList);
+        // платные категории
+        List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService.loadAllPaydAbleCategories(session);
+
         if (!clientInfoList.isEmpty()) {
             for (ClientInfo clientInfo : clientInfoList) {
-                // правила для организации
-                List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
-                        .getDiscountRulesByOrg(session, clientInfo.getIdOfOrg());
-                // платные категории
-                List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService
-                        .loadAllPaydAbleCategories(session);
-                List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
-                        .loadComplexNameByPlan(session, clientInfo.getIdOfOrg(), startTime, endTime);
 
-                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
+                List<Long> categories = getClientBenefits(clientInfo.getCategoriesDiscounts(),
+                        clientInfo.getGroupName());
                 categories.removeAll(onlyPaidCategories);
-                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrgMap.get(clientInfo.getIdOfOrg()), categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, complexInfoItemListByPlan, clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo, rule, startTime);
                 }
             }
             return allItems;
@@ -122,18 +118,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList) {
-        // План питания льготники
-        String orderTypeExempt = "4,6,8";
-
-        List<PlanOrderItem> planOrderItemList = DetailedDeviationsWithoutCorpsService
-                .loadPaidPlanOrderInfo(session, orderTypeExempt, idOfOrgList, startTime, endTime);
-
-        List<Long> idOfClientsList = new ArrayList<Long>();
-
-        for (PlanOrderItem planOrderItem : planOrderItemList) {
-            idOfClientsList.add(planOrderItem.getIdOfClient());
-        }
+            List<Long> idOfOrgList, List<Long> idOfClientsList) {
 
         List<ClientInfo> clientInfoListNot = new ArrayList<ClientInfo>();
 
@@ -164,59 +149,31 @@ public class DetailedDeviationsWithoutCorpsService {
                         (String) resultClientItem[5]);
                 clientInfoListNot.add(clientInfo);
             }
-        } else {
-            Query query = session.createSQLQuery(
-                    "SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_clients cl "
-                            + "LEFT JOIN cf_clientgroups gr "
-                            + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
-                            + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg in (:idOfOrgList) "
-                            + "AND cl.idOfClientGroup < 1100000030 AND cl.idofclient NOT IN (SELECT cl.idofclient "
-                            + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
-                            + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
-                            + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
-                            + "AND e.idoforg in ( :idOfOrgList) AND e.idofclient IS NOT null "
-                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030)");
-            query.setParameterList("idOfOrgList", idOfOrgList);
-            query.setParameter("startTime", startTime.getTime());
-            query.setParameter("endTime", endTime.getTime());
-
-            List result = query.list();
-
-            for (Object resultClient : result) {
-                Object[] resultClientItem = (Object[]) resultClient;
-                ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(), ((BigInteger) resultClientItem[1]).longValue(),
-                        (String) resultClientItem[2], ((BigInteger) resultClientItem[3]).longValue(),
-                        (String) resultClientItem[4], (String) resultClientItem[5]);
-                clientInfoListNot.add(clientInfo);
-            }
         }
         return clientInfoListNot;
     }
 
     // Те кто должен был получить | Проход по карте зафиксирован
     public static List<PlanOrderItem> loadPlanOrderItemToPayDetected(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList) {
+            List<Long> idOfOrgList, HashMap<Long, List<DiscountRule>> rulesForOrgMap, HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap) {
         List<PlanOrderItem> allItems = new ArrayList<PlanOrderItem>();
         // клиенты которые в здании
         List<ClientInfo> clientInfoList = DetailedDeviationsWithoutCorpsService
                 .loadClientsInfoToPayDetected(session, startTime, endTime, idOfOrgList);
+
+        // платные категории
+        List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService.loadAllPaydAbleCategories(session);
+
         if (!clientInfoList.isEmpty()) {
             for (ClientInfo clientInfo : clientInfoList) {
-                // правила для организации
-                List<DiscountRule> rulesForOrg = DetailedDeviationsWithoutCorpsService
-                        .getDiscountRulesByOrg(session, clientInfo.getIdOfOrg());
-                // платные категории
-                List<Long> onlyPaydAbleCategories = DetailedDeviationsWithoutCorpsService
-                        .loadAllPaydAbleCategories(session);
-                List<ComplexInfoItem> complexInfoItemListByPlan = DetailedDeviationsWithoutCorpsService
-                        .loadComplexNameByPlan(session, clientInfo.getIdOfOrg(), startTime, endTime);
 
-                List<Long> categories = getClientBenefits(clientInfo.categoriesDiscounts, clientInfo.groupName);
-                categories.removeAll(onlyPaydAbleCategories);
-                List<DiscountRule> rules = getClientsRules(rulesForOrg, categories);
+                List<Long> categories = getClientBenefits(clientInfo.getCategoriesDiscounts(),
+                        clientInfo.getGroupName());
+                categories.removeAll(onlyPaidCategories);
+                List<DiscountRule> rules = getClientsRules(rulesForOrgMap.get(clientInfo.getIdOfOrg()), categories);
                 rules = getRulesByHighPriority(rules);
                 for (DiscountRule rule : rules) {
-                    addPlanOrderItems(allItems, complexInfoItemListByPlan, clientInfo, rule, startTime);
+                    addPlanOrderItems(allItems, complexInfoItemListByPlanMap.get(clientInfo.getIdOfOrg()), clientInfo, rule, startTime);
                 }
             }
             return allItems;
