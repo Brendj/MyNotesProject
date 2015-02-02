@@ -141,7 +141,7 @@ public class ReportRuleConstants {
             new ParamHint("address", "Адрес клиента"),
             new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента")
                     .setDefaultRule("= contragent: "),    //20
-            new ParamHint("contragentName", "Наименование контрагента"),
+            new ParamHint("contragentName", "Наименование контрагента"),  //21
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule(
@@ -252,7 +252,7 @@ public class ReportRuleConstants {
             //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3, -33})
             // отрицательное значение - обязательное
             new ReportHint(AutoEnterEventV2Report.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(TotalSalesReport.class.getCanonicalName(), new int[]{23}),
+            new ReportHint(TotalSalesReport.class.getCanonicalName(), new int[]{20}),
             new ReportHint(FeedingAndVisitReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(FeedingAndVisitSReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),

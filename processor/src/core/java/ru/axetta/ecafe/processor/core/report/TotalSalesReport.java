@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.order.OrdersRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
@@ -28,7 +29,7 @@ import java.util.*;
  * User: Shamil
  * Date: 25.01.15
  */
-public class TotalSalesReport extends BasicReportForAllOrgJob {
+public class TotalSalesReport  extends BasicReportForContragentJob {
 
     private static final String NAME_COMPLEX = "Платные комплексы";
     private static final String NAME_BUFFET = "Буфетная продукция";
@@ -36,10 +37,16 @@ public class TotalSalesReport extends BasicReportForAllOrgJob {
 
     final private static Logger logger = LoggerFactory.getLogger(TotalSalesReport.class);
 
+    public TotalSalesReport(Date generateTime, long l, JasperPrint jasperPrint, Date startTime, Date endTime,Long idOfContragent) {
+        super(generateTime,l,jasperPrint,startTime,endTime,idOfContragent);
+    }
+
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
     }
 
-    public static class Builder extends BasicReportForAllOrgJob.Builder {
+    public static class Builder extends BasicReportForContragentJob.Builder {
+
+        private Long idOfContragent= -1L;
 
         private long sumComplex = 0L;
         private long sumBuffet = 0L;
@@ -56,18 +63,24 @@ public class TotalSalesReport extends BasicReportForAllOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(),
-                    parameterMap);
+
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("sumComplex", sumComplex);
             parameterMap.put("sumBuffet", sumBuffet);
             parameterMap.put("sumBen", sumBen);
 
+            if (contragent != null) {
+                parameterMap.put("contragentName", contragent.getContragentName());
+                idOfContragent = contragent.getIdOfContragent();
+            }
+
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(),
+                    parameterMap);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new TotalSalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
-                    startTime, endTime);
+                    startTime, endTime, idOfContragent);
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
@@ -156,7 +169,10 @@ public class TotalSalesReport extends BasicReportForAllOrgJob {
 
         private void retreiveAllOrgs(Map<String, List<TotalSalesItem>> totalSalesItemMap, List<String> dates) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
-            List<OrgItem> allNames = orgRepository.findAllNames();
+            if(idOfContragent != -1){
+
+            }
+            List<OrgItem> allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
             List<TotalSalesItem> totalSalesItemList;
             for (OrgItem allName : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();
@@ -168,16 +184,17 @@ public class TotalSalesReport extends BasicReportForAllOrgJob {
                 totalSalesItemMap.put(allName.getOfficialName(), totalSalesItemList);
             }
         }
+
+        public void setIdOfContragent(Long idOfContragent) {
+            this.idOfContragent = idOfContragent;
+        }
     }
 
 
     public TotalSalesReport() {
     }
 
-    @Override
-    public BasicReportForAllOrgJob createInstance() {
-        return new TotalSalesReport();
-    }
+
 
     @Override
     public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
@@ -189,14 +206,19 @@ public class TotalSalesReport extends BasicReportForAllOrgJob {
         return logger;
     }
 
-    public TotalSalesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime) {
-        super(generateTime, generateDuration, print, startTime,
-                endTime);    //To change body of overridden methods use File | Settings | File Templates.
-    }
 
     @Override
     public int getDefaultReportPeriod() {
         return REPORT_PERIOD_PREV_DAY;
     }
 
+    @Override
+    public BasicReportForContragentJob createInstance() {
+        return new TotalSalesReport();
+    }
+
+    @Override
+    protected Integer getContragentSelectClass() {
+        return Contragent.TSP;
+    }
 }

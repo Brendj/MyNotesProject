@@ -22,6 +22,12 @@
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" opened="true"
                             headerClass="filter-panel-header" width="800">
         <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+            <h:selectOneMenu value="#{totalSalesPage.contragentId}">
+                <f:selectItem />
+                <f:selectItems value="#{totalSalesPage.contragentsSelectItems}"/>
+            </h:selectOneMenu>
+
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"

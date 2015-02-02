@@ -9,12 +9,15 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentRepository;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.report.TotalSalesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -34,8 +38,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * User: shamil
@@ -53,6 +59,8 @@ public class TotalSalesPage extends OnlineReportPage{
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private Long contragentId = -1L;
+    private List<SelectItem> contragentsSelectItems;
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
@@ -97,7 +105,13 @@ public class TotalSalesPage extends OnlineReportPage{
     }
 
     @Override
-    public void onShow() throws Exception {}
+    public void onShow() throws Exception {
+        contragentsSelectItems = new ArrayList<SelectItem>();
+        ContragentRepository contragentRepository = ContragentRepository.getInstance();
+        for(Contragent contragent :contragentRepository.findAllByType(Contragent.TSP)){
+            contragentsSelectItems.add(new SelectItem(contragent.getIdOfContragent(), contragent.getContragentName()));
+        }
+    }
 
     public String getHtmlReport() {
         return htmlReport;
@@ -114,6 +128,7 @@ public class TotalSalesPage extends OnlineReportPage{
             return null;
         }
         TotalSalesReport.Builder builder = new TotalSalesReport.Builder(templateFilename);
+        builder.setIdOfContragent(contragentId);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
@@ -245,4 +260,25 @@ public class TotalSalesPage extends OnlineReportPage{
         return "report/online/total_sales_report";
     }
 
+    public Object showContragentListSelectPage () {
+        //setSelectIdOfOrgList(false);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public void setContragentId(Long contragentId) {
+        this.contragentId = contragentId;
+    }
+
+    public Long getContragentId() {
+        return contragentId;
+    }
+
+    public void setContragentsSelectItems(List<SelectItem> contragentsSelectItems) {
+        this.contragentsSelectItems = contragentsSelectItems;
+    }
+
+    public List<SelectItem> getContragentsSelectItems() {
+        return contragentsSelectItems;
+    }
 }
