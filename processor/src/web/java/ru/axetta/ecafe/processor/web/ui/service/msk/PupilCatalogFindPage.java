@@ -203,6 +203,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     @Transactional
     public void updateList() {
         try {
+            printError("При поиске без организации необходимо указать фамилию, имя, отчество");
             ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids=null;
             if (org!= null) {
                 orgGuids = new ImportRegisterClientsService.OrgRegistryGUIDInfo(org);
@@ -216,6 +217,10 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                     printError("При поиске без организации необходимо указать фамилию, имя, отчество");
                     return;
                 }
+            }
+            if(orgGuids == null || orgGuids.getOrgGuids() == null || orgGuids.getOrgGuids().size() < 1) {
+                printError("Необходимо выбрать хотя бы одну организацию, привязанную к Реестрам (по GID)");
+                return;
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound = 0;

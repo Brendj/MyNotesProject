@@ -471,6 +471,9 @@ public class MskNSIService {
             }
         }*/
 
+        if(guids == null || guids.size() < 1) {
+            throw new Exception("Запрос конитингенту без указания организации запрещен. Необходимо указывать организацию!");
+        }
         //  Ограничение по guid'ам
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр обучаемых");
