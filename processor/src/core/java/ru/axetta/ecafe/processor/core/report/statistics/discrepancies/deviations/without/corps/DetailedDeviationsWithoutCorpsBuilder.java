@@ -144,6 +144,11 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
                                 && organizationsInfoModel.getOfficialName() != null) {
                             deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
                             deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
+                        } else {
+                            for (Org orgSetItem : orgSet) {
+                                deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
+                                deviationPaymentItem.setAddress(orgSetItem.getAddress());
+                            }
                         }
                         deviationPaymentItem.setRowNum(rowNum);
                         deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
@@ -216,6 +221,11 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
                                 && organizationsInfoModel.getOfficialName() != null) {
                             deviationPaymentItem.setOrgName(organizationsInfoModel.getOfficialName());
                             deviationPaymentItem.setAddress(organizationsInfoModel.getAddress());
+                        } else {
+                            for (Org orgSetItem : orgSet) {
+                                deviationPaymentItem.setOrgName(orgSetItem.getOfficialName());
+                                deviationPaymentItem.setAddress(orgSetItem.getAddress());
+                            }
                         }
                         deviationPaymentItem.setRowNum(rowNum);
                         deviationPaymentItem.setDeviationPaymentSubReportItemList(deviationPaymentSubReportItemList);
