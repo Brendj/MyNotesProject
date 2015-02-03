@@ -41,3 +41,10 @@ CREATE TABLE cf_orgregistrychange (
 
   CONSTRAINT cf_orgregistrychange_pk PRIMARY KEY (idoforgregistrychange)
 );
+create index cf_orgregistrychange_createDate_idx on cf_orgregistrychange(createdate);
+
+
+--  Добавление индексов для синхронизации с реестрами
+create index cf_registrychange_org_idx on cf_registrychange(idOfOrg);
+create index cf_registrychange_createDate_idx on cf_registrychange(createDate);
+create index cf_registrychange_type_idx on cf_registrychange(type);
