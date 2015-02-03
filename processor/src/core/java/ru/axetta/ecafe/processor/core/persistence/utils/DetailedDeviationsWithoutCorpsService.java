@@ -118,6 +118,7 @@ public class DetailedDeviationsWithoutCorpsService {
         return null;
     }
 
+    //Проход по карте не зафиксирован
     private static List<ClientInfo> loadClientsInfoToPayNotDetected(Session session, Date startTime, Date endTime,
             List<Long> idOfOrgList, List<Long> idOfClientsList) {
 
