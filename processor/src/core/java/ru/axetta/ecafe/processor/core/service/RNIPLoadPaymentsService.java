@@ -280,7 +280,7 @@ public class RNIPLoadPaymentsService {
 
 
     public void run() {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        if (/*!RuntimeContext.getInstance().isMainNode() || */!isOn()) {
             return;
         }
 
