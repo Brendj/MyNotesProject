@@ -62,7 +62,7 @@
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="490" y="0" width="550" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" stretchType="RelativeToBandHeight" x="490" y="0" width="550" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -108,7 +108,7 @@
 	<detail>
 		<band height="50">
 			<subreport>
-				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="490" y="0" width="550" height="50"/>
+				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" stretchType="RelativeToBandHeight" x="490" y="0" width="550" height="50"/>
 				<subreportParameter name="orgName">
 					<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 				</subreportParameter>
