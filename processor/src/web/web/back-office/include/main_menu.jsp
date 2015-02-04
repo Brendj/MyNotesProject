@@ -864,10 +864,8 @@
         <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
         <rich:panelMenuItem id="registerStampReportMenuItem" binding="#{registerStampPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPage.show}" reRender="workspaceForm" />
-                            <%--@elvariable id="feedingAndVisitPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitPage"--%>
-        <%--<rich:panelMenuItem id="feedingAndVisitReportMenuItem" binding="#{feedingAndVisitPage.mainMenuComponent}"--%>
-                            <%--label="Отчет по питанию и посещению" action="#{feedingAndVisitPage.show}" reRender="workspaceForm" />--%>
-                            <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
+
+        <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
@@ -877,6 +875,11 @@
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"
                             reRender="workspaceForm" />
+
+
+        <%--@elvariable id="totalBenefFeedReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalBenefFeedReportPage"--%>
+        <rich:panelMenuItem id="totalBenefFeedReportMenuItem" binding="#{totalBenefFeedReportPage.mainMenuComponent}"
+                            label="Сводный отчет по льготному питанию" action="#{totalBenefFeedReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="paidFoodGroupMenu" binding="#{mainPage.paidFoodGroupMenu.mainMenuComponent}"

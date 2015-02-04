@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.persistence.service.org;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 
@@ -18,6 +19,10 @@ import java.util.List;
 public class OrgService {
     OrgRepository dao;
 
+    public static OrgService getInstance(){
+        return RuntimeContext.getAppContext().getBean(OrgService.class);
+    }
+
     @Autowired
     public void setDao(OrgRepository dao) {
         this.dao = dao;
@@ -32,5 +37,22 @@ public class OrgService {
         return dao.findOrgCategories(id);
     }
 
+    public Org findOrgWithFriendlyOrgs(Long id){
+        return dao.findOrgWithFriendlyOrgs(id);
+    }
+
+    public Org getMainBulding(long idOfOrg){
+        Org org = findOrgWithFriendlyOrgs(idOfOrg);
+        for (Org org1 : org.getFriendlyOrg()) {
+            if(org1.isMainBuilding()){
+                return org1;
+            }
+        }
+        return null;
+    }
+
+    public Org getMainBulding(Org org){
+        return getMainBulding(org.getIdOfOrg());
+    }
 
 }

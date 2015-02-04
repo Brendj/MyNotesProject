@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.SubFeedingService;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.service.order.OrderService;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Data;
@@ -59,7 +60,9 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("orgName", org.getOfficialName());
+            OrgService orgService = OrgService.getInstance();
+            Org mainBulding = orgService.getMainBulding(org.getIdOfOrg());
+            parameterMap.put("orgName", mainBulding != null? mainBulding.getShortName() : org.getOfficialName());
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 

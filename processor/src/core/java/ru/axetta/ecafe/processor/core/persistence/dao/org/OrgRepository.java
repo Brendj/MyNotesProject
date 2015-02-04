@@ -62,4 +62,11 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
         return orgItemList;
     }
+
+    public Org findOrgWithFriendlyOrgs(long idOfOrg) {
+        return entityManager.createQuery("select o from Org o left join fetch o.friendlyOrg where o.idOfOrg=:idOfOrg", Org.class)
+                .setParameter("idOfOrg", idOfOrg)
+                .getSingleResult();
+
+    }
 }
