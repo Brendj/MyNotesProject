@@ -15,52 +15,65 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--@elvariable id="totalSalesPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalSalesPage"--%>
-<h:panelGrid id="registerStampReportPanelGrid" binding="#{totalSalesPage.pageComponent}"
+
+<h:panelGrid id="registerStampReportPanelGrid" binding="#{mainPage.totalSalesPage.pageComponent}"
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" opened="true"
                             headerClass="filter-panel-header" width="800">
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
-            <h:selectOneMenu value="#{totalSalesPage.contragentId}">
-                <f:selectItem />
-                <f:selectItems value="#{totalSalesPage.contragentsSelectItems}"/>
-            </h:selectOneMenu>
+            <%--<h:selectOneMenu value="#{totalSalesPage.contragentId}">--%>
+                <%--<f:selectItem />--%>
+                <%--<f:selectItems value="#{totalSalesPage.contragentsSelectItems}"/>--%>
+            <%--</h:selectOneMenu>--%>
+
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.totalSalesPage.contragent.contragentName}" readonly="true"
+                             styleClass="input-text" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                   reRender="modalContragentSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                </a4j:commandButton>
+            </h:panelGroup>
+
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-            <rich:calendar value="#{totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar value="#{mainPage.totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"
                            showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDateCalendar,registerStampReportPanel"
-                             actionListener="#{totalSalesPage.onReportPeriodChanged}" />
+                             actionListener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
             </rich:calendar>
 
             <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-            <h:selectOneMenu id="endDatePeriodSelect" value="#{totalSalesPage.periodTypeMenu.periodType}"
+            <h:selectOneMenu id="endDatePeriodSelect" value="#{mainPage.totalSalesPage.periodTypeMenu.periodType}"
                              styleClass="input-text" style="width: 250px;">
                 <f:converter converterId="periodTypeConverter" />
-                <f:selectItems value="#{totalSalesPage.periodTypeMenu.items}" />
+                <f:selectItems value="#{mainPage.totalSalesPage.periodTypeMenu.items}" />
                 <a4j:support event="onchange" reRender="endDateCalendar,registerStampReportPanel"
-                             actionListener="#{totalSalesPage.onReportPeriodChanged}" />
+                             actionListener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar id="endDateCalendar" value="#{totalSalesPage.endDate}"
+            <rich:calendar id="endDateCalendar" value="#{mainPage.totalSalesPage.endDate}"
                            datePattern="dd.MM.yyyy" converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDatePeriodSelect,registerStampReportPanel"
-                             actionListener="#{totalSalesPage.onEndDateSpecified}" />
+                             actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
             </rich:calendar>
 
         </h:panelGrid>
 
     </rich:simpleTogglePanel>
     <h:panelGrid styleClass="borderless-grid" columns="3">
-        <a4j:commandButton value="Генерировать отчет" action="#{totalSalesPage.buildReportHTML}"
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.totalSalesPage.buildReportHTML}"
                            reRender="registerStampReportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{totalSalesPage.showCSVList}" styleClass="command-button" />
-        <a4j:commandButton value="Очистить" action="#{totalSalesPage.clear}"
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}"
                            reRender="registerStampReportPanelGrid"
                            styleClass="command-button" status="reportGenerateStatus" />
     </h:panelGrid>
@@ -75,9 +88,9 @@
 
     <h:panelGrid styleClass="borderless-grid" id="registerStampReportPanel" columnClasses="center-aligned-column">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${totalSalesPage.htmlReport!=null && not empty totalSalesPage.htmlReport}" >
+        <c:if test="${mainPage.totalSalesPage.htmlReport!=null && not empty mainPage.totalSalesPage.htmlReport}" >
             <f:verbatim>
-                <div>${totalSalesPage.htmlReport}</div>
+                <div>${mainPage.totalSalesPage.htmlReport}</div>
             </f:verbatim>
         </c:if>
     </h:panelGrid>

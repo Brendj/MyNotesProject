@@ -93,6 +93,9 @@ public class Function {
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_CLIENTS = "onlineRprtClients";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_CLIENTS = "Закрыть раздел 'Отчеты по клиентам'";
+
 
     private Long idOfFunction;
     private String functionName;

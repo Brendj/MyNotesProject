@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.report.TotalSalesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
@@ -50,7 +51,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class TotalSalesPage extends OnlineReportPage{
+public class TotalSalesPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler{
 
     private final static Logger logger = LoggerFactory.getLogger(TotalSalesPage.class);
 
@@ -128,13 +129,14 @@ public class TotalSalesPage extends OnlineReportPage{
             return null;
         }
         TotalSalesReport.Builder builder = new TotalSalesReport.Builder(templateFilename);
-        builder.setIdOfContragent(contragentId);
+        if(contragent!= null){
+            builder.setContragent(contragent);
+        }
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
-
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -197,6 +199,9 @@ public class TotalSalesPage extends OnlineReportPage{
         }
         Date generateTime = new Date();
         TotalSalesReport.Builder builder = new TotalSalesReport.Builder(templateFilename);
+        if(contragent!= null){
+            builder.setContragent(contragent);
+        }
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
@@ -280,5 +285,24 @@ public class TotalSalesPage extends OnlineReportPage{
 
     public List<SelectItem> getContragentsSelectItems() {
         return contragentsSelectItems;
+    }
+
+
+    private Contragent contragent;
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
+        if (null != idOfContragent) {
+            this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
+        }
     }
 }

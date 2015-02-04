@@ -239,6 +239,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage optionGroupPage = new BasicWorkspacePage();
     private final CurrentPositionsReportPage currentPositionsReportPage = new CurrentPositionsReportPage();
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
+    private final TotalSalesPage totalSalesPage = new TotalSalesPage();
 
     // POS manipulation
     private final BasicWorkspacePage posGroupPage = new BasicWorkspacePage();
@@ -301,6 +302,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage subscriptionFeedingGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
     private final OrgDiscountsReportPage orgDiscountsReportPage = new OrgDiscountsReportPage();
@@ -5146,6 +5148,10 @@ public class MainPage implements Serializable {
         return activityReportsGroupMenu;
     }
 
+    public BasicWorkspacePage getClientReportsGroupMenu() {
+        return clientReportsGroupMenu;
+    }
+
     public BasicWorkspacePage getInformReportsGroupMenu() {
         return informReportsGroupMenu;
     }
@@ -5182,6 +5188,12 @@ public class MainPage implements Serializable {
 
     public Object showActivityReportsGroupMenu() {
         currentWorkspacePage = activityReportsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showClientReportsGroupMenu() {
+        currentWorkspacePage = clientReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -5959,6 +5971,44 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public TotalSalesPage getTotalSalesPage() {
+        return totalSalesPage;
+    }
+
+    public Object showTotalSalesPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = totalSalesPage;
+        } catch (Exception e) {
+            logger.error("Failed to set client report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildTotalSalesReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+
+        try {
+
+            totalSalesPage.buildReportHTML();
+
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build client report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+
         }
         return null;
     }
@@ -7590,6 +7640,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewActivityReports() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY);
+    }
+
+    public boolean isEligibleToViewClientsReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS);
     }
 
     public Object removeClient() {

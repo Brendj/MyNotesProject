@@ -64,19 +64,21 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
 
+            if (contragent != null) {
+                parameterMap.put("contragentName", contragent.getContragentName());
+                idOfContragent = contragent.getIdOfContragent();
+            }
+
+
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(),
+                    parameterMap);
+
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("sumComplex", sumComplex);
             parameterMap.put("sumBuffet", sumBuffet);
             parameterMap.put("sumBen", sumBen);
 
-            if (contragent != null) {
-                parameterMap.put("contragentName", contragent.getContragentName());
-                idOfContragent = contragent.getIdOfContragent();
-            }
-
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(),
-                    parameterMap);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new TotalSalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
@@ -209,7 +211,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_PREV_DAY;
+        return REPORT_PERIOD_LAST_WEEK;
     }
 
     @Override
