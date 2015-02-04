@@ -2202,7 +2202,7 @@ public class Processor implements SyncProcessor,
                     orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                 }
 
-                if (clientGroup != null) {
+                if ((clientGroup != null )&&(client.getClientGroup() != null)&&(clientGroup.getCompositeIdOfClientGroup() != null)) {
                     if(!clientGroup.getCompositeIdOfClientGroup().equals(client.getClientGroup().getCompositeIdOfClientGroup())){
                         ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
                         migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);

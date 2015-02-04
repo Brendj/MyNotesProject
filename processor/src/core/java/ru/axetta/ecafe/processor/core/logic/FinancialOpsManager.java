@@ -201,7 +201,7 @@ public class FinancialOpsManager {
     }
 
     public void cancelOrder(Session session, Order order) throws Exception {
-        if (order.getState()!=Order.STATE_COMMITED) throw new Exception("Заказ не может отменен из статуса: "+order.getStateAsString());
+        if (order.getState()!=Order.STATE_COMMITED) throw new Exception("Заказ не может отменен из статуса: "+order.getStateAsString() + ", idOfOrg: " + order.getOrg().getIdOfOrg() + ", compositeIdOfOrder: " + order.getCompositeIdOfOrder());
         order.setState(Order.STATE_CANCELED);
         session.save(order);
         for (OrderDetail od : order.getOrderDetails()) {
