@@ -59,6 +59,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+            parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
