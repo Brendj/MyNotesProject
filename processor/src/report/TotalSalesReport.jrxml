@@ -90,24 +90,24 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement x="318" y="40" width="100" height="20" uuid="b1cb8a4f-a1c2-4fc3-89aa-5f7f2f11e8cc"/>
+				<reportElement uuid="b1cb8a4f-a1c2-4fc3-89aa-5f7f2f11e8cc" x="318" y="40" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="429" y="40" width="100" height="20" uuid="d82669f9-c46f-46d5-bc4a-a78e195f3406"/>
+				<reportElement uuid="d82669f9-c46f-46d5-bc4a-a78e195f3406" x="429" y="40" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="274" y="0" width="285" height="40" uuid="060ad62c-067d-406d-8813-d32eac3e3b08"/>
+				<reportElement uuid="060ad62c-067d-406d-8813-d32eac3e3b08" x="274" y="0" width="285" height="40"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Сводный отчет по продажам]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="418" y="40" width="11" height="20" uuid="85df686b-ca53-4389-846a-24b5b41a5345"/>
+				<reportElement uuid="85df686b-ca53-4389-846a-24b5b41a5345" x="418" y="40" width="11" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[-]]></text>
 			</staticText>
@@ -119,7 +119,7 @@
 	<detail>
 		<band height="272" splitType="Stretch">
 			<crosstab>
-				<reportElement x="0" y="38" width="802" height="231" uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce"/>
+				<reportElement uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce" x="0" y="38" width="802" height="231"/>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="122f20f9-c69c-45b3-8977-e31e8d50953a">
@@ -130,14 +130,14 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<textField>
-							<reportElement style="border" x="0" y="0" width="194" height="30" uuid="624d1c50-a084-47bd-bcce-62b3d5e2e1f8"/>
+							<reportElement uuid="624d1c50-a084-47bd-bcce-62b3d5e2e1f8" style="border" x="0" y="0" width="194" height="30"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA["Школа"]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement style="border" x="194" y="0" width="87" height="30" uuid="345bdf24-92d5-450d-84dc-ea8db5a80ee4"/>
+							<reportElement uuid="345bdf24-92d5-450d-84dc-ea8db5a80ee4" style="border" x="194" y="0" width="87" height="30"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true" isStrikeThrough="false"/>
 							</textElement>
@@ -155,7 +155,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" positionType="Float" mode="Transparent" x="0" y="0" width="194" height="50" uuid="ce6d1ec3-bec5-4d64-9603-0e9659eb75af"/>
+								<reportElement uuid="ce6d1ec3-bec5-4d64-9603-0e9659eb75af" style="Crosstab Data Text" positionType="Float" mode="Transparent" x="0" y="0" width="194" height="50"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{name}]]></textFieldExpression>
 							</textField>
@@ -167,7 +167,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="194" height="25" forecolor="#000000" uuid="06b404fa-5bda-42b0-bbf5-bb2010a97f8b"/>
+								<reportElement uuid="06b404fa-5bda-42b0-bbf5-bb2010a97f8b" x="0" y="0" width="194" height="25" forecolor="#000000"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -186,7 +186,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="87" height="25" uuid="38ffb258-83b7-46e1-98db-f4bdcd0afc11"/>
+								<reportElement uuid="38ffb258-83b7-46e1-98db-f4bdcd0afc11" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="87" height="25"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>
 							</textField>
@@ -198,7 +198,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="87" height="25" uuid="e2b63e28-38fa-462e-b8f6-1f763902594d"/>
+								<reportElement uuid="e2b63e28-38fa-462e-b8f6-1f763902594d" x="0" y="0" width="87" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -217,7 +217,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="127" height="30" uuid="0995a243-2212-48cf-b2ca-10ffca270533"/>
+								<reportElement uuid="0995a243-2212-48cf-b2ca-10ffca270533" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="127" height="30"/>
 								<textElement verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -231,7 +231,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement x="0" y="0" width="72" height="30" uuid="3476e131-5a2c-4c30-b2a8-127cb24fe515"/>
+								<reportElement uuid="3476e131-5a2c-4c30-b2a8-127cb24fe515" x="0" y="0" width="127" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -252,7 +252,7 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="127" height="25" uuid="4cdf902c-284d-4275-ac5b-48b5193a0de8"/>
+							<reportElement uuid="4cdf902c-284d-4275-ac5b-48b5193a0de8" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
 							<textElement verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{summMeasure}]]></textFieldExpression>
 						</textField>
@@ -264,29 +264,32 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="127" height="25" uuid="02d62c10-439e-4b26-b250-6d6cbaf85e31"/>
+							<reportElement uuid="02d62c10-439e-4b26-b250-6d6cbaf85e31" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
+							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="72" height="25" columnTotalGroup="type">
+				<crosstabCell width="127" height="25" columnTotalGroup="type">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="72" height="25" uuid="440d2eb3-9d71-4658-906b-e34dfa096e21"/>
+							<reportElement uuid="440d2eb3-9d71-4658-906b-e34dfa096e21" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
+							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="72" height="25" rowTotalGroup="name" columnTotalGroup="type">
+				<crosstabCell width="127" height="25" rowTotalGroup="name" columnTotalGroup="type">
 					<cellContents backcolor="#FF0000" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="72" height="25" uuid="f1773956-2f08-4126-9d19-40032d474e8b"/>
+							<reportElement uuid="f1773956-2f08-4126-9d19-40032d474e8b" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
+							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
@@ -297,25 +300,27 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="127" height="25" uuid="b63449ba-3d43-4d66-b43d-7aaa1c780c82"/>
+							<reportElement uuid="b63449ba-3d43-4d66-b43d-7aaa1c780c82" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
+							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="72" height="25" rowTotalGroup="date" columnTotalGroup="type">
+				<crosstabCell width="127" height="25" rowTotalGroup="date" columnTotalGroup="type">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField pattern="#,##0.00">
-							<reportElement style="Crosstab Data Text" x="0" y="0" width="72" height="25" uuid="74deed95-c672-4047-b561-2ea85fd8ce8e"/>
+							<reportElement uuid="74deed95-c672-4047-b561-2ea85fd8ce8e" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
+							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
 			</crosstab>
 			<textField>
-				<reportElement x="20" y="18" width="174" height="20" uuid="f263b515-37e2-4f48-a86a-38e74e37aa47"/>
+				<reportElement uuid="f263b515-37e2-4f48-a86a-38e74e37aa47" x="20" y="18" width="174" height="20"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
@@ -326,7 +331,7 @@
 	<lastPageFooter>
 		<band height="50">
 			<textField pattern="#,##0.00">
-				<reportElement x="535" y="12" width="127" height="20" uuid="e69f29bf-f4f8-4857-b3de-7573cfb2b5c5"/>
+				<reportElement uuid="e69f29bf-f4f8-4857-b3de-7573cfb2b5c5" x="535" y="12" width="127" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -340,7 +345,7 @@
 				<textFieldExpression><![CDATA[$P{sumComplex}/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="281" y="12" width="127" height="20" uuid="7515ea7f-91e9-4ddd-8ae5-2e57b8d5da01"/>
+				<reportElement uuid="7515ea7f-91e9-4ddd-8ae5-2e57b8d5da01" x="281" y="12" width="127" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -354,7 +359,7 @@
 				<textFieldExpression><![CDATA[$P{sumBuffet}/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="408" y="12" width="127" height="20" uuid="a6ca435f-3afe-4356-8fb7-9be7d127d07b"/>
+				<reportElement uuid="a6ca435f-3afe-4356-8fb7-9be7d127d07b" x="408" y="12" width="127" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -368,12 +373,26 @@
 				<textFieldExpression><![CDATA[$P{sumBen}/100]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="116" y="12" width="165" height="20" uuid="e6104f6c-f6fc-45cf-a489-5256bb19c0e3"/>
+				<reportElement uuid="e6104f6c-f6fc-45cf-a489-5256bb19c0e3" x="116" y="12" width="165" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[ИТОГО]]></text>
 			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement uuid="b67cfe7a-e8ba-4c43-8e93-d49308db6db6" x="662" y="12" width="127" height="20"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{sumComplex}+$P{sumBuffet}+$P{sumBen})/100]]></textFieldExpression>
+			</textField>
 		</band>
 	</lastPageFooter>
 </jasperReport>
