@@ -23,11 +23,11 @@ public class GroupControlSubscriptionsItem {
     public GroupControlSubscriptionsItem() {
     }
 
-    public GroupControlSubscriptionsItem(String orgNameWithAddress, String firstName, String surname, String secondName,
+    public GroupControlSubscriptionsItem(String orgNameWithAddress, String surname, String firstName, String secondName,
             Long contractId, String result) {
         this.orgNameWithAddress = orgNameWithAddress;
-        this.firstName = firstName;
         this.surname = surname;
+        this.firstName = firstName;
         this.secondName = secondName;
         this.contractId = contractId;
         this.result = result;
