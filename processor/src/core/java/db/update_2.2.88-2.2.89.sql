@@ -48,3 +48,8 @@ create index cf_orgregistrychange_createDate_idx on cf_orgregistrychange(created
 create index cf_registrychange_org_idx on cf_registrychange(idOfOrg);
 create index cf_registrychange_createDate_idx on cf_registrychange(createDate);
 create index cf_registrychange_type_idx on cf_registrychange(type);
+
+
+-- Расширение таблицы для повторной отправки смс
+alter table cf_clientsms_resending alter column paramscontents type text;
+alter table cf_clientsms_resending alter column textcontents type text;
