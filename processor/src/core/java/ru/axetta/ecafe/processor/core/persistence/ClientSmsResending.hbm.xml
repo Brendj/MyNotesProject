@@ -15,8 +15,8 @@
         <property name="serviceName" column="ServiceName" type="string" length="10" not-null="true" update="false"/>
         <property name="contentsId" column="ContentsId" type="long" not-null="false"/>
         <property name="contentsType" column="ContentsType" type="integer" not-null="true"/>
-        <property name="textContents" column="TextContents" type="string" length="120" not-null="true" update="false"/>
-        <property name="paramsContents" column="ParamsContents" type="string" length="255" not-null="true" update="false"/>
+        <property name="textContents" column="TextContents" type="string" length="65535" not-null="true" update="false"/>
+        <property name="paramsContents" column="ParamsContents" type="string" length="65535" not-null="true" update="false"/>
         <property name="createDate" column="CreateDate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
