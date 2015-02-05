@@ -35,7 +35,7 @@ public class XmlReportGeneratorService {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             List<Contragent> some = DailyFormationOfRegistriesService.getContragentTSP(persistenceSession);
