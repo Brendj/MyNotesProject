@@ -14,12 +14,14 @@ import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletio
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +63,22 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
     private Calendar localCalendar;
 
     private Boolean transactionsWithoutOrgIsPresented = false;
+
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    private OrganizationType organizationType;
+    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public OrganizationTypeMenu getOrganizationTypeMenu() {
+        return organizationTypeMenu;
+    }
 
     @Override
     public void onShow() throws Exception {
@@ -171,6 +189,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         builder.setContragent(defaultSupplier);
         Session session = (Session) entityManager.getDelegate();
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+        builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
         try {
             //ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
             BasicReportJob report = builder.build(session,startDate, endDate, localCalendar);

@@ -256,6 +256,17 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
         private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
                 Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
 
+            String organizationTypeProperty = getReportProperties().getProperty("organizationType");
+            OrganizationType orgType = null;
+
+            OrganizationType[] organizationTypes = OrganizationType.values();
+            for (OrganizationType organizationType : organizationTypes) {
+                if (organizationType.toString().equals(organizationTypeProperty)) {
+                    orgType = organizationType;
+                    break;
+                }
+            }
+
             List<Org> orgList =  new ArrayList<Org>();
             for (Long idOfOrg : idOfOrgList) {
                 Org localOrg = (Org) session.load(Org.class, idOfOrg);
@@ -270,6 +281,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 clientPaymentCriteria.add(Restrictions.in("t.org", orgList));
             clientPaymentCriteria.createAlias("transaction.client", "cl");
             clientPaymentCriteria.createAlias("transaction.client.org", "o");
+            if (orgType == null) {
+                clientPaymentCriteria.add(Restrictions.eq("o.type", orgType));
+            }
             if (contragentReceiver!=null)
                 clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
             if (contragent !=null)
@@ -285,6 +299,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.isNull("t.org"));
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client", "cl");
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client.org", "o");
+            if (orgType == null) {
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("o.type", orgType));
+            }
             if (!CollectionUtils.isEmpty(idOfOrgList))
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("o.idOfOrg", idOfOrgList));
             if (contragentReceiver!=null)

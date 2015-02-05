@@ -9,13 +9,13 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<h:panelGrid id="contragentPaymentReportPanelGrid" binding="#{mainPage.contragentPaymentReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="contragentPaymentReportPanelGrid" binding="#{mainPage.contragentPaymentReportPage.pageComponent}"
+             styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.contragentPaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar"
                          actionListener="#{mainPage.contragentPaymentReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -31,60 +31,71 @@
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.contragentPaymentReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.contragentPaymentReportPage.onEndDateSpecified}" />
         </rich:calendar>
 
         <h:outputText escape="true" value="Агент по приему платежей" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.contragentPaymentReportPage.contragentFilter.contragent.contragentName}" readonly="true"
-                         styleClass="input-text" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.contragentPaymentReportPage.showContragentSelectPage(false)}"
+            <h:inputText value="#{mainPage.contragentPaymentReportPage.contragentFilter.contragent.contragentName}"
+                         readonly="true" styleClass="input-text" style="margin-right: 2px;" />
+            <a4j:commandButton value="..."
+                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPage(false)}"
                                reRender="modalContragentSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0"
-                                             target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="1"
-                                             target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="1" target="#{mainPage.classTypes}" />
             </a4j:commandButton>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.contragentPaymentReportPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
-                         styleClass="input-text" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.contragentPaymentReportPage.showContragentSelectPage(true)}"
+            <h:inputText
+                    value="#{mainPage.contragentPaymentReportPage.contragentReceiverFilter.contragent.contragentName}"
+                    readonly="true" styleClass="input-text" style="margin-right: 2px;" />
+            <a4j:commandButton value="..."
+                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPage(true)}"
                                reRender="modalContragentSelectorPanel, orgPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0"
-                                             target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="2"
-                                             target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
             </a4j:commandButton>
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup id="orgPanel">
-            <a4j:commandButton value="..." action="#{mainPage.contragentPaymentReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.contragentPaymentReportPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
                 <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.contragentPaymentReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{mainPage.contragentPaymentReportPage.filter}}" />
         </h:panelGroup>
+
+        <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+        <h:panelGroup>
+            <h:selectOneMenu value="#{mainPage.contragentPaymentReportPage.organizationType}" styleClass="input-text"
+                             style="width: 250px;">
+                <f:converter converterId="organizationTypeConverter" />
+                <f:selectItems value="#{mainPage.contragentPaymentReportPage.organizationTypeMenu.items}" />
+            </h:selectOneMenu>
+        </h:panelGroup>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.contragentPaymentReportPage.buildReport}"
-                           reRender="workspaceTogglePanel"
-                           styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Генерировать отчет в Excel" actionListener="#{mainPage.contragentPaymentReportPage.exportToXLS}" styleClass="command-button" />
+                           reRender="workspaceTogglePanel" styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Генерировать отчет в Excel"
+                         actionListener="#{mainPage.contragentPaymentReportPage.exportToXLS}"
+                         styleClass="command-button" />
     </h:panelGrid>
 
     <a4j:status id="reportGenerateStatus">
@@ -98,13 +109,11 @@
 
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${not empty mainPage.contragentPaymentReportPage.htmlReport}" >
+        <c:if test="${not empty mainPage.contragentPaymentReportPage.htmlReport}">
             <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
 
             <f:verbatim>
-                <div class="htmlReportContent">
-                        ${mainPage.contragentPaymentReportPage.htmlReport}
-                </div>
+                <div class="htmlReportContent"> ${mainPage.contragentPaymentReportPage.htmlReport} </div>
             </f:verbatim>
 
         </c:if>
