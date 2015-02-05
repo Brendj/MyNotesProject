@@ -22,8 +22,6 @@ import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -71,7 +69,7 @@ public class PaymentTotalsReportService {
 
             Long orgID = org.getIdOfOrg();
 
-            String orgName = org.getOfficialName();
+            String orgName = org.getShortName();
 
             String lastSyncTime = YEAR_DATE_FORMAT.format(getLastSyncTime(idOfOrg));
 
@@ -102,12 +100,6 @@ public class PaymentTotalsReportService {
         }
 
         date = printTime(date, " ms - Main cycle passed.", 2L);
-
-        if (reportItems.size() <= 0) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные по выбранным организациям за указанный период отсутствуют", null));
-        }
 
         return reportItems;
     }
@@ -234,9 +226,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("od.menuType", OrderDetail.TYPE_DISH_ITEM));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
+        // не нужно - удалить
+        //Org org = (Org) session.load(Org.class, idOfOrg);
+        //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[] {"sum"},
                         new Type[] {LongType.INSTANCE}))
@@ -264,9 +256,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.between("od.menuType", OrderDetail.TYPE_COMPLEX_MIN, OrderDetail.TYPE_COMPLEX_MAX));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
+        // не нужно - удалить
+        //Org org = (Org) session.load(Org.class, idOfOrg);
+        //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[] {"sum"},
                         new Type[] {LongType.INSTANCE}))
@@ -334,8 +326,9 @@ public class PaymentTotalsReportService {
         orgClientsDetachedCriteria.setProjection(Property.forName("idOfClient"));
 
         Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.gt("transactionTime", startTime));    // <
-        criteria.add(Restrictions.lt("transactionTime", endTime));    // <
+        criteria.add(Restrictions.gt("transactionTime", startTime));
+        criteria.add(Restrictions.lt("transactionTime", endTime));
+        criteria.add(Restrictions.gt("transactionSum", 0L));
         criteria.add(Property.forName("client.idOfClient").in(orgClientsDetachedCriteria));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
         List list = criteria.list();
@@ -366,7 +359,7 @@ public class PaymentTotalsReportService {
         orgClientsDetachedCriteria.setProjection(Property.forName("idOfClient"));
 
         Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.lt("transactionTime", toTime));    // <
+        criteria.add(Restrictions.lt("transactionTime", toTime));
         criteria.add(Property.forName("client.idOfClient").in(orgClientsDetachedCriteria));
         criteria.setProjection(Projections.sum("transactionSum"));
         List list = criteria.list();
