@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
@@ -21,6 +22,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -57,6 +59,21 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private boolean receiverSelection;
     private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    private OrganizationType organizationType;
+    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public OrganizationTypeMenu getOrganizationTypeMenu() {
+        return organizationTypeMenu;
+    }
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
@@ -154,6 +171,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                     Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             BasicReportJob report = null;
@@ -290,6 +308,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                 Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+        builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
         BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
