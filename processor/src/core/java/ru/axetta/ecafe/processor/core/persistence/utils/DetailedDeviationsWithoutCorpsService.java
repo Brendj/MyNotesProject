@@ -130,12 +130,12 @@ public class DetailedDeviationsWithoutCorpsService {
                             + "LEFT JOIN cf_clientgroups gr "
                             + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
                             + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg IN (:idOfOrgList) "
-                            + "AND cl.idOfClientGroup < 1100000030 AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                            + "AND cl.idOfClientGroup < 1100000000 AND cl.idofclient NOT IN (SELECT cl.idofclient "
                             + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
                             + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
                             + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
                             + "AND e.idoforg IN ( :idOfOrgList) AND e.idofclient IS NOT null AND e.idofclient IN ( :idOfClientsList ) "
-                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030)");
+                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000000)");
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameterList("idOfClientsList", idOfClientsList);
             query.setParameter("startTime", startTime.getTime());
@@ -193,7 +193,7 @@ public class DetailedDeviationsWithoutCorpsService {
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
                         + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
                         + "WHERE e.evtdatetime BETWEEN :startTime AND :endTime AND e.idoforg IN ( :idOfOrgList ) AND cl.idoforg IN ( :idOfOrgList) AND e.idofclient IS NOT null "
-                        + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030");
+                        + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000000");
         query.setParameter("startTime", startTime.getTime());
         query.setParameterList("idOfOrgList", idOfOrgList);
         query.setParameter("endTime", endTime.getTime());
