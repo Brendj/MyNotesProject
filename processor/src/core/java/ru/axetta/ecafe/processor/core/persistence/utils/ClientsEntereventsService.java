@@ -209,7 +209,7 @@ public class ClientsEntereventsService {
                         + "LEFT JOIN cf_clientgroups gr "
                         + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
                         + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson "
-                        + "WHERE e.evtdatetime BETWEEN :startTime AND :endTime AND e.idoforg = :idOfOrg AND e.idofclient IS NOT null "
+                        + "WHERE e.evtdatetime BETWEEN :startTime AND :endTime AND e.idoforg = :idOfOrg AND cl.idoforg = :idOfOrg AND e.idofclient IS NOT null "
                         + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000030");
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("idOfOrg", idOfOrg);

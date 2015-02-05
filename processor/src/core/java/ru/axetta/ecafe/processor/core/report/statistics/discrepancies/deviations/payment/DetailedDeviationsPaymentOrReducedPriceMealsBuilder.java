@@ -121,7 +121,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
-                ++rowNum;
+
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
@@ -140,6 +140,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
 
                     for (Long idOfOrg : idOfOrgList) {
+                        ++rowNum;
                         DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                         List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
@@ -201,7 +202,6 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
 
             for (FriendlyOrganizationsInfoModel organizationsInfoModel : friendlyOrganizationsInfoModels) {
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
-                ++rowNum;
                 if (orgSet.size() > 0) {
                     List<Long> idOfOrgList = new ArrayList<Long>();
                     for (Org org : orgSet) {
@@ -220,6 +220,7 @@ public class DetailedDeviationsPaymentOrReducedPriceMealsBuilder extends BasicRe
                     }
 
                     for (Long idOfOrg : idOfOrgList) {
+                        ++rowNum;
                         DeviationPaymentItem deviationPaymentItem = new DeviationPaymentItem();
                         List<DeviationPaymentSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentSubReportItem>();
 
