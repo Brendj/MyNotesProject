@@ -927,6 +927,13 @@
         <rich:panelMenuItem id="regularPaymentsReportMenuItem" binding="#{regularPaymentsReportPage.mainMenuComponent}"
                             label="Отчет по регулярным платежам" action="#{regularPaymentsReportPage.show}"
                             reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="paymentTotalsReportMenuItem"
+                            binding="#{mainPage.paymentTotalsReportPage.mainMenuComponent}"
+                            label="Итоговые показатели"
+                            action="#{mainPage.paymentTotalsReportPage.show}"
+                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="activityReportsGroupMenu" binding="#{mainPage.activityReportsGroupMenu.mainMenuComponent}"

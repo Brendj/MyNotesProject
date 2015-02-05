@@ -346,6 +346,7 @@ public class MainPage implements Serializable {
     private final DetailedDeviationsWithoutCorpsReportPage detailedDeviationsWithoutCorpsReportPage = new DetailedDeviationsWithoutCorpsReportPage();
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
+    private final PaymentTotalsReportPage paymentTotalsReportPage = new PaymentTotalsReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -1460,6 +1461,10 @@ public class MainPage implements Serializable {
         return showOrgSelectPage (null, null);
     }
 
+    public Object showOrgSelectPage(Long idOfContragent) {
+        return showOrgSelectPage (idOfContragent, null);
+    }
+
     public Object showOrgSelectPage(Long idOfContragent, Long idOfContract) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgSelectPage.CompleteHandler) {
@@ -1547,6 +1552,46 @@ public class MainPage implements Serializable {
         }
         return null;
     }
+
+    public Object showOrgListSelectPage(Long idOfContragent) {
+        List<Long> idOfContragentList = new ArrayList<Long>();
+        idOfContragentList.add(idOfContragent);
+
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setFilter("");
+                orgListSelectPage.setTagFilter("");
+                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
+                } else {
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
+                            idOfContragentOrgList, idOfContragentList);
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                orgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
+                modalPages.push(orgListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill org selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
 
     public Object showOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
@@ -5418,6 +5463,10 @@ public class MainPage implements Serializable {
         return typesOfCardReportPage;
     }
 
+    public PaymentTotalsReportPage getPaymentTotalsReportPage() {
+        return paymentTotalsReportPage;
+    }
+
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
@@ -7886,7 +7935,7 @@ public class MainPage implements Serializable {
 
     public String getUserContragentsList () {
         try {
-            return ContextDAOServices.getInstance().getContragentsListForTooltip (getCurrentUser().getIdOfUser());
+            return ContextDAOServices.getInstance().getContragentsListForTooltip(getCurrentUser().getIdOfUser());
         } catch (Exception e) {
             logger.error("getContragentsListForTooltip Error",e);
             return "";
