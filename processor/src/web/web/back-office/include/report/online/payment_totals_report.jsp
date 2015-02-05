@@ -62,43 +62,43 @@
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
-    <%--<rich:simpleTogglePanel label="Временные настройки отчета" switchType="client" style="width: 800px;" opened="true"--%>
-                            <%--headerClass="filter-panel-header" id="paymentTotalsReportFilterPanelGridTemporary">--%>
-        <%--<h:panelGrid styleClass="borderless-grid" columns="2">--%>
+    <rich:simpleTogglePanel label="Временные настройки отчета" switchType="client" style="width: 800px;" opened="true"
+                            headerClass="filter-panel-header" id="paymentTotalsReportFilterPanelGridTemporary">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
 
-            <%--<h:outputText escape="true" value="Поставщик" styleClass="output-text" />--%>
-            <%--<h:panelGroup styleClass="borderless-div">--%>
-                <%--<h:inputText value="#{mainPage.paymentTotalsReportPage.contragentFilter.contragent.contragentName}" readonly="true"--%>
-                             <%--styleClass="input-text long-field" style="margin-right: 2px;" />--%>
-                <%--<a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"--%>
-                                   <%--reRender="modalContragentSelectorPanel"--%>
-                                   <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"--%>
-                                   <%--styleClass="command-link" style="width: 25px;">--%>
-                    <%--<f:setPropertyActionListener value="0"--%>
-                                                 <%--target="#{mainPage.multiContrFlag}" />--%>
-                    <%--<f:setPropertyActionListener value="2,"--%>
-                                                 <%--target="#{mainPage.classTypes}" />--%>
-                <%--</a4j:commandButton>--%>
-            <%--</h:panelGroup>--%>
+            <h:outputText escape="true" value="Поставщик" styleClass="output-text" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.paymentTotalsReportPage.contragentFilter.contragent.contragentName}" readonly="true"
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                   reRender="modalContragentSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="0"
+                                                 target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2,"
+                                                 target="#{mainPage.classTypes}" />
+                </a4j:commandButton>
+            </h:panelGroup>
 
-            <%--<h:outputText styleClass="output-text" escape="true" value="Организация" />--%>
-            <%--<h:panelGroup id="orgFilter">--%>
-                <%--<a4j:commandButton value="..."--%>
-                                   <%--action="#{mainPage.paymentTotalsReportPage.showOrgListSelectPage}"--%>
-                                   <%--reRender="modalOrgListSelectorPanel"--%>
-                                   <%--oncomplete="if (#{facesContext.maximumSeverity == null})--%>
-                                        <%--#{rich:component('modalOrgListSelectorPanel')}.show();"--%>
-                                   <%--styleClass="command-link" style="width: 25px;">--%>
-                    <%--<f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />--%>
-                    <%--<f:setPropertyActionListener--%>
-                            <%--value="#{mainPage.paymentTotalsReportPage.getStringIdOfOrgList}"--%>
-                            <%--target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />--%>
-                <%--</a4j:commandButton>--%>
-                <%--<h:outputText styleClass="output-text" escape="true"--%>
-                              <%--value=" {#{mainPage.paymentTotalsReportPage.filter}}" />--%>
-            <%--</h:panelGroup>--%>
-        <%--</h:panelGrid>--%>
-    <%--</rich:simpleTogglePanel>--%>
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup id="orgFilter">
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.paymentTotalsReportPage.showOrgListSelectPage}"
+                                   reRender="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+                    <f:setPropertyActionListener
+                            value="#{mainPage.paymentTotalsReportPage.getStringIdOfOrgList}"
+                            target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true"
+                              value=" {#{mainPage.paymentTotalsReportPage.filter}}" />
+            </h:panelGroup>
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
 
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.paymentTotalsReportPage.exportToHTML}"
