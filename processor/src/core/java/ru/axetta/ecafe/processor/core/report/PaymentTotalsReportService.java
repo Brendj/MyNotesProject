@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -419,7 +418,7 @@ public class PaymentTotalsReportService {
         orgCriteria.add(Restrictions.eq("syncResult", 0));
         orgCriteria.setProjection(Projections.projectionList().add(Projections.property("syncEndTime")));
         List<Date> syncTimes = orgCriteria.list();
-        Date lastSyncTime = CalendarUtils.addDays(new Date(), -35);
+        Date lastSyncTime = new Date(0L);
         if (syncTimes != null && syncTimes.size() > 0 && syncTimes.get(0) != null) {
             lastSyncTime = syncTimes.get(0);
             for (Date syncTime : syncTimes)
