@@ -68,6 +68,8 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         localCalendar.add(Calendar.DATE, 7);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
+        idOfOrgList.add(57L);
+        idOfOrgList.add(101L);
     }
 
     @Override
@@ -150,6 +152,9 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             storedReport = report;
+            if (report.getPrint().getPages().size() <= 0) {
+                printWarn("Данные по выбранным организациям за указанный период отсутствуют");
+            }
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

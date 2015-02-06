@@ -16,8 +16,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -112,12 +110,6 @@ public class PaymentTotalsReport extends BasicReportForAllOrgJob {
 
             List<PaymentTotalsReportService.Item> reportItems = service.buildReportItems(idOfContragent, idOfOrgList,
                     startTime, endTime, hideNullRows);
-
-            if (reportItems.size() <= 0) {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные по выбранным организациям за указанный период отсутствуют", null));
-            }
 
             return new JRBeanCollectionDataSource(reportItems);
         }
