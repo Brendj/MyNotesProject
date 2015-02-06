@@ -73,7 +73,8 @@ public class PaymentTotalsReportService {
 
             String lastSyncTime = YEAR_DATE_FORMAT.format(getLastSyncTime(idOfOrg));
 
-            Long startCash = getOrgClientsBalanceOnDate(idOfOrg, startTime, ClientGroupMenu.CLIENT_STUDENTS);
+            Long startCash = getOrgClientsBalance(idOfOrg, startTime, ClientGroupMenu.CLIENT_STUDENTS);
+            // getOrgClientsBalanceOnDateBeforeRubicon(idOfOrg, startTime, ClientGroupMenu.CLIENT_STUDENTS);
 
             Long income = getOrgClientsIncomeOnPeriod(idOfOrg, startTime, endTime, ClientGroupMenu.CLIENT_STUDENTS);
 
@@ -89,9 +90,11 @@ public class PaymentTotalsReportService {
 
             Long cashMoved = getCashMovedSum(idOfOrg, startTime, endTime);
 
-            Long endCash = startCash + income;
+            Long endCashControl = startCash + income - paidTotal + repayment + cashMoved;
 
-            String comment = "";
+            Long endCash = getOrgClientsBalance(idOfOrg, endTime, ClientGroupMenu.CLIENT_STUDENTS);
+
+            String comment = getStatusDetail(idOfOrg);
 
             Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack, paidTotal,
                     repayment, cashMoved, endCash, comment);
@@ -102,6 +105,43 @@ public class PaymentTotalsReportService {
         date = printTime(date, " ms - Main cycle passed.", 2L);
 
         return reportItems;
+    }
+
+    private String getStatusDetail(Long idOfOrg) {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        String statusDetailing = org.getStatusDetailing();
+        if (!statusDetailing.equals("") && !statusDetailing.equals("/"))
+            return statusDetailing;
+        return "";
+    }
+
+    private Long getOrgClientsBalance(Long idOfOrg, Date toTime, Long clientGroup) {
+        Long result = 0L;
+        Date rubicon = new Date(113, 2, 14); // 2013-03-14 00:00:00
+        result = getOrgClientsBalanceOnDateBeforeRubicon(idOfOrg, rubicon, clientGroup);
+        if (toTime.after(rubicon))
+            result += getOrgClientsBalanceChangeOnPeriodAfterRubicon(idOfOrg, rubicon, toTime, clientGroup);
+        return result;
+    }
+
+    private Long getOrgClientsBalanceChangeOnPeriodAfterRubicon(Long idOfOrg, Date rubicon, Date toTime,
+            Long clientGroup) {
+
+        Date date = new Date();
+        date = printTime(date, " ms - getOrgClientsBalanceChangeOnPeriodAfterRubicon, idOfOrg - " + idOfOrg, 4L);
+
+        Criteria criteria = session.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.between("transactionTime", rubicon, toTime));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.setProjection(Projections.sum("transactionSum"));
+        List list = criteria.list();
+
+        Long cashSum = 0L;
+        if (list != null && list.size() > 0 && list.get(0) != null) cashSum = (Long) list.get(0);
+
+        date = printTime(date,  " ms - getOrgClientsBalanceChangeOnPeriodAfterRubicon, idOfOrg - " + idOfOrg, 4L);
+
+        return cashSum;
     }
 
     private boolean notZeroCash(Item item) {
@@ -132,7 +172,7 @@ public class PaymentTotalsReportService {
             newDate = new Date();
             Long diff = (newDate.getTime() - date.getTime());
             if (diff > 1000L)
-                logger.info((newDate.getTime()-date.getTime()) + message + " debug level - " + debugLevel);
+                logger.warn((newDate.getTime()-date.getTime()) + message + " debug level - " + debugLevel);
             date = newDate;
         }
         return date;
@@ -230,8 +270,8 @@ public class PaymentTotalsReportService {
         //Org org = (Org) session.load(Org.class, idOfOrg);
         //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[] {"sum"},
-                        new Type[] {LongType.INSTANCE}))
+                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE}))
         );
         List list = criteria.list();
 
@@ -260,8 +300,8 @@ public class PaymentTotalsReportService {
         //Org org = (Org) session.load(Org.class, idOfOrg);
         //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[] {"sum"},
-                        new Type[] {LongType.INSTANCE}))
+                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE}))
         );
         List list = criteria.list();
 
@@ -279,20 +319,16 @@ public class PaymentTotalsReportService {
         date = printTime(date, " ms - getPaidOrdersSumSQL, idOfOrg - " + idOfOrg, 4L);
 
         Query query = session.createSQLQuery(
-            "SELECT sum(this_.rprice * this_.qty) AS sum "
-            + "FROM "
-                + "CF_OrderDetails this_ "
-                + "INNER JOIN CF_Orders o1_ "
-                    + "ON this_.IdOfOrg = o1_.IdOfOrg AND this_.IdOfOrder = o1_.IdOfOrder "
-            + "WHERE "
-                + "this_.State = :state "
-            + "AND o1_.OrderType IN (:ordertype) "
-            //+ "AND this_.MenuType BETWEEN :menutypemin AND :menutypemax "
-            //+ "AND o1_.IdOfOrg IN (:idoforgs) "
-            //+ "AND o1_.CreatedDate BETWEEN :startdate AND :enddate "
+                "SELECT sum(this_.rprice * this_.qty) AS sum " + "FROM " + "CF_OrderDetails this_ "
+                        + "INNER JOIN CF_Orders o1_ "
+                        + "ON this_.IdOfOrg = o1_.IdOfOrg AND this_.IdOfOrder = o1_.IdOfOrder " + "WHERE "
+                        + "this_.State = :state " + "AND o1_.OrderType IN (:ordertype) "
+                //+ "AND this_.MenuType BETWEEN :menutypemin AND :menutypemax "
+                //+ "AND o1_.IdOfOrg IN (:idoforgs) "
+                //+ "AND o1_.CreatedDate BETWEEN :startdate AND :enddate "
         );
         query.setParameter("state", 0);
-        query.setParameterList("ordertype", new Long[]{ 1L, 3L, 7L});
+        query.setParameterList("ordertype", new Long[]{1L, 3L, 7L});
         //query.setParameter("menutypemin", 0);
         //query.setParameter("menutypemax", 0);
         //query.setParameter("idoforgs", idOfOrg);
@@ -341,10 +377,10 @@ public class PaymentTotalsReportService {
         return income;
     }
 
-    private Long getOrgClientsBalanceOnDate(Long idOfOrg, Date toTime, Long clientGroupId) {
+    private Long getOrgClientsBalanceOnDateBeforeRubicon(Long idOfOrg, Date toTime, Long clientGroupId) {
 
         Date date = new Date();
-        date = printTime(date, " ms - getOrgClientsBalanceOnDate, idOfOrg - " + idOfOrg, 4L);
+        date = printTime(date, " ms - getOrgClientsBalanceOnDateBeforeRubicon, idOfOrg - " + idOfOrg, 4L);
 
         DetachedCriteria orgClientsDetachedCriteria = DetachedCriteria.forClass(Client.class);
         orgClientsDetachedCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
@@ -367,7 +403,7 @@ public class PaymentTotalsReportService {
         Long cashSum = 0L;
         if (list != null && list.size() > 0 && list.get(0) != null) cashSum = (Long) list.get(0);
 
-        date = printTime(date,  " ms - getOrgClientsBalanceOnDate, idOfOrg - " + idOfOrg, 4L);
+        date = printTime(date,  " ms - getOrgClientsBalanceOnDateBeforeRubicon, idOfOrg - " + idOfOrg, 4L);
 
         return cashSum;
     }
