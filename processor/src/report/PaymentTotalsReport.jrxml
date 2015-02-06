@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-05T19:20:53 -->
+<!-- 2015-02-06T14:53:18 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
@@ -933,7 +933,9 @@
 					<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="54" height="18" uuid="07970855-eb84-47f3-82d7-e5cbe39eeed7"/>
+					<reportElement style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="54" height="18" uuid="07970855-eb84-47f3-82d7-e5cbe39eeed7">
+						<printWhenExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse($F{lastSyncTime}).getTime() > $P{endDate}.getTime()]]></printWhenExpression>
+					</reportElement>
 					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 						<topPen lineWidth="0.5"/>
 						<leftPen lineWidth="0.5"/>
@@ -998,7 +1000,7 @@
 					<textFieldExpression><![CDATA[$V{rowsCount}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="254" y="0" width="54" height="18" uuid="eb89ca96-8eac-48aa-b958-e63354285b59">
+					<reportElement style="Detail" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="254" y="0" width="54" height="18" uuid="eb89ca96-8eac-48aa-b958-e63354285b59">
 						<property name="local_mesure_unity" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="local_mesure_unitx" value="pixel"/>
@@ -1140,6 +1142,21 @@
 						<font fontName="SansSerif" size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{cashMoved})) / 100.0]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="200" y="0" width="54" height="18" backcolor="#FF8C8C" uuid="a68f98ee-eacc-495f-9373-dea5a7bfa5f0">
+						<printWhenExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse($F{lastSyncTime}).getTime() <= $P{endDate}.getTime()]]></printWhenExpression>
+					</reportElement>
+					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse($F{lastSyncTime}))]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
