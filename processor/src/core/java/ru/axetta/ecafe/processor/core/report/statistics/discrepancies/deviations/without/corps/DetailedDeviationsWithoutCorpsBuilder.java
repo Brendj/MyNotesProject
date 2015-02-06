@@ -93,7 +93,7 @@ public class DetailedDeviationsWithoutCorpsBuilder extends BasicReportForAllOrgJ
         List<DeviationPaymentItem> deviationPaymentItemList = new ArrayList<DeviationPaymentItem>();
 
         // План питания льготники
-        String orderTypeLgotnick = "4,6,8";
+        String orderTypeLgotnick = "4,8"; // 6 - резерв
 
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
