@@ -131,7 +131,7 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
                 }
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
         } finally {
             logger.info("Response from BK: {}", paymentResponse.toString());
         }

@@ -105,6 +105,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return getAppContext().containsBean("orgRoomCommonBean");
     }
 
+    public boolean isTestMode() {
+        return Boolean.parseBoolean((String)configProperties.get("ecafe.processor.testMode"));
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {

@@ -1017,16 +1017,18 @@ public class Processor implements SyncProcessor,
     * */
     @Async
      private void runRegularPayments(SyncRequest request) {
-        Boolean enabled = Boolean.valueOf(
-                (String) RuntimeContext.getInstance
-                        ().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
-        if( (enabled != null) && (enabled) ){
-            logger.info("runRegularPayments run");
-            BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
-                    .getInstance()
-                    .getRegularPaymentSubscriptionService();
-            regularPaymentSubscriptionService.checkClientBalances(request.getIdOfOrg());
-            logger.info("runRegularPayments stop");
+        try {
+            Boolean enabled = Boolean.valueOf(
+                    (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
+            if ((enabled != null) && (enabled)) {
+                logger.info("runRegularPayments run");
+                BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
+                        .getInstance().getRegularPaymentSubscriptionService();
+                regularPaymentSubscriptionService.checkClientBalances(request.getIdOfOrg());
+                logger.info("runRegularPayments stop");
+            }
+        } catch (Exception e) {
+            logger.warn("catch BKRegularPaymentSubscriptionService exc");
         }
     }
 
@@ -1848,8 +1850,9 @@ public class Processor implements SyncProcessor,
                         if (logger.isWarnEnabled()) {
                             if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
                                 logger.warn(
-                                        String.format("Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
-                                                ""+ client.getIdOfClient(), card.toString(), newCard.toString()));
+                                        String.format(
+                                                "Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
+                                                "" + client.getIdOfClient(), card.getIdOfCard(), newCard.getIdOfCard()));
                             }
                         }
                         card = newCard;
@@ -2213,10 +2216,10 @@ public class Processor implements SyncProcessor,
                         migrationHistory.setNewGroupName(clientGroup.getGroupName());
 
                         persistenceSession.save(migrationHistory);
-                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     }
 
                 }
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
             client.setClientRegistryVersion(version);
