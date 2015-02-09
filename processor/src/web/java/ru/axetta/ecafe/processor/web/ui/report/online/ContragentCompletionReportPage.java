@@ -110,6 +110,16 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
             orgItems = contragentDAOService.findAllDistributionOrganization();
         }
 
+        if (this.organizationType != null) {
+            List<Org> orgList = new ArrayList<Org>();
+            for (Org org : orgItems) {
+                if (org.getType().equals(this.organizationType)) {
+                    orgList.add(org);
+                }
+            }
+            orgItems = orgList;
+        }
+
         List<String> stringOrgList = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
         List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
         for (String idOfOrg : stringOrgList) {

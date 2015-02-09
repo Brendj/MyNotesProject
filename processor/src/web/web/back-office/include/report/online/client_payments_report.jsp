@@ -25,6 +25,14 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientPaymentsReportPage.filter}}" />
         </h:panelGroup>
+        <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+        <h:panelGroup>
+            <h:selectOneMenu value="#{mainPage.clientPaymentsReportPage.organizationType}" styleClass="input-text"
+                             style="width: 250px;">
+                <f:converter converterId="organizationTypeConverter" />
+                <f:selectItems value="#{mainPage.clientPaymentsReportPage.organizationTypeMenu.items}" />
+            </h:selectOneMenu>
+        </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientPaymentsReport}"
                            reRender="workspaceTogglePanel, clientPaymentsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />

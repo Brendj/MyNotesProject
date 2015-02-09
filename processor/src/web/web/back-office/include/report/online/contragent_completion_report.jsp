@@ -51,6 +51,15 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{contragentCompletionReportPage.filter}}" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+        <h:panelGroup>
+            <h:selectOneMenu value="#{contragentCompletionReportPage.organizationType}" styleClass="input-text"
+                             style="width: 250px;">
+                <f:converter converterId="organizationTypeConverter" />
+                <f:selectItems value="#{contragentCompletionReportPage.organizationTypeMenu.items}" />
+            </h:selectOneMenu>
+        </h:panelGroup>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">

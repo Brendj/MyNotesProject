@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletio
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,8 +64,19 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
+            String organizationTypeProperty = getReportProperties().getProperty("organizationType");
+            OrganizationType orgType = null;
+
+            OrganizationType[] organizationTypes = OrganizationType.values();
+            for (OrganizationType organizationType : organizationTypes) {
+                if (organizationType.toString().equals(organizationTypeProperty)) {
+                    orgType = organizationType;
+                    break;
+                }
+            }
+
             JRDataSource dataSource = createDataSource(session, contragent, startTime, endTime,
-                    (Calendar) calendar.clone(), parameterMap, idOfOrgList);
+                    (Calendar) calendar.clone(), parameterMap, idOfOrgList, orgType);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -73,7 +85,7 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                     jasperPrint, startTime, endTime, contragent.getIdOfContragent());
         }
 
-        private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
+        private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList, OrganizationType organizationType) {
             ContragentDAOService contragentDAOService = new ContragentDAOService();
             contragentDAOService.setSession(session);
             List<ContragentCompletionReportItem> list = new ArrayList<ContragentCompletionReportItem>();
@@ -85,6 +97,16 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                 orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(contragent);
             } else {
                 orgItems = contragentDAOService.findAllDistributionOrganization();
+            }
+
+            if (organizationType != null) {
+                List<Org> orgList = new ArrayList<Org>();
+                for (Org org : orgItems) {
+                     if (org.getType().equals(organizationType)) {
+                         orgList.add(org);
+                     }
+                }
+                orgItems = orgList;
             }
 
             if (!orgItems.isEmpty()) {
