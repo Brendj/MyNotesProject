@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="1330" pageHeight="10000" columnWidth="1290" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
-	<property name="ireport.zoom" value="1.1000000000000005"/>
-	<property name="ireport.x" value="218"/>
+	<property name="ireport.zoom" value="0.9090909090909097"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -51,7 +51,7 @@
 					<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DetailedDeviationsWithoutCorpsIntervalJasperReport_Subreport.jasper"]]></subreportExpression>
 				</subreport>
 				<textField isBlankWhenNull="true">
-					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToTallestObject" x="40" y="0" width="225" height="50"/>
+					<reportElement uuid="89c6b3f5-a42d-47c7-bef4-cf0715ec8bef" stretchType="RelativeToBandHeight" x="40" y="0" width="225" height="50"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -79,7 +79,7 @@
 					<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement uuid="10036522-7c1d-4628-b666-70e3a0e0ef50" stretchType="RelativeToTallestObject" x="265" y="0" width="225" height="50"/>
+					<reportElement uuid="10036522-7c1d-4628-b666-70e3a0e0ef50" stretchType="RelativeToBandHeight" x="265" y="0" width="225" height="50"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>

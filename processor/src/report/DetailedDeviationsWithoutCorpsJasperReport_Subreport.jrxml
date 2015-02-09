@@ -16,7 +16,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="e97c91e1-2879-421b-a4a8-50efc275cb49" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="800" height="20" backcolor="#CCCCCC"/>
+					<reportElement uuid="e97c91e1-2879-421b-a4a8-50efc275cb49" mode="Opaque" x="0" y="0" width="800" height="20" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -34,7 +34,7 @@
 		<groupFooter>
 			<band height="20">
 				<textField>
-					<reportElement uuid="760a0f46-a729-4a33-a24f-ce6f16a979ad" stretchType="RelativeToTallestObject" x="0" y="0" width="800" height="20"/>
+					<reportElement uuid="760a0f46-a729-4a33-a24f-ce6f16a979ad" x="0" y="0" width="800" height="20"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -55,7 +55,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="bc79ce7c-6b5c-4e2a-87fd-3cbb65f8104b" stretchType="RelativeToTallestObject" x="0" y="0" width="800" height="20"/>
+					<reportElement uuid="bc79ce7c-6b5c-4e2a-87fd-3cbb65f8104b" x="0" y="0" width="800" height="20"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -74,7 +74,7 @@
 	<detail>
 		<band height="20">
 			<textField>
-				<reportElement uuid="3e004ede-aa89-430a-abca-f58d0ab6aff9" stretchType="RelativeToTallestObject" x="0" y="0" width="800" height="20"/>
+				<reportElement uuid="3e004ede-aa89-430a-abca-f58d0ab6aff9" x="0" y="0" width="800" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
