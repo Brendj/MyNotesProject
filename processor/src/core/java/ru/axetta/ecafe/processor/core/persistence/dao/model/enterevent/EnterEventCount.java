@@ -14,10 +14,16 @@ package ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent;
 public class EnterEventCount {
     private long idOfOrg;
     private int count;
+    private long idOfClient;
 
     public EnterEventCount(long idOfOrg, int count) {
         this.idOfOrg = idOfOrg;
         this.count = count;
+    }
+
+    public EnterEventCount( long idOfOrg,long idOfClient) {
+        this.idOfOrg = idOfOrg;
+        this.idOfClient = idOfClient;
     }
 
     public long getIdOfOrg() {
@@ -34,5 +40,13 @@ public class EnterEventCount {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 }

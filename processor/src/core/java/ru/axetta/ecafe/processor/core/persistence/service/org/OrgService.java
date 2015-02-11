@@ -48,7 +48,7 @@ public class OrgService {
                 return org1;
             }
         }
-        return null;
+        return org;
     }
 
     public Org getMainBulding(Org org){

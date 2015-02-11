@@ -184,17 +184,36 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
-        if(!org.isMainBuilding() ){
-            if((org.getFriendlyOrg()== null||(org.getFriendlyOrg()!=null && org.getFriendlyOrg().size() == 0)) ){
+        if (!org.isMainBuilding()) {
+            if ((org.getFriendlyOrg() == null || (org.getFriendlyOrg() != null && org.getFriendlyOrg().size() == 0))) {
                 org.setMainBuilding(true);
-            } else if(mainBuilding) {
-                for(Org fOrg : org.getFriendlyOrg()){
+            } else if (mainBuilding) {
+                for (Org fOrg : org.getFriendlyOrg()) {
                     if (fOrg.isMainBuilding()) {
                         fOrg.setMainBuilding(false);
                         DAOUtils.orgMainBuildingUnset(session, fOrg.getIdOfOrg());
                     }
                 }
                 org.setMainBuilding(true);
+            } else {
+                boolean flag = false;
+                for (Org fOrg : org.getFriendlyOrg()) {
+                    if (fOrg.isMainBuilding()) {
+                        flag = true;
+                    }
+                }
+                if (!flag) {
+                    org.setMainBuilding(true);
+                }
+            }
+        } else {
+            if ((org.getFriendlyOrg() != null && org.getFriendlyOrg().size() > 0)) {
+                for (Org fOrg : org.getFriendlyOrg()) {
+                    if (fOrg.getIdOfOrg() != org.getIdOfOrg() && fOrg.isMainBuilding()) {
+                        fOrg.setMainBuilding(false);
+                        DAOUtils.orgMainBuildingUnset(session, fOrg.getIdOfOrg());
+                    }
+                }
             }
         }
 

@@ -4,6 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * User: regal
  * Date: 03.02.15
@@ -11,25 +16,51 @@ package ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport;
  */
 public class TotalBenefFeedItem {
     private long idOfOrg;
-    private String name ="d" ;
-    private String adress = "dd";
+    private String orgNum ;
+    private String name ;
+    private String adress;
     private int students;
     private int benefStudents; //Число учащихся льготников
     private int orderedMeals ; //Количество заказанных порций
+    private List<SubItem> orderedMealsList;
     private int enteredBenefStudents ; //Зафиксирован проход учащихся льготников
+    private List<SubItem> enteredBenefStudentsList ;
     private int receiveMealBenefStudents ; //Предоставлено льготное питание учащимся льготникам
+    private List<SubItem> receiveMealBenefStudentsList ;
     private int notReceiveMealEnteredBenefStudents ; //Не предоставлено льготное питание учащимся льготникам, присутствующим в ОО
+    private List<SubItem> notReceiveMealEnteredBenefStudentsList ;
     private int receiveMealNotEnteredBenefStudents ; //Предоставлено льготное питание учащимся льготникам, не присутствующим в ОО
+    private List<SubItem> receiveMealNotEnteredBenefStudentsList ;
     private int receiveMealReserveStudents ; //Педоставлено питание учащимся, числящимся в резервной группе
 
 
     public TotalBenefFeedItem() {
     }
 
+    public TotalBenefFeedItem(Org org){
+        this.idOfOrg = org.getIdOfOrg();
+        this.orgNum = Org.extractOrgNumberFromName(org.getOfficialName());
+        this.name = org.getShortName();
+        this.adress = org.getAddress();
+
+        orderedMealsList = new ArrayList<SubItem>();
+        enteredBenefStudentsList = new ArrayList<SubItem>();
+        receiveMealBenefStudentsList = new ArrayList<SubItem>();
+        notReceiveMealEnteredBenefStudentsList = new ArrayList<SubItem>();
+        receiveMealNotEnteredBenefStudentsList = new ArrayList<SubItem>();
+    }
+
     public TotalBenefFeedItem(long idOfOrg, String name, String adress) {
         this.idOfOrg = idOfOrg;
         this.name = name;
         this.adress = adress;
+
+        orderedMealsList = new ArrayList<SubItem>();
+        enteredBenefStudentsList = new ArrayList<SubItem>();
+        receiveMealBenefStudentsList = new ArrayList<SubItem>();
+        notReceiveMealEnteredBenefStudentsList = new ArrayList<SubItem>();
+        receiveMealNotEnteredBenefStudentsList = new ArrayList<SubItem>();
+
     }
 
     public long getIdOfOrg() {
@@ -38,6 +69,14 @@ public class TotalBenefFeedItem {
 
     public void setIdOfOrg(long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getOrgNum() {
+        return orgNum;
+    }
+
+    public void setOrgNum(String orgNum) {
+        this.orgNum = orgNum;
     }
 
     public String getName() {
@@ -118,5 +157,45 @@ public class TotalBenefFeedItem {
 
     public void setReceiveMealReserveStudents(int receiveMealReserveStudents) {
         this.receiveMealReserveStudents = receiveMealReserveStudents;
+    }
+
+    public List<SubItem> getOrderedMealsList() {
+        return orderedMealsList;
+    }
+
+    public void setOrderedMealsList(List<SubItem> orderedMealsList) {
+        this.orderedMealsList = orderedMealsList;
+    }
+
+    public List<SubItem> getEnteredBenefStudentsList() {
+        return enteredBenefStudentsList;
+    }
+
+    public void setEnteredBenefStudentsList(List<SubItem> enteredBenefStudentsList) {
+        this.enteredBenefStudentsList = enteredBenefStudentsList;
+    }
+
+    public List<SubItem> getReceiveMealBenefStudentsList() {
+        return receiveMealBenefStudentsList;
+    }
+
+    public void setReceiveMealBenefStudentsList(List<SubItem> receiveMealBenefStudentsList) {
+        this.receiveMealBenefStudentsList = receiveMealBenefStudentsList;
+    }
+
+    public List<SubItem> getNotReceiveMealEnteredBenefStudentsList() {
+        return notReceiveMealEnteredBenefStudentsList;
+    }
+
+    public void setNotReceiveMealEnteredBenefStudentsList(List<SubItem> notReceiveMealEnteredBenefStudentsList) {
+        this.notReceiveMealEnteredBenefStudentsList = notReceiveMealEnteredBenefStudentsList;
+    }
+
+    public List<SubItem> getReceiveMealNotEnteredBenefStudentsList() {
+        return receiveMealNotEnteredBenefStudentsList;
+    }
+
+    public void setReceiveMealNotEnteredBenefStudentsList(List<SubItem> receiveMealNotEnteredBenefStudentsList) {
+        this.receiveMealNotEnteredBenefStudentsList = receiveMealNotEnteredBenefStudentsList;
     }
 }

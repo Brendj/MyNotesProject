@@ -62,6 +62,19 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         return orgItemList;
     }
 
+    public List<Long> findAllActiveIds(){
+        List<Long> orgItemList = new ArrayList<Long>();
+        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg FROM CF_Orgs "
+                + " WHERE State =1 and OrganizationType=0 and RefectoryType != 3 ORDER BY OfficialName ");
+
+        List<BigInteger> temp = nativeQuery.getResultList();
+        for(BigInteger o : temp){
+            orgItemList.add(o.longValue());
+        }
+
+        return orgItemList;
+    }
+
     public List<OrgItem> findAllNamesByContragentTSP(long idOfContragent){
         List<OrgItem> orgItemList = new ArrayList<OrgItem>();
         Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs "
@@ -79,7 +92,7 @@ public class OrgRepository extends AbstractJpaDao<Org> {
     public Org findOrgWithFriendlyOrgs(long idOfOrg) {
         return entityManager.createQuery("select o from Org o left join fetch o.friendlyOrg where o.idOfOrg=:idOfOrg", Org.class)
                 .setParameter("idOfOrg", idOfOrg)
-                .getSingleResult();
+                .getResultList().get(0);
 
     }
 }

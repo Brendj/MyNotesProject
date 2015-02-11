@@ -878,8 +878,8 @@
 
 
         <%--@elvariable id="totalBenefFeedReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalBenefFeedReportPage"--%>
-        <%--<rich:panelMenuItem id="totalBenefFeedReportMenuItem" binding="#{totalBenefFeedReportPage.mainMenuComponent}"--%>
-                            <%--label="Сводный отчет по льготному питанию" action="#{totalBenefFeedReportPage.show}" reRender="workspaceForm" />--%>
+        <rich:panelMenuItem id="totalBenefFeedReportMenuItem" binding="#{totalBenefFeedReportPage.mainMenuComponent}"
+                            label="Сводный отчет по льготному питанию" action="#{totalBenefFeedReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="paidFoodGroupMenu" binding="#{mainPage.paidFoodGroupMenu.mainMenuComponent}"

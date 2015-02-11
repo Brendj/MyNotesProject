@@ -236,5 +236,22 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         }
         return result;
     }
+    @Transactional
+    public List<EnterEventCount> findAllBeneficiaryStudentsEnterEvents(Date startTime, Date endTime) {
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select c.idoforg, e.idofclient from cf_clients c, "
+                        + "(select distinct idofclient from cf_enterevents where evtdatetime between :startTime and :endTime  "
+                        + ") e where c.idofclientgroup <  1100000000  "
+                        + "AND c.DiscountMode > 0  and  c.idofclient =e.idofclient  "
+                        + "order by idoforg ")
+                .setParameter("startTime",startTime.getTime())
+                .setParameter("endTime",endTime.getTime());
+        List<EnterEventCount> result = new ArrayList<EnterEventCount>();
+        for (Object o : nativeQuery.getResultList()) {
+            Object[] o1 = (Object[]) o;
+            result.add(new EnterEventCount(((BigInteger)o1[0]).longValue(),((BigInteger)o1[1]).longValue()));
+        }
+        return result;
+    }
 
 }

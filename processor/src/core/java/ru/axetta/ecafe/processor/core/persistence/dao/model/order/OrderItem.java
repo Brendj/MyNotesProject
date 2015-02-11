@@ -60,6 +60,13 @@ public class OrderItem {
         this.sum = sum;
     }
 
+    public OrderItem(long idOfOrg, int ordertype, long sum, long idOfClient) {
+        this.idOfOrg = idOfOrg;
+        this.ordertype = ordertype;
+        this.sum = sum;
+        this.idOfClient = idOfClient;
+    }
+
     public OrderItem(long idOfOrg, int ordertype, int qty, long sum) {
         this.idOfOrg = idOfOrg;
         this.ordertype = ordertype;

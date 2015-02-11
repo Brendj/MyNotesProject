@@ -23,29 +23,14 @@
                             headerClass="filter-panel-header" width="800">
         <h:panelGrid styleClass="borderless-grid" columns="2">
 
-            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+            <h:outputText escape="true" value="Дата выборки" styleClass="output-text" />
             <rich:calendar value="#{totalBenefFeedReportPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"
                            showWeeksBar="false">
-                <a4j:support event="onchanged" reRender="endDateCalendar,registerStampReportPanel"
+                <a4j:support event="onchanged" reRender="registerStampReportPanel"
                              actionListener="#{totalBenefFeedReportPage.onReportPeriodChanged}" />
             </rich:calendar>
 
-            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-            <h:selectOneMenu id="endDatePeriodSelect" value="#{totalBenefFeedReportPage.periodTypeMenu.periodType}"
-                             styleClass="input-text" style="width: 250px;">
-                <f:converter converterId="periodTypeConverter" />
-                <f:selectItems value="#{totalBenefFeedReportPage.periodTypeMenu.items}" />
-                <a4j:support event="onchange" reRender="endDateCalendar,registerStampReportPanel"
-                             actionListener="#{totalBenefFeedReportPage.onReportPeriodChanged}" />
-            </h:selectOneMenu>
-            <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar id="endDateCalendar" value="#{totalBenefFeedReportPage.endDate}"
-                           datePattern="dd.MM.yyyy" converter="dateConverter"
-                           inputClass="input-text" showWeeksBar="false">
-                <a4j:support event="onchanged" reRender="endDatePeriodSelect,registerStampReportPanel"
-                             actionListener="#{totalBenefFeedReportPage.onEndDateSpecified}" />
-            </rich:calendar>
 
         </h:panelGrid>
 

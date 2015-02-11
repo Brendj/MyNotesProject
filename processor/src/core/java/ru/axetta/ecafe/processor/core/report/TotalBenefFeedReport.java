@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
@@ -18,11 +19,15 @@ import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.order.OrdersRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
+import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.SubItem;
 import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.TotalBenefFeedData;
 import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.TotalBenefFeedItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +61,10 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
 
-            if (RuntimeContext.getInstance().isTestMode()) {
-                startTime = new Date(1409515200000L);
-                endTime = new Date(1410119999000L);
-            }
+            //if (RuntimeContext.getInstance().isTestMode()) {
+            //    startTime = new Date(1409877287000L);
+            //    endTime = new Date(1409963687000L);
+            //}
 
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
@@ -76,25 +81,18 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
             Map<Long, TotalBenefFeedItem> dataMap = new HashMap<Long, TotalBenefFeedItem>();
+            Map<Long,Long> mainBuildingMap = new HashMap<Long, Long>();
+            retrieveAllOrgs(dataMap, mainBuildingMap);
 
-            retrieveAllOrgs(dataMap);
+            retrieveStudentsCount(dataMap, mainBuildingMap);
+            retrieveBeneficiaryStudentsCount(dataMap, mainBuildingMap);
+            retrieveEnterEventsCount(dataMap, mainBuildingMap, startTime, endTime);
+            retrieveMealCount(dataMap, mainBuildingMap, startTime, endTime);
 
-            retrieveStudentsCount(dataMap);
-            retrieveBeneficiaryStudentsCount(dataMap);
-            retrieveEnterEventsCount(dataMap);
-            retrieveOrdersCount(dataMap);
             retrieveOrdersWithEnterEventsCount(dataMap);
             retrieveOrdersWithNoEnterEventsCount(dataMap);
 
-
-
-
-
-
-
-
-
-
+            retrieveOrderedMeals(dataMap, mainBuildingMap, startTime, endTime);
 
 
 
@@ -105,92 +103,144 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(dataList);
         }
 
-        private void retrieveOrdersCount(Map<Long, TotalBenefFeedItem> dataMap) {
+        private void retrieveOrderedMeals(Map<Long, TotalBenefFeedItem> dataMap, Map<Long, Long> mainBuildingMap, Date startDate,
+                Date endDate) {
+            GoodRequestsNewReportService service;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            if (!runtimeContext.isMainNode()) {
+                return;
+            }
+            List<GoodRequestsNewReportService.Item> items;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                service = new GoodRequestsNewReportService(persistenceSession,"И", "И", true);
+                List<Long> idOfOrgList = new ArrayList<Long>(mainBuildingMap.keySet());//orgRepository.findAllActiveIds();
+                items = service
+                        .buildReportItems(startDate,endDate, "", 1, 1, new Date(), new Date(),
+                                idOfOrgList, new ArrayList<Long>(), true, true, 1);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+
+            for (GoodRequestsNewReportService.Item item : items) {
+                if(item.getFeedingPlanTypeNum() != 0){
+                    continue;
+                }
+                if(item.getGoodName().contains("1-4")){
+                    continue;
+                }
+
+                TotalBenefFeedItem dataMapItem = null;
+                for (TotalBenefFeedItem totalBenefFeedItem : dataMap.values()) {
+                    if(totalBenefFeedItem.getOrgNum().equals(item.getOrgNum())){
+                        dataMapItem = totalBenefFeedItem;
+                        break;
+                    }
+                }
+
+                if(dataMapItem == null){
+                    continue;
+                }
+                dataMapItem.setOrderedMeals(dataMapItem.getOrderedMeals() + item.getTotalCount().intValue());
+
+            }
+        }
+
+        private void retrieveMealCount(Map<Long, TotalBenefFeedItem> dataMap, Map<Long, Long> mainBuildingMap, Date startTime, Date endTime) {
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            for (OrderItem orderItem : ordersRepository.findAllBeneficiaryComplexes()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(orderItem.getIdOfOrg());
+            for (OrderItem orderItem : ordersRepository.findAllBeneficiaryComplexes(startTime, endTime)) {
+                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(mainBuildingMap.get(orderItem.getIdOfOrg()));
                 if(totalBenefFeedItem== null){
                     continue;
                     //todo wtf
                 }
-                totalBenefFeedItem.setOrderedMeals(totalBenefFeedItem.getOrderedMeals() + ((Long)orderItem.getSum()).intValue());
                 if (orderItem.getOrdertype() == 4){
-                    totalBenefFeedItem.setReceiveMealBenefStudents(totalBenefFeedItem.getReceiveMealBenefStudents() + ((Long)orderItem.getSum()).intValue());
+                    totalBenefFeedItem.setReceiveMealBenefStudents(totalBenefFeedItem.getReceiveMealBenefStudents() + 1);
+                    totalBenefFeedItem.getReceiveMealBenefStudentsList().add(new SubItem(orderItem.getIdOfClient()));
                 }else if (orderItem.getOrdertype() == 6){
-                    totalBenefFeedItem.setReceiveMealReserveStudents(totalBenefFeedItem.getReceiveMealReserveStudents() + ((Long)orderItem.getSum()).intValue());
+                    totalBenefFeedItem.setReceiveMealReserveStudents(totalBenefFeedItem.getReceiveMealReserveStudents() + 1);
                 }
             }
         }
 
         private void retrieveOrdersWithEnterEventsCount(Map<Long, TotalBenefFeedItem> dataMap) {
-            OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            for (OrderItem orderItem : ordersRepository.findAllWithEnterEventCount()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(orderItem.getIdOfOrg());
-                if(totalBenefFeedItem== null){
-                    continue;
+            for (TotalBenefFeedItem item : dataMap.values()) {
+                List<Long> tempEnterEvents = new ArrayList<Long>();
+                for (SubItem subItem : item.getEnteredBenefStudentsList()) {
+                    tempEnterEvents.add(subItem.getIdofclient());
                 }
-                if (orderItem.getQty() == 1){
-                }else if (orderItem.getQty() == 0){
-                    totalBenefFeedItem.setReceiveMealNotEnteredBenefStudents(totalBenefFeedItem.getReceiveMealNotEnteredBenefStudents() + ((Long)orderItem.getSum()).intValue());
+                for ( SubItem subItem : item.getReceiveMealBenefStudentsList()){
+                    tempEnterEvents.remove(subItem.getIdofclient());
                 }
+                item.setNotReceiveMealEnteredBenefStudents(tempEnterEvents.size());
             }
         }
 
 
         private void retrieveOrdersWithNoEnterEventsCount(Map<Long, TotalBenefFeedItem> dataMap) {
-            OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            for (OrderItem orderItem : ordersRepository.findAllWithNoEnterEventCount()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(orderItem.getIdOfOrg());
-                if(totalBenefFeedItem== null){
-                    continue;
+            for (TotalBenefFeedItem item : dataMap.values()) {
+                List<Long> tempReceiveMeal = new ArrayList<Long>();
+                for (SubItem subItem : item.getReceiveMealBenefStudentsList()) {
+                    tempReceiveMeal.add(subItem.getIdofclient());
                 }
-                totalBenefFeedItem.setNotReceiveMealEnteredBenefStudents(totalBenefFeedItem.getNotReceiveMealEnteredBenefStudents() + ((Long)orderItem.getSum()).intValue());
-
+                for ( SubItem subItem : item.getEnteredBenefStudentsList()){
+                    tempReceiveMeal.remove(subItem.getIdofclient());
+                }
+                item.setReceiveMealNotEnteredBenefStudents(tempReceiveMeal.size());
             }
         }
 
-        private void retrieveStudentsCount(Map<Long, TotalBenefFeedItem> dataMap) {
+        private void retrieveStudentsCount(Map<Long, TotalBenefFeedItem> dataMap, Map<Long, Long> mainBuildingMap) {
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
             for (ClientCount clientCount : clientDao.findAllStudentsCount()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(clientCount.getIdOfOrg());
+                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(mainBuildingMap.get(clientCount.getIdOfOrg()));
                 if(totalBenefFeedItem != null){
-                    totalBenefFeedItem.setStudents(clientCount.getCount());
+                    totalBenefFeedItem.setStudents(totalBenefFeedItem.getStudents() + clientCount.getCount());
                 }
             }
         }
 
 
-        private void retrieveBeneficiaryStudentsCount(Map<Long, TotalBenefFeedItem> dataMap) {
+        private void retrieveBeneficiaryStudentsCount(Map<Long, TotalBenefFeedItem> dataMap,
+                Map<Long, Long> mainBuildingMap) {
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
             for (ClientCount clientCount : clientDao.findAllBeneficiaryStudentsCount()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(clientCount.getIdOfOrg());
+                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(mainBuildingMap.get(clientCount.getIdOfOrg()));
                 if(totalBenefFeedItem != null){
-                    totalBenefFeedItem.setBenefStudents(clientCount.getCount());
+                    totalBenefFeedItem.setBenefStudents(totalBenefFeedItem.getBenefStudents() + clientCount.getCount());
                 }
             }
         }
 
 
-        private void retrieveEnterEventsCount(Map<Long, TotalBenefFeedItem> dataMap) {
+        private void retrieveEnterEventsCount(Map<Long, TotalBenefFeedItem> dataMap, Map<Long, Long> mainBuildingMap, Date startTime, Date endTime) {
             EnterEventsRepository enterEventsRepository = RuntimeContext.getAppContext().getBean(EnterEventsRepository.class);
-            for (EnterEventCount enterEventCount : enterEventsRepository.findAllBeneficiaryStudentsEnterEventsCount()) {
-                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(enterEventCount.getIdOfOrg());
+            for (EnterEventCount enterEventCount : enterEventsRepository.findAllBeneficiaryStudentsEnterEvents(startTime, endTime)) {
+                TotalBenefFeedItem totalBenefFeedItem = dataMap.get(mainBuildingMap.get(enterEventCount.getIdOfOrg()));
                 if(totalBenefFeedItem != null){
-                    totalBenefFeedItem.setEnteredBenefStudents(enterEventCount.getCount());
+                    totalBenefFeedItem.setEnteredBenefStudents(totalBenefFeedItem.getEnteredBenefStudents() + 1);
+                    totalBenefFeedItem.getEnteredBenefStudentsList().add( new SubItem(enterEventCount.getIdOfOrg(),enterEventCount.getIdOfClient()) );
                 }
             }
         }
 
 
-        private void retrieveAllOrgs(Map<Long, TotalBenefFeedItem> totalBenefFeedItemsMap) {
+        private void retrieveAllOrgs(Map<Long, TotalBenefFeedItem> totalBenefFeedItemsMap, Map<Long,Long> mainBuildingMap) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
-
+            OrgService orgService = RuntimeContext.getAppContext().getBean(OrgService.class);
             List<OrgItem> allNames = orgRepository.findAllActive();
             TotalBenefFeedItem totalBenefFeedItem;
             for (OrgItem allName : allNames) {
-                totalBenefFeedItem = new TotalBenefFeedItem(allName.getIdOfOrg(),allName.getOfficialName(),allName.getAddress());
-
-                totalBenefFeedItemsMap.put(allName.getIdOfOrg(), totalBenefFeedItem);
+                Org mainBulding = orgService.getMainBulding(allName.getIdOfOrg());
+                mainBuildingMap.put(allName.getIdOfOrg(),mainBulding.getIdOfOrg());
+                totalBenefFeedItem = new TotalBenefFeedItem(mainBulding);
+                totalBenefFeedItemsMap.put(mainBulding.getIdOfOrg(), totalBenefFeedItem);
             }
         }
     }
@@ -225,6 +275,6 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_CURRENT_MONTH;
+        return REPORT_PERIOD_PREV_DAY;
     }
 }

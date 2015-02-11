@@ -126,6 +126,7 @@ public class TotalBenefFeedReportPage extends OnlineReportPage{
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+            endDate = CalendarUtils.endOfDay(startDate);
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -192,6 +193,7 @@ public class TotalBenefFeedReportPage extends OnlineReportPage{
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+            endDate = CalendarUtils.endOfDay(startDate);
             TotalBenefFeedReport totalBenefFeedReport = (TotalBenefFeedReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
