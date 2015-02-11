@@ -14,11 +14,20 @@ public class OrgItem {
     private long idOfOrg;
     private String officialName;
     private String district;
+    private String address;
+
 
     public OrgItem(long idOfOrg, String officialName, String district) {
         this.idOfOrg = idOfOrg;
         this.officialName = officialName;
         this.district = district;
+    }
+
+    public OrgItem(long idOfOrg, String officialName, String district, String address) {
+        this.idOfOrg = idOfOrg;
+        this.officialName = officialName;
+        this.district = district;
+        this.address = address;
     }
 
     public long getIdOfOrg() {
@@ -43,5 +52,13 @@ public class OrgItem {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

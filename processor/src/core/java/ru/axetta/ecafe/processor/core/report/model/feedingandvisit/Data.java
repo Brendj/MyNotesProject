@@ -100,6 +100,10 @@ public class Data  implements Comparable<Data> {
         String thisOrgName = this.name;
         String numThisString = thisOrgName.replaceAll("[^\\d]", "");
         String numOString = oOrgName.replaceAll("[^\\d]", "");
+        int stringCompareResult = ((Integer)numThisString.length()).compareTo(numOString.length());
+        if( stringCompareResult!= 0){
+            return stringCompareResult;
+        }
 
         Integer numThis = Integer.valueOf(numThisString);
         Integer numO = Integer.valueOf(numOString);

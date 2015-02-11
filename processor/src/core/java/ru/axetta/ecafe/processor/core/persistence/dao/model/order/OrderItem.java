@@ -54,6 +54,24 @@ public class OrderItem {
         this.sum = sum;
     }
 
+    public OrderItem(long idOfOrg, int ordertype, long sum) {
+        this.idOfOrg = idOfOrg;
+        this.ordertype = ordertype;
+        this.sum = sum;
+    }
+
+    public OrderItem(long idOfOrg, int ordertype, int qty, long sum) {
+        this.idOfOrg = idOfOrg;
+        this.ordertype = ordertype;
+        this.qty = qty;
+        this.sum = sum;
+    }
+
+    public OrderItem(long idOfOrg, long sum) {
+        this.idOfOrg = idOfOrg;
+        this.sum = sum;
+    }
+
     public long getIdOfOrg() {
         return idOfOrg;
     }

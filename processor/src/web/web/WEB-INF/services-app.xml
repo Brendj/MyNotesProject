@@ -51,7 +51,11 @@
             ref="entityManagerFactory" />
     </bean>-->
 
-    <task:annotation-driven />
+    <task:annotation-driven executor="executorWithPoolSizeRange" />
+    <task:executor id="executorWithPoolSizeRange"
+                   pool-size="5-25"
+                   queue-capacity="100"
+                   keep-alive="120"/>
     <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true" />
     <tx:annotation-driven transaction-manager="txManagerReports" proxy-target-class="true"/>
 

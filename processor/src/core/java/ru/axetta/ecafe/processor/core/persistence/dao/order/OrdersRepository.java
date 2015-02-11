@@ -154,4 +154,64 @@ public class OrdersRepository extends BaseJpaDao {
         }
         return orderItemList;
     }
+
+
+    public List<OrderItem> findAllBeneficiaryComplexes(){
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Query nativeQuery = entityManager.createNativeQuery(
+                "SELECT  o.idoforg,o.ordertype, count(*)   FROM cf_orders o "
+                        + "WHERE o.socdiscount > 0 AND o.ordertype IN (4,6,8) AND o.state=0 "
+                        + "AND o.createddate BETWEEN  1409877287000 AND 1409963687000 "
+                        + "GROUP BY o.idoforg, o.ordertype " + "ORDER BY o.idoforg");
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orderItemList.add(new OrderItem(((BigInteger)o[0]).longValue(),(Integer)o[1],((BigInteger)o[2]).longValue()));
+        }
+        return orderItemList;
+
+    }
+
+
+    public List<OrderItem> findAllWithEnterEventCount(){
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Query nativeQuery = entityManager.createNativeQuery(
+                "SELECT w.idoforg,w.ordertype, w.col, count(*) "
+                        + " FROM (SELECT distinct on (o.idofclient )"
+                        + "o.idoforg,o.ordertype, q.col, o.idofclient   FROM cf_orders o "
+                        + " INNER JOIN (SELECT c.idofclient, e.idofenterevent, CASE WHEN e.idofenterevent IS NOT null THEN 1 ELSE 0 END AS col   "
+                        + "      FROM cf_clients c  "
+                        + "      LEFT JOIN cf_enterevents e ON c.idofclient=e.idofclient AND e.evtdatetime BETWEEN  1409877287000 AND 1409963687000 AND e.passdirection IN (0,1,6,7) "
+                        + "      WHERE c.DiscountMode > 0 AND c.idofclientgroup <  1100000000 ) q ON o.idofclient = q.idofclient "
+                        + "  WHERE o.socdiscount > 0   AND o.ordertype IN (4,8)   AND o.state=0 "
+                        + "  AND o.createddate BETWEEN  1409877287000 AND 1409963687000  "
+                        + "  GROUP BY o.idoforg, o.idofclient, o.ordertype, q.col   ORDER BY o.idofclient) w "
+                        + "GROUP BY w.idoforg, w.ordertype, w.col ORDER BY w.idoforg");
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orderItemList.add(new OrderItem(((BigInteger)o[0]).longValue(),(Integer)o[1],(Integer)o[2],((BigInteger)o[3]).longValue()));
+        }
+        return orderItemList;
+    }
+
+    public List<OrderItem> findAllWithNoEnterEventCount(){
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select e1.idoforg, count(*) from( select        e.idoforg, count(*)      "
+                        + "from cf_enterevents e     left join cf_clients c on e.idofclient = c.idofclient      "
+                        + "        where      e.evtdatetime between  1409877287000 and 1409963687000  "
+                        + "and e.idofclient is not null and c.discountmode = 3   "
+                        + "and e.idofclient not in (select     distinct o.idofclient    from cf_orders o  "
+                        + "left join cf_orderdetails od  on o.idoforder=od.idoforder      "
+                        + "where o.socdiscount > 0 and (od.menutype >=  50 and od.menutype <=99)  "
+                        + "and o.createddate  between  1409877287000 and 1409963687000)      "
+                        + "group by e.idoforg, e.idofclient     ) e1        group by e1.idoforg      ");
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orderItemList.add(new OrderItem(((BigInteger)o[0]).longValue(),((BigInteger)o[1]).longValue()));
+        }
+        return orderItemList;
+    }
 }

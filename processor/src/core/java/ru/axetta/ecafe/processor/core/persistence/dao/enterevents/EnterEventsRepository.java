@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.AbstractJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.EnterEventCount;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -198,4 +200,41 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         }
         return resultMap;
     }
+
+
+    @Transactional
+    public List<EnterEventCount> findAllStudentsEnterEventsCount() {
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select c.idoforg, count(*)from cf_clients c,"
+                        + "(select distinct idofclient from cf_enterevents where evtdatetime between 1409877287000 and 1409963687000 "
+                        + " ) e where c.idofclientgroup <  1100000000 "
+                        + " and  c.idofclient =e.idofclient "
+                        + "group by c.idoforg "
+                        + " order by idoforg ");
+        List<EnterEventCount> result = new ArrayList<EnterEventCount>();
+        for (Object o : nativeQuery.getResultList()) {
+            Object[] o1 = (Object[]) o;
+            result.add(new EnterEventCount(((BigInteger)o1[0]).longValue(),((BigInteger)o1[1]).intValue()));
+        }
+        return result;
+    }
+
+
+    @Transactional
+    public List<EnterEventCount> findAllBeneficiaryStudentsEnterEventsCount() {
+        Query nativeQuery = entityManager.createNativeQuery(
+                "select c.idoforg, count(*)from cf_clients c,"
+                        + "(select distinct idofclient from cf_enterevents where evtdatetime between 1409877287000 and 1409963687000 "
+                        + " ) e where c.idofclientgroup <  1100000000 "
+                        + " AND c.DiscountMode > 0  and  c.idofclient =e.idofclient "
+                        + "group by c.idoforg "
+                        + " order by idoforg ");
+        List<EnterEventCount> result = new ArrayList<EnterEventCount>();
+        for (Object o : nativeQuery.getResultList()) {
+            Object[] o1 = (Object[]) o;
+            result.add(new EnterEventCount(((BigInteger)o1[0]).longValue(),((BigInteger)o1[1]).intValue()));
+        }
+        return result;
+    }
+
 }

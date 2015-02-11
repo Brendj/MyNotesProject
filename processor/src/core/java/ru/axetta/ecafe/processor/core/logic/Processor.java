@@ -1017,6 +1017,7 @@ public class Processor implements SyncProcessor,
     * */
     @Async
      private void runRegularPayments(SyncRequest request) {
+        long time = System.currentTimeMillis();
         try {
             Boolean enabled = Boolean.valueOf(
                     (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
@@ -1030,6 +1031,10 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.warn("catch BKRegularPaymentSubscriptionService exc");
         }
+        finally {
+            logger.warn("runRegularPayments ms: " + (System.currentTimeMillis() - time));
+        }
+
     }
 
     /* Do process full synchronization */
@@ -2219,7 +2224,7 @@ public class Processor implements SyncProcessor,
                     }
 
                 }
-                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                client.setClientGroup(clientGroup);
             }
 
             client.setClientRegistryVersion(version);

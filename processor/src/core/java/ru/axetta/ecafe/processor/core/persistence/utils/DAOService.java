@@ -1510,6 +1510,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             UserOrgs userOrgs1 = new UserOrgs(user , org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
             session.save(userOrgs1);
         }
+        session.close();
     }
 
 	public boolean existsOrgByIdAndTags(Long idOfOrg, String tag) {
@@ -1518,6 +1519,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.ilike("tag", tag, MatchMode.ANYWHERE));
         List list = criteria.list();
+        session.close();
         return list.size()>0;
     }
 
@@ -1575,6 +1577,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return receiveIdOfOrgByAccessory(idoforg, accessoryType, "" + accessoryNumber);
     }
 
+    @Transactional
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
         if(accessoryNumber == null || StringUtils.isBlank(accessoryNumber)) {
             return idoforg;

@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.SubFeedingService;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.service.order.OrderService;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.feedingandvisit.Data;
@@ -58,7 +59,9 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("orgName", org.getOfficialName());
+            OrgService orgService = OrgService.getInstance();
+            Org mainBulding = orgService.getMainBulding(org.getIdOfOrg());
+            parameterMap.put("orgName", mainBulding != null? mainBulding.getShortName() : org.getOfficialName());
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
@@ -210,11 +213,7 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 List<DAOEnterEventSummaryModel> enterEventsSummary, List<Org> orgList, String orgsIdsString) {
             Data data;
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
-            List<Row> rowList;
             for (DAOEnterEventSummaryModel enterEvent : enterEventsSummary) {
-                if(enterEvent.getGroupName().startsWith("1-Ж")){
-                    System.out.print("dd");
-                }
                 data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getClientOrgId()));
                 if (data == null) {
                     ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, enterEvent.getClientOrgId());
@@ -254,9 +253,6 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 List<ClientItem> clientItems, Date startTime, Date endTime, List<Org> orgList) {
 
             for (ClientItem item : clientItems) {
-                if(item.getGroupName().equals("1Б") && item.getIdOfOrg() == 5){
-                    System.out.print("d");
-                }
                 Data dataItem = dataMap.get( prepareGroupName(orgList, item.getGroupName(), item.getIdOfOrg()) );
                 if (dataItem == null) {
                     dataItem = createGroup(dataMap,orgList,item,startTime,endTime);

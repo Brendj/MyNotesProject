@@ -102,6 +102,7 @@ public class FinancialOpsManager {
             clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
         }
         session.save(clientSms);
+        session.close();
         return clientSms;
     }
 
