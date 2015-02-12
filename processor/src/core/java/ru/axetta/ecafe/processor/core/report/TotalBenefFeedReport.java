@@ -122,7 +122,7 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
                         .buildReportItems(startDate,endDate, "", 1, 1, new Date(), new Date(),
                                 idOfOrgList, new ArrayList<Long>(), true, true, 1);
                 persistenceTransaction.commit();
-                persistenceTransaction = null;
+                persistenceTransaction ;= null;
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
