@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 
 import javax.faces.model.SelectItem;
@@ -20,7 +19,7 @@ import java.util.List;
  */
 public class OrganizationTypeMenu {
 
-    private List<SelectItem> items = readAllItems();
+    private Li;st<SelectItem> items = readAllItems();
 
     private static List<SelectItem> readAllItems() {
         OrganizationType[] organizationTypes = OrganizationType.values();
