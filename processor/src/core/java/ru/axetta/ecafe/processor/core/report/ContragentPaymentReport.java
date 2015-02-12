@@ -64,6 +64,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             public Date createTime;
             public String idOfPayment;
             public int paymentMethod;
+            public String addIdOfPayment;
 
             public ClientPaymentRow(ClientPayment clientPayment) {
                 AccountTransaction accountTransaction = clientPayment.getTransaction();
@@ -92,6 +93,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 this.createTime = clientPayment.getCreateTime();
                 this.idOfPayment = clientPayment.getIdOfPayment();
                 this.paymentMethod = clientPayment.getPaymentMethod();
+                this.addIdOfPayment = clientPayment.getAddIdOfPayment();
             }
 
             @Override
@@ -162,6 +164,14 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             public String getPayMethod() {
                 return ClientPayment.PAYMENT_METHOD_SHORT_NAMES[paymentMethod];
             }
+
+            public String getAddIdOfPayment() {
+                return addIdOfPayment;
+            }
+
+            public void setAddIdOfPayment(String addIdOfPayment) {
+                this.addIdOfPayment = addIdOfPayment;
+            }
         }
 
         private final String templateFilename;
@@ -216,6 +226,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 }
             }
 
+            parameterMap.put("nameOfContragentSender", contragentPayer.getContragentName());
+            parameterMap.put("nameOfContragentReceiver", contragentReceiver.getContragentName());
+
             String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
@@ -256,6 +269,12 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
         private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
                 Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
 
+            // терминал
+            String terminal = getReportProperties().getProperty("terminal");
+
+            // идентификатор платежа
+            String paymentIdentifier = getReportProperties().getProperty("paymentIdentifier");
+
             String organizationTypeProperty = getReportProperties().getProperty("organizationType");
             OrganizationType orgType = null;
 
@@ -281,7 +300,13 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 clientPaymentCriteria.add(Restrictions.in("t.org", orgList));
             clientPaymentCriteria.createAlias("transaction.client", "cl");
             clientPaymentCriteria.createAlias("transaction.client.org", "o");
-            if (orgType == null) {
+            if (!terminal.equals("")) {
+                clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%"));
+            }
+            if (!paymentIdentifier.equals("")) {
+                clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%"));
+            }
+            if (orgType != null) {
                 clientPaymentCriteria.add(Restrictions.eq("o.type", orgType));
             }
             if (contragentReceiver!=null)
@@ -299,7 +324,13 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.isNull("t.org"));
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client", "cl");
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client.org", "o");
-            if (orgType == null) {
+            if (!terminal.equals("")) {
+                clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%"));
+            }
+            if (!paymentIdentifier.equals("")) {
+                clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%"));
+            }
+            if (orgType != null) {
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("o.type", orgType));
             }
             if (!CollectionUtils.isEmpty(idOfOrgList))

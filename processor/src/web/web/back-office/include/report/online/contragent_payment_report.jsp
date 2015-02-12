@@ -14,8 +14,8 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.contragentPaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+        <rich:calendar value="#{mainPage.contragentPaymentReportPage.startDate}" datePattern="dd.MM.yyyy HH:mm"
+                       converter="timeMinuteConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar"
                          actionListener="#{mainPage.contragentPaymentReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -31,7 +31,7 @@
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.contragentPaymentReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                       datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.contragentPaymentReportPage.onEndDateSpecified}" />
         </rich:calendar>
@@ -88,6 +88,12 @@
             </h:selectOneMenu>
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Терминал" styleClass="output-text" />
+        <h:inputText value="#{mainPage.contragentPaymentReportPage.terminal}" styleClass="input-text" />
+
+        <h:outputText escape="true" value="Идентификатор платежа" styleClass="output-text" />
+        <h:inputText value="#{mainPage.contragentPaymentReportPage.paymentIdentifier}" styleClass="input-text" />
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">
@@ -110,12 +116,10 @@
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.contragentPaymentReportPage.htmlReport}">
-            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
-
             <f:verbatim>
                 <div class="htmlReportContent"> ${mainPage.contragentPaymentReportPage.htmlReport} </div>
             </f:verbatim>
-
+            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
         </c:if>
     </h:panelGrid>
 

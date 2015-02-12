@@ -49,7 +49,7 @@ import java.util.Properties;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-public class ContragentPaymentReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
+public class ContragentPaymentReportPage extends OnlineReportCustomPage implements ContragentSelectPage.CompleteHandler {
     private ContragentPaymentReport contragentPaymentReport;
     private String htmlReport;
     private Org org;
@@ -62,6 +62,24 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+    private String terminal;
+    private String paymentIdentifier;
+
+    public String getPaymentIdentifier() {
+        return paymentIdentifier;
+    }
+
+    public void setPaymentIdentifier(String paymentIdentifier) {
+        this.paymentIdentifier = paymentIdentifier;
+    }
+
+    public String getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(String terminal) {
+        this.terminal = terminal;
+    }
 
     public OrganizationType getOrganizationType() {
         return organizationType;
@@ -83,15 +101,19 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
+                setHoursMinuteSecond(endDate);
             } break;
             case ONE_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 6));
+                setHoursMinuteSecond(endDate);
             } break;
             case TWO_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 13));
+                setHoursMinuteSecond(endDate);
             } break;
             case ONE_MONTH: {
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+                setHoursMinuteSecond(endDate);
             } break;
         }
     }
@@ -172,6 +194,8 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
                     Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
             builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
+            builder.getReportProperties().setProperty("terminal", terminal);
+            builder.getReportProperties().setProperty("paymentIdentifier", paymentIdentifier);
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             BasicReportJob report = null;
@@ -309,6 +333,8 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
                 Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
+        builder.getReportProperties().setProperty("terminal", terminal);
+        builder.getReportProperties().setProperty("paymentIdentifier", paymentIdentifier);
         BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
