@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class OrganizationTypeMenu {
 
-    private Li;st<SelectItem> items = readAllItems();
+    private List<SelectItem> items = readAllItems();
 
     private static List<SelectItem> readAllItems() {
         OrganizationType[] organizationTypes = OrganizationType.values();
