@@ -81,10 +81,10 @@
 
         <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
         <h:panelGroup>
-            <h:selectOneMenu value="#{mainPage.contragentPaymentReportPage.organizationType}" styleClass="input-text"
+            <h:selectOneMenu value="#{mainPage.contragentPaymentReportPage.organizationTypeModify}" styleClass="input-text"
                              style="width: 250px;">
-                <f:converter converterId="organizationTypeConverter" />
-                <f:selectItems value="#{mainPage.contragentPaymentReportPage.organizationTypeMenu.items}" />
+                <f:converter converterId="organizationTypeModifyConverter" />
+                <f:selectItems value="#{mainPage.contragentPaymentReportPage.organizationTypeModifyMenu.customItems}" />
             </h:selectOneMenu>
         </h:panelGroup>
 

@@ -27,10 +27,10 @@
         </h:panelGroup>
         <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
         <h:panelGroup>
-            <h:selectOneMenu value="#{mainPage.clientPaymentsReportPage.organizationType}" styleClass="input-text"
+            <h:selectOneMenu value="#{mainPage.clientPaymentsReportPage.organizationTypeModify}" styleClass="input-text"
                              style="width: 250px;">
-                <f:converter converterId="organizationTypeConverter" />
-                <f:selectItems value="#{mainPage.clientPaymentsReportPage.organizationTypeMenu.items}" />
+                <f:converter converterId="organizationTypeModifyConverter" />
+                <f:selectItems value="#{mainPage.clientPaymentsReportPage.organizationTypeModifyMenu.customItems}" />
             </h:selectOneMenu>
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientPaymentsReport}"

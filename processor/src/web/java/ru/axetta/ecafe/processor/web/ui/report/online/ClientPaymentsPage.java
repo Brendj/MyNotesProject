@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
 import ru.axetta.ecafe.processor.core.report.ClientPaymentsReport;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
+import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
 import org.hibernate.Session;
 
@@ -24,20 +26,23 @@ import java.util.List;
 public class ClientPaymentsPage extends OnlineReportPage {
     private ClientPaymentsReport clientPaymentsReport;
 
-    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    private OrganizationType organizationType;
-    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+    private OrganizationType organizationType = null;
 
-    public OrganizationType getOrganizationType() {
-        return organizationType;
+    // тип организации
+    private OrganizationTypeModify organizationTypeModify;
+
+    private final OrganizationTypeModifyMenu organizationTypeModifyMenu = new OrganizationTypeModifyMenu();
+
+    public OrganizationTypeModify getOrganizationTypeModify() {
+        return organizationTypeModify;
     }
 
-    public void setOrganizationType(OrganizationType organizationType) {
-        this.organizationType = organizationType;
+    public void setOrganizationTypeModify(OrganizationTypeModify organizationTypeModify) {
+        this.organizationTypeModify = organizationTypeModify;
     }
 
-    public OrganizationTypeMenu getOrganizationTypeMenu() {
-        return organizationTypeMenu;
+    public OrganizationTypeModifyMenu getOrganizationTypeModifyMenu() {
+        return organizationTypeModifyMenu;
     }
 
     public String getPageFilename() {
@@ -71,6 +76,21 @@ public class ClientPaymentsPage extends OnlineReportPage {
         ClientPaymentsReport.Builder reportBuilder = new ClientPaymentsReport.Builder();
 
         List<Long> orgList = new ArrayList<Long>();
+
+        if(this.idOfOrgList.isEmpty()){
+            printError("Не выбрана организация");
+        }
+
+        OrganizationType[] organizationTypes = OrganizationType.values();
+
+        for (OrganizationType orgType: organizationTypes) {
+            if (orgType.name().equals(this.organizationTypeModify.name())) {
+                this.organizationType = orgType;
+                break;
+            } else {
+                this.organizationType = null;
+            }
+        }
 
         if (this.organizationType != null) {
 

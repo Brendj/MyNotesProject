@@ -275,7 +275,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             // идентификатор платежа
             String paymentIdentifier = getReportProperties().getProperty("paymentIdentifier");
 
-            String organizationTypeProperty = getReportProperties().getProperty("organizationType");
+            String organizationTypeProperty = getReportProperties().getProperty("organizationTypeModify");
             OrganizationType orgType = null;
 
             OrganizationType[] organizationTypes = OrganizationType.values();

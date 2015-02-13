@@ -200,6 +200,12 @@
     </converter>
 
     <converter>
+        <description>Organization Type Modify Converter</description>
+        <converter-id>organizationTypeModifyConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeModifyConverter</converter-class>
+    </converter>
+
+    <converter>
         <converter-id>rublesStringConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
     </converter>

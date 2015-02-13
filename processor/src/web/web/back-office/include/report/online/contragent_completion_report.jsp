@@ -53,10 +53,10 @@
 
         <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
         <h:panelGroup>
-            <h:selectOneMenu value="#{contragentCompletionReportPage.organizationType}" styleClass="input-text"
+            <h:selectOneMenu value="#{contragentCompletionReportPage.organizationTypeModify}" styleClass="input-text"
                              style="width: 250px;">
-                <f:converter converterId="organizationTypeConverter" />
-                <f:selectItems value="#{contragentCompletionReportPage.organizationTypeMenu.items}" />
+                <f:converter converterId="organizationTypeModifyConverter" />
+                <f:selectItems value="#{contragentCompletionReportPage.organizationTypeModifyMenu.customItems}" />
             </h:selectOneMenu>
         </h:panelGroup>
 

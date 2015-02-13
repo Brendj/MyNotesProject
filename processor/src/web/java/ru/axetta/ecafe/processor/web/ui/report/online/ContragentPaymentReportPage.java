@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
@@ -23,6 +24,7 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
+import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -59,9 +61,9 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private boolean receiverSelection;
     private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
-    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    private OrganizationType organizationType;
-    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+    // тип организации
+    private OrganizationTypeModify organizationTypeModify;
+    private final OrganizationTypeModifyMenu organizationTypeModifyMenu = new OrganizationTypeModifyMenu();
     private String terminal;
     private String paymentIdentifier;
 
@@ -81,16 +83,16 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         this.terminal = terminal;
     }
 
-    public OrganizationType getOrganizationType() {
-        return organizationType;
+    public OrganizationTypeModify getOrganizationTypeModify() {
+        return organizationTypeModify;
     }
 
-    public void setOrganizationType(OrganizationType organizationType) {
-        this.organizationType = organizationType;
+    public void setOrganizationTypeModify(OrganizationTypeModify organizationTypeModify) {
+        this.organizationTypeModify = organizationTypeModify;
     }
 
-    public OrganizationTypeMenu getOrganizationTypeMenu() {
-        return organizationTypeMenu;
+    public OrganizationTypeModifyMenu getOrganizationTypeModifyMenu() {
+        return organizationTypeModifyMenu;
     }
 
     public PeriodTypeMenu getPeriodTypeMenu() {
@@ -193,7 +195,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                     Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
+            builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
             builder.getReportProperties().setProperty("terminal", terminal);
             builder.getReportProperties().setProperty("paymentIdentifier", paymentIdentifier);
             Session persistenceSession = null;
@@ -332,7 +334,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                 Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-        builder.getReportProperties().setProperty("organizationType", String.valueOf(getOrganizationType()));
+        builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
         builder.getReportProperties().setProperty("terminal", terminal);
         builder.getReportProperties().setProperty("paymentIdentifier", paymentIdentifier);
         BasicReportJob report = null;

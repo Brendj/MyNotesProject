@@ -64,7 +64,7 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            String organizationTypeProperty = getReportProperties().getProperty("organizationType");
+            String organizationTypeProperty = getReportProperties().getProperty("organizationTypeModify");
             OrganizationType orgType = null;
 
             OrganizationType[] organizationTypes = OrganizationType.values();
@@ -111,6 +111,20 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
 
             if (!orgItems.isEmpty()) {
                 if (!CollectionUtils.isEmpty(idOfOrgList)) {
+
+                    // пересорт по типу организации
+                    List<Long> orgSortedList = new ArrayList<Long>();
+                    for (Org org : orgItems) {
+                        for (Long idOfOrg: idOfOrgList) {
+                            if (org.getIdOfOrg().equals(idOfOrg)) {
+                                orgSortedList.add(idOfOrg);
+                                break;
+                            }
+                        }
+                    }
+
+                    idOfOrgList = orgSortedList;
+
                     for (Long idOrg : idOfOrgList) {
                         Org org1 = contragentDAOService.getOrdByOrgId(idOrg);
                         ContragentCompletionReportItem contragentCompletionReportItem = null;
@@ -131,6 +145,9 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
                 }
+            } else {
+                List<Long> listOrg = new ArrayList<Long>();
+                idOfOrgList = listOrg;
             }
 
             List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateReportItems(idOfOrgList,
