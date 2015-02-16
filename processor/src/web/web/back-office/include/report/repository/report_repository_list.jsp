@@ -75,7 +75,7 @@ function checkReporitoryDate () {
                 <h:panelGroup styleClass="borderless-div">
                     <h:inputText value="#{reportRepositoryListPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
                                  styleClass="input-text" style="margin-right: 2px;" />
-                    <a4j:commandButton value="..." action="#{contragentPaymentReportPage.showContragentSelectPage(true)}"
+                    <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
                                        reRender="modalContragentSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                        styleClass="command-link" style="width: 25px;">
