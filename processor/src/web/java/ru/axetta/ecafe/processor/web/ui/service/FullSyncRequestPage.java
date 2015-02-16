@@ -6,9 +6,13 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryItem;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +32,32 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
 
     private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>();
+
+    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
+
+    public CCAccountFilter getContragentReceiverFilter() {
+        return contragentReceiverFilter;
+    }
+
+    private boolean selectReceiver;
+
+    public boolean isSelectReceiver() {
+        return selectReceiver;
+    }
+
+    public void setSelectReceiver(boolean selectReceiver) {
+        this.selectReceiver = selectReceiver;
+    }
+
+    ReportRepositoryItem.Filter filterReceiver = new ReportRepositoryItem.Filter();
+
+    public ReportRepositoryItem.Filter getFilterReceiver() {
+        return filterReceiver;
+    }
 
     @Autowired
     private DAOService daoService;
@@ -98,4 +124,12 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
         this.filter = filter;
     }
 
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
+        if (selectReceiver) {
+            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+            filterReceiver.setIdOfContragentReceiver(idOfContragent);
+        }
+    }
 }

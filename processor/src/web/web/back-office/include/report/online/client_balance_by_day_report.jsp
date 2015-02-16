@@ -26,7 +26,7 @@
                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
             </a4j:commandButton>
         </h:panelGroup>
-        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:outputText styleClass="output-text" escape="true" value="Организации" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.clientBalanceByDayReportPage.showOrgListSelectPage}"
                                reRender="modalOrgListSelectorPanel"
