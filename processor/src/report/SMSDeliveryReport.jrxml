@@ -107,7 +107,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сводный отчет по заявкам]]></text>
+				<text><![CDATA[Показатели обработки событий для формирования и отправки SMS-сообщений]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
 				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="83" y="32" width="81" height="20"/>
