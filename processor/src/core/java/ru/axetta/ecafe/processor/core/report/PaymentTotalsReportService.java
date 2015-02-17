@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -51,7 +50,7 @@ public class PaymentTotalsReportService {
         if (idOfOrgList.size() <= 0)
             idOfOrgList = getOrgs(idOfContragent);
 
-        Set<Long> reportOrgSet = complementIdOfOrgSet(idOfOrgList);
+        List<Long> reportOrgSet = DAOUtils.complementIdOfOrgSet(session, idOfOrgList);
 
         Date date = new Date();
         Long iterator = 0L;
@@ -436,21 +435,6 @@ public class PaymentTotalsReportService {
         Set<Org> orgs = ((Contragent) session.load(Contragent.class, idOfContragent)).getOrgs();
         for (Org org : orgs) orgList.add(org.getIdOfOrg());
         return orgList;
-    }
-
-    private Set<Long> complementIdOfOrgSet(List<Long> idOfOrgList) {
-        Set<Long> idOfOrgSet = new HashSet<Long>();
-        Set<FriendlyOrganizationsInfoModel> organizationsInfoModelSet = OrgUtils.getMainBuildingAndFriendlyOrgsList(session, idOfOrgList);
-        for (FriendlyOrganizationsInfoModel org: organizationsInfoModelSet) {
-            idOfOrgSet.add(org.getIdOfOrg());
-            Set<Org> friends = org.getFriendlyOrganizationsSet();
-            if (friends != null) {
-                for (Org friend: friends) {
-                    idOfOrgSet.add(friend.getIdOfOrg());
-                }
-            }
-        }
-        return idOfOrgSet;
     }
 
     public static class Item implements Comparable {

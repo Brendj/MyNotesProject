@@ -51,7 +51,7 @@
                         <h:outputText styleClass="column-header" escape="true" value="Число учащихся" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Получают льготное питание" />
+                        <h:outputText styleClass="column-header" escape="true" value="Число льготников" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Зафиксирован проход" />
@@ -60,7 +60,10 @@
                         <h:outputText styleClass="column-header" escape="true" value="Получили льготное питание" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Получили платное питание" />
+                        <h:outputText styleClass="column-header" escape="true" value="Получили комплексное питание" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                        <h:outputText styleClass="column-header" escape="true" value="Получили питание в буфете" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Получили питание (льготное + платное)" />
@@ -70,40 +73,46 @@
             <rich:column styleClass="center-aligned-column">
                 <h:outputText value="#{row + 1}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.officialName}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column ">
                 <h:outputText styleClass="output-text" value="#{item.data['totalClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['planBenefitClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['per_planBenefitClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['currentClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['per_currentClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['realBenefitClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['per_realBenefitClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['realPayedClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['per_realPayedClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText styleClass="output-text" value="#{item.data['realSnackPayedClientsCount']}" />
+            </rich:column>
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText styleClass="output-text" value="#{item.data['per_realSnackPayedClientsCount']}" />
+            </rich:column>
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['uniqueClientsCount']}" />
             </rich:column>
-            <rich:column styleClass="left-aligned-column">
+            <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.data['per_uniqueClientsCount']}" />
             </rich:column>
             <f:facet name="footer">

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
 import org.hibernate.Session;
 
@@ -38,76 +39,125 @@ public class TotalServicesReport extends BasicReport {
             Date generateTime = new Date();
             Map<Long, TotalEntry> entries = new HashMap<Long, TotalEntry>();
             // Обработать лист с организациями
-            String orgCondition = "";
-            if (!idOfOrgList.isEmpty()) {
-                for (Long idOfOrg : idOfOrgList) {
-                    orgCondition = orgCondition.concat("cf_orgs.idOfOrg = " + idOfOrg + " or ");
-                }
-                orgCondition = " (" + orgCondition.substring(0, orgCondition.length() - 4) + ") ";
-            }
+            String orgConditionWithCFORGS = getOrgCondition(idOfOrgList, "cf_orgs.idOfOrg = ");
+            String orgConditionWithCFORDERS = getOrgCondition(idOfOrgList, "cf_orders.idOfOrg = ");
+            String orgConditionIn = getOrgTuple(idOfOrgList);
             TotalServiceQueryLauncher queryLauncher = RuntimeContext.getAppContext().getBean(TotalServiceQueryLauncher.class);
 
-            queryLauncher.loadOrgs(orgCondition, entries);
+            // Инициализация структуры данных, подсчет общего количества учащихся
+            queryLauncher.loadOrgs(orgConditionWithCFORGS, entries);
+            // Получение количества получающих льготное питание
             queryLauncher.loadValue(entries, "planBenefitClientsCount",
                                         "select cf_orgs.idoforg, count (idofclientcomplexdiscount) "
                                       + "from cf_clientscomplexdiscounts "
                                       + "left join cf_clients on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                                       + "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
                                       + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
-                                      + " AND " + orgCondition
+                                      + " AND " + orgConditionWithCFORGS
                                       + "group by cf_orgs.idoforg "
                                       + "order by cf_orgs.idoforg ");
+            // Получение количества событий прохода через турникет за период
             queryLauncher.loadValue(entries, "currentClientsCount",
                     "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
                             "from cf_orgs " +
                             "left join cf_clients on cf_clients.idoforg=cf_orgs.idoforg " +
-                            "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient " +
+                            "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg in " + orgConditionIn +
                             "where cf_orgs.state=1 "
-                            //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            + " AND " + orgCondition +
+                            + " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + " AND " + orgConditionWithCFORGS +
                             " AND cf_enterevents.evtdatetime>=" + startDate.getTime() +
                             " AND cf_enterevents.evtdatetime<" + endDate.getTime() +
                             " group by cf_enterevents.idoforg");
+            // Получение количества учеников получивших льготное питание
             queryLauncher.loadValue(entries, "realBenefitClientsCount",
-                    "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
-                            "from cf_orgs " +
-                            "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
-                            "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and cf_orders.state=0 "
-                            //+ "and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            + " AND " + orgCondition + " and "
-                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
-                            "group by cf_orgs.idoforg");
+                    "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) "
+                            + " FROM cf_orders "
+                            + " LEFT JOIN cf_orderdetails ON cf_orders.idoforder = cf_orderdetails.idoforder and cf_orders.idoforg = cf_orderdetails.idoforg "
+                            + " LEFT JOIN cf_clients ON cf_clients.idofclient = cf_orders.idofclient "
+                            + " WHERE "
+                            + "     cf_orderdetails.menutype between " + OrderDetail.TYPE_COMPLEX_MIN + " and " + OrderDetail.TYPE_COMPLEX_MAX
+                            + "     AND cf_orders.state = 0 "
+                            + "     AND cf_orders.ordertype in (4, 6) "
+                            + "     AND cf_clients.idOfClientGroup < " + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + "     AND cf_orders.createddate between " + startDate.getTime() + " and " + endDate.getTime()
+                            + "     AND " + orgConditionWithCFORDERS
+                            + "group by cf_orders.idoforg");
+            // Получение количества получивших платное комплексное питание
             queryLauncher.loadValue(entries, "realPayedClientsCount",
-                    "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
-                            "from cf_orgs " +
-                            "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
-                            "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0  and cf_orders.state=0 "
-                            //+ "and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            + " AND " + orgCondition + " and "
-                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
-                            "group by cf_orgs.idoforg");
+                    "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) "
+                            + " FROM cf_orders  "
+                            + " LEFT JOIN cf_orderdetails ON cf_orders.idoforder = cf_orderdetails.idoforder and cf_orders.idoforg = cf_orderdetails.idoforg "
+                            + " LEFT JOIN cf_clients ON cf_clients.idofclient = cf_orders.idofclient "
+                            + " WHERE "
+                            + "     cf_orderdetails.menutype between " + OrderDetail.TYPE_COMPLEX_MIN + " and " + OrderDetail.TYPE_COMPLEX_MAX
+                            + "     AND cf_orders.state = 0 "
+                            + "     AND cf_orders.ordertype in (1, 3, 7) "
+                            + "     AND cf_clients.idOfClientGroup < " + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + "     AND cf_orders.createddate between " + startDate.getTime() + " and " + endDate.getTime()
+                            + "     AND " + orgConditionWithCFORDERS
+                            + "group by cf_orders.idoforg");
+            // Получение количества клиентов получивших платное питание в буфете
+            queryLauncher.loadValue(entries, "realSnackPayedClientsCount",
+                    "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) "
+                            + " FROM cf_orders "
+                            + " LEFT JOIN cf_orderdetails ON cf_orders.idoforder = cf_orderdetails.idoforder and cf_orders.idoforg = cf_orderdetails.idoforg "
+                            + " LEFT JOIN cf_clients ON cf_clients.idofclient = cf_orders.idofclient "
+                            + " WHERE "
+                            + "     cf_orderdetails.menutype = " + OrderDetail.TYPE_DISH_ITEM
+                            + "     AND cf_orders.state = 0 "
+                            + "     AND cf_orders.ordertype in (1) "
+                            + "     AND cf_clients.idOfClientGroup < " + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + "     AND cf_orders.createddate between " + startDate.getTime() + " and " + endDate.getTime()
+                            + "     AND " + orgConditionWithCFORDERS
+                            + "group by cf_orders.idoforg");
+            // Получение количества клиентов получивших питание
             queryLauncher.loadValue(entries, "uniqueClientsCount",
-                    "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
-                            "from cf_orgs " +
-                            "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
-                            "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1  and cf_orders.state=0 "
-                            //+ " and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            + " AND " + orgCondition + " and "
-                            + "cf_orders.createddate>=" + startDate.getTime() + " AND cf_orders.createddate<" + endDate.getTime() +
-                            "group by cf_orgs.idoforg");
+                    "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) "
+                            + " FROM cf_orders "
+                            + " LEFT JOIN cf_orderdetails ON cf_orders.idoforder = cf_orderdetails.idoforder and cf_orders.idoforg = cf_orderdetails.idoforg "
+                            + " LEFT JOIN cf_clients ON cf_clients.idofclient = cf_orders.idofclient "
+                            + " WHERE "
+                            + "     (cf_orderdetails.menutype = " + OrderDetail.TYPE_DISH_ITEM
+                            + "     OR cf_orderdetails.menutype between " + OrderDetail.TYPE_COMPLEX_MIN + " and " + OrderDetail.TYPE_COMPLEX_MAX + ")"
+                            + "     AND cf_orders.state = 0 "
+                            + "     AND cf_orders.ordertype in (1, 3, 4, 6, 7) "
+                            + "     AND cf_clients.idOfClientGroup < " + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            + "     AND cf_orders.createddate between " + startDate.getTime() + " and " + endDate.getTime()
+                            + "     AND " + orgConditionWithCFORDERS
+                            + "group by cf_orders.idoforg");
 
             List<TotalEntry> result = new LinkedList(entries.values());
             calculatePercents(result, "planBenefitClientsCount");
             calculatePercents(result, "currentClientsCount");
-            calculatePercents(result, "realBenefitClientsCount", "planBenefitClientsCount");
+            calculatePercents(result, "realBenefitClientsCount");
             calculatePercents(result, "realPayedClientsCount");
+            calculatePercents(result, "realSnackPayedClientsCount");
             calculatePercents(result, "uniqueClientsCount");
 
 
             return new TotalServicesReport(generateTime, new Date().getTime() - generateTime.getTime(), result);
+        }
+
+        private String getOrgTuple(List<Long> idOfOrgList) {
+            String orgConditionIn = "";
+            if (!idOfOrgList.isEmpty()) {
+                for (Long idOfOrg : idOfOrgList) {
+                    orgConditionIn = orgConditionIn.concat(idOfOrg + ", ");
+                }
+                orgConditionIn = " (" + orgConditionIn.substring(0, orgConditionIn.length() - 2) + ") ";
+            }
+            return orgConditionIn;
+        }
+
+        private String getOrgCondition(List<Long> idOfOrgList, String prefix) {
+            String orgConditionWithCFORGS = "";
+            if (!idOfOrgList.isEmpty()) {
+                for (Long idOfOrg : idOfOrgList) {
+                    orgConditionWithCFORGS = orgConditionWithCFORGS.concat(prefix + idOfOrg + " or ");
+                }
+                orgConditionWithCFORGS = " (" + orgConditionWithCFORGS.substring(0, orgConditionWithCFORGS.length() - 4) + ") ";
+            }
+            return orgConditionWithCFORGS;
         }
 
 
@@ -149,18 +199,20 @@ public class TotalServicesReport extends BasicReport {
 
     public static class TotalEntry {
 
-        private String officialName;          // Название организации
-        private String totalClientsCount;        // Общее количество клиентов
-        private String planBenefitClientsCount;  // Число получающих льготное питание
-        private String perPlanBenefitClientsCount;
-        private String currentClientsCount;      // Находящиеся в ОУ в текущий момент
-        private String perCurrentClientsCount;
-        private String realBenefitClientsCount;  // Число реально получившие льготное питание
-        private String perRealBenefitClientsCount;
-        private String realPayedClientsCount;    // Получившие платное питание
-        private String perRealPayedClientsCount;
-        private String uniqueClientsCount;       // Уникальные записи об обучающихся
-        private String perUniqueClientsCount;
+        private String officialName;                    // Название организации
+        //private String totalClientsCount;             // Общее количество учащихся
+        //private String planBenefitClientsCount;       // Число получающих льготное питание
+        //private String perPlanBenefitClientsCount;
+        //private String currentClientsCount;           // Зафиксирован проход в течении периода
+        //private String perCurrentClientsCount;
+        //private String realBenefitClientsCount;       // Число получивших льготное питание
+        //private String perRealBenefitClientsCount;
+        //private String realPayedClientsCount;         // Число получивших комплексное питание
+        //private String perRealPayedClientsCount;
+        //private String realPayedSnackClientsCount;    // Число получивших платное питание в буфете
+        //private String perRealPayedSnackClientsCount;
+        //private String uniqueClientsCount;            // Число получивших питание (льготное + платное)
+        //private String perUniqueClientsCount;
         private Map<String, Object> data;
 
 
@@ -168,96 +220,8 @@ public class TotalServicesReport extends BasicReport {
             return data;
         }
 
-        public void setTotalClientsCount(String totalClientsCount) {
-            this.totalClientsCount = totalClientsCount;
-        }
-
-        public void setPlanBenefitClientsCount(String planBenefitClientsCount) {
-            this.planBenefitClientsCount = planBenefitClientsCount;
-        }
-
-        public void setPerPlanBenefitClientsCount(String perPlanBenefitClientsCount) {
-            this.perPlanBenefitClientsCount = perPlanBenefitClientsCount;
-        }
-
-        public void setCurrentClientsCount(String currentClientsCount) {
-            this.currentClientsCount = currentClientsCount;
-        }
-
-        public void setPerCurrentClientsCount(String perCurrentClientsCount) {
-            this.perCurrentClientsCount = perCurrentClientsCount;
-        }
-
-        public void setRealBenefitClientsCount(String realBenefitClientsCount) {
-            this.realBenefitClientsCount = realBenefitClientsCount;
-        }
-
-        public void setPerRealBenefitClientsCount(String perRealBenefitClientsCount) {
-            this.perRealBenefitClientsCount = perRealBenefitClientsCount;
-        }
-
-        public void setRealPayedClientsCount(String realPayedClientsCount) {
-            this.realPayedClientsCount = realPayedClientsCount;
-        }
-
-        public void setPerRealPayedClientsCount(String perRealPayedClientsCount) {
-            this.perRealPayedClientsCount = perRealPayedClientsCount;
-        }
-
-        public void setUniqueClientsCount(String uniqueClientsCount) {
-            this.uniqueClientsCount = uniqueClientsCount;
-        }
-
-        public void setPerUniqueClientsCount(String perUniqueClientsCount) {
-            this.perUniqueClientsCount = perUniqueClientsCount;
-        }
-
         public String getOfficialName() {
             return officialName;
-        }
-
-        public String getTotalClientsCount() {
-            return totalClientsCount;
-        }
-
-        public String getPlanBenefitClientsCount() {
-            return planBenefitClientsCount;
-        }
-
-        public String getPerPlanBenefitClientsCount() {
-            return perPlanBenefitClientsCount;
-        }
-
-        public String getCurrentClientsCount() {
-            return currentClientsCount;
-        }
-
-        public String getPerCurrentClientsCount() {
-            return perCurrentClientsCount;
-        }
-
-        public String getRealBenefitClientsCount() {
-            return realBenefitClientsCount;
-        }
-
-        public String getPerRealBenefitClientsCount() {
-            return perRealBenefitClientsCount;
-        }
-
-        public String getRealPayedClientsCount() {
-            return realPayedClientsCount;
-        }
-
-        public String getPerRealPayedClientsCount() {
-            return perRealPayedClientsCount;
-        }
-
-        public String getUniqueClientsCount() {
-            return uniqueClientsCount;
-        }
-
-        public String getPerUniqueClientsCount() {
-            return perUniqueClientsCount;
         }
 
         public void put(String k, Object v) {

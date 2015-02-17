@@ -1892,4 +1892,22 @@ public class DAOUtils {
         query.setParameter("idOfSourceOrg", idOfSourceOrg);
         return (List<Accessory>)query.list();
     }
+
+    public static List<Long> complementIdOfOrgSet(Session session, List<Long> idOfOrgList) {
+        Set<Long> idOfOrgSet = new HashSet<Long>();
+        Set<FriendlyOrganizationsInfoModel> organizationsInfoModelSet = OrgUtils.getMainBuildingAndFriendlyOrgsList(
+                session, idOfOrgList);
+        for (FriendlyOrganizationsInfoModel org: organizationsInfoModelSet) {
+            idOfOrgSet.add(org.getIdOfOrg());
+            Set<Org> friends = org.getFriendlyOrganizationsSet();
+            if (friends != null) {
+                for (Org friend: friends) {
+                    idOfOrgSet.add(friend.getIdOfOrg());
+                }
+            }
+        }
+        List<Long> resultlist = new ArrayList<Long>();
+        resultlist.addAll(idOfOrgSet);
+        return resultlist;
+    }
 }

@@ -22,6 +22,8 @@
         <h:outputText escape="false" value=";#{item.data['per_realBenefitClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['realPayedClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['per_realPayedClientsCount']}" />
+        <h:outputText escape="false" value=";#{item.data['realSnackPayedClientsCount']}" />
+        <h:outputText escape="false" value=";#{item.data['per_realSnackPayedClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['uniqueClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['per_uniqueClientsCount']}" />
         <h:outputText escape="false" value="#{mainPage.endOfLine}" />

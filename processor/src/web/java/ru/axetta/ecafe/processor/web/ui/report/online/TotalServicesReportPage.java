@@ -4,19 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.TotalServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -25,11 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,9 +45,8 @@ public class TotalServicesReportPage extends OnlineReportPage{
             this.totalReport = new TotalServicesReport ();
             TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder();
             List<Long> orgs = new ArrayList<Long>();
-            if(idOfOrg != null && idOfOrg>=0) {
-                orgs.add(idOfOrg);
-            }
+            if(idOfOrg != null && idOfOrg>=0) orgs.add(idOfOrg);
+            orgs = DAOUtils.complementIdOfOrgSet(session, orgs);
             this.totalReport = reportBuilder.build(session, startDate, endDate, orgs);
             persistenceTransaction.commit();
             persistenceTransaction = null;

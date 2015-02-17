@@ -42,7 +42,7 @@ public class TotalServiceQueryLauncher {
                         "cf_orgs.state=1 and  cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES
                         .getValue() + " " +
                         "group by cf_orgs.idoforg";
-        Session session = (Session) entityManager.unwrap(Session.class);
+        Session session = entityManager.unwrap(Session.class);
         Query query = session.createSQLQuery(preparedQuery);
         List resultList = query.list();
 
@@ -52,14 +52,14 @@ public class TotalServiceQueryLauncher {
             String officialName = ((String) e[1]).trim();
 
             TotalServicesReport.TotalEntry item = new TotalServicesReport.TotalEntry(officialName);
-            item.put("totalClientsCount", (BigInteger) e[2]);
+            item.put("totalClientsCount", e[2]);
             entries.put(id, item);
         }
     }
 
     @Transactional
     public void loadValue(Map<Long, TotalServicesReport.TotalEntry> entries, String valueKey, String preparedQuery) {
-        Session session = (Session) entityManager.unwrap(Session.class);
+        Session session = entityManager.unwrap(Session.class);
         Query query = session.createSQLQuery(preparedQuery);
         List resultList = query.list();
 
@@ -69,7 +69,7 @@ public class TotalServiceQueryLauncher {
 
             try {
                 TotalServicesReport.TotalEntry item = entries.get(id);
-                item.put(valueKey, (BigInteger) e[1]);
+                item.put(valueKey, e[1]);
             } catch (Exception e1) {
             }
         }
