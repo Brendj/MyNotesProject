@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-01-16T17:45:53 -->
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-02-17T18:27:37 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" pageWidth="900" pageHeight="95" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="900" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
@@ -166,7 +166,8 @@
 							<property name="local_mesure_unitheight" value="pixel"/>
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<textField isBlankWhenNull="true">
-								<reportElement style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="300" height="24" backcolor="#99CCFF" uuid="f25ffeb0-d0ba-4c96-a6cb-c6bf252b0ced"/>
+								<reportElement style="Crosstab Data Text" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="300" height="24" backcolor="#99CCFF" uuid="f25ffeb0-d0ba-4c96-a6cb-c6bf252b0ced"/>
+								<box leftPadding="4"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle" markup="html">
 									<font size="12"/>
 									<paragraph leftIndent="8"/>
@@ -228,7 +229,7 @@
 					<cellContents style="table">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
-						<textField>
+						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" forecolor="#FFFFFF" backcolor="#FF6666" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
 								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
@@ -249,7 +250,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 + ")"
 )) + "</font>"]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#92D050" uuid="67da7250-646f-4951-8566-1635493f6071">
 								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
@@ -261,7 +262,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 ($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
     ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
 								<printWhenExpression><![CDATA[!Integer.valueOf($V{doneDate}.getDay()).equals(0)
 && $V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
@@ -273,7 +274,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 ($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
     ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
 						</textField>
-						<textField>
+						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#CCCCCC" uuid="317b030e-0775-4653-b428-52ae97c008ec">
 								<printWhenExpression><![CDATA[Integer.valueOf($V{doneDate}.getDay()).equals(0)
 && $V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
