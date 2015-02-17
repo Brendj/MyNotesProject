@@ -295,10 +295,17 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         return "report/online/contragent_completion_report";
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
         if (null != idOfContragent) {
             this.defaultSupplier = (Contragent) session.get(Contragent.class, idOfContragent);
+        } else {
+            clear();
         }
+    }
+
+    private void clear() {
+        defaultSupplier = null;
     }
 
     public Contragent getDefaultSupplier() {

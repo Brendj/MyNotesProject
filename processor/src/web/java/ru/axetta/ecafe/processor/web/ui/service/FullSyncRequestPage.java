@@ -65,12 +65,6 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
         this.selectReceiver = selectReceiver;
     }
 
-    ReportRepositoryItem.Filter filterReceiver = new ReportRepositoryItem.Filter();
-
-    public ReportRepositoryItem.Filter getFilterReceiver() {
-        return filterReceiver;
-    }
-
     @Autowired
     private DAOService daoService;
 
@@ -154,8 +148,13 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
             throws Exception {
         if (idOfContragent != null) {
             this.defaultSupplier = (Contragent) session.get(Contragent.class, idOfContragent);
-            filterReceiver.setIdOfContragentReceiver(idOfContragent);
+        } else {
+            clear();
         }
+    }
+
+    private void clear() {
+        defaultSupplier = null;
     }
 
     public Object showOrgListSelectPage() {
