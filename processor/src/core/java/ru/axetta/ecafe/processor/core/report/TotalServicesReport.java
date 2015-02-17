@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -127,6 +126,32 @@ public class TotalServicesReport extends BasicReport {
                             + "group by cf_orders.idoforg");
 
             List<TotalEntry> result = new LinkedList(entries.values());
+            Long totalClientsCount = 0L;
+            Long planBenefitClientsCount = 0L;
+            Long currentClientsCount = 0L;
+            Long realBenefitClientsCount = 0L;
+            Long realPayedClientsCount = 0L;
+            Long realSnackPayedClientsCount = 0L;
+            Long uniqueClientsCount = 0L;
+            for (TotalEntry entry : result) {
+                totalClientsCount += Long.parseLong(entry.getData().get("totalClientsCount").toString());
+                planBenefitClientsCount += Long.parseLong(entry.getData().get("planBenefitClientsCount").toString());
+                currentClientsCount += Long.parseLong(entry.getData().get("currentClientsCount").toString());
+                realBenefitClientsCount += Long.parseLong(entry.getData().get("realBenefitClientsCount").toString());
+                realPayedClientsCount += Long.parseLong(entry.getData().get("realPayedClientsCount").toString());
+                realSnackPayedClientsCount += Long.parseLong(entry.getData().get("realSnackPayedClientsCount").toString());
+                uniqueClientsCount += Long.parseLong(entry.getData().get("uniqueClientsCount").toString());
+            }
+            TotalEntry totalEntry = new TotalEntry("Итого");
+            totalEntry.getData().put("totalClientsCount", totalClientsCount);
+            totalEntry.getData().put("planBenefitClientsCount", planBenefitClientsCount);
+            totalEntry.getData().put("currentClientsCount", currentClientsCount);
+            totalEntry.getData().put("realBenefitClientsCount", realBenefitClientsCount);
+            totalEntry.getData().put("realPayedClientsCount", realPayedClientsCount);
+            totalEntry.getData().put("realSnackPayedClientsCount", realSnackPayedClientsCount);
+            totalEntry.getData().put("uniqueClientsCount", uniqueClientsCount);
+            result.add(totalEntry);
+
             calculatePercents(result, "planBenefitClientsCount");
             calculatePercents(result, "currentClientsCount");
             calculatePercents(result, "realBenefitClientsCount");
@@ -172,8 +197,8 @@ public class TotalServicesReport extends BasicReport {
                 Object bO = e.getData().get(base);
                 if (vO != null && bO != null) {
                     try {
-                        double v = ((BigInteger) vO).doubleValue();
-                        double b = ((BigInteger) bO).doubleValue();
+                        Double v = Double.parseDouble(vO.toString());
+                        Double b = Double.parseDouble(bO.toString());
                         e.put("per_" + key, new BigDecimal(b == 0 ? 0 : v / b * 100).
                                 setScale(2, BigDecimal.ROUND_HALF_DOWN).toString() + "%");
                     } catch (Exception e1) {

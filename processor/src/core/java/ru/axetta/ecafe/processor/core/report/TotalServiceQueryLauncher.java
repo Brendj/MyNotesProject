@@ -35,7 +35,7 @@ public class TotalServiceQueryLauncher {
     @Transactional
     public void loadOrgs(String orgCondition, Map<Long, TotalServicesReport.TotalEntry> entries) {
         String preparedQuery =
-                "select cf_orgs.idoforg, cf_orgs.officialname, count(distinct cf_clients.idofclient) " +
+                "select cf_orgs.idoforg, cf_orgs.shortname, count(distinct cf_clients.idofclient) " +
                         "from cf_orgs " +
                         "left join cf_clients on cf_clients.idoforg = cf_orgs.idoforg " +
                         (orgCondition.length() > 0 ? "where " + orgCondition + " AND " : "where ") +
@@ -73,5 +73,11 @@ public class TotalServiceQueryLauncher {
             } catch (Exception e1) {
             }
         }
+        for (Long key : entries.keySet()) {
+            if (entries.get(key).getData().get(valueKey) == null) {
+                entries.get(key).getData().put(valueKey, 0L);
+            }
+        }
+
     }
 }
