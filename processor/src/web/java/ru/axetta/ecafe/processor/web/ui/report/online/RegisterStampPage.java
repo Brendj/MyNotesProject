@@ -52,7 +52,7 @@ public class RegisterStampPage extends OnlineReportPage{
     private ReportDAOService daoService;
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
