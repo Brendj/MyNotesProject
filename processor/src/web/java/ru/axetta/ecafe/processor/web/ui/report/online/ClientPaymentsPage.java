@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
 import ru.axetta.ecafe.processor.core.report.ClientPaymentsReport;
-import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
 import org.hibernate.Session;
@@ -24,6 +23,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientPaymentsPage extends OnlineReportPage {
+
     private ClientPaymentsReport clientPaymentsReport;
 
     private OrganizationType organizationType = null;
@@ -58,15 +58,15 @@ public class ClientPaymentsPage extends OnlineReportPage {
             printError("Не указано дата выборки от");
             return true;
         }*/
-        if(endDate==null){
+        if (endDate == null) {
             printError("Не указано дата выборки до");
             return true;
         }
-        if(startDate!=null){
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-            return true;
-        }
+        if (startDate != null) {
+            if (startDate.after(endDate)) {
+                printError("Дата выборки от меньше дата выборки до");
+                return true;
+            }
         }
         return false;
     }
@@ -77,13 +77,12 @@ public class ClientPaymentsPage extends OnlineReportPage {
 
         List<Long> orgList = new ArrayList<Long>();
 
-        if(this.idOfOrgList.isEmpty()){
+        if (this.idOfOrgList.isEmpty()) {
             printError("Не выбрана организация");
         }
-
         OrganizationType[] organizationTypes = OrganizationType.values();
 
-        for (OrganizationType orgType: organizationTypes) {
+        for (OrganizationType orgType : organizationTypes) {
             if (orgType.name().equals(this.organizationTypeModify.name())) {
                 this.organizationType = orgType;
                 break;
@@ -106,8 +105,6 @@ public class ClientPaymentsPage extends OnlineReportPage {
                     orgList.add(org.getIdOfOrg());
                 }
             }
-        }
-        if (!orgList.isEmpty()) {
             this.clientPaymentsReport = reportBuilder.build(session, startDate, endDate, orgList);
         } else {
             this.clientPaymentsReport = reportBuilder.build(session, startDate, endDate, idOfOrgList);
