@@ -20,12 +20,28 @@
     <rich:panel>
         <f:facet name="header"><h:outputText styleClass="column-header" value="Запрос полной синхронизации" /></f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+
+            <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{fullSyncRequestPage.defaultSupplier.contragentName}" readonly="true"
+                             styleClass="input-text" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
+                                   reRender="modalContragentSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{true}" target="#{fullSyncRequestPage.selectReceiver}" />
+                    <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                </a4j:commandButton>
+            </h:panelGroup>
+
             <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
             <h:panelGrid columns="2">
-                <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                <a4j:commandButton value="..." action="#{fullSyncRequestPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
+                    <%--<f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />--%>
                     <f:setPropertyActionListener value="#{fullSyncRequestPage.idOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
@@ -33,34 +49,17 @@
                               value=" {#{fullSyncRequestPage.filter}}" />
             </h:panelGrid>
 
-            <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
-            <h:panelGroup styleClass="borderless-div">
-                <h:inputText value="#{fullSyncRequestPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
-                             styleClass="input-text" style="margin-right: 2px;" />
-                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
-                                   reRender="modalContragentSelectorPanel"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{true}"
-                                                 target="#{fullSyncRequestPage.selectReceiver}" />
-                    <f:setPropertyActionListener value="0"
-                                                 target="#{mainPage.multiContrFlag}" />
-                    <f:setPropertyActionListener value="2"
-                                                 target="#{mainPage.classTypes}" />
-                </a4j:commandButton>
-            </h:panelGroup>
-
             <a4j:commandButton value="Запросить" action="#{fullSyncRequestPage.applyFullSyncOperation}" />
             <rich:spacer />
-            <h:panelGrid styleClass="borderless-grid">
-                <a4j:status id="sFullSyncRequestStatus">
-                    <f:facet name="start">
-                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                    </f:facet>
-                </a4j:status>
-                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                               warnClass="warn-messages" />
-            </h:panelGrid>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <a4j:status id="sFullSyncRequestStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages" />
         </h:panelGrid>
     </rich:panel>
 </h:panelGrid>

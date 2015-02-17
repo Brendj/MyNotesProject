@@ -4,8 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -19,7 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,12 +42,17 @@ import java.util.Map;
 public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
 
     private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
+
+    @PersistenceContext(unitName = "reportsPU")
+    private EntityManager entityManager;
+
     private List<Long> idOfOrgList = new ArrayList<Long>();
+    private ContragentDAOService contragentDAOService = new ContragentDAOService();
 
-    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
+    private Contragent defaultSupplier;
 
-    public CCAccountFilter getContragentReceiverFilter() {
-        return contragentReceiverFilter;
+    public Contragent getDefaultSupplier() {
+        return defaultSupplier;
     }
 
     private boolean selectReceiver;
@@ -66,17 +78,30 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
 
     @Override
     public void onShow() throws Exception {
+        contragentDAOService.setSession((Session) entityManager.getDelegate());
 //        filter = "Не выбрано";
 //        idOfOrgList.clear();
     }
 
     public Object applyFullSyncOperation(){
         try {
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+            if (!CollectionUtils.isEmpty(idOfOrgList)||defaultSupplier != null) {
+                List<Org> orgItems = null;
+                if (!CollectionUtils.isEmpty(idOfOrgList)) {
                 daoService.applyFullSyncOperationByOrgList(idOfOrgList);
                 printMessage("Запрос отправлен");
+                } else if (defaultSupplier != null) {
+                    orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(defaultSupplier);
+                    List<Long> idOfOrgItemList = new ArrayList<Long>();
+                    for (Org orgItem: orgItems) {
+                        idOfOrgItemList.add(orgItem.getIdOfOrg());
+                    }
+                    daoService.applyFullSyncOperationByOrgList(idOfOrgItemList);
+                    printMessage("Запрос отправлен");
+
+                }
             } else {
-                printError("Не выбрана организация");
+                printError("Не выбран Поставщик или Организация ");
             }
         } catch (Exception e){
             printError("Ошибка при сохранении данных: "+e.getMessage());
@@ -127,9 +152,17 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
     @Override
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
             throws Exception {
-        if (selectReceiver) {
-            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+        if (idOfContragent != null) {
+            this.defaultSupplier = (Contragent) session.get(Contragent.class, idOfContragent);
             filterReceiver.setIdOfContragentReceiver(idOfContragent);
         }
+    }
+
+    public Object showOrgListSelectPage() {
+        if (defaultSupplier != null) {
+            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(defaultSupplier.getIdOfContragent()));
+        }
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 }
