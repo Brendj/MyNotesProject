@@ -60,7 +60,6 @@
 		<field name="orderedMeals" class="java.lang.Integer">
 			<fieldDescription><![CDATA[orderedMeals]]></fieldDescription>
 		</field>
-		<field name="orgNum" class="java.lang.String"/>
 	</subDataset>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
@@ -76,21 +75,31 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="8fa7b1f1-2652-4032-9b68-8045fc9e9d31" x="519" y="0" width="333" height="20"/>
+				<reportElement x="519" y="0" width="333" height="20" uuid="8fa7b1f1-2652-4032-9b68-8045fc9e9d31"/>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[Сводный отчет по льготному питанию]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="cd85ec01-d40e-4b9c-a8a0-1f765696d377" x="637" y="20" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<reportElement x="581" y="20" width="100" height="20" uuid="cd85ec01-d40e-4b9c-a8a0-1f765696d377"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="691" y="20" width="100" height="20" uuid="98473e4b-91c0-4773-8d12-11c7c68cabdc"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="681" y="20" width="10" height="20" uuid="7b219f96-f906-4130-ad2e-d695d47ea6d0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[-]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
 		<band height="209" splitType="Stretch">
 			<componentElement>
-				<reportElement uuid="2ed274ec-08a2-4ba3-91ee-b5e3500a2433" key="table" style="table" x="0" y="0" width="360" height="140"/>
+				<reportElement key="table" style="table" x="0" y="0" width="360" height="140" uuid="2ed274ec-08a2-4ba3-91ee-b5e3500a2433"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="New Dataset 1" uuid="ffcf707e-e0ae-463f-b31b-2225d87087cd">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{itemList})]]></dataSourceExpression>
@@ -100,7 +109,7 @@
 						<jr:tableFooter height="0" rowSpan="1"/>
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="ff5ec1ce-e9c8-464e-94a6-8a1b503cc3c9" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="ff5ec1ce-e9c8-464e-94a6-8a1b503cc3c9"/>
 								<box>
 									<pen lineWidth="0.25"/>
 									<topPen lineWidth="0.25"/>
@@ -116,7 +125,7 @@
 						<jr:columnFooter height="0" rowSpan="1"/>
 						<jr:detailCell height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="8614459e-0902-4832-8d2e-72cf9ba4182e" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="8614459e-0902-4832-8d2e-72cf9ba4182e"/>
 								<box>
 									<pen lineWidth="0.25"/>
 									<topPen lineWidth="0.25"/>
@@ -132,7 +141,7 @@
 					<jr:column width="90" uuid="e3981e93-28b0-45ee-8559-710a85b8c939">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="59832755-86e8-4e37-af73-4facd7ab8972" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="59832755-86e8-4e37-af73-4facd7ab8972"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Организация
 ]]></text>
@@ -140,16 +149,16 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="b30b5554-e2c5-4a9a-a3e4-77cec42fc807" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="064860be-6721-4236-bb95-88c2584d3ab3"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{orgNum}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="181" uuid="69a85514-48ac-4661-917f-b65c707ec638">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="dff12adc-cb60-48ad-8477-a7032c1f7f1c" x="0" y="0" width="181" height="63"/>
+								<reportElement x="0" y="0" width="181" height="63" uuid="dff12adc-cb60-48ad-8477-a7032c1f7f1c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Наименование
 ]]></text>
@@ -157,7 +166,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="ecf62efc-ae09-4e3b-a979-f466ebce05c4" x="0" y="0" width="181" height="46"/>
+								<reportElement x="0" y="0" width="181" height="46" uuid="ecf62efc-ae09-4e3b-a979-f466ebce05c4"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 							</textField>
@@ -166,7 +175,7 @@
 					<jr:column width="184" uuid="65147cf8-34e5-4a2a-b5b5-7a13af3beef5">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="72455b3d-7c8a-416a-9827-6202af101cbd" x="0" y="0" width="184" height="63"/>
+								<reportElement x="0" y="0" width="184" height="63" uuid="72455b3d-7c8a-416a-9827-6202af101cbd"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Адрес
 ]]></text>
@@ -174,7 +183,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="51361141-a305-4da9-b8fc-8da8ee22d3f6" x="0" y="0" width="184" height="46"/>
+								<reportElement x="0" y="0" width="184" height="46" uuid="51361141-a305-4da9-b8fc-8da8ee22d3f6"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{adress}]]></textFieldExpression>
 							</textField>
@@ -183,7 +192,7 @@
 					<jr:column width="90" uuid="26db392b-55e4-41e8-a2c6-a2fa0c09444c">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="d086c869-d3c7-41af-ad7b-7fe546a260fa" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="d086c869-d3c7-41af-ad7b-7fe546a260fa"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Общее число учащихся
 ]]></text>
@@ -191,7 +200,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="c29b84ac-a429-4f6a-ac7a-6934fb2b8a8a" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="c29b84ac-a429-4f6a-ac7a-6934fb2b8a8a"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{students}]]></textFieldExpression>
 							</textField>
@@ -200,7 +209,7 @@
 					<jr:column width="90" uuid="7398e297-da3e-49d1-97c7-684d972d3598">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="dcce8ee6-8e3f-4efd-8ecc-80ff3cf4a458" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="dcce8ee6-8e3f-4efd-8ecc-80ff3cf4a458"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Число учащихся льготников
 ]]></text>
@@ -208,7 +217,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="34ea5ee8-672f-45e2-aa5e-7c55b1cc0aa0" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="34ea5ee8-672f-45e2-aa5e-7c55b1cc0aa0"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{benefStudents}]]></textFieldExpression>
 							</textField>
@@ -217,7 +226,7 @@
 					<jr:column width="90" uuid="13566ba8-36eb-4365-a7aa-d6c4853df8eb">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="7b4b8be6-99aa-4d71-b2e4-78a396225770" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="7b4b8be6-99aa-4d71-b2e4-78a396225770"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Количество заказанных порций
 ]]></text>
@@ -225,7 +234,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="a6b163db-b678-4d3c-a889-b370a893cb4c" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="a6b163db-b678-4d3c-a889-b370a893cb4c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{orderedMeals}]]></textFieldExpression>
 							</textField>
@@ -234,7 +243,7 @@
 					<jr:column width="90" uuid="04c243e1-cab0-4d79-a17e-2a80c5d73ad1">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="8c3f970d-2633-4ed9-96ff-0e5a9748cf60" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="8c3f970d-2633-4ed9-96ff-0e5a9748cf60"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Зафиксирован проход учащихся льготников
 ]]></text>
@@ -242,7 +251,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="65950970-64dc-4ddf-9c28-1a28d9fe1956" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="65950970-64dc-4ddf-9c28-1a28d9fe1956"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{enteredBenefStudents}]]></textFieldExpression>
 							</textField>
@@ -251,7 +260,7 @@
 					<jr:column width="90" uuid="d8e72064-1f5a-4b49-8bdf-139a9679e6fd">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="e15ebcfa-4c3e-4fd3-a3b0-543f21566a40" x="0" y="0" width="90" height="63"/>
+								<reportElement x="0" y="0" width="90" height="63" uuid="e15ebcfa-4c3e-4fd3-a3b0-543f21566a40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Предоставлено льготное питание учащимся льготникам
 ]]></text>
@@ -259,7 +268,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="8aa8cafc-5d93-4fbf-bd5e-fb5d7cef3ff6" x="0" y="0" width="90" height="46"/>
+								<reportElement x="0" y="0" width="90" height="46" uuid="8aa8cafc-5d93-4fbf-bd5e-fb5d7cef3ff6"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{receiveMealBenefStudents}]]></textFieldExpression>
 							</textField>
@@ -268,7 +277,7 @@
 					<jr:column width="125" uuid="ae794bce-d59c-4303-8d0c-6b3095612061">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="42f5a156-7edf-44df-97eb-8262f8c57eb8" x="0" y="0" width="125" height="63"/>
+								<reportElement x="0" y="0" width="125" height="63" uuid="42f5a156-7edf-44df-97eb-8262f8c57eb8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Не предоставлено льготное питание учащимся льготникам, присутствующим в ОО
 ]]></text>
@@ -276,7 +285,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="e67619c8-a499-4a26-a1fd-fbe44b97d2af" x="0" y="0" width="125" height="46"/>
+								<reportElement x="0" y="0" width="125" height="46" uuid="e67619c8-a499-4a26-a1fd-fbe44b97d2af"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{notReceiveMealEnteredBenefStudents}]]></textFieldExpression>
 							</textField>
@@ -285,7 +294,7 @@
 					<jr:column width="122" uuid="7edf8b26-7bb3-4a2b-a335-8017164c93c6">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="7efe7f78-df95-4754-ab15-144112cf1265" x="0" y="0" width="122" height="63"/>
+								<reportElement x="0" y="0" width="122" height="63" uuid="7efe7f78-df95-4754-ab15-144112cf1265"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Предоставлено льготное питание учащимся льготникам, не присутствующим в ОО
 ]]></text>
@@ -293,7 +302,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="ef6b6995-8145-4782-8b70-8dc5aca42a13" x="0" y="0" width="122" height="46"/>
+								<reportElement x="0" y="0" width="122" height="46" uuid="ef6b6995-8145-4782-8b70-8dc5aca42a13"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{receiveMealNotEnteredBenefStudents}]]></textFieldExpression>
 							</textField>
@@ -302,7 +311,7 @@
 					<jr:column width="123" uuid="0a98da8e-e594-4b98-bac6-70b49ad9a5e2">
 						<jr:columnHeader style="table_CH" height="63" rowSpan="1">
 							<staticText>
-								<reportElement uuid="78172803-d6d3-4d74-a82f-f94849eea01f" x="0" y="0" width="123" height="63"/>
+								<reportElement x="0" y="0" width="123" height="63" uuid="78172803-d6d3-4d74-a82f-f94849eea01f"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<text><![CDATA[Педоставлено питание учащимся, числящимся в резервной группе
 ]]></text>
@@ -310,7 +319,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="46" rowSpan="1">
 							<textField>
-								<reportElement uuid="07ddf2a3-40d0-465b-97e2-e9c20aad2c7c" x="0" y="0" width="123" height="46"/>
+								<reportElement x="0" y="0" width="123" height="46" uuid="07ddf2a3-40d0-465b-97e2-e9c20aad2c7c"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{receiveMealReserveStudents}]]></textFieldExpression>
 							</textField>
