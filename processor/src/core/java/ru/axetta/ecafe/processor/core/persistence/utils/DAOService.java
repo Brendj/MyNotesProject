@@ -646,6 +646,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return getContragentsList(null);
     }
 
+    @Transactional
     public List<Contragent> getContragentsListFromOrders() {
         String q = "SELECT distinct c from Contragent c, Order o WHERE o.contragent=c";
         TypedQuery<Contragent> query = entityManager.createQuery(q, Contragent.class);

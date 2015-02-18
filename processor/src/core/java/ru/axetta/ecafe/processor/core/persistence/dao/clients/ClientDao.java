@@ -47,7 +47,8 @@ public class ClientDao extends WritableJpaDao {
     @Transactional
     public List<Client> findAllByOrg(List<Long> orgsIdList ) {
         TypedQuery<Client> query = entityManager
-                .createQuery("from Client c where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060", Client.class)
+                .createQuery("from Client c left join fetch c.clientGroup "
+                        + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060", Client.class)
                 .setParameter("orgsIdList", orgsIdList);
         return query.getResultList();
     }
