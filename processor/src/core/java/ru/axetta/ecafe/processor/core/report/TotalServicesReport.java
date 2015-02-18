@@ -8,6 +8,8 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
+import ru.axetta.ecafe.processor.core.report.totalServices.TotalServicesHelper;
 
 import org.hibernate.Session;
 
@@ -45,6 +47,11 @@ public class TotalServicesReport extends BasicReport {
 
             // Инициализация структуры данных, подсчет общего количества учащихся
             queryLauncher.loadOrgs(orgConditionWithCFORGS, entries);
+
+
+            List<PlanOrderItem> i = TotalServicesHelper.getDiscounters(session, startDate, endDate, idOfOrgList);
+
+
             // Получение количества получающих льготное питание
             queryLauncher.loadValue(entries, "planBenefitClientsCount",
                                         "select cf_orgs.idoforg, count (idofclientcomplexdiscount) "
