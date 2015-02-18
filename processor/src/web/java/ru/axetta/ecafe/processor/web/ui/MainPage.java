@@ -50,6 +50,7 @@ import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
 import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
 import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
 import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
+import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 
@@ -202,6 +203,7 @@ public class MainPage implements Serializable {
     private final BuildSignKeysPage buildSignKeysPage = new BuildSignKeysPage();
     private final OrderRemovePage orderRemovePage = new OrderRemovePage();
     private final GroupControlSubscriptionsPage groupControlSubscriptionsPage = new GroupControlSubscriptionsPage();
+    private final GroupControlBenefitsPage groupControlBenefitsPage = new GroupControlBenefitsPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -227,6 +229,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage complexGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage uosGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage autorechargePage = new BasicWorkspacePage();
+    private final BasicWorkspacePage benefitPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
@@ -4063,6 +4066,14 @@ public class MainPage implements Serializable {
         }
     }
 
+    public void benefitsLoadFileListener(UploadEvent event) {
+
+    }
+
+    public void groupControlBenefitsGenerate() {
+
+    }
+
     public void reportTemplateLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
@@ -4813,6 +4824,10 @@ public class MainPage implements Serializable {
         return groupControlSubscriptionsPage;
     }
 
+    public GroupControlBenefitsPage getGroupControlBenefitsPage() {
+        return groupControlBenefitsPage;
+    }
+
     public Object showOrderRemovePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5131,6 +5146,10 @@ public class MainPage implements Serializable {
         return autorechargePage;
     }
 
+    public BasicWorkspacePage getBenefitPage() {
+        return benefitPage;
+    }
+
     public Object showComplexGroupPage() {
         currentWorkspacePage = complexGroupPage;
         updateSelectedMainMenu();
@@ -5151,6 +5170,12 @@ public class MainPage implements Serializable {
 
     public Object showAutorechargeGroupPage() {
         currentWorkspacePage = autorechargePage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showBenefitGroupPage() {
+        currentWorkspacePage = benefitPage;
         updateSelectedMainMenu();
         return null;
     }
