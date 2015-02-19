@@ -19,7 +19,8 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
-        <h:outputText value="вида: 'Наименовани ОУ'; 'Группа (класс)'; 'Фамилия'; 'Имя'; 'Отчество'; 'Номер л/c'; 'Пуст. строка'; 'Названия льготных категорий'" />
+        <h:outputText
+                value="вида: 'Наименовани ОУ'; 'Группа (класс)'; 'Фамилия'; 'Имя'; 'Отчество'; 'Номер л/c'; 'Пуст. строка'; 'Названия льготных категорий - через запятую'" />
         <rich:fileUpload id="benefitFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                          addButtonClassDisabled="upload-command-button-diasbled"
                          cleanButtonClass="upload-command-button"
@@ -57,10 +58,18 @@
             </rich:panel>
         </h:panelGroup>
     </h:panelGrid>
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Предварительная отмена льготных категорий по всем учащимся" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.groupControlBenefitsPage.clientCancelBenefits}"
+                                 styleClass="output-text">
+            <a4j:support event="onclick" reRender="groupControlBenefitsPagePanelGrid" ajaxSingle="true"
+                         actionListener="#{mainPage.groupControlBenefitsPage.onHideClientCancelBenefitsChange}" />
+        </h:selectBooleanCheckbox>
+    </h:panelGrid>
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
-        <a4j:commandButton value="Провести" action="#{mainPage.groupControlBenefitsGenerate}" reRender="workspaceTogglePanel"
-                           styleClass="command-button" />
+        <a4j:commandButton value="Провести" action="#{mainPage.groupControlBenefitsGenerate}"
+                           reRender="workspaceTogglePanel" styleClass="command-button" />
     </h:panelGrid>
 
     <a4j:outputPanel ajaxRendered="true">
@@ -70,8 +79,7 @@
         </h:panelGrid>
     </a4j:outputPanel>
 
-    <rich:dataTable value="#{mainPage.groupControlBenefitsPage.groupControlBenefitsItems}" var="item"
-                    rowKeyVar="row">
+    <rich:dataTable value="#{mainPage.groupControlBenefitsPage.groupControlBenefitsItems}" var="item" rowKeyVar="row">
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" />
@@ -86,9 +94,9 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Группа (класс)" styleClass="output-text"/>
+                <h:outputText value="Группа (класс)" styleClass="output-text" />
             </f:facet>
-            <h:outputText value="#{item.groupName}" styleClass="output-text"/>
+            <h:outputText value="#{item.groupName}" styleClass="output-text" />
         </rich:column>
         <rich:column>
             <f:facet name="header">

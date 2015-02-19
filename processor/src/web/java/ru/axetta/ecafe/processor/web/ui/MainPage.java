@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JRException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
+import ru.axetta.ecafe.processor.core.mail.*;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -71,6 +72,7 @@ import javax.faces.event.ActionEvent;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -4067,11 +4069,56 @@ public class MainPage implements Serializable {
     }
 
     public void benefitsLoadFileListener(UploadEvent event) {
-
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        try {
+            if (item.isTempFile()) {
+                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+                file.setFile(item.getFile());
+                file.setFileName(item.getFileName());
+                file.setContentType(item.getContentType());
+                groupControlBenefitsPage.setUploadItem(item);
+                groupControlBenefitsPage.getFiles().add(file);
+            } else {
+                throw new Exception("Invalid file");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load file", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
+                            null));
+        }
     }
 
     public void groupControlBenefitsGenerate() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        BufferedReader bufferedReader = null;
 
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        try {
+            groupControlBenefitsPage.groupBenefitsGenerate(groupControlBenefitsPage.getUploadItem(), runtimeContext, bufferedReader);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл не был найден" + e.getMessage(), null));
+        } catch (PersistenceException ex) {
+            ex.printStackTrace();
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл неверного формата" + ex.getMessage(), null));
+        } catch (Exception e) {
+            e.printStackTrace();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+        } finally {
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+                }
+            }
+        }
     }
 
     public void reportTemplateLoadFileListener(UploadEvent event) {

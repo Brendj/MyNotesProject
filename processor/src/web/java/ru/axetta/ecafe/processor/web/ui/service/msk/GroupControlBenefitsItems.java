@@ -13,7 +13,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
  */
 public class GroupControlBenefitsItems {
 
-     private String orgName;
+    private String orgName;
     private String groupName;
     private String firstName;
     private String surname;
