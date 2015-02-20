@@ -5,19 +5,27 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.richfaces.model.UploadItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,6 +35,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class GroupControlBenefitsPage extends BasicWorkspacePage {
+
+    private static final Logger logger = LoggerFactory.getLogger(GroupControlBenefitsPage.class);
 
     private Boolean clientCancelBenefits = false;
     public UploadItem uploadItem;
@@ -41,7 +51,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        groupControlBenefitsItems = new ArrayList<GroupControlBenefitsItems>();
+        //    groupControlBenefitsItems = new ArrayList<GroupControlBenefitsItems>();
         files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
     }
 
@@ -94,44 +104,77 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
         if (item != null) {
             File file = item.getFile();
-            bufferedReader = new BufferedReader(new FileReader(file.getAbsolutePath()));
+            bufferedReader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
 
             groupControlBenefitsItems = new ArrayList<GroupControlBenefitsItems>();
             files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
 
+            Long rowNum = 0L;
+
             while ((line = bufferedReader.readLine()) != null) {
+                ++rowNum;
                 Session persistenceSession = runtimeContext.createPersistenceSession();
-                Transaction persistenceTransaction = persistenceSession.beginTransaction();
+                Transaction persistenceTransaction = null;
+                try {
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    String[] separatedData = line.split(csvSplitBy);
 
-                String[] separatedData = line.split(csvSplitBy);
-
-                if (separatedData.length < 7) {
-                    groupControlBenefitsItems
-                            .add(new GroupControlBenefitsItems(separatedData[0], separatedData[1], separatedData[2],
-                                    separatedData[3], separatedData[4], separatedData[5], "",
-                                    "Не верный формат .csv файла"));
-                } else {
-
-                    Client client = groupControlBenefitService
-                            .findClientByContractId(Long.parseLong(separatedData[5].trim()), persistenceSession);
-
-                    if (client != null) {
-                        String[] separatedBenefits = separatedData[7].split(benefitsSplitBy);
-                        // выгрузка csv файл
-                        // Клиент
-                        if (!clientCancelBenefits) {
-                            // добавляем с проверкой.
-
-                        } else {
-                            // сбрасываем и устанавливаем новые
-
-                        }
-                    } else {
+                    if (separatedData.length < 7) {
                         groupControlBenefitsItems
-                                .add(new GroupControlBenefitsItems(separatedData[0], separatedData[1], separatedData[2],
-                                        separatedData[3], separatedData[4], separatedData[5], separatedData[7],
-                                        "Клиент с Л/с № " + separatedData[5] + " не найден"));
+                                .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
+                                        separatedData[2], separatedData[3], separatedData[4], separatedData[5], "",
+                                        "Не верный формат .csv файла"));
+                    } else {
+                        Client client = groupControlBenefitService
+                                .findClientByContractId(Long.parseLong(separatedData[5].trim()), persistenceSession);
+
+                        if (client != null) {
+                            String[] separatedBenefits = separatedData[7].split(benefitsSplitBy);
+
+                            Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+
+                            String errorCategoryName = "";
+
+                            for (String categoryName : separatedBenefits) {
+                                CategoryDiscount categoryDiscount = groupControlBenefitService
+                                        .findCategoryDiscountByCategoryName(categoryName.trim(), persistenceSession);
+                                if (categoryDiscount != null) {
+                                    categoryDiscountSet.add(categoryDiscount);
+                                } else {
+                                    categoryDiscountSet.clear();
+                                    errorCategoryName = errorCategoryName + categoryName;
+                                }
+                                errorCategoryName = errorCategoryName + ", ";
+                            }
+
+                            if (categoryDiscountSet.isEmpty()) {
+                                groupControlBenefitsItems
+                                        .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
+                                                separatedData[2], separatedData[3], separatedData[4], separatedData[5],
+                                                separatedData[7], "Льготы названия : '" + errorCategoryName + "' не найдены в системе"));
+                            } else {
+
+                                if (!clientCancelBenefits) {
+                                    // добавляем с проверкой.
+
+                                } else {
+                                    // добавляем с очисткой старых льгот
+
+                                }
+                            }
+                        } else {
+                            groupControlBenefitsItems
+                                    .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
+                                            separatedData[2], separatedData[3], separatedData[4], separatedData[5],
+                                            separatedData[7], "Клиент с Л/с № " + separatedData[5] + " не найден"));
+                        }
                     }
+                    persistenceTransaction.commit();
+                } catch (Exception ex) {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                } finally {
+                    HibernateUtils.close(persistenceSession, logger);
                 }
             }
         } else {

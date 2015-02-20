@@ -59,7 +59,8 @@
         </h:panelGroup>
     </h:panelGrid>
     <h:panelGrid columns="2" styleClass="borderless-grid">
-        <h:outputText escape="true" value="Предварительная отмена льготных категорий по всем учащимся" styleClass="output-text" />
+        <h:outputText escape="true" value="Предварительная отмена льготных категорий по всем учащимся"
+                      styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.groupControlBenefitsPage.clientCancelBenefits}"
                                  styleClass="output-text">
             <a4j:support event="onclick" reRender="groupControlBenefitsPagePanelGrid" ajaxSingle="true"
@@ -79,7 +80,10 @@
         </h:panelGrid>
     </a4j:outputPanel>
 
-    <rich:dataTable value="#{mainPage.groupControlBenefitsPage.groupControlBenefitsItems}" var="item" rowKeyVar="row">
+    <rich:dataTable id="groupControlBenefitsTable"
+                    value="#{mainPage.groupControlBenefitsPage.groupControlBenefitsItems}" var="item" rows="30"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
+                    footerClass="data-table-footer" rowKeyVar="row">
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" />
@@ -134,6 +138,17 @@
             </f:facet>
             <h:outputText value="#{item.result}" styleClass="output-text" />
         </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="groupControlBenefitsTable" renderIfSinglePage="false" maxPages="5"
+                               fastControls="hide" stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
     </rich:dataTable>
-
+    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showGroupControlBenefitsCSVList}" styleClass="command-button" />
 </h:panelGrid>

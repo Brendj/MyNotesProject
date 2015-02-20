@@ -12,7 +12,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
  * To change this template use File | Settings | File Templates.
  */
 public class GroupControlBenefitsItems {
-
+    private Long rowNum;
     private String orgName;
     private String groupName;
     private String firstName;
@@ -25,8 +25,9 @@ public class GroupControlBenefitsItems {
     public GroupControlBenefitsItems() {
     }
 
-    public GroupControlBenefitsItems(String orgName, String groupName, String firstName, String surname,
+    public GroupControlBenefitsItems(Long rowNum, String orgName, String groupName, String firstName, String surname,
             String secondName, String contractId, String benefits, String result) {
+        this.rowNum = rowNum;
         this.orgName = orgName;
         this.groupName = groupName;
         this.firstName = firstName;
@@ -35,6 +36,14 @@ public class GroupControlBenefitsItems {
         this.contractId = contractId;
         this.benefits = benefits;
         this.result = result;
+    }
+
+    public Long getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(Long rowNum) {
+        this.rowNum = rowNum;
     }
 
     public String getOrgName() {
