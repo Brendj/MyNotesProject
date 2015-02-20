@@ -222,6 +222,16 @@ public interface ClientRoomController {
     @WebMethod Result changePassword(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "base64passwordHash") String base64passwordHash);
 
+    @WebMethod PublicationListResult getPublicationListSimple(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "searchCondition") String searchCondition, @WebParam(name="limit") int limit,
+            @WebParam(name="offset") int offset);
+
+    @WebMethod PublicationListResult getPublicationListAdvanced(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "author") String author, @WebParam(name = "title") String title,
+            @WebParam(name = "title2") String title2, @WebParam(name = "publicationDate") String publicationDate,
+            @WebParam(name = "publisher") String publisher, @WebParam(name = "isbn") String isbn,
+            @WebParam(name="limit") int limit, @WebParam(name="offset") int offset);
+
     @WebMethod CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") int state);
 

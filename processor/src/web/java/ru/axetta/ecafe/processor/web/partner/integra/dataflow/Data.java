@@ -46,6 +46,7 @@ import javax.xml.bind.annotation.*;
     "cardList",
     "enterEventList", "enterEventWithRepList",
     "circulationItemList",
+    "publicationItemList",
     "complexDateList",
     "questionaryList",
     "clientRepresentativesList"
@@ -75,6 +76,10 @@ public class Data {
     protected EnterEventList enterEventList;
     @XmlElement(name = "EnterEventWithRepList")
     protected EnterEventWithRepList enterEventWithRepList;
+    @XmlElement(name = "PublicationItemList")
+    protected PublicationItemList publicationItemList;
+    @XmlAttribute(name = "AmountForCondition")
+    protected int amountForCondition;
     @XmlElement(name = "CirculationItemList")
     protected CirculationItemList circulationItemList;
     @XmlAttribute(name = "IdOfContract")
@@ -335,6 +340,54 @@ public class Data {
      */
     public void setEnterEventWithRepList(EnterEventWithRepList value) {
         this.enterEventWithRepList = value;
+    }
+
+    /**
+     * Gets the value of the publicationItemList property.
+     *
+     * @return
+     *     possible object is
+     *     {@link PublicationItemList }
+     *
+     */
+    public PublicationItemList getPublicationItemList() {
+        return publicationItemList;
+    }
+
+    /**
+     * Sets the value of the publicationItemList property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link PublicationItemList }
+     *
+     */
+    public void setPublicationItemList(PublicationItemList value) {
+        this.publicationItemList = value;
+    }
+
+    /**
+     * Gets the value of the amountForCondition property.
+     *
+     * @return
+     *     possible object is
+     *     {@link int }
+     *
+     */
+    public int getAmountForCondition() {
+        return amountForCondition;
+    }
+
+    /**
+     * Sets the value of the amountForCondition property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link int }
+     *
+     */
+    public void setAmountForCondition(int value) {
+        this.amountForCondition = value;
     }
 
     /**

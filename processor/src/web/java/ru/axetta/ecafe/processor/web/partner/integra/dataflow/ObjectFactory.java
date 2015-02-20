@@ -149,6 +149,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link PublicationItemList }
+     *
+     */
+    public PublicationItemList createPublicationItemList() {
+        return new PublicationItemList();
+    }
+
+    /**
+     * Create an instance of {@link PublicationInstancesItem }
+     *
+     */
+    public PublicationInstancesItem createPublicationInstancesItem() {
+        return new PublicationInstancesItem();
+    }
+
+    /**
      * Create an instance of {@link CirculationItemList }
      * 
      */

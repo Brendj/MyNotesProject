@@ -1,4 +1,3 @@
-
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,6 +41,8 @@ public class PublicationItem {
     protected String publicationDate;
     @XmlAttribute(name = "Publisher")
     protected String publisher;
+	@XmlAttribute(name = "PublicationId")
+    protected Long publicationId;
 
     /**
      * Gets the value of the author property.
@@ -161,6 +162,22 @@ public class PublicationItem {
      */
     public void setPublisher(String value) {
         this.publisher = value;
+    }
+	
+	public Long getPublicationId() {
+        return publicationId;
+    }
+
+    /**
+     * Sets the value of the author property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *
+     */
+    public void setPublicationId(Long value) {
+        this.publicationId = value;
     }
 
 }

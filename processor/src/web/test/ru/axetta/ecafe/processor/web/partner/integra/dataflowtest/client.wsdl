@@ -1,4 +1,9 @@
-<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="ClientRoomControllerWSService" targetNamespace="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="ClientRoomControllerWSService"
+                  targetNamespace="http://soap.integra.partner.web.processor.ecafe.axetta.ru/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://soap.integra.partner.web.processor.ecafe.axetta.ru/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
 <xs:schema elementFormDefault="unqualified" targetNamespace="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" version="1.0" xmlns:tns="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 <xs:element name="Data">
@@ -14,10 +19,12 @@
         <xs:element minOccurs="0" name="CardList" type="tns:CardList"/>
         <xs:element minOccurs="0" name="EnterEventList" type="tns:EnterEventList"/>
         <xs:element minOccurs="0" name="CirculationItemList" type="tns:CirculationItemList"/>
+        <xs:element minOccurs="0" name="PublicationItemList" type="tns:PublicationItemList"/>
       </xs:sequence>
       <xs:attribute name="IdOfContract" type="xs:long"/>
       <xs:attribute name="ResultCode" type="xs:long"/>
       <xs:attribute name="Description" type="xs:string"/>
+      <xs:attribute name="AmountForCondition" type="xs:int"/>
     </xs:complexType>
   </xs:element>
 <xs:element name="attachGuardSan" type="tns:attachGuardSan"/>
@@ -44,6 +51,8 @@
 <xs:element name="getCardListBySan" type="tns:getCardListBySan"/>
 <xs:element name="getCardListBySanResponse" type="tns:getCardListBySanResponse"/>
 <xs:element name="getCardListResponse" type="tns:getCardListResponse"/>
+<xs:element name="getPublicationListSimple" type="tns:getPublicationListSimple"/>
+<xs:element name="getPublicationListResponse" type="tns:getPublicationListResponse"/>
 <xs:element name="getCirculationList" type="tns:getCirculationList"/>
 <xs:element name="getCirculationListResponse" type="tns:getCirculationListResponse"/>
 <xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
@@ -546,6 +555,40 @@
       <xs:element minOccurs="0" name="return" type="tns:result"/>
     </xs:sequence>
   </xs:complexType>
+<xs:complexType name="getPublicationListSimple">
+    <xs:sequence>
+        <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+        <xs:element name="state" type="xs:int"/>
+        <xs:element name="searchCondition" type="xs:string"/>
+        <xs:element name="limit" type="xs:int"/>
+        <xs:element name="offset" type="xs:int"/>
+    </xs:sequence>
+</xs:complexType>
+<xs:complexType name="getPublicationListResponse">
+    <xs:sequence>
+        <xs:element minOccurs="0" name="return" type="tns:publicationListResult"/>
+    </xs:sequence>
+</xs:complexType>
+<xs:complexType name="publicationListResult">
+    <xs:sequence>
+        <xs:element minOccurs="0" name="publicationList" type="tns:PublicationItemList"/>
+        <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+        <xs:element minOccurs="0" name="description" type="xs:string"/>
+        <xs:element minOccurs="0" name="amountForCondition" type="xs:int"/>
+    </xs:sequence>
+</xs:complexType>
+<xs:complexType name="PublicationItemList">
+    <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="C" type="tns:PublicationInstancesItem"/>
+    </xs:sequence>
+</xs:complexType>
+    <xs:complexType name="PublicationInstancesItem">
+        <xs:sequence>
+            <xs:element name="Publication" type="tns:PublicationItem"/>
+        </xs:sequence>
+        <xs:attribute name="InstancesAmount" type="xs:int"/>
+        <xs:attribute name="InstancesAvailable" type="xs:int"/>
+    </xs:complexType>
 <xs:complexType name="getCirculationList">
     <xs:sequence>
       <xs:element minOccurs="0" name="contractId" type="xs:long"/>
@@ -585,6 +628,7 @@
     <xs:attribute name="Title2" type="xs:string"/>
     <xs:attribute name="PublicationDate" type="xs:string"/>
     <xs:attribute name="Publisher" type="xs:string"/>
+    <xs:attribute name="PublicationId" type="xs:long"/>
   </xs:complexType>
 <xs:complexType name="changeExpenditureLimit">
     <xs:sequence>
@@ -736,6 +780,10 @@
     <wsdl:part element="tns:getMenuListBySan" name="parameters">
     </wsdl:part>
   </wsdl:message>
+    <wsdl:message name="getPublicationListSimple">
+        <wsdl:part element="tns:getPublicationListSimple" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
   <wsdl:message name="getCirculationList">
     <wsdl:part element="tns:getCirculationList" name="parameters">
     </wsdl:part>
@@ -895,6 +943,10 @@
   <wsdl:message name="getCardListBySan">
     <wsdl:part element="tns:getCardListBySan" name="parameters">
     </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPublicationListResponse">
+      <wsdl:part element="tns:getPublicationListResponse" name="parameters">
+      </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getCirculationListResponse">
     <wsdl:part element="tns:getCirculationListResponse" name="parameters">
@@ -1082,6 +1134,12 @@
     </wsdl:input>
       <wsdl:output message="tns:authorizeClientResponse" name="authorizeClientResponse">
     </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPublicationListSimple">
+      <wsdl:input message="tns:getPublicationListSimple" name="getPublicationListSimple">
+      </wsdl:input>
+      <wsdl:output message="tns:getPublicationListResponse" name="getPublicationListResponse">
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="getCirculationList">
       <wsdl:input message="tns:getCirculationList" name="getCirculationList">

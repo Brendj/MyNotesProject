@@ -54,6 +54,7 @@ import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.*;
@@ -138,6 +139,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final int MAX_RECS = 50;
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
+
+    private static final String QUERY_PUBLICATION_LIST =
+            "select fq.*, count(ins.IdOfInstance) as instancesAvailable from (select pub.IdOfPublication, pub.Author, pub.Title, pub.Title2, pub.PublicationDate, pub.Publisher, " +
+            "count(ins.IdOfInstance) as instancesAmount " +
+            "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication " +
+            "where ins.OrgOwner = :org " +
+            "CONDITION " +
+            "group by pub.IdOfPublication order by Author limit :limit offset :offset) fq inner join " +
+            "cf_instances ins on fq.IdOfPublication = ins.IdOfPublication " +
+            "where ins.OrgOwner = :org and not exists (select IdOfCirculation from cf_circulations cir inner join cf_issuable iss on cir.IdOfIssuable = iss.IdOfIssuable " +
+            "where iss.IdOfInstance = ins.IdOfInstance and cir.RealRefundDate is null) " +
+            "group by fq.IdOfPublication, fq.Author, fq.Title, fq.Title2, fq.PublicationDate, fq.Publisher, fq.instancesAmount " +
+            "order by fq.Author";
+    private static final String QUERY_PUBLICATION_LIST_COUNT = "select count(distinct pub.IdOfPublication) " +
+            "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
+            "where ins.OrgOwner = :org and not exists (select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
 
     static class Processor {
 
@@ -3485,6 +3502,196 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
+    @Override
+    public PublicationListResult getPublicationListSimple(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "searchCondition") String searchCondition, @WebParam(name = "limit") int limit,
+            @WebParam(name = "offset") int offset) {
+
+        authenticateRequest(contractId);
+
+        final String fSearchCondition = searchCondition;
+        final int fLimit = limit;
+        final int fOffset = offset;
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processPublicationListSimple(client, data, objectFactory, session, fSearchCondition, fLimit, fOffset);
+            }
+        });
+
+        PublicationListResult pubListResult = new PublicationListResult();
+        pubListResult.publicationList = data.getPublicationItemList();
+        pubListResult.resultCode = data.getResultCode();
+        pubListResult.description = data.getDescription();
+        pubListResult.amountForCondition = data.getAmountForCondition();
+        return pubListResult;
+    }
+
+    private void processPublicationListSimple(Client client, Data data, ObjectFactory objectFactory, Session session,
+            String searchCondition, int limit, int offset) throws DatatypeConfigurationException {
+
+        String str_condition = " and (pub.Author like :condition_like or pub.Title like :condition_like or pub.Title2 like :condition_like or pub.PublicationDate = :condition_eq " +
+                "or pub.Publisher like :condition_like or pub.ISBN like :condition_isbn) ";
+
+        Long org = client.getOrg().getIdOfOrg();
+
+        StringBuilder bquery = new StringBuilder();
+        bquery.append(QUERY_PUBLICATION_LIST);
+
+        SQLQuery query = session.createSQLQuery(bquery.toString().replaceAll("CONDITION", str_condition));
+        query.setParameter("org", org);
+        query.setParameter("condition_like", "%" + searchCondition + "%");
+        query.setParameter("condition_eq", searchCondition);
+        query.setParameter("condition_isbn", searchCondition.replaceAll("-", "") + "%");
+        query.setParameter("limit", limit);
+        query.setParameter("offset", offset);
+
+        data.setPublicationItemList(getPublicationListItem(objectFactory, query));
+
+        bquery.setLength(0);
+        bquery.append(QUERY_PUBLICATION_LIST_COUNT);
+        bquery.append(str_condition);
+        query = session.createSQLQuery(bquery.toString());
+        query.setParameter("org", org);
+        query.setParameter("condition_like", "%" + searchCondition + "%");
+        query.setParameter("condition_eq", searchCondition);
+        query.setParameter("condition_isbn", searchCondition.replaceAll("-", "") + "%");
+        data.setAmountForCondition(((BigInteger)query.uniqueResult()).intValue());
+    }
+
+    @Override
+    public PublicationListResult getPublicationListAdvanced(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "author") String author, @WebParam(name = "title") String title,
+            @WebParam(name = "title2") String title2, @WebParam(name = "publicationDate") String publicationDate,
+            @WebParam(name = "publisher") String publisher, @WebParam(name = "isbn") String isbn,
+            @WebParam(name="limit") int limit, @WebParam(name="offset") int offset) {
+
+        authenticateRequest(contractId);
+
+        final String fAuthor = author;
+        final String fTitle = title;
+        final String fTitle2 = title2;
+        final String fPublicationDate = publicationDate;
+        final String fPublisher = publisher;
+        final String fISBN = isbn;
+        final int fLimit = limit;
+        final int fOffset = offset;
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processPublicationListAdvanced(client, data, objectFactory, session, fAuthor, fTitle, fTitle2,
+                        fPublicationDate, fPublisher, fISBN, fLimit, fOffset);
+            }
+        });
+
+        PublicationListResult pubListResult = new PublicationListResult();
+        pubListResult.publicationList = data.getPublicationItemList();
+        pubListResult.resultCode = data.getResultCode();
+        pubListResult.description = data.getDescription();
+        pubListResult.amountForCondition = data.getAmountForCondition();
+        return pubListResult;
+    }
+
+    private void processPublicationListAdvanced(Client client, Data data, ObjectFactory objectFactory, Session session,
+            String author, String title, String title2, String publicationDate, String publisher, String isbn,
+            int limit, int offset) throws DatatypeConfigurationException {
+
+        Long org = client.getOrg().getIdOfOrg();
+
+        StringBuilder bquery = new StringBuilder();
+        bquery.append(QUERY_PUBLICATION_LIST);
+        String str_condition = getConditionsForPublicationListAdvanced(author, title, title2, publicationDate, publisher, isbn);
+
+        SQLQuery query = session.createSQLQuery(bquery.toString().replaceAll("CONDITION", str_condition));
+
+        setUserParametersForPublicationList(query, author, title, title2, publicationDate, publisher, isbn);
+
+        query.setParameter("org", org);
+        query.setParameter("limit", limit);
+        query.setParameter("offset", offset);
+
+        data.setPublicationItemList(getPublicationListItem(objectFactory, query));
+
+        bquery.setLength(0);
+        bquery.append(QUERY_PUBLICATION_LIST_COUNT);
+        bquery.append(str_condition);
+
+        query = session.createSQLQuery(bquery.toString());
+        query.setParameter("org", org);
+        setUserParametersForPublicationList(query, author, title, title2, publicationDate, publisher, isbn);
+        data.setAmountForCondition(((BigInteger)query.uniqueResult()).intValue());
+    }
+
+    private String getConditionsForPublicationListAdvanced(String author, String title, String title2,
+            String publicationDate, String publisher, String isbn) {
+        StringBuilder builder = new StringBuilder();
+        if (author != null && !author.isEmpty()) {
+            builder.append(" and pub.Author like :author ");
+        }
+        if (title != null && !title.isEmpty()) {
+            builder.append(" and pub.Title like :title ");
+        }
+        if (title2 != null && !title2.isEmpty()) {
+            builder.append(" and pub.Title2 like :title2 ");
+        }
+        if (publicationDate != null && !publicationDate.isEmpty()) {
+            builder.append(" and pub.PublicationDate = :publicationDate ");
+        }
+        if (publisher != null && !publisher.isEmpty()) {
+            builder.append(" and pub.Publisher like :publisher ");
+        }
+        if (isbn != null && !isbn.isEmpty()) {
+            builder.append(" and pub.ISBN like :isbn ");
+        }
+        return builder.toString();
+    }
+
+    private void setUserParametersForPublicationList(SQLQuery query, String author, String title, String title2,
+            String publicationDate, String publisher, String isbn) {
+        if (author != null && !author.isEmpty()) {
+            query.setParameter("author", "%" + author + "%");
+        }
+        if (title != null && !title.isEmpty()) {
+            query.setParameter("title", "%" + title + "%");
+        }
+        if (title2 != null && !title2.isEmpty()) {
+            query.setParameter("title2", "%" + title2 + "%");
+        }
+        if (publicationDate != null && !publicationDate.isEmpty()) {
+            query.setParameter("publicationDate", publicationDate);
+        }
+        if (publisher != null && !publisher.isEmpty()) {
+            query.setParameter("publisher", "%" + publisher + "%");
+        }
+        if (isbn != null && !isbn.isEmpty()) {
+            query.setParameter("isbn", isbn.replaceAll("-", "") + "%");
+        }
+    }
+
+    private PublicationItemList getPublicationListItem(ObjectFactory objectFactory, SQLQuery query) {
+        List list = query.list();
+
+        PublicationItemList puList = objectFactory.createPublicationItemList();
+        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+            Object[] objs = (Object[])iterator.next();
+
+            PublicationInstancesItem pu = new PublicationInstancesItem();
+
+            pu.setInstancesAmount(((BigInteger)objs[6]).intValue());
+            pu.setInstancesAvailable(((BigInteger)objs[7]).intValue());
+            PublicationItem pi = new PublicationItem();
+            pi.setAuthor(objs[1].toString());
+            pi.setPublisher(objs[5].toString());
+            pi.setTitle(objs[2].toString());
+            pi.setTitle2(objs[3].toString());
+            pi.setPublicationDate(objs[4].toString());
+            pi.setPublicationId(((BigInteger)objs[0]).longValue());
+            pu.setPublication(pi);
+
+            puList.getC().add(pu);
+        }
+        return puList;
+    }
 
     @Override
     public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, int state) {
@@ -3534,6 +3741,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 pi.setTitle(p.getTitle());
                 pi.setTitle2(p.getTitle2());
                 pi.setPublicationDate(p.getPublicationdate());
+                pi.setPublicationId(p.getGlobalId());
                 ci.setPublication(pi);
             }
             ciList.getC().add(ci);
