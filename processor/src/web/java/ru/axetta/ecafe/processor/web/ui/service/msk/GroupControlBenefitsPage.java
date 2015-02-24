@@ -17,10 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import javax.persistence.PersistenceException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -92,8 +90,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         clientCancelBenefits = true;
     }
 
-    public void groupBenefitsGenerate(UploadItem item, RuntimeContext runtimeContext, BufferedReader bufferedReader)
-            throws Exception {
+    public void groupBenefitsGenerate(UploadItem item, RuntimeContext runtimeContext) throws Exception {
 
         GroupControlBenefitService groupControlBenefitService = new GroupControlBenefitService();
 
@@ -104,7 +101,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
         if (item != null) {
             File file = item.getFile();
-            bufferedReader = new BufferedReader(
+            BufferedReader bufferedReader = new BufferedReader(
                     new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
 
             groupControlBenefitsItems = new ArrayList<GroupControlBenefitsItems>();
@@ -112,69 +109,152 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
             Long rowNum = 0L;
 
-            while ((line = bufferedReader.readLine()) != null) {
-                ++rowNum;
-                Session persistenceSession = runtimeContext.createPersistenceSession();
-                Transaction persistenceTransaction = null;
-                try {
-                    persistenceTransaction = persistenceSession.beginTransaction();
-                    String[] separatedData = line.split(csvSplitBy);
+            try {
+                while ((line = bufferedReader.readLine()) != null) {
+                    ++rowNum;
+                    Session persistenceSession = runtimeContext.createPersistenceSession();
+                    Transaction persistenceTransaction = null;
+                    try {
+                        persistenceTransaction = persistenceSession.beginTransaction();
+                        String[] separatedData = line.split(csvSplitBy);
 
-                    if (separatedData.length < 7) {
-                        groupControlBenefitsItems
-                                .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
-                                        separatedData[2], separatedData[3], separatedData[4], separatedData[5], "",
-                                        "Не верный формат .csv файла"));
-                    } else {
-                        Client client = groupControlBenefitService
-                                .findClientByContractId(Long.parseLong(separatedData[5].trim()), persistenceSession);
+                        if (separatedData.length < 7) {
+                            groupControlBenefitsItems
+                                    .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
+                                            separatedData[2], separatedData[3], separatedData[4], separatedData[5], "",
+                                            "Неверный формат, вид .csv файла"));
+                        } else {
+                            Client client = groupControlBenefitService
+                                    .findClientByContractId(Long.parseLong(separatedData[5].trim()),
+                                            persistenceSession);
 
-                        if (client != null) {
-                            String[] separatedBenefits = separatedData[7].split(benefitsSplitBy);
+                            if (client != null) {
+                                String[] separatedBenefits = separatedData[7].split(benefitsSplitBy);
 
-                            Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+                                Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
 
-                            String errorCategoryName = "";
+                                String errorCategoryName = "";
 
-                            for (String categoryName : separatedBenefits) {
-                                CategoryDiscount categoryDiscount = groupControlBenefitService
-                                        .findCategoryDiscountByCategoryName(categoryName.trim(), persistenceSession);
-                                if (categoryDiscount != null) {
-                                    categoryDiscountSet.add(categoryDiscount);
-                                } else {
-                                    categoryDiscountSet.clear();
-                                    errorCategoryName = errorCategoryName + categoryName;
+                                String categoriesDiscounts = "";
+
+                                int count = 0;
+
+                                for (String categoryName : separatedBenefits) {
+                                    ++count;
+                                    CategoryDiscount categoryDiscount = groupControlBenefitService
+                                            .findCategoryDiscountByCategoryName(categoryName.trim(),
+                                                    persistenceSession);
+                                    if (categoryDiscount != null) {
+                                        categoryDiscountSet.add(categoryDiscount);
+                                        categoriesDiscounts =
+                                                categoriesDiscounts + categoryDiscount.getIdOfCategoryDiscount();
+                                        if (separatedBenefits.length > 1 && count < separatedBenefits.length) {
+                                            categoriesDiscounts = categoriesDiscounts + ',';
+                                        }
+                                    } else {
+                                        categoryDiscountSet.clear();
+                                        categoriesDiscounts = "";
+                                        errorCategoryName = errorCategoryName + categoryName;
+                                        if (separatedBenefits.length > 1 && count < separatedBenefits.length) {
+                                            errorCategoryName = errorCategoryName + ", ";
+                                        }
+                                    }
+
                                 }
-                                errorCategoryName = errorCategoryName + ", ";
-                            }
 
-                            if (categoryDiscountSet.isEmpty()) {
+                                if (categoryDiscountSet.isEmpty()) {
+                                    groupControlBenefitsItems
+                                            .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
+                                                    separatedData[1], separatedData[2], separatedData[3],
+                                                    separatedData[4], separatedData[5], separatedData[7],
+                                                    "Льготы названия : '" + errorCategoryName
+                                                            + "' не найдены в системе"));
+                                } else {
+
+                                    if (!clientCancelBenefits) {
+                                        // добавляем с проверкой.
+                                        Set<CategoryDiscount> clientCategoryDiscounts = client.getCategories();
+
+                                        String categoryName = "";
+
+                                        for (CategoryDiscount categoryDiscount : categoryDiscountSet) {
+                                            if (!clientCategoryDiscounts.contains(categoryDiscount)) {
+                                                clientCategoryDiscounts.add(categoryDiscount);
+                                                categoryName = categoryName + categoryDiscount.getCategoryName() + ", ";
+                                            }
+                                        }
+
+                                        String categoryDiscounts = "";
+
+                                        int countSize = 0;
+
+                                        for (CategoryDiscount clientCategory : clientCategoryDiscounts) {
+                                            ++countSize;
+                                            categoryDiscounts =
+                                                    categoryDiscounts + clientCategory.getIdOfCategoryDiscount();
+                                            if (clientCategoryDiscounts.size() > 1
+                                                    && countSize < clientCategoryDiscounts.size()) {
+                                                categoryDiscounts = categoryDiscounts + ',';
+                                            }
+                                        }
+
+                                        client.setDiscountMode(3);
+                                        client.setCategories(clientCategoryDiscounts);
+                                        client.setCategoriesDiscounts(categoryDiscounts);
+                                        persistenceSession.save(client);
+                                        groupControlBenefitsItems
+                                                .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
+                                                        separatedData[1], separatedData[2], separatedData[3],
+                                                        separatedData[4], separatedData[5], separatedData[7],
+                                                        "Клиент с Л/с № " + separatedData[5]
+                                                                + " обновлены льготы, добавились льготы ("
+                                                                + categoryName.trim() + ")"));
+
+                                    } else {
+                                        //добавляем с удаление прежних льгот
+                                        client.setDiscountMode(3);
+                                        client.setCategoriesDiscounts(categoriesDiscounts);
+                                        client.setCategories(categoryDiscountSet);
+                                        persistenceSession.save(client);
+                                        groupControlBenefitsItems
+                                                .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
+                                                        separatedData[1], separatedData[2], separatedData[3],
+                                                        separatedData[4], separatedData[5], separatedData[7],
+                                                        "Клиент с Л/с № " + separatedData[5]
+                                                                + " обновлены льготы, с предварительной отменой льготных категорий"));
+                                    }
+                                }
+                            } else {
                                 groupControlBenefitsItems
                                         .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
                                                 separatedData[2], separatedData[3], separatedData[4], separatedData[5],
-                                                separatedData[7], "Льготы названия : '" + errorCategoryName + "' не найдены в системе"));
-                            } else {
-
-                                if (!clientCancelBenefits) {
-                                    // добавляем с проверкой.
-
-                                } else {
-                                    // добавляем с очисткой старых льгот
-
-                                }
+                                                separatedData[7], "Клиент с Л/с № " + separatedData[5] + " не найден"));
                             }
-                        } else {
-                            groupControlBenefitsItems
-                                    .add(new GroupControlBenefitsItems(rowNum, separatedData[0], separatedData[1],
-                                            separatedData[2], separatedData[3], separatedData[4], separatedData[5],
-                                            separatedData[7], "Клиент с Л/с № " + separatedData[5] + " не найден"));
                         }
+                        persistenceTransaction.commit();
+                    } catch (Exception ex) {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                    } finally {
+                        HibernateUtils.close(persistenceSession, logger);
                     }
-                    persistenceTransaction.commit();
-                } catch (Exception ex) {
-                    HibernateUtils.rollback(persistenceTransaction, logger);
-                } finally {
-                    HibernateUtils.close(persistenceSession, logger);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                printError("Файл не был найден");
+            } catch (PersistenceException ex) {
+                ex.printStackTrace();
+                printError("Файл неверного формата");
+            } catch (Exception e) {
+                e.printStackTrace();
+                printError(e.getMessage());
+            } finally {
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        printError(e.getMessage());
+                    }
                 }
             }
         } else {

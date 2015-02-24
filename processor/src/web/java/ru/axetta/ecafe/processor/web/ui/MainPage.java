@@ -4094,35 +4094,11 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void groupControlBenefitsGenerate() {
+    public void groupControlBenefitsGenerate() throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         BufferedReader bufferedReader = null;
-
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-
-        try {
-            groupControlBenefitsPage.groupBenefitsGenerate(groupControlBenefitsPage.getUploadItem(), runtimeContext, bufferedReader);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл не был найден" + e.getMessage(), null));
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Файл неверного формата" + ex.getMessage(), null));
-        } catch (Exception e) {
-            e.printStackTrace();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
-                }
-            }
-        }
+        groupControlBenefitsPage.groupBenefitsGenerate(groupControlBenefitsPage.getUploadItem(), runtimeContext);
     }
 
     public void reportTemplateLoadFileListener(UploadEvent event) {

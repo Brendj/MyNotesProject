@@ -63,7 +63,7 @@
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.groupControlBenefitsPage.clientCancelBenefits}"
                                  styleClass="output-text">
-            <a4j:support event="onclick" reRender="groupControlBenefitsPagePanelGrid" ajaxSingle="true"
+            <a4j:support event="onclick" ajaxSingle="true"
                          actionListener="#{mainPage.groupControlBenefitsPage.onHideClientCancelBenefitsChange}" />
         </h:selectBooleanCheckbox>
     </h:panelGrid>
@@ -150,5 +150,6 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showGroupControlBenefitsCSVList}" styleClass="command-button" />
+    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showGroupControlBenefitsCSVList}"
+                     styleClass="command-button" />
 </h:panelGrid>
