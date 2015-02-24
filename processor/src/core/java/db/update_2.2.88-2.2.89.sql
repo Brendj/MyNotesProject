@@ -53,3 +53,29 @@ create index cf_registrychange_type_idx on cf_registrychange(type);
 -- Расширение таблицы для повторной отправки смс
 alter table cf_clientsms_resending alter column paramscontents type text;
 alter table cf_clientsms_resending alter column textcontents type text;
+
+
+
+
+
+
+-- DROP TABLE cf_AccountOperations;
+
+CREATE TABLE cf_account_operations
+(
+  idofaccountoperation bigint NOT NULL,
+  idoforg bigint,
+  accountoperationtype integer,
+  idofoperation bigint,
+  date bigint,
+  idofcontract bigint,
+  value bigint,
+  type integer,
+  idoforder bigint,
+  staffguid VARCHAR(128),
+  idofpos bigint,
+  CONSTRAINT cf_account_operations_pk PRIMARY KEY (idofaccountoperation)
+)
+WITH (
+OIDS=FALSE
+);

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.*;
@@ -1175,6 +1176,7 @@ public class SyncResponse {
     private final String options;
     private final AccRegistry accRegistry;
     private final ResPaymentRegistry resPaymentRegistry;
+    private final ResAccountOperationsRegistry resAccountOperationsRegistry;
     private final AccIncRegistry accIncRegistry;
     private final ClientRegistry clientRegistry;
     private final ResOrgStructure resOrgStructure;
@@ -1198,7 +1200,7 @@ public class SyncResponse {
     private final ProhibitionsMenu prohibitionsMenu;
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
-          ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry, ClientRegistry clientRegistry,
+          ResPaymentRegistry resPaymentRegistry, ResAccountOperationsRegistry resAccountOperationsRegistry, AccIncRegistry accIncRegistry, ClientRegistry clientRegistry,
           ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData, ResDiary resDiary, String message,
           ResEnterEvents resEnterEvents, ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData, ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
           ComplexRoles complexRoles, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
@@ -1216,6 +1218,7 @@ public class SyncResponse {
         this.accRegistry = accRegistry;
         this.accIncRegistry = accIncRegistry;
         this.resPaymentRegistry = resPaymentRegistry;
+        this.resAccountOperationsRegistry = resAccountOperationsRegistry;
         this.clientRegistry = clientRegistry;
         this.resOrgStructure = resOrgStructure;
         this.resMenuExchangeData = resMenuExchangeData;
@@ -1271,6 +1274,11 @@ public class SyncResponse {
         // ResPaymentRegistry
         if (null != resPaymentRegistry) {
             ecafeEnvelopeElement.appendChild(resPaymentRegistry.toElement(document));
+        }
+
+        // ResAccountOperationsRegistry
+        if (null != resAccountOperationsRegistry) {
+            ecafeEnvelopeElement.appendChild(resAccountOperationsRegistry.toElement(document));
         }
 
         // AccIncRegistry

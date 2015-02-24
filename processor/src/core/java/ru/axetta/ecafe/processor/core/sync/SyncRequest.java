@@ -8,12 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -2125,6 +2126,12 @@ public class SyncRequest {
                 paymentRegistry = paymentRegistryBuilder.build(paymentRegistryNode, loadContext);
             }
 
+            Node accountOperationsRegistryNode = findFirstChildElement(envelopeNode, AccountOperationsRegistry.SYNC_NAME);
+            AccountOperationsRegistry accountOperationsRegistry = null;
+            if (accountOperationsRegistryNode != null) {
+                accountOperationsRegistry = AccountOperationsRegistry.build(accountOperationsRegistryNode, loadContext);
+            }
+
             Node accIncRegistryRequestNode = findFirstChildElement(envelopeNode, "AccIncRegistryRequest");
             AccIncRegistryRequest accIncRegistryRequest = null;
             if (accIncRegistryRequestNode != null) {
@@ -2215,7 +2222,7 @@ public class SyncRequest {
             }
 
 
-            return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
                     clientGuardianRequest, prohibitionMenuRequest);
@@ -2237,6 +2244,7 @@ public class SyncRequest {
     private final Long idOfPacket;
     private final MenuGroups menuGroups;
     private final PaymentRegistry paymentRegistry;
+    private final AccountOperationsRegistry accountOperationsRegistry;
     private final ClientParamRegistry clientParamRegistry;
     private final ClientRegistryRequest clientRegistryRequest;
     private final AccIncRegistryRequest accIncRegistryRequest;
@@ -2254,7 +2262,7 @@ public class SyncRequest {
     private final ProhibitionMenuRequest prohibitionMenuRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org,
-          Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
+          Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry, AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
           ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
           EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
           AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
@@ -2274,6 +2282,7 @@ public class SyncRequest {
         this.syncTime = syncTime;
         this.idOfPacket = idOfPacket;
         this.paymentRegistry = paymentRegistry;
+        this.accountOperationsRegistry = accountOperationsRegistry;
         this.accIncRegistryRequest = accIncRegistryRequest;
         this.clientParamRegistry = clientParamRegistry;
         this.clientRegistryRequest = clientRegistryRequest;
@@ -2315,6 +2324,10 @@ public class SyncRequest {
 
     public PaymentRegistry getPaymentRegistry() {
         return paymentRegistry;
+    }
+
+    public AccountOperationsRegistry getAccountOperationsRegistry() {
+        return accountOperationsRegistry;
     }
 
     public AccIncRegistryRequest getAccIncRegistryRequest() {
@@ -2376,7 +2389,8 @@ public class SyncRequest {
     @Override
     public String toString() {
         return "SyncRequest{" + "protoVersion=" + protoVersion + ", idOfOrg=" + idOfOrg + ", syncTime=" + syncTime
-                + ", idOfPacket=" + idOfPacket + ", paymentRegistry=" + paymentRegistry + ", clientParamRegistry="
+                + ", idOfPacket=" + idOfPacket + ", paymentRegistry=" + paymentRegistry
+                + ", accountOperationsRegistry=" + accountOperationsRegistry + ", clientParamRegistry="
                 + clientParamRegistry + ", clientRegistryRequest=" + clientRegistryRequest + ", orgStructure="
                 + orgStructure + ", reqMenu=" + reqMenu + ", reqDiary=" + reqDiary + ", message='" + message + '\''
                 + ", enterEvents=" + enterEvents + '}';

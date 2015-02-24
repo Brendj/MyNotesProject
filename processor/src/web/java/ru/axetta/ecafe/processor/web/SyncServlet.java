@@ -99,6 +99,11 @@ public class SyncServlet extends HttpServlet {
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
              /* Must be FALSE for testing!!!  */
             boolean verifySignature = true;
+            if (RuntimeContext.getInstance().isTestMode()){
+                verifySignature = false;
+                //todo delete
+            }
+
             if (!verifySignature || bLogPackets) {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             } else {

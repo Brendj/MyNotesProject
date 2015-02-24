@@ -23,13 +23,13 @@ public abstract class AbstractJpaDao< T> extends BaseJpaDao {
                 .getResultList();
     }
 
-    public void save( T entity ){
-        entityManager.persist( entity );
-    }
+    //public void save( T entity ){
+    //    entityManager.persist( entity );
+    //}
 
-    public T update( T entity ){
-        return entityManager.merge( entity );
-    }
+    //public T update( T entity ){
+    //    return entityManager.merge( entity );
+    //}
 
     public void delete( T entity ){
         entityManager.remove( entity );

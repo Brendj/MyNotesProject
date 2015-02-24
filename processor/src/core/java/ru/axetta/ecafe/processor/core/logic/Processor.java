@@ -31,6 +31,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
@@ -720,6 +722,7 @@ public class Processor implements SyncProcessor,
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
 
         ResPaymentRegistry resPaymentRegistry = null;
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -751,6 +754,17 @@ public class Processor implements SyncProcessor,
                 request.getRemoteAddr());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
+
+
+        try {
+            if (request.getAccountOperationsRegistry()!= null){
+                AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
+                resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
+            }
+        }catch (Exception e){
+            logger.error("Ошибка при обработке AccountOperationsRegistry: ",e);
+        }
+
 
         // Process paymentRegistry
         try {
@@ -1007,7 +1021,7 @@ public class Processor implements SyncProcessor,
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
-                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
@@ -1044,6 +1058,7 @@ public class Processor implements SyncProcessor,
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
 
         ResPaymentRegistry resPaymentRegistry = null;
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -1118,7 +1133,7 @@ public class Processor implements SyncProcessor,
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
-                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
@@ -1131,6 +1146,7 @@ public class Processor implements SyncProcessor,
         SyncHistory idOfSync = null;
 
         ResPaymentRegistry resPaymentRegistry = null;
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -1214,7 +1230,7 @@ public class Processor implements SyncProcessor,
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
-                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
@@ -1227,6 +1243,7 @@ public class Processor implements SyncProcessor,
         SyncHistory idOfSync = null;
 
         ResPaymentRegistry resPaymentRegistry = null;
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -1293,7 +1310,7 @@ public class Processor implements SyncProcessor,
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
-                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
@@ -1303,7 +1320,7 @@ public class Processor implements SyncProcessor,
     private SyncResponse buildAccIncSyncResponse(SyncRequest request) {
 
         Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
-
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
         ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
@@ -1329,6 +1346,15 @@ public class Processor implements SyncProcessor,
         ProhibitionsMenu prohibitionsMenu = null;
 
         boolean bError = false;
+
+        try {
+            if (request.getAccountOperationsRegistry()!= null){
+                AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
+                resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
+            }
+        }catch (Exception e){
+            logger.error("Ошибка при обработке AccountOperationsRegistry: ",e);
+        }
 
         // Process paymentRegistry
         try {
@@ -1414,7 +1440,7 @@ public class Processor implements SyncProcessor,
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
-                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);

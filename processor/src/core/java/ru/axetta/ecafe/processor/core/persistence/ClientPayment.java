@@ -19,22 +19,24 @@ public class ClientPayment {
             "Банковская карта Visa/MasterCard", "Электронные платёжные системы", "Предоплаченная карта RBK Money",
             "Системы денежных переводов", "Платёжные терминалы", "SMS", "Банковский платёж", "Почта России",
             "Банкомат/терминал", "Интернет банкинг", "Синхронизация реестров платежей", "Интернет-эквайринг",
-            "Автоплатеж с банковской карты"};
+            "Автоплатеж с банковской карты", "Пополнение через кассу"};
 
     public static final String[] PAYMENT_METHOD_SHORT_NAMES = {
             "БК", "ЭПС", "ПК",
             "СДП", "ПТ", "SMS", "БП", "ПР",
             "Б/Т", "ИБ", "РЗ", "ИЭ",
-            "АБК"};
+            "АБК", "ПЧК"};
 
-    public static final int SYNC_PAYMENT_METHOD = 10;
-    public static final int KIOSK_PAYMENT_METHOD = 4;
-    public static final int PAY_POINT_PAYMENT_METHOD = 4;
     public static final int CLIENT_TO_ACCOUNT_PAYMENT = 1;
     public static final int CLIENT_TO_SUB_ACCOUNT_PAYMENT = 2;
+    public static final int KIOSK_PAYMENT_METHOD = 4;
+    public static final int PAY_POINT_PAYMENT_METHOD = 4;
     public static final int ATM_PAYMENT_METHOD = 8;
-    public static final int AUTO_PAYMENT_METHOD = 12;
+    public static final int SYNC_PAYMENT_METHOD = 10;
     public static final int INTERNET_ACQUIRING_METHOD = 11;
+    public static final int AUTO_PAYMENT_METHOD = 12;
+    public static final int CASHIER_PAYMENT_METHOD = 13;
+
 
     private Long idOfClientPayment;
     private AccountTransaction transaction;
