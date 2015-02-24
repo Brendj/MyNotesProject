@@ -108,7 +108,7 @@ public class AccountOperationsRegistryHandler {
         }
 
         if (payResponse != null){
-            resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "Ok");
+            resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
         }else if(resAccountOperationItem == null) {
 
             resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
@@ -118,14 +118,13 @@ public class AccountOperationsRegistryHandler {
     }
 
     private ResAccountOperationItem handleDuplicate(AccountOperationItem accountOperationItem) {
-        ResAccountOperationItem resAccountOperationItem = new ResAccountOperationItem(
-                accountOperationItem.getIdOfOperation(), ResAccountOperationItem.DUPLICATE, "Duplicate");
-        return resAccountOperationItem;
+        return new ResAccountOperationItem(
+                accountOperationItem.getIdOfOperation(), ResAccountOperationItem.DUPLICATE, "Операция с данным идентификатором зарегистрирована");
     }
 
     private ResAccountOperationItem handleError(AccountOperationItem accountOperationItem) {
         return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.ERROR,
-                "???");
+                "Внутренняя ошибка процесинга");
     }
 
 

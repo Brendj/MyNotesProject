@@ -42,8 +42,8 @@ public class ResAccountOperationItem {
     }
 
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("RPT");
-        element.setAttribute("idOfOperation", Long.toString(this.idOfOperation));
+        Element element = document.createElement(SYNC_NAME);
+        element.setAttribute("IdOfOperation", Long.toString(this.idOfOperation));
         element.setAttribute("Result", Integer.toString(this.result));
         element.setAttribute("Error", this.error);
         if (null != this.error) {
