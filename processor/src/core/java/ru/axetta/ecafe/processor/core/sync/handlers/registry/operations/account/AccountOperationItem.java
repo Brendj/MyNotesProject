@@ -47,7 +47,7 @@ public class AccountOperationItem {
         Long idOfContract = getLongValueNullSafe(namedNodeMap, "ContractId");
         long value = getLongValue(namedNodeMap, "Value");
         int type = getIntValue(namedNodeMap, "Type");
-        Long idOfOrder = getLongValue(namedNodeMap, "OrderId");
+        Long idOfOrder = getLongValueNullSafe(namedNodeMap, "OrderId");
         String staffGuid = getStringValueNullSafe(namedNodeMap, "StaffGuid");
         Long idOfPOS = getLongValueNullSafe(namedNodeMap, "PosId");
 

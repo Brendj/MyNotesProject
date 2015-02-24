@@ -171,7 +171,7 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
             payRequest = new OnlinePaymentProcessor.PayRequest(1, false, contragentId, null,
-                    ClientPayment.CASHIER_PAYMENT_METHOD, contractId, "C_"+paymentId, null, (realAmount * (-1)), true);
+                    ClientPayment.CASHIER_PAYMENT_METHOD, contractId, paymentId, null, (realAmount * (-1)), true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalException(e.getMessage());
