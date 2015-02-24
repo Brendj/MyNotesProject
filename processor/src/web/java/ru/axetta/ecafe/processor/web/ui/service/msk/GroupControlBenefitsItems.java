@@ -15,8 +15,8 @@ public class GroupControlBenefitsItems {
     private Long rowNum;
     private String orgName;
     private String groupName;
-    private String firstName;
     private String surname;
+    private String firstName;
     private String secondName;
     private String contractId;
     private String benefits;
@@ -25,13 +25,13 @@ public class GroupControlBenefitsItems {
     public GroupControlBenefitsItems() {
     }
 
-    public GroupControlBenefitsItems(Long rowNum, String orgName, String groupName, String firstName, String surname,
+    public GroupControlBenefitsItems(Long rowNum, String orgName, String groupName, String surname, String firstName,
             String secondName, String contractId, String benefits, String result) {
         this.rowNum = rowNum;
         this.orgName = orgName;
         this.groupName = groupName;
-        this.firstName = firstName;
         this.surname = surname;
+        this.firstName = firstName;
         this.secondName = secondName;
         this.contractId = contractId;
         this.benefits = benefits;
