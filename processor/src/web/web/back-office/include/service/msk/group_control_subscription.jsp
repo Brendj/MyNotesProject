@@ -28,7 +28,7 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
-        <h:outputText value="вида: 'Наименовани ОУ и адрес'; 'Пуст. строка'; 'Фамилия'; 'Имя'; 'Отчество'; 'Л/c';" />
+        <h:outputText value="вида: 'Наименование ОУ и адрес'; 'Пуст. строка'; 'Фамилия'; 'Имя'; 'Отчество'; 'Л/c';" />
         <rich:fileUpload id="subscriptionFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                          addButtonClassDisabled="upload-command-button-diasbled"
                          cleanButtonClass="upload-command-button"
@@ -89,7 +89,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Наименовани ОУ и адрес" styleClass="output-text" />
+                <h:outputText value="Наименование ОУ и адрес" styleClass="output-text" />
             </f:facet>
             <h:outputText value="#{item.orgNameWithAddress}" styleClass="output-text" />
         </rich:column>
