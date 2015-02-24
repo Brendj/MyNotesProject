@@ -2251,6 +2251,7 @@ public class Processor implements SyncProcessor,
 
                 }
                 client.setClientGroup(clientGroup);
+                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
             client.setClientRegistryVersion(version);
@@ -2260,7 +2261,9 @@ public class Processor implements SyncProcessor,
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } finally {
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
