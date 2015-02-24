@@ -13,6 +13,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 public class GroupControlSubscriptionsItem {
 
+    private Long rowNum;
     private String orgNameWithAddress;
     private String firstName;
     private String surname;
@@ -23,14 +24,23 @@ public class GroupControlSubscriptionsItem {
     public GroupControlSubscriptionsItem() {
     }
 
-    public GroupControlSubscriptionsItem(String orgNameWithAddress, String surname, String firstName, String secondName,
-            Long contractId, String result) {
+    public GroupControlSubscriptionsItem(Long rowNum, String orgNameWithAddress, String firstName, String surname,
+            String secondName, Long contractId, String result) {
+        this.rowNum = rowNum;
         this.orgNameWithAddress = orgNameWithAddress;
-        this.surname = surname;
         this.firstName = firstName;
+        this.surname = surname;
         this.secondName = secondName;
         this.contractId = contractId;
         this.result = result;
+    }
+
+    public Long getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(Long rowNum) {
+        this.rowNum = rowNum;
     }
 
     public String getResult() {

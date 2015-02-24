@@ -2905,6 +2905,10 @@ public class MainPage implements Serializable {
         return "showGroupControlBenefitsCSVList";
     }
 
+    public String showGroupControlSubscriptionsCSVList() {
+        return "showGroupControlSubscriptionsCSVList";
+    }
+
     public String showClientLoadResultCSVList() {
         return "showClientLoadResultCSVList";
     }

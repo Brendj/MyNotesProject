@@ -249,6 +249,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showGroupControlSubscriptionsCSVList</from-outcome>
+            <to-view-id>/back-office/group_control_subscriptions_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showClientLoadResultCSVList</from-outcome>
             <to-view-id>/back-office/client_load_result_csv_list.jsp</to-view-id>
             <redirect/>
