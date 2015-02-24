@@ -32,18 +32,17 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
     final public static String P_USE_COLOR_ACCENT = "useColorAccent";
     final public static String P_SHOW_ONLY_DIVERGENCE = "showOnlyDivergence";
 
-    final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
+    final private static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReport.class);
     final private static long OVERALL = Long.MAX_VALUE - 10;
-    final private static long OVERALL_TOTAL = Long.MAX_VALUE - 8;
-    final private static String OVERALL_TOTAL_TITLE = "ВСЕГО";
     final private static String OVERALL_TITLE = "ИТОГО";
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
+
+    public RequestsAndOrdersReport() {}
 
     public RequestsAndOrdersReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
-    }
-
-    public RequestsAndOrdersReport() {
     }
 
     @Override
@@ -77,7 +76,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            return build(session, startTime, endTime, calendar, false, false);  //To change body of implemented methods use File | Settings | File Templates.
+            return build(session, startTime, endTime, calendar, false, false);
         }
 
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,

@@ -30,14 +30,15 @@ public class PaymentTotalsReport extends BasicReportForAllOrgJob {
     final public static String P_CONTRAGENT = "contragent";
     final public static String P_ORG_LIST = "orgList";
     final public static String P_HIDE_NULL_ROWS = "hideNullRows";
-    final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReport.class);
+    final private static Logger logger = LoggerFactory.getLogger(PaymentTotalsReport.class);
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
+
+    public PaymentTotalsReport() {}
 
     public PaymentTotalsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
-    }
-
-    public PaymentTotalsReport() {
     }
 
     @Override
