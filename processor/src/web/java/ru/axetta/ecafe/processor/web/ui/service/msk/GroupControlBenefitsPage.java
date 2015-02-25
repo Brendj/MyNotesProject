@@ -163,7 +163,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
                                 }
 
-                                if (categoryDiscountSet.isEmpty()) {
+                                if (categoryDiscountSet.size() != separatedBenefits.length) {
                                     groupControlBenefitsItems
                                             .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
                                                     separatedData[1], separatedData[2], separatedData[3],
