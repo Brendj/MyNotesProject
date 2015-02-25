@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders;
 
-import java.awt.*;
 import java.util.Set;
 
 /**
@@ -273,14 +272,19 @@ public class OrderDetail {
                 + '\'' + ", rootMenu='" + rootMenu + '\'' + ", menuType=" + menuType + ", menuOutput='"
                 + menuOutput + '\'' + ", menuOrigin=" + menuOrigin + '}';
     }
-    public final static int PRODUCT_OWN = 0, PRODUCT_CENTRALIZE = 1, PRODUCT_CENTRALIZE_COOK = 2, PRODUCT_PURCHASE = 10;
-    public final static String[] PRODUCTION_NAMES_TYPES = { "Собственное", "Централизованное", "Централизованное с доготовкой", "Закупленное" };
+
+    public final static int PRODUCT_OWN = 0, PRODUCT_CENTRALIZE = 1, PRODUCT_CENTRALIZE_COOK = 2, PRODUCT_PURCHASE = 10, PRODUCT_VENDING = 11, PRODUCT_COMMERCIAL = 21;
+    public final static String[] PRODUCTION_NAMES_TYPES = {
+            "Собственное", "Централизованное", "Централизованное с доготовкой", "Закупленное", "Вендинг",
+            "Коммерческое питание"};
 
     public static String getMenuOriginAsString(int menuOrigin) {
         if (menuOrigin==PRODUCT_OWN) return PRODUCTION_NAMES_TYPES[0];
         else if (menuOrigin==PRODUCT_CENTRALIZE) return PRODUCTION_NAMES_TYPES[1];
         else if (menuOrigin==PRODUCT_CENTRALIZE_COOK) return PRODUCTION_NAMES_TYPES[2];
         else if (menuOrigin==PRODUCT_PURCHASE) return PRODUCTION_NAMES_TYPES[3];
+        else if (menuOrigin==PRODUCT_VENDING) return PRODUCTION_NAMES_TYPES[4];
+        else if (menuOrigin==PRODUCT_COMMERCIAL) return PRODUCTION_NAMES_TYPES[5];
         return "Неизвестное";
     }
 
