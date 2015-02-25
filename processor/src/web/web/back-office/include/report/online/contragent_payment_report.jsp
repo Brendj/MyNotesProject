@@ -119,7 +119,7 @@
             <f:verbatim>
                 <div class="htmlReportContent"> ${mainPage.contragentPaymentReportPage.htmlReport} </div>
             </f:verbatim>
-            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
+            <h:outputText escape="true" value="Отчет по платежам" styleClass="output-text" />
         </c:if>
     </h:panelGrid>
 
