@@ -11,7 +11,10 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.richfaces.model.UploadItem;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +83,8 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
 
             if (item != null) {
                 File file = item.getFile();
-                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
+                bufferedReader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream(file.getAbsolutePath()), Charset.forName("UTF-8")));
 
                 groupControlSubscriptionsItems = new ArrayList<GroupControlSubscriptionsItem>();
                 files = new ArrayList<ru.axetta.ecafe.processor.core.mail.File>();
@@ -94,35 +98,40 @@ public class GroupControlSubscriptionsPage extends BasicWorkspacePage {
 
                     // разделитель
                     String[] separatedData = line.split(cvsSplitBy);
-
-                    RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
-                            .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5].trim()),
-                                    persistenceSession);
-
-                    if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
-                            || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
-                        RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
-                                regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
-                                        this.lowerLimitAmount, this.paymentAmount, persistenceSession,
-                                        persistenceTransaction, runtimeContext);
-
+                    if (separatedData.length < 6) {
                         groupControlSubscriptionsItems
                                 .add(new GroupControlSubscriptionsItem(rowNum, separatedData[0], separatedData[2],
-                                        separatedData[3], separatedData[4], Long.parseLong(separatedData[5].trim()),
-                                        requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
-                                                .getErrorDesc() : "добавлен"));
+                                        separatedData[3], separatedData[4], null, "Неверный формат, вид .csv файла"));
                     } else {
-                        RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
-                                .regularPaymentEasyCheckEdit(
-                                        requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
-                                        Long.parseLong(separatedData[5].trim()), this.lowerLimitAmount,
-                                        this.paymentAmount, persistenceSession, persistenceTransaction);
+                        RequestResultEasyCheck requestResultEasyCheck = regularPaymentEasyCheck
+                                .regularPaymentEasyCheckReadSubscriptionList(Long.parseLong(separatedData[5].trim()),
+                                        persistenceSession);
 
-                        groupControlSubscriptionsItems
-                                .add(new GroupControlSubscriptionsItem(rowNum, separatedData[0], separatedData[2],
-                                        separatedData[3], separatedData[4], Long.parseLong(separatedData[5].trim()),
-                                        requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
-                                                .getErrorDesc() : "редактирован"));
+                        if (requestResultEasyCheck.getSubscriptionListEasyCheck() == null
+                                || requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList().size() <= 0) {
+                            RequestResultEasyCheck requestResultEasyCheck1 = regularPaymentEasyCheck.
+                                    regularPaymentEasyCheckCreateSubscription(Long.parseLong(separatedData[5].trim()),
+                                            this.lowerLimitAmount, this.paymentAmount, persistenceSession,
+                                            persistenceTransaction, runtimeContext);
+
+                            groupControlSubscriptionsItems
+                                    .add(new GroupControlSubscriptionsItem(rowNum, separatedData[0], separatedData[2],
+                                            separatedData[3], separatedData[4], Long.parseLong(separatedData[5].trim()),
+                                            requestResultEasyCheck1.getErrorDesc() != null ? requestResultEasyCheck1
+                                                    .getErrorDesc() : "добавлен"));
+                        } else {
+                            RequestResultEasyCheck requestResultEasyCheck2 = regularPaymentEasyCheck
+                                    .regularPaymentEasyCheckEdit(
+                                            requestResultEasyCheck.getSubscriptionListEasyCheck().getIdList(),
+                                            Long.parseLong(separatedData[5].trim()), this.lowerLimitAmount,
+                                            this.paymentAmount, persistenceSession, persistenceTransaction);
+
+                            groupControlSubscriptionsItems
+                                    .add(new GroupControlSubscriptionsItem(rowNum, separatedData[0], separatedData[2],
+                                            separatedData[3], separatedData[4], Long.parseLong(separatedData[5].trim()),
+                                            requestResultEasyCheck2.getErrorDesc() != null ? requestResultEasyCheck2
+                                                    .getErrorDesc() : "редактирован"));
+                        }
                     }
                 }
             } else {

@@ -43,10 +43,10 @@ public class RegularPaymentEasyCheck {
     private static final int RC_BAD_REQUEST = 400;
     private static final int RC_INTERNAL_SERVER_ERROR = 500;
 
-    private static final String RC_CLIENT_NOT_FOUND_DESC = "Client with %s = %s not found.";
-    private static final String RC_INTERNAL_SERVER_ERROR_DESC = "Internal server error.";
-    private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Subscription with id = %s not found.";
-    private static final String RC_SUBSCRIPTION_CLIENT_NOT_VALID = "Subscription client not valid.";
+    private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент с Л/с № %s не найден.";
+    private static final String RC_INTERNAL_SERVER_ERROR_DESC = "Внутренняя ошибка сервера.";
+    private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Подписка с id = %s не найдена.";
+    private static final String RC_SUBSCRIPTION_CLIENT_NOT_VALID = "Подписка коиента не действительна.";
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
 
     @Autowired
@@ -72,11 +72,10 @@ public class RegularPaymentEasyCheck {
         return requestResult;
     }
 
-    public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractID, Long lowerLimitAmount,
+    public RequestResultEasyCheck regularPaymentEasyCheckCreateSubscription(Long contractId, Long lowerLimitAmount,
             Long paymentAmount, Session session, Transaction transaction, RuntimeContext runtimeContext) {
         RequestResultEasyCheck requestResultEasyCheck = new RequestResultEasyCheck();
         try {
-            Long contractId = contractID;
             Client c = DAOUtils.findClientByContractId(session, contractId);
             int period = 12;
 
@@ -105,8 +104,8 @@ public class RegularPaymentEasyCheck {
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage());
-            requestResultEasyCheck.setErrorCode(RC_INTERNAL_SERVER_ERROR);
-            requestResultEasyCheck.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+            requestResultEasyCheck.setErrorCode(RC_BAD_REQUEST);
+            requestResultEasyCheck.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
         } finally {
             HibernateUtils.close(session, logger);
         }
@@ -131,8 +130,8 @@ public class RegularPaymentEasyCheck {
             requestResultEasyCheck.setErrorCode(0);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            requestResultEasyCheck.setErrorCode(RC_INTERNAL_SERVER_ERROR);
-            requestResultEasyCheck.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+            requestResultEasyCheck.setErrorCode(RC_BAD_REQUEST);
+            requestResultEasyCheck.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
         }
         return requestResultEasyCheck;
     }
@@ -143,7 +142,7 @@ public class RegularPaymentEasyCheck {
             Client c = DAOService.getInstance().getClientByContractId(contractId);
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
-                requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, "contractId", contractId));
+                requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, contractId));
                 return false;
             }
             if (c.getIdOfClient().longValue() != bs.getClient().getIdOfClient().longValue()) {
