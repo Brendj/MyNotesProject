@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -198,10 +199,13 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                             }
                                         }
 
+                                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
                                         client.setDiscountMode(3);
                                         client.setCategories(clientCategoryDiscounts);
                                         client.setCategoriesDiscounts(categoryDiscounts);
-                                        persistenceSession.save(client);
+                                        client.setClientRegistryVersion(clientRegistryVersion);
+                                        persistenceSession.update(client);
                                         groupControlBenefitsItems
                                                 .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
                                                         separatedData[1], separatedData[2], separatedData[3],
@@ -212,10 +216,14 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
                                     } else {
                                         //добавляем с удаление прежних льгот
+
+                                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
                                         client.setDiscountMode(3);
                                         client.setCategoriesDiscounts(categoriesDiscounts);
                                         client.setCategories(categoryDiscountSet);
-                                        persistenceSession.save(client);
+                                        client.setClientRegistryVersion(clientRegistryVersion);
+                                        persistenceSession.update(client);
                                         groupControlBenefitsItems
                                                 .add(new GroupControlBenefitsItems(rowNum, separatedData[0],
                                                         separatedData[1], separatedData[2], separatedData[3],
