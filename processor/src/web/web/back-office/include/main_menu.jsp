@@ -766,7 +766,7 @@
         <rich:panelMenuItem id="groupControlSubscriptions" binding="#{mainPage.groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
                             action="#{mainPage.groupControlSubscriptionsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
-    <rich:panelMenuGroup id="benefit" binding="#{mainPage.benefitPage.mainMenuComponent}" label="Льгота"
+    <rich:panelMenuGroup id="benefit" binding="#{mainPage.benefitPage.mainMenuComponent}" label="Льготы"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showBenefitGroupPage}" reRender="workspaceForm" />
 
