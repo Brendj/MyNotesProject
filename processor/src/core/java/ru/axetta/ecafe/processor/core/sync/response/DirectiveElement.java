@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
@@ -51,6 +52,14 @@ public class DirectiveElement {
 
         Boolean usePlanOrders = org.getUsePlanOrders();
         directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
+
+        if(org.getDefaultSupplier() != null){
+            OrgRepository orgRepository = OrgRepository.getInstance();
+
+            Boolean paymentsByCashier = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
+            directiveItemList.add(new DirectiveItem("PaymentsByCashier",paymentsByCashier?"1":"0"));
+        }
+
 
     }
 

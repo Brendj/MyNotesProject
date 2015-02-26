@@ -82,6 +82,8 @@ public class Contragent {
     private String kpp;
     private String ogrn;
     private String lastRNIPUpdate;
+    private Contragent defaultPayContragent;
+    private Boolean payByCashier;
 
 
     protected Contragent() {
@@ -565,6 +567,22 @@ public class Contragent {
         }
         final Contragent that = (Contragent) o;
         return idOfContragent.equals(that.getIdOfContragent());
+    }
+
+    public Contragent getDefaultPayContragent() {
+        return defaultPayContragent;
+    }
+
+    public void setDefaultPayContragent(Contragent defaultPayContragent) {
+        this.defaultPayContragent = defaultPayContragent;
+    }
+
+    public Boolean isPayByCashier() {
+        return payByCashier;
+    }
+
+    public void setPayByCashier(Boolean payByCashier) {
+        this.payByCashier = payByCashier;
     }
 
     @Override

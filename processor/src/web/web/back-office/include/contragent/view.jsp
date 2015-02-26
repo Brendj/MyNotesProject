@@ -75,6 +75,12 @@
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyMailList}" styleClass="input-text" />
     <h:outputText escape="true" value="Список рассылки по отмененным заказам" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.orderNotifyMailList}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Платежный контрагент по умолчанию" styleClass="output-text" rendered="#{mainPage.contragentViewPage.TSP}" />
+    <h:inputText value="#{mainPage.contragentViewPage.defaultPayContragent}" readonly="true" styleClass="input-text"  rendered="#{mainPage.contragentViewPage.TSP}" />
+
+    <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" rendered="#{mainPage.contragentViewPage.TSP}" />
+    <h:selectBooleanCheckbox value="#{mainPage.contragentViewPage.payByCashier}" disabled="true" styleClass="input-text" rendered="#{mainPage.contragentViewPage.TSP}" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

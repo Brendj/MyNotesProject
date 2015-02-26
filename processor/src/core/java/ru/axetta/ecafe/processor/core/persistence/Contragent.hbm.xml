@@ -106,6 +106,14 @@
             <key column="IdOfContragentReceiver"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AddPayment"/>
         </set>
+
+        <many-to-one name="defaultPayContragent"
+                     column="DefaultContragent"
+                     class="ru.axetta.ecafe.processor.core.persistence.Contragent"
+                    cascade="save-update"/>
+
+        <property name="payByCashier" column="PayByCashier"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>
 

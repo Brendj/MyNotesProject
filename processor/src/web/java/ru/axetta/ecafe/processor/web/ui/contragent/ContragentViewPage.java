@@ -84,6 +84,8 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private boolean needAccountTranslate;
     private String kpp;
     private String ogrn;
+    private String defaultPayContragent;
+    private boolean payByCashier;
 
     public Long getIdOfContragent() {
         return idOfContragent;
@@ -247,6 +249,28 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
         this.kpp = contragent.getKpp();
         this.ogrn = contragent.getOgrn();
+        if (contragent.getDefaultPayContragent() != null) {
+            this.defaultPayContragent = contragent.getDefaultPayContragent().getContragentName();
+        }else {
+            this.defaultPayContragent = null;
+        }
+
+        if (contragent.isPayByCashier() == null) {
+            this.payByCashier = false;
+        }else {
+            this.payByCashier = contragent.isPayByCashier();
+        }
     }
 
+    public boolean isTSP(){
+        return classId == Contragent.TSP;
+    }
+
+    public String getDefaultPayContragent() {
+        return defaultPayContragent;
+    }
+
+    public boolean isPayByCashier() {
+        return payByCashier;
+    }
 }

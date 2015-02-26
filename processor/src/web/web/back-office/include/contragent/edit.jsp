@@ -72,6 +72,24 @@
     <h:inputText value="#{mainPage.contragentEditPage.requestNotifyMailList}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Список рассылки по отмененным заказам" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentEditPage.orderNotifyMailList}" styleClass="input-text" />
+
+
+    <h:outputText escape="true" value="Платежный контрагент по умолчанию" styleClass="output-text" rendered="#{mainPage.contragentEditPage.TSP}" />
+
+    <h:panelGroup styleClass="borderless-div"   rendered="#{mainPage.contragentEditPage.TSP}" >
+        <h:inputText value="#{mainPage.contragentEditPage.defaultPayContragentName}" readonly="true"
+                     styleClass="input-text" style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                           reRender="modalContragentSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="1" target="#{mainPage.classTypes}" />
+        </a4j:commandButton>
+    </h:panelGroup>
+
+    <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" rendered="#{mainPage.contragentEditPage.TSP}" />
+    <h:selectBooleanCheckbox value="#{mainPage.contragentEditPage.payByCashier}"  styleClass="input-text" rendered="#{mainPage.contragentEditPage.TSP}" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

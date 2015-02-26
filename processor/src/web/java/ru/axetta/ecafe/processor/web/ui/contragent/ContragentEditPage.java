@@ -23,7 +23,7 @@ import java.util.Date;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ContragentEditPage extends BasicWorkspacePage {
+public class ContragentEditPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
 
     public static class PersonItem {
 
@@ -119,7 +119,9 @@ public class ContragentEditPage extends BasicWorkspacePage {
     private final ContragentClassMenu contragentClassMenu = new ContragentClassMenu();
     private String kpp;
     private String ogrn;
-
+    private Contragent defaultPayContragent;
+    private String defaultPayContragentName;
+    private Boolean payByCashier;
 
     public ContragentClassMenu getContragentClassMenu() {
         return contragentClassMenu;
@@ -371,6 +373,17 @@ public class ContragentEditPage extends BasicWorkspacePage {
         contragent.setNeedAccountTranslate(this.needAccountTranslate);
         contragent.setKpp(kpp.trim());
         contragent.setOgrn(ogrn.trim());
+        if (defaultPayContragent != null){
+            contragent.setDefaultPayContragent(defaultPayContragent);
+            contragent.setPayByCashier(payByCashier);
+        }else {
+            if(contragent.getDefaultPayContragent() == null){
+                payByCashier = false;
+                contragent.setPayByCashier(false);
+            }else {
+                contragent.setPayByCashier(payByCashier);
+            }
+        }
         session.update(contragent);
         GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItem(session, contragent);
         fill(contragent);
@@ -403,6 +416,18 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.needAccountTranslate = contragent.getNeedAccountTranslate();
         this.kpp = contragent.getKpp();
         this.ogrn = contragent.getOgrn();
+        if (contragent.getDefaultPayContragent() != null) {
+            this.defaultPayContragentName = contragent.getDefaultPayContragent().getContragentName();
+        }else {
+            this.defaultPayContragentName = null;
+            this.defaultPayContragent = null;
+        }
+
+        if (contragent.isPayByCashier() == null) {
+            this.payByCashier = false;
+        }else {
+            this.payByCashier = contragent.isPayByCashier();
+        }
     }
 
 
@@ -485,4 +510,30 @@ public class ContragentEditPage extends BasicWorkspacePage {
         return false;
     }
 
+    public boolean isTSP(){
+        return classId == Contragent.TSP;
+    }
+
+    public void setDefaultPayContragent(Contragent defaultPayContragent) {
+        this.defaultPayContragent = defaultPayContragent;
+    }
+
+    public String getDefaultPayContragentName() {
+        return defaultPayContragentName;
+    }
+
+    public Boolean getPayByCashier() {
+        return payByCashier;
+    }
+
+    public void setPayByCashier(Boolean payByCashier) {
+        this.payByCashier = payByCashier;
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags, String classTypes) throws Exception {
+        if (null != idOfContragent) {
+            this.defaultPayContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            this.defaultPayContragentName = this.defaultPayContragent.getContragentName();
+        }
+    }
 }
