@@ -116,10 +116,11 @@
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.contragentPaymentReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по платежам" styleClass="output-text" />
             <f:verbatim>
                 <div class="htmlReportContent"> ${mainPage.contragentPaymentReportPage.htmlReport} </div>
             </f:verbatim>
-            <h:outputText escape="true" value="Отчет по платежам" styleClass="output-text" />
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
         </c:if>
     </h:panelGrid>
 
