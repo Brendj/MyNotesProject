@@ -1085,11 +1085,6 @@ public class Processor implements SyncProcessor,
         boolean bError = false;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
-        // Register sync history
-        //syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-        //        request.getRemoteAddr());
-        //addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-        //        request.getRemoteAddr());
 
         try {
             orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
@@ -1110,12 +1105,6 @@ public class Processor implements SyncProcessor,
                     request.getIdOfOrg()), e);
         }
 
-        //if (bError) {
-        //    DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
-        //} else {
-        //    DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
-        //}
-
         try {
             directiveElement = processFullSyncDirective(request.getOrg());
         } catch (Exception e) {
@@ -1124,12 +1113,6 @@ public class Processor implements SyncProcessor,
         }
 
         Date syncEndTime = new Date();
-
-        //if (request.getSyncType() == SyncType.TYPE_FULL) {
-        //    // Update sync history - store sync end time and sync result
-        //    updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
-        //    updateFullSyncParam(request.getIdOfOrg());
-        //}
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
@@ -1170,6 +1153,46 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+
+
+        boolean bError = false;
+
+        //Process AccountOperationsRegistry
+        try {
+            if (request.getAccountOperationsRegistry()!= null){
+                AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
+                resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
+            }
+        }catch (Exception e){
+            logger.error("Ошибка при обработке AccountOperationsRegistry: ",e);
+        }
+
+
+        // Process paymentRegistry
+        try {
+            if (request.getPaymentRegistry() != null) {
+                if (request.getPaymentRegistry().getPayments() != null) {
+                    if (request.getPaymentRegistry().getPayments().hasNext()) {
+                        if (!RuntimeContext.getInstance()
+                                .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                            String clientVersion = (request.getClientVersion()==null?"":request.getClientVersion());
+                            Long packet = (idOfPacket==null?-1L:idOfPacket);
+                            SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
+                                    clientVersion, request.getRemoteAddr());
+                            final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
+                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
+                            throw new Exception("no license slots available");
+                        }
+                    }
+                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync.getIdOfSync(), request.getIdOfOrg(),
+                            request.getPaymentRegistry(), errorClientIds);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process Payment Registry, IdOfOrg == %s", request.getIdOfOrg()), e);
+            bError = true;
+        }
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1262,10 +1285,47 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+
+        //Process AccountOperationsRegistry
+        try {
+            if (request.getAccountOperationsRegistry()!= null){
+                AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
+                resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
+            }
+        }catch (Exception e){
+            logger.error("Ошибка при обработке AccountOperationsRegistry: ",e);
+        }
+
+
+        // Process paymentRegistry
+        try {
+            if (request.getPaymentRegistry() != null) {
+                if (request.getPaymentRegistry().getPayments() != null) {
+                    if (request.getPaymentRegistry().getPayments().hasNext()) {
+                        if (!RuntimeContext.getInstance()
+                                .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                            String clientVersion = (request.getClientVersion()==null?"":request.getClientVersion());
+                            Long packet = (idOfPacket==null?-1L:idOfPacket);
+                            SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
+                                    clientVersion, request.getRemoteAddr());
+                            final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
+                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
+                            throw new Exception("no license slots available");
+                        }
+                    }
+                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync.getIdOfSync(), request.getIdOfOrg(),
+                            request.getPaymentRegistry(), errorClientIds);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process Payment Registry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1354,6 +1414,7 @@ public class Processor implements SyncProcessor,
             }
         }catch (Exception e){
             logger.error("Ошибка при обработке AccountOperationsRegistry: ",e);
+            bError = true;
         }
 
         // Process paymentRegistry
@@ -2599,6 +2660,7 @@ public class Processor implements SyncProcessor,
             Date currentDate = new Date();
             List<Integer> transactionSourceTypes = Arrays.asList(
                     AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
+                    AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE,
                     AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE,
                     AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE);
             persistenceSession.refresh(org);
