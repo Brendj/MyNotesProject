@@ -240,17 +240,30 @@ public class FinancialOpsManager {
             throws Exception {
         // регистрируем транзакцию и проводим по балансу
         if(subScribeNum==null || subScribeNum.equals(0)){
-            AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                    null, paySum, idOfPayment,
-                    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+            AccountTransaction accountTransaction;
+            if(paymentMethod != null && paymentMethod == ClientPayment.CASHIER_PAYMENT_METHOD){
+                accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+                        null, paySum, idOfPayment,
+                        AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, new Date());
+            }else {
+                accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+                        null, paySum, idOfPayment,
+                        AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+            }
             // регистрируем платеж клиента
             ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerClientPayment(session, clientPayment, client);
         } else {
             // TODO: логика по субсчетам
-            AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
+            AccountTransaction accountTransaction;
+            if(paymentMethod != null && paymentMethod == ClientPayment.CASHIER_PAYMENT_METHOD){
+                accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
+                        AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
+            }else {
+                accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
                     AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
+            }
             // регистрируем платеж клиента
             ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);

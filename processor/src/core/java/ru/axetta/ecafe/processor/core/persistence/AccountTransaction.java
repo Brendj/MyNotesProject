@@ -21,6 +21,7 @@ import java.util.Set;
 public class AccountTransaction {
 
     public static final int PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE = 3;
+    public static final int CASHBOX_TRANSACTION_SOURCE_TYPE = 4;
     public static final int CLIENT_ORDER_TRANSACTION_SOURCE_TYPE = 8;
     public static final int INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE = 10;
     public static final int SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE = 20;
@@ -30,6 +31,7 @@ public class AccountTransaction {
 
     public static String sourceTypeToString(int sourceType) {
         if (sourceType==PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE) return "Платежная система";
+        else if (sourceType==CASHBOX_TRANSACTION_SOURCE_TYPE) return "Пополнение через кассовый терминал";
         else if (sourceType==CLIENT_ORDER_TRANSACTION_SOURCE_TYPE) return "Покупка";
         else if (sourceType==INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE) return "Операция";
         else if (sourceType==SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE) return "Плата";
