@@ -27,7 +27,7 @@ public class AccountOperationsRegistryHandler {
         AccountOperationsRegistry accountOperationsRegistry = request.getAccountOperationsRegistry();
         if (accountOperationsRegistry.getOperationItemList() == null
                 || accountOperationsRegistry.getOperationItemList().size() == 0) {
-            return null;
+            return new ResAccountOperationsRegistry();
         }
 
         ResAccountOperationsRegistry resAccountOperationsRegistry = new ResAccountOperationsRegistry();
