@@ -57,7 +57,7 @@ public class DirectiveElement {
             OrgRepository orgRepository = OrgRepository.getInstance();
 
             Boolean paymentsByCashier = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
-            directiveItemList.add(new DirectiveItem("PaymentsByCashier",paymentsByCashier?"1":"0"));
+            directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentsByCashier?"1":"0"));
         }
 
 
