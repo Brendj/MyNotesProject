@@ -1184,7 +1184,7 @@ public class Processor implements SyncProcessor,
                             throw new Exception("no license slots available");
                         }
                     }
-                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync.getIdOfSync(), request.getIdOfOrg(),
+                    resPaymentRegistry = processSyncPaymentRegistry(null, request.getIdOfOrg(),
                             request.getPaymentRegistry(), errorClientIds);
                 }
             }
@@ -1318,7 +1318,7 @@ public class Processor implements SyncProcessor,
                             throw new Exception("no license slots available");
                         }
                     }
-                    resPaymentRegistry = processSyncPaymentRegistry(idOfSync.getIdOfSync(), request.getIdOfOrg(),
+                    resPaymentRegistry = processSyncPaymentRegistry(null, request.getIdOfOrg(),
                             request.getPaymentRegistry(), errorClientIds);
                 }
             }
