@@ -153,10 +153,6 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         }
     }
 
-    public Date getStartDate() {
-        return new Date();
-    }
-
     public Boolean getIncludeSummaryByDistrict() {
         return includeSummaryByDistrict;
     }
@@ -175,6 +171,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
     }
 
     public void onShow() throws Exception {
+        startDate = new Date();
     }
 
     private String checkIsExistFile() {

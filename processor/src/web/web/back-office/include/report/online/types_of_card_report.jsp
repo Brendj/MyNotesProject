@@ -45,6 +45,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty  mainPage.typesOfCardReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
@@ -53,7 +54,7 @@
                 </style>
                 <div class="htmlReportContent"> ${mainPage.typesOfCardReportPage.htmlReport} </div>
             </f:verbatim>
-            <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
         </c:if>
     </h:panelGrid>
 </h:panelGrid>
