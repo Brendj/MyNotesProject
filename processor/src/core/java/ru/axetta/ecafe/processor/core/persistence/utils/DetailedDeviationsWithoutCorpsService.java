@@ -326,9 +326,9 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     // Выбор правил по льготам
-    public static List<DiscountRule> getClientsRules(List<DiscountRule> discountRules, List<Long> clientBenefits) {
+    public static List<DiscountRule> getClientsRules(List<DiscountRule> orgDiscountRules, List<Long> clientBenefits) {
         List<DiscountRule> discountRulesResult = new ArrayList<DiscountRule>();
-        for (DiscountRule discount : discountRules) {
+        for (DiscountRule discount : orgDiscountRules) {
             String[] categoryDiscounts = discount.getCategoryDiscounts().split(",");
             if (categoryDiscounts.length > 0) {
                 List<Long> categoryDiscountsList = new ArrayList<Long>();
@@ -346,7 +346,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     // Отбирает все правила с высоким приорететом
-    private static List<DiscountRule> getRulesByHighPriority(List<DiscountRule> rules) {
+    public static List<DiscountRule> getRulesByHighPriority(List<DiscountRule> rules) {
         List<DiscountRule> resList = new LinkedList<DiscountRule>();
         int maxPriority = 0;
         for (DiscountRule rule : rules) {
@@ -387,7 +387,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     // Заполнение плана кто должен был получить питание на основе комплексов
-    private static void addPlanOrderItems(List<PlanOrderItem> items, List<ComplexInfoItem> complexInfoItemList,
+    public static void addPlanOrderItems(List<PlanOrderItem> items, List<ComplexInfoItem> complexInfoItemList,
             ClientInfo clientInfo, DiscountRule rule, Date payedDate) {
 
         String complexMap = rule.getComplexesMap();

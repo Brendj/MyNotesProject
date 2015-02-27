@@ -12,7 +12,7 @@
     <h:outputText escape="false" value="Организация;Число учащихся;Получают льготное питание;;Зафиксирован проход;;Получили льготное питание;;Получили платное питание;;Получили питание (льготное + платное)"/>
     <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     <a4j:repeat value="#{totalServicesReportPage.totalReport.items}" var="item">
-        <h:outputText escape="false" value="#{item.officialName}" />
+        <h:outputText escape="false" value="#{item.shortName}" />
         <h:outputText escape="false" value=";#{item.data['totalClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['planBenefitClientsCount']}" />
         <h:outputText escape="false" value=";#{item.data['per_planBenefitClientsCount']}" />

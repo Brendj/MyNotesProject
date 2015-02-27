@@ -49,9 +49,9 @@ public class TotalServiceQueryLauncher {
         for (Object result : resultList) {
             Object e[] = (Object[]) result;
             long id = ((BigInteger) e[0]).longValue();
-            String officialName = ((String) e[1]).trim();
+            String shortName = ((String) e[1]).trim();
 
-            TotalServicesReport.TotalEntry item = new TotalServicesReport.TotalEntry(officialName);
+            TotalServicesReport.TotalEntry item = new TotalServicesReport.TotalEntry(shortName);
             item.put("totalClientsCount", e[2]);
             entries.put(id, item);
         }

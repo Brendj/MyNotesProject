@@ -8,13 +8,11 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.report.totalServices.TotalServicesHelper;
 
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -36,10 +34,10 @@ public class TotalServicesReport extends BasicReport {
             if(idOfOrgList == null || idOfOrgList.size() < 1) {
                 throw new Exception("Необходимо выбрать организацию");
             }
-            java.text.Format df = new SimpleDateFormat("yyyy-MM-dd");
             Date generateTime = new Date();
             Map<Long, TotalEntry> entries = new HashMap<Long, TotalEntry>();
-            // Обработать лист с организациями
+
+            // Получение строки с условиями для вставки в запросы
             String orgConditionWithCFORGS = getOrgCondition(idOfOrgList, "cf_orgs.idOfOrg = ");
             String orgConditionWithCFORDERS = getOrgCondition(idOfOrgList, "cf_orders.idOfOrg = ");
             String orgConditionIn = getOrgTuple(idOfOrgList);
@@ -48,20 +46,9 @@ public class TotalServicesReport extends BasicReport {
             // Инициализация структуры данных, подсчет общего количества учащихся
             queryLauncher.loadOrgs(orgConditionWithCFORGS, entries);
 
-
-            List<PlanOrderItem> i = TotalServicesHelper.getDiscounters(session, startDate, endDate, idOfOrgList);
-
-
             // Получение количества получающих льготное питание
-            queryLauncher.loadValue(entries, "planBenefitClientsCount",
-                                        "select cf_orgs.idoforg, count (idofclientcomplexdiscount) "
-                                      + "from cf_clientscomplexdiscounts "
-                                      + "left join cf_clients on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
-                                      + "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
-                                      + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
-                                      + " AND " + orgConditionWithCFORGS
-                                      + "group by cf_orgs.idoforg "
-                                      + "order by cf_orgs.idoforg ");
+            loadBeneficiaryStudentsCount(session, entries, startDate, endDate, "planBenefitClientsCount");
+
             // Получение количества событий прохода через турникет за период
             queryLauncher.loadValue(entries, "currentClientsCount",
                     "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) " +
@@ -170,6 +157,26 @@ public class TotalServicesReport extends BasicReport {
             return new TotalServicesReport(generateTime, new Date().getTime() - generateTime.getTime(), result);
         }
 
+        private void loadBeneficiaryStudentsCount(Session session, Map<Long, TotalEntry> entries, Date startDate, Date endDate, String valueKey) {
+
+            /** todo следует использовать
+             *  ClientDao clientDao = new ClientDao();
+             *  clientDao.findAllBeneficiaryStudentsCount();
+             */
+
+            for (Long idOfOrg : entries.keySet()) {
+                Set<Long> beneficiaryClientsSet = TotalServicesHelper.getBeneficiaryClientsIdSet(session, startDate,
+                        endDate, idOfOrg);
+                TotalEntry item = entries.get(idOfOrg);
+                item.put(valueKey, beneficiaryClientsSet.size());
+                for (Long key : entries.keySet()) {
+                    if (entries.get(key).getData().get(valueKey) == null) {
+                        entries.get(key).getData().put(valueKey, 0L);
+                    }
+                }
+            }
+        }
+
         private String getOrgTuple(List<Long> idOfOrgList) {
             String orgConditionIn = "";
             if (!idOfOrgList.isEmpty()) {
@@ -231,7 +238,7 @@ public class TotalServicesReport extends BasicReport {
 
     public static class TotalEntry {
 
-        private String officialName;                    // Название организации
+        private String shortName;                    // Название организации
         //private String totalClientsCount;             // Общее количество учащихся
         //private String planBenefitClientsCount;       // Число получающих льготное питание
         //private String perPlanBenefitClientsCount;
@@ -252,16 +259,16 @@ public class TotalServicesReport extends BasicReport {
             return data;
         }
 
-        public String getOfficialName() {
-            return officialName;
+        public String getShortName() {
+            return shortName;
         }
 
         public void put(String k, Object v) {
             data.put(k, v);
         }
 
-        public TotalEntry(String officialName) {
-            this.officialName = officialName;
+        public TotalEntry(String shortName) {
+            this.shortName = shortName;
             data = new HashMap<String, Object>();
         }
     }

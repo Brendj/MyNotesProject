@@ -74,7 +74,7 @@
                 <h:outputText value="#{row + 1}" styleClass="output-text" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.officialName}" />
+                <h:outputText styleClass="output-text" value="#{item.shortName}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column ">
                 <h:outputText styleClass="output-text" value="#{item.data['totalClientsCount']}" />
