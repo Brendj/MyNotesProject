@@ -80,7 +80,7 @@ public class AccountOperationsRegistryHandler {
         }
 
         if (payResponse != null){
-            resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "Ok");
+            resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
         }else if(resAccountOperationItem == null) {
 
             resAccountOperationItem = new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
