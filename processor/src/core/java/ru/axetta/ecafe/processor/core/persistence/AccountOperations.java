@@ -28,6 +28,7 @@ public class AccountOperations implements Serializable {
     private Long idOfOrder;
     private String staffGuid;
     private Long idOfPos;
+    private Long idOfContragent;
 
     public static final int CASHIER_OPERATIONTYPE = 0;//Операция через кассу
 
@@ -49,6 +50,7 @@ public class AccountOperations implements Serializable {
         idOfOrder = accountOperationItem.getIdOfOrder();
         staffGuid = accountOperationItem.getStaffGuid();
         idOfPos = accountOperationItem.getIdOfPos();
+        idOfContragent = accountOperationItem.getIdOfPos();
     }
 
     public long getIdOfAccountOperation() {
@@ -137,5 +139,13 @@ public class AccountOperations implements Serializable {
 
     public void setIdOfPos(Long idOfPos) {
         this.idOfPos = idOfPos;
+    }
+
+    public Long getIdOfContragent() {
+        return idOfContragent;
+    }
+
+    public void setIdOfContragent(Long idOfContragent) {
+        this.idOfContragent = idOfContragent;
     }
 }

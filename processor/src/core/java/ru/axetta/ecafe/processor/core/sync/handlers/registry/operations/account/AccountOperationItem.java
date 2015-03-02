@@ -26,9 +26,10 @@ public class AccountOperationItem {
     private Long idOfOrder;
     private String staffGuid;
     private Long idOfPos;
+    private Long idOfContragent;
 
     public AccountOperationItem(long idOfOperation, long date, long idOfContract, long value, int type, Long idOfOrder,
-            String staffGuid, Long idOfPos) {
+            String staffGuid, Long idOfPos, Long idOfContragent) {
         this.idOfOperation = idOfOperation;
         this.date = date;
         this.idOfContract = idOfContract;
@@ -37,6 +38,7 @@ public class AccountOperationItem {
         this.idOfOrder = idOfOrder;
         this.staffGuid = staffGuid;
         this.idOfPos = idOfPos;
+        this.idOfContragent = idOfContragent;
     }
 
     public static AccountOperationItem build(Node paymentNode, LoadContext loadContext) throws Exception {
@@ -50,8 +52,9 @@ public class AccountOperationItem {
         Long idOfOrder = getLongValueNullSafe(namedNodeMap, "OrderId");
         String staffGuid = getStringValueNullSafe(namedNodeMap, "StaffGuid");
         Long idOfPOS = getLongValueNullSafe(namedNodeMap, "PosId");
+        Long idOfContragent = getLongValueNullSafe(namedNodeMap, "ContragentId");
 
-        return new AccountOperationItem(idOfOperation,date.getTime(),idOfContract,value,type,idOfOrder,staffGuid,idOfPOS);
+        return new AccountOperationItem(idOfOperation,date.getTime(),idOfContract,value,type,idOfOrder,staffGuid,idOfPOS,idOfContragent);
     }
 
     public Long getIdOfPos() {
