@@ -373,16 +373,13 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         contragent.setNeedAccountTranslate(this.needAccountTranslate);
         contragent.setKpp(kpp.trim());
         contragent.setOgrn(ogrn.trim());
-        if (defaultPayContragent != null){
-            contragent.setDefaultPayContragent(defaultPayContragent);
-            contragent.setPayByCashier(payByCashier);
+
+        contragent.setDefaultPayContragent(defaultPayContragent);
+        if(defaultPayContragent == null ){
+            contragent.setPayByCashier(false);
+            payByCashier = false;
         }else {
-            if(contragent.getDefaultPayContragent() == null){
-                payByCashier = false;
-                contragent.setPayByCashier(false);
-            }else {
-                contragent.setPayByCashier(payByCashier);
-            }
+            contragent.setPayByCashier(payByCashier);
         }
         session.update(contragent);
         GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItem(session, contragent);
@@ -535,5 +532,10 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
             this.defaultPayContragent = (Contragent) session.load(Contragent.class, idOfContragent);
             this.defaultPayContragentName = this.defaultPayContragent.getContragentName();
         }
+    }
+
+    public void cancelContragentSelection() {
+        this.defaultPayContragent = null;
+        this.defaultPayContragentName = null;
     }
 }

@@ -86,6 +86,7 @@
             <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
             <f:setPropertyActionListener value="1" target="#{mainPage.classTypes}" />
         </a4j:commandButton>
+        <a4j:commandButton value="X" action="#{mainPage.contragentEditPage.cancelContragentSelection}" reRender="contragentEditGrid"/>
     </h:panelGroup>
 
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" rendered="#{mainPage.contragentEditPage.TSP}" />
