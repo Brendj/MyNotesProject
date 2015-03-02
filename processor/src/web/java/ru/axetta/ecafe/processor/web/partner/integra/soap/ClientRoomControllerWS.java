@@ -3530,8 +3530,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void processPublicationListSimple(Client client, Data data, ObjectFactory objectFactory, Session session,
             String searchCondition, int limit, int offset) throws DatatypeConfigurationException {
 
-        String str_condition = " and (pub.Author like :condition_like or pub.Title like :condition_like or pub.Title2 like :condition_like or pub.PublicationDate = :condition_eq " +
-                "or pub.Publisher like :condition_like or pub.ISBN like :condition_isbn) ";
+        if (searchCondition.isEmpty()) {
+            data.setPublicationItemList(new PublicationItemList());
+            data.setAmountForCondition(0);
+            return;
+        }
+        String str_condition = " and (upper(pub.Author) like :condition_like or upper(pub.Title) like :condition_like or upper(pub.Title2) like :condition_like " +
+                "or pub.PublicationDate = :condition_eq " +
+                "or upper(pub.Publisher) like :condition_like or pub.ISBN like :condition_isbn) ";
 
         Long org = client.getOrg().getIdOfOrg();
 
@@ -3540,7 +3546,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         SQLQuery query = session.createSQLQuery(bquery.toString().replaceAll("CONDITION", str_condition));
         query.setParameter("org", org);
-        query.setParameter("condition_like", "%" + searchCondition + "%");
+        query.setParameter("condition_like", "%" + searchCondition.toUpperCase() + "%");
         query.setParameter("condition_eq", searchCondition);
         query.setParameter("condition_isbn", searchCondition.replaceAll("-", "") + "%");
         query.setParameter("limit", limit);
@@ -3553,7 +3559,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         bquery.append(str_condition);
         query = session.createSQLQuery(bquery.toString());
         query.setParameter("org", org);
-        query.setParameter("condition_like", "%" + searchCondition + "%");
+        query.setParameter("condition_like", "%" + searchCondition.toUpperCase() + "%");
         query.setParameter("condition_eq", searchCondition);
         query.setParameter("condition_isbn", searchCondition.replaceAll("-", "") + "%");
         data.setAmountForCondition(((BigInteger)query.uniqueResult()).intValue());
@@ -3596,6 +3602,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String author, String title, String title2, String publicationDate, String publisher, String isbn,
             int limit, int offset) throws DatatypeConfigurationException {
 
+        if (author.isEmpty() && title.isEmpty() && title2.isEmpty() && publicationDate.isEmpty() && publisher.isEmpty() && isbn.isEmpty()) {
+            data.setPublicationItemList(new PublicationItemList());
+            data.setAmountForCondition(0);
+            return;
+        }
         Long org = client.getOrg().getIdOfOrg();
 
         StringBuilder bquery = new StringBuilder();
@@ -3626,19 +3637,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             String publicationDate, String publisher, String isbn) {
         StringBuilder builder = new StringBuilder();
         if (author != null && !author.isEmpty()) {
-            builder.append(" and pub.Author like :author ");
+            builder.append(" and upper(pub.Author) like :author ");
         }
         if (title != null && !title.isEmpty()) {
-            builder.append(" and pub.Title like :title ");
+            builder.append(" and upper(pub.Title) like :title ");
         }
         if (title2 != null && !title2.isEmpty()) {
-            builder.append(" and pub.Title2 like :title2 ");
+            builder.append(" and upper(pub.Title2) like :title2 ");
         }
         if (publicationDate != null && !publicationDate.isEmpty()) {
             builder.append(" and pub.PublicationDate = :publicationDate ");
         }
         if (publisher != null && !publisher.isEmpty()) {
-            builder.append(" and pub.Publisher like :publisher ");
+            builder.append(" and upper(pub.Publisher) like :publisher ");
         }
         if (isbn != null && !isbn.isEmpty()) {
             builder.append(" and pub.ISBN like :isbn ");
@@ -3649,19 +3660,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void setUserParametersForPublicationList(SQLQuery query, String author, String title, String title2,
             String publicationDate, String publisher, String isbn) {
         if (author != null && !author.isEmpty()) {
-            query.setParameter("author", "%" + author + "%");
+            query.setParameter("author", "%" + author.toUpperCase() + "%");
         }
         if (title != null && !title.isEmpty()) {
-            query.setParameter("title", "%" + title + "%");
+            query.setParameter("title", "%" + title.toUpperCase() + "%");
         }
         if (title2 != null && !title2.isEmpty()) {
-            query.setParameter("title2", "%" + title2 + "%");
+            query.setParameter("title2", "%" + title2.toUpperCase() + "%");
         }
         if (publicationDate != null && !publicationDate.isEmpty()) {
             query.setParameter("publicationDate", publicationDate);
         }
         if (publisher != null && !publisher.isEmpty()) {
-            query.setParameter("publisher", "%" + publisher + "%");
+            query.setParameter("publisher", "%" + publisher.toUpperCase() + "%");
         }
         if (isbn != null && !isbn.isEmpty()) {
             query.setParameter("isbn", isbn.replaceAll("-", "") + "%");

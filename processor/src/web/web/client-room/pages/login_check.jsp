@@ -7,6 +7,8 @@
 <%@ page import="ru.axetta.ecafe.processor.core.client.ClientAuthenticator" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWSService" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
@@ -56,6 +58,9 @@
             errorMessage = "Неверные данные и/или формат данных";
         }
         if (null != contractId && null != password) {
+            ClientRoomControllerWSService service = new ClientRoomControllerWSService();
+            ClientRoomController port
+                    = service.getClientRoomControllerWSPort();
             RuntimeContext runtimeContext = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
@@ -64,7 +69,7 @@
                 if (!loginSucceed) {
                     errorMessage = "Неверный номер договора и/или пароль";
                 } else {
-                    ClientAuthToken clientAuthToken = new ClientAuthToken(contractId, false);
+                    ClientAuthToken clientAuthToken = new ClientAuthToken(port, contractId, false);
                     clientAuthToken.storeTo(session);
                     session.setMaxInactiveInterval(INACTIVE_SESSION_TIMOUT_SECONDS);
                 }
