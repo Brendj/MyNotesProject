@@ -70,8 +70,7 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayResponse payResponse = null;
         ResAccountOperationItem resAccountOperationItem = null;
         try {
-            payResponse = sendCancelRequestToPayment(null, accountOperationItem.getIdOfContract(),
-                    "" + accountOperationItem.getIdOfOperation(), accountOperationItem.getValue());
+            payResponse = sendCancelRequestToPayment(accountOperationItem);
             accountOperationsRepository.create(new AccountOperations(accountOperationItem,request));
         } catch (InternalException e) {
             e.printStackTrace();
@@ -96,9 +95,7 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayResponse payResponse = null;
         ResAccountOperationItem resAccountOperationItem = null;
         try {
-            payResponse = sendRequestToPayment(null,
-                    accountOperationItem.getIdOfContract(), "" + accountOperationItem.getIdOfOperation(),
-                    accountOperationItem.getValue());
+            payResponse = sendRequestToPayment(accountOperationItem);
             accountOperationsRepository.create(new AccountOperations(accountOperationItem,request));
         } catch (InternalException e) {
             e.printStackTrace();
@@ -132,17 +129,14 @@ public class AccountOperationsRegistryHandler {
     /*
     * Отправка запроса на оплату внутри ИСПП
     * */
-    private OnlinePaymentProcessor.PayResponse sendRequestToPayment(Long clientId, Long contractId, String paymentId,
-            long realAmount) throws DuplicatePaymentException, InternalException{
-        Long contragentId = Long.valueOf(
-                (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.cashier.payment.contragentId"));
-        if (contragentId == null){
-            throw new InternalException("ecafe.cashier.payment.contragentId not found");
+    private OnlinePaymentProcessor.PayResponse sendRequestToPayment(AccountOperationItem accountOperationItem) throws DuplicatePaymentException, InternalException{
+        if (accountOperationItem.getIdOfContragent() == null){
+            throw new InternalException("Контрагент не установлен. Contragent not found.");
         }
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
-            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, contragentId, null,
-                    ClientPayment.CASHIER_PAYMENT_METHOD, contractId, paymentId, null, realAmount, false);
+            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, accountOperationItem.getIdOfContragent(), null,
+                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), ""+accountOperationItem.getIdOfOperation(), null, accountOperationItem.getValue(), false);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalException(e.getMessage());
@@ -160,17 +154,15 @@ public class AccountOperationsRegistryHandler {
     /*
     * Отправка запроса на отмену оплаты внутри ИСПП
     * */
-    private OnlinePaymentProcessor.PayResponse sendCancelRequestToPayment(Long clientId, Long contractId, String paymentId,
-            long realAmount) throws DuplicatePaymentException, InternalException{
-        Long contragentId = Long.valueOf(
-                (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.cashier.payment.contragentId"));
-        if (contragentId == null){
-            throw new InternalException("ecafe.cashier.payment.contragentId not found");
+    private OnlinePaymentProcessor.PayResponse sendCancelRequestToPayment(AccountOperationItem accountOperationItem) throws DuplicatePaymentException, InternalException{
+
+        if (accountOperationItem.getIdOfContragent() == null){
+            throw new InternalException("Контрагент не установлен. Contragent not found.");
         }
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
-            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, contragentId, null,
-                    ClientPayment.CASHIER_PAYMENT_METHOD, contractId, paymentId, null, (realAmount * (-1)), true);
+            payRequest = new OnlinePaymentProcessor.PayRequest(1, false, accountOperationItem.getIdOfContragent(), null,
+                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), ""+accountOperationItem.getIdOfOperation(), null, (accountOperationItem.getValue() * (-1)), true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalException(e.getMessage());

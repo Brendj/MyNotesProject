@@ -92,4 +92,8 @@ public class AccountOperationItem {
     public boolean isPayment(){
         return type == AccountOperations.TYPE_PAYMENT;
     }
+
+    public Long getIdOfContragent() {
+        return idOfContragent;
+    }
 }
