@@ -1170,6 +1170,7 @@ public class SyncResponse {
     private final Long idOfOrg;
     private final String orgName;
     private final OrganizationType organizationType;
+    private final String directorName;
     private final Long idOfPacket;
     private final Long protoVersion;
     private final Date time;
@@ -1199,18 +1200,21 @@ public class SyncResponse {
     private final AccRegistryUpdate accRegistryUpdate;
     private final ProhibitionsMenu prohibitionsMenu;
 
-    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
-          ResPaymentRegistry resPaymentRegistry, ResAccountOperationsRegistry resAccountOperationsRegistry, AccIncRegistry accIncRegistry, ClientRegistry clientRegistry,
-          ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData, ResDiary resDiary, String message,
-          ResEnterEvents resEnterEvents, ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData, ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-          ComplexRoles complexRoles, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
-          OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
-          DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian, ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate,
-          ProhibitionsMenu prohibitionsMenu) {
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
+            String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
+            ResPaymentRegistry resPaymentRegistry, ResAccountOperationsRegistry resAccountOperationsRegistry,
+            AccIncRegistry accIncRegistry, ClientRegistry clientRegistry, ResOrgStructure resOrgStructure,
+            ResMenuExchangeData resMenuExchangeData, ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
+            ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData,
+            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
+            QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
+            ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
         this.organizationType = organizationType;
+        this.directorName = directorName;
         this.idOfPacket = idOfPacket;
         this.protoVersion = protoVersion;
         this.time = time;
@@ -1270,6 +1274,10 @@ public class SyncResponse {
         ecafeEnvelopeElement.setAttribute("Options", this.options);
         ecafeEnvelopeElement.setAttribute("Type",syncType.toString());
         ecafeEnvelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
+
+        if (directorName != null) {
+            ecafeEnvelopeElement.setAttribute("DirectorName", this.directorName);
+        }
 
         // ResPaymentRegistry
         if (null != resPaymentRegistry) {

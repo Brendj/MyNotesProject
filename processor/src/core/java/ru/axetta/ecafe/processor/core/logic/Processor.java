@@ -1020,7 +1020,7 @@ public class Processor implements SyncProcessor,
         runRegularPayments(request);
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
-                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                request.getOrg().getType(), request.getOrg().getOfficialPerson().getFullName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1115,7 +1115,7 @@ public class Processor implements SyncProcessor,
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
-                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                request.getOrg().getType(), request.getOrg().getOfficialPerson().getFullName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1252,7 +1252,7 @@ public class Processor implements SyncProcessor,
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),request.getOrg().getShortName(),
-                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                request.getOrg().getType(), request.getOrg().getOfficialPerson().getFullName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1369,7 +1369,7 @@ public class Processor implements SyncProcessor,
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
-                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                request.getOrg().getType(), request.getOrg().getOfficialPerson().getFullName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1500,7 +1500,7 @@ public class Processor implements SyncProcessor,
         runRegularPayments(request);
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
-                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                request.getOrg().getType(), request.getOrg().getOfficialPerson().getFullName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
