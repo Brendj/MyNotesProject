@@ -96,10 +96,16 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
     }
 
-    public boolean isPaymentByCashierEnabled(long idOfOrg){
-        Query r = entityManager.createNativeQuery("select c.paybycashier "
-                + " from cf_orgs o left join cf_contragents c on o.defaultsupplier=c.idofcontragent "
+    /*
+    * Если paybycashier = true то передаем № платежного контрагента
+    * */
+    public Long isPaymentByCashierEnabled(long idOfOrg){
+        Query r = entityManager.createNativeQuery("select c.DefaultContragent "
+                + " from cf_orgs o left join cf_contragents c on o.defaultsupplier=c.idofcontragent and PayByCashier=1 "
                 + " where o.idoforg=:idoforg").setParameter("idoforg", idOfOrg);
-        return r.getResultList().size() > 0 && r.getResultList().get(0)!=null && (Integer) r.getResultList().get(0) != 0;
+        if ((r.getResultList().size() > 0) && (r.getResultList().get(0) != null)) {
+            return ((BigInteger) r.getResultList().get(0)).longValue();
+        }
+        return null;
     }
 }

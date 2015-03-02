@@ -38,6 +38,11 @@ public class DirectiveElement {
 
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+
+        OrgRepository orgRepository = OrgRepository.getInstance();
+        Long paymentContragentId = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
+        directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentContragentId != null?"1":"0", paymentContragentId!=null?""+paymentContragentId:null));
+
     }
 
     public void processForFullSync(Org org) throws Exception {
@@ -53,14 +58,9 @@ public class DirectiveElement {
         Boolean usePlanOrders = org.getUsePlanOrders();
         directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
 
-        if(org.getDefaultSupplier() != null){
-            OrgRepository orgRepository = OrgRepository.getInstance();
-
-            Boolean paymentsByCashier = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
-            directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentsByCashier?"1":"0"));
-        }
-
-
+        OrgRepository orgRepository = OrgRepository.getInstance();
+        Long paymentContragentId = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
+        directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentContragentId != null?"1":"0", paymentContragentId!=null?""+paymentContragentId:null));
     }
 
     public Element toElement(Document document) throws Exception {
