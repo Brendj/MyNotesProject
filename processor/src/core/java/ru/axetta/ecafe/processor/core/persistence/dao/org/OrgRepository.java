@@ -100,6 +100,6 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         Query r = entityManager.createNativeQuery("select c.paybycashier "
                 + " from cf_orgs o left join cf_contragents c on o.defaultsupplier=c.idofcontragent "
                 + " where o.idoforg=:idoforg").setParameter("idoforg", idOfOrg);
-        return r.getResultList().size() > 0 && (Integer) r.getResultList().get(0) != 0;
+        return r.getResultList().size() > 0 && r.getResultList().get(0)!=null && (Integer) r.getResultList().get(0) != 0;
     }
 }
