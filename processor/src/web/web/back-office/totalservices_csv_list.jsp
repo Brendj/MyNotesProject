@@ -11,21 +11,22 @@
 %><f:view>
     <h:outputText escape="false" value="Организация;Число учащихся;Получают льготное питание;;Зафиксирован проход;;Получили льготное питание;;Получили платное питание;;Получили питание (льготное + платное)"/>
     <h:outputText escape="false" value="#{mainPage.endOfLine}" />
+    <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <a4j:repeat value="#{totalServicesReportPage.totalReport.items}" var="item">
         <h:outputText escape="false" value="#{item.shortName}" />
-        <h:outputText escape="false" value=";#{item.data['totalClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['planBenefitClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_planBenefitClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['currentClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_currentClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['realBenefitClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_realBenefitClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['realPayedClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_realPayedClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['realSnackPayedClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_realSnackPayedClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['uniqueClientsCount']}" />
-        <h:outputText escape="false" value=";#{item.data['per_uniqueClientsCount']}" />
+        <h:outputText escape="false" value=";#{item.totalClientsCount}" />
+        <h:outputText escape="false" value=";#{item.planBenefitClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_planBenefitClientsCount}" />
+        <h:outputText escape="false" value=";#{item.currentClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_currentClientsCount}" />
+        <h:outputText escape="false" value=";#{item.realBenefitClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_realBenefitClientsCount}" />
+        <h:outputText escape="false" value=";#{item.realPaidClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_realPaidClientsCount}" />
+        <h:outputText escape="false" value=";#{item.realSnackPaidClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_realSnackPaidClientsCount}" />
+        <h:outputText escape="false" value=";#{item.uniqueClientsCount}" />
+        <h:outputText escape="false" value=";#{item.per_uniqueClientsCount}" />
         <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     </a4j:repeat>
 </f:view>

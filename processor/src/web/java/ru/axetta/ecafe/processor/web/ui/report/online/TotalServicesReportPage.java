@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.TotalServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -15,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,8 +27,8 @@ import java.util.List;
 public class TotalServicesReportPage extends OnlineReportPage{
 
     private TotalServicesReport totalReport;
-    private String htmlReport = null;
     private static final Logger logger = LoggerFactory.getLogger(TotalServicesReportPage.class);
+    private Boolean showBuildingDetails = true;
 
     public void buildReportHTML() throws Exception{
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -43,11 +39,10 @@ public class TotalServicesReportPage extends OnlineReportPage{
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             this.totalReport = new TotalServicesReport ();
-            TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder();
-            List<Long> orgs = new ArrayList<Long>();
-            if(idOfOrg != null && idOfOrg>=0) orgs.add(idOfOrg);
-            orgs = DAOUtils.complementIdOfOrgSet(session, orgs);
-            this.totalReport = reportBuilder.build(session, startDate, endDate, orgs);
+            TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder(session, startDate, endDate,
+                    idOfOrg, showBuildingDetails);
+            if(idOfOrg == null || idOfOrg<0) throw new Exception("Необходимо выбрать организацию");
+            this.totalReport = reportBuilder.build();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             printMessage("Свод по услугам построен");
@@ -70,5 +65,13 @@ public class TotalServicesReportPage extends OnlineReportPage{
 
     public TotalServicesReport getTotalReport(){
         return totalReport;
+    }
+
+    public Boolean getShowBuildingDetails() {
+        return showBuildingDetails;
+    }
+
+    public void setShowBuildingDetails(Boolean showBuildingDetails) {
+        this.showBuildingDetails = showBuildingDetails;
     }
 }

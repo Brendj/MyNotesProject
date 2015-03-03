@@ -25,6 +25,12 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
+        <h:outputText escape="true" value="Показывать информацию по корпусам" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{totalServicesReportPage.showBuildingDetails}"
+                                 styleClass="output-text">
+            <a4j:support event="onclick" reRender="reportPanelGrid" ajaxSingle="true"
+                         actionListener="#{totalServicesReportPage.showBuildingDetails}"/>
+        </h:selectBooleanCheckbox>
         <a4j:commandButton value="Генерировать отчет" action="#{totalServicesReportPage.buildReportHTML}"
                            reRender="workspaceTogglePanel, itemsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
@@ -37,8 +43,8 @@
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Свод по услугам" styleClass="output-text" />
         <rich:dataTable id="itemsReportTable" value="#{totalServicesReportPage.totalReport.items}"
-                        var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
-                        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
+        var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
+        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
@@ -77,43 +83,43 @@
                 <h:outputText styleClass="output-text" value="#{item.shortName}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column ">
-                <h:outputText styleClass="output-text" value="#{item.data['totalClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.totalClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['planBenefitClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.planBenefitClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_planBenefitClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_planBenefitClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['currentClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.currentClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_currentClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_currentClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['realBenefitClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.realBenefitClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_realBenefitClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_realBenefitClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['realPayedClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.realPaidClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_realPayedClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_realPaidClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['realSnackPayedClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.realSnackPaidClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_realSnackPayedClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_realSnackPaidClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['uniqueClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.uniqueClientsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
-                <h:outputText styleClass="output-text" value="#{item.data['per_uniqueClientsCount']}" />
+                <h:outputText styleClass="output-text" value="#{item.per_uniqueClientsCount}" />
             </rich:column>
             <f:facet name="footer">
                 <rich:datascroller for="itemsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
