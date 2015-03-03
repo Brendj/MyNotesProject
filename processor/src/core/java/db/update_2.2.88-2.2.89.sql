@@ -33,3 +33,6 @@ OIDS=FALSE
 
 ALTER TABLE cf_contragents ADD COLUMN defaultcontragent bigint;
 ALTER TABLE cf_contragents ADD COLUMN paybycashier integer;
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150203) НЕ МЕНЯТЬ
