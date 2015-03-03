@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -344,6 +345,7 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         fill(contragent);
     }
 
+    @Transactional
     public void updateContragent(Session session, Long idOfContragent) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
         Person contractPerson = contragent.getContactPerson();
