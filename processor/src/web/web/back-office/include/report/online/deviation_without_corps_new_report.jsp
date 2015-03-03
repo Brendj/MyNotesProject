@@ -5,57 +5,52 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<h:panelGrid id="detailedDeviationsWithoutCorpsReportPageGrid"
-             binding="#{mainPage.detailedDeviationsWithoutCorpsReportPage.pageComponent}"
+<h:panelGrid id="detailedDeviationsWithoutCorpsNewReportPageGrid"
+             binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.detailedDeviationsWithoutCorpsReportPage.startDate}"
+        <rich:calendar value="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.startDate}"
                        datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar"
-                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsReportPage.onReportPeriodChanged}" />
+                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.onReportPeriodChanged}" />
         </rich:calendar>
 
         <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
         <h:selectOneMenu id="endDatePeriodSelect"
-                         value="#{mainPage.detailedDeviationsWithoutCorpsReportPage.periodTypeMenu.periodType}"
+                         value="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.periodTypeMenu.periodType}"
                          styleClass="input-text" style="width: 250px;">
             <f:converter converterId="periodTypeConverter" />
             <f:selectItems
-                    value="#{mainPage.detailedDeviationsWithoutCorpsReportPage.periodTypeMenu.items}" />
+                    value="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.periodTypeMenu.items}" />
             <a4j:support event="onchange" reRender="endDateCalendar"
-                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsReportPage.onReportPeriodChanged}" />
+                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar"
-                       value="#{mainPage.detailedDeviationsWithoutCorpsReportPage.endDate}"
+                       value="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.endDate}"
                        datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
-                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsReportPage.onEndDateSpecified}" />
+                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.onEndDateSpecified}" />
         </rich:calendar>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener
-                        value="#{mainPage.detailedDeviationsWithoutCorpsReportPage.getStringIdOfOrgList}"
-                        target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-            </a4j:commandButton>
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{mainPage.detailedDeviationsWithoutCorpsReportPage.filter}}" />
+                          value=" {#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.filter}}" />
         </h:panelGroup>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет"
-                               action="#{mainPage.detailedDeviationsWithoutCorpsReportPage.buildReportHTML}"
+                               action="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.buildReportHTML}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
                                status="reportGenerateStatus" />
         </h:panelGrid>
         <h:commandButton value="Выгрузить в Excel"
-                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsReportPage.generateXLS}"
+                         actionListener="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.generateXLS}"
                          styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -67,7 +62,7 @@
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${not empty mainPage.detailedDeviationsWithoutCorpsReportPage.htmlReport}">
+        <c:if test="${not empty mainPage.detailedDeviationsWithoutCorpsNewReportPage.htmlReport}">
             <h:outputText escape="true" value="Детализированный отчет отклонений оплаты льготного питания"
                           styleClass="output-text" />
             <f:verbatim>
@@ -76,7 +71,7 @@
                         display: none;
                     }
                 </style>
-                <div class="htmlReportContent"> ${mainPage.detailedDeviationsWithoutCorpsReportPage.htmlReport} </div>
+                <div class="htmlReportContent"> ${mainPage.detailedDeviationsWithoutCorpsNewReportPage.htmlReport} </div>
             </f:verbatim>
             <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
         </c:if>

@@ -1025,6 +1025,11 @@
                             label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsWithoutCorpsReportPage}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
+                            binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
+                            label="Детализированный отчет отклонений оплаты льготного питания (редактированный)"
+                            action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"

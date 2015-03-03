@@ -349,6 +349,7 @@ public class MainPage implements Serializable {
     private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
             = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
     private final DetailedDeviationsWithoutCorpsReportPage detailedDeviationsWithoutCorpsReportPage = new DetailedDeviationsWithoutCorpsReportPage();
+    private final DetailedDeviationsWithoutCorpsNewReportPage detailedDeviationsWithoutCorpsNewReportPage = new DetailedDeviationsWithoutCorpsNewReportPage();
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
     private final PaymentTotalsReportPage paymentTotalsReportPage = new PaymentTotalsReportPage();
@@ -5543,6 +5544,10 @@ public class MainPage implements Serializable {
         return detailedDeviationsWithoutCorpsReportPage;
     }
 
+    public DetailedDeviationsWithoutCorpsNewReportPage getDetailedDeviationsWithoutCorpsNewReportPage() {
+        return detailedDeviationsWithoutCorpsNewReportPage;
+    }
+
     public Object showGoodRequestNewReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5766,6 +5771,19 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
                             null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showDetailedDeviationsWithoutCorpsNewReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            detailedDeviationsWithoutCorpsNewReportPage.fill();
+            currentWorkspacePage = detailedDeviationsWithoutCorpsNewReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
