@@ -88,14 +88,16 @@ public class PaymentTotalsReportService {
 
             Long cashMoved = getCashMovedSum(idOfOrg, startTime, endTime);
 
-            Long endCashControl = startCash + income - paidTotal + repayment + cashMoved;
-
             Long endCash = getOrgClientsBalance(idOfOrg, endTime, ClientGroupMenu.CLIENT_STUDENTS);
+
+            Long endCash1 = startCash + income - paidTotal - repayment + cashMoved;
+
+            Long endCash2 = getOrgClientsBalance2(idOfOrg, ClientGroupMenu.CLIENT_STUDENTS);
 
             String comment = getStatusDetail(idOfOrg);
 
             Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack, paidTotal,
-                    repayment, cashMoved, endCash, comment);
+                    repayment, cashMoved, endCash, endCash1, endCash2, comment);
             if (notZeroCash(item) || !hideNullRows)
                 reportItems.add(item);
         }
@@ -103,6 +105,27 @@ public class PaymentTotalsReportService {
         date = printTime(date, " ms - Main cycle passed.", 2L);
 
         return reportItems;
+    }
+
+    private Long getOrgClientsBalance2(Long idOfOrg, Long clientStudents) {
+        Criteria orgClientsCriteria = session.createCriteria(Client.class);
+        orgClientsCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+        String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
+        if (!clientStudents.equals(ClientGroupMenu.CLIENT_ALL))
+            if (clientStudents.equals(ClientGroupMenu.CLIENT_STUDENTS))
+                orgClientsCriteria.add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
+            else
+                orgClientsCriteria.add(Restrictions.eq(cgFieldName, clientStudents));
+        orgClientsCriteria.createCriteria("org", "o");
+        orgClientsCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        List result = orgClientsCriteria.list();
+
+        Long sum = 0L;
+        for (Object o : result) {
+            Client client = (Client) o;
+            sum += client.getBalance();
+        }
+        return sum;
     }
 
     private String getStatusDetail(Long idOfOrg) {
@@ -190,13 +213,11 @@ public class PaymentTotalsReportService {
         if (list != null && list.size() > 0 && list.get(0) != null) {
             for (ClientMigration clientMigration : list) {
                 if (clientMigration.getOrg().getIdOfOrg() == idOfOrg) {
-                    cashMovedSum += getClientsBalanceOnDate(clientMigration.getClient(), startTime,
-                            clientMigration.getRegistrationDate(), 1L);
+                    cashMovedSum += getClientsBalanceOnDate(clientMigration.getClient(), clientMigration.getRegistrationDate(), 1L);
                 } else if (clientMigration.getOldOrg().getIdOfOrg() == idOfOrg) {
-                    cashMovedSum -= getClientsBalanceOnDate(clientMigration.getClient(), startTime,
-                            clientMigration.getRegistrationDate(), 1L);
+                    cashMovedSum -= getClientsBalanceOnDate(clientMigration.getClient(), clientMigration.getRegistrationDate(), 1L);
                 } else {
-                    logger.info("Clients migrations processing error");
+                    logger.info("Clients migration processing error " + clientMigration.toString());
                 }
             }
         }
@@ -206,14 +227,13 @@ public class PaymentTotalsReportService {
         return cashMovedSum;
     }
 
-    private Long getClientsBalanceOnDate(Client client, Date startTime, Date registrationDate, Long debugLevel) {
+    private Long getClientsBalanceOnDate(Client client, Date registrationDate, Long debugLevel) {
 
         Date date = new Date();
         date = printTime(date, " ms - getClientsBalanceOnDate, idOfClient - " + client.getIdOfClient(), 4L);
 
         Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.gt("transactionTime", startTime));    // <
-        criteria.add(Restrictions.lt("transactionTime", registrationDate));    // <
+        criteria.add(Restrictions.lt("transactionTime", registrationDate));
         criteria.add(Restrictions.eq("client", client));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
         List list = criteria.list();
@@ -239,8 +259,8 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
 
         criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.transactionsum) as sum", new String[] {"sum"},
-                        new Type[] {LongType.INSTANCE}))
+                .add(Projections.sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE}))
         );
         List list = criteria.list();
 
@@ -450,11 +470,13 @@ public class PaymentTotalsReportService {
         private Long repayment;
         private Long cashMoved;
         private Long endCash;
+        private Long endCash1;
+        private Long endCash2;
         private String comment;
 
         protected Item(Long orgNum, Long orgID, String orgName, String lastSyncTime, Long startCash, Long income,
-                Long paid, Long paidSnack, Long paidTotal, Long repayment, Long cashMoved, Long endCash,
-                String comment) {
+                Long paid, Long paidSnack, Long paidTotal, Long repayment, Long cashMoved, Long endCash, Long endCash1,
+                Long endCash2, String comment) {
             this.orgNum = orgNum;
             this.orgID = orgID;
             this.orgName = orgName;
@@ -467,6 +489,8 @@ public class PaymentTotalsReportService {
             this.repayment = repayment;
             this.cashMoved = cashMoved;
             this.endCash = endCash;
+            this.endCash1 = endCash1;
+            this.endCash2 = endCash2;
             this.comment = comment;
         }
 
@@ -587,6 +611,22 @@ public class PaymentTotalsReportService {
 
         public void setEndCash(Long endCash) {
             this.endCash = endCash;
+        }
+
+        public Long getEndCash1() {
+            return endCash1;
+        }
+
+        public void setEndCash1(Long endCash1) {
+            this.endCash1 = endCash1;
+        }
+
+        public Long getEndCash2() {
+            return endCash2;
+        }
+
+        public void setEndCash2(Long endCash2) {
+            this.endCash2 = endCash2;
         }
 
         public String getComment() {

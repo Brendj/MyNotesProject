@@ -68,8 +68,8 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         localCalendar.add(Calendar.DATE, 7);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
-        idOfOrgList.add(57L);
-        idOfOrgList.add(101L);
+        //idOfOrgList.add(57L);
+        //idOfOrgList.add(101L);
     }
 
     @Override
