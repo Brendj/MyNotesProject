@@ -51,6 +51,7 @@ import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
 import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
 import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
 import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
+import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
@@ -206,6 +207,7 @@ public class MainPage implements Serializable {
     private final OrderRemovePage orderRemovePage = new OrderRemovePage();
     private final GroupControlSubscriptionsPage groupControlSubscriptionsPage = new GroupControlSubscriptionsPage();
     private final GroupControlBenefitsPage groupControlBenefitsPage = new GroupControlBenefitsPage();
+    private final CancelCategoryBenefitsPage cancelCategoryBenefitsPage = new CancelCategoryBenefitsPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -4106,6 +4108,12 @@ public class MainPage implements Serializable {
         groupControlBenefitsPage.groupBenefitsGenerate(groupControlBenefitsPage.getUploadItem(), runtimeContext);
     }
 
+    public void cancelCategoryBenefitsGenerate() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        cancelCategoryBenefitsPage.cancelCategoryBenefitsGenerate(runtimeContext);
+    }
+
     public void reportTemplateLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
@@ -4858,6 +4866,10 @@ public class MainPage implements Serializable {
 
     public GroupControlBenefitsPage getGroupControlBenefitsPage() {
         return groupControlBenefitsPage;
+    }
+
+    public CancelCategoryBenefitsPage getCancelCategoryBenefitsPage() {
+        return cancelCategoryBenefitsPage;
     }
 
     public Object showOrderRemovePage() {

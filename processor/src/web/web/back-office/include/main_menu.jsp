@@ -772,6 +772,10 @@
 
         <rich:panelMenuItem id="groupControlBenefits" binding="#{mainPage.groupControlBenefitsPage.mainMenuComponent}" label="Групповая установка льготных категорий"
                             action="#{mainPage.groupControlBenefitsPage.show}" reRender="workspaceForm" />
+
+
+        <rich:panelMenuItem id="cancelBenefits" binding="#{mainPage.cancelCategoryBenefitsPage.mainMenuComponent}" label="Отмена льготных категорий по всем учащимся"
+                            action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
