@@ -29,7 +29,7 @@
     </a4j:outputPanel>
 
     <rich:dataTable id="groupControlBenefitsTable"
-                    value="#{mainPage.groupControlBenefitsPage.groupControlBenefitsItems}" var="item" rows="30"
+                    value="#{mainPage.cancelCategoryBenefitsPage.groupControlBenefitsItemsList}" var="item" rows="30"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
                     footerClass="data-table-footer" rowKeyVar="row">
         <rich:column>

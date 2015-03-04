@@ -5,11 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.slf4j.LoggerFactory;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +28,7 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(CancelCategoryBenefitsPage.class);
 
-    private List<GroupControlBenefitsItems> groupControlBenefitsItems;
+    private List<GroupControlBenefitsItems> groupControlBenefitsItemsList;
 
     @Override
     public String getPageFilename() {
@@ -34,15 +39,43 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
     }
 
-    public void cancelCategoryBenefitsGenerate(RuntimeContext runtimeContext) throws Exception{
+    public void cancelCategoryBenefitsGenerate(RuntimeContext runtimeContext) throws Exception {
+        CancelCategoryBenefitsService cancelCategoryBenefitsService = new CancelCategoryBenefitsService();
 
+        groupControlBenefitsItemsList = new ArrayList<GroupControlBenefitsItems>();
+
+        Session persistenceSession = runtimeContext.createPersistenceSession();
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            List<Client> clientList = cancelCategoryBenefitsService.getAllBenefitClients(persistenceSession);
+
+            if (!clientList.isEmpty()) {
+                Long rowNum = 0L;
+                for (Client client : clientList) {
+                    GroupControlBenefitsItems groupControlBenefitsItems = new GroupControlBenefitsItems(++rowNum,
+                            client.getOrg().getShortName(), client.getClientGroup().getGroupName(),
+                            client.getPerson().getSurname(), client.getPerson().getFirstName(),
+                            client.getPerson().getSecondName(), client.getContractId().toString(), "", "");
+
+                    groupControlBenefitsItemsList.add(groupControlBenefitsItems);
+                }
+            }
+            persistenceTransaction.commit();
+        } catch (Exception ex) {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            ex.printStackTrace();
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 
-    public List<GroupControlBenefitsItems> getGroupControlBenefitsItems() {
-        return groupControlBenefitsItems;
+    public List<GroupControlBenefitsItems> getGroupControlBenefitsItemsList() {
+        return groupControlBenefitsItemsList;
     }
 
-    public void setGroupControlBenefitsItems(List<GroupControlBenefitsItems> groupControlBenefitsItems) {
-        this.groupControlBenefitsItems = groupControlBenefitsItems;
+    public void setGroupControlBenefitsItemsList(List<GroupControlBenefitsItems> groupControlBenefitsItemsList) {
+        this.groupControlBenefitsItemsList = groupControlBenefitsItemsList;
     }
 }
