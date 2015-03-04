@@ -17,8 +17,9 @@
     </a4j:status>
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
-        <a4j:commandButton value="Отмена льготных категорий по всем учащимся" action="#{mainPage.cancelCategoryBenefitsGenerate}"
-                           reRender="workspaceTogglePanel" styleClass="command-button" />
+        <a4j:commandButton value="Отмена льготных категорий по всем учащимся"
+                           action="#{mainPage.cancelCategoryBenefitsGenerate}" reRender="workspaceTogglePanel"
+                           styleClass="command-button" />
     </h:panelGrid>
 
     <a4j:outputPanel ajaxRendered="true">
@@ -98,6 +99,6 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showGroupControlBenefitsCSVList}"
+    <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showCancelCategoryBenefitsCSVList}"
                      styleClass="command-button" />
 </h:panelGrid>

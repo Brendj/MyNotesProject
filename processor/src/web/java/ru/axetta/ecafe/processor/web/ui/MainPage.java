@@ -9,7 +9,6 @@ import net.sf.jasperreports.engine.JRException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
-import ru.axetta.ecafe.processor.core.mail.*;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -73,7 +72,6 @@ import javax.faces.event.ActionEvent;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -341,15 +339,12 @@ public class MainPage implements Serializable {
     private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
-    private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
-    private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
-    private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage
-            = new StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage();
+    private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage();
+    private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage();
+    private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage = new StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage();
     private final DetailedGoodRequestReportPage detailedGoodRequestReportPage = new DetailedGoodRequestReportPage();
-    private final DiscrepanciesDataOnOrdersAndPaymentReportPage discrepanciesDataOnOrdersAndPaymentReportPage
-            = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
-    private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage
-            = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
+    private final DiscrepanciesDataOnOrdersAndPaymentReportPage discrepanciesDataOnOrdersAndPaymentReportPage = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
+    private final DetailedDeviationsPaymentOrReducedPriceMealsReportPage detailedDeviationsPaymentOrReducedPriceMealsReportPage = new DetailedDeviationsPaymentOrReducedPriceMealsReportPage();
     private final DetailedDeviationsWithoutCorpsReportPage detailedDeviationsWithoutCorpsReportPage = new DetailedDeviationsWithoutCorpsReportPage();
     private final DetailedDeviationsWithoutCorpsNewReportPage detailedDeviationsWithoutCorpsNewReportPage = new DetailedDeviationsWithoutCorpsNewReportPage();
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
@@ -461,7 +456,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build all orgs discounts report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -486,7 +482,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build org discounts report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -572,9 +569,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = userListPage;
         } catch (Exception e) {
             logger.error("Failed to fill user list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -598,9 +594,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for user list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -629,7 +624,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to remove user", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении пользователя: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении пользователя: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -672,9 +668,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedUserGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected user group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы пользователя: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы пользователя: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -771,9 +766,8 @@ public class MainPage implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные пользователя обновлены успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to update user", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных пользователя: " + e.getMessage(),
-                                null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при изменении данных пользователя: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -835,8 +829,8 @@ public class MainPage implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to create user", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании пользователя: " + e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при создании пользователя: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -876,9 +870,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = orgListPage;
         } catch (Exception e) {
             logger.error("Failed to fill org list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка организаций: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -888,7 +881,6 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
-
 
 
     /* обновление списка организаций */
@@ -906,9 +898,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set filter for org list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка организаций: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -934,9 +925,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -972,9 +962,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedOrgGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected org group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1050,8 +1039,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = menuExchangePage;
         } catch (Exception e) {
             logger.error("Failed to load menu exchange from table", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по мастера меню: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при выводе данных по мастера меню: " + e.getMessage(), null));
         } finally {
 
         }
@@ -1074,7 +1063,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -1094,14 +1084,15 @@ public class MainPage implements Serializable {
             persistenceTransaction = persistenceSession.beginTransaction();
             selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
             orgEditPage.fill(persistenceSession, selectedIdOfOrg);
-            orgFilterOfSelectOrgListSelectPage="";
+            orgFilterOfSelectOrgListSelectPage = "";
             persistenceTransaction.commit();
             persistenceTransaction = null;
             selectedOrgGroupPage.showAndExpandMenuGroup();
             currentWorkspacePage = orgEditPage;
         } catch (Exception e) {
             logger.error("Failed to fill org edit page", e);
-            final String summary = "Ошибка при подготовке страницы редактирования данных организации: " + e.getMessage();
+            final String summary =
+                    "Ошибка при подготовке страницы редактирования данных организации: " + e.getMessage();
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1121,13 +1112,13 @@ public class MainPage implements Serializable {
             return null;
         }
         if (orgEditPage.getChangeCommodityAccounting()) {
-            if(orgEditPage.getConfigurationProvider()==null){
+            if (orgEditPage.getConfigurationProvider() == null) {
                 final String summary = "Не указана 'Производственная конфигурация'";
                 final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
                 facesContext.addMessage(null, facesMessage);
                 return null;
             }
-            if(orgEditPage.getRefectoryType()!=3 && orgEditPage.getMenuExchangeSourceOrg()==null){
+            if (orgEditPage.getRefectoryType() != 3 && orgEditPage.getMenuExchangeSourceOrg() == null) {
                 final String summary = "Не указана 'Идентификатор организации - источника меню'";
                 final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
                 facesContext.addMessage(null, facesMessage);
@@ -1142,7 +1133,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            if(orgEditPage.getChangeCommodityAccounting()){
+            if (orgEditPage.getChangeCommodityAccounting()) {
                 orgEditPage.checkCommodityAccountingConfiguration(persistenceSession);
             }
             orgEditPage.updateOrg(persistenceSession, selectedIdOfOrg);
@@ -1155,7 +1146,7 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null, facesMessage);
         } catch (Exception e) {
             logger.error("Failed to update org", e);
-            final String summary = "Ошибка при изменении данных организации: " +e.getMessage();
+            final String summary = "Ошибка при изменении данных организации: " + e.getMessage();
             final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
             facesContext.addMessage(null, facesMessage);
         } finally {
@@ -1277,7 +1268,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build org balance report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1337,7 +1329,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build org order report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1466,11 +1459,11 @@ public class MainPage implements Serializable {
     }
 
     public Object showOrgSelectPage() {
-        return showOrgSelectPage (null, null);
+        return showOrgSelectPage(null, null);
     }
 
     public Object showOrgSelectPage(Long idOfContragent) {
-        return showOrgSelectPage (idOfContragent, null);
+        return showOrgSelectPage(idOfContragent, null);
     }
 
     public Object showOrgSelectPage(Long idOfContragent, Long idOfContract) {
@@ -1540,8 +1533,9 @@ public class MainPage implements Serializable {
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
-                            idOfContragentOrgList, idOfContragentList);
+                    orgListSelectPage
+                            .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
+                                    idOfContragentList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1581,8 +1575,9 @@ public class MainPage implements Serializable {
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
-                            idOfContragentOrgList, idOfContragentList);
+                    orgListSelectPage
+                            .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
+                                    idOfContragentList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1618,8 +1613,9 @@ public class MainPage implements Serializable {
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
-                            idOfContragentOrgList, idOfContragentList);
+                    orgListSelectPage
+                            .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
+                                    idOfContragentList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1651,9 +1647,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to fill org selection page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1691,15 +1686,16 @@ public class MainPage implements Serializable {
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                 orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList);
             } else {
-                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList, idOfContragentList);
+                orgListSelectPage
+                        .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList,
+                                idOfContragentList);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to fill org selection page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1747,8 +1743,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete org selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1769,8 +1765,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete org selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора организации: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1786,8 +1782,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete orgs selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1803,8 +1799,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete orgs selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1838,9 +1834,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = contragentListPage;
         } catch (Exception e) {
             logger.error("Failed to fill contragent list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1878,9 +1873,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedContragentGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected contragent group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы контрагента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1964,7 +1958,8 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            String prevRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            String prevRNIPId = RNIPLoadPaymentsService
+                    .getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
@@ -1973,22 +1968,24 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
             String newRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
-            Boolean upd = contragentEditPage.updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
+            Boolean upd = contragentEditPage
+                    .updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
             if (upd != null && upd == true) {
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП", null));
-            } else if(upd != null && upd == false) {
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП",
+                                null));
+            } else if (upd != null && upd == false) {
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не удалось загрузить данные контрагента в РНИП", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не удалось загрузить данные контрагента в РНИП",
+                                null));
             }
         } catch (IllegalStateException ise) {
             logger.error("Failed to update contragent catalog in RNIP", ise);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to update contragent", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных контрагента: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении данных контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2051,8 +2048,8 @@ public class MainPage implements Serializable {
                     null));
         } catch (Exception e) {
             logger.error("Failed to create contragent", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации контрагента: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2112,7 +2109,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build contragent balance report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2126,11 +2124,11 @@ public class MainPage implements Serializable {
         return contragentSelectPage;
     }
 
-    public ContractSelectPage getContractSelectPage () {
+    public ContractSelectPage getContractSelectPage() {
         return contractSelectPage;
     }
 
-    public ContragentListSelectPage getContragentListSelectPage () {
+    public ContragentListSelectPage getContragentListSelectPage() {
         return contragentListSelectPage;
     }
 
@@ -2142,7 +2140,7 @@ public class MainPage implements Serializable {
         this.classTypes = classTypes;
     }
 
-    public Object showContragentListSelectPage () {
+    public Object showContragentListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -2158,7 +2156,7 @@ public class MainPage implements Serializable {
                 persistenceTransaction = null;
                 contragentListSelectPage
                         .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
-                    modalPages.push(contragentListSelectPage);
+                modalPages.push(contragentListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -2173,19 +2171,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showContractSelectPage () {
-        return showContractSelectPage (null, null);
+    public Object showContractSelectPage() {
+        return showContractSelectPage(null, null);
     }
 
-    public Object showContractSelectPage (String contragentName) {
+    public Object showContractSelectPage(String contragentName) {
         return showContractSelectPage(contragentName, null);
     }
 
-    public Object showContractSelectPage (Long idOfContragent) {
-        return showContractSelectPage (null, idOfContragent);
+    public Object showContractSelectPage(Long idOfContragent) {
+        return showContractSelectPage(null, idOfContragent);
     }
 
-    public Object showContractSelectPage (String contragentName, Long idOfContragent) {
+    public Object showContractSelectPage(String contragentName, Long idOfContragent) {
 
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler
@@ -2252,7 +2250,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object completeContragentListSelection () {
+    public Object completeContragentListSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -2271,8 +2269,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete contragent list selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2294,14 +2292,13 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("{}", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
         }
         return null;
     }
 
-    public Object completeContractSelection () {
+    public Object completeContractSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -2320,8 +2317,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete contract selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контракта: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора контракта: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2351,8 +2348,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete contragent selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контрагента: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2413,9 +2410,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientListPage;
         } catch (Exception e) {
             logger.error("Failed to fill client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2440,9 +2436,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set filter for client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2467,9 +2462,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2493,9 +2487,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set filter for client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2520,9 +2513,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2559,9 +2551,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedClientGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected client group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2722,9 +2713,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientCreatePage;
         } catch (Exception e) {
             logger.error("Failed to show client create page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы регистрации клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2755,8 +2745,8 @@ public class MainPage implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиент зарегистрирован успешно", null));
             } catch (Exception e) {
                 logger.error("Failed to create client", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации клиента: " + e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при регистрации клиента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2792,7 +2782,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to show client file load page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы загрузки регистрационного списка клиентов: " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы загрузки регистрационного списка клиентов: " + e.getMessage(),
+                    null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2882,9 +2873,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиенты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update clients from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(), null));
         } finally {
             close(inputStream);
         }
@@ -2910,6 +2900,10 @@ public class MainPage implements Serializable {
 
     public String showGroupControlSubscriptionsCSVList() {
         return "showGroupControlSubscriptionsCSVList";
+    }
+
+    public String showCancelCategoryBenefitsCSVList() {
+        return "showCancelCategoryBenefitsCSVList";
     }
 
     public String showClientLoadResultCSVList() {
@@ -2954,9 +2948,8 @@ public class MainPage implements Serializable {
                 modalPages.push(clientSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to fill client selection page", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
-                                null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2981,9 +2974,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to fill client selection page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3012,8 +3004,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete client selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора клиента: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3038,9 +3030,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for client select page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3050,7 +3041,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public BasicPage popModal () {
+    public BasicPage popModal() {
         return modalPages.pop();
     }
 
@@ -3073,9 +3064,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = contractBuildPage;
         } catch (Exception e) {
             logger.error("Failed to show contract build page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы подготовки договора: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы подготовки договора: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3102,9 +3092,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Номер договора клиента сгенерирован успешно", null));
         } catch (Exception e) {
             logger.error("Failed to generate client contract number", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации номера договора клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при генерации номера договора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3193,7 +3182,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to batch update client limit", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3220,7 +3210,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to batch update card expire date", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3277,8 +3268,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Отправка SMS завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to send client negative balance sms", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Отправка SMS завершена с ошибками: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Отправка SMS завершена с ошибками: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3394,8 +3385,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = cardListPage;
         } catch (Exception e) {
             logger.error("Failed to fill card list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3420,8 +3411,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set filter for card list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3446,8 +3437,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for card list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3480,9 +3471,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedCardGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected card group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3576,8 +3566,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные карты обновлены успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update card", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных карты: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении данных карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3606,9 +3596,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = cardCreatePage;
         } catch (Exception e) {
             logger.error("Failed to show card create page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3636,7 +3625,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to create card", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации карты: " +e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации карты: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3729,9 +3719,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
             logger.error("Failed to load cards from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по картам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по картам: " + e.getMessage(), null));
         } finally {
             close(inputStream);
         }
@@ -3876,8 +3865,9 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to remove contragent client account", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении счета: " + e.getMessage(), null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении счета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3939,7 +3929,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to create ccAccount", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации счета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации счета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3995,9 +3986,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Счета загружены и зарегистрированы успешно", null));
         } catch (Exception e) {
             logger.error("Failed to load ccAccounts from file", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по счетам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по счетам: " + e.getMessage(), null));
         } finally {
             close(inputStream);
         }
@@ -4019,7 +4009,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
+                            null));
         }
     }
 
@@ -4045,14 +4036,16 @@ public class MainPage implements Serializable {
         }
     }
 
-    public void groupControlGenerate(){
+    public void groupControlGenerate() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         BufferedReader bufferedReader = null;
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
-            groupControlSubscriptionsPage.groupControlGenerate(groupControlSubscriptionsPage.getUploadItem(), runtimeContext, bufferedReader);
+            groupControlSubscriptionsPage
+                    .groupControlGenerate(groupControlSubscriptionsPage.getUploadItem(), runtimeContext,
+                            bufferedReader);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             facesContext.addMessage(null,
@@ -4126,7 +4119,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: "+e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
+                            null));
         }
     }
 
@@ -4187,8 +4181,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Электронное письмо отправлено успешно", null));
         } catch (Exception e) {
             logger.error("Failed to send support email", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при отправке электронного письма: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при отправке электронного письма: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4256,9 +4250,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to remove report discountrule", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки отчетов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при удалении правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4369,7 +4362,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to fill report discountrule edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования правила обработки отчетов: " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы редактирования правила обработки отчетов: " + e.getMessage(),
+                    null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4398,9 +4392,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Правило обработки отчетов обновлено успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update report discountrule", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила обработки отчетов: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4459,7 +4452,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4528,9 +4522,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to remove event notification", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки уведомлений: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при удалении правила обработки уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4672,7 +4665,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to update report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4731,7 +4725,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4760,9 +4755,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = testLogPage;
         } catch (Exception e) {
             logger.error("Failed to show log ru.axetta.ecafe.processor.core.test page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы тестирования лога: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы тестирования лога: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4789,7 +4783,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to ru.axetta.ecafe.processor.core.test log", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при тестировании лога: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при тестировании лога: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4846,7 +4841,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build sign keys", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации ключей: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации ключей: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4887,9 +4883,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = orderRemovePage;
         } catch (Exception e) {
             logger.error("Failed to show order remove page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы удаления покупки: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы удаления покупки: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4962,7 +4957,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to remove report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении задачи: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении задачи: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -5033,9 +5029,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = reportJobViewPage;
         } catch (Exception e) {
             logger.error("Failed to fill report job view page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы просмотра задачи: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра задачи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5104,7 +5099,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to update report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении задачи: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении задачи: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -5128,9 +5124,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = reportJobCreatePage;
         } catch (Exception e) {
             logger.error("Failed to show report job create page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы создания задачи: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы создания задачи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5149,7 +5144,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to create report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании задачи: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании задачи: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -5270,19 +5266,19 @@ public class MainPage implements Serializable {
         return informReportsGroupMenu;
     }
 
-    public Object showGoodRequestsGroupMenu () {
+    public Object showGoodRequestsGroupMenu() {
         currentWorkspacePage = goodRequestsGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showBudgetFoodGroupMenu () {
+    public Object showBudgetFoodGroupMenu() {
         currentWorkspacePage = budgetFoodGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showPaidFoodGroupMenu () {
+    public Object showPaidFoodGroupMenu() {
         currentWorkspacePage = paidFoodGroupMenu;
         updateSelectedMainMenu();
         return null;
@@ -5294,7 +5290,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showPaymentReportsGroupMenu () {
+    public Object showPaymentReportsGroupMenu() {
         currentWorkspacePage = paymentReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
@@ -5312,7 +5308,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showRepositoryUtilityGroupMenu () {
+    public Object showRepositoryUtilityGroupMenu() {
         currentWorkspacePage = repositoryUtilityGroupMenu;
         updateSelectedMainMenu();
         return null;
@@ -5355,7 +5351,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build free complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5402,7 +5399,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build pay complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5436,15 +5434,14 @@ public class MainPage implements Serializable {
         return clientsBenefitsReportPage;
     }
 
-    public Object showClientsBenefitsReportPage () {
+    public Object showClientsBenefitsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = clientsBenefitsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по количеству льгот: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по количеству льгот: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5467,7 +5464,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5475,15 +5473,14 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showDeliveredServicesReportPage () {
+    public Object showDeliveredServicesReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = deliveredServicesReportPage;
         } catch (Exception e) {
             logger.error("Failed to set delivered report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по предоставленным услугам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по предоставленным услугам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5505,14 +5502,14 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (JRException fnfe) {
             logger.error("Failed to build Delivered report", fnfe);
-            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message), null));
+            String message = (fnfe.getCause() == null ? fnfe.getMessage() : fnfe.getCause().getMessage());
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message), null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5560,7 +5557,7 @@ public class MainPage implements Serializable {
         return detailedDeviationsWithoutCorpsNewReportPage;
     }
 
-    public Object showGoodRequestNewReportPage () {
+    public Object showGoodRequestNewReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -5585,7 +5582,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showRequestsAndOrdersReportPage () {
+    public Object showRequestsAndOrdersReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext;
         Session persistenceSession = null;
@@ -5611,16 +5608,15 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showDiscrepanciesOnOrdersAndAttendanceReportPage () {
+    public Object showDiscrepanciesOnOrdersAndAttendanceReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             discrepanciesOnOrdersAndAttendanceReportPage.fill();
             currentWorkspacePage = discrepanciesOnOrdersAndAttendanceReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5643,7 +5639,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5670,7 +5667,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5695,14 +5693,15 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReportSum report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
     }
 
-    public Object showAggregateGoodRequestReportPage () {
+    public Object showAggregateGoodRequestReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = detailedGoodRequestReportPage;
@@ -5733,7 +5732,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5795,35 +5795,35 @@ public class MainPage implements Serializable {
             currentWorkspacePage = detailedDeviationsWithoutCorpsNewReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(), null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
+                            null));
         }
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showContragentPaymentsReportPage () {
+    public Object showContragentPaymentsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = contragentPaymentReportPage;
         } catch (Exception e) {
             logger.error("Failed to set payment report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по платежам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по платежам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
     }
 
-    public Object showClientPaymentsReportPage () {
+    public Object showClientPaymentsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = clientPaymentsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5831,7 +5831,7 @@ public class MainPage implements Serializable {
 
     public Object buildClientPaymentsReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if(clientPaymentsReportPage.validateFormData()){
+        if (clientPaymentsReportPage.validateFormData()) {
             return null;
         }
         RuntimeContext runtimeContext = null;
@@ -5849,7 +5849,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5865,9 +5866,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = salesReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5890,7 +5890,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5946,7 +5947,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build sync report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5990,7 +5992,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build status sync report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6010,9 +6013,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = enterEventReportPage;
         } catch (Exception e) {
             logger.error(" Failed to set enter event report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по турникетам: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчет по турникетам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -6035,7 +6037,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build enter event report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6059,9 +6062,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientBalanceByDayReportPage;
         } catch (Exception e) {
             logger.error("Failed to set ClientBalanceByDayreport page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -6077,9 +6079,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientReportPage;
         } catch (Exception e) {
             logger.error("Failed to set client report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -6102,7 +6103,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build client report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6120,9 +6122,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = totalSalesPage;
         } catch (Exception e) {
             logger.error("Failed to set client report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -6141,7 +6142,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build client report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
 
         }
@@ -6174,8 +6176,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = configurationPage;
         } catch (Exception e) {
             logger.error("Failed to fill configuration page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы конфигурации: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы конфигурации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6209,8 +6211,8 @@ public class MainPage implements Serializable {
                     "Конфигурация сохранена успешно. Для применения необходим перезапуск", null));
         } catch (Exception e) {
             logger.error("Failed to save configurations", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при сохранении конфигурации: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при сохранении конфигурации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6285,7 +6287,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build current positions report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6342,8 +6345,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to count current positions", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при расчете текущих позиций: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при расчете текущих позиций: " + e.getMessage(), null));
         } finally {
 
         }
@@ -6442,8 +6445,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Точка продажи зарегистрирована успешно", null));
         } catch (Exception e) {
             logger.error("Failed to create ccAccount", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации точки продажи: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6468,9 +6471,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке справочника точек продаж: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке справочника точек продаж: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6507,8 +6509,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to remove POS", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении точки продажи: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при удалении точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6572,8 +6574,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные точки продажи обновлены успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update POS", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных точки продажи: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении данных точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6602,9 +6604,8 @@ public class MainPage implements Serializable {
             currentWorkspacePage = selectedPosGroupPage;
         } catch (Exception e) {
             logger.error("Failed to fill selected POS group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы точки продажи: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6711,9 +6712,8 @@ public class MainPage implements Serializable {
                     "Платеж между указанными контрагентами не может быть осуществлен: " + e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to create settlement", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6777,7 +6777,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to remove settlement", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6840,8 +6841,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные платежа обновлены успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update settlement", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении данных платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6978,9 +6979,8 @@ public class MainPage implements Serializable {
                     "Платеж между указанными контрагентами не может быть осуществлен: " + e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to create addPayment", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7044,7 +7044,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to remove addPayment", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7107,8 +7108,8 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные платежа обновлены успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update addPayment", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении данных платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7188,8 +7189,8 @@ public class MainPage implements Serializable {
                 modalPages.push(ruleListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to complete  discountrule selection", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при обработке выбора правила: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7214,8 +7215,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7236,8 +7237,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7253,8 +7254,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7321,9 +7322,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to complete categorydiscount org selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7343,9 +7343,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории организации: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7361,9 +7360,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
-                            null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории организации: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7376,8 +7374,7 @@ public class MainPage implements Serializable {
         return categoryFilterOfSelectCategoryListSelectPage;
     }
 
-    public void setCategoryFilterOfSelectCategoryListSelectPage(
-            String categoryFilterOfSelectCategoryListSelectPage) {
+    public void setCategoryFilterOfSelectCategoryListSelectPage(String categoryFilterOfSelectCategoryListSelectPage) {
         this.categoryFilterOfSelectCategoryListSelectPage = categoryFilterOfSelectCategoryListSelectPage;
     }
 
@@ -7400,8 +7397,7 @@ public class MainPage implements Serializable {
                 if (StringUtils.isEmpty(categoryFilterOfSelectCategoryListSelectPage)) {
                     categoryListSelectPage.fill(persistenceSession, flag);
                 } else {
-                    categoryListSelectPage
-                            .fill(persistenceSession, flag, categoryFilterOfSelectCategoryListSelectPage);
+                    categoryListSelectPage.fill(persistenceSession, flag, categoryFilterOfSelectCategoryListSelectPage);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -7410,8 +7406,8 @@ public class MainPage implements Serializable {
                 modalPages.push(categoryListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to complete  categorydiscount selection", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при обработке выбора категории: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7441,8 +7437,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7463,8 +7459,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7480,8 +7476,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7511,9 +7507,8 @@ public class MainPage implements Serializable {
                 }
             } catch (Exception e) {
                 logger.error("Failed to fill categorydiscount selection page", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора категории: " + e.getMessage(),
-                                null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора категории: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7543,8 +7538,8 @@ public class MainPage implements Serializable {
             }
         } catch (Exception e) {
             logger.error("Failed to complete categorydiscount selection", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7626,7 +7621,7 @@ public class MainPage implements Serializable {
     }
 
     public String getUserRole() throws Exception {
-       return getCurrentUser().getRoleName();
+        return getCurrentUser().getRoleName();
     }
 
     public boolean isEligibleToViewOrgs() throws Exception {
@@ -7853,7 +7848,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to build all complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7884,8 +7880,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new limit", e);
-            facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита: " + e.getMessage(), null));
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7909,7 +7905,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to set new org", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации: " + e.getMessage(),
+                            null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7932,8 +7929,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита дневных трат: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при смене лимита дневных трат: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7955,8 +7952,8 @@ public class MainPage implements Serializable {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении параметров уведомления: " + e.getMessage(), null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при изменении параметров уведомления: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7979,7 +7976,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Error on deleting report template file.", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона: " + e.getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона: " + e.getMessage(),
+                            null));
         }
         return null;
     }
@@ -8005,6 +8003,7 @@ public class MainPage implements Serializable {
     public void registerModalPageShow(BasicPage modalPage) {
         modalPages.push(modalPage);
     }
+
     public void registerModalPageHide(BasicPage modalPage) {
         if (modalPages.peek().equals(modalPage)) {
             modalPages.pop();
@@ -8012,27 +8011,27 @@ public class MainPage implements Serializable {
     }
 
     public UvDeletePage getOpenedDeletePage() {
-        return (UvDeletePage)modalPages.peek();
+        return (UvDeletePage) modalPages.peek();
     }
 
     public BasicWorkspacePage getInfoGroupMenu() {
         return infoGroupMenu;
     }
 
-    public String getUserContragentsList () {
+    public String getUserContragentsList() {
         try {
             return ContextDAOServices.getInstance().getContragentsListForTooltip(getCurrentUser().getIdOfUser());
         } catch (Exception e) {
-            logger.error("getContragentsListForTooltip Error",e);
+            logger.error("getContragentsListForTooltip Error", e);
             return "";
         }
     }
 
-    public String getUserRegionsList () {
+    public String getUserRegionsList() {
         try {
             return getCurrentUser().getRegion();
         } catch (Exception e) {
-            logger.error("getContragentsListForTooltip Error",e);
+            logger.error("getContragentsListForTooltip Error", e);
             return "";
         }
     }

@@ -54,10 +54,16 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
             if (!clientList.isEmpty()) {
                 Long rowNum = 0L;
                 for (Client client : clientList) {
+                    String clientGroup;
+                    if (client.getClientGroup() != null) {
+                        clientGroup = client.getClientGroup().getGroupName();
+                    } else {
+                        clientGroup = "";
+                    }
                     GroupControlBenefitsItems groupControlBenefitsItems = new GroupControlBenefitsItems(++rowNum,
-                            client.getOrg().getShortName(), client.getClientGroup().getGroupName(),
-                            client.getPerson().getSurname(), client.getPerson().getFirstName(),
-                            client.getPerson().getSecondName(), client.getContractId().toString(), "", "");
+                            client.getOrg().getShortName(), clientGroup, client.getPerson().getSurname(),
+                            client.getPerson().getFirstName(), client.getPerson().getSecondName(),
+                            client.getContractId().toString(), "", "");
 
                     groupControlBenefitsItemsList.add(groupControlBenefitsItems);
                 }
