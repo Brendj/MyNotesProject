@@ -15,7 +15,7 @@ import java.util.Date;
  * Time: 16:08
  */
 
-public class DeviationPaymentNewSubReportItem implements Comparable<DeviationPaymentNewSubReportItem>  {
+public class DeviationPaymentNewSubReportItem implements Comparable<DeviationPaymentNewSubReportItem> {
 
     public Long rowNum; //номер порядковый
     public String groupName;    // группа клиента (класс, сотрудники и т.д.)
@@ -27,8 +27,8 @@ public class DeviationPaymentNewSubReportItem implements Comparable<DeviationPay
     public DeviationPaymentNewSubReportItem() {
     }
 
-    public DeviationPaymentNewSubReportItem(Long rowNum, String condition, String groupName, String personName, Date orderDate,
-            String complexName) {
+    public DeviationPaymentNewSubReportItem(Long rowNum, String condition, String groupName, String personName,
+            Date orderDate, String complexName) {
         this.rowNum = rowNum;
         this.condition = condition;
         this.groupName = groupName;
@@ -92,12 +92,6 @@ public class DeviationPaymentNewSubReportItem implements Comparable<DeviationPay
     @Override
     public int compareTo(DeviationPaymentNewSubReportItem o) {
         int retCode = this.condition.compareTo(o.getCondition());
-        if (retCode == 0) {
-            retCode = this.groupName.compareTo(o.getGroupName());
-        }
-        if (retCode == 0) {
-            retCode = this.orderDate.compareTo(o.getOrderDate());
-        }
         return retCode;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Date;
  * Time: 13:44
  */
 
-public class PlanOrderItem {
+public class PlanOrderItem implements Comparable<PlanOrderItem> {
 
     public Long idOfClient;
     public String clientName;
@@ -182,5 +182,14 @@ public class PlanOrderItem {
         result = 31 * result + idOfRule.hashCode();
         result = 31 * result + orderDate.hashCode();
         return result;
+    }
+
+    @Override
+    public int compareTo(PlanOrderItem o) {
+        int retCode = this.groupName.compareTo(o.getGroupName());
+        if (retCode == 0)
+            retCode = this.orderDate.compareTo(o.getOrderDate());
+
+        return retCode;
     }
 }
