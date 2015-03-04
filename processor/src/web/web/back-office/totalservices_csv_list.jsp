@@ -9,7 +9,7 @@
 <%
     response.setHeader("Content-disposition", "inline;filename=totalservices.csv");
 %><f:view>
-    <h:outputText escape="false" value="Организация;Число учащихся;Получают льготное питание;;Зафиксирован проход;;Получили льготное питание;;Получили платное питание;;Получили питание (льготное + платное)"/>
+    <h:outputText escape="false" value="Организация;Число учащихся;Число льготников;;Зафиксирован проход;;Получили льготное питание;;Получили комплексное питание;;Получили питание в буфете;;Получили питание (льготное + платное)"/>
     <h:outputText escape="false" value="#{mainPage.endOfLine}" />
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <a4j:repeat value="#{totalServicesReportPage.totalReport.items}" var="item">
