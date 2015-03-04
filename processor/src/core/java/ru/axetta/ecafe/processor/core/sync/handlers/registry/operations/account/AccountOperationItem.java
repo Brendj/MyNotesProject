@@ -18,6 +18,8 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
 public class AccountOperationItem {
     public static final String SYNC_NAME = "AT";
 
+    private String modifiedIdOfOperation;
+
     private long idOfOperation;
     private long date;
     private long idOfContract;
@@ -95,5 +97,13 @@ public class AccountOperationItem {
 
     public Long getIdOfContragent() {
         return idOfContragent;
+    }
+
+    public String getModifiedIdOfOperation() {
+        return modifiedIdOfOperation;
+    }
+
+    public void setModifiedIdOfOperation(String modifiedIdOfOperation) {
+        this.modifiedIdOfOperation = modifiedIdOfOperation;
     }
 }

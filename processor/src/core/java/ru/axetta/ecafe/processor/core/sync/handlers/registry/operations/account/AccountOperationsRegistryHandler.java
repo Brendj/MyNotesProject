@@ -34,6 +34,7 @@ public class AccountOperationsRegistryHandler {
         AccountOperationsRepository accountOperationsRepository = AccountOperationsRepository.getInstance();
 
         for (AccountOperationItem accountOperationItem : accountOperationsRegistry.getOperationItemList()) {
+            accountOperationItem.setModifiedIdOfOperation(preapreIdOfOperation(request, accountOperationItem.getIdOfOperation()));
             List<AccountOperations> searchResult = accountOperationsRepository
                     .findByIdOfOperation(accountOperationItem.getIdOfOperation(), request.getIdOfOrg());
             ResAccountOperationItem resAccountOperationItem = handleItem(accountOperationItem, searchResult,request);
@@ -136,7 +137,7 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
             payRequest = new OnlinePaymentProcessor.PayRequest(1, false, accountOperationItem.getIdOfContragent(), null,
-                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), ""+accountOperationItem.getIdOfOperation(), null, accountOperationItem.getValue(), false);
+                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), accountOperationItem.getModifiedIdOfOperation(), null, accountOperationItem.getValue(), false);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalException(e.getMessage());
@@ -162,7 +163,7 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayRequest payRequest = null;
         try {
             payRequest = new OnlinePaymentProcessor.PayRequest(1, false, accountOperationItem.getIdOfContragent(), null,
-                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), ""+accountOperationItem.getIdOfOperation(), null, (accountOperationItem.getValue() * (-1)), true);
+                    ClientPayment.CASHIER_PAYMENT_METHOD, accountOperationItem.getIdOfContract(), accountOperationItem.getModifiedIdOfOperation(), null, (accountOperationItem.getValue() * (-1)), true);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InternalException(e.getMessage());
@@ -174,5 +175,13 @@ public class AccountOperationsRegistryHandler {
             throw new DuplicatePaymentException();
         }
         return payResponse;
+    }
+
+    /*
+    * AO+_+idoforg+_+idofoperation
+    * */
+    private String preapreIdOfOperation(SyncRequest request, long idOfOperation){
+        return "AO_"+request.getIdOfOrg()+"_"+idOfOperation;
+
     }
 }
