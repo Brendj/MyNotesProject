@@ -66,20 +66,18 @@ public class ContragentDAOService extends AbstractDAOService {
     public ContragentCompletionItem generateReportItemWithTransactionOrgIsNull(Long idOfOrg,
             List<Contragent> contragentList, Date startDate, Date endDate) {
         Org org = (Org) getSession().load(Org.class, idOfOrg);
-        Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
-        criteriaIsNotNull.createAlias("transaction", "tr")
+        Criteria criteriaIsNull = getSession().createCriteria(ClientPayment.class);
+        criteriaIsNull.createAlias("transaction", "tr")
                 .add(Restrictions.isNull("tr.org"))
                 .createAlias("tr.client", "cl")
                 .add(Restrictions.eq("cl.org", org))
                 .createAlias("contragent", "c")
                 .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteriaIsNotNull.setProjection(Projections.projectionList()
-                .add(Projections.sum("paySum"))
-                .add(Projections.groupProperty("c.idOfContragent"))
-                .add(Projections.count("idOfClientPayment")));
-        criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
-        List list = criteriaIsNotNull.list();
+        criteriaIsNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        criteriaIsNull.add(Restrictions.between("createTime", startDate, endDate));
+        List list = criteriaIsNull.list();
 
         ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
         contragentCompletionItem.setContragentPayItems(list);
