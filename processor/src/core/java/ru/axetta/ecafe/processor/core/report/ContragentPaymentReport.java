@@ -75,7 +75,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 this.firstName = person.getFirstName();
                 this.surName = person.getSurname();
                 this.secondName = person.getSecondName();
-                Org org = client.getOrg();
+                Org org = accountTransaction.getOrg() != null ? accountTransaction.getOrg() : client.getOrg();
                 this.idOfOrg = org.getIdOfOrg();
                 this.shortName = org.getShortName();
                 Contragent contragentReceiver = clientPayment.getContragentReceiver();
