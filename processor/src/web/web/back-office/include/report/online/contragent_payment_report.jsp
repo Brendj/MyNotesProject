@@ -120,6 +120,9 @@
             <f:verbatim>
                 <div class="htmlReportContent"> ${mainPage.contragentPaymentReportPage.htmlReport} </div>
             </f:verbatim>
+            <c:if test="${not empty mainPage.contragentPaymentReportPage.emptyData}">
+                <h:outputText escape="true" value=" #{mainPage.contragentPaymentReportPage.emptyData}" styleClass="input-text"/>
+            </c:if>
             <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
         </c:if>
     </h:panelGrid>

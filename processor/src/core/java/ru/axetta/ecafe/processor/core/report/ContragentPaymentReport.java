@@ -46,6 +46,16 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
     public static class Builder extends BasicReportForContragentJob.Builder {
 
+        public String error = null;
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+
         public static class ClientPaymentRow implements Comparable<ClientPaymentRow> {
 
             public Long idOfClient;
@@ -362,6 +372,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 }
             }
             parameterMap.put("totalSum", (float) totalSum / 100);
+            if(clientPaymentItems.isEmpty()) {
+                error  = "Для построения отчета данных не найдено";
+            }
             return new JRBeanCollectionDataSource(clientPaymentItems);
         }
 

@@ -67,6 +67,16 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     private String terminal;
     private String paymentIdentifier;
 
+    String emptyData = null;
+
+    public String getEmptyData() {
+        return emptyData;
+    }
+
+    public void setEmptyData(String emptyData) {
+        this.emptyData = emptyData;
+    }
+
     public String getPaymentIdentifier() {
         return paymentIdentifier;
     }
@@ -343,6 +353,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             persistenceTransaction = persistenceSession.beginTransaction();
             builder.setContragent(getContragent());
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            emptyData = builder.getError();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -391,7 +402,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         contragentPaymentReport = (ContragentPaymentReport) reportBuilder.build(session, startDate, endDate, localCalendar);
         htmlReport = contragentPaymentReport.getHtmlReport();
     }
-    
+
     private Contragent getContragent() throws Exception {
         Contragent contragent = null;
         if (contragentFilter != null && contragentFilter.getContragent() != null &&
@@ -406,10 +417,10 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
         return contragent;
     }
-    
+
     private Properties fillContragentReceiver() {
         return fillContragentReceiver(new Properties());
-    } 
+    }
 
     private Properties fillContragentReceiver(Properties props) {
         if (contragentReceiverFilter.getContragent() != null &&
