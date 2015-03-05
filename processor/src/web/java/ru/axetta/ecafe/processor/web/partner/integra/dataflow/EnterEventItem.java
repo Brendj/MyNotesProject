@@ -43,6 +43,14 @@ public class EnterEventItem {
     @XmlAttribute(name = "GuardianSan")
     protected String guardianSan;
 
+    @XmlAttribute(name = "idOfClient")
+    protected Long idOfClient;
+    @XmlAttribute(name = "IdOfCard")
+    protected Long IdOfCard;
+    @XmlAttribute(name = "TurnstileAddr")
+    protected String TurnstileAddr;
+    @XmlAttribute(name = "VisitorFullName")
+    protected String VisitorFullName;
 
     /**
      * Gets the value of the dateTime property.
@@ -170,5 +178,37 @@ public class EnterEventItem {
 
     public void setGuardianSan(String guardianSan) {
         this.guardianSan = guardianSan;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
+    }
+
+    public Long getIdOfCard() {
+        return IdOfCard;
+    }
+
+    public void setIdOfCard(Long idOfCard) {
+        IdOfCard = idOfCard;
+    }
+
+    public String getTurnstileAddr() {
+        return TurnstileAddr;
+    }
+
+    public void setTurnstileAddr(String turnstileAddr) {
+        TurnstileAddr = turnstileAddr;
+    }
+
+    public String getVisitorFullName() {
+        return VisitorFullName;
+    }
+
+    public void setVisitorFullName(String visitorFullName) {
+        VisitorFullName = visitorFullName;
     }
 }

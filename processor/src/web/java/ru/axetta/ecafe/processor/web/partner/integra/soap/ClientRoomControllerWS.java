@@ -17,6 +17,8 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcess
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
+import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
@@ -2702,17 +2704,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public EnterEventListResult getNEnterEventList(@WebParam(name = "orgId") long orgId,@WebParam(name = "startDate") final Date startDate,
             @WebParam(name = "N") final int n) {
         Data data = null;
+        EnterEventListResult enterEventListResult = new EnterEventListResult();
         try {
             data = processNEnterEventList( orgId,startDate, n);
+            enterEventListResult.enterEventList = data.getEnterEventList();
+            enterEventListResult.resultCode = data.getResultCode();
+            enterEventListResult.description = data.getDescription();
         } catch (Exception e) {
             e.printStackTrace();
+            enterEventListResult.resultCode = RC_INTERNAL_ERROR;
+            enterEventListResult.description = e.getMessage().toString();
         }
-
-
-        EnterEventListResult enterEventListResult = new EnterEventListResult();
-        enterEventListResult.enterEventList = data.getEnterEventList();
-        enterEventListResult.resultCode = data.getResultCode();
-        enterEventListResult.description = data.getDescription();
         return enterEventListResult;
     }
 
@@ -2856,41 +2858,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private Data processNEnterEventList(long orgId,Date date, int n) throws Exception {
 
         Data data = new Data();
-        RuntimeContext runtimeContext = null;
-        Session session = null;
-        List<EnterEvent> enterEvents = null;
+        data.setResultCode(RC_OK);
+        data.setDescription(RC_OK_DESC);
 
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            session = runtimeContext.createPersistenceSession();
-        Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
+        List<EnterEvent> lastNEnterEvent = EnterEventsRepository.getInstance().findLastNEnterEvent(orgId, date, n);
 
-            enterEventCriteria.add(Restrictions.lt("evtDateTime", date));
-            enterEventCriteria.add(Restrictions.eq("org.idOfOrg",orgId ));
-            enterEventCriteria.add(Restrictions.ne("passDirection", 4));
-            enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
-            enterEventCriteria.setMaxResults(n);
-            enterEvents = enterEventCriteria.list();
-        } catch (Exception e) {
-            log("Ошибка при получении событий прохода",e);
-        }
-        finally {
-            if(session != null){
-                session.close();
-
-            }
-
-        }
         Locale locale = new Locale("ru", "RU");
         Calendar calendar = Calendar.getInstance(locale);
 
-
         EnterEventList enterEventList =new EnterEventList();
-        int nRecs = 0;
-        for (EnterEvent enterEvent : enterEvents) {
-            if (nRecs++ > MAX_RECS) {
-                break;
-            }
+        for (EnterEvent enterEvent : lastNEnterEvent) {
             EnterEventItem enterEventItem = new EnterEventItem();
             enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
             calendar.setTime(enterEvent.getEvtDateTime());
@@ -2900,11 +2877,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
-                //Client guardian = DAOUtils.findClient(session, guardianId);
-                //enterEventItem.setGuardianSan(guardian.getSan());
-                enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
+                enterEventItem.setGuardianSan(ClientDao.getInstance().extractSanFromClient(guardianId));
             }
             enterEventList.getE().add(enterEventItem);
+
+            if (enterEvent.getClient()!= null){
+                enterEventItem.setIdOfClient(enterEvent.getClient().getIdOfClient());
+            }
+            enterEventItem.setIdOfCard(enterEvent.getIdOfCard());
+            enterEventItem.setTurnstileAddr(enterEvent.getTurnstileAddr());
+            enterEventItem.setVisitorFullName(enterEvent.getVisitorFullName());
         }
         data.setEnterEventList(enterEventList);
 

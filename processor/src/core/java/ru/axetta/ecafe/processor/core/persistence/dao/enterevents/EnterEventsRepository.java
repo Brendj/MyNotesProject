@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.enterevents;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.AbstractJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -254,4 +256,15 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
         return result;
     }
 
+
+    @Transactional(readOnly = true)
+    public List<EnterEvent> findLastNEnterEvent(long orgId,Date date, int n){
+        TypedQuery<EnterEvent> query = entityManager.createQuery(
+                "from EnterEvent where evtDateTime <= :date and org.idOfOrg = :idOfOrg order by evtDateTime desc ",
+                EnterEvent.class);
+        query.setMaxResults(n);
+        query.setParameter("idOfOrg",orgId);
+        query.setParameter("date",date);
+        return query.getResultList();
+    }
 }

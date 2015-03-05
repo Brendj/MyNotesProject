@@ -6,9 +6,14 @@ package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,12 +74,21 @@ public class ClientDao extends WritableJpaDao {
     @Transactional
     public List<ClientCount> findAllBeneficiaryStudentsCount() {
         Query nativeQuery = entityManager.createNativeQuery(
-                "select idoforg, count(*) from cf_clients where idofclientgroup <  1100000000 and DiscountMode > 0 group by idoforg ");
+                "select idoforg, count(*) from cf_clients where idofclientgroup <  :groupLimitation and DiscountMode > 0 group by idoforg ");
+        nativeQuery.setParameter("groupLimitation", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES);
         List<ClientCount> result = new ArrayList<ClientCount>();
         for (Object o : nativeQuery.getResultList()) {
             Object[] o1 = (Object[]) o;
             result.add(new ClientCount(((BigInteger)o1[0]).longValue(),((BigInteger)o1[1]).intValue()));
         }
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public String extractSanFromClient(long idOfClient){
+        Criteria criteria = entityManager.unwrap(Session.class).createCriteria(Client.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        criteria.setProjection(Projections.property("san"));
+        return (String) criteria.uniqueResult();
     }
 }
