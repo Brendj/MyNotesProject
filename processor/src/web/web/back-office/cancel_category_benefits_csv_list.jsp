@@ -5,11 +5,11 @@
         taglib prefix="a4j" uri="http://richfaces.org/a4j" %><%
     response.setHeader("Content-disposition", "inline;filename=cancelCategoryBenefits.csv");
 %><f:view>
-    <h:outputText escape="false" value="№;Наименование ОУ и адрес;Фамилия;Имя;Отчество;Л/c;Результат;"/>
+    <h:outputText escape="false" value="№;Наименование ОУ;Фамилия;Имя;Отчество;Л/c;Льготы;Результат;"/>
     <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
     <a4j:repeat value="#{mainPage.cancelCategoryBenefitsPage.groupControlBenefitsItemsList}" var="item">
         <h:outputText escape="false"
-                      value="#{item.rowNum};#{item.orgName};#{item.surname};#{item.firstName};#{item.secondName};#{item.contractId};#{item.result};"/>
+                      value="#{item.rowNum};#{item.orgName};#{item.surname};#{item.firstName};#{item.secondName};#{item.contractId};#{item.benefits};#{item.result};"/>
         <h:outputText escape="false" value="#{mainPage.endOfLine}"/>
     </a4j:repeat>
 </f:view>

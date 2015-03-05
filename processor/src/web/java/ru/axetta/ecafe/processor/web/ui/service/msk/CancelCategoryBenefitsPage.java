@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -15,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,23 +59,68 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
                 Long rowNum = 0L;
                 for (Client client : clientList) {
                     String clientGroup;
+
                     if (client.getClientGroup() != null) {
                         clientGroup = client.getClientGroup().getGroupName();
                     } else {
                         clientGroup = "";
                     }
-                    GroupControlBenefitsItems groupControlBenefitsItems = new GroupControlBenefitsItems(++rowNum,
-                            client.getOrg().getShortName(), clientGroup, client.getPerson().getSurname(),
-                            client.getPerson().getFirstName(), client.getPerson().getSecondName(),
-                            client.getContractId().toString(), "", "");
 
-                    groupControlBenefitsItemsList.add(groupControlBenefitsItems);
+                    Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
+
+                    Set<CategoryDiscount> emptyCategoryDiscountSet = new HashSet<CategoryDiscount>();
+
+                    if (!categoryDiscountSet.isEmpty()) {
+                        String categoriesDiscounts = "";
+                        int countSize = 0;
+                        for (CategoryDiscount categoryDiscount : categoryDiscountSet) {
+                            ++countSize;
+                            categoriesDiscounts = categoriesDiscounts + categoryDiscount.getCategoryName();
+                            if (categoryDiscountSet.size() > 1 && countSize < categoryDiscountSet.size()) {
+                                categoriesDiscounts = categoriesDiscounts + ", ";
+                            }
+                        }
+
+                        GroupControlBenefitsItems groupControlBenefitsItems = new GroupControlBenefitsItems(++rowNum,
+                                client.getOrg().getShortName(), clientGroup, client.getPerson().getSurname(),
+                                client.getPerson().getFirstName(), client.getPerson().getSecondName(),
+                                client.getContractId().toString(), categoriesDiscounts,
+                                "Клиент с л/c № " + client.getContractId().toString() + " отменены льготы ("
+                                        + categoriesDiscounts + ")");
+
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+                        client.setDiscountMode(0);
+                        client.setCategoriesDiscounts("");
+                        client.setClientRegistryVersion(clientRegistryVersion);
+                        client.setCategories(emptyCategoryDiscountSet);
+                        persistenceSession.update(client);
+
+                        groupControlBenefitsItemsList.add(groupControlBenefitsItems);
+                    } else {
+
+                        GroupControlBenefitsItems groupControlBenefitsItems = new GroupControlBenefitsItems(++rowNum,
+                                client.getOrg().getShortName(), clientGroup, client.getPerson().getSurname(),
+                                client.getPerson().getFirstName(), client.getPerson().getSecondName(),
+                                client.getContractId().toString(), "",
+                                "Клиент с л/c № " + client.getContractId().toString() + " не обнаружены льготы");
+
+                        if (client.getDiscountMode() == 3) {
+                            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+
+                            client.setDiscountMode(0);
+                            client.setCategoriesDiscounts("");
+                            client.setClientRegistryVersion(clientRegistryVersion);
+                            persistenceSession.update(client);
+                        }
+                        groupControlBenefitsItemsList.add(groupControlBenefitsItems);
+                    }
                 }
             }
             persistenceTransaction.commit();
         } catch (Exception ex) {
             HibernateUtils.rollback(persistenceTransaction, logger);
             ex.printStackTrace();
+            printError("Произошла ошибка обработки клиента. Отмена льгот не произведена для всех клиентов.");
         } finally {
             HibernateUtils.close(persistenceSession, logger);
         }
