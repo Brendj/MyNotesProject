@@ -1495,6 +1495,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return map;
     }
 
+    @Transactional(readOnly = true)
     public void updateInfoCurrentUser(List<Long> orgIds, List<Long> orgIdsCancel, User user) {
         Session session = entityManager.unwrap(Session.class);
         session.refresh(user);
@@ -1511,16 +1512,15 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             UserOrgs userOrgs1 = new UserOrgs(user , org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
             session.save(userOrgs1);
         }
-        session.close();
     }
 
+    @Transactional(readOnly = true)
 	public boolean existsOrgByIdAndTags(Long idOfOrg, String tag) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.ilike("tag", tag, MatchMode.ANYWHERE));
         List list = criteria.list();
-        session.close();
         return list.size()>0;
     }
 
