@@ -39,6 +39,8 @@ public class OrderDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob
             values.put(1,"Централизованное");
             values.put(2, "Централизованное с доготовкой");
             values.put(10,"Закупленное");
+            values.put(11, "Вендинг");
+            values.put(20, "Коммерческое питание");
         }
 
         public static class OrderDetailsItem {
