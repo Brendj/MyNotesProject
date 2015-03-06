@@ -78,6 +78,7 @@ public class ContragentSelectPage extends BasicPage {
                     multiContrFlag, classTypesString);
             completeHandlers.pop();
         }
+        clear(session);
     }
 
     public List<Item> getItems() {
@@ -119,6 +120,17 @@ public class ContragentSelectPage extends BasicPage {
             items.add(item);
         }
         this.items = items;
+    }
+
+    public void clear(Session session) {
+        this.multiContrFlag = 0;
+        filter = "";
+        selectedItem = new Item();
+        try {
+            fill(session, multiContrFlag, "1");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
