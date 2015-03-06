@@ -42,6 +42,8 @@ public class EnterEventItem {
     protected Integer temporaryCard;
     @XmlAttribute(name = "GuardianSan")
     protected String guardianSan;
+    @XmlAttribute(name = "PassWithGuardian")
+    protected Long passWithGuardian;
 
     @XmlAttribute(name = "idOfClient")
     protected Long idOfClient;
@@ -210,5 +212,13 @@ public class EnterEventItem {
 
     public void setVisitorFullName(String visitorFullName) {
         VisitorFullName = visitorFullName;
+    }
+
+    public Long getPassWithGuardian() {
+        return passWithGuardian;
+    }
+
+    public void setPassWithGuardian(Long passWithGuardian) {
+        this.passWithGuardian = passWithGuardian;
     }
 }
