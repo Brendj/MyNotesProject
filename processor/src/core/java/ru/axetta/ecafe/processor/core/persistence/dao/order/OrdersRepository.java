@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.dao.order;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 
@@ -22,6 +23,10 @@ import java.util.List;
  */
 @Repository
 public class OrdersRepository extends BaseJpaDao {
+
+    public static OrdersRepository getInstance() {
+        return RuntimeContext.getAppContext().getBean(OrdersRepository.class);
+    }
 
     private List<OrderItem> getOrderItemBySQL(String query) {
         List<Object[]> temp = entityManager.createNativeQuery(query).getResultList();
@@ -173,6 +178,31 @@ public class OrdersRepository extends BaseJpaDao {
         List<Object[]> temp = nativeQuery.getResultList();
         for(Object[] o : temp){
             orderItemList.add(new OrderItem(((BigInteger)o[0]).longValue(),(Integer)o[1],0L,((BigInteger)o[2]).longValue()));
+        }
+        return orderItemList;
+
+    }
+
+    public List<OrderItem> findAllBeneficiaryOrders(Date startTime, Date endTime){
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Query nativeQuery = entityManager.createNativeQuery(
+                "SELECT distinct on (o.idofclient) o.idoforg,o.ordertype, o.idofclient, o.createddate, o.socdiscount  FROM cf_orders o "
+                        + " INNER JOIN cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder=od.idoforder "
+                        + " WHERE o.socdiscount > 0 "
+                        + " AND o.ordertype IN (4,6,8)"
+                        + " AND o.state=0 "
+                        + " AND o.createddate BETWEEN  :startTime AND :endTime "
+                        + " AND od.menutype between 50 and 99 ")
+                .setParameter("startTime",startTime.getTime())
+                .setParameter("endTime",endTime.getTime());
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            OrderItem orderItem = new OrderItem(((BigInteger) o[0]).longValue(), (Integer) o[1], 0L,
+                    ((BigInteger) o[2]).longValue());
+            orderItem.setOrderDate(((BigInteger) o[3]).longValue());
+            orderItem.setSum(((BigInteger) o[4]).longValue());
+            orderItemList.add(orderItem);
         }
         return orderItemList;
 

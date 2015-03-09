@@ -449,4 +449,9 @@ public class CalendarUtils {
         return dates;
     }
 
+    public static Integer getMonthNumb(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return c.get(Calendar.MONTH);
     }
+}
