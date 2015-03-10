@@ -66,12 +66,13 @@
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
-		<field name="day" class="java.lang.Integer">
+		<field name="day" class="java.lang.Long">
 			<fieldDescription><![CDATA[day]]></fieldDescription>
 		</field>
 		<field name="dayl" class="java.lang.Integer">
 			<fieldDescription><![CDATA[dayl]]></fieldDescription>
 		</field>
+		<field name="dayShort" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="PlanSet" uuid="25fb1e4c-77f5-4943-9e8d-415f5b038bd0">
 		<field name="name" class="java.lang.String"/>
@@ -342,12 +343,12 @@
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="F-051" height="41" totalPosition="End">
-					<bucket class="java.lang.Integer">
-						<bucketExpression><![CDATA[$F{day}]]></bucketExpression>
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{dayShort}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Transparent" style="Crosstab 4_CH">
-							<textField>
+							<textField pattern="">
 								<reportElement uuid="49adc328-96dc-4d50-9c05-ac1330d12f61" x="0" y="0" width="70" height="40"/>
 								<box>
 									<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -582,14 +583,14 @@
 			</crosstab>
 			<staticText>
 				<reportElement uuid="9d9f4afb-f98b-428c-9979-f87ca5efbc8b" x="23" y="20" width="100" height="20"/>
-				<textElement/>
+				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 		</band>
 		<band height="80">
 			<staticText>
 				<reportElement uuid="60ee2169-85f9-4e3c-8c75-17a454addbed" x="23" y="7" width="100" height="20"/>
-				<textElement/>
+				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[По плану питания]]></text>
 			</staticText>
 			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false">
@@ -758,7 +759,7 @@
 		<band height="85">
 			<staticText>
 				<reportElement uuid="04c54ee0-334a-4172-a81f-14907d06b6f4" x="23" y="0" width="100" height="20"/>
-				<textElement/>
+				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Итого]]></text>
 			</staticText>
 			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false">
