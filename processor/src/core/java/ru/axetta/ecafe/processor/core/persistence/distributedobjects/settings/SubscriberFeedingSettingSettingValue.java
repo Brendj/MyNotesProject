@@ -9,7 +9,7 @@ import java.text.ParseException;
  * Time: 16:45
  * To change this template use File | Settings | File Templates.
  */
-public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySettingValue{
+public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettingValue {
 
     private int dayRequest; // Количество дней, на которые оформляются заявки на поставку
     private int dayDeActivate;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
@@ -29,13 +29,18 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
         this.enableFeeding = values[2].equals("1");
         //this.dayForbidChange = Integer.parseInt(values[3]);
         this.hoursForbidChange = Integer.parseInt(values[3]);
-        this.sixWorkWeek = values[4].equals("1");
+        if (values.length < 5) {
+            sixWorkWeek = false;
+        } else {
+            this.sixWorkWeek = values[4].equals("1");
+        }
     }
 
     @Override
     public String build() {
         //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
-        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (sixWorkWeek ? 1 : 0) + ";";
+        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
+                sixWorkWeek ? 1 : 0) + ";";
     }
 
     @Override
