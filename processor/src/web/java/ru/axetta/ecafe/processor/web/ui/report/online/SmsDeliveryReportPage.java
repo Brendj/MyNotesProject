@@ -68,7 +68,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             session = (Session) entityManager.getDelegate();
             buildReport(session);
         } catch (Exception e) {
-            logger.error("Failed to load sent sms data", e);
+                logger.error("Failed to load sent sms data", e);
         }
     }
 
@@ -110,6 +110,9 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
             SMSDeliveryReport.Builder builder = new SMSDeliveryReport.Builder(templateFilename);
+            if(idOfOrg != null) {
+                builder.setOrg(new BasicReportJob.OrgShortItem(idOfOrg, filter, filter));
+            }
             SMSDeliveryReport smsDeliveryReport = builder.build(session, startDate, endDate, new GregorianCalendar());
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();

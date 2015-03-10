@@ -159,7 +159,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         public List<SMSDeliveryReportItem> findInternal(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
             String orgCondition = "";
             if (org != null) {
-                orgCondition = "            and (o.idoforg=:idoforg) ";
+                orgCondition = "            and (sync1.idoforg=:idoforg) ";
             }
 
             Calendar startCal = new GregorianCalendar();
@@ -292,32 +292,34 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }
 
 
-            //  calc stats
-            for(long idoforg : entries.keySet()) {
-                temp = entries.get(idoforg);
-                if(temp == null || temp.size() < 1) {
-                    continue;
-                }
-                SMSDeliveryReportItem it = null;
-                for(SMSDeliveryReportItem i : items) {
-                    if(i.getOrgName() != null && temp.get(0).getOrgName() != null &&
-                       i.getOrgName().equals(temp.get(0).getOrgName())) {
-                        it = i;
-                        break;
+            if(entries != null) {
+                //  calc stats
+                for(long idoforg : entries.keySet()) {
+                    temp = entries.get(idoforg);
+                    if(temp == null || temp.size() < 1) {
+                        continue;
+                    }
+                    SMSDeliveryReportItem it = null;
+                    for(SMSDeliveryReportItem i : items) {
+                        if(i.getOrgName() != null && temp.get(0).getOrgName() != null &&
+                           i.getOrgName().equals(temp.get(0).getOrgName())) {
+                            it = i;
+                            break;
+                        }
+                    }
+                    boolean exists = it != null;
+                    it = calcSmsDeliveryitem(temp, it, exists ? null : items.size() + 1);
+                    if(!exists) {
+                        items.add(it);
                     }
                 }
-                boolean exists = it != null;
-                it = calcSmsDeliveryitem(temp, it, exists ? null : items.size() + 1);
-                if(!exists) {
-                    items.add(it);
-                }
+                /*
+                    SMSDeliveryReportItem item = new SMSDeliveryReportItem();
+                    item.setColumnId(1);
+                    item.setOrgName(officialname);
+                    item.setUniqueId(i);
+                 */
             }
-            /*
-                SMSDeliveryReportItem item = new SMSDeliveryReportItem();
-                item.setColumnId(1);
-                item.setOrgName(officialname);
-                item.setUniqueId(i);
-             */
 
             return items;
         }
@@ -406,7 +408,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         }
 
         protected static String calcTimeout(long time) {
-            DateFormat df;
+            /*DateFormat df;
             if(time / (60*60*24) >= 1) {
                 df = new SimpleDateFormat(String.format("'%s' '%s' H '%s' m '%s'", time / 86400000L, "дн.", "час.", "мин."));
             } else if(time / (60*60) >= 1) {
@@ -415,7 +417,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 df = new SimpleDateFormat(String.format("m '%s'", "мин."));
             } else {
                 df = new SimpleDateFormat(String.format("s '%s'", "сек."));
-            }
+            }*/
+            DateFormat df = new SimpleDateFormat(String.format("HH:mm:ss"));
             Date d = new Date(time*1000);
             return df.format(d);
         }
