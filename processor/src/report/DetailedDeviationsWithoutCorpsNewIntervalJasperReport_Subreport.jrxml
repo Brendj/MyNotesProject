@@ -22,7 +22,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="1bb790f8-67c7-42f0-9801-c07df0f73530" mode="Opaque" x="0" y="0" width="640" height="20" backcolor="#CCCCCC"/>
+					<reportElement uuid="1bb790f8-67c7-42f0-9801-c07df0f73530" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="640" height="20" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -40,7 +40,7 @@
 		<groupFooter>
 			<band height="20">
 				<textField>
-					<reportElement uuid="0b13630c-a9af-483e-870c-9e0b740ab825" x="0" y="0" width="640" height="20"/>
+					<reportElement uuid="0b13630c-a9af-483e-870c-9e0b740ab825" stretchType="RelativeToBandHeight" x="0" y="0" width="640" height="20"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -61,7 +61,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="91124eee-3f59-4166-83f2-7e687c07a8dc" x="0" y="0" width="640" height="20"/>
+					<reportElement uuid="91124eee-3f59-4166-83f2-7e687c07a8dc" stretchType="RelativeToBandHeight" x="0" y="0" width="640" height="20"/>
 					<box>
 						<pen lineWidth="0.75"/>
 						<topPen lineWidth="0.75"/>
@@ -83,7 +83,7 @@
 	<detail>
 		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement uuid="68f974d4-7034-4ac5-9ece-4bf9728d5e41" x="30" y="0" width="510" height="20"/>
+				<reportElement uuid="68f974d4-7034-4ac5-9ece-4bf9728d5e41" stretchType="RelativeToBandHeight" x="40" y="0" width="500" height="20"/>
 				<box>
 					<pen lineWidth="0.5" lineStyle="Dashed"/>
 					<topPen lineWidth="0.5" lineStyle="Dashed"/>
@@ -97,7 +97,7 @@
 				<textFieldExpression><![CDATA[$F{personName} + "   ("+$F{complexName} + ")"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="1f749420-1217-4217-b867-6d7e54026392" x="540" y="0" width="100" height="20"/>
+				<reportElement uuid="1f749420-1217-4217-b867-6d7e54026392" stretchType="RelativeToBandHeight" x="540" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -111,7 +111,7 @@
 				<textFieldExpression><![CDATA[$F{orderDateShortFormat}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="eb338d38-bca9-4ea9-a720-15de85ea533e" x="0" y="0" width="30" height="20"/>
+				<reportElement uuid="eb338d38-bca9-4ea9-a720-15de85ea533e" x="0" y="0" width="40" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

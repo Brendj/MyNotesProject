@@ -43,7 +43,7 @@
 					<reportElement uuid="a24683fd-5452-4d75-bcc6-13715a7f1dcf" positionType="Float" x="0" y="0" width="640" height="50"/>
 				</rectangle>
 				<subreport>
-					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" positionType="Float" x="0" y="0" width="640" height="50"/>
+					<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="0" y="0" width="640" height="50"/>
 					<subreportParameter name="orgName">
 						<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 					</subreportParameter>
@@ -100,7 +100,7 @@
 	<pageHeader>
 		<band height="25">
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" positionType="Float" x="30" y="0" width="510" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="40" y="0" width="500" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -114,7 +114,7 @@
 				<text><![CDATA[ФИО Учащегося]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6cbc72ea-9b8d-4ebe-a97b-84370753e4a3" positionType="Float" x="0" y="0" width="30" height="25"/>
+				<reportElement uuid="6cbc72ea-9b8d-4ebe-a97b-84370753e4a3" x="0" y="0" width="40" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -126,7 +126,7 @@
 				<text><![CDATA[№]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b6a16611-554d-46a5-9313-de24ff2ff182" positionType="Float" x="540" y="0" width="100" height="25"/>
+				<reportElement uuid="b6a16611-554d-46a5-9313-de24ff2ff182" x="540" y="0" width="100" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
