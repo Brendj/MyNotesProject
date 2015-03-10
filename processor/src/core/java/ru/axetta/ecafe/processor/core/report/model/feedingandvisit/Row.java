@@ -34,6 +34,7 @@ public class Row {
 
 
     private Integer color = 0; //  0 не оплачен . 1 оплачен
+    private Integer colorTo = 0; // - белый
     public static final int COLOR_PAID = 1;   //оплачен
     public static final int COLOR_NOT_PAID = 0; // не оплачен
 
@@ -143,6 +144,8 @@ public class Row {
     }
 
     public String getEntry() {
+        return entry;
+    }public String processEntry() {
         if (totalRow) {
             return "" + totalCount;
         } else if (enter == null && exit == null) {
@@ -151,6 +154,32 @@ public class Row {
 
         return "" + ((enter != null) ? CalendarUtils.timeToString(enter) : "...") + " - " + ((exit != null)
                 ? CalendarUtils.timeToString(exit) : "...");
+    }
+
+
+    public Integer processColorTo() {
+        if(entry.length() == 1){
+            if(color == 0 ){
+                return 0;//белый
+            } else{
+                return 2;//красный
+            }
+        }else if( entry.length() > 1){
+            if(color == 0 ){
+                return 1;//синий
+            }else {
+                return 0;//белый
+            }
+        }
+        return -1;//colorTo;
+    }
+
+    public Integer getColorTo() {
+        return colorTo;
+    }
+
+    public void setColorTo(Integer colorTo) {
+        this.colorTo = colorTo;
     }
 
     public void setEntry(String entry) {

@@ -107,8 +107,25 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
 
             List<Data> dataList = new ArrayList<Data>(dataMap.values());
             Collections.sort(dataList);
+
+            processColors(dataList);
+
             return new JRBeanCollectionDataSource(dataList);
         }
+
+        private void processColors(List<Data> dataList) {
+            for (Data data : dataList) {
+                processColorsRowsList(data.getPlan());
+                processColorsRowsList(data.getReserve());
+            }
+        }
+        private void processColorsRowsList(List<Row> dataList) {
+            for (Row row : dataList) {
+                row.setEntry(row.processEntry());
+                row.setColorTo(row.processColorTo());
+            }
+        }
+
 
         private void updataDataWithOrders(Map<String, Data> dataMap, List<OrderItem> orderItemList, Date startTime,
                 Date endTime, List<Org> orgList, String orgsIdsString) {
