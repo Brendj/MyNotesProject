@@ -107,7 +107,8 @@ public class SMSService {
                 try {
                     if(smsService instanceof EMPSmsServiceImpl) {
                         sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
-                        if(sendResponse != null && !sendResponse.isSuccess()) {
+                        boolean isSuccess = sendResponse.isSuccess();
+                        if(sendResponse != null && !isSuccess) {
                             String msg = ((EMPEventType) textObject).buildText();
                             msg = String.format("E:[%s] %s", sendResponse.getStatusCode(), msg);
                             regisgterClientSMSFailedCharge(client, sendResponse.getMessageId(),
@@ -128,7 +129,7 @@ public class SMSService {
                 } catch (Exception e) {
                     /*logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
                             new Object[]{sender, phoneNumber, textObject.toString(), e});*/
-                    logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}",
+                        logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}",
                             new Object[]{sender, phoneNumber, textObject.toString()}, e);
                 }
             }

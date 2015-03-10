@@ -51,7 +51,9 @@ public class FinancialOpsManager {
 
         Session session = em.unwrap(Session.class);
 
-        textContents = textContents.substring(0, 70);
+        if(textContents.length() >= 70) {
+            textContents = textContents.substring(0, 69);
+        }
         long priceOfSms = client.getOrg().getPriceOfSms();
         ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms);
@@ -102,7 +104,7 @@ public class FinancialOpsManager {
             clientSms.setDeliveryStatus(ClientSms.DELIVERED_TO_RECIPENT);
         }
         session.save(clientSms);
-        session.close();
+        //session.close();
         return clientSms;
     }
 
