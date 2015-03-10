@@ -76,4 +76,26 @@
         </wsimport>
 
     </target>
+
+    <target name="gen_emp_event" description="">
+        <wsimport
+                package="generated.emp_events"
+                keep="true"
+                destdir="../../src/core/java"
+                extension="true"
+                wsdl="http://api.uat.emp.msk.ru:8090/ws/subscriptions/?wsdl">
+        </wsimport>
+    </target>
+
+    <target name="gen_emp_storage" description="">
+        <wsimport
+                package="generated.emp_storage"
+                keep="true"
+                destdir="../../src/core/java"
+                extension="true"
+                wsdl="http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl">
+        </wsimport>
+    </target>
+
+
 </project>
