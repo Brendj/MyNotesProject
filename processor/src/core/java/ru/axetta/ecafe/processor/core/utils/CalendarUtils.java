@@ -29,6 +29,7 @@ public class CalendarUtils {
     private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private final static SimpleDateFormat dateShortdd_mmFormat = new SimpleDateFormat("dd.MM");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
     private final static SimpleDateFormat dateShortFormatFullYear = new SimpleDateFormat("dd.MM.yyyy");
     private final static SimpleDateFormat MMMMYYYY = new SimpleDateFormat("MMMM yyyy");
@@ -201,6 +202,9 @@ public class CalendarUtils {
 
     public static String dateShortToString(long date) {
         return dateShortFormat.format(new Date(date));
+    }
+    public static String dateShortdd_mmToString(long date) {
+        return dateShortdd_mmFormat.format(new Date(date));
     }
     public static String dateShortToString(Date date) {
         return dateShortFormat.format(date);
@@ -431,6 +435,17 @@ public class CalendarUtils {
         List<Integer> result = new ArrayList<Integer>();
         for(int j = 1; j <= i ; j++){
             result.add(getDayOfMonth(startLocal));
+            startLocal = addOneDay(startLocal);
+        }
+        return result;
+    }
+
+    public static List<Long> daysBetweenInMillis( Date start, Date end ){
+        Date startLocal = (Date) start.clone();
+        int i = getDifferenceInDays(startLocal,end);
+        List<Long> result = new ArrayList<Long>();
+        for(int j = 1; j <= i ; j++){
+            result.add(startLocal.getTime());
             startLocal = addOneDay(startLocal);
         }
         return result;

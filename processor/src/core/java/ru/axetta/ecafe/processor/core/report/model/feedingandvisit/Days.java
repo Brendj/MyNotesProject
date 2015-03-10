@@ -4,25 +4,31 @@
 
 package ru.axetta.ecafe.processor.core.report.model.feedingandvisit;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 /**
  * User: shamil
  * Date: 03.10.14
  * Time: 11:02
  */
 public class Days {
-    private int day;
+    private long day;
     private int dayl;
 
-    public Days(int day) {
+    public Days(long day) {
         this.day = day;
         dayl = 2;
     }
 
-    public int getDay() {
+    public long getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    public String getDayShort(){
+        return CalendarUtils.dateShortdd_mmToString(day);
+    }
+
+    public void setDay(long day) {
         this.day = day;
     }
 

@@ -289,7 +289,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
 
         private static Data createGroup(Map<String, Data> dataMap, List<Org> orgList,ClientItem item, Date startTime, Date endTime){
             List<Days> days = new ArrayList<Days>();
-            for (int i : CalendarUtils.daysBetween(startTime, endTime)) {
+            for (long i : CalendarUtils.daysBetweenInMillis(startTime, endTime)) {
                 days.add(new Days(i));
             }
             Data dataItem = new Data(prepareGroupName(orgList, item.getGroupName(), item.getIdOfOrg()), days);
