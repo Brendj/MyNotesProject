@@ -79,6 +79,7 @@
 		<field name="entry" class="java.lang.String"/>
 		<field name="color" class="java.lang.Integer"/>
 		<field name="orgName" class="java.lang.String"/>
+		<field name="colorTo" class="java.lang.Integer"/>
 	</subDataset>
 	<subDataset name="ReserveSet" uuid="cc298b45-3d91-449b-97e3-62898bf7c805">
 		<queryString>
@@ -97,6 +98,7 @@
 			<fieldDescription><![CDATA[color]]></fieldDescription>
 		</field>
 		<field name="orgName" class="java.lang.String"/>
+		<field name="colorTo" class="java.lang.Integer"/>
 	</subDataset>
 	<subDataset name="TotalSet" uuid="0a02a6f1-bfd9-4fca-a05e-a97c6ace5d50">
 		<queryString>
@@ -115,12 +117,14 @@
 			<fieldDescription><![CDATA[name]]></fieldDescription>
 		</field>
 		<field name="orgName" class="java.lang.String"/>
+		<field name="colorTo" class="java.lang.Integer"/>
 	</subDataset>
 	<subDataset name="PlanSet_1" uuid="5631462e-602a-46f2-8a82-5d5708943fe4">
 		<field name="name" class="java.lang.String"/>
 		<field name="day" class="java.lang.Integer"/>
 		<field name="entry" class="java.lang.String"/>
 		<field name="color" class="java.lang.Integer"/>
+		<field name="colorTo" class="java.lang.Integer"/>
 	</subDataset>
 	<parameter name="orgName" class="java.lang.String"/>
 	<parameter name="startDate" class="java.lang.String"/>
@@ -192,7 +196,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c5f9acc5-92f6-4632-bffa-3561ee6c2528" mode="Opaque" x="0" y="211" width="100" height="20" forecolor="#000000" backcolor="#FF9999"/>
+				<reportElement uuid="c5f9acc5-92f6-4632-bffa-3561ee6c2528" mode="Opaque" x="0" y="211" width="100" height="20" forecolor="#000000" backcolor="#B4F3FF"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -218,7 +222,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8c72cbeb-d408-4db3-9685-52c1c4e47c4e" x="0" y="251" width="100" height="20"/>
+				<reportElement uuid="8c72cbeb-d408-4db3-9685-52c1c4e47c4e" mode="Opaque" x="0" y="251" width="100" height="20" backcolor="#FF9999"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -503,32 +507,22 @@
 				<measure name="F-07_MEASURE1" class="java.lang.Integer">
 					<measureExpression><![CDATA[$F{color}]]></measureExpression>
 				</measure>
+				<measure name="measureColorTo" class="java.lang.Integer">
+					<measureExpression><![CDATA[$F{colorTo}]]></measureExpression>
+				</measure>
 				<crosstabCell width="70" height="20">
 					<cellContents mode="Opaque">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 						<textField>
-							<reportElement uuid="5bb57f38-f9dc-4601-b185-e5115c0520fe" style="Crosstab Data Text" positionType="FixRelativeToBottom" x="0" y="0" width="70" height="0">
+							<reportElement uuid="5bb57f38-f9dc-4601-b185-e5115c0520fe" style="Crosstab Data Text" positionType="FixRelativeToBottom" x="0" y="0" width="70" height="5">
 								<printWhenExpression><![CDATA[1> 10]]></printWhenExpression>
 							</reportElement>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{F-07_MEASURE1}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="637e6e4f-bb66-4791-b741-6f68991edfe1" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FF9999">
-								<printWhenExpression><![CDATA[($V{F-07_MEASURE1} == 0 && ($V{F-06_MEASURE1}).length() > 1)]]></printWhenExpression>
-							</reportElement>
-							<box>
-								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-								<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-							</box>
-							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
-						</textField>
-						<textField isBlankWhenNull="true">
-							<reportElement uuid="512b24ae-ce87-4be5-b166-07ed09dbbff0" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FFFFFF">
-								<printWhenExpression><![CDATA[($V{F-07_MEASURE1} == 1||($V{F-06_MEASURE1}).length() == 1)]]></printWhenExpression>
+							<reportElement uuid="37e0c0fe-6f16-4f80-8d92-77d6530f7fb3" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FFFFFF">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==0)]]></printWhenExpression>
 							</reportElement>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -537,6 +531,32 @@
 								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html"/>
+							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="121a174a-0839-42d9-9066-47ef8ad243de" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#B4F3FF">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==1)]]></printWhenExpression>
+							</reportElement>
+							<box>
+								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html"/>
+							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="d508abfb-9f82-4266-888c-3b61ccde5c2f" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FF9999">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==2)]]></printWhenExpression>
+							</reportElement>
+							<box>
+								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
 						</textField>
 					</cellContents>
@@ -661,19 +681,35 @@
 				<measure name="F-07_MEASURE1" class="java.lang.Integer">
 					<measureExpression><![CDATA[$F{color}]]></measureExpression>
 				</measure>
+				<measure name="measureColorTo" class="java.lang.Integer">
+					<measureExpression><![CDATA[$F{colorTo}]]></measureExpression>
+				</measure>
 				<crosstabCell width="70" height="20">
 					<cellContents mode="Opaque">
 						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 						<textField>
-							<reportElement uuid="29a24b8f-146b-4e9e-989f-9057f4c1f914" style="Crosstab Data Text" positionType="FixRelativeToBottom" x="0" y="0" width="70" height="0">
+							<reportElement uuid="29a24b8f-146b-4e9e-989f-9057f4c1f914" style="Crosstab Data Text" positionType="FixRelativeToBottom" x="0" y="0" width="70" height="5">
 								<printWhenExpression><![CDATA[1> 10]]></printWhenExpression>
 							</reportElement>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{F-07_MEASURE1}]]></textFieldExpression>
 						</textField>
+						<textField isBlankWhenNull="false">
+							<reportElement uuid="7159e5b3-d17d-4277-814b-8b1943e0b3c9" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FFFFFF">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==0)]]></printWhenExpression>
+							</reportElement>
+							<box>
+								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html"/>
+							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
+						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="c9522c09-a0ac-4e03-b13c-00b8cfed0e5e" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FF9999">
-								<printWhenExpression><![CDATA[($V{F-07_MEASURE1} == 0 && ($V{F-06_MEASURE1}).length() > 1)]]></printWhenExpression>
+							<reportElement uuid="c9522c09-a0ac-4e03-b13c-00b8cfed0e5e" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#B4F3FF">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==1)]]></printWhenExpression>
 							</reportElement>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -682,11 +718,11 @@
 								<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{F-06_MEASURE1}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[ $V{F-06_MEASURE1}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="7159e5b3-d17d-4277-814b-8b1943e0b3c9" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FFFFFF">
-								<printWhenExpression><![CDATA[($V{F-07_MEASURE1} == 1 || ($V{F-06_MEASURE1}).length() == 1)]]></printWhenExpression>
+							<reportElement uuid="ab104c6b-a6b3-432a-ad09-5c78c9178ed0" mode="Opaque" x="0" y="0" width="70" height="20" forecolor="#000000" backcolor="#FF9999">
+								<printWhenExpression><![CDATA[($V{measureColorTo}==2)]]></printWhenExpression>
 							</reportElement>
 							<box>
 								<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
