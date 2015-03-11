@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SSTSReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="588b4ca5-6b5e-4f0f-b017-83c596dd9fd7">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SSTSReport" pageWidth="1042" pageHeight="595" orientation="Landscape" columnWidth="1002" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="588b4ca5-6b5e-4f0f-b017-83c596dd9fd7">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -10,6 +10,8 @@
 	<field name="sumBuffet" class="java.lang.Long"/>
 	<field name="sumComplex" class="java.lang.Long"/>
 	<field name="sumComplexBenefit" class="java.lang.Long"/>
+	<field name="sumProductVending" class="java.lang.Long"/>
+	<field name="sumCommercialFood" class="java.lang.Long"/>
 	<variable name="ComplexSum" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[(double) $F{sumComplex} / 100]]></variableExpression>
 	</variable>
@@ -19,18 +21,24 @@
 	<variable name="ComplexBenefitSum" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[(double) $F{sumComplexBenefit} / 100]]></variableExpression>
 	</variable>
+	<variable name="ProductVendingSum" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[(double) $F{sumProductVending} / 100]]></variableExpression>
+	</variable>
+	<variable name="CommercialFoodSum" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[(double) $F{sumCommercialFood} / 100]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="50" splitType="Stretch">
 			<textField>
-				<reportElement uuid="48d00395-d098-4a55-8155-b2b8ca8d5d4c" x="0" y="30" width="802" height="20"/>
+				<reportElement uuid="48d00395-d098-4a55-8155-b2b8ca8d5d4c" x="0" y="30" width="1002" height="20"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA["За " + $P{beginDate} + ($P{beginDate}.equals($P{endDate}) ? "" : " - " + $P{endDate})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="114dda3c-3e1e-43c6-bc25-3f7b67e2b8c0" x="0" y="10" width="802" height="20"/>
+				<reportElement uuid="114dda3c-3e1e-43c6-bc25-3f7b67e2b8c0" x="0" y="10" width="1002" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -87,45 +95,73 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="96d90c6d-f4e7-4424-aace-2f75a78b17e2" x="502" y="0" width="100" height="50"/>
-				<box leftPadding="5" bottomPadding="2">
+				<box leftPadding="0" bottomPadding="0">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Комплексное платное питание (руб.)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="76f335f1-ceee-4e50-9750-e2a9358bd865" x="602" y="0" width="100" height="50"/>
-				<box leftPadding="5" bottomPadding="2">
+				<box leftPadding="0" bottomPadding="0">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Буфетная продукция (руб.)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="364840aa-09a7-452c-8e65-bf0d67e495a2" x="702" y="0" width="100" height="50"/>
-				<box leftPadding="5" bottomPadding="2">
+				<box leftPadding="0" bottomPadding="0">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Комплексное льготное питание (руб.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a13b3207-7b00-475e-b193-91d1c042a957" x="802" y="0" width="100" height="50"/>
+				<box leftPadding="0" bottomPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Коммерческое питание (руб.) ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="53da3066-5337-4ba3-8763-02f91f227808" x="902" y="0" width="100" height="50"/>
+				<box leftPadding="0" bottomPadding="0">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Вендинг (руб.) ]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -203,6 +239,30 @@
 				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none"/>
 				<textFieldExpression><![CDATA[(double) $F{sumComplexBenefit} / 100]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="9f265b3e-139a-4723-8780-363a8f87508a" stretchType="RelativeToBandHeight" x="802" y="0" width="100" height="23"/>
+				<box leftPadding="0" rightPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none"/>
+				<textFieldExpression><![CDATA[(double) $F{sumProductVending} / 100]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="9f265b3e-139a-4723-8780-363a8f87508a" stretchType="RelativeToBandHeight" x="902" y="0" width="100" height="23"/>
+				<box leftPadding="0" rightPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none"/>
+				<textFieldExpression><![CDATA[(double) $F{sumCommercialFood} / 100]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
@@ -268,6 +328,34 @@
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{ComplexBenefitSum}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="993370cc-f8fc-48ce-a5da-a46a5c1abf6b" stretchType="RelativeToBandHeight" x="802" y="0" width="100" height="20"/>
+				<box leftPadding="0" rightPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ProductVendingSum}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
+				<reportElement uuid="993370cc-f8fc-48ce-a5da-a46a5c1abf6b" stretchType="RelativeToBandHeight" x="902" y="0" width="100" height="20"/>
+				<box leftPadding="0" rightPadding="3">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{CommercialFoodSum}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
