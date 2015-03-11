@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,8 @@ public class EventNotificationService {
     public static final String GUARDIAN_VALUES_KEY = "guardianId";
     public static final String TARGET_VALUES_KEY   = "targetId";
     public static final String DIRECTION_VALUES_KEY   = "direction";
+
+
 
     @Resource
     SMSService smsService;
@@ -426,6 +429,7 @@ public class EventNotificationService {
                     smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                     result = true;
                 } else {
+                    //result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                     result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                 }
             }
