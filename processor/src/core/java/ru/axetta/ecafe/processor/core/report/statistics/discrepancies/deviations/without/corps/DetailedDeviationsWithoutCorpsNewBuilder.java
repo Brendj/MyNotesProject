@@ -141,7 +141,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
 
 
-                    deviationPaymentNewItem.setOrgName(selectedOrg.getOfficialName());
+                    deviationPaymentNewItem.setOrgName(selectedOrg.getShortName());
                     deviationPaymentNewItem.setAddress(selectedOrg.getAddress());
                     deviationPaymentNewItem.setRowNum(rowNum);
                     deviationPaymentNewItem.setDeviationPaymentNewSubReportItemList(deviationPaymentSubReportItemList);
@@ -179,7 +179,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
 
-                    deviationPaymentNewItem.setOrgName(selectedOrg.getOfficialName());
+                    deviationPaymentNewItem.setOrgName(selectedOrg.getShortName());
                     deviationPaymentNewItem.setAddress(selectedOrg.getAddress());
 
                     deviationPaymentNewItem.setRowNum(rowNum);
