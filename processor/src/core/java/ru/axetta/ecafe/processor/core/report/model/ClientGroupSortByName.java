@@ -17,30 +17,7 @@ public abstract class ClientGroupSortByName<T extends ClientGroupSortByNameItem>
             return stringCompareResult;
         }
 
-        String oOrgName = o.getName();
-        String thisOrgName = this.getName();
-        String numThisString = thisOrgName.replaceAll("[^\\d]", "");
-        String numOString = oOrgName.replaceAll("[^\\d]", "");
-        stringCompareResult = ((Integer)numThisString.length()).compareTo(numOString.length());
-        if( stringCompareResult!= 0){
-            return stringCompareResult;
-        }
-
-        if(numThisString.length()==0){
-            return 0;
-        }
-
-        Integer numThis = Integer.valueOf(numThisString);
-        Integer numO = Integer.valueOf(numOString);
-        if(numThis.equals(numO)){
-            String sThis = thisOrgName.replaceAll("[^\\D]", "").toUpperCase();
-            String sO = oOrgName.replaceAll("[^\\D]", "").toUpperCase();
-            Integer letterThis = printSum(sThis);
-            Integer letterO = printSum(sO);
-            return  letterThis.compareTo(letterO);
-        }else{
-            return numThis.compareTo(numO);
-        }
+        return this.getName().toLowerCase().compareTo(o.getName().toLowerCase());
     }
 
     private static int printSum(String original){
