@@ -33,9 +33,9 @@
 
     <!-- SMS sending executor. Used by EventNotificationService -->
     <bean id="smsSendingTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
-        <property name="corePoolSize" value="5" />
-        <property name="maxPoolSize" value="10" />
-        <property name="queueCapacity" value="25" />
+        <property name="corePoolSize" value="15" />
+        <property name="maxPoolSize" value="50" />
+        <property name="queueCapacity" value="200" />
     </bean>
 
 <!--    <jee:jndi-lookup id="dataSource" jndi-name="java:jboss/PostgresDS"/>-->
