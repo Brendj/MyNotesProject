@@ -3224,9 +3224,12 @@ public class Processor implements SyncProcessor,
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
 
+
+
                 //  Применяем фильтр оборудования
                 idOfOrg = accessories.get(e.getTurnstileAddr());
                 if(idOfOrg == null){
+                    idOfOrg = org.getIdOfOrg();
                     idOfOrg =DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
                     accessories.put(e.getTurnstileAddr(), idOfOrg);
                 }
