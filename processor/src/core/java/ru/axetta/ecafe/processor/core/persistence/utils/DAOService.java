@@ -1738,4 +1738,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public OrgRegistryChange getOrgRegistryChange(long idOfOrgRegistryChange) {
         return DAOUtils.getOrgRegistryChange((Session) entityManager.unwrap(Session.class), idOfOrgRegistryChange);
     }
+
+    public String getPersonNameByOrg(Org org) {
+        Query query = entityManager.createNativeQuery(
+                "SELECT (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname FROM cf_orgs cfo LEFT JOIN cf_persons p ON cfo.idofofficialperson = p.idofperson WHERE cfo.idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", org.getIdOfOrg());
+        return (String) query.getSingleResult();
+    }
 }
