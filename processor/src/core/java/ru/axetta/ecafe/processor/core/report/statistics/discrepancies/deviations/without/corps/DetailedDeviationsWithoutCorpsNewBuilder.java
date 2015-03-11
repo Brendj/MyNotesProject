@@ -252,7 +252,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         }
 
         Collections.sort(resultIntersection);
-        Collections.sort(resultIntersection);
+        Collections.sort(resultSubtraction);
         Collections.sort(planOrderItemsReserveByOneDay);
 
         if (!resultSubtraction.isEmpty()) {
@@ -374,8 +374,16 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
     public void fill(List<PlanOrderItem> result, String condition,
             List<DeviationPaymentNewSubReportItem> deviationPaymentNewSubReportItemList) {
         Long rowNum = 0L;
+        String groupName = result.get(0).getGroupName();
+
         for (PlanOrderItem planOrderItem : result) {
-            DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = createReportItem(++rowNum, condition, planOrderItem);
+            if (groupName.equals(planOrderItem.getGroupName())) {
+                ++rowNum;
+            } else {
+                groupName = planOrderItem.getGroupName();
+                rowNum = 1L;
+            }
+            DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = createReportItem(rowNum, condition, planOrderItem);
             deviationPaymentNewSubReportItemList.add(deviationPaymentNewSubReportItem);
         }
     }
