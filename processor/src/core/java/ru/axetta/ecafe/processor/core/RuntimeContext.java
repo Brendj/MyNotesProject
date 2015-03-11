@@ -225,6 +225,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private static X509Certificate rtCert = null; // корневой сертификат
 
 
+    private SettingsConfig settingsConfig;
+
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
     }
@@ -1574,6 +1576,17 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public RegularPaymentSubscriptionService getRegularPaymentSubscriptionService() {
         return regularPaymentSubscriptionService;
+    }
+
+    public SettingsConfig getSettingsConfig() {
+        if (settingsConfig == null){
+            settingsConfig = new SettingsConfig();
+        }
+        return settingsConfig;
+    }
+
+    public void setSettingsConfig(SettingsConfig settingsConfig) {
+        this.settingsConfig = settingsConfig;
     }
 }
 

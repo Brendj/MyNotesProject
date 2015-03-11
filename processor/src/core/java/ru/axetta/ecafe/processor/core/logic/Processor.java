@@ -1017,7 +1017,9 @@ public class Processor implements SyncProcessor,
         updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
         updateFullSyncParam(request.getIdOfOrg());
 
-        runRegularPayments(request);
+        if(RuntimeContext.getInstance().isMainNode() && RuntimeContext.getInstance().getSettingsConfig().isEcafeAutopaymentBkEnabled()){
+            runRegularPayments(request);
+        }
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
@@ -1033,24 +1035,16 @@ public class Processor implements SyncProcessor,
     * */
     @Async
      private void runRegularPayments(SyncRequest request) {
-        long time = System.currentTimeMillis();
         try {
-            Boolean enabled = Boolean.valueOf(
-                    (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.autopayment.bk.enabled"));
-            if ((enabled != null) && (enabled)) {
-                logger.info("runRegularPayments run");
-                BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
-                        .getInstance().getRegularPaymentSubscriptionService();
-                regularPaymentSubscriptionService.checkClientBalances(request.getIdOfOrg());
-                logger.info("runRegularPayments stop");
-            }
+            long time = System.currentTimeMillis();
+            logger.info("runRegularPayments run");
+            BKRegularPaymentSubscriptionService regularPaymentSubscriptionService = (BKRegularPaymentSubscriptionService) RuntimeContext
+                    .getInstance().getRegularPaymentSubscriptionService();
+            regularPaymentSubscriptionService.checkClientBalances(request.getIdOfOrg());
+            logger.info("runRegularPayments stop" + (System.currentTimeMillis() - time));
         } catch (Exception e) {
             logger.warn("catch BKRegularPaymentSubscriptionService exc");
         }
-        finally {
-            logger.warn("runRegularPayments ms: " + (System.currentTimeMillis() - time));
-        }
-
     }
 
     /* Do process full synchronization */
@@ -1501,7 +1495,9 @@ public class Processor implements SyncProcessor,
 
         Date syncEndTime = new Date();
 
-        runRegularPayments(request);
+        if(RuntimeContext.getInstance().isMainNode() && RuntimeContext.getInstance().getSettingsConfig().isEcafeAutopaymentBkEnabled()){
+            runRegularPayments(request);
+        }
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
