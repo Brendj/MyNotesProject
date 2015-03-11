@@ -371,7 +371,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             res.addValue("0_sumDelayMidday", calcTimeout(sumDelayMidday));
             res.addValue("0_maxDelayNight", calcTimeout(maxDelayNight));
             res.addValue("0_sumDelayNight", calcTimeout(sumDelayNight));
-            res.addValue("0_lastSync", calcTimeout(lastSync));
+            res.addValue("0_lastSync", calcDate(lastSync));
             return res;
         }
 
@@ -418,7 +418,14 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             } else {
                 df = new SimpleDateFormat(String.format("s '%s'", "сек."));
             }*/
-            DateFormat df = new SimpleDateFormat(String.format("HH:mm:ss"));
+            //DateFormat df = new SimpleDateFormat(String.format("HH:mm:ss"));
+            DateFormat df = new SimpleDateFormat(String.format("'%s':mm:ss", time / 3600000L));
+            Date d = new Date(time*1000);
+            return df.format(d);
+        }
+
+        protected static String calcDate(long time){
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             Date d = new Date(time*1000);
             return df.format(d);
         }
