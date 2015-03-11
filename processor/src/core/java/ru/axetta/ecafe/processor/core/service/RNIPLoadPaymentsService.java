@@ -117,7 +117,7 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("SystemIdentifier");     // Идентификатор платежа в РНИП (уникаклен)
         PAYMENT_PARAMS.add("Amount");               //  Сумма платежа
         PAYMENT_PARAMS.add("PaymentDate");          // Дата платежа
-        PAYMENT_PARAMS.add("NUM_DOGOVOR");          // Это номер договора в нашей БД
+        PAYMENT_PARAMS.add("PAYMENT_TO");           // Это номер договора в нашей БД
         PAYMENT_PARAMS.add("SRV_CODE");             // Здесь содержится идентификатор контрагента
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
@@ -758,13 +758,13 @@ public class RNIPLoadPaymentsService {
                 errorWriter.write(String.format("%s: %s\r\n", workDate, str));
                 continue;
             }
-            String contractId = p.get("NUM_DOGOVOR");
+            String contractId = p.get("PAYMENT_TO");
             Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
-            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, NUM_DOGOVOR=%s, Amount=%s ..",
+            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
                     paymentID, paymentDate, contragentKey, bic, contractId, amount);
             if (client == null) {
-                //throw new Exception ("Клиент с номером контракта " + p.get("NUM_DOGOVOR") + " не найден");
-                errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("NUM_DOGOVOR")));
+                //throw new Exception ("Клиент с номером контракта " + p.get("PAYMENT_TO") + " не найден");
+                errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("PAYMENT_TO")));
                 continue;
             }
             Long idOfPaymentContragent = null;
@@ -791,8 +791,8 @@ public class RNIPLoadPaymentsService {
             OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
                     OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
                     ClientPayment.ATM_PAYMENT_METHOD,
-                    Long.parseLong(p.get("NUM_DOGOVOR")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
-                                                            поэтому используется Long.parseLong(p.get("NUM_DOGOVOR")) */
+                    Long.parseLong(p.get("PAYMENT_TO")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
+                                                            поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
                     paymentID, paymentDate + "/" + paymentID, amt,
                     false);
             OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
@@ -834,6 +834,10 @@ public class RNIPLoadPaymentsService {
         if (content.indexOf("%CONTRAGENT_ID%") > 1) {
             String id = getRNIPIdFromRemarks(contragent.getRemarks());
             content = content.replaceAll("%CONTRAGENT_ID%", formatString(id == null ? "" : id));
+        }
+        if (content.indexOf("%CONTRAGENT_BMID%") > 1) {
+            String id = getRNIPBmIdFromRemarks(contragent.getRemarks());
+            content = content.replaceAll("%CONTRAGENT_BMID%", formatString(id == null ? "" : id));
         }
         if (content.indexOf("%FINANCE_PROVIDER%") > 1) {
             content = content.replaceAll("%FINANCE_PROVIDER%", formatString(contragent.getBank()));
@@ -942,16 +946,26 @@ public class RNIPLoadPaymentsService {
 
 
     public static final String getRNIPIdFromRemarks (String remark) {
-        String RNIPIdOfContragent = null;
-        if (remark != null && remark.length() > 0 && remark.indexOf("{RNIP=") > -1) {
-            RNIPIdOfContragent = remark.substring(remark.indexOf("{RNIP=") + "{RNIP=".length(),
-                    remark.indexOf("}", remark.indexOf("{RNIP=") + "{RNIP=".length()));
+        return getValueByNameFromRemars(remark, "RNIP");
+    }
+
+    public static final String getRNIPBmIdFromRemarks (String remark) {
+        return getValueByNameFromRemars(remark, "BMID");
+    }
+
+    protected static final String getValueByNameFromRemars(String remark, String name) {
+        String val = null;
+        if (remark != null && remark.length() > 0 && remark.indexOf("{" + name + "=") > -1) {
+            val = remark.substring(remark.indexOf("{" + name + "=") + ("{" + name + "=").length(),
+                    remark.indexOf("}", remark.indexOf("{" + name + "=") + ("{" + name + "=").length()));
         }
-        if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+        if (val == null || val.length() < 1) {
             return null;
         }
-        return RNIPIdOfContragent;
+        return val;
     }
+
+
 
 
     public static final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
