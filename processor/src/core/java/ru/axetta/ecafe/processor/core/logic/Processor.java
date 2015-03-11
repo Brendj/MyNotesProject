@@ -3213,7 +3213,8 @@ public class Processor implements SyncProcessor,
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
-
+        Long idOfOrg;
+        Map<String, Long> accessories = new HashMap<String, Long>();
         for (EnterEventItem e : enterEvents.getEvents()) {
 
             try {
@@ -3222,10 +3223,14 @@ public class Processor implements SyncProcessor,
 
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
-                long idOfOrg = org.getIdOfOrg();
 
                 //  Применяем фильтр оборудования
-                idOfOrg = DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
+                idOfOrg = accessories.get(e.getTurnstileAddr());
+                if(idOfOrg == null){
+                    idOfOrg =DAOService.getInstance().receiveIdOfOrgByAccessory(idOfOrg, Accessory.GATE_ACCESSORY_TYPE, e.getTurnstileAddr());
+                    accessories.put(e.getTurnstileAddr(), idOfOrg);
+                }
+
 
                 if (existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
                     EnterEvent ee = findEnterEvent(persistenceSession,
