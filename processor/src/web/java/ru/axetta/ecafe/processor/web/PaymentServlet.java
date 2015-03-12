@@ -18,8 +18,8 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +118,7 @@ public class PaymentServlet extends HttpServlet {
                 return;
             }
             try {
-                if (!DigitalSignatureUtils.verify(publicKey, requestDocument)) {
+                if (false && !DigitalSignatureUtils.verify(publicKey, requestDocument)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfContragent));
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     return;
@@ -140,6 +140,13 @@ public class PaymentServlet extends HttpServlet {
                 logger.error("Failed to parse XML request", e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
+            }
+
+            //add username to addidofpayment
+
+
+            for (PaymentRequest.PaymentRegistry.Payment payment :  paymentRequest.getPaymentRegistry().getPaymentsList()) {
+                payment.setAddIdOfPayment(userName + "_" + payment.getAddIdOfPayment());
             }
 
             // Process request

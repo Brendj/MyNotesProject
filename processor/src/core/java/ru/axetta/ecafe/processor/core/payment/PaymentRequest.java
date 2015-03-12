@@ -67,7 +67,7 @@ public class PaymentRequest {
                     if (contractId==null && clientId==null) throw new IllegalArgumentException("Missing ContractId and ClientId");
                     Date payTime = timeFormat.parse(namedNodeMap.getNamedItem("PayTime").getTextContent());
                     long sum = getLongValue(namedNodeMap, "Sum");
-                    int paymentMethod = getIntValue(namedNodeMap, "PaymentMethod");
+                    int paymentMethod = ClientPayment.REGISTRY_PAYMENT_METHOD;
                     if (paymentMethod < 0 || paymentMethod >= ClientPayment.PAYMENT_METHOD_NAMES.length) {
                         throw new IllegalArgumentException("Unknown payment method");
                     }
@@ -97,7 +97,7 @@ public class PaymentRequest {
             private final long sum;
             private final int paymentMethod;
             private final String addPaymentMethod;
-            private final String addIdOfPayment;
+            private  String addIdOfPayment;
 
             public Payment(String idOfPayment, Long contractId, Long clientId, Long tspContragentId, Date payTime, long sum, int paymentMethod,
                     String addPaymentMethod, String addIdOfPayment, boolean bResetBalance) {
@@ -169,6 +169,10 @@ public class PaymentRequest {
                 return addIdOfPayment;
             }
 
+            public void setAddIdOfPayment(String addIdOfPayment) {
+                this.addIdOfPayment = addIdOfPayment;
+            }
+
             public Long getTspContragentId() {
                 return tspContragentId;
             }
@@ -220,6 +224,10 @@ public class PaymentRequest {
 
         public Enumeration<Payment> getPayments() {
             return Collections.enumeration(payments);
+        }
+
+        public List<Payment> getPaymentsList(){
+            return payments;
         }
 
         @Override
