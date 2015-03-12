@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -50,8 +51,11 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(TypeOfAccompanyingDocument.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
-        TypeOfAccompanyingDocument typeOfAccompanyingDocument = (TypeOfAccompanyingDocument) criteria.uniqueResult();
+        criteria.addOrder(Order.asc("globalId"));
+        List<TypeOfAccompanyingDocument> typeList = criteria.list();
         session.clear();
+        if ((typeList == null) || (typeList.size() == 0)) return;
+        TypeOfAccompanyingDocument typeOfAccompanyingDocument = typeList.get(0);
         if(!(typeOfAccompanyingDocument==null || typeOfAccompanyingDocument.getDeletedState() || guid.equals(typeOfAccompanyingDocument.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("TypeOfAccompanyingDocument DATA_EXIST_VALUE");
             distributedObjectException.setData(typeOfAccompanyingDocument.getGuid());

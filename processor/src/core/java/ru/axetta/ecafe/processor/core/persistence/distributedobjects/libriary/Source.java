@@ -12,12 +12,14 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -48,8 +50,11 @@ public class Source extends LibraryDistributedObject {
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(Source.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
-        Source source = (Source) criteria.uniqueResult();
+        criteria.addOrder(Order.asc("globalId"));
+        List<Source> sourceList = criteria.list();
         session.clear();
+        if ((sourceList == null) || (sourceList.size() == 0)) return;
+        Source source = sourceList.get(0);
         if(!(source==null || source.getDeletedState() || guid.equals(source.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Source DATA_EXIST_VALUE");
             distributedObjectException.setData(source.getGuid());
