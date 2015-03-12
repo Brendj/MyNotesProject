@@ -3381,7 +3381,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception ex) {
-                logger.error("Save enter event to database error: ", e);
+                logger.error("Save enter event to database error: ", ex);
                 resEnterEvents = new SyncResponse.ResEnterEvents();
                 for (EnterEventItem ee : enterEvents.getEvents()) {
                     SyncResponse.ResEnterEvents.Item item;
