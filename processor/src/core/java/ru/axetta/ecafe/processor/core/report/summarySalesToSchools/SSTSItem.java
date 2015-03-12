@@ -19,6 +19,8 @@ public class SSTSItem {
     private Long sumBuffet;
     private Long sumComplex;
     private Long sumComplexBenefit;
+    private Long sumProductVending;
+    private Long sumCommercialFood;
 
     public Long getOrgId() {
         return orgId;
@@ -66,5 +68,21 @@ public class SSTSItem {
 
     public void setSumComplexBenefit(Long sumComplexBenefit) {
         this.sumComplexBenefit = sumComplexBenefit;
+    }
+
+    public Long getSumProductVending() {
+        return sumProductVending;
+    }
+
+    public void setSumProductVending(Long sumProductVending) {
+        this.sumProductVending = sumProductVending;
+    }
+
+    public Long getSumCommercialFood() {
+        return sumCommercialFood;
+    }
+
+    public void setSumCommercialFood(Long sumCommercialFood) {
+        this.sumCommercialFood = sumCommercialFood;
     }
 }
