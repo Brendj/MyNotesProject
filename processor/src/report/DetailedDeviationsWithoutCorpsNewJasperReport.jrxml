@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="580" pageHeight="10000" columnWidth="540" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport" pageWidth="660" pageHeight="10000" columnWidth="620" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7dc70495-3fd7-4431-9881-a96ee10ffd74">
 	<property name="ireport.zoom" value="1.9487171000000019"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="111"/>
+	<property name="ireport.y" value="23"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -37,14 +37,14 @@
 	<title>
 		<band height="221" splitType="Stretch">
 			<textField>
-				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" positionType="Float" x="0" y="0" width="540" height="100"/>
+				<reportElement uuid="db246b3c-209f-450e-aff9-590c04a617e1" x="0" y="0" width="620" height="100"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="18" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Детализированный отчет отклонений оплаты льготного питания на " + $P{beginDate} + " года"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="e59c63d7-bbc1-4b29-9e77-3a2baa47a3ad" stretchType="RelativeToBandHeight" x="110" y="100" width="430" height="60"/>
+				<reportElement uuid="e59c63d7-bbc1-4b29-9e77-3a2baa47a3ad" x="110" y="100" width="510" height="60"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 					<paragraph leftIndent="20"/>
@@ -52,14 +52,14 @@
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="d8a3f67d-9631-4226-934a-97b93dbe3678" stretchType="RelativeToBandHeight" x="0" y="100" width="110" height="60"/>
+				<reportElement uuid="d8a3f67d-9631-4226-934a-97b93dbe3678" x="0" y="100" width="110" height="60"/>
 				<textElement verticalAlignment="Top">
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="3aeb38bf-8d8e-4f73-9d6f-38be71ca03a2" stretchType="RelativeToBandHeight" x="110" y="160" width="430" height="60"/>
+				<reportElement uuid="3aeb38bf-8d8e-4f73-9d6f-38be71ca03a2" x="110" y="160" width="510" height="60"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 					<paragraph leftIndent="20"/>
@@ -67,7 +67,14 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="3261d203-3f9a-433b-ba59-898e51945e56" stretchType="RelativeToBandHeight" x="0" y="160" width="110" height="60"/>
+				<reportElement uuid="3261d203-3f9a-433b-ba59-898e51945e56" x="0" y="160" width="110" height="60"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
 				<textElement>
 					<font size="14"/>
 				</textElement>
@@ -78,7 +85,7 @@
 	<pageHeader>
 		<band height="25">
 			<staticText>
-				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="30" y="0" width="510" height="25"/>
+				<reportElement uuid="4e3288c1-0900-4034-b9b1-1b765f065940" x="110" y="0" width="510" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -92,7 +99,7 @@
 				<text><![CDATA[ФИО Учащегося]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6240d0ac-477b-40da-bf45-d4c8e9494d59" x="0" y="0" width="30" height="25"/>
+				<reportElement uuid="6240d0ac-477b-40da-bf45-d4c8e9494d59" x="0" y="0" width="110" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -108,10 +115,10 @@
 	<detail>
 		<band height="50">
 			<rectangle>
-				<reportElement uuid="0f179e82-c3a8-4d1f-8d92-beac730379bc" x="0" y="0" width="540" height="50"/>
+				<reportElement uuid="0f179e82-c3a8-4d1f-8d92-beac730379bc" x="0" y="0" width="620" height="50"/>
 			</rectangle>
 			<subreport>
-				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="0" y="0" width="540" height="50"/>
+				<reportElement uuid="2108c071-4d73-449f-b080-1bf180109b67" x="0" y="0" width="620" height="50"/>
 				<subreportParameter name="orgName">
 					<subreportParameterExpression><![CDATA[$F{orgName}]]></subreportParameterExpression>
 				</subreportParameter>

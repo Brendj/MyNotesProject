@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport_Subreport" pageWidth="540" pageHeight="802" columnWidth="540" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b5a30d48-060c-4780-844c-ddb58075f363">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DetailedDeviationsPaymentOrReducedPriceMealsJasperReport_Subreport" pageWidth="620" pageHeight="802" columnWidth="620" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b5a30d48-060c-4780-844c-ddb58075f363">
 	<property name="ireport.zoom" value="1.0000000000000007"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -17,7 +17,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="e97c91e1-2879-421b-a4a8-50efc275cb49" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="540" height="20" backcolor="#CCCCCC"/>
+					<reportElement uuid="e97c91e1-2879-421b-a4a8-50efc275cb49" mode="Opaque" x="0" y="0" width="620" height="20" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -35,7 +35,7 @@
 		<groupFooter>
 			<band height="20">
 				<textField>
-					<reportElement uuid="760a0f46-a729-4a33-a24f-ce6f16a979ad" stretchType="RelativeToBandHeight" x="0" y="0" width="540" height="20"/>
+					<reportElement uuid="760a0f46-a729-4a33-a24f-ce6f16a979ad" x="0" y="0" width="620" height="20"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -56,7 +56,7 @@
 		<groupHeader>
 			<band height="20">
 				<textField>
-					<reportElement uuid="bc79ce7c-6b5c-4e2a-87fd-3cbb65f8104b" stretchType="RelativeToBandHeight" x="0" y="0" width="540" height="20"/>
+					<reportElement uuid="bc79ce7c-6b5c-4e2a-87fd-3cbb65f8104b" x="0" y="0" width="620" height="20"/>
 					<box>
 						<pen lineWidth="0.75"/>
 						<topPen lineWidth="0.75"/>
@@ -75,13 +75,13 @@
 	<detail>
 		<band height="20">
 			<textField>
-				<reportElement uuid="3e004ede-aa89-430a-abca-f58d0ab6aff9" stretchType="RelativeToBandHeight" x="30" y="0" width="510" height="20"/>
+				<reportElement uuid="3e004ede-aa89-430a-abca-f58d0ab6aff9" x="110" y="0" width="510" height="20"/>
 				<box>
-					<pen lineWidth="0.5" lineStyle="Dashed"/>
-					<topPen lineWidth="0.5" lineStyle="Dashed"/>
-					<leftPen lineWidth="0.5" lineStyle="Dashed"/>
-					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
-					<rightPen lineWidth="0.5" lineStyle="Dashed"/>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
@@ -89,7 +89,7 @@
 				<textFieldExpression><![CDATA[$F{personName} + "   ("+$F{complexName} +")"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="8508fa8f-87ef-404d-9301-dbda0c150dca" x="0" y="0" width="30" height="20"/>
+				<reportElement uuid="8508fa8f-87ef-404d-9301-dbda0c150dca" x="0" y="0" width="110" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
