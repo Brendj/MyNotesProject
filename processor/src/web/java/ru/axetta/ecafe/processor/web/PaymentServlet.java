@@ -112,7 +112,7 @@ public class PaymentServlet extends HttpServlet {
             // Verify XML signature
             PublicKey publicKey;
             try {
-                publicKey = extractPublicKey(runtimeContext, idOfContragent);
+                //publicKey = extractPublicKey(runtimeContext, idOfContragent);
             } catch (Exception e) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
