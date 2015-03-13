@@ -192,7 +192,8 @@
         </set>
 
         <one-to-one name="orgSync" class="ru.axetta.ecafe.processor.core.persistence.OrgSync" cascade="all"/>
-
+        <property name="payByCashier" column="PayByCashier"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>
 

@@ -114,6 +114,8 @@ public class Org implements Serializable {
     private Long additionalIdBuilding;
     private String statusDetailing;
     private OrgSync orgSync;
+    private Boolean payByCashier;
+
 
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
@@ -833,6 +835,14 @@ public class Org implements Serializable {
 
     public void setOrgSync(OrgSync orgSync) {
         this.orgSync = orgSync;
+    }
+
+    public Boolean getPayByCashier() {
+        return payByCashier;
+    }
+
+    public void setPayByCashier(Boolean payByCashier) {
+        this.payByCashier = payByCashier;
     }
 
     @Override

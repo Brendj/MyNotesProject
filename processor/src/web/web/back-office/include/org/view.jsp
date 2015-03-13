@@ -144,6 +144,8 @@
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReports2}" styleClass="input-text long-field" />
 
+    <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.payByCashier}"  styleClass="input-text" disabled="true"  />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

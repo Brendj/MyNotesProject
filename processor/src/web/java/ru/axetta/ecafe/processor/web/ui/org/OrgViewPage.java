@@ -73,6 +73,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long additionalIdBuilding;
     private String statusDetailing;
 
+    private Boolean payByCashier;
+
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
@@ -220,6 +222,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         } else {
             this.statusTextArea = "";
         }
+
+        this.payByCashier = org.getPayByCashier();
 
     }
 
@@ -515,5 +519,9 @@ public class OrgViewPage extends BasicWorkspacePage {
     public Object updateBalance(){
         for (int i=0;i<10000000;i++);
         return null;
+    }
+
+    public Boolean getPayByCashier() {
+        return payByCashier;
     }
 }

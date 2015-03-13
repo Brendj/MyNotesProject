@@ -76,6 +76,8 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Long additionalIdBuilding;
     private String statusDetailing;
 
+    private Boolean payByCashier;
+
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
@@ -453,6 +455,10 @@ public class OrgCreatePage extends BasicWorkspacePage
             org.setSsoPassword(plainSsoPassword);
         }
         org.setRefectoryType(refectoryType);
+        org.setPayByCashier(payByCashier);
+
+
+
         session.save(org);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());
@@ -572,5 +578,13 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setStatusTextArea(String statusTextArea) {
         this.statusTextArea = statusTextArea;
+    }
+
+    public Boolean getPayByCashier() {
+        return payByCashier;
+    }
+
+    public void setPayByCashier(Boolean payByCashier) {
+        this.payByCashier = payByCashier;
     }
 }

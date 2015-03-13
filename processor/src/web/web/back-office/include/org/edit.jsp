@@ -208,6 +208,9 @@
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.mailingListReports2}" styleClass="input-text long-field" />
 
+
+    <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.payByCashier}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"

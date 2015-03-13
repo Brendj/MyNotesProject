@@ -144,6 +144,8 @@
     <h:outputText escape="true" value="Список рассылки №2" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.mailingListReports2}" styleClass="input-text" />
 
+    <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.payByCashier}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать новую организацию" action="#{mainPage.createOrg}"

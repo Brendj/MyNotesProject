@@ -99,6 +99,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private String statusDetailing;
 
+    private Boolean payByCashier;
+
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
@@ -274,10 +276,13 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        org.setPayByCashier(payByCashier);
+
         session.update(org);
         fill(org);
         /////
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
+
     }
 
     private void fill(Org org) throws Exception {
@@ -395,6 +400,8 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             this.statusTextArea = "";
         }
+
+        this.payByCashier = payByCashier;
 
     }
 
@@ -969,5 +976,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setStatusDetail(String statusDetail) {
         this.statusDetail = statusDetail;
+    }
+
+    public Boolean getPayByCashier() {
+        return payByCashier;
+    }
+
+    public void setPayByCashier(Boolean payByCashier) {
+        this.payByCashier = payByCashier;
     }
 }
