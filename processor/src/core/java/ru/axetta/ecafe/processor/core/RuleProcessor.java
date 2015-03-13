@@ -306,7 +306,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         private long ruleId;
         //private final Set<RuleCondition> ruleConditions;
 
-        private Rule(ReportHandleRule reportHandleRule) throws Exception {
+        public Rule(ReportHandleRule reportHandleRule) throws Exception {
             this.ruleId = reportHandleRule.getIdOfReportHandleRule();
             this.ruleName = reportHandleRule.getRuleName();
             this.tag = reportHandleRule.getTag();

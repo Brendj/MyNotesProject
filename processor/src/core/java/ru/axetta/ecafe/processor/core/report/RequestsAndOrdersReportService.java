@@ -52,16 +52,16 @@ public class RequestsAndOrdersReportService {
 
     public List<Item> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
             List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean useColorAccent,
-            boolean showOnlyDivergence) throws Exception {
+            boolean showOnlyDivergence) {
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getOrgMap(idOfOrgList, idOfMenuSourceOrgList);
         List<Item> itemList = new LinkedList<Item>();
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date endDate = CalendarUtils.endOfDay(endTime);
         List complexList = getComplexList(orgMap, beginDate, endDate);
         if (complexList.size() <= 0) {
-            InputMismatchException e = new InputMismatchException(
-                    "В указанный период времени данные по комплексам отсутствуют: попробуйте изменить параметры отчета.");
-            throw e;
+            logger.warn(String.format(
+                    "Ошибка построения отчета \"%s\". В течении заданного периода (\"%s - \"%s) данные по комплексам отсутствуют. Попробуйте изменить параметры отчета.",
+                    this.getClass().getCanonicalName(), startTime.toString(), endTime.toString()));
         }
         ReportDataMap reportDataMap;
         reportDataMap = new ReportDataMap();
@@ -102,11 +102,13 @@ public class RequestsAndOrdersReportService {
         }
         populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence);
         if ((itemList == null) || (itemList.size() == 0)) {
-            Exception e = new Exception("В указанный период времени данные по организации отсутствуют: попробуйте изменить параметры отчета.");
-            throw e;
-        } else {
-            return itemList;
+            logger.warn(String.format(
+                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
+                    this.getClass().getCanonicalName(), startTime.toString(), endTime.toString()));
+            itemList.add(new Item("-1", "ОО не определено", "План питания не определен", "Комплекс не определен",
+                    "Состояние не определено", new Date(), 0L, true));
         }
+        return itemList;
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> complementOrgMap(Session session, HashMap<Long, BasicReportJob.OrgShortItem> orgMap) {

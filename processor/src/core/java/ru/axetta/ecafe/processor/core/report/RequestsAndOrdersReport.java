@@ -9,10 +9,15 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,5 +141,101 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(
                     service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, useColorAccent, showOnlyDivergence));
         }
+    }
+
+    @Override
+    public int getDefaultReportPeriod() {
+        return REPORT_PERIOD_PREV_MONTH;
+    }
+
+    @Override
+    public AutoReportRunner getAutoReportRunner() {
+
+        return new AutoReportRunner() {
+            public void run(AutoReportBuildTask autoReportBuildTask) {
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(String.format("Building auto reports \"%s\"",
+                            getMyClass().getCanonicalName()));
+                }
+                String classPropertyValue = getMyClass().getCanonicalName();
+                List<AutoReport> autoReports = new ArrayList<AutoReport>();
+                Session session = null;
+                org.hibernate.Transaction transaction = null;
+                try {
+                    session = autoReportBuildTask.sessionFactory.openSession();
+                    transaction = BasicReport.createTransaction(session);
+                    transaction.begin();
+
+                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
+                    for (RuleProcessor.Rule rule : thisReportRulesList) {
+                        List<String> nullPropertiesList = new ArrayList<String>();
+                        String idOfOrgsString = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
+                        String hideMissedColumnsString = rule.getExpressionValue(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
+                        String useColorAccentString = rule.getExpressionValue(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
+                        String showOnlyDivergenceString = rule.getExpressionValue(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
+                        if (idOfOrgsString == null) {
+                            nullPropertiesList.add(ReportPropertiesUtils.P_ID_OF_ORG);
+                        }
+                        if (hideMissedColumnsString == null) {
+                            nullPropertiesList.add(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
+                        }
+                        if (useColorAccentString == null) {
+                            nullPropertiesList.add(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
+                        }
+                        if (showOnlyDivergenceString == null) {
+                            nullPropertiesList.add(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
+                        }
+                        if (nullPropertiesList.size() < 1) {
+                            Properties properties = new Properties();
+                            ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
+                            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgsString);
+                            properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS,
+                                    hideMissedColumnsString);
+                            properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, useColorAccentString);
+                            properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE,
+                                    showOnlyDivergenceString);
+                            BasicReportForAllOrgJob report = createInstance();
+                            report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
+                                    autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
+                                    autoReportBuildTask.startCalendar);
+                            autoReports.add(new AutoReport(report, properties));
+                        } else {
+                            getLogger().warn(String.format("Failed at building auto reports properties \"%s\" - \"%s\"",
+                                    classPropertyValue, StringUtils.join(nullPropertiesList, ", ")));
+                        }
+                    }
+
+                    transaction.commit();
+                    transaction = null;
+                    autoReportBuildTask.executorService.execute(
+                            new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
+                                    autoReportBuildTask.documentBuilders));
+                } catch (Exception e) {
+                    getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
+                } finally {
+                    HibernateUtils.rollback(transaction, getLogger());
+                    HibernateUtils.close(session, getLogger());
+                }
+
+            }
+        };
+    }
+
+    private List<RuleProcessor.Rule> getThisReportRulesList(Session session) throws Exception {
+        List<RuleProcessor.Rule> newRules = new LinkedList<RuleProcessor.Rule>();
+        Criteria reportRulesCriteria = ReportHandleRule.createEnabledReportRulesCriteria(session);
+        List rules = reportRulesCriteria.list();
+        for (Object currObject : rules) {
+            ReportHandleRule currRule = (ReportHandleRule) currObject;
+            if (currRule.isEnabled()) {
+                for (RuleCondition ruleCondition : currRule.getRuleConditions()) {
+                    if (ruleCondition.getConditionConstant().equals(getMyClass().getCanonicalName())) {
+                        newRules.add(new RuleProcessor.Rule(currRule));
+                        break;
+                    }
+                }
+            }
+        }
+        return newRules;
     }
 }
