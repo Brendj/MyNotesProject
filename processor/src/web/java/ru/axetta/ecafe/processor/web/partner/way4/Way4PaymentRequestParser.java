@@ -56,7 +56,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         //linkConfig.remoteAddressMask = ".*";
         //linkConfig.idOfContragent = 12;
         //linkConfig.authType= 0;
-        if (function.equals("bank_account")) {
+        if (function.equals("bank_account") || linkConfig.checkOnly) {
             return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
                     linkConfig.idOfContragent, null, paymentMethod, clientId,
                     ""+opId, null, 0L, false, bmId);
