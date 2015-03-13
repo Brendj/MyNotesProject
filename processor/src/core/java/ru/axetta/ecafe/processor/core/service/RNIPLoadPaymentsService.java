@@ -71,6 +71,7 @@ import ru.CryptoPro.JCP.tools.Array;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
@@ -109,6 +110,7 @@ public class RNIPLoadPaymentsService {
     public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
     public static final String ERRORS_OUTPUT_FILE = "/rnip.errors";
     public static final String RNIP_DIR = "/rnip/";
+    private static final String SERVICE_NAME = "РНИП";
 
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
@@ -356,8 +358,7 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
-        String fileName;
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {String fileName;
         if (requestType==REQUEST_MODIFY_CATALOG) {
             fileName = MODIFY_CATALOG_TEMPLATE;
         } else if (requestType==REQUEST_CREATE_CATALOG) {
@@ -793,11 +794,15 @@ public class RNIPLoadPaymentsService {
                     ClientPayment.ATM_PAYMENT_METHOD,
                     Long.parseLong(p.get("PAYMENT_TO")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
                                                             поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
-                    paymentID, paymentDate + "/" + paymentID, amt,
+                    paymentID, SERVICE_NAME + "/" + paymentDate + "/" + bic, amt,
                     false);
             OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
                     .processPayRequest(req);
-            info("Платеж SystemIdentifier=%s обработан", paymentID);
+            if(resp.getResultCode() == PaymentProcessResult.OK.getCode()) {
+                info("Платеж SystemIdentifier=%s обработан. Присвоен id %s", paymentID, resp.getPaymentId());
+            } else {
+                logger.error(String.format("Платеж SystemIdentifier=%s обработан. Присвоен id %s. Произошла ошибка с кодом %s", paymentID, resp.getPaymentId(), resp.getResultCode()));
+            }
             /*logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
                     resp == null ? "null" : resp.toString()));*/
         }
