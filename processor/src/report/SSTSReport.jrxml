@@ -42,7 +42,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сводный отчет по школам]]></text>
+				<text><![CDATA[Сводный отчет по реализации]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -249,7 +249,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none"/>
-				<textFieldExpression><![CDATA[(double) $F{sumProductVending} / 100]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(double) $F{sumCommercialFood} / 100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
 				<reportElement uuid="9f265b3e-139a-4723-8780-363a8f87508a" stretchType="RelativeToBandHeight" x="902" y="0" width="100" height="23"/>
@@ -261,7 +261,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none"/>
-				<textFieldExpression><![CDATA[(double) $F{sumCommercialFood} / 100]]></textFieldExpression>
+				<textFieldExpression><![CDATA[(double) $F{sumProductVending} / 100]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -341,7 +341,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{ProductVendingSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{CommercialFoodSum}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00">
 				<reportElement uuid="993370cc-f8fc-48ce-a5da-a46a5c1abf6b" stretchType="RelativeToBandHeight" x="902" y="0" width="100" height="20"/>
@@ -355,7 +355,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{CommercialFoodSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{ProductVendingSum}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
