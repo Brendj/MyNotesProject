@@ -53,9 +53,11 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+            startTime = CalendarUtils.roundToBeginOfDay(startTime);
             parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
+
 
             endTime = CalendarUtils.endOfDay(endTime);
             calendar.setTime(startTime);

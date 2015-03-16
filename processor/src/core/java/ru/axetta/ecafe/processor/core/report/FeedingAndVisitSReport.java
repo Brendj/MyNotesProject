@@ -66,6 +66,8 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
+            startTime = CalendarUtils.roundToBeginOfDay(startTime);
+
             endTime = CalendarUtils.endOfDay(endTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime));
@@ -233,9 +235,6 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
             List<Row> rowList;
             for (DAOEnterEventSummaryModel enterEvent : enterEventsSummary) {
-                if(enterEvent.getGroupName().startsWith("1-Ж")){
-                    System.out.print("dd");
-                }
                 data = dataMap.get( prepareGroupName(orgList, enterEvent.getGroupName(), enterEvent.getClientOrgId()));
                 if (data == null) {
                     ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, enterEvent.getClientOrgId());

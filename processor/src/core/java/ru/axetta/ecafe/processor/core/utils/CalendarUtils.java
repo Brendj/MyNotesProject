@@ -469,4 +469,16 @@ public class CalendarUtils {
         c.setTime(date);
         return c.get(Calendar.MONTH);
     }
+
+    public static Date roundToBeginOfDay(Date startTime) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startTime);
+        if(calendar.get(Calendar.HOUR_OF_DAY)> 18){
+            calendar.add(Calendar.HOUR_OF_DAY, 1);
+            truncateToDayOfMonth(calendar);
+        }
+        return calendar.getTime();
+    }
+
 }
