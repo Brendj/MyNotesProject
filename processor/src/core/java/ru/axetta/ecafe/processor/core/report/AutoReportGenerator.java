@@ -1212,7 +1212,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(RequestsAndOrdersReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -1234,7 +1234,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(PaymentTotalsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -1256,7 +1256,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(BeneficiaryByAllOrgReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -1506,10 +1506,9 @@ public class AutoReportGenerator {
         trigger.setTimeZone(this.calendar.getTimeZone());
         trigger.setStartTime(new Date());
         if (this.scheduler.getTrigger(jobId, Scheduler.DEFAULT_GROUP)!=null) {
-            this.scheduler.rescheduleJob(jobId, Scheduler.DEFAULT_GROUP,this.scheduler.getTrigger(jobId, Scheduler.DEFAULT_GROUP) );
-        }else {
-            this.scheduler.scheduleJob(jobDetail, trigger);
+            this.scheduler.deleteJob(jobId, Scheduler.DEFAULT_GROUP);
         }
+        this.scheduler.scheduleJob(jobDetail, trigger);
     }
 
     private void cancelScheduledJob(String jobId) throws Exception {
