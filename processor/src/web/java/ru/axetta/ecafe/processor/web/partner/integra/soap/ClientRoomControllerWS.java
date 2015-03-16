@@ -81,6 +81,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
@@ -5652,7 +5653,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
+            // Текущая дата
+            Date date = new Date();
 
             final int hoursForbidChange = parser.getHoursForbidChange();
 
@@ -5666,6 +5668,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             //Вычисление с какой даты можно активировать по поставщику ориентируясь.
             Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("HH");
+            Long hours = Long.valueOf(sdf.format(dayForbid));
+            if (hours >= 12 ) {
+                dayForbid = CalendarUtils.addOneDay(dayForbid);
+            }
 
             if (parser.isSixWorkWeek()) {
                 if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
@@ -5747,7 +5755,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date date = new Date();
 
             final int hoursForbidChange = parser.getHoursForbidChange();
 
@@ -5761,6 +5769,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             //Вычисление с какой даты можно активировать по поставщику ориентируясь.
             Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("HH");
+            Long hours = Long.valueOf(sdf.format(dayForbid));
+            if (hours >= 12 ) {
+                dayForbid = CalendarUtils.addOneDay(dayForbid);
+            }
 
             if (parser.isSixWorkWeek()) {
                 if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
@@ -5776,7 +5790,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if(activateDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Неправильная дата активация циклограммы";
+                result.description = "Неправильная дата возобновления подписки";
                 return result;
             }
             Date currentDate = new Date();
@@ -5937,7 +5951,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings settings = (ECafeSettings) settingsList.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
                     .getSplitSettingValue();
-            Date date = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date date = new Date();
 
             final int hoursForbidChange = parser.getHoursForbidChange();
 
@@ -5950,6 +5964,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             //Вычисление с какой даты можно активировать по поставщику ориентируясь.
             Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("HH");
+            Long hours = Long.valueOf(sdf.format(dayForbid));
+            if (hours >= 12 ) {
+                dayForbid = CalendarUtils.addOneDay(dayForbid);
+            }
 
             if (parser.isSixWorkWeek()) {
                 if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
