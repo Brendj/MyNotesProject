@@ -1024,14 +1024,14 @@
                             <%--action="#{mainPage.showDetailedDeviationsPaymentOrReducedPriceMealsReportPage}"--%>
                             <%--reRender="workspaceForm" />--%>
         <%--@elvariable id="detailedDeviationsWithoutCorpsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DetailedDeviationsWithoutCorpsReportPage"--%>
-        <rich:panelMenuItem id="detailedDeviationsWithoutCorpsReportMenuItem"
+        <%--<rich:panelMenuItem id="detailedDeviationsWithoutCorpsReportMenuItem"
                             binding="#{mainPage.detailedDeviationsWithoutCorpsReportPage.mainMenuComponent}"
                             label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsWithoutCorpsReportPage}"
-                            reRender="workspaceForm" />
+                            reRender="workspaceForm" />--%>
         <rich:panelMenuItem id="detailedDeviationsWithoutCorpsNewReportMenuItem"
                             binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.mainMenuComponent}"
-                            label="Детализированный отчет отклонений оплаты льготного питания (редактированный)"
+                            label="Детализированный отчет отклонений оплаты льготного питания"
                             action="#{mainPage.showDetailedDeviationsWithoutCorpsNewReportPage}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
