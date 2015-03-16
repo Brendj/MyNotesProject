@@ -123,17 +123,17 @@ public class SSTSReport extends BasicReportForContragentJob {
                     .add(Restrictions.eq("o.state", 0)).add(Restrictions.eq("org.defaultSupplier", contragent))
                     .add(Restrictions.between("o.createTime", startTime, endTime)).addOrder(Order.asc("org.shortName"))
                     .setProjection(Projections.projectionList().add(Projections.sqlProjection(
-                            "sum(case when {alias}.menuType = 0 then {alias}.qty * {alias}.rPrice else 0 end) as sumBuffet",
+                            "sum(case when {alias}.menuType = 0 and {alias}.menuOrigin not in (11, 20) then {alias}.qty * {alias}.rPrice else 0 end) as sumBuffet",
                             new String[]{"sumBuffet"}, new Type[]{new LongType()})).add(Projections.sqlProjection(
                             "sum(case when {alias}.menuType between 50 and 99 and {alias}.rPrice > 0 then {alias}.qty * {alias}.rPrice else 0 end) as sumComplex",
                             new String[]{"sumComplex"}, new Type[]{new LongType()})).add(Projections.sqlProjection(
                             "sum(case when {alias}.menuType between 50 and 99 and {alias}.rPrice = 0 and {alias}.discount > 0 then {alias}.qty * {alias}.discount else 0 end) as sumComplexBenefit",
                             new String[]{"sumComplexBenefit"}, new Type[]{new LongType()})).add(Projections
                             .sqlProjection(
-                                    "sum(CASE WHEN this_.menuOrigin = 11 AND this_.menuType = 0 THEN this_.qty * this_.rPrice ELSE 0 END) AS sumProductVending",
+                                    "sum(CASE WHEN {alias}.menuOrigin = 11 AND {alias}.menuType = 0 THEN {alias}.qty * {alias}.rPrice ELSE 0 END) AS sumProductVending",
                                     new String[]{"sumProductVending"}, new Type[]{new LongType()})).add(Projections
                             .sqlProjection(
-                                    "sum(CASE WHEN this_.menuOrigin = 20 AND this_.menuType = 0 THEN this_.qty * this_.rPrice ELSE 0 END) AS sumCommercialFood",
+                                    "sum(CASE WHEN {alias}.menuOrigin = 20 AND {alias}.menuType = 0 THEN {alias}.qty * {alias}.rPrice ELSE 0 END) AS sumCommercialFood",
                                     new String[]{"sumCommercialFood"}, new Type[]{new LongType()}))
                             .add(Projections.groupProperty("org.idOfOrg"), "orgId")
                             .add(Projections.groupProperty("org.shortName"), "orgName")
