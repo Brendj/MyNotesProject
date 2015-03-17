@@ -6,3 +6,6 @@
 --! Изменение таблицы cf_clients добавление поля MiddleGroup
 
 ALTER TABLE cf_clients ADD COLUMN middlegroup varchar(64);
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150314) НЕ МЕНЯТЬ
