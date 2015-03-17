@@ -426,7 +426,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(SubscriptionFeedingJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -448,7 +448,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(QuestionaryResultByOrgReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -470,7 +470,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ClientMigrationHistoryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -492,7 +492,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ClientSelectedAnswerResultByOrgReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -514,7 +514,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(MenuDetailsGroupByMenuOriginReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -624,7 +624,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(RegisterStampReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -646,7 +646,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(DeliveredServicesReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -668,7 +668,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ActiveClientsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -690,7 +690,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ActiveDiscountClientsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -712,7 +712,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(ComplaintCountByGoodReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -848,7 +848,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap ()
                         .put (HalfYearSummaryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -873,7 +873,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap ()
                         .put (BeneficiarySummaryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
@@ -1190,7 +1190,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
 
-                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(SMSDeliveryReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
