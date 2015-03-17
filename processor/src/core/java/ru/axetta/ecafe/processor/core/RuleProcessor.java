@@ -475,9 +475,11 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         String subject = "";
                         Long idOfOrg = null;
                         if (!StringUtils.isEmpty(report.getProperties().getProperty("idOfOrg"))) {
-                            idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
+                            if(!report.getProperties().getProperty("idOfOrg").contains(",")){
+                                idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
+                            }
                         }
-                        
+
                         ReportDocumentBuilder documentBuilder = reportDocumentBuilders
                                 .get(currRule.getDocumentFormat());
                         ReportDocument reportDocument=null;

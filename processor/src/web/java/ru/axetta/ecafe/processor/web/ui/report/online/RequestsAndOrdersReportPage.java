@@ -256,7 +256,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar, useColorAccent, showOnlyDivergence);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

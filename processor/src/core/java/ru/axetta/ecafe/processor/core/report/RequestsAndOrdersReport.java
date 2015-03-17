@@ -81,24 +81,17 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            return build(session, startTime, endTime, calendar, false, false);
-        }
-
-        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                                Boolean useColorAccent, Boolean showOnlyDivergence) throws Exception {
 
             Date generateTime = new Date();
 
+            boolean useColorAccent = Boolean
+                    .parseBoolean(getReportProperties().getProperty(P_USE_COLOR_ACCENT, "false"));
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             parameterMap.put("useColorAccent", useColorAccent);
 
-            // todo need complete testing - maybe useles code
-            //calendar.setTime(startTime);
-            //calendar.setTime(endTime);
-
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, parameterMap);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -109,32 +102,29 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
         }
 
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
-                Map<String, Object> parameterMap) throws Exception {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime) throws Exception {
 
-            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            String idOfOrgs = getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG, "");
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            String idOfMenuSourceOrgs = StringUtils
-                    .trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
+            String idOfMenuSourceOrgs = getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, "");
             List<String> idOfMenuSourceOrgStrList = Arrays.asList(StringUtils.split(idOfMenuSourceOrgs, ','));
             List<Long> idOfMenuSourceOrgList = new ArrayList<Long>(idOfMenuSourceOrgStrList.size());
             for (String idOfMenuSourceOrg : idOfMenuSourceOrgStrList) {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
 
-            boolean hideMissedColumns = Boolean
-                    .parseBoolean(reportProperties.getProperty(P_HIDE_MISSED_COLUMNS, "false"));
+            boolean hideMissedColumns = Boolean.parseBoolean(getReportProperties().getProperty(P_HIDE_MISSED_COLUMNS, "false"));
 
             boolean useColorAccent = Boolean
-                    .parseBoolean(reportProperties.getProperty(P_USE_COLOR_ACCENT, "false"));
+                    .parseBoolean(getReportProperties().getProperty(P_USE_COLOR_ACCENT, "false"));
 
             boolean showOnlyDivergence = Boolean
-                    .parseBoolean(reportProperties.getProperty(P_SHOW_ONLY_DIVERGENCE, "false"));
+                    .parseBoolean(getReportProperties().getProperty(P_SHOW_ONLY_DIVERGENCE, "false"));
 
             RequestsAndOrdersReportService service;
             service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE);
