@@ -198,9 +198,12 @@ public class Row {
         if (day != CalendarUtils.getDayOfMonth(model.getEvtDateTime())) {
             return;
         }
+
         switch (model.getPassDirection()) {
             case 0:
             case 6:
+            case 100:
+
                 if ((enter == null) || (enter > model.getEvtDateTime())) {
                     enter = model.getEvtDateTime();
                 }
