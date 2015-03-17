@@ -119,6 +119,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             for (Data data : dataList) {
                 processColorsRowsList(data.getPlan());
                 processColorsRowsList(data.getReserve());
+                processColorsRowsList(data.getTotal());
             }
         }
         private void processColorsRowsList(List<Row> dataList) {
