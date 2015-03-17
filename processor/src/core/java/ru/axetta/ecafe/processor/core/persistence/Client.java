@@ -60,6 +60,7 @@ public class Client {
     private String address;
     private String phone;
     private String mobile;
+    private String middleGroup;
     private String email;
     private boolean notifyViaEmail;
     private boolean notifyViaSMS;
@@ -229,6 +230,14 @@ public class Client {
 
     public boolean hasMobile() {
         return mobile != null && mobile.length() > 0;
+    }
+
+    public String getMiddleGroup() {
+        return middleGroup;
+    }
+
+    public void setMiddleGroup(String middleGroup) {
+        this.middleGroup = middleGroup;
     }
 
     public boolean hasEmail() {

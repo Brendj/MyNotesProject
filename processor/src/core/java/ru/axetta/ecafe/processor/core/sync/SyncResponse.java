@@ -300,6 +300,7 @@ public class SyncResponse {
             private final String address;
             private final String phone;
             private final String mobile;
+            private final String middleGroup;
             private final String email;
             private final String fax;
             private final int contractState;
@@ -326,6 +327,7 @@ public class SyncResponse {
                 this.address = client.getAddress();
                 this.phone = client.getPhone();
                 this.mobile = client.getMobile();
+                this.middleGroup = client.getMiddleGroup();
                 this.fax = client.getFax();
                 this.email = client.getEmail();
                 this.contractState = client.getContractState();
@@ -384,6 +386,10 @@ public class SyncResponse {
                 return mobile;
             }
 
+            public String getMiddleGroup() {
+                return middleGroup;
+            }
+
             public String getFax() {
                 return fax;
             }
@@ -424,6 +430,7 @@ public class SyncResponse {
                 element.setAttribute("Address", this.address);
                 element.setAttribute("Phone", this.phone);
                 element.setAttribute("Mobile", this.mobile);
+                element.setAttribute("MiddleGroup", this.middleGroup);
                 element.setAttribute("Fax", this.fax);
                 element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
