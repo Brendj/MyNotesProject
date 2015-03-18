@@ -16,10 +16,25 @@
         </f:facet>
     </a4j:status>
 
+    <h:panelGrid columns="1" styleClass="borderless-grid">
+        <h:outputText value="Пожалуйста ответьте на этот простой математический вопрос " styleClass="output-text" />
+    </h:panelGrid>
+
+    <h:panelGrid columns="7" styleClass="borderless-grid">
+        <h:outputText value="#{mainPage.cancelCategoryBenefitsPage.number1}" styleClass="output-text" />
+        <h:outputText value=" + " styleClass="output-text" />
+        <h:outputText value="#{mainPage.cancelCategoryBenefitsPage.number2}" styleClass="output-text" />
+        <h:outputText value=" = " styleClass="output-text" />
+        <h:inputText value="#{mainPage.cancelCategoryBenefitsPage.plusResult}" size="10" styleClass="input-text" />
+        <a4j:commandButton value="Подсчитать"
+                           action="#{mainPage.cancelCategoryBenefitsPage.resultChecker}" reRender="workspaceTogglePanel"
+                           styleClass="command-button" />
+    </h:panelGrid>
+
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <a4j:commandButton value="Отмена льготных категорий по всем учащимся"
                            action="#{mainPage.cancelCategoryBenefitsGenerate}" reRender="workspaceTogglePanel"
-                           styleClass="command-button" />
+                           styleClass="command-button" disabled="#{mainPage.cancelCategoryBenefitsPage.disabled}" />
     </h:panelGrid>
 
     <a4j:outputPanel ajaxRendered="true">

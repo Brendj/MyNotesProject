@@ -16,10 +16,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,13 +31,58 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
     private List<GroupControlBenefitsItems> groupControlBenefitsItemsList;
 
+    private boolean disabled = true;
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    Random random = new Random();
+
+    private Integer number1;
+
+    private Integer number2;
+
+    private Integer plusResult = null;
+
+    public Integer getNumber1() {
+        return number1;
+    }
+
+    public void setNumber1(Integer number1) {
+        this.number1 = number1;
+    }
+
+    public Integer getNumber2() {
+        return number2;
+    }
+
+    public void setNumber2(Integer number2) {
+        this.number2 = number2;
+    }
+
+    public Integer getPlusResult() {
+        return plusResult;
+    }
+
+    public void setPlusResult(Integer plusResult) {
+        this.plusResult = plusResult;
+    }
+
     @Override
     public String getPageFilename() {
         return "service/msk/cancel_category_benefits";
     }
 
     public void onShow() throws Exception {
-
+        number1 = random.nextInt(98) + 1 ;
+        number2 = random.nextInt(8) + 1;
+        disabled = true;
+        plusResult = null;
     }
 
     public void cancelCategoryBenefitsGenerate(RuntimeContext runtimeContext) throws Exception {
@@ -132,5 +174,17 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
     public void setGroupControlBenefitsItemsList(List<GroupControlBenefitsItems> groupControlBenefitsItemsList) {
         this.groupControlBenefitsItemsList = groupControlBenefitsItemsList;
+    }
+
+    public void resultChecker() {
+        if (plusResult != null && plusResult != 0) {
+            if ((number1 + number2) == plusResult) {
+                disabled = false;
+            } else {
+                printError("Ответ подсчитан неверно");
+            }
+        } else {
+            printError("Введите подсчитанный ответ");
+        }
     }
 }
