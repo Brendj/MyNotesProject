@@ -158,41 +158,33 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
                     List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
-                        List<String> nullPropertiesList = new ArrayList<String>();
+                        Properties properties = new Properties();
+                        ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
                         String idOfOrgsString = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
+                        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG,
+                                idOfOrgsString == null ? "" : idOfOrgsString);
+
                         String hideMissedColumnsString = rule.getExpressionValue(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
+                        properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS,
+                                hideMissedColumnsString == null ? "false" : hideMissedColumnsString);
+
                         String useColorAccentString = rule.getExpressionValue(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
+                        properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT,
+                                useColorAccentString == null ? "true" : useColorAccentString);
+
                         String showOnlyDivergenceString = rule.getExpressionValue(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
-                        if (idOfOrgsString == null) {
-                            nullPropertiesList.add(ReportPropertiesUtils.P_ID_OF_ORG);
-                        }
-                        if (hideMissedColumnsString == null) {
-                            nullPropertiesList.add(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
-                        }
-                        if (useColorAccentString == null) {
-                            nullPropertiesList.add(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
-                        }
-                        if (showOnlyDivergenceString == null) {
-                            nullPropertiesList.add(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
-                        }
-                        if (nullPropertiesList.size() < 1) {
-                            Properties properties = new Properties();
-                            ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
-                            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgsString);
-                            properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS,
-                                    hideMissedColumnsString);
-                            properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, useColorAccentString);
-                            properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE,
-                                    showOnlyDivergenceString);
-                            BasicReportForAllOrgJob report = createInstance();
-                            report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
-                                    autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
-                                    autoReportBuildTask.startCalendar);
-                            autoReports.add(new AutoReport(report, properties));
-                        } else {
-                            getLogger().warn(String.format("Failed at building auto reports properties \"%s\" - \"%s\"",
-                                    classPropertyValue, StringUtils.join(nullPropertiesList, ", ")));
-                        }
+                        properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE,
+                                showOnlyDivergenceString == null ? "false" : showOnlyDivergenceString);
+
+                        String reportPeriodType = rule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE);
+                        properties.setProperty(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
+                                reportPeriodType == null ? "5" : reportPeriodType);
+
+                        BasicReportForAllOrgJob report = createInstance();
+                        report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
+                                autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
+                                autoReportBuildTask.startCalendar);
+                        autoReports.add(new AutoReport(report, properties));
                     }
 
                     transaction.commit();

@@ -650,6 +650,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         else if (sType.equalsIgnoreCase("today")) {
             type=BasicReportJob.REPORT_PERIOD_TODAY;
         }
+        else if (sType.equalsIgnoreCase("7")) {
+            type=BasicReportJob.REPORT_PERIOD_PREV_WEEK;
+        }
         Date[] dates = BasicReportJob.calculateDatesForPeriodType(Calendar.getInstance(), null, new Date(), type);
         reportJob.setStartTime(dates[0]);
         reportJob.setEndTime(dates[1]);
