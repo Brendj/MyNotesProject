@@ -325,7 +325,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
         if (contragentFilter.getContragent().getIdOfContragent() == null
                 || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
-            printError("Не выбран 'Агент по приему платежей' и 'Контарагент-получатель'");
+            printError("Не выбран 'Агент по приему платежей' и 'Контрагент-получатель'");
         }
         return false;
     }
