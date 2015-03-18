@@ -111,6 +111,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long limit;
     private Long expenditureLimit;
     private String clientGroupName;
+    private String middleGroup;
     private Long externalId;
     private String clientGUID;
     private List<BankSubscription> bankSubscriptions;
@@ -146,6 +147,10 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public String getClientGroupName() {
         return clientGroupName;
+    }
+
+    public String getMiddleGroup() {
+        return middleGroup;
     }
 
     private final ClientCardListViewPage clientCardListViewPage = new ClientCardListViewPage();
@@ -343,6 +348,8 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         ClientGroup group = client.getClientGroup();
         this.clientGroupName = group==null?"":group.getGroupName();
+
+        this.middleGroup = client.getMiddleGroup();
 
         // Категории скидок
         this.categoriesDiscounts=new LinkedList<CategoryDiscount>();

@@ -53,6 +53,8 @@
     </h:panelGrid>
     <h:outputText escape="true" value="Группа" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientGroupName}" readonly="true" styleClass="input-text" />
+    <h:outputText escape="true" value="Промежуточная группа" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.middleGroup}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.balance}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />

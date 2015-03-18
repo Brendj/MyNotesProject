@@ -188,6 +188,13 @@
             <h:outputText escape="true" value="#{item.clientGroupName}"
                           styleClass="output-text" />
         </rich:column>
+        <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Промежуточная группа" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.middleGroup}"
+                          styleClass="output-text" />
+        </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                <h:outputText escape="true" value="Организация" />

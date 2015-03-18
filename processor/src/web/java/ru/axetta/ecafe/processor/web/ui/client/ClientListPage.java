@@ -100,6 +100,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final boolean notifyViaEmail;
         private boolean notifyViaSMS;
         private final String clientGroupName;
+        private final String middleGroup;
         private final Long balance;
         private Long limit;
         private Long expenditureLimit;
@@ -171,6 +172,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             } else {
                 this.clientGroupName = clientGroup.getGroupName();
             }
+            this.middleGroup = client.getMiddleGroup();
             if (null == discountMode) {
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[0];
             } else {
@@ -246,6 +248,9 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return clientGroupName;
         }
 
+        public String getMiddleGroup() {
+            return middleGroup;
+        }
 
         public String getIdOfClientString() {
             return this.getIdOfClient().toString();
