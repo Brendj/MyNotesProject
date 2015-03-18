@@ -2070,21 +2070,14 @@ public class Processor implements SyncProcessor,
                 // отмена заказа
                 if (null != order) {
                     // Update client balance
-                    Client client = order.getClient();
-                    if (null != client) {
-                        RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
-                        persistenceSession.flush();
-                        persistenceTransaction.commit();
-                        persistenceTransaction = null;
-                    } else {
-                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 210,
-                                String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
-                                        payment.getIdOfOrder(), client.getIdOfClient()));
-                    }
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
                 } else {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, String.format(
-                            "Unknown order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                            payment.getIdOfOrder()));
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,
+                            String.format("Unknown order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                                    payment.getIdOfOrder()));
                 }
             }
 
