@@ -71,6 +71,7 @@ public class SyncRequest {
                     String address = getStringValueNullSafe(namedNodeMap, "Address");
                     String phone = getStringValueNullSafe(namedNodeMap, "Phone");
                     String mobilePhone = getStringValueNullSafe(namedNodeMap, "Mobile");
+                    String middleGroup = getStringValueNullSafe(namedNodeMap, "MiddleGroup");
                     String email = getStringValueNullSafe(namedNodeMap, "Email");
                     String fax = getStringValueNullSafe(namedNodeMap, "Fax");
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
@@ -82,7 +83,7 @@ public class SyncRequest {
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
                             discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
-                            mobilePhone, fax, email, remarks, notifyViaEmail==null?null:notifyViaEmail.equals("1"),
+                            mobilePhone, middleGroup, fax, email, remarks, notifyViaEmail==null?null:notifyViaEmail.equals("1"),
                             notifyViaSMS==null?null:notifyViaSMS.equals("1"), groupName, canConfirmGroupPayment==null?null:canConfirmGroupPayment.equals("1"),
                             guid, expenditureLimit);
                 }
@@ -90,7 +91,7 @@ public class SyncRequest {
             }
 
             private final long idOfClient;
-            private final String name, surname, secondName, address, phone, mobilePhone, fax, email, remarks;
+            private final String name, surname, secondName, address, phone, mobilePhone, middleGroup, fax, email, remarks;
             private final int freePayCount;
             private final int freePayMaxCount;
             private final Date lastFreePayTime;
@@ -104,7 +105,7 @@ public class SyncRequest {
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
-                    String address, String phone, String mobilePhone, String fax, String email, String remarks,
+                    String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
                     Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit) {
                 this.idOfClient = idOfClient;
@@ -119,6 +120,7 @@ public class SyncRequest {
                 this.address = address;
                 this.phone = phone;
                 this.mobilePhone = mobilePhone;
+                this.middleGroup = middleGroup;
                 this.fax = fax;
                 this.email = email;
                 this.remarks = remarks;
@@ -178,6 +180,10 @@ public class SyncRequest {
                 return mobilePhone;
             }
 
+            public String getMiddleGroup() {
+                return middleGroup;
+            }
+
             public String getFax() {
                 return fax;
             }
@@ -218,7 +224,7 @@ public class SyncRequest {
             public String toString() {
                 return "ClientParamItem{" + "idOfClient=" + idOfClient + ", name='" + name + '\'' + ", surname='"
                         + surname + '\'' + ", secondName='" + secondName + '\'' + ", address='" + address + '\''
-                        + ", phone='" + phone + '\'' + ", mobilePhone='" + mobilePhone + '\'' + ", fax='" + fax + '\''
+                        + ", phone='" + phone + '\'' + ", mobilePhone='" + mobilePhone + '\'' + ", middleGroup='" + middleGroup + '\'' + ", fax='" + fax + '\''
                         + ", email='" + email + '\'' + ", remarks='" + remarks + '\'' + ", freePayCount=" + freePayCount
                         + ", freePayMaxCount=" + freePayMaxCount + ", lastFreePayTime=" + lastFreePayTime
                         + ", discountMode=" + discountMode + ", categoriesDiscounts='" + categoriesDiscounts + '\''

@@ -2249,6 +2249,10 @@ public class Processor implements SyncProcessor,
                     client.setNotifyViaSMS(true);
                 }
             }
+            if (clientParamItem.getMiddleGroup() != null) {
+                client.setMiddleGroup(clientParamItem.getMiddleGroup());
+            }
+
             if (clientParamItem.getName() != null) {
                 client.getPerson().setFirstName(clientParamItem.getName());
             }
