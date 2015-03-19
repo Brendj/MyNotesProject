@@ -1,27 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DailySalesByGroupsReport_subreport_totals" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d8eb3592-fcdb-4dc9-8ddf-235c4e643d9e">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DailySalesByGroupsReport_subreport_totals" pageWidth="680" pageHeight="595" orientation="Landscape" columnWidth="680" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d8eb3592-fcdb-4dc9-8ddf-235c4e643d9e">
 	<property name="ireport.zoom" value="1.3310000000000004"/>
-	<property name="ireport.x" value="8"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
 		</box>
 	</style>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\workspace\\branche\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
 	<field name="totalOriginName" class="java.lang.String"/>
 	<field name="totalSum" class="java.lang.Long"/>
 	<field name="totalCount" class="java.lang.Long"/>
-	<variable name="sumTotalCount" class="java.lang.Long" calculation="Sum">
-		<variableExpression><![CDATA[$F{totalCount}]]></variableExpression>
-		<initialValueExpression><![CDATA[0L]]></initialValueExpression>
-	</variable>
-	<variable name="sumTotalSum" class="java.lang.Long" calculation="Sum">
-		<variableExpression><![CDATA[$F{totalSum}]]></variableExpression>
-		<initialValueExpression><![CDATA[]]></initialValueExpression>
-	</variable>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
+	<field name="subReportDataRows" class="java.util.List"/>
 	<title>
 		<band height="50">
 			<textField>
@@ -50,27 +43,15 @@
 	</title>
 	<detail>
 		<band height="20" splitType="Stretch">
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="ebc97cdd-1fbd-40cd-abab-8eb5ab29dbb7" style="table" stretchType="RelativeToBandHeight" x="501" y="0" width="79" height="20"/>
-				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[$F{totalCount}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="0.00">
-				<reportElement uuid="9ae051a9-b909-4bd0-b701-408773e8d601" style="table" stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20"/>
-				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{totalSum}).movePointLeft(2)]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="46b1f1ad-cbd5-4230-a737-b6658ae76f7b" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="501" height="20"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$F{totalOriginName}]]></textFieldExpression>
-			</textField>
+			<subreport>
+				<reportElement uuid="69987ef7-aa09-4b82-8fe8-2f7891460ef1" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="680" height="20"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{subReportDataRows})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DailySalesByGroupsReport_subreport_items.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
-	</detail>
-	<summary>
-		<band height="21">
-			<staticText>
-				<reportElement uuid="8a32fb55-693d-4cb8-971d-68303d52c7b2" x="0" y="0" width="501" height="20"/>
+		<band height="20">
+			<textField>
+				<reportElement uuid="574fe8de-9bd4-45ca-b9a9-16b3c5c84465" mode="Opaque" x="0" y="0" width="501" height="20" backcolor="#CCCCCC"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -79,26 +60,12 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[ВСЕГО:]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="c2117742-5ee3-42ba-b63f-6ee7599786a4" x="501" y="0" width="79" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center">
-					<font isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{sumTotalCount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalOriginName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="490c1713-1d02-4760-b5b4-58a16f70632e" x="580" y="0" width="100" height="20"/>
+				<reportElement uuid="c2117742-5ee3-42ba-b63f-6ee7599786a4" mode="Opaque" x="501" y="0" width="79" height="20" backcolor="#CCCCCC"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -109,8 +76,22 @@
 				<textElement textAlignment="Center">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{sumTotalSum}).movePointLeft(2)]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="490c1713-1d02-4760-b5b4-58a16f70632e" mode="Opaque" x="580" y="0" width="100" height="20" backcolor="#CCCCCC"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{totalSum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 		</band>
-	</summary>
+	</detail>
 </jasperReport>

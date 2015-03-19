@@ -12,11 +12,8 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
-import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -157,9 +154,12 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             LinkedList<TotalDataRow> totalDataRows = new LinkedList<TotalDataRow>();
 
+            LinkedList<SubReportDataRow> subReportDataRowsPay = new LinkedList<SubReportDataRow>();
+
             List mealsList = null;
             MealRow mealRow;
             long totalCount=0, totalSum=0;
+            long totalPayCount=0, totalPaySum=0;
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
@@ -197,16 +197,23 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                         menuName = String.format("%s (скидка %d%%)", menuName, tradeDiscount);
                     //MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                     totalCount+=count;
+                    totalPayCount+=count;
                     totalSum+=sum;
+                    totalPaySum+=sum;
                     mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                     payMealRows.add(mealRow);
                 }
-                totalDataRows.add(new TotalDataRow(menuGroup, totalCount, totalSum));
+                subReportDataRowsPay.add(new SubReportDataRow(menuGroup, totalCount, totalSum));
                 
                 Collections.sort(payMealRows);
                 mealRows.addAll(payMealRows);
 
+                totalDataRows.add(new TotalDataRow("Платное питание ВСЕГО: ", totalPayCount, totalPaySum, subReportDataRowsPay));
+
                 //// бесплатное питание
+
+                List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
+
                 Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount " +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
                         " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
@@ -222,6 +229,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 mealsList = freeComplexQuery1.list();
 
                 totalCount=0; totalSum=0;
+                int totalCountUnPaid = 0; int totalSumUnPaid = 0;
+
                 menuGroup = "Бесплатное комплексное питание";
                 for (Object o : mealsList) {
                     vals=(Object[])o;
@@ -232,12 +241,18 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
                     long socdiscount = vals[5]==null?0:Long.parseLong(vals[5].toString());
                     totalCount+=count;
+                    totalCountUnPaid+=count;
                     totalSum+=sum;
+                    totalSumUnPaid+=sum;
                     mealRow = new MealRow(menuGroup, menuName, count, rPrice+socdiscount, sum);
                     mealRows.add(mealRow);
                 }
-                totalDataRows.add(new TotalDataRow(menuGroup, totalCount, totalSum));
+                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroup, totalCount, totalSum));
+
+                totalDataRows.add(new TotalDataRow("Бесплатное комплексное питание ВСЕГО: ", totalCountUnPaid, totalSumUnPaid, subReportDataRowsUnPaid));
             }
+
+            // буфет
 
             String groupByField = "MenuOrigin";
             boolean groupByMenuOrigin = true;
@@ -273,13 +288,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             mealsList = mealsQuery.list();
 
+            List<SubReportDataRow> subReportDataRowsBuffet = new LinkedList<SubReportDataRow>();
+
             int menuOrigin = 0;
             String menuGroup = null;
             String menuName;
             String currentTotalGroup="";
             
             long totalBuffetCount=0, totalBuffetSum=0;
-            int nTotalBufferDataRowPosition=totalDataRows.size();
             
             for (Object o : mealsList) {
                 vals=(Object[])o;
@@ -299,7 +315,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 ////
                 if (!currentTotalGroup.equals(mealRow.getOriginName())) {
                     if (!currentTotalGroup.equals("")) {
-                        totalDataRows.add(new TotalDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
+                        subReportDataRowsBuffet.add(new SubReportDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
                     }
                     totalCount=0; totalSum=0;
                     currentTotalGroup = mealRow.getOriginName();
@@ -310,10 +326,10 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 totalSum+=sum;
             }
             if (!currentTotalGroup.equals("")) {
-                totalDataRows.add(new TotalDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
+                subReportDataRowsBuffet.add(new SubReportDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
             }
 
-            totalDataRows.add(nTotalBufferDataRowPosition, new TotalDataRow("Буфет", totalBuffetCount, totalBuffetSum));
+            totalDataRows.add(new TotalDataRow("БУФЕТ ВСЕГО: ", totalBuffetCount, totalBuffetSum, subReportDataRowsBuffet));
             
             ///
             parameterMap.put("totalsData", new JRBeanCollectionDataSource(totalDataRows));
@@ -328,11 +344,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         String totalOriginName;
         long totalCount;
         long totalSum;
+        List<SubReportDataRow> subReportDataRows;
 
-        public TotalDataRow(String totalOriginName, long totalCount, long totalSum) {
+        public TotalDataRow(String totalOriginName, long totalCount, long totalSum, List<SubReportDataRow> subReportDataRows) {
             this.totalOriginName = totalOriginName;
             this.totalCount = totalCount;
             this.totalSum = totalSum;
+            this.subReportDataRows = subReportDataRows;
         }
 
         public String getTotalOriginName() {
@@ -357,6 +375,50 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         public void setTotalSum(long totalSum) {
             this.totalSum = totalSum;
+        }
+
+        public List<SubReportDataRow> getSubReportDataRows() {
+            return subReportDataRows;
+        }
+
+        public void setSubReportDataRows(List<SubReportDataRow> subReportDataRows) {
+            this.subReportDataRows = subReportDataRows;
+        }
+    }
+
+    public static class SubReportDataRow {
+        String originName;
+        Long count;
+        Long sum;
+
+        public SubReportDataRow(String originName, Long count, Long sum) {
+            this.originName = originName;
+            this.count = count;
+            this.sum = sum;
+        }
+
+        public String getOriginName() {
+            return originName;
+        }
+
+        public void setOriginName(String originName) {
+            this.originName = originName;
+        }
+
+        public Long getCount() {
+            return count;
+        }
+
+        public void setCount(Long count) {
+            this.count = count;
+        }
+
+        public Long getSum() {
+            return sum;
+        }
+
+        public void setSum(Long sum) {
+            this.sum = sum;
         }
     }
 

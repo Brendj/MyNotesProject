@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="aac8b8f8-0b88-48ef-bc1c-c75a8f107ea0">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="720" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="680" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="aac8b8f8-0b88-48ef-bc1c-c75a8f107ea0">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -140,14 +140,14 @@
 	<title>
 		<band height="104" splitType="Stretch">
 			<textField>
-				<reportElement uuid="b8e43dc2-2988-4a07-b18e-f711ae62dcfc" x="0" y="30" width="802" height="24"/>
+				<reportElement uuid="b8e43dc2-2988-4a07-b18e-f711ae62dcfc" x="0" y="30" width="680" height="24"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Учреждение: "+$P{orgName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="df99d7d5-eb36-453d-88ec-eb89178a3987" x="0" y="0" width="802" height="20"/>
+				<reportElement uuid="df99d7d5-eb36-453d-88ec-eb89178a3987" x="0" y="0" width="680" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -156,7 +156,7 @@
 			</textField>
 			<elementGroup/>
 			<staticText>
-				<reportElement uuid="dcdc0da8-4ad0-496b-b000-592ca1d39e11" x="0" y="54" width="802" height="20"/>
+				<reportElement uuid="dcdc0da8-4ad0-496b-b000-592ca1d39e11" x="0" y="54" width="680" height="20"/>
 				<textElement/>
 				<text><![CDATA[ ]]></text>
 			</staticText>
@@ -192,7 +192,7 @@
 	<summary>
 		<band height="30">
 			<subreport>
-				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="0" width="802" height="29"/>
+				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="0" width="680" height="29"/>
 				<dataSourceExpression><![CDATA[$P{totalsData}]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DailySalesByGroupsReport_subreport_totals.jasper"]]></subreportExpression>
 			</subreport>
