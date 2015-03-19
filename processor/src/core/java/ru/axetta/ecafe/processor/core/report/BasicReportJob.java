@@ -424,55 +424,63 @@ public abstract class BasicReportJob extends BasicJasperReport {
     }
 
     public static Date[] calculateDatesForPeriodType(Calendar calendar, Date startTime, Date generateTime, int type) {
-        Date endTime=null;
-        if (type==REPORT_PERIOD_PREV_MONTH) {
-            if (startTime==null) startTime = CalendarUtils.calculateLastMonthFirstDay(calendar, generateTime);
+        Date endTime = null;
+        if (type == REPORT_PERIOD_PREV_MONTH) {
+            if (startTime == null) {
+                startTime = CalendarUtils.calculateLastMonthFirstDay(calendar, generateTime);
+            }
             endTime = CalendarUtils.calculatePlusOneMonth(calendar, startTime);
-        } else if (type== REPORT_PERIOD_CURRENT_MONTH) {
+        } else if (type == REPORT_PERIOD_CURRENT_MONTH) {
             // startTime - первый день текущего месяца
             // endTime - поледний день текущего месяца
-            if (startTime==null) startTime = CalendarUtils.calculateCurrentMonthFirstDay(calendar, generateTime);
+            if (startTime == null) {
+                startTime = CalendarUtils.calculateCurrentMonthFirstDay(calendar, generateTime);
+            }
             endTime = CalendarUtils.calculatePlusOneMonth(calendar, startTime);
             calendar.setTime(endTime);
             calendar.add(Calendar.MILLISECOND, -1);
             endTime = calendar.getTime();
-        }  else if (type==REPORT_PERIOD_PREV_DAY) {
-            if (startTime==null) startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
+        } else if (type == REPORT_PERIOD_PREV_DAY) {
+            if (startTime == null) {
+                startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
+            }
             endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
-        } else if (type==REPORT_PERIOD_PREV_PREV_DAY) {
-            if (startTime==null) {
+        } else if (type == REPORT_PERIOD_PREV_PREV_DAY) {
+            if (startTime == null) {
                 startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
                 startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
             }
             endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
-        } else if (type==REPORT_PERIOD_PREV_PREV_PREV_DAY) {
-            if (startTime==null) {
+        } else if (type == REPORT_PERIOD_PREV_PREV_PREV_DAY) {
+            if (startTime == null) {
                 startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
                 startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
                 startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
             }
             endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
-        } else if (type==REPORT_PERIOD_TODAY) {
-            if (startTime==null) startTime = CalendarUtils.calculateTodayStart(calendar, generateTime);
+        } else if (type == REPORT_PERIOD_TODAY) {
+            if (startTime == null) {
+                startTime = CalendarUtils.calculateTodayStart(calendar, generateTime);
+            }
             endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
-        } else if (type== REPORT_PERIOD_LAST_WEEK) {
-            if (startTime==null) {
+        } else if (type == REPORT_PERIOD_LAST_WEEK) {
+            if (startTime == null) {
                 calendar.setTime(generateTime);
             } else {
                 calendar.setTime(startTime);
             }
             // устанавливаем понедельник в качестве стартовой даты выборки
-            calendar.set(Calendar.DAY_OF_WEEK,2);
+            calendar.set(Calendar.DAY_OF_WEEK, 2);
             calendar.set(Calendar.MILLISECOND, 0);
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             startTime = calendar.getTime();
             // устанавливаем субботу в качестве конечной даты выборки
-            calendar.set(Calendar.DAY_OF_WEEK,7);
+            calendar.set(Calendar.DAY_OF_WEEK, 7);
             endTime = calendar.getTime();
-        } else if (type== REPORT_PERIOD_PREV_WEEK) {
-            if (startTime==null) {
+        } else if (type == REPORT_PERIOD_PREV_WEEK) {
+            if (startTime == null) {
                 calendar.setTime(generateTime);
             } else {
                 calendar.setTime(startTime);
@@ -483,10 +491,10 @@ public abstract class BasicReportJob extends BasicJasperReport {
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.add(Calendar.DATE, -7);
             // устанавливаем понедельник в качестве стартовой даты выборки
-            calendar.set(Calendar.DAY_OF_WEEK,2);
+            calendar.set(Calendar.DAY_OF_WEEK, 2);
             startTime = calendar.getTime();
             // устанавливаем воскресенье в качестве конечной даты выборки
-            calendar.set(Calendar.DAY_OF_WEEK,1);
+            calendar.set(Calendar.DAY_OF_WEEK, 1);
             endTime = CalendarUtils.endOfDay(calendar.getTime());
         }
         return new Date[]{startTime, endTime};

@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleProcessor implements AutoReportProcessor, EventProcessor {
+
     public static final String ORG_EXPRESSION = "org:";
     public static final String CONTRAGENT_EXPRESSION = "contragent:";
     public static final String CONTRAGENT_PAYAGENT_EXPRESSION = "contragent-payagent:"; // Использовать для контрагентов агент по платежам !!!!
@@ -48,31 +49,53 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     public static final String CHECKBOX_EXPRESSION = "чекбокс:";
     public static final String RADIO_EXPRESSION = "опции:";
     public static final String METHOD_EXPRESSION = "метод:";
+    public static final String DELIMETER = ",";
+    private static final Logger logger = LoggerFactory.getLogger(RuleProcessor.class);
+    private final SessionFactory sessionFactory;
+    private final AutoReportPostman autoReportPostman;
+    private final Postman eventNotificationPostman;
+    private final Object reportRulesLock;
+    private final Object eventNotificationsLock;
+    Pattern periodMatcher = Pattern.compile("(\\d+)-(L|\\d+)[, ]*");
+    private Rule currRule;
+    private Properties reportProperties;
+    private List<Rule> reportRules;
+    private List<Rule> eventNotifications;
 
+    public RuleProcessor(SessionFactory sessionFactory, AutoReportPostman autoReportPostman,
+            Postman eventNotificationPostman) {
+        this.sessionFactory = sessionFactory;
+        this.autoReportPostman = autoReportPostman;
+        this.eventNotificationPostman = eventNotificationPostman;
+        this.reportRules = Collections.emptyList();
+        this.reportRulesLock = new Object();
+        this.eventNotificationsLock = new Object();
+    }
 
-    public static Map<String, String> getParametersFromString (String parameters) {
+    public static Map<String, String> getParametersFromString(String parameters) {
         if (!parameters.contains(COMBOBOX_EXPRESSION) &&
-            !parameters.contains(CHECKBOX_EXPRESSION) &&
-            !parameters.contains(RADIO_EXPRESSION) &&
-            !parameters.contains(METHOD_EXPRESSION)) {
+                !parameters.contains(CHECKBOX_EXPRESSION) &&
+                !parameters.contains(RADIO_EXPRESSION) &&
+                !parameters.contains(METHOD_EXPRESSION)) {
             return Collections.emptyMap();
         }
         if (parameters.contains(METHOD_EXPRESSION)) {
             try {
-                String method = parameters.substring(parameters.indexOf(METHOD_EXPRESSION) + METHOD_EXPRESSION.length());
+                String method = parameters
+                        .substring(parameters.indexOf(METHOD_EXPRESSION) + METHOD_EXPRESSION.length());
                 parameters = getMethodExecutionResult(method);
             } catch (Exception e) {
                 return Collections.emptyMap();
             }
         }
 
-        Map<String, String> result = new HashMap<String, String> ();
+        Map<String, String> result = new HashMap<String, String>();
         parameters = parameters.replaceAll(COMBOBOX_EXPRESSION, "");
         parameters = parameters.replaceAll(CHECKBOX_EXPRESSION, "");
         parameters = parameters.replaceAll(RADIO_EXPRESSION, "");
         parameters = parameters.replaceAll(METHOD_EXPRESSION, "");
 
-        String parts [] = parameters.split(DELIMETER);
+        String parts[] = parameters.split(DELIMETER);
         Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9\\u005F]*)\\})?([-а-яА-Яa-zA-Z0-9\\s]+)");
         for (String p : parts) {
             Matcher matcher = pattern.matcher(p);
@@ -90,24 +113,26 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         return result;
     }
 
-    public static String getMethodExecutionResult (String method) throws Exception {
+    public static String getMethodExecutionResult(String method) throws Exception {
         //  Данный метод возвращает унифицированную строку для результата от выполнения метода в виде {ключ}значение, {ключ}значение
         if (method == null || method.length() < 1) {
             return "";
         }
 
 
-        List <String []> values = new ArrayList <String []> ();
+        List<String[]> values = new ArrayList<String[]>();
         try {
             Class cl = Class.forName(method.substring(0, method.lastIndexOf(".")));
-            java.lang.reflect.Method meth = cl.getDeclaredMethod(method.substring(method.lastIndexOf(".") + 1), Session.class, Map.class, List.class);
+            java.lang.reflect.Method meth = cl
+                    .getDeclaredMethod(method.substring(method.lastIndexOf(".") + 1), Session.class, Map.class,
+                            List.class);
             meth.invoke(RuntimeContext.getInstance().getAutoReportProcessor(), null, Collections.EMPTY_MAP, values);
         } catch (Exception e) {
             throw e;
         }
 
         String result = "";
-        for (String [] v : values) {
+        for (String[] v : values) {
             if (v[1] == null || v[1].length() < 1) {
                 continue;
             }
@@ -116,24 +141,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             }
             result = result + "{" + v[0] + "}" + v[1];
         }
-    return result;
+        return result;
     }
 
-    public void testMethodCalling (Session session, Map<String, Object> parameters, List <String []> result) {
-        result.add(new String [] { "1", "один" });
-        result.add(new String [] { "2", "два" });
-        result.add(new String [] { "3", "три" });
-    }
-
-    public void inputValueMethodCalling (Session session, Map<String, Object> parameters, List <String []> result) {
-        result.add(new String [] { "", "значение будет здесь" });   //  ключ можно не заполнять, браться будет всегда только первое значение
-    }
-
-    public static final String parseMethodExecutionResultForEquals (String methodResult) {
+    public static final String parseMethodExecutionResultForEquals(String methodResult) {
         //  Данный метод обрабатывает результат от метода в формате {ключ}значение, {ключ}значение в ключ, ключ
         Pattern pattern = Pattern.compile("\\{{1}([a-zA-Z0-9]*)\\}{1}");
         Matcher matcher = pattern.matcher(methodResult);
-        String result   = "";
+        String result = "";
         while (matcher.find()) {
             if (result.length() > 0) {
                 result += DELIMETER;
@@ -143,281 +158,41 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         return result;
     }
 
-
-    private static final Logger logger = LoggerFactory.getLogger(RuleProcessor.class);
-
-    public static final String DELIMETER = ",";
-
-    private Rule currRule;
-    private Properties reportProperties;
-
-    private static interface BasicBoolExpression {
-        public String getComparatorArgument();
-        public String getComparatorValue();
-
-        boolean applicatable(Properties properties);
-
-        boolean evaluate(Properties properties);
-
-    }
-
-    private static class MethodExpression implements BasicBoolExpression {
-        private final String comparatorArgument;
-        private final String methodName;
-
-        public MethodExpression(String comparatorArgument, String methodName) {
-            this.comparatorArgument = comparatorArgument;
-            this.methodName = methodName;
+    public static String fillTemplate(String pattern, Properties properties) {
+        if (StringUtils.isEmpty(pattern)) {
+            return StringUtils.defaultString(pattern);
         }
-
-        @Override
-        public String getComparatorArgument() {
-            return comparatorArgument;
-        }
-
-        @Override
-        public String getComparatorValue() {
-            return methodName;
-        }
-
-        public boolean applicatable(Properties properties) {
-            return true;
-        }
-
-        public boolean evaluate(Properties properties) {
-            return true;                                //  НЕОБХОДИМО ВЫЗЫВАТЬ МЕТОД И ПРОВЕРЯТЬ ОТВЕТ ОТ НЕГО!
-        }
-    }
-
-    private static class TautologyExpression implements BasicBoolExpression {
-
-        @Override
-        public String getComparatorArgument() {
-            return null;
-        }
-
-        @Override
-        public String getComparatorValue() {
-            return null;
-        }
-
-        public boolean applicatable(Properties properties) {
-            return true;
-        }
-
-        public boolean evaluate(Properties properties) {
-            return true;
-        }
-    }
-
-    private static class EqualExpression implements BasicBoolExpression {
-
-        private String comparatorArgument;
-        private String comparatorValue;
-
-        public EqualExpression(String comparatorArgument, String comparatorValue) {
-            this.comparatorArgument = comparatorArgument;
-            this.comparatorValue = comparatorValue;
-        }
-
-        public boolean applicatable(Properties properties) {
-            if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
-                properties.put(this.comparatorArgument, "");
-                return true;
-            }
-            return StringUtils.isNotEmpty(properties.getProperty(this.comparatorArgument));
-        }
-
-        @Override
-        public String getComparatorArgument() {
-            return comparatorArgument;
-        }
-
-        public String getComparatorValue() {
-            return comparatorValue;
-        }
-
-        public boolean evaluate(Properties properties) {
-            //  Анализ строки-сигнатуры, получение дополнительных параметров для сравнения (напр., необходимость запуска процедуры, выбора из комбобокса и т.д.)
-            if (comparatorValue.indexOf(METHOD_EXPRESSION) == 0) {
-                String result = "";
-                try {
-                    result = getMethodExecutionResult(comparatorValue);
-                } catch (Exception e) {
-                    return false;
+        StringBuilder stringBuilder = new StringBuilder(pattern);
+        StringBuilder paramMatcherBuilder = new StringBuilder();
+        for (Map.Entry<?, ?> entry : properties.entrySet()) {
+            String param = (String) entry.getKey();
+            if (StringUtils.isNotEmpty(param)) {
+                String value = StringUtils.defaultString((String) entry.getValue());
+                int len = paramMatcherBuilder.length();
+                if (len > 0) {
+                    paramMatcherBuilder.delete(0, len);
                 }
-                comparatorValue = parseMethodExecutionResultForEquals(result);
-            } else if (comparatorValue.indexOf(CHECKBOX_EXPRESSION) == 0) {
-                //  Если есть слово чекбокс, значит был произведен выбор из нескольких чекбоксов
-                comparatorValue = comparatorValue.substring(0, CHECKBOX_EXPRESSION.length()).trim();
-                //
-            } else if (comparatorValue.indexOf(COMBOBOX_EXPRESSION) == 0) {
-                //  Если есть слово комбобокс, значит был произведен выбор из меню
-                comparatorValue = comparatorValue.substring(0, COMBOBOX_EXPRESSION.length()).trim();
-            } else if (comparatorValue.indexOf(RADIO_EXPRESSION) == 0) {
-                //  Если есть слово комбобокс, значит был произведен выбор из меню
-                comparatorValue = comparatorValue.substring(0, RADIO_EXPRESSION.length()).trim();
-            }
-
-            return evaluateValue (properties);
-        }
-
-        public boolean evaluateValue (Properties properties) {
-            boolean result = false;
-            String values[];
-            if (this.comparatorValue.startsWith("/")) values = new String[]{this.comparatorValue};
-            else values = this.comparatorValue.split(DELIMETER);
-            String property[] = properties.getProperty(this.comparatorArgument).split(DELIMETER);
-            for (String value : values) {
-                for (String prop : property) {
-                    if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
-                        properties.put(this.comparatorArgument, this.comparatorValue);
-                        //properties.put(prop,
-                        //        String.format("%s%s%s", properties.get(prop), value, DELIMETER));
-                        result = true;//return true;//continue;
-                    }
-                    if (value.startsWith("/") && value.endsWith("/")) {
-                        return prop.matches(value.substring(1, value.length()-1));
-                    }
-                    if (StringUtils.equals(prop.trim(), value.trim())) {
-                        return true;
-                    }
+                paramMatcherBuilder.append("${").append(param).append("}");
+                String paramMatcher = paramMatcherBuilder.toString();
+                int start = stringBuilder.indexOf(paramMatcher, 0);
+                while (start >= 0) {
+                    stringBuilder.replace(start, start + paramMatcher.length(), value);
+                    start = stringBuilder.indexOf(paramMatcher, start + StringUtils.length(value) + 1);
                 }
             }
-            return result;
         }
-
-        @Override
-        public String toString() {
-            return "EqualExpression{" + "comparatorArgument='" + comparatorArgument + '\'' + ", comparatorValue='"
-                    + comparatorValue + '\'' + '}';
-        }
+        return stringBuilder.toString();
     }
 
-    public static class Rule {
-
-        private final int documentFormat;
-        private final String subject;
-        private final List<String> routeAdresses;
-        private final List<BasicBoolExpression> boolExpressions;
-        private final String templateFileName;
-        private final String ruleName;
-        private String tag;
-        private long ruleId;
-        //private final Set<RuleCondition> ruleConditions;
-
-        public Rule(ReportHandleRule reportHandleRule) throws Exception {
-            this.ruleId = reportHandleRule.getIdOfReportHandleRule();
-            this.ruleName = reportHandleRule.getRuleName();
-            this.tag = reportHandleRule.getTag();
-            this.documentFormat = reportHandleRule.getDocumentFormat();
-            this.subject = reportHandleRule.getSubject();
-            this.routeAdresses = new LinkedList<String>();
-            this.routeAdresses.add(reportHandleRule.getRoute0());
-            this.routeAdresses.add(reportHandleRule.getRoute1());
-            this.routeAdresses.add(reportHandleRule.getRoute2());
-            this.routeAdresses.add(reportHandleRule.getRoute3());
-            this.routeAdresses.add(reportHandleRule.getRoute4());
-            this.routeAdresses.add(reportHandleRule.getRoute5());
-            this.routeAdresses.add(reportHandleRule.getRoute6());
-            this.routeAdresses.add(reportHandleRule.getRoute7());
-            this.routeAdresses.add(reportHandleRule.getRoute8());
-            this.routeAdresses.add(reportHandleRule.getRoute9());
-            this.boolExpressions = new LinkedList<BasicBoolExpression>();
-            for (RuleCondition currRuleCondition : reportHandleRule.getRuleConditions()) {
-                this.boolExpressions.add(createExpression(currRuleCondition));
-            }
-            this.templateFileName = reportHandleRule.getTemplateFileName();
-            //this.ruleConditions = reportHandleRule.getRuleConditions();
-        }
-
-        private static BasicBoolExpression createExpression(RuleCondition ruleCondition) throws Exception {
-            switch (ruleCondition.getConditionOperation()) {
-                case RuleCondition.TAUTOLOGY_OPERTAION:
-                    return new TautologyExpression();
-                case RuleCondition.LESS_OPERATION:
-                case RuleCondition.MORE_OPERATION:
-                case RuleCondition.NOT_EQUAL_OPERATION:
-                case RuleCondition.EQUAL_OPERTAION:
-                    return new EqualExpression(ruleCondition.getConditionArgument(),
-                            ruleCondition.getConditionConstant());
-                default:
-                    throw new IllegalArgumentException(String.format("Unknown operation: %s", ruleCondition));
-            }
-        }
-
-        public int getDocumentFormat() {
-            return documentFormat;
-        }
-
-        public String getSubject() {
-            return subject;
-        }
-
-        public List<String> getRouteAdresses() {
-            return routeAdresses;
-        }
-
-        public String getRuleName() {
-            return ruleName;
-        }
-
-        public long getRuleId() {
-            return ruleId;
-        }
-        
-        public String getExpressionValue(String name) {
-            for (BasicBoolExpression currExpression : this.boolExpressions) {
-                if (currExpression.getComparatorArgument()!=null && currExpression.getComparatorArgument().equals(name)) {
-                    return currExpression.getComparatorValue();
-                }
-            }
-            return null;
-        }
-
-        public boolean applicatable(Properties properties) {
-            for (BasicBoolExpression currExpression : this.boolExpressions) {
-                if (!currExpression.applicatable(properties)) {
-                    return false;
-                }
-                if (!currExpression.evaluate(properties)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return "Rule{" + "documentFormat=" + documentFormat + ", routeAdresses=" + routeAdresses
-                    + ", boolExpressions=" + boolExpressions + '}';
-        }
-
-        public String getTemplateFileName() {
-            return templateFileName;
-        }
-
-        public String getTag() {
-            return tag;
-        }
+    public void testMethodCalling(Session session, Map<String, Object> parameters, List<String[]> result) {
+        result.add(new String[]{"1", "один"});
+        result.add(new String[]{"2", "два"});
+        result.add(new String[]{"3", "три"});
     }
 
-    private final SessionFactory sessionFactory;
-    private final AutoReportPostman autoReportPostman;
-    private final Postman eventNotificationPostman;
-    private List<Rule> reportRules;
-    private List<Rule> eventNotifications;
-    private final Object reportRulesLock;
-    private final Object eventNotificationsLock;
-
-    public RuleProcessor(SessionFactory sessionFactory, AutoReportPostman autoReportPostman,
-            Postman eventNotificationPostman) {
-        this.sessionFactory = sessionFactory;
-        this.autoReportPostman = autoReportPostman;
-        this.eventNotificationPostman = eventNotificationPostman;
-        this.reportRules = Collections.emptyList();
-        this.reportRulesLock = new Object();
-        this.eventNotificationsLock = new Object();
+    public void inputValueMethodCalling(Session session, Map<String, Object> parameters, List<String[]> result) {
+        result.add(new String[]{
+                "", "значение будет здесь"});   //  ключ можно не заполнять, браться будет всегда только первое значение
     }
 
     /**
@@ -440,28 +215,28 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 rulesCopy = this.reportRules;
             }
 
-            Date originalReportStartTime=null, originalReportEndTime=null;
+            Date originalReportStartTime = null, originalReportEndTime = null;
             for (AutoReport report : reports) {
                 BasicReport basicReport = report.getBasicReport();
                 for (Rule currRule : rulesCopy) {
                     Properties reportProperties = copyProperties(report.getProperties());
                     ////
                     if (currRule.applicatable(reportProperties)) {
-                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE)!=null &&
-                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER)+"").equals("true")
-                                && basicReport instanceof BasicReportJob) {
-                            originalReportStartTime = ((BasicReportJob)basicReport).getStartTime();
-                            originalReportEndTime = ((BasicReportJob)basicReport).getEndTime();
+                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE) != null &&
+                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER) + "")
+                                        .equals("true") && basicReport instanceof BasicReportJob) {
+                            originalReportStartTime = ((BasicReportJob) basicReport).getStartTime();
+                            originalReportEndTime = ((BasicReportJob) basicReport).getEndTime();
                             applyRulePeriodType(currRule, (BasicReportJob) basicReport);
                         }
-                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD)!=null &&
-                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER)+"").equals("true")
-                                && basicReport instanceof BasicReportJob) {
-                            if (originalReportStartTime==null) {
-                                originalReportStartTime = ((BasicReportJob)basicReport).getStartTime();
-                                originalReportEndTime = ((BasicReportJob)basicReport).getEndTime();
+                        if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD) != null &&
+                                !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER) + "")
+                                        .equals("true") && basicReport instanceof BasicReportJob) {
+                            if (originalReportStartTime == null) {
+                                originalReportStartTime = ((BasicReportJob) basicReport).getStartTime();
+                                originalReportEndTime = ((BasicReportJob) basicReport).getEndTime();
                             }
-                            applyRulePeriod(currRule, (BasicReportJob)basicReport);
+                            applyRulePeriod(currRule, (BasicReportJob) basicReport);
                         }
                         ////
                         if (logger.isDebugEnabled()) {
@@ -475,14 +250,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         String subject = "";
                         Long idOfOrg = null;
                         if (!StringUtils.isEmpty(report.getProperties().getProperty("idOfOrg"))) {
-                            if(!report.getProperties().getProperty("idOfOrg").contains(",")){
+                            if (!report.getProperties().getProperty("idOfOrg").contains(",")) {
                                 idOfOrg = Long.parseLong(report.getProperties().getProperty("idOfOrg"));
                             }
                         }
 
                         ReportDocumentBuilder documentBuilder = reportDocumentBuilders
                                 .get(currRule.getDocumentFormat());
-                        ReportDocument reportDocument=null;
+                        ReportDocument reportDocument = null;
                         if (null == documentBuilder) {
                             if (logger.isWarnEnabled()) {
                                 logger.warn(String.format(
@@ -492,7 +267,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         } else {
                             subject = fillTemplate(currRule.getSubject(), reportProperties);
                             basicReport.setReportProperties(reportProperties);
-                            reportDocument = documentBuilder.buildDocument(currRule.getRuleId()+"", basicReport);
+                            reportDocument = documentBuilder.buildDocument(currRule.getRuleId() + "", basicReport);
 
                             if (basicReport instanceof BasicReportJob) {
                                 BasicReportJob basicReportJob = (BasicReportJob) basicReport;
@@ -503,28 +278,29 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 Long idOfContragent = null;
                                 String contragent = null;
                                 if (basicReport instanceof BasicReportForContragentJob) {
-                                    BasicReportForContragentJob contragentJob  = (BasicReportForContragentJob) basicReport;
+                                    BasicReportForContragentJob contragentJob = (BasicReportForContragentJob) basicReport;
                                     idOfContragent = contragentJob.getIdOfContragent();
-                                    contragent = DAOService.getInstance().getContragentById(idOfContragent).getContragentName();
+                                    contragent = DAOService.getInstance().getContragentById(idOfContragent)
+                                            .getContragentName();
                                 }
                                 Long idOfContragentReceiver = null;
                                 String contragentReceiver = null;
                                 if (reportProperties != null) {
                                     final String property = reportProperties
                                             .getProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID);
-                                    if(StringUtils.isNotEmpty(property)){
+                                    if (StringUtils.isNotEmpty(property)) {
                                         idOfContragentReceiver = Long.valueOf(property);
-                                        contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver).getContragentName();
+                                        contragentReceiver = DAOService.getInstance()
+                                                .getContragentById(idOfContragentReceiver).getContragentName();
                                     }
                                 }
                                 DAOService.getInstance()
-                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
-                                                subject, basicReport.getGenerateTime(),
-                                                basicReport.getGenerateDuration(), basicReportJob.getStartTime(),
-                                                basicReportJob.getEndTime(), relativeReportFilePath,
-                                                report.getProperties()
-                                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag(), idOfContragentReceiver, contragentReceiver,
+                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(), subject,
+                                                basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
+                                                basicReportJob.getStartTime(), basicReportJob.getEndTime(),
+                                                relativeReportFilePath, report.getProperties()
+                                                .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
+                                                currRule.getTag(), idOfContragentReceiver, contragentReceiver,
                                                 idOfContragent, contragent);
                             }
 
@@ -535,13 +311,12 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                                         .substring(f.getAbsolutePath().length());
                                 DAOService.getInstance()
-                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
-                                                subject, basicReport.getGenerateTime(),
-                                                basicReport.getGenerateDuration(), basicReportJob.getBaseTime(),
-                                                basicReportJob.getBaseTime(), relativeReportFilePath,
-                                                report.getProperties()
-                                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag(), null, null, null, null);
+                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(), subject,
+                                                basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
+                                                basicReportJob.getBaseTime(), basicReportJob.getBaseTime(),
+                                                relativeReportFilePath, report.getProperties()
+                                                .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
+                                                currRule.getTag(), null, null, null, null);
                             }
 
                         }
@@ -609,13 +384,13 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                             }
                         }
                         if (basicReport instanceof BasicReportJob) {
-                            ((BasicReportJob)basicReport).setPrint(null);
+                            ((BasicReportJob) basicReport).setPrint(null);
                         }
                     }
-                    if (originalReportStartTime!=null) {
+                    if (originalReportStartTime != null) {
                         // если изменяли даты
-                        ((BasicReportJob)basicReport).setStartTime(originalReportStartTime);
-                        ((BasicReportJob)basicReport).setEndTime(originalReportEndTime);
+                        ((BasicReportJob) basicReport).setStartTime(originalReportStartTime);
+                        ((BasicReportJob) basicReport).setEndTime(originalReportEndTime);
                         originalReportStartTime = originalReportEndTime = null;
                     }
                 }
@@ -631,41 +406,38 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     private void applyRulePeriodType(Rule currRule, BasicReportJob reportJob) throws Exception {
         String sType = currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE);
-        int type=BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
-        if (sType.equalsIgnoreCase("prevMonth")) {
-            type=BasicReportJob.REPORT_PERIOD_PREV_MONTH;
-        }
-        else if (sType.equalsIgnoreCase("currentMonth")) {
-            type=BasicReportJob.REPORT_PERIOD_CURRENT_MONTH;
-        }
-        else if (sType.equalsIgnoreCase("prevDay")) {
-            type=BasicReportJob.REPORT_PERIOD_PREV_DAY;
-        }
-        else if (sType.equalsIgnoreCase("prevPrevDay")) {
-            type=BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
-        }
-        else if (sType.equalsIgnoreCase("prevPrevPrevDay")) {
-            type=BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY;
-        }
-        else if (sType.equalsIgnoreCase("today")) {
-            type=BasicReportJob.REPORT_PERIOD_TODAY;
-        }
-        else if (sType.equalsIgnoreCase("7")) {
-            type=BasicReportJob.REPORT_PERIOD_PREV_WEEK;
+        int type = BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
+        if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_MONTH))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_MONTH;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_CURRENT_MONTH))) {
+            type = BasicReportJob.REPORT_PERIOD_CURRENT_MONTH;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_DAY))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_DAY;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_TODAY))) {
+            type = BasicReportJob.REPORT_PERIOD_TODAY;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_WEEK))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_WEEK;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_LAST_WEEK))) {
+            type = BasicReportJob.REPORT_PERIOD_LAST_WEEK;
         }
         Date[] dates = BasicReportJob.calculateDatesForPeriodType(Calendar.getInstance(), null, new Date(), type);
         reportJob.setStartTime(dates[0]);
         reportJob.setEndTime(dates[1]);
     }
 
-    Pattern periodMatcher = Pattern.compile("(\\d+)-(L|\\d+)[, ]*");
+    private String intToString(int number) {
+        return ((Integer) number).toString();
+    }
+
     private Date applyRulePeriod(Rule currRule, BasicReportJob reportJob) throws Exception {
         String sPeriod = currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD);
         int dayOfReport = CalendarUtils.getDayOfMonth(reportJob.getStartTime());
         int period;
 
         Date originalReportStartTime = reportJob.getStartTime();
-        if (sPeriod.indexOf('-')!=-1) {
+        if (sPeriod.indexOf('-') != -1) {
             Matcher m = periodMatcher.matcher(sPeriod);
             while (m.find()) {
                 int dayFrom = Integer.parseInt(m.group(1));
@@ -674,13 +446,12 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 if (m.group(2).equals("L")) {
                     dateTo = CalendarUtils.getFirstDayOfNextMonth(originalReportStartTime);
                     dayTo = 31;
-                }
-                else {
+                } else {
                     dayTo = Integer.parseInt(m.group(2));
                     dateTo = CalendarUtils.addDays(CalendarUtils.setDayOfMonth(originalReportStartTime, dayTo), 1);
                 }
 
-                if (dayOfReport>=dayFrom && dayOfReport<=dayTo) {
+                if (dayOfReport >= dayFrom && dayOfReport <= dayTo) {
                     reportJob.setStartTime(CalendarUtils.setDayOfMonth(originalReportStartTime, dayFrom));
                     reportJob.setEndTime(dateTo);
                 }
@@ -689,7 +460,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             try {
                 period = Integer.parseInt(sPeriod);
             } catch (Exception e) {
-                throw new Exception("Ошибка парсинга периода отчета (требуется число дней): "+sPeriod);
+                throw new Exception("Ошибка парсинга периода отчета (требуется число дней): " + sPeriod);
             }
             reportJob.applyDataQueryPeriod(period);
         }
@@ -716,32 +487,6 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             HibernateUtils.close(session, logger);
         }
         return mailListMap;
-    }
-
-    public static String fillTemplate(String pattern, Properties properties) {
-        if (StringUtils.isEmpty(pattern)) {
-            return StringUtils.defaultString(pattern);
-        }
-        StringBuilder stringBuilder = new StringBuilder(pattern);
-        StringBuilder paramMatcherBuilder = new StringBuilder();
-        for (Map.Entry<?, ?> entry : properties.entrySet()) {
-            String param = (String) entry.getKey();
-            if (StringUtils.isNotEmpty(param)) {
-                String value = StringUtils.defaultString((String) entry.getValue());
-                int len = paramMatcherBuilder.length();
-                if (len > 0) {
-                    paramMatcherBuilder.delete(0, len);
-                }
-                paramMatcherBuilder.append("${").append(param).append("}");
-                String paramMatcher = paramMatcherBuilder.toString();
-                int start = stringBuilder.indexOf(paramMatcher, 0);
-                while (start >= 0) {
-                    stringBuilder.replace(start, start + paramMatcher.length(), value);
-                    start = stringBuilder.indexOf(paramMatcher, start + StringUtils.length(value) + 1);
-                }
-            }
-        }
-        return stringBuilder.toString();
     }
 
     public void loadAutoReportRules() throws Exception {
@@ -867,5 +612,262 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     public Properties getReportProperties() {
         return reportProperties;
+    }
+
+    private static interface BasicBoolExpression {
+
+        public String getComparatorArgument();
+
+        public String getComparatorValue();
+
+        boolean applicatable(Properties properties);
+
+        boolean evaluate(Properties properties);
+
+    }
+
+    private static class MethodExpression implements BasicBoolExpression {
+
+        private final String comparatorArgument;
+        private final String methodName;
+
+        public MethodExpression(String comparatorArgument, String methodName) {
+            this.comparatorArgument = comparatorArgument;
+            this.methodName = methodName;
+        }
+
+        @Override
+        public String getComparatorArgument() {
+            return comparatorArgument;
+        }
+
+        @Override
+        public String getComparatorValue() {
+            return methodName;
+        }
+
+        public boolean applicatable(Properties properties) {
+            return true;
+        }
+
+        public boolean evaluate(Properties properties) {
+            return true;                                //  НЕОБХОДИМО ВЫЗЫВАТЬ МЕТОД И ПРОВЕРЯТЬ ОТВЕТ ОТ НЕГО!
+        }
+    }
+
+    private static class TautologyExpression implements BasicBoolExpression {
+
+        @Override
+        public String getComparatorArgument() {
+            return null;
+        }
+
+        @Override
+        public String getComparatorValue() {
+            return null;
+        }
+
+        public boolean applicatable(Properties properties) {
+            return true;
+        }
+
+        public boolean evaluate(Properties properties) {
+            return true;
+        }
+    }
+
+    private static class EqualExpression implements BasicBoolExpression {
+
+        private String comparatorArgument;
+        private String comparatorValue;
+
+        public EqualExpression(String comparatorArgument, String comparatorValue) {
+            this.comparatorArgument = comparatorArgument;
+            this.comparatorValue = comparatorValue;
+        }
+
+        public boolean applicatable(Properties properties) {
+            if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
+                properties.put(this.comparatorArgument, "");
+                return true;
+            }
+            return StringUtils.isNotEmpty(properties.getProperty(this.comparatorArgument));
+        }
+
+        @Override
+        public String getComparatorArgument() {
+            return comparatorArgument;
+        }
+
+        public String getComparatorValue() {
+            return comparatorValue;
+        }
+
+        public boolean evaluate(Properties properties) {
+            //  Анализ строки-сигнатуры, получение дополнительных параметров для сравнения (напр., необходимость запуска процедуры, выбора из комбобокса и т.д.)
+            if (comparatorValue.indexOf(METHOD_EXPRESSION) == 0) {
+                String result = "";
+                try {
+                    result = getMethodExecutionResult(comparatorValue);
+                } catch (Exception e) {
+                    return false;
+                }
+                comparatorValue = parseMethodExecutionResultForEquals(result);
+            } else if (comparatorValue.indexOf(CHECKBOX_EXPRESSION) == 0) {
+                //  Если есть слово чекбокс, значит был произведен выбор из нескольких чекбоксов
+                comparatorValue = comparatorValue.substring(0, CHECKBOX_EXPRESSION.length()).trim();
+                //
+            } else if (comparatorValue.indexOf(COMBOBOX_EXPRESSION) == 0) {
+                //  Если есть слово комбобокс, значит был произведен выбор из меню
+                comparatorValue = comparatorValue.substring(0, COMBOBOX_EXPRESSION.length()).trim();
+            } else if (comparatorValue.indexOf(RADIO_EXPRESSION) == 0) {
+                //  Если есть слово комбобокс, значит был произведен выбор из меню
+                comparatorValue = comparatorValue.substring(0, RADIO_EXPRESSION.length()).trim();
+            }
+
+            return evaluateValue(properties);
+        }
+
+        public boolean evaluateValue(Properties properties) {
+            boolean result = false;
+            String values[];
+            if (this.comparatorValue.startsWith("/"))
+                values = new String[]{this.comparatorValue};
+            else
+                values = this.comparatorValue.split(DELIMETER);
+            String property[] = properties.getProperty(this.comparatorArgument).split(DELIMETER);
+            for (String value : values) {
+                for (String prop : property) {
+                    if (RuleExpressionUtil.isPostArgument(this.comparatorArgument)) {
+                        properties.put(this.comparatorArgument, this.comparatorValue);
+                        //properties.put(prop,
+                        //        String.format("%s%s%s", properties.get(prop), value, DELIMETER));
+                        result = true;//return true;//continue;
+                    }
+                    if (value.startsWith("/") && value.endsWith("/")) {
+                        return prop.matches(value.substring(1, value.length() - 1));
+                    }
+                    if (StringUtils.equals(prop.trim(), value.trim())) {
+                        return true;
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "EqualExpression{" + "comparatorArgument='" + comparatorArgument + '\'' + ", comparatorValue='"
+                    + comparatorValue + '\'' + '}';
+        }
+    }
+
+    public static class Rule {
+
+        private final int documentFormat;
+        private final String subject;
+        private final List<String> routeAdresses;
+        private final List<BasicBoolExpression> boolExpressions;
+        private final String templateFileName;
+        private final String ruleName;
+        private String tag;
+        private long ruleId;
+        //private final Set<RuleCondition> ruleConditions;
+
+        public Rule(ReportHandleRule reportHandleRule) throws Exception {
+            this.ruleId = reportHandleRule.getIdOfReportHandleRule();
+            this.ruleName = reportHandleRule.getRuleName();
+            this.tag = reportHandleRule.getTag();
+            this.documentFormat = reportHandleRule.getDocumentFormat();
+            this.subject = reportHandleRule.getSubject();
+            this.routeAdresses = new LinkedList<String>();
+            this.routeAdresses.add(reportHandleRule.getRoute0());
+            this.routeAdresses.add(reportHandleRule.getRoute1());
+            this.routeAdresses.add(reportHandleRule.getRoute2());
+            this.routeAdresses.add(reportHandleRule.getRoute3());
+            this.routeAdresses.add(reportHandleRule.getRoute4());
+            this.routeAdresses.add(reportHandleRule.getRoute5());
+            this.routeAdresses.add(reportHandleRule.getRoute6());
+            this.routeAdresses.add(reportHandleRule.getRoute7());
+            this.routeAdresses.add(reportHandleRule.getRoute8());
+            this.routeAdresses.add(reportHandleRule.getRoute9());
+            this.boolExpressions = new LinkedList<BasicBoolExpression>();
+            for (RuleCondition currRuleCondition : reportHandleRule.getRuleConditions()) {
+                this.boolExpressions.add(createExpression(currRuleCondition));
+            }
+            this.templateFileName = reportHandleRule.getTemplateFileName();
+            //this.ruleConditions = reportHandleRule.getRuleConditions();
+        }
+
+        private static BasicBoolExpression createExpression(RuleCondition ruleCondition) throws Exception {
+            switch (ruleCondition.getConditionOperation()) {
+                case RuleCondition.TAUTOLOGY_OPERTAION:
+                    return new TautologyExpression();
+                case RuleCondition.LESS_OPERATION:
+                case RuleCondition.MORE_OPERATION:
+                case RuleCondition.NOT_EQUAL_OPERATION:
+                case RuleCondition.EQUAL_OPERTAION:
+                    return new EqualExpression(ruleCondition.getConditionArgument(),
+                            ruleCondition.getConditionConstant());
+                default:
+                    throw new IllegalArgumentException(String.format("Unknown operation: %s", ruleCondition));
+            }
+        }
+
+        public int getDocumentFormat() {
+            return documentFormat;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public List<String> getRouteAdresses() {
+            return routeAdresses;
+        }
+
+        public String getRuleName() {
+            return ruleName;
+        }
+
+        public long getRuleId() {
+            return ruleId;
+        }
+
+        public String getExpressionValue(String name) {
+            for (BasicBoolExpression currExpression : this.boolExpressions) {
+                if (currExpression.getComparatorArgument() != null && currExpression.getComparatorArgument()
+                        .equals(name)) {
+                    return currExpression.getComparatorValue();
+                }
+            }
+            return null;
+        }
+
+        public boolean applicatable(Properties properties) {
+            for (BasicBoolExpression currExpression : this.boolExpressions) {
+                if (!currExpression.applicatable(properties)) {
+                    return false;
+                }
+                if (!currExpression.evaluate(properties)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Rule{" + "documentFormat=" + documentFormat + ", routeAdresses=" + routeAdresses
+                    + ", boolExpressions=" + boolExpressions + '}';
+        }
+
+        public String getTemplateFileName() {
+            return templateFileName;
+        }
+
+        public String getTag() {
+            return tag;
+        }
     }
 }
