@@ -163,12 +163,13 @@ public class ReportRuleConstants {
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true)
                     .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                             "{" + BasicReportJob.REPORT_PERIOD_PREV_MONTH + "}прошлый месяц," +
-                            "{" + BasicReportJob.REPORT_PERIOD_LAST_WEEK + "}текущая неделя," +
-                            "{" + BasicReportJob.REPORT_PERIOD_PREV_WEEK + "}прошлая неделя," +
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_DAY + "}-1 день," +
+                            "{" + BasicReportJob.REPORT_PERIOD_TODAY+ "}сегодня," +
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY + "}-2 дня," +
                             "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY + "}-3 дня," +
-                            "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY + "}-2 дня,{"
-                            + BasicReportJob.REPORT_PERIOD_PREV_DAY + "}-1 день,{" + BasicReportJob.REPORT_PERIOD_TODAY
-                            + "}сегодня"),
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_WEEK + "}прошлая неделя," +
+                            "{" + BasicReportJob.REPORT_PERIOD_CURRENT_MONTH + "}текущий месяц," +
+                            "{" + BasicReportJob.REPORT_PERIOD_LAST_WEEK + "}текущая неделя"),
             new ParamHint("referCategory", "Категория").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                     "{Шк Здоровья 1-4 кл.(завтрак+обед)}Шк Здоровья 1-4 кл.(завтрак+обед),"
                     + "{Шк Здоровья 5-11 кл.(завтрак+обед)}Шк Здоровья 5-11 кл.(завтрак+обед),"

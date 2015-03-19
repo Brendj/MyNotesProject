@@ -409,18 +409,20 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         int type = BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
         if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_MONTH))) {
             type = BasicReportJob.REPORT_PERIOD_PREV_MONTH;
-        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_CURRENT_MONTH))) {
-            type = BasicReportJob.REPORT_PERIOD_CURRENT_MONTH;
         } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_DAY))) {
             type = BasicReportJob.REPORT_PERIOD_PREV_DAY;
-        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY))) {
-            type = BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY;
         } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_TODAY))) {
             type = BasicReportJob.REPORT_PERIOD_TODAY;
-        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_WEEK))) {
-            type = BasicReportJob.REPORT_PERIOD_PREV_WEEK;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY;
         } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_LAST_WEEK))) {
             type = BasicReportJob.REPORT_PERIOD_LAST_WEEK;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_CURRENT_MONTH))) {
+            type = BasicReportJob.REPORT_PERIOD_CURRENT_MONTH;
+        } else if (sType.equalsIgnoreCase(intToString(BasicReportJob.REPORT_PERIOD_PREV_WEEK))) {
+            type = BasicReportJob.REPORT_PERIOD_PREV_WEEK;
         }
         Date[] dates = BasicReportJob.calculateDatesForPeriodType(Calendar.getInstance(), null, new Date(), type);
         reportJob.setStartTime(dates[0]);
