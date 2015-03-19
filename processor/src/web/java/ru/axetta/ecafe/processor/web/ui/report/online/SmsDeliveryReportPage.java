@@ -16,7 +16,9 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -33,6 +35,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.util.GregorianCalendar;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -75,12 +78,18 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     public void buildReport(Session session) throws Exception {
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder();
-        if (idOfOrg != null) {
-            Org org = null;
+        if (idOfOrgList != null && idOfOrgList.size() > 0) {
+            /*Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
                 org = DAOService.getInstance().findOrById(idOfOrg);
             }
-            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));*/
+            Properties properties = reportBuilder.getReportProperties();
+            String idOfOrgString = "";
+            if(idOfOrgList != null) {
+                idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+            }
+            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         }
         this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
     }

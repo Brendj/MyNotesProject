@@ -14,6 +14,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -158,9 +159,19 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         public List<SMSDeliveryReportItem> findInternal(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
             String orgCondition = "";
+            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            if(idOfOrgs != null && !StringUtils.isBlank(idOfOrgs)) {
+                List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+                StringBuilder builder = new StringBuilder();
+                for(String id : stringOrgList) {
+                    builder.append(builder.length() > 0 ? " or " : "").append("sync1.idoforg=").append(id);
+                }
+                orgCondition = "            and (" + builder.toString() + ") ";
+            }
+            /*String orgCondition = "";
             if (org != null) {
                 orgCondition = "            and (sync1.idoforg=:idoforg) ";
-            }
+            }*/
 
             Calendar startCal = new GregorianCalendar();
             startCal.setTimeInMillis(start.getTime());
@@ -187,9 +198,9 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             Query query = session.createSQLQuery(sql);
             query.setParameter("start", startCal.getTimeInMillis());
             query.setParameter("end", endCal.getTimeInMillis());
-            if (org != null) {
+            /*if (org != null) {
                 query.setParameter("idoforg", org.getIdOfOrg());
-            }
+            }*/
 
             Long prevIdOfOrg = null;
             SyncEntry prevEntry = null;

@@ -20,11 +20,25 @@
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
-        <h:panelGroup>
+        <%--<h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true" value=" {#{smsDeliveryReportPage.filter}}" />
+        </h:panelGroup>--%>
+        <h:panelGroup id="orgFilter">
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                               <%--disabled="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"--%>
+                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="#{smsDeliveryReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{smsDeliveryReportPage.filter}}" />
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{smsDeliveryReportPage.buildReport}"
