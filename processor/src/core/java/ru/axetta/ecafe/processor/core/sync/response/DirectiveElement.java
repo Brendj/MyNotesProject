@@ -38,11 +38,6 @@ public class DirectiveElement {
 
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
-
-        OrgRepository orgRepository = OrgRepository.getInstance();
-        Long paymentContragentId = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
-        directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentContragentId != null?"1":"0", paymentContragentId!=null?""+paymentContragentId:null));
-
     }
 
     public void processForFullSync(Org org) throws Exception {

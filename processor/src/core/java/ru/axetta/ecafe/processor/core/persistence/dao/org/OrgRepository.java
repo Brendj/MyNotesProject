@@ -99,7 +99,8 @@ public class OrgRepository extends AbstractJpaDao<Org> {
     /*
     * Если paybycashier = true то передаем № платежного контрагента
     * */
-    public Long isPaymentByCashierEnabled(long idOfOrg){
+    @Transactional(readOnly = true)
+     public Long isPaymentByCashierEnabled(long idOfOrg){
         Query r = entityManager.createNativeQuery("select c.DefaultContragent "
                 + " from cf_orgs o inner join cf_contragents c on o.defaultsupplier=c.idofcontragent and c.PayByCashier=1 "
                 + " where o.idoforg=:idoforg and o.paybycashier=1").setParameter("idoforg", idOfOrg);
