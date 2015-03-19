@@ -3,8 +3,8 @@
 --! Информация для разработчика -- информация для пользователя
 
 -- Пакет обновлений 2.2.91
---! Таблица "Бронирование литературы из личного кабинета"
 
+-- --! Таблица "Бронирование литературы из личного кабинета"
 CREATE TABLE cf_order_publications
 (
   idoforder bigserial NOT NULL,
@@ -29,3 +29,13 @@ CREATE TABLE cf_order_publications
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT cf_order_publications_guid_key UNIQUE (guid)
 );
+
+--! Обновление значений параметров в правилах обработки отчетов генерируемых по расписанию в таблице cf_ruleconditions
+update cf_ruleconditions set conditionconstant = '0' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevMonth';
+update cf_ruleconditions set conditionconstant = '1' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevDay';
+update cf_ruleconditions set conditionconstant = '2' where conditionargument = 'reportPeriodType' and conditionconstant = 'today';
+update cf_ruleconditions set conditionconstant = '3' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevPrevDay';
+update cf_ruleconditions set conditionconstant = '4' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevPrevPrevDay';
+update cf_ruleconditions set conditionconstant = '5' where conditionargument = 'reportPeriodType' and conditionconstant = 'lastWeek';
+update cf_ruleconditions set conditionconstant = '6' where conditionargument = 'reportPeriodType' and conditionconstant = 'currentMonth';
+update cf_ruleconditions set conditionconstant = '7' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevWeek';
