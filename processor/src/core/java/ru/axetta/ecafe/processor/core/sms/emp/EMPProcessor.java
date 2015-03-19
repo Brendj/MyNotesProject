@@ -481,18 +481,23 @@ public class EMPProcessor {
         active.setName(ATTRIBUTE_ACTIVE);
         active.getValue().add(Boolean.TRUE);
         entry.getAttribute().add(active);
-        EntryAttribute smsSend = new EntryAttribute();
-        smsSend.setName(ATTRIBUTE_SMS_SEND);
-        smsSend.getValue().add(Boolean.TRUE);
-        entry.getAttribute().add(smsSend);
-        EntryAttribute emailSend = new EntryAttribute();
-        emailSend.setName(ATTRIBUTE_EMAIL_SEND);
-        emailSend.getValue().add(Boolean.TRUE);
-        entry.getAttribute().add(emailSend);
-        EntryAttribute pushSend = new EntryAttribute();
-        pushSend.setName(ATTRIBUTE_PUSH_SEND);
-        pushSend.getValue().add(Boolean.TRUE);
-        entry.getAttribute().add(pushSend);
+        if(client.isNotifyViaSMS()) {
+            EntryAttribute smsSend = new EntryAttribute();
+            smsSend.setName(ATTRIBUTE_SMS_SEND);
+            smsSend.getValue().add(Boolean.TRUE);
+            entry.getAttribute().add(smsSend);
+
+            EntryAttribute pushSend = new EntryAttribute();
+            pushSend.setName(ATTRIBUTE_PUSH_SEND);
+            pushSend.getValue().add(Boolean.TRUE);
+            entry.getAttribute().add(pushSend);
+        }
+        if(client.isNotifyViaEmail()) {
+            EntryAttribute emailSend = new EntryAttribute();
+            emailSend.setName(ATTRIBUTE_EMAIL_SEND);
+            emailSend.getValue().add(Boolean.TRUE);
+            entry.getAttribute().add(emailSend);
+        }
         //  empty
         String[] emptyParams = new String[]{"SURNAME", "NAME", "PATRONYMIC"};
         String[] nullParams = new String[]{
