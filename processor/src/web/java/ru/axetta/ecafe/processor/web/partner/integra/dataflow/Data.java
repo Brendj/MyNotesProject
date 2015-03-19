@@ -47,6 +47,7 @@ import javax.xml.bind.annotation.*;
     "enterEventList", "enterEventWithRepList",
     "circulationItemList",
     "publicationItemList",
+    "orderPublicationItemList",
     "complexDateList",
     "questionaryList",
     "clientRepresentativesList"
@@ -80,6 +81,10 @@ public class Data {
     protected PublicationItemList publicationItemList;
     @XmlAttribute(name = "AmountForCondition")
     protected int amountForCondition;
+    @XmlAttribute(name = "IdOfOrderPublication")
+    protected Long idOfOrderPublication;
+    @XmlElement(name = "OrderPublicationItemList")
+    protected OrderPublicationItemList orderPublicationItemList;
     @XmlElement(name = "CirculationItemList")
     protected CirculationItemList circulationItemList;
     @XmlAttribute(name = "IdOfContract")
@@ -388,6 +393,54 @@ public class Data {
      */
     public void setAmountForCondition(int value) {
         this.amountForCondition = value;
+    }
+
+    /**
+     * Gets the value of the idOfOrderPublication property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *
+     */
+    public Long getIdOfOrderPublication() {
+        return idOfOrderPublication;
+    }
+
+    /**
+     * Sets the value of the idOfOrderPublication property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *
+     */
+    public void setIdOfOrderPublication(Long value) {
+        this.idOfOrderPublication = value;
+    }
+
+    /**
+     * Gets the value of the orderPublicationItemList property.
+     *
+     * @return
+     *     possible object is
+     *     {@link OrderPublicationItemList }
+     *
+     */
+    public OrderPublicationItemList getOrderPublicationItemList() {
+        return orderPublicationItemList;
+    }
+
+    /**
+     * Sets the value of the orderPublicationItemList property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link OrderPublicationItemList }
+     *
+     */
+    public void setOrderPublicationItemList(OrderPublicationItemList value) {
+        this.orderPublicationItemList = value;
     }
 
     /**

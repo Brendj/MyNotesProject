@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
+import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
@@ -26,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Cyc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.OrderPublication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
@@ -122,6 +124,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_PROHIBIT_NOT_FOUND = 310L;
     private static final Long RC_PROHIBIT_REMOVED = 320L;
     private static final Long RC_SUBSCRIPTION_FEEDING_ACTIVATED = 330L;
+    private static final Long RC_PUBLICATION_NOT_AVAILABLE = 340L;
+    private static final Long RC_ORDER_PUBLICATION_NOT_FOUND = 350L;
+
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -139,6 +144,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_PROHIBIT_EXIST_DESC = "Запрет с данными параметрами уже существует";
     private static final String RC_PROHIBIT_REMOVED_DESC = "Запрет с данными параметрами был удален";
     private static final String RC_PROHIBIT_NOT_FOUND_DESC = "Запрет с данными параметрами не найден";
+    private static final String RC_PUBLICATION_NOT_AVAILABLE_DESC = "Книга не найдена или нет свободных экземпляров";
+    private static final String RC_ORDER_PUBLICATION_NOT_FOUND_DESC = "Заказ не найден";
     private static final int MAX_RECS = 50;
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
@@ -3686,6 +3693,148 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             puList.getC().add(pu);
         }
         return puList;
+    }
+
+    @Override
+    public OrderPublicationResult orderPublication(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "publicationId") Long publicationId) {
+       authenticateRequest(contractId);
+       final Long fPublicationId = publicationId;
+       Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processOrderPublication(client, data, objectFactory, session, fPublicationId);
+            }
+        });
+        OrderPublicationResult orderResult = new OrderPublicationResult();
+        orderResult.resultCode = data.getResultCode();
+        orderResult.description = data.getDescription();
+        orderResult.id = data.getIdOfOrderPublication();
+        return orderResult;
+    }
+
+    private void processOrderPublication(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Long publicationId) throws DatatypeConfigurationException {
+        final String ORDER_PUBLICATION = "OrderPublication";
+        final String bquery = "select count(ins.IdOfInstance) " +
+                "from cf_instances ins inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
+                "where ins.OrgOwner = :org and ins.IdOfPublication = :pub and not exists " +
+                "(select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
+        Long org = client.getOrg().getIdOfOrg();
+        SQLQuery query = session.createSQLQuery(bquery.toString());
+        query.setParameter("org", org);
+        query.setParameter("pub", publicationId);
+        Long insCount = ((BigInteger)query.uniqueResult()).longValue();
+        if (insCount > 0) {
+            Long maxVersion = DOVersionRepository.updateClassVersion(ORDER_PUBLICATION, session);
+            OrderPublication orderPublication = new OrderPublication();
+            orderPublication.setGlobalVersion(maxVersion);
+            orderPublication.setGlobalVersionOnCreate(maxVersion);
+            orderPublication.setCreatedDate(new Date());
+            orderPublication.setDeletedState(false);
+            orderPublication.setIdOfClient(client.getIdOfClient());
+            orderPublication.setOrgOwner(client.getOrg().getIdOfOrg());
+            orderPublication.setSendAll(SendToAssociatedOrgs.DontSend);
+            Publication publication = findPublicationByPublicationId(session, publicationId);
+            orderPublication.setPublication(publication);
+            orderPublication.setClient(client);
+            session.persist(orderPublication);
+            data.setIdOfOrderPublication(orderPublication.getGlobalId());
+        }
+        else {
+            data.setResultCode(RC_PUBLICATION_NOT_AVAILABLE);
+            throw new DatatypeConfigurationException(RC_PUBLICATION_NOT_AVAILABLE_DESC);
+        }
+    }
+
+    private Publication findPublicationByPublicationId(Session session, long publicationId) {
+        Criteria publicationCriteria = session.createCriteria(Publication.class);
+        publicationCriteria.add(Restrictions.eq("globalId", publicationId));
+        List<Publication> resultList = (List<Publication>) publicationCriteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @Override
+    public OrderPublicationListResult getOrderPublicationList(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processOrderPublicationList(client, data, objectFactory, session);
+            }
+        });
+
+        OrderPublicationListResult orderListResult = new OrderPublicationListResult();
+        orderListResult.orderPublicationList = data.getOrderPublicationItemList();
+        orderListResult.resultCode = data.getResultCode();
+        orderListResult.description = data.getDescription();
+        return orderListResult;
+    }
+
+    private void processOrderPublicationList(Client client, Data data, ObjectFactory objectFactory, Session session)
+            throws DatatypeConfigurationException {
+        Criteria orderCriteria = session.createCriteria(OrderPublication.class);
+        orderCriteria.add(Restrictions.eq("client", client));
+        orderCriteria.add(Restrictions.eq("deletedState", false));
+        orderCriteria.addOrder(org.hibernate.criterion.Order.asc("createdDate"));
+
+        List<OrderPublication> orderList = orderCriteria.list();
+
+        OrderPublicationItemList orList = objectFactory.createOrderPublicationItemList();
+        for (OrderPublication c : orderList) {
+            OrderPublicationItem oi = new OrderPublicationItem();
+            oi.setOrderDate(toXmlDateTime(c.getCreatedDate()));
+            oi.setOrderId(c.getGlobalId());
+            oi.setOrderStatus(c.getStatus());
+            Publication p = c.getPublication();
+            if (p != null) {
+                PublicationItem pi = new PublicationItem();
+                pi.setAuthor(p.getAuthor());
+                pi.setPublisher(p.getPublisher());
+                pi.setTitle(p.getTitle());
+                pi.setTitle2(p.getTitle2());
+                pi.setPublicationDate(p.getPublicationdate());
+                pi.setPublicationId(p.getGlobalId());
+                oi.setPublication(pi);
+            }
+            orList.getC().add(oi);
+        }
+        data.setOrderPublicationItemList(orList);
+    }
+
+    @Override
+    public OrderPublicationDeleteResult deleteOrderPublication(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "orderId") Long orderId) {
+        authenticateRequest(contractId);
+
+        final Long fOrderId = orderId;
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processDeleteOrderPublication(client, data, objectFactory, session, fOrderId);
+            }
+        });
+
+        OrderPublicationDeleteResult orderDeleteResult = new OrderPublicationDeleteResult();
+        orderDeleteResult.resultCode = data.getResultCode();
+        orderDeleteResult.description = data.getDescription();
+        return orderDeleteResult;
+    }
+
+    private void processDeleteOrderPublication(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Long orderId) throws DatatypeConfigurationException {
+        Criteria orderCriteria = session.createCriteria(OrderPublication.class);
+        orderCriteria.add(Restrictions.eq("globalId", orderId));
+        OrderPublication order = (OrderPublication) orderCriteria.uniqueResult();
+        if (order == null) {
+            data.setResultCode(RC_ORDER_PUBLICATION_NOT_FOUND);
+            throw new DatatypeConfigurationException(RC_ORDER_PUBLICATION_NOT_FOUND_DESC);
+        }
+        else {
+             order.setDeletedState(true);
+             session.flush();
+        }
     }
 
     @Override

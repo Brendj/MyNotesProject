@@ -397,6 +397,8 @@
             <url-pattern>/client-room/inlinecabinet.jsp</url-pattern>
             <url-pattern>/client-room/no-styles-inlinecabinet.jsp</url-pattern>
             <url-pattern>/client-room/sso.jsp</url-pattern>
+            <url-pattern>/client-room/pages/order-publication.jsp</url-pattern>
+            <url-pattern>/client-room/pages/delete-order-publication.jsp</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>

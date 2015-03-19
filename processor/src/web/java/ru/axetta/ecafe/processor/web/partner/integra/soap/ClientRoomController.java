@@ -232,6 +232,14 @@ public interface ClientRoomController {
             @WebParam(name = "publisher") String publisher, @WebParam(name = "isbn") String isbn,
             @WebParam(name="limit") int limit, @WebParam(name="offset") int offset);
 
+    @WebMethod OrderPublicationResult orderPublication(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "publicationId") Long publicationId);
+
+    @WebMethod OrderPublicationListResult getOrderPublicationList(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod OrderPublicationDeleteResult deleteOrderPublication(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "orderId") Long orderId);
+
     @WebMethod CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") int state);
 

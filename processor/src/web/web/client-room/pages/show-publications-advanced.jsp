@@ -48,6 +48,8 @@
         int limit = 10;
         int offset = 0;
         int amountForCondition = 0;
+        URI currentUri = UriUtils
+                .removeParams(ServletUtils.getHostRelativeUriWithQuery(request), Arrays.asList(PARAMS_TO_REMOVE));
 
         if (haveDataToProcess) {
             try {
@@ -66,7 +68,53 @@
         } else {
         }
 %>
+<script type="text/javascript">
+    var req;
+    var isIE;
 
+    function init(prefix, Id) {
+        completeField = document.getElementById(prefix+Id);
+    }
+
+    function doOrder(pubId) {
+        init("pub", pubId);
+        var url = "pages/order-publication.jsp?publication_id="+pubId;
+        req = initRequest();
+        req.open("get", url, "true");
+        req.onreadystatechange = callback;
+        req.send();
+    }
+
+    function deleteOrder(orderId) {
+        init("order", orderId);
+        var url = "pages/delete-order-publication.jsp?order_id="+orderId;
+        req = initRequest();
+        req.open("get", url, "true");
+        req.onreadystatechange = callback;
+        req.send();
+    }
+
+    function initRequest() {
+        if (window.XMLHttpRequest) {
+            if (navigator.userAgent.indexOf('MSIE') != -1) {
+                isIE = true;
+            }
+            return new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            isIE = true;
+            return new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    }
+    function callback() {
+        if (req.readyState == 4) {
+            if (req.status == 200) {
+                completeField.innerHTML = req.responseText;
+            }
+        }
+    }
+</script>
+<a class="command-link" href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(currentUri, "page", "show-order-publications").toString()))%>">Мои заказы</a> |
+<a class="command-link" href="<%=StringEscapeUtils.escapeHtml(response.encodeURL(UriUtils.putParam(currentUri, "page", "show-publications").toString()))%>">Простой поиск</a>
 <div class="output-text">Расширенный поиск в каталоге библиотеки</div>
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
       enctype="application/x-www-form-urlencoded" class="borderless-form">
@@ -180,7 +228,7 @@
     </tr>
 </table>
 
-<table>
+<table width="100%">
     <tr>
         <td>
             <div class="output-text">Автор</div>
@@ -202,6 +250,9 @@
         </td>
         <td>
             <div class="output-text">Доступно к выдаче</div>
+        </td>
+        <td>
+            <div class="output-text">Заказ</div>
         </td>
     </tr>
     <%
@@ -229,6 +280,11 @@
         </td>
         <td>
             <%=publicationIns.getInstancesAvailable().toString()%>
+        </td>
+        <td>
+            <div id="pub<%=publicationIns.getPublication().getPublicationId().toString()%>">
+                <a href="#" onclick="doOrder(<%=publicationIns.getPublication().getPublicationId()%>);">Забронировать</a>
+            </div>
         </td>
     </tr>
     <%

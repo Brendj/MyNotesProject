@@ -35,7 +35,9 @@
     final String SHOW_JOURNAL = "show-journal";
     final String SHOW_LIBRARY = "show-library";
     final String SHOW_PUBLICATIONS = "show-publications";
+    final String ORDER_PUBLICATION = "order-publication";
     final String SHOW_PUBLICATIONS_ADVANCED = "show-publications-advanced";
+    final String SHOW_ORDER_PUBLICATIONS = "show-order-publications";
     final String RECOVER_PARAM = "recover";
     final String PASSWORD_PARAM = "password";
     final String AUTO_REFILL_PAGE = "balance_auto_refill";
@@ -95,18 +97,20 @@
     }
     String[] pageNames = {
             SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_JOURNAL,  SHOW_LIBRARY, SHOW_PUBLICATIONS, SHOW_PUBLICATIONS_ADVANCED,
-            PAY_BANK_INFO, PREPARE_PAY_PAGE,
+            ORDER_PUBLICATION, SHOW_ORDER_PUBLICATIONS, PAY_BANK_INFO, PREPARE_PAY_PAGE,
             AUTO_REFILL_PAGE ,SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
     String[] labels = {
             "Покупки и платежи", "Узнать меню",  "Дневник", "Посещение школы", "Данные книговыдачи библиотеки", "Поиск в каталоге библиотеки", "Расширенный поиск в каталоге библиотеки",
-            "Оплата в банке", "Оплата он-лайн",
+            "Забронировать книгу", "Мои заказы в библиотеке", "Оплата в банке", "Оплата он-лайн",
             "Автопополнение", "Мои карты", "Личные данные", "Изменить пароль", "Выход"};
+    String[] dontShowLibraryPages = { SHOW_PUBLICATIONS_ADVANCED, ORDER_PUBLICATION, SHOW_ORDER_PUBLICATIONS };
 %>
 <table width="100%">
     <tr>
         <% 
             for (int i = 0; i != pageNames.length; ++i) {
-                if (pageNames[i]==null || hidePagesAttr.indexOf(pageNames[i])!=-1 || pageNames[i] == SHOW_PUBLICATIONS_ADVANCED) continue;
+                if (pageNames[i]==null || hidePagesAttr.indexOf(pageNames[i])!=-1
+                        || Arrays.asList(dontShowLibraryPages).contains(pageNames[i])) continue;
                 if (!(clientAuthToken.isSsoAuth() && (StringUtils.equals(LOGOUT_PAGE, pageNames[i]) || StringUtils
                         .equals(CHANGE_PASSWORD_PAGE, pageNames[i])))) {
                     boolean activePage = null != pageNames[i] && StringUtils.equals(pageNames[i], pageName);
@@ -167,6 +171,10 @@
 <jsp:include page="pages/show-publications.jsp" />
 <%} else if (StringUtils.equals(pageName, SHOW_PUBLICATIONS_ADVANCED)) {%>
 <jsp:include page="pages/show-publications-advanced.jsp" />
+<%} else if (StringUtils.equals(pageName, ORDER_PUBLICATION)) {%>
+<jsp:include page="pages/order-publication.jsp" />
+<%} else if (StringUtils.equals(pageName, SHOW_ORDER_PUBLICATIONS)) {%>
+<jsp:include page="pages/show-order-publications.jsp" />
 <%} else if (StringUtils.equals(pageName, AUTO_REFILL_PAGE)) {%>
 <jsp:include page="pages/balance_auto_refill.jsp" />
 <%

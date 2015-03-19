@@ -165,6 +165,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link OrderPublicationItemList }
+     *
+     */
+    public OrderPublicationItemList createOrderPublicationItemList() {
+        return new OrderPublicationItemList();
+    }
+
+    /**
      * Create an instance of {@link CirculationItemList }
      * 
      */
