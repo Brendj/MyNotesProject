@@ -21,8 +21,10 @@ public class OrderItem {
     private int qty;
     private long sum;
 
+    private long createdDateEqualsOrderDate;
+
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
-            String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname) {
+            String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname, long createdDateEqualsOrderDate) {
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
         this.idOfClient = idOfClient;
@@ -35,6 +37,7 @@ public class OrderItem {
         this.idOfClientOrg = idOfClientOrg;
         this.clientOrgName = clientOrgName;
         this.fullname = fullname;
+        this.createdDateEqualsOrderDate = createdDateEqualsOrderDate;
     }
 
     public OrderItem(long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
@@ -181,5 +184,13 @@ public class OrderItem {
 
     public void setSum(long sum) {
         this.sum = sum;
+    }
+
+    public long getCreatedDateEqualsOrderDate() {
+        return createdDateEqualsOrderDate;
+    }
+
+    public void setCreatedDateEqualsOrderDate(long createdDateEqualsOrderDate) {
+        this.createdDateEqualsOrderDate = createdDateEqualsOrderDate;
     }
 }

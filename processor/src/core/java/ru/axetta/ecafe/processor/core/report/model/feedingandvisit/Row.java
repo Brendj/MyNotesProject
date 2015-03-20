@@ -38,6 +38,8 @@ public class Row {
     public static final int COLOR_PAID = 1;   //оплачен
     public static final int COLOR_NOT_PAID = 0; // не оплачен
 
+    private long createdDateEqualsOrderDate = 0;
+
     public Row() {
     }
 
@@ -145,7 +147,8 @@ public class Row {
 
     public String getEntry() {
         return entry;
-    }public String processEntry() {
+    }
+    public String processEntry() {
         if (totalRow) {
             return "" + totalCount;
         } else if (enter == null && exit == null) {
@@ -154,6 +157,13 @@ public class Row {
 
         return "" + ((enter != null) ? CalendarUtils.timeToString(enter) : "...") + " - " + ((exit != null)
                 ? CalendarUtils.timeToString(exit) : "...");
+    }
+
+    public void processOrderDiff(){//Разница в 12 часов
+        if (!totalRow && (createdDateEqualsOrderDate < -1 * 12 * 60 * 60 * 1000) )  {
+            entry = "<span style='text-decoration:underline;font-weight: bold;' >" + entry + "</span>";
+        }
+
     }
 
 
@@ -252,5 +262,6 @@ public class Row {
 
     public void update(OrderItem item) {
         setColor(COLOR_PAID);
+        createdDateEqualsOrderDate = item.getCreatedDateEqualsOrderDate();
     }
 }

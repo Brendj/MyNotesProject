@@ -132,6 +132,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             for (Row row : dataList) {
                 row.setEntry(row.processEntry());
                 row.setColorTo(row.processColorTo());
+                row.processOrderDiff();
             }
         }
 
