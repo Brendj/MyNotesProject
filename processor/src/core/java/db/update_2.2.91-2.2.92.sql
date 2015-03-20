@@ -39,3 +39,6 @@ update cf_ruleconditions set conditionconstant = '4' where conditionargument = '
 update cf_ruleconditions set conditionconstant = '5' where conditionargument = 'reportPeriodType' and conditionconstant = 'lastWeek';
 update cf_ruleconditions set conditionconstant = '6' where conditionargument = 'reportPeriodType' and conditionconstant = 'currentMonth';
 update cf_ruleconditions set conditionconstant = '7' where conditionargument = 'reportPeriodType' and conditionconstant = 'prevWeek';
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150320) НЕ МЕНЯТЬ
