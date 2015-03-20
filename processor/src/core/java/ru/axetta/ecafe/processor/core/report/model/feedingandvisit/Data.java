@@ -20,6 +20,7 @@ public class Data extends ClientGroupSortByName<Data> {
     List<Row> reserve = new LinkedList<Row>();
     List<Row> plan = new LinkedList<Row>();
     List<Row> total = new LinkedList<Row>();
+    List<Row> overall = new LinkedList<Row>();
 
     public Data(List<Days> daysList) {
         this.daysList = daysList;
@@ -75,5 +76,17 @@ public class Data extends ClientGroupSortByName<Data> {
 
     public void setTotal(List<Row> total) {
         this.total = total;
+    }
+
+    public List<Row> getOverall() {
+        return overall;
+    }
+
+    public void setOverall(List<Row> overall) {
+        this.overall = overall;
+    }
+
+    public boolean isOverAllFieldActive(){
+        return overall.size() > 0;
     }
 }

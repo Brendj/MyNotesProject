@@ -97,7 +97,9 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
 
             dataMap = fillDataPlanWithClients(dataMap, clientItemList, startTime, endTime, orgList);
 
-            updataDataWithOrders(dataMap, orderItemList, startTime, endTime, orgList, orgsIdsString);
+            List<Row> overallTotal = new LinkedList<Row>();
+
+            updataDataWithOrders(dataMap, orderItemList, startTime, endTime, orgList, orgsIdsString, overallTotal);
 
             //clientItemList = subFeedingService.getClientItems(org.getIdOfOrg(),notFoundOrderItems);
             EnterEventsService enterEventsService = RuntimeContext.getAppContext().getBean(EnterEventsService.class);
@@ -110,6 +112,9 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             List<Data> dataList = new ArrayList<Data>(dataMap.values());
             Collections.sort(dataList);
 
+            if(dataList.size() > 0){
+                dataList.get(dataList.size()-1).setOverall(overallTotal);
+            }
             processColors(dataList);
 
             return new JRBeanCollectionDataSource(dataList);
@@ -120,6 +125,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                 processColorsRowsList(data.getPlan());
                 processColorsRowsList(data.getReserve());
                 processColorsRowsList(data.getTotal());
+                processColorsRowsList(data.getOverall());
             }
         }
         private void processColorsRowsList(List<Row> dataList) {
@@ -131,7 +137,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
 
 
         private void updataDataWithOrders(Map<String, Data> dataMap, List<OrderItem> orderItemList, Date startTime,
-                Date endTime, List<Org> orgList, String orgsIdsString) {
+                Date endTime, List<Org> orgList, String orgsIdsString, List<Row> overallTotal) {
             Data currentData;
             OrderItem notfoundItem = null;
             SubFeedingService subFeedingService = RuntimeContext.getAppContext().getBean(SubFeedingService.class);
@@ -174,6 +180,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
 
                 //todo 8 handle
                 updateTotalListWithOrder(currentData, orderItem, startTime, endTime);
+                updateOverallTotalListWithOrder(overallTotal, orderItem, startTime, endTime);
             }
         }
 
@@ -214,6 +221,26 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                             }});
                 }
                 updateTotalListWithOrder(data, item, startTime, endTime);
+            }
+        }
+
+        private static void updateOverallTotalListWithOrder(List<Row> data, OrderItem item, Date startTime, Date endTime) {
+            int itemDay = CalendarUtils.getDayOfMonth(item.orderDate);
+            boolean foundItemNameInTotal = false;
+            for (Row totalRow : data) {
+                if ((totalRow.getClientId().equals((long) item.idOfComplex)) && (totalRow.getDay().equals(itemDay))) {
+                    totalRow.updateTotal(item);
+                    foundItemNameInTotal = true;
+                }
+            }
+
+            if (!foundItemNameInTotal) {
+                for (int i : CalendarUtils.daysBetween(startTime, endTime)) {
+                    data.add(new Row( (long) item.idOfComplex, item.getIdOfOrg(), item.getComplexName(), i, item.getGroupName()) {{
+                                setTotalRow(true);
+                            }});
+                }
+                updateOverallTotalListWithOrder(data, item, startTime, endTime);
             }
         }
 
