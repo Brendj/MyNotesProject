@@ -44,7 +44,7 @@
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["C:\\Work\\Work.dev\\SVN\\ecafe-jb7\\processor\\src\\report\\"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="totalsData" class="java.lang.Object" isForPrompting="false"/>
 	<field name="name" class="java.lang.String"/>

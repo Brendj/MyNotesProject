@@ -8,13 +8,11 @@
 			<pen lineWidth="1.0" lineColor="#000000"/>
 		</box>
 	</style>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["D:\\workspace\\branche\\processor\\src\\report\\"]]></defaultValueExpression>
-	</parameter>
 	<field name="totalOriginName" class="java.lang.String"/>
 	<field name="totalSum" class="java.lang.Long"/>
 	<field name="totalCount" class="java.lang.Long"/>
 	<field name="subReportDataRows" class="java.util.List"/>
+	<field name="subReportDir" class="java.lang.String"/>
 	<title>
 		<band height="50">
 			<textField>
@@ -46,7 +44,7 @@
 			<subreport>
 				<reportElement uuid="69987ef7-aa09-4b82-8fe8-2f7891460ef1" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="680" height="20"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{subReportDataRows})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DailySalesByGroupsReport_subreport_items.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$F{subReportDir} + "DailySalesByGroupsReport_subreport_items.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="20">
