@@ -656,6 +656,9 @@ public class RNIPLoadPaymentsService {
             if (node.hasChildNodes() && node.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE) {
                 String n = node.getNodeName();
                 String v = node.getChildNodes().item(0).getNodeValue();
+                if(n.equals("BIK") && vals.containsKey(n)) {
+                    break;
+                }
                 for (String param : PAYMENT_PARAMS) {
                     if (param.equals(n)) {
                         vals.put(n, v);
