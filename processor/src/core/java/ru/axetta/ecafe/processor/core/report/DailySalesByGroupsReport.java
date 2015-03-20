@@ -49,13 +49,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             private final long price, sum;
             private String originName = null;
 
-            public MealRow(int menuOrigin, String name, long count, long price, long sum) {
-                this.name = name;
-                this.count = count;
-                this.price = price;
-                this.sum = sum;
-            }
-
             public MealRow(String originName, String name, long count, long price, long sum) {
                 this.name = name;
                 this.count = count;
@@ -345,6 +338,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         long totalCount;
         long totalSum;
         List<SubReportDataRow> subReportDataRows;
+        String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
 
         public TotalDataRow(String totalOriginName, long totalCount, long totalSum, List<SubReportDataRow> subReportDataRows) {
             this.totalOriginName = totalOriginName;
@@ -383,6 +377,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         public void setSubReportDataRows(List<SubReportDataRow> subReportDataRows) {
             this.subReportDataRows = subReportDataRows;
+        }
+
+        public String getSubReportDir() {
+            return subReportDir;
+        }
+
+        public void setSubReportDir(String subReportDir) {
+            this.subReportDir = subReportDir;
         }
     }
 
