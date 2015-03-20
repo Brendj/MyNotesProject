@@ -322,7 +322,15 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         if(startDate.after(endDate)){
             printError("Дата выборки от меньше дата выборки до");
             return true;
+        } else {
+            int diffInDays = (int)( (endDate.getTime() - startDate.getTime() )
+                    / (1000 * 60 * 60 * 24) );
+
+            if (diffInDays >= 365) {
+                printError("Выбран слишком большой период. Измените период и повторите построение отчета" );
+            }
         }
+
         if (contragentFilter.getContragent().getIdOfContragent() == null
                 || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
             printError("Не выбран 'Агент по приему платежей' и 'Контрагент-получатель'");
