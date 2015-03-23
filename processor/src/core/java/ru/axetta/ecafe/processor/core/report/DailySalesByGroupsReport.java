@@ -151,99 +151,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             List mealsList = null;
             MealRow mealRow;
+
             long totalCount=0, totalSum=0;
-            long totalPayCount=0, totalPaySum=0;
-            if (includeComplex) {
-                Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
-                        " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
-                        " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND " +
-                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 "
-                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
-
-                complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
-                complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
-                complexQuery_1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                //complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
-                //complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
-                //complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
-                //complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
-                //complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
-                complexQuery_1.setParameter("startTime", startTime.getTime());
-                complexQuery_1.setParameter("endTime", endTime.getTime());
-
-                mealsList = complexQuery_1.list();
-
-                List<MealRow> payMealRows = new LinkedList<MealRow>();
-                String menuGroup = "Платное комплексное питание";
-                for (Object o : mealsList) {
-                    vals=(Object[])o;
-                    //int menuOrigin = Integer.parseInt(vals[0].toString());
-                    String menuName = vals[4].toString(); // od.MenuType
-                    long count = Long.parseLong(vals[1].toString());
-                    long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
-                    long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
-                    long discount = vals[5]==null?0:Long.parseLong(vals[5].toString());
-                    long socdiscount = vals[6]==null?0:Long.parseLong(vals[6].toString());
-                    long grant = vals[7]==null?0:Long.parseLong(vals[7].toString());
-                    long tradeDiscount = (long)( ((double)(discount - socdiscount)/(double)(discount + socdiscount + rPrice + grant))*100 );
-                    if (tradeDiscount > 0)
-                        menuName = String.format("%s (скидка %d%%)", menuName, tradeDiscount);
-                    //MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
-                    totalCount+=count;
-                    totalPayCount+=count;
-                    totalSum+=sum;
-                    totalPaySum+=sum;
-                    mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
-                    payMealRows.add(mealRow);
-                }
-                subReportDataRowsPay.add(new SubReportDataRow(menuGroup, totalCount, totalSum));
-                
-                Collections.sort(payMealRows);
-                mealRows.addAll(payMealRows);
-
-                totalDataRows.add(new TotalDataRow("Платное питание ВСЕГО: ", totalPayCount, totalPaySum, subReportDataRowsPay));
-
-                //// бесплатное питание
-
-                List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
-
-                Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount " +
-                        " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
-                        " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0"
-                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
-
-                freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
-                freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
-                freeComplexQuery1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                freeComplexQuery1.setParameter("startTime", startTime.getTime());
-                freeComplexQuery1.setParameter("endTime", endTime.getTime());
-
-                mealsList = freeComplexQuery1.list();
-
-                totalCount=0; totalSum=0;
-                int totalCountUnPaid = 0; int totalSumUnPaid = 0;
-
-                menuGroup = "Бесплатное комплексное питание";
-                for (Object o : mealsList) {
-                    vals=(Object[])o;
-                    //int menuOrigin = Integer.parseInt(vals[0].toString());
-                    String menuName = vals[4].toString(); // od.MenuType
-                    long count = Long.parseLong(vals[1].toString());
-                    long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
-                    long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
-                    long socdiscount = vals[5]==null?0:Long.parseLong(vals[5].toString());
-                    totalCount+=count;
-                    totalCountUnPaid+=count;
-                    totalSum+=sum;
-                    totalSumUnPaid+=sum;
-                    mealRow = new MealRow(menuGroup, menuName, count, rPrice+socdiscount, sum);
-                    mealRows.add(mealRow);
-                }
-                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroup, totalCount, totalSum));
-
-                totalDataRows.add(new TotalDataRow("Бесплатное комплексное питание ВСЕГО: ", totalCountUnPaid, totalSumUnPaid, subReportDataRowsUnPaid));
-            }
+            long totalBuffetCount=0, totalBuffetSum=0;
 
             // буфет
 
@@ -287,9 +197,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             String menuGroup = null;
             String menuName;
             String currentTotalGroup="";
-            
-            long totalBuffetCount=0, totalBuffetSum=0;
-            
+
             for (Object o : mealsList) {
                 vals=(Object[])o;
                 if (groupByMenuOrigin)
@@ -322,7 +230,111 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 subReportDataRowsBuffet.add(new SubReportDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
             }
 
-            totalDataRows.add(new TotalDataRow("БУФЕТ ВСЕГО: ", totalBuffetCount, totalBuffetSum, subReportDataRowsBuffet));
+            totalDataRows.add(new TotalDataRow("Буфет ВСЕГО: ", totalBuffetCount, totalBuffetSum, subReportDataRowsBuffet));
+
+            long totalUnPaidCount = 0, totalUnPaidSum = 0;
+            long totalPayCount=0, totalPaySum=0;
+
+            totalCount=0;
+            totalSum=0;
+
+            if (includeComplex) {
+                Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
+                        " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
+                        " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND " +
+                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 "
+                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
+
+                complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
+                complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                complexQuery_1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+                //complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
+                //complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
+                //complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
+                //complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
+                //complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
+                complexQuery_1.setParameter("startTime", startTime.getTime());
+                complexQuery_1.setParameter("endTime", endTime.getTime());
+
+                mealsList = complexQuery_1.list();
+
+                List<MealRow> payMealRows = new LinkedList<MealRow>();
+                String menuGroupPay = "Платное комплексное питание";
+                for (Object o : mealsList) {
+                    vals=(Object[])o;
+                    //int menuOrigin = Integer.parseInt(vals[0].toString());
+                    String menuNamePay = vals[4].toString(); // od.MenuType
+                    long count = Long.parseLong(vals[1].toString());
+                    long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
+                    long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
+                    long discount = vals[5]==null?0:Long.parseLong(vals[5].toString());
+                    long socdiscount = vals[6]==null?0:Long.parseLong(vals[6].toString());
+                    long grant = vals[7]==null?0:Long.parseLong(vals[7].toString());
+                    long tradeDiscount = (long)( ((double)(discount - socdiscount)/(double)(discount + socdiscount + rPrice + grant))*100 );
+                    if (tradeDiscount > 0)
+                        menuNamePay = String.format("%s (скидка %d%%)", menuNamePay, tradeDiscount);
+                    //MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
+                    totalCount+=count;
+                    totalPayCount+=count;
+                    totalSum+=sum;
+                    totalPaySum+=sum;
+                    mealRow = new MealRow(menuGroupPay, menuNamePay, count, rPrice, sum);
+                    payMealRows.add(mealRow);
+                }
+                subReportDataRowsPay.add(new SubReportDataRow(menuGroupPay, totalCount, totalSum));
+                
+                Collections.sort(payMealRows);
+                mealRows.addAll(payMealRows);
+
+                long totalPayAndBuffetCount = totalBuffetCount + totalPayCount;
+                long totalPayAndBuffetSum = totalBuffetSum + totalPaySum;
+
+                totalDataRows.add(new TotalDataRow("Платное комплексное питание + Буфет ВСЕГО: ", totalPayAndBuffetCount, totalPayAndBuffetSum, subReportDataRowsPay));
+
+                //// бесплатное питание
+
+                List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
+
+                Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount " +
+                        " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
+                        " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
+                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0"
+                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
+
+                freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
+                freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                freeComplexQuery1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+                freeComplexQuery1.setParameter("startTime", startTime.getTime());
+                freeComplexQuery1.setParameter("endTime", endTime.getTime());
+
+                mealsList = freeComplexQuery1.list();
+
+                totalCount=0;
+                totalSum=0;
+
+                String menuGroupUnPaid = "Бесплатное комплексное питание";
+                for (Object o : mealsList) {
+                    vals=(Object[])o;
+                    //int menuOrigin = Integer.parseInt(vals[0].toString());
+                    String menuNameUnPaid = vals[4].toString(); // od.MenuType
+                    long count = Long.parseLong(vals[1].toString());
+                    long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
+                    long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
+                    long socdiscount = vals[5]==null?0:Long.parseLong(vals[5].toString());
+                    totalCount+=count;
+                    totalUnPaidCount+=count;
+                    totalSum+=sum;
+                    totalUnPaidSum+=sum;
+                    mealRow = new MealRow(menuGroupUnPaid, menuNameUnPaid, count, rPrice+socdiscount, sum);
+                    mealRows.add(mealRow);
+                }
+                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaid, totalCount, totalSum));
+
+                long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount;
+                long totalByAllSum = totalBuffetSum + totalPaySum +totalUnPaidSum;
+
+                totalDataRows.add(new TotalDataRow("ОБЩЕЕ: ", totalByAllCount, totalByAllSum, subReportDataRowsUnPaid));
+            }
             
             ///
             parameterMap.put("totalsData", new JRBeanCollectionDataSource(totalDataRows));
