@@ -204,27 +204,29 @@ public class FinancialOpsManager {
     }
 
     public void cancelOrder(Session session, Order order) throws Exception {
-        if (order.getState()!=Order.STATE_COMMITED) throw new Exception("Заказ не может быть отменен из статуса: "+order.getStateAsString() + ", idOfOrg: " + order.getOrg().getIdOfOrg() + ", compositeIdOfOrder: " + order.getCompositeIdOfOrder());
-        order.setState(Order.STATE_CANCELED);
-        session.save(order);
-        for (OrderDetail od : order.getOrderDetails()) {
-            od.setState(OrderDetail.STATE_CANCELED);
-            session.save(od);
+        if (order.getState() != Order.STATE_COMMITED) {
+        } else {
+            order.setState(Order.STATE_CANCELED);
+            session.save(order);
+            for (OrderDetail od : order.getOrderDetails()) {
+                od.setState(OrderDetail.STATE_CANCELED);
+                session.save(od);
+            }
+
+            CanceledOrder canceledOrder = new CanceledOrder(order, order.getOrg());
+
+            if (0 != order.getSumByCard()) {
+                AccountTransaction transaction = order.getTransaction();
+                canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
+                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            }
+
+            session.save(canceledOrder);
+
+            Long sumByCard = order.getSumByCard();
+            Long budgetSum = order.getSocDiscount() + order.getGrantSum();
+            getCurrentPositionsManager(session).changeOrderPosition(-sumByCard, -budgetSum, order.getContragent());
         }
-
-        CanceledOrder canceledOrder = new CanceledOrder(order, order.getOrg());
-
-        if(0!=order.getSumByCard()){
-            AccountTransaction transaction = order.getTransaction();
-            canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
-            ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
-        }
-
-        session.save(canceledOrder);
-
-        Long sumByCard = order.getSumByCard();
-        Long budgetSum = order.getSocDiscount() + order.getGrantSum();
-        getCurrentPositionsManager(session).changeOrderPosition(-sumByCard, -budgetSum, order.getContragent());
     }
 
 
