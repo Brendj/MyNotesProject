@@ -328,6 +328,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
 
             if (diffInDays >= 365) {
                 printError("Выбран слишком большой период. Измените период и повторите построение отчета" );
+                return true;
             }
         }
 
