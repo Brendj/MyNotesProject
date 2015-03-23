@@ -126,6 +126,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_SUBSCRIPTION_FEEDING_ACTIVATED = 330L;
     private static final Long RC_PUBLICATION_NOT_AVAILABLE = 340L;
     private static final Long RC_ORDER_PUBLICATION_NOT_FOUND = 350L;
+    private static final Long RC_ORDER_PUBLICATION_CANT_BE_DELETED = 360L;
+    private static final Long RC_ORDER_PUBLICATION_ALREADY_EXISTS = 370L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -146,6 +148,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_PROHIBIT_NOT_FOUND_DESC = "Запрет с данными параметрами не найден";
     private static final String RC_PUBLICATION_NOT_AVAILABLE_DESC = "Книга не найдена или нет свободных экземпляров";
     private static final String RC_ORDER_PUBLICATION_NOT_FOUND_DESC = "Заказ не найден";
+    private static final String RC_ORDER_PUBLICATION_CANT_BE_DELETED_DESC = "Заказ не может быть удален";
+    private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
     private static final int MAX_RECS = 50;
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
@@ -3698,53 +3702,86 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public OrderPublicationResult orderPublication(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "publicationId") Long publicationId) {
-       authenticateRequest(contractId);
-       final Long fPublicationId = publicationId;
-       Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                    Session session, Transaction transaction) throws Exception {
-                processOrderPublication(client, data, objectFactory, session, fPublicationId);
-            }
-        });
-        OrderPublicationResult orderResult = new OrderPublicationResult();
-        orderResult.resultCode = data.getResultCode();
-        orderResult.description = data.getDescription();
-        orderResult.id = data.getIdOfOrderPublication();
-        return orderResult;
-    }
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        OrderPublicationResult result = new OrderPublicationResult();
 
-    private void processOrderPublication(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Long publicationId) throws DatatypeConfigurationException {
-        final String ORDER_PUBLICATION = "OrderPublication";
-        final String bquery = "select count(ins.IdOfInstance) " +
-                "from cf_instances ins inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
-                "where ins.OrgOwner = :org and ins.IdOfPublication = :pub and not exists " +
-                "(select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
-        Long org = client.getOrg().getIdOfOrg();
-        SQLQuery query = session.createSQLQuery(bquery.toString());
-        query.setParameter("org", org);
-        query.setParameter("pub", publicationId);
-        Long insCount = ((BigInteger)query.uniqueResult()).longValue();
-        if (insCount > 0) {
-            Long maxVersion = DOVersionRepository.updateClassVersion(ORDER_PUBLICATION, session);
-            OrderPublication orderPublication = new OrderPublication();
-            orderPublication.setGlobalVersion(maxVersion);
-            orderPublication.setGlobalVersionOnCreate(maxVersion);
-            orderPublication.setCreatedDate(new Date());
-            orderPublication.setDeletedState(false);
-            orderPublication.setIdOfClient(client.getIdOfClient());
-            orderPublication.setOrgOwner(client.getOrg().getIdOfOrg());
-            orderPublication.setSendAll(SendToAssociatedOrgs.DontSend);
-            Publication publication = findPublicationByPublicationId(session, publicationId);
-            orderPublication.setPublication(publication);
-            orderPublication.setClient(client);
-            session.persist(orderPublication);
-            data.setIdOfOrderPublication(orderPublication.getGlobalId());
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+
+                Publication publication = findPublicationByPublicationId(session, publicationId);
+                if (publication == null) {
+                    result.resultCode = RC_PUBLICATION_NOT_AVAILABLE;
+                    result.description = RC_PUBLICATION_NOT_AVAILABLE_DESC;
+                    return result;
+                }
+
+                Criteria orderCriteria = session.createCriteria(OrderPublication.class);
+                orderCriteria.add(Restrictions.eq("client", client));
+                orderCriteria.add(Restrictions.eq("publication", publication));
+                orderCriteria.add(Restrictions.eq("deletedState", false));
+                if (!orderCriteria.list().isEmpty()) {
+                    result.resultCode = RC_ORDER_PUBLICATION_ALREADY_EXISTS;
+                    result.description = RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC;
+                    return result;
+                }
+
+                final String ORDER_PUBLICATION = "OrderPublication";
+                final String bquery = "select count(ins.IdOfInstance) " +
+                        "from cf_instances ins inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
+                        "where ins.OrgOwner = :org and ins.IdOfPublication = :pub and not exists " +
+                        "(select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
+                Long org = client.getOrg().getIdOfOrg();
+                SQLQuery query = session.createSQLQuery(bquery.toString());
+                query.setParameter("org", org);
+                query.setParameter("pub", publicationId);
+                Long insCount = ((BigInteger)query.uniqueResult()).longValue();
+                if (insCount > 0) {
+                    Long maxVersion = DOVersionRepository.updateClassVersion(ORDER_PUBLICATION, session);
+                    OrderPublication orderPublication = new OrderPublication();
+                    orderPublication.setGlobalVersion(maxVersion);
+                    orderPublication.setGlobalVersionOnCreate(maxVersion);
+                    orderPublication.setCreatedDate(new Date());
+                    orderPublication.setDeletedState(false);
+                    orderPublication.setIdOfClient(client.getIdOfClient());
+                    orderPublication.setOrgOwner(client.getOrg().getIdOfOrg());
+                    orderPublication.setSendAll(SendToAssociatedOrgs.DontSend);
+
+                    orderPublication.setPublication(publication);
+                    orderPublication.setClient(client);
+                    session.persist(orderPublication);
+                    result.id = orderPublication.getGlobalId();
+                    result.resultCode = RC_OK;
+                    result.description = RC_OK_DESC;
+                }
+                else {
+                    result.resultCode = RC_PUBLICATION_NOT_AVAILABLE;
+                    result.description = RC_PUBLICATION_NOT_AVAILABLE_DESC;
+                }
+                transaction.commit();
+                transaction = null;
+            }
+            finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
         }
-        else {
-            data.setResultCode(RC_PUBLICATION_NOT_AVAILABLE);
-            throw new DatatypeConfigurationException(RC_PUBLICATION_NOT_AVAILABLE_DESC);
+        catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
         }
+        return result;
+
     }
 
     private Publication findPublicationByPublicationId(Session session, long publicationId) {
@@ -3807,34 +3844,52 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public OrderPublicationDeleteResult deleteOrderPublication(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "orderId") Long orderId) {
         authenticateRequest(contractId);
-
-        final Long fOrderId = orderId;
-        Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                    Session session, Transaction transaction) throws Exception {
-                processDeleteOrderPublication(client, data, objectFactory, session, fOrderId);
+        OrderPublicationDeleteResult result = new OrderPublicationDeleteResult();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+                Criteria orderCriteria = session.createCriteria(OrderPublication.class);
+                orderCriteria.add(Restrictions.eq("globalId", orderId));
+                OrderPublication order = (OrderPublication) orderCriteria.uniqueResult();
+                if (order == null) {
+                    result.resultCode = RC_ORDER_PUBLICATION_NOT_FOUND;
+                    result.description = RC_ORDER_PUBLICATION_NOT_FOUND_DESC;
+                    return result;
+                }
+                else {
+                    if (order.getStatus() != null && !order.getStatus().isEmpty())
+                    {
+                        result.resultCode = RC_ORDER_PUBLICATION_CANT_BE_DELETED;
+                        result.description = RC_ORDER_PUBLICATION_CANT_BE_DELETED_DESC;
+                        return result;
+                    }
+                    order.setDeletedState(true);
+                    session.save(order);
+                    transaction.commit();
+                    transaction = null;
+                }
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
             }
-        });
-
-        OrderPublicationDeleteResult orderDeleteResult = new OrderPublicationDeleteResult();
-        orderDeleteResult.resultCode = data.getResultCode();
-        orderDeleteResult.description = data.getDescription();
-        return orderDeleteResult;
-    }
-
-    private void processDeleteOrderPublication(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Long orderId) throws DatatypeConfigurationException {
-        Criteria orderCriteria = session.createCriteria(OrderPublication.class);
-        orderCriteria.add(Restrictions.eq("globalId", orderId));
-        OrderPublication order = (OrderPublication) orderCriteria.uniqueResult();
-        if (order == null) {
-            data.setResultCode(RC_ORDER_PUBLICATION_NOT_FOUND);
-            throw new DatatypeConfigurationException(RC_ORDER_PUBLICATION_NOT_FOUND_DESC);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
         }
-        else {
-             order.setDeletedState(true);
-             session.flush();
+        catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
         }
+        return result;
     }
 
     @Override

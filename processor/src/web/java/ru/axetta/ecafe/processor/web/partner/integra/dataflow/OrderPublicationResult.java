@@ -4,8 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
-public class OrderPublicationResult {
-    public Long resultCode;
-    public String description;
-    public Long id;
+public class OrderPublicationResult extends Result {
+    public Long id = null;
+
+    public OrderPublicationResult(Long resultCode, String desc) {
+        super(resultCode, desc);
+        id = null;
+    }
+
+    public OrderPublicationResult() {
+    }
 }

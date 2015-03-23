@@ -21,10 +21,18 @@
         ClientRoomController port = clientAuthToken.getPort();
         OrderPublicationResult orderResult=port.orderPublication(clientAuthToken.getContractId(), publicationId);
         orderId = orderResult.id;
+        long resultCode = orderResult.resultCode;
+        if (resultCode == 0L) {
 %>
 <div id="order<%=orderId%>">Книга забронирована. <a href="#" onclick="deleteOrder(<%=orderId%>);">Отменить заказ</a>
 </div>
 <%
+    }
+    else {
+%>
+Не удалось забронировать книгу
+<%
+    }
         }
     catch (Exception e) {
 %>

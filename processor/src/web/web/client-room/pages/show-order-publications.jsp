@@ -129,9 +129,11 @@
             <%=orderPub.getOrderStatus()%>
         </td>
         <td>
+            <% if ((orderPub.getOrderStatus() == null) || (orderPub.getOrderStatus().isEmpty())) { %>
             <div id="order<%=orderPub.getOrderId().toString()%>">
                 <a href="#" onclick="deleteOrder(<%=orderPub.getOrderId()%>);">Отменить</a>
             </div>
+            <% } %>
         </td>
     </tr>
     <%
