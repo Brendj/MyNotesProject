@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -152,8 +153,17 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                 //находим класс в котором был заказ, если
                 if (currentData == null) {
                     ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem.idOfClient);
-
-                    currentData = dataMap.get( prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+                    if(clientItem == null ){
+                        clientItem = new ClientItem(orderItem.getIdOfClient(), orderItem.getIdOfOrg(), orderItem.getOrgName(), orderItem.getFullname(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), orderItem.getOrdertype());
+                        if(orderItem.getOrdertype() == 4){
+                            clientItem.setPlanType(ClientItem.IN_PLAN_TYPE);
+                        }else {
+                            clientItem.setPlanType(ClientItem.IN_RESERVE_TYPE);
+                        }
+                    }
+                    currentData = dataMap.get(
+                            prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
 
                     if(currentData == null){
                         currentData = createGroup(dataMap,orgList, clientItem, startTime, endTime);
@@ -164,11 +174,20 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                 if (notfoundItem != null) {
                     try {
                         ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem.idOfClient);
-                        if (clientItem.getIdOfOrg() != orderItem.getIdOfOrg()) {
-                            currentData = dataMap
+                        if(clientItem == null ){
+                            clientItem = new ClientItem(orderItem.getIdOfClient(), orderItem.getIdOfOrg(), orderItem.getOrgName(), orderItem.getFullname(),
+                                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), orderItem.getOrdertype());
+                            if(orderItem.getOrdertype() == 4){
+                                clientItem.setPlanType(ClientItem.IN_PLAN_TYPE);
+                            }else {
+                                clientItem.setPlanType(ClientItem.IN_RESERVE_TYPE);
+                            }
+                        }
+
+                        currentData = dataMap
                                     .get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
 
-                        }
+
 
                         notfoundItem = updateRowListWithOrder(currentData, orderItem);
                         if (notfoundItem != null) {
