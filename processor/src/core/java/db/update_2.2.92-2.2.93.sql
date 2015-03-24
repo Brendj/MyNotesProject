@@ -9,5 +9,4 @@
 ALTER TABLE cf_account_operations ADD COLUMN IdOfClientPayment bigint;
 
 -- --! Добавление поля notifyviapush в таблицу cf_clients
-ALTER TABLE cf_clients ADD COLUMN notifyviapush integer NOT NULL DEFAULT 0;
-UPDATE cf_clients SET notifyviapush = 0;
+ALTER TABLE cf_clients ADD COLUMN notifyviapush smallint NOT NULL DEFAULT 0;
