@@ -128,6 +128,7 @@ public class PaymentResponse {
             private final ClientInfo client;
             private final CardInfo card;
             private final HashMap<String, String> addInfo;
+            private Long idOfClientPayment;
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
                     Long subBalance1, int result, String error, HashMap<String, String> addInfo) {
@@ -227,6 +228,14 @@ public class PaymentResponse {
 
             public Long getSubBalance1() {
                 return subBalance1;
+            }
+
+            public Long getIdOfClientPayment() {
+                return idOfClientPayment;
+            }
+
+            public void setIdOfClientPayment(Long idOfClientPayment) {
+                this.idOfClientPayment = idOfClientPayment;
             }
 
             public Element toElement(Document document) throws Exception {

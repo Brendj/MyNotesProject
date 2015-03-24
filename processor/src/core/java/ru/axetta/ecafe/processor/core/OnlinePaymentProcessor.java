@@ -52,12 +52,15 @@ public class OnlinePaymentProcessor {
                     request.getContragentId(), payment);
             ////
             PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
-            return new PayResponse(request.protoVersion, request.isCheckOnly(), processResult.getResult(),
-                    processResult.getError(), processResult.getTspContragentId(), clientId, request.getPaymentId(), processResult.getBalance(),
-                    processResult.getSubBalance1(), (client==null || client.getPerson()==null)?null:client.getPerson().getFirstName(),
-                    (client==null || client.getPerson()==null)?null:client.getPerson().getSurname(),
-                    (client==null || client.getPerson()==null)?null:client.getPerson().getSecondName(),
+            PayResponse payResponse = new PayResponse(request.protoVersion, request.isCheckOnly(),
+                    processResult.getResult(), processResult.getError(), processResult.getTspContragentId(), clientId,
+                    request.getPaymentId(), processResult.getBalance(), processResult.getSubBalance1(),
+                    (client == null || client.getPerson() == null) ? null : client.getPerson().getFirstName(),
+                    (client == null || client.getPerson() == null) ? null : client.getPerson().getSurname(),
+                    (client == null || client.getPerson() == null) ? null : client.getPerson().getSecondName(),
                     getCardPrintedNo(processResult.getCard()), processResult.getAddInfo());
+            payResponse.setIdOfClientPayment(processResult.getIdOfClientPayment());
+            return payResponse;
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
             return new PayResponse(request.protoVersion, request.isCheckOnly(), PaymentProcessResult.UNKNOWN_ERROR.getCode(),
@@ -183,6 +186,7 @@ public class OnlinePaymentProcessor {
         private final String resultDescription;
         private final Long tspContragentId;
         private final HashMap<String, String> addInfo;
+        private Long idOfClientPayment;
 
         public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
                 Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
@@ -260,6 +264,14 @@ public class OnlinePaymentProcessor {
 
         public Long getSubBalance1() {
             return subBalance1;
+        }
+
+        public Long getIdOfClientPayment() {
+            return idOfClientPayment;
+        }
+
+        public void setIdOfClientPayment(Long idOfClientPayment) {
+            this.idOfClientPayment = idOfClientPayment;
         }
 
         @Override

@@ -239,9 +239,12 @@ public class FinancialOpsManager {
         session.save(transactionJournal);
     }
 
-    public void createClientPayment(Session session, Client client, Contragent contragent, Integer paymentMethod, Long paySum,
-            Date createTime, String idOfPayment, String addPaymentMethod, String addIdOfPayment, Integer subScribeNum)
+    public ClientPayment createClientPayment(Session session, Client client, Contragent contragent,
+            Integer paymentMethod, Long paySum, Date createTime, String idOfPayment, String addPaymentMethod,
+            String addIdOfPayment, Integer subScribeNum)
             throws Exception {
+        ClientPayment clientPayment;
+
         // регистрируем транзакцию и проводим по балансу
         if(subScribeNum==null || subScribeNum.equals(0)){
             AccountTransaction accountTransaction;
@@ -255,7 +258,7 @@ public class FinancialOpsManager {
                         AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
             }
             // регистрируем платеж клиента
-            ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, createTime,
+            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerClientPayment(session, clientPayment, client);
         } else {
@@ -269,10 +272,12 @@ public class FinancialOpsManager {
                     AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
             }
             // регистрируем платеж клиента
-            ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT, createTime,
+            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerSubBalance1ClientPayment(session, clientPayment, client);
         }
+
+        return clientPayment;
     }
 
     private Contragent getContragentReceiverForPayments(Session session, Client client) {

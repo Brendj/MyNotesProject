@@ -10,8 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableAbstractJpaDao;
 
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 /**
  * User: shamil
  * Date: 20.02.15
@@ -27,9 +25,9 @@ public class AccountOperationsRepository extends WritableAbstractJpaDao<AccountO
         setClazz(AccountOperations.class);
     }
 
-    public List<AccountOperations> findByIdOfOperation(long idOfOperation, long idOfOrg){
-        return entityManager.createQuery("from AccountOperations a where a.idOfOrg = :idOfOrg and a.idOfOperation = :idOfOperation")
+    public AccountOperations findByIdOfOperation(long idOfOperation, long idOfOrg){
+        return (AccountOperations) entityManager.createQuery("from AccountOperations a where a.idOfOrg = :idOfOrg and a.idOfOperation = :idOfOperation")
                 .setParameter("idOfOperation",idOfOperation)
-                .setParameter("idOfOrg", idOfOrg).getResultList();
+                .setParameter("idOfOrg", idOfOrg).getSingleResult();
     }
 }

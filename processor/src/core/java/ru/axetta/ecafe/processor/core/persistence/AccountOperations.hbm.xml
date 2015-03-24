@@ -23,7 +23,9 @@
         <property name="idOfOrder" column="idoforder" type="long" update="false"/>
         <property name="staffGuid" column="staffguid" type="string" update="false"/>
         <property name="idOfPos" column="idofpos" type="long" update="false"/>
+        <property name="idOfContragent" column="idOfContragent" type="long" update="false"/>
 
+        <property name="idOfClientPayment"  column="IdOfClientPayment" type="long"  update="false" />
 
     </class>
 </hibernate-mapping>

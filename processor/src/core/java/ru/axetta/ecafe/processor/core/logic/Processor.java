@@ -189,6 +189,7 @@ public class Processor implements SyncProcessor,
                                 PaymentProcessResult.CARD_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId()), client);
             } */
+            ClientPayment clientPayment = null;
             if (!payment.isCheckOnly()) {
                 long paymentSum = payment.getSum();
                 if (payment.isResetBalance()) {
@@ -202,8 +203,10 @@ public class Processor implements SyncProcessor,
                 //                contragent, payment.getAddPaymentMethod(), payment.getAddIdOfPayment());
 
                 final FinancialOpsManager financialOpsManager = RuntimeContext.getFinancialOpsManager();
-                financialOpsManager.createClientPayment(persistenceSession, client, contragent, payment.getPaymentMethod(), paymentSum,
-                         payment.getPayTime(), payment.getIdOfPayment(), payment.getAddPaymentMethod(), payment.getAddIdOfPayment(), subBalanceNum);
+                 clientPayment = financialOpsManager
+                        .createClientPayment(persistenceSession, client, contragent, payment.getPaymentMethod(),
+                                paymentSum, payment.getPayTime(), payment.getIdOfPayment(),
+                                payment.getAddPaymentMethod(), payment.getAddIdOfPayment(), subBalanceNum);
 
                 persistenceSession.flush();
             }
@@ -211,6 +214,9 @@ public class Processor implements SyncProcessor,
                     idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(),
                     PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, client.getSubBalance1(),
                     payAddInfo);
+            if(clientPayment != null){
+                result.setIdOfClientPayment(clientPayment.getIdOfClientPayment());
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
