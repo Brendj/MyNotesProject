@@ -120,6 +120,8 @@
 
     <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaSMS}" styleClass="output-text" />
+    <h:outputText escape="true" value="Уведомлять с помощью PUSH-уведомлений" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaPUSH}" styleClass="output-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.email}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />

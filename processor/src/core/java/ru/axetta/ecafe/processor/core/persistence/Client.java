@@ -64,6 +64,7 @@ public class Client {
     private String email;
     private boolean notifyViaEmail;
     private boolean notifyViaSMS;
+    private boolean notifyViaPUSH;
     //private Blob image = Hibernate.createBlob(new byte[]{});
     private String remarks;
     private Date updateTime;
@@ -115,7 +116,7 @@ public class Client {
     }
 
     public Client(Org org, Person person, Person contractPerson, int flags, boolean notifyViaEmail,
-            boolean notifyViaSMS, long contractId, Date contractTime, int contractState, String plainPassword,
+            boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState, String plainPassword,
             int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit, String categoriesDiscounts)
             throws Exception {
         this.org = org;
@@ -124,6 +125,7 @@ public class Client {
         this.flags = flags;
         this.notifyViaEmail = notifyViaEmail;
         this.notifyViaSMS = notifyViaSMS;
+        this.notifyViaPUSH = notifyViaPUSH;
         this.updateTime = new Date();
         this.contractId = contractId;
         this.contractTime = contractTime;
@@ -481,6 +483,13 @@ public class Client {
 
     public void setNotifyViaSMS(boolean notifyViaSMS) {
         this.notifyViaSMS = notifyViaSMS;
+    }
+    public boolean isNotifyViaPUSH() {
+        return notifyViaPUSH;
+    }
+
+    public void setNotifyViaPUSH(boolean notifyViaPUSH) {
+        this.notifyViaPUSH = notifyViaPUSH;
     }
 
     /*public Blob getImage() {
@@ -886,13 +895,13 @@ public class Client {
                 + idOfClientGroup + ", clientRegistryVersion=" + clientRegistryVersion + ", clientGroup=" + clientGroup
                 + ", person=" + person + ", contractPerson=" + contractPerson + ", flags=" + flags + ", address='"
                 + address + '\'' + ", phone='" + phone + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email
-                + '\'' + ", notifyViaEmail=" + notifyViaEmail + ", notifyViaSMS=" + notifyViaSMS + ", remarks='"
-                + remarks + '\'' + ", updateTime=" + updateTime + ", contractId=" + contractId + ", contractTime="
-                + contractTime + ", contractState=" + contractState + ", cypheredPassword='" + cypheredPassword + '\''
-                + ", payForSMS=" + payForSMS + ", freePayMaxCount=" + freePayMaxCount + ", freePayCount=" + freePayCount
-                + ", lastFreePayTime=" + lastFreePayTime + ", discountMode=" + discountMode + ", balance=" + balance
-                + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit + ", categoriesDiscounts="
-                + categoriesDiscounts + '}';
+                + '\'' + ", notifyViaEmail=" + notifyViaEmail + ", notifyViaSMS=" + notifyViaSMS + ", notifyViaPUSH="
+                + notifyViaPUSH + ", remarks='" + remarks + '\'' + ", updateTime=" + updateTime + ", contractId="
+                + contractId + ", contractTime=" + contractTime + ", contractState=" + contractState
+                + ", cypheredPassword='" + cypheredPassword + '\'' + ", payForSMS=" + payForSMS + ", freePayMaxCount="
+                + freePayMaxCount + ", freePayCount=" + freePayCount + ", lastFreePayTime=" + lastFreePayTime
+                + ", discountMode=" + discountMode + ", balance=" + balance + ", limit=" + limit + ", expenditureLimit="
+                + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts + '}';
     }
 
 }

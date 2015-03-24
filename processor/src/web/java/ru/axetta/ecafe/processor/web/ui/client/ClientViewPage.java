@@ -6,8 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
@@ -92,6 +92,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String email;
     private Boolean notifyViaEmail;
     private Boolean notifyViaSMS;
+    private Boolean notifyViaPUSH;
     private String remarks;
     private Date updateTime;
     private Long contractId;
@@ -232,6 +233,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         return notifyViaSMS;
     }
 
+    public Boolean getNotifyViaPUSH() {
+        return notifyViaPUSH;
+    }
+
     public String getRemarks() {
         return remarks;
     }
@@ -313,6 +318,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.email = client.getEmail();
         this.notifyViaEmail = client.isNotifyViaEmail();
         this.notifyViaSMS = client.isNotifyViaSMS();
+        this.notifyViaPUSH = client.isNotifyViaPUSH();
         this.remarks = client.getRemarks();
         this.updateTime = client.getUpdateTime();
         this.contractId = client.getContractId();

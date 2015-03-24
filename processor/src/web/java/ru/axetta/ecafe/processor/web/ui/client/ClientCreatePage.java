@@ -181,6 +181,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String fax;
     private Boolean notifyViaEmail = false;
     private Boolean notifyViaSMS = true;
+    private Boolean notifyViaPUSH = false;
     private String remarks;
     private String plainPassword;
     private String plainPasswordConfirmation;
@@ -340,6 +341,13 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     public void setNotifyViaSMS(Boolean notifyViaSMS) {
         this.notifyViaSMS = notifyViaSMS;
     }
+    public Boolean getNotifyViaPUSH() {
+        return notifyViaPUSH;
+    }
+
+    public void setNotifyViaPUSH(Boolean notifyViaPUSH) {
+        this.notifyViaPUSH = notifyViaPUSH;
+    }
 
     public String getRemarks() {
         return remarks;
@@ -492,7 +500,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         Person contractPerson = this.contractPerson.buildPerson();
         persistenceSession.save(contractPerson);
 
-        Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS,
+        Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS, this.notifyViaPUSH,
                 this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
                 clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 

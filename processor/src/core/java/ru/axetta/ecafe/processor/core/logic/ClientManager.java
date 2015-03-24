@@ -49,6 +49,7 @@ public class ClientManager {
         EMAIL,
         PAY_FOR_SMS,
         NOTIFY_BY_SMS,
+        NOTIFY_BY_PUSH,
         NOTIFY_BY_EMAIL,
         OVERDRAFT,
         COMMENTS,
@@ -85,6 +86,7 @@ public class ClientManager {
             new FieldProcessor.Def(15, false, false, "E-mail", null, FieldId.EMAIL, true),
             new FieldProcessor.Def(16, false, false, "Платный SMS", "0", FieldId.PAY_FOR_SMS, true),
             new FieldProcessor.Def(17, false, false, "Уведомление по SMS", "1", FieldId.NOTIFY_BY_SMS, true),
+            new FieldProcessor.Def(17, false, false, "Уведомление через PUSH", "1", FieldId.NOTIFY_BY_PUSH, true),
             new FieldProcessor.Def(18, false, false, "Уведомление по e-mail", "0", FieldId.NOTIFY_BY_EMAIL, true),
             new FieldProcessor.Def(19, false, false, "Овердрафт", null, FieldId.OVERDRAFT, true),
             new FieldProcessor.Def(20, false, false, "Комментарии", null, FieldId.COMMENTS, true),
@@ -366,6 +368,10 @@ public class ClientManager {
             if (fieldConfig.getValue(ClientManager.FieldId.NOTIFY_BY_SMS) != null) {
                 client.setNotifyViaSMS(fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS));
             }
+            //tokens[20])
+            if (fieldConfig.getValue(FieldId.NOTIFY_BY_PUSH) != null) {
+                client.setNotifyViaPUSH(fieldConfig.getValueBool(FieldId.NOTIFY_BY_PUSH));
+            }
             //tokens[19]);
             if (fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT) != null) {
                 long limit = CurrencyStringUtils.rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));
@@ -610,6 +616,7 @@ public class ClientManager {
 
             boolean notifyByEmail = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_EMAIL);
             boolean notifyBySms = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS);
+            boolean notifyByPUSH = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_PUSH);
             Date contractDate = fieldConfig
                     .getValueDate(ClientManager.FieldId.CONTRACT_DATE);//dateFormat.parse(tokens[3]);
             int contractState = fieldConfig.getValueInt(ClientManager.FieldId.CONTRACT_STATE);
@@ -627,9 +634,9 @@ public class ClientManager {
                         .rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
             }
             logger.debug("create client");
-            Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms, contractId,
-                    contractDate, contractState, password, payForSms, clientRegistryVersion, limit, expenditureLimit,
-                    "");
+            Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms,
+                    notifyByPUSH, contractId, contractDate, contractState, password, payForSms, clientRegistryVersion,
+                    limit, expenditureLimit, "");
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);

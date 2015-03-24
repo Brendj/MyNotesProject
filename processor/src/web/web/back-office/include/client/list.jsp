@@ -308,6 +308,15 @@
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
                 </h:panelGrid>
             </rich:tab>
+            <rich:tab label="PUSH-уведомления">
+                <h:panelGrid columns="2">
+                    <h:outputText value="Включить PUSH-уведомления" styleClass="output-text"/>
+                    <h:selectBooleanCheckbox value="#{mainPage.clientListPage.notifyViaPUSH}" styleClass="output-text" />
+                    <rich:spacer/>
+                    <a4j:commandButton value="Применить" action="#{mainPage.setClientGroupNofifyViaPUSH}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                </h:panelGrid>
+            </rich:tab>
         </rich:tabPanel>
     </rich:simpleTogglePanel>
     <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showClientCSVList}" styleClass="command-button" />

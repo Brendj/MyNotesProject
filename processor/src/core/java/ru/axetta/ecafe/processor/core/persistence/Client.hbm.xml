@@ -41,6 +41,8 @@
                   not-null="true"/>
         <property name="notifyViaSMS" column="NotifyViaSMS" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="notifyViaPUSH" column="NotifyViaPUSH" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
         <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
         <!--property name="image" column="Image" type="blob"/-->

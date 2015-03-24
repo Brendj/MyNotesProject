@@ -7,7 +7,7 @@
 %><f:view>
     <a4j:repeat value="#{mainPage.clientListPage.items}" var="item">
         <h:outputText escape="false" value="#{item.contractId}" converter="contractIdConverter" />
-        <h:outputText escape="false" value=";#{item.contractState};#{item.contractPerson.surname};#{item.contractPerson.firstName};#{item.contractPerson.secondName};#{item.contractPerson.idDocument};#{item.person.surname};#{item.person.firstName};#{item.person.secondName};#{item.person.idDocument};#{item.address};#{item.phone};#{item.mobile};#{item.email};#{item.payForSMS};#{item.notifyViaSMS};#{item.notifyViaEmail}" />
+        <h:outputText escape="false" value=";#{item.contractState};#{item.contractPerson.surname};#{item.contractPerson.firstName};#{item.contractPerson.secondName};#{item.contractPerson.idDocument};#{item.person.surname};#{item.person.firstName};#{item.person.secondName};#{item.person.idDocument};#{item.address};#{item.phone};#{item.mobile};#{item.email};#{item.payForSMS};#{item.notifyViaSMS};#{item.notifyViaEmail};#{item.notifyViaPUSH}" />
         <h:outputText escape="false" value=";" />
         <h:outputText escape="false" value="#{item.updateTime}" converter="timeConverter" />
         <h:outputText escape="false" value=";#{item.clientGroupName};"/>

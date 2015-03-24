@@ -1270,6 +1270,18 @@ public class DAOUtils {
             throw new Exception("Ошибка при изменении параметров SMS уведомления");
     }
 
+    public static void changeClientGroupNotifyViaPUSH(Session session, boolean notifyViaPUSH, List<Long> clientsId)
+            throws Exception {
+        org.hibernate.Query q = session.createQuery(
+                "update Client set notifyViaPUSH = :notifyViaPUSH, clientRegistryVersion=:clientRegistryVersion where idOfClient in :clientsId");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        q.setLong("clientRegistryVersion", clientRegistryVersion);
+        q.setBoolean("notifyViaPUSH", notifyViaPUSH);
+        q.setParameterList("clientsId", clientsId);
+        if (q.executeUpdate() != clientsId.size())
+            throw new Exception("Ошибка при изменении параметров PUSH уведомления");
+    }
+
     public static void changeReadOnlyNotifyViaSMS(Session session, boolean readOnlyNotifyViaSMS, List<Long> clientsId)
             throws Exception {
         org.hibernate.Query q = session.createQuery(

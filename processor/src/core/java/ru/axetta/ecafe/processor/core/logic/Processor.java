@@ -2250,9 +2250,13 @@ public class Processor implements SyncProcessor,
                     client.setSsoid("");
                 }
                 client.setMobile(mobile);
-                if (!StringUtils.isEmpty(mobile)
-                        && clientParamItem.getNotifyViaSMS() == null) {
-                    client.setNotifyViaSMS(true);
+                if (!StringUtils.isEmpty(mobile)) {
+                    if (clientParamItem.getNotifyViaSMS() == null) {
+                        client.setNotifyViaSMS(true);
+                    }
+                    if (clientParamItem.getNotifyViaPUSH() == null) {
+                        client.setNotifyViaPUSH(false);
+                    }
                 }
             }
             if (clientParamItem.getMiddleGroup() != null) {
@@ -2279,6 +2283,9 @@ public class Processor implements SyncProcessor,
             }
             if (clientParamItem.getNotifyViaSMS() != null) {
                 client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+            }
+            if (clientParamItem.getNotifyViaPUSH() != null) {
+                client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
             }
             /* FAX клиента */
             if (clientParamItem.getFax() != null) {

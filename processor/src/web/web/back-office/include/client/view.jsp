@@ -91,6 +91,9 @@
     <h:outputText escape="true" value="Уведомлять с помощью SMS" styleClass="output-text" />
     <h:selectBooleanCheckbox disabled="true" value="#{mainPage.clientViewPage.notifyViaSMS}" readonly="true"
                              styleClass="output-text" />
+    <h:outputText escape="true" value="Уведомлять с помощью PUSH-уведомлений" styleClass="output-text" />
+    <h:selectBooleanCheckbox disabled="true" value="#{mainPage.clientViewPage.notifyViaPUSH}" readonly="true"
+                             styleClass="output-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.email}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
