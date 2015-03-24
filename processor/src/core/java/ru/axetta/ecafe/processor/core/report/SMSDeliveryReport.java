@@ -247,8 +247,14 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         public List<SMSDeliveryReportItem> findExternal(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
             String orgCondition = "";
-            if (org != null) {
-                orgCondition = "            and (org.idoforg=:idoforg) ";
+            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            if(idOfOrgs != null && !StringUtils.isBlank(idOfOrgs)) {
+                List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+                StringBuilder builder = new StringBuilder();
+                for(String id : stringOrgList) {
+                    builder.append(builder.length() > 0 ? " or " : "").append("sync1.idoforg=").append(id);
+                }
+                orgCondition = "            and (" + builder.toString() + ") ";
             }
 
             String sql =
@@ -272,9 +278,9 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             Query query = session.createSQLQuery(sql);
             query.setParameter("start", start.getTime());
             query.setParameter("end", end.getTime());
-            if (org != null) {
+            /*if (org != null) {
                 query.setParameter("idoforg", org.getIdOfOrg());
-            }
+            }*/
 
 
             long prevIdOfOrg = -1L;
