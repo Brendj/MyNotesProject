@@ -105,10 +105,10 @@ public class RequestsAndOrdersReportService {
             logger.warn(String.format(
                     "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
                     this.getClass().getCanonicalName(), startTime.toString(), endTime.toString()));
-            itemList.add(new Item("-1", "ОО не определено", "План питания не определен", "Комплекс не определен",
-                    "Заказано", beginDate, 0L, true));
-            itemList.add(new Item("-1", "ОО не определено", "План питания не определен", "Комплекс не определен",
-                    "Оплачено", beginDate, 0L, true));
+            //itemList.add(new Item("-1", "ОО не определено", "План питания не определен", "Комплекс не определен",
+            //        "Заказано", beginDate, 0L, true));
+            //itemList.add(new Item("-1", "ОО не определено", "План питания не определен", "Комплекс не определен",
+            //        "Оплачено", beginDate, 0L, true));
         }
         return itemList;
     }
