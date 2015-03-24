@@ -310,7 +310,7 @@ public class SyncResponse {
             private final ClientGroup clientGroup;
             private final boolean notifyViaEmail;
             private final boolean notifyViaSMS;
-            private final boolean notifyViaPUSH;
+            //private final boolean notifyViaPUSH;
             private final String remarks;
             private final boolean canConfirmGroupPayment;
             private final int discountMode;
@@ -338,7 +338,7 @@ public class SyncResponse {
                 this.clientGroup=client.getClientGroup();
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
-                this.notifyViaPUSH=client.isNotifyViaPUSH();
+                //this.notifyViaPUSH=client.isNotifyViaPUSH();
                 this.remarks = client.getRemarks();
                 this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
                 this.discountMode = client.getDiscountMode();
@@ -436,7 +436,7 @@ public class SyncResponse {
                 element.setAttribute("Fax", this.fax);
                 element.setAttribute("NotifyViaEmail", this.notifyViaEmail?"1":"0");
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
-                element.setAttribute("NotifyViaPUSH", this.notifyViaPUSH?"1":"0");
+                //element.setAttribute("NotifyViaPUSH", this.notifyViaPUSH?"1":"0");
                 element.setAttribute("CanConfirmGroupPayment", this.canConfirmGroupPayment?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
