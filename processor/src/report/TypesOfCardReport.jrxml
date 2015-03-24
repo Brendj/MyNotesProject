@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="typesOfCardReport" pageWidth="1240" pageHeight="30000" columnWidth="1200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2618c0b2-68a3-472d-b832-de6de3dbb845">
 	<property name="ireport.zoom" value="1.6105100000000019"/>
-	<property name="ireport.x" value="816"/>
+	<property name="ireport.x" value="837"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="groupName" class="java.lang.String"/>
@@ -45,11 +45,11 @@
 	<title>
 		<band height="40" splitType="Stretch">
 			<textField>
-				<reportElement uuid="0f5ae126-8be3-41fc-b764-180bdeb632b1" x="400" y="0" width="800" height="40"/>
+				<reportElement uuid="0f5ae126-8be3-41fc-b764-180bdeb632b1" x="0" y="0" width="1190" height="40"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["На " + $P{beginDate} + " в ИС ПП привязаны карты категории клиентов " + $P{groupName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Отчет по типам карт на " + $P{beginDate} + " в ИС ПП привязаны карты категории клиентов " + $P{groupName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
