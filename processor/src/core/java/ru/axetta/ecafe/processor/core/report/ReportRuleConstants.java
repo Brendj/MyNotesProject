@@ -245,7 +245,7 @@ public class ReportRuleConstants {
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(ClientBalanceByDayReport.class.getCanonicalName(), new int[]{20}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{32}),
             new ReportHint(StatisticsPaymentPreferentialSupplyJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(TelephoneNumberCountJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(ActiveDiscountClientsReport.class.getCanonicalName(), new int[]{3}),
