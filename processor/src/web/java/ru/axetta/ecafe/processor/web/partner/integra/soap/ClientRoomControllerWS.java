@@ -3432,6 +3432,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result enableNotificationByPUSH(@WebParam(name = "contractId") Long contractId,
+          @WebParam(name = "state") boolean state) {
+        authenticateRequest(contractId);
+
+        Result r = new Result();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        if (!DAOService.getInstance().enableClientNotificationByPUSH(contractId, state)) {
+            r.resultCode = RC_CLIENT_NOT_FOUND;
+            r.description = RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return r;
+    }
+
+    @Override
     public Result enableNotificationByEmail(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state) {
         authenticateRequest(contractId);

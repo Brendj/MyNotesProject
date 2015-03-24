@@ -300,6 +300,13 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
+    public boolean enableClientNotificationByPUSH(Long contractId, boolean state) {
+        Query q = entityManager.createQuery("update Client set notifyViaPUSH=:notifyViaPUSH where contractId=:contractId");
+        q.setParameter("notifyViaPUSH", state);
+        q.setParameter("contractId", contractId);
+        return q.executeUpdate() != 0;
+    }
+
     public boolean enableClientNotificationByEmail(Long contractId, boolean state) {
         Query q = entityManager.createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId=:contractId");
         q.setParameter("notifyViaEmail", state);

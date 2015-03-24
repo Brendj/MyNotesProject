@@ -207,6 +207,9 @@ public interface ClientRoomController {
     @WebMethod Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state);
 
+    Result enableNotificationByPUSH(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "state") boolean state);
+
     @WebMethod Result enableNotificationByEmail(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state);
 
