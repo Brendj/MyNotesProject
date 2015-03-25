@@ -626,7 +626,7 @@ public class ProjectStateReportService {
         initContragetsChartType();
         l = System.currentTimeMillis() - l;
         if(l > 50000){
-            logger.warn("runInitContragetsChartTypeAtStartup time:" + (System.currentTimeMillis() - l) );
+            logger.warn("runInitContragetsChartTypeAtStartup time:" +  l );
         }
     }
 

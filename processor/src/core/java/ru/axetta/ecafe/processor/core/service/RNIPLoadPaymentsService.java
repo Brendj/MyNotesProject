@@ -275,7 +275,7 @@ public class RNIPLoadPaymentsService {
         }
         l = System.currentTimeMillis() - l;
         if(l > 50000){
-            logger.warn("RNIPLoadPaymentsService time:" + (System.currentTimeMillis() - l) );
+            logger.warn("RNIPLoadPaymentsService time:" +  l);
         }
         info("Загрузка платежей РНИП завершена");
     }
