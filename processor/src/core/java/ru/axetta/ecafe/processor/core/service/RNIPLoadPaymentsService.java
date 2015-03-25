@@ -4,60 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.crypto.KeySelector;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ws.security.message.WSSecHeader;
-import org.apache.ws.security.message.token.X509Security;
-import org.hibernate.Session;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-
 import com.sun.org.apache.xml.internal.security.Init;
 import com.sun.org.apache.xml.internal.security.transforms.Transforms;
 import com.sun.org.apache.xpath.internal.XPathAPI;
@@ -65,8 +11,6 @@ import generated.rnip.roskazna.smevunifoservice.UnifoTransferMsg;
 import generated.rnip.roskazna.xsd.errinfo.ErrInfo;
 import generated.rnip.roskazna.xsd.exportpaymentsresponse.ExportPaymentsResponse;
 import generated.rnip.roskazna.xsd.paymentinfo.PaymentInfoType;
-import generated.rnip.roskazna.xsd.responsetemplate.ResponseTemplate;
-import ru.CryptoPro.JCP.JCP;
 import ru.CryptoPro.JCP.tools.Array;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
@@ -76,12 +20,55 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.service.contragent.ContragentService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import javax.xml.namespace.QName;
-import javax.xml.soap.*;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ws.security.message.WSSecHeader;
+import org.apache.ws.security.message.token.X509Security;
+import org.hibernate.Session;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.crypto.KeySelector;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -169,15 +156,6 @@ public class RNIPLoadPaymentsService {
         RuntimeContext.getInstance()
                 .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME, dateFormat.format(date));
     }
-
-
-    private void setLastUpdateDate(Contragent contragent, Date date) {
-        /*RuntimeContext.getInstance()
-                .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME, dateFormat.format(date));*/
-        contragent.setLastRNIPUpdate(dateFormat.format(date));
-        DAOService.getInstance().saveEntity(contragent);
-    }
-
 
     private Date getLastUpdateDate() {
         try {
@@ -286,13 +264,18 @@ public class RNIPLoadPaymentsService {
             return;
         }
 
+        long l = System.currentTimeMillis();
         info("Загрузка платежей РНИП..");
-        for (Contragent contragent : DAOService.getInstance().getContragentsList()) {
+        for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
                 RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).receiveContragentPayments(contragent);
             } catch (Exception e) {
                 logger.error("Failed to receive or proceed payments", e);
             }
+        }
+        l = System.currentTimeMillis() - l;
+        if(l > 50000){
+            logger.warn("RNIPLoadPaymentsService time:" + (System.currentTimeMillis() - l) );
         }
         info("Загрузка платежей РНИП завершена");
     }
@@ -353,7 +336,7 @@ public class RNIPLoadPaymentsService {
 
 
         //  Обновляем дату последней загрузки платежей
-        setLastUpdateDate(contragent, updateTime);
+        ContragentService.getInstance().setLastRNIPUpdate(contragent,updateTime);
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
     }
 

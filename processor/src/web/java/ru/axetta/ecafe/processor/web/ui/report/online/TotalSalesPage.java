@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
@@ -108,8 +108,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     @Override
     public void onShow() throws Exception {
         contragentsSelectItems = new ArrayList<SelectItem>();
-        ContragentRepository contragentRepository = ContragentRepository.getInstance();
-        for(Contragent contragent :contragentRepository.findAllByType(Contragent.TSP)){
+        ContragentReadOnlyRepository contragentReadOnlyRepository = ContragentReadOnlyRepository.getInstance();
+        for(Contragent contragent :contragentReadOnlyRepository.findAllByType(Contragent.TSP)){
             contragentsSelectItems.add(new SelectItem(contragent.getIdOfContragent(), contragent.getContragentName()));
         }
     }

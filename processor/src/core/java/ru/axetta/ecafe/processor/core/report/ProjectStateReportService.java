@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -622,7 +621,13 @@ public class ProjectStateReportService {
 
 
     public void runInitContragetsChartTypeAtStartup() {
+        long l = System.currentTimeMillis();
+
         initContragetsChartType();
+        l = System.currentTimeMillis() - l;
+        if(l > 50000){
+            logger.warn("runInitContragetsChartTypeAtStartup time:" + (System.currentTimeMillis() - l) );
+        }
     }
 
     public static ProjectStateReportService.Type getChartType(String reportType) {
