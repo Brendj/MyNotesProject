@@ -70,7 +70,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             public String nameOfContragentReceiver;
             public Long idOfContragentSender;
             public String nameOfContragentSender;
-            public long paySum;
+            public Long paySum;
             public Date createTime;
             public String idOfPayment;
             public int paymentMethod;
@@ -159,8 +159,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 return nameOfContragentSender;
             }
 
-            public Float getPaySum() {
-                return (float) paySum / 100;
+            public double getPaySum() {
+                return paySum / 100.0;
             }
 
             public Date getCreateTime() {
@@ -371,7 +371,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                     totalSum += newClientPaymentItem.paySum;
                 }
             }
-            parameterMap.put("totalSum", (float) totalSum / 100);
+            parameterMap.put("totalSum", (double) totalSum / 100.0);
             if(clientPaymentItems.isEmpty()) {
                 error  = "Для построения отчета данных не найдено";
             }

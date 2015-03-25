@@ -23,6 +23,7 @@
 	<parameter name="startTime" class="java.lang.Long"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="totalSum" class="java.lang.Double"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -31,7 +32,7 @@
 	<field name="surName" class="java.lang.String"/>
 	<field name="firstName" class="java.lang.String"/>
 	<field name="secondName" class="java.lang.String"/>
-	<field name="paySum" class="java.lang.Float"/>
+	<field name="paySum" class="java.lang.Double"/>
 	<field name="nameOfContragentReceiver" class="java.lang.String"/>
 	<field name="orgName" class="java.lang.String"/>
 	<field name="contractId" class="java.lang.String"/>
@@ -277,7 +278,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{variable1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{totalSum}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
