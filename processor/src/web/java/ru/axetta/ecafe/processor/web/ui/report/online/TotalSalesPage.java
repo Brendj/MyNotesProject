@@ -185,6 +185,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         this.endDate = localCalendar.getTime();
         includeActDiscrepancies = true;
         htmlReport = null;
+        contragent = null;
         return null;
     }
 
