@@ -4,14 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sms.emp;
 
-import generated.emp_events.*;
+import generated.emp_events.SendSubscriptionStreamEventsRequestType;
 import generated.emp_storage.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -25,15 +24,13 @@ import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.io.FileWriter;
-import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -486,7 +483,8 @@ public class EMPProcessor {
             smsSend.setName(ATTRIBUTE_SMS_SEND);
             smsSend.getValue().add(Boolean.TRUE);
             entry.getAttribute().add(smsSend);
-
+        }
+        if (client.isNotifyViaPUSH()) {
             EntryAttribute pushSend = new EntryAttribute();
             pushSend.setName(ATTRIBUTE_PUSH_SEND);
             pushSend.getValue().add(Boolean.TRUE);

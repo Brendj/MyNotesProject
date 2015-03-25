@@ -30,6 +30,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="LastEnterEventCode" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="LastEnterEventTime" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *       &lt;attribute name="NotifyViaSMS" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="NotifyViaPUSH" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="NotifyViaEmail" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="MobilePhone" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Email" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -80,6 +81,8 @@ public class ClientSummaryExt {
     protected XMLGregorianCalendar lastEnterEventTime;
     @XmlAttribute(name = "NotifyViaSMS")
     protected Boolean notifyViaSMS;
+    @XmlAttribute(name = "NotifyViaPUSH")
+    protected Boolean notifyViaPUSH;
     @XmlAttribute(name = "NotifyViaEmail")
     protected Boolean notifyViaEmail;
     @XmlAttribute(name = "MobilePhone")
@@ -453,14 +456,38 @@ public class ClientSummaryExt {
 
     /**
      * Sets the value of the notifyViaSMS property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setNotifyViaSMS(Boolean value) {
         this.notifyViaSMS = value;
+    }
+
+    /**
+     * Gets the value of the notifyViaPUSH property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public Boolean isNotifyViaPUSH() {
+        return notifyViaPUSH;
+    }
+
+    /**
+     * Sets the value of the notifyViaPUSH property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setNotifyViaPUSH(Boolean value) {
+        this.notifyViaPUSH = value;
     }
 
     /**

@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -280,7 +279,7 @@ public class EventNotificationService {
             return;
         }
         Boolean sms = null;
-        if (client.isNotifyViaSMS()) {
+        if (client.isNotifyViaSMS() || client.isNotifyViaPUSH()) {
             if (isSMSNotificationEnabledForType(type)) {
                 if(sendAsync != null) {
                     sms = sendSMS(client, type, values, sendAsync, passDirection, guardian);
