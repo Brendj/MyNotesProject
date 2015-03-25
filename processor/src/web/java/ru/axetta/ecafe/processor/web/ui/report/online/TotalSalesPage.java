@@ -59,7 +59,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private ReportDAOService daoService;
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
     private List<SelectItem> contragentsSelectItems;
 
@@ -186,6 +186,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         includeActDiscrepancies = true;
         htmlReport = null;
         contragent = null;
+        periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         return null;
     }
 
