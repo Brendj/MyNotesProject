@@ -44,9 +44,9 @@ public class ContragentReadOnlyRepository extends BaseJpaDao {
 
     @Transactional(readOnly = true)
     public List<Contragent> getContragentsList(Integer classId) {
-        String q = "from Contragent";
+        String q = "from Contragent c left join fetch  c.contragentSync ";
         if(classId != null) {
-            q += " c WHERE c.classId=:classId order by idOfContragent";
+            q += "  WHERE c.classId=:classId order by idOfContragent";
         }
         TypedQuery<Contragent> query = entityManager.createQuery(q, Contragent.class);
         if(classId != null) {

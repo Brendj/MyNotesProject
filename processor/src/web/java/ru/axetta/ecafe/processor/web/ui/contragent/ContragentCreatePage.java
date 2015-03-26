@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.ContragentSync;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -337,6 +338,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setCorrAccount(this.corrAccount.trim());
         contragent.setAccount(this.account.trim());
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
+        contragent.setContragentSync(new ContragentSync(contragent));
         session.save(contragent);
         updateContragentRNIP(session, contragent);
         GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItem(session, contragent);

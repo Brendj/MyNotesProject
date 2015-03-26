@@ -185,7 +185,7 @@ public class RNIPLoadPaymentsService {
     private Date getLastUpdateDate(Contragent contragent) {
         try {
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
-            String d = contragent.getLastRNIPUpdate();//RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
+            String d = contragent.getContragentSync().getLastRNIPUpdate();//RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
             if(d == null || StringUtils.isBlank(d)) {
                 return new Date(0);
             }

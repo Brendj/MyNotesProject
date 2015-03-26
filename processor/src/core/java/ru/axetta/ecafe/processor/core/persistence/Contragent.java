@@ -81,9 +81,9 @@ public class Contragent {
     private Set<AddPayment> receiverAddPayments = new HashSet<AddPayment>();
     private String kpp;
     private String ogrn;
-    private String lastRNIPUpdate;
     private Contragent defaultPayContragent;
     private Boolean payByCashier;
+    private ContragentSync contragentSync;
 
 
     protected Contragent() {
@@ -549,14 +549,6 @@ public class Contragent {
         return StringUtils.substringBetween(remarks, "{MFR_ID=", "}");
     }
 
-    public String getLastRNIPUpdate() {
-        return lastRNIPUpdate;
-    }
-
-    public void setLastRNIPUpdate(String lastRNIPUpdate) {
-        this.lastRNIPUpdate = lastRNIPUpdate;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -588,6 +580,14 @@ public class Contragent {
     @Override
     public int hashCode() {
         return idOfContragent.hashCode();
+    }
+
+    public ContragentSync getContragentSync() {
+        return contragentSync;
+    }
+
+    public void setContragentSync(ContragentSync contragentSync) {
+        this.contragentSync = contragentSync;
     }
 
     @Override
