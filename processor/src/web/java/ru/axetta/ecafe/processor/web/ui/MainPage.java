@@ -46,10 +46,7 @@ import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
-import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
-import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
-import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
-import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
+import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
@@ -185,6 +182,7 @@ public class MainPage implements Serializable {
     private final ClientSmsListPage clientSmsListPage = new ClientSmsListPage();
     private final ClientOperationListPage clientOperationListPage = new ClientOperationListPage();
     private final BasicWorkspacePage thinClientUserGroupPage = new BasicWorkspacePage();
+    private final EmpInfoPage empInfoPage = new EmpInfoPage();
 
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
@@ -7809,6 +7807,10 @@ public class MainPage implements Serializable {
 
         }
         return null;
+    }
+
+    public EmpInfoPage getEmpInfoPage() {
+        return empInfoPage;
     }
 
     /*

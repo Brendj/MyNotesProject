@@ -17,6 +17,9 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,7 +32,9 @@ import java.io.FileWriter;
 import java.math.BigInteger;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -307,7 +312,7 @@ public class EMPProcessor {
         log(synchDate + "Попытка связать клиента [" + client.getIdOfClient() + "] " + client.getMobile()
                 + " с использованием поиска по телефону");
         //  execute reqeuest
-        SelectEntriesRequest request = buildSelectEntryParams(client.getMobile());
+        SelectEntriesRequest request = buildSelectEntryParams(client);
         SelectEntriesResponse response = storage.selectEntries(request);
         if (response==null) {
             log(synchDate + "Получен ответ: null");
@@ -347,45 +352,40 @@ public class EMPProcessor {
         ///
         String newSsoid = SSOID_REGISTERED_AND_WAITING_FOR_DATA;
         String newEmail = null;
+        String newNotifyViaEmail = null;
+        String newNotifyViaSMS = null;
+        String newNotifyViaPUSH = null;
         List<EntryAttribute> attributes = e.getAttribute();
         for (EntryAttribute attr : attributes) {
-            if (attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
-                    attr.getValue() != null && attr.getValue().size() > 0 &&
-                    attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null
-                    && !attr.getValue().get(0).equals(client.getSsoid())) {
-                try {
-                    String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
-                    //client.setSsoid(val);
-                    newSsoid = val;
-                    found = true;
-                } catch (Exception e1) {
-                    logger.error("Failed to process existing object", e1);
-                    throw new EMPException(e1);
-                }
+            if (attr.getName().equals(ATTRIBUTE_SSOID_NAME)) {
+                newSsoid = getString(client, attr);
             }
-            if (attr.getName().equals(ATTRIBUTE_EMAIL_NAME) &&
-                    attr.getValue() != null && attr.getValue().size() > 0 &&
-                    attr.getValue().get(0) != null && ((Element) attr.getValue().get(0)).getFirstChild() != null
-                    && !attr.getValue().get(0).equals(client.getEmail())) {
-                try {
-                    String val = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
-                    //client.setEmail(val);
-                    newEmail = val;
-                    found = true;
-                } catch (Exception e1) {
-                    logger.error("Failed to process existing object");
-                    throw new EMPException(e1);
-                }
+            if (attr.getName().equals(ATTRIBUTE_EMAIL_NAME)) {
+                newEmail = getString(client, attr);
+            }
+            if (attr.getName().equals(ATTRIBUTE_EMAIL_SEND)) {
+                newNotifyViaEmail = getString(client, attr);
+            }
+            if (attr.getName().equals(ATTRIBUTE_SMS_SEND)) {
+                newNotifyViaSMS = getString(client, attr);
+            }
+            if (attr.getName().equals(ATTRIBUTE_PUSH_SEND)) {
+                newNotifyViaPUSH = getString(client, attr);
             }
         }
 
         List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
-        log(synchDate + "С телефоном [SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size() + " клиентов [" +
-            idsList + "]. Для всех них будут обновлены следующие параметры: {Email: " + newEmail + "}, {SSOID: " + newSsoid + "}");
+        log(synchDate + "С телефоном [SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size()
+                + " клиентов [" + idsList + "]. Для всех них будут обновлены следующие параметры: {Email: " + newEmail
+                + "}, {SSOID: " + newSsoid + "}, {notifyViaEmail: " + newNotifyViaEmail + "}, {notifyViaSMS: "
+                + newNotifyViaSMS + "}, {notifyViaPUSH: " + newNotifyViaPUSH + "}");
         for(Client cl : clients) {
             cl.setSsoid(newSsoid);
             cl.setEmail(newEmail);
+            cl.setNotifyViaEmail(newNotifyViaEmail.equals("true") ? true : false);
+            cl.setNotifyViaSMS(newNotifyViaSMS.equals("true") ? true : false);
+            cl.setNotifyViaPUSH(newNotifyViaPUSH.equals("true") ? true : false);
             DAOService.getInstance().saveEntity(cl);
         }
         /*log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
@@ -393,6 +393,23 @@ public class EMPProcessor {
                 + "}");
         DAOService.getInstance().saveEntity(client);*/
         return true;
+    }
+
+    private String getString(Client client, EntryAttribute attr) throws EMPException {
+        String newValue = null;
+        if (attr.getValue() != null &&
+                attr.getValue().size() > 0 &&
+                attr.getValue().get(0) != null &&
+                ((Element) attr.getValue().get(0)).getFirstChild() != null &&
+                !attr.getValue().get(0).equals(Boolean.toString(client.isNotifyViaSMS()))) {
+            try {
+                newValue = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+            } catch (Exception e1) {
+                logger.error("Failed to process existing object");
+                throw new EMPException(e1);
+            }
+        }
+        return newValue;
     }
 
     protected String getClientIdsAsString(List<Client> clients) {
@@ -510,6 +527,10 @@ public class EMPProcessor {
         return request;
     }
 
+    protected SelectEntriesRequest buildSelectEntryParams(Client client) {
+        return buildSelectEntryParams(client.getMobile());
+    }
+
     protected SelectEntriesRequest buildSelectEntryParams(String clientMobile) {
         SelectEntriesRequest request = new SelectEntriesRequest();
         //  base
@@ -549,6 +570,135 @@ public class EMPProcessor {
         request.setChangeSequence(changeSequence);
 
         return request;
+    }
+
+    public void updateNotificationParams(Long contractId) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession;
+        Client client = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            Criteria criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("contractId", contractId));
+            List resultList = criteria.list();
+            client = (Client) resultList.get(0);
+        } catch (Exception e) {
+            logger.error("Failed to get Client from persistence for {contractId :" + contractId + "\"} : ", e);
+        }
+        updateNotificationParams(client);
+    }
+    public void updateNotificationParams(Client client) {
+
+        StoragePortType storage = createStorageController();
+        UpdateEntriesRequest request = new UpdateEntriesRequest();
+
+        request.setToken(getConfigToken());
+
+        request.setCatalogName(getConfigCatalogName());
+
+        List<EntryAttribute> criteria = request.getCriteria();
+
+        if (client.getSsoid() != null && !client.getSsoid().equals("") && !client.getSsoid().equals("-1")) {
+            EntryAttribute ssoid = new EntryAttribute();
+            ssoid.setName(ATTRIBUTE_SSOID_NAME);
+            ssoid.getValue().add(client.getSsoid());
+            criteria.add(ssoid);
+        } else {
+            EntryAttribute msisdn = new EntryAttribute();
+            msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
+            msisdn.getValue().add(client.getMobile());
+            criteria.add(msisdn);
+        }
+
+        List<EntryAttribute> attribute = request.getAttribute();
+
+        EntryAttribute smsSend = new EntryAttribute();
+        smsSend.setName(ATTRIBUTE_SMS_SEND);
+        smsSend.getValue().add(client.isNotifyViaSMS());
+        attribute.add(smsSend);
+
+        EntryAttribute pushSend = new EntryAttribute();
+        pushSend.setName(ATTRIBUTE_PUSH_SEND);
+        pushSend.getValue().add(client.isNotifyViaPUSH());
+        attribute.add(pushSend);
+
+        EntryAttribute emailSend = new EntryAttribute();
+        emailSend.setName(ATTRIBUTE_EMAIL_SEND);
+        emailSend.getValue().add(client.isNotifyViaEmail());
+        attribute.add(emailSend);
+
+        storage.updateEntries(request);
+    }
+
+    public HashMap<String, List<String>> getEntryAttributesByMobile(String clientMobileString) {
+
+        HashMap<String, List<String>> resultMap = new HashMap<String, List<String>>();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession;
+        Client client = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            Criteria criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("mobile", clientMobileString));
+            List resultList = criteria.list();
+            if (resultList.size() == 1) {
+                client = (Client) resultList.get(0);
+            } else if (resultList.size() == 0) {
+                throw new Exception("Error: no persistence data");
+            } else if (resultList.size() > 1) {
+                throw new Exception("Too many data, clean the database");
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to get Client from persistence for {contractId :" + clientMobileString + "\"} : ", e);
+        }
+
+        StoragePortType storage = createStorageController();
+        SelectEntriesRequest request = new SelectEntriesRequest();
+
+        request.setToken(getConfigToken());
+
+        request.setCatalogName(getConfigCatalogName());
+
+        List<EntryAttribute> criteria = request.getCriteria();
+
+        String ssoidString = null;
+        try {
+            ssoidString = client.getSsoid();
+        } catch (Exception e) {}
+
+        if (client != null && ssoidString != null && !ssoidString.equals("") && !ssoidString.equals("-1")) {
+            EntryAttribute ssoid = new EntryAttribute();
+            ssoid.setName(ATTRIBUTE_SSOID_NAME);
+            ssoid.getValue().add(client.getSsoid());
+            criteria.add(ssoid);
+        } else {
+            EntryAttribute msisdn = new EntryAttribute();
+            msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
+            msisdn.getValue().add(clientMobileString);
+            criteria.add(msisdn);
+        }
+
+        SelectEntriesResponse response = storage.selectEntries(request);
+
+        if (response.getResult() != null) {
+            List<Entry> entries = response.getResult().getEntry();
+            for (Entry entry : entries) {
+                List<EntryAttribute> entryAttributeList = entry.getAttribute();
+                for (EntryAttribute entryAttribute : entryAttributeList) {
+                    List<String> attributeList = resultMap.get(entryAttribute.getName());
+                    if (attributeList == null) {
+                        attributeList = new ArrayList<String>();
+                    }
+                    if (entryAttribute.getValue().get(0) != null && ((Element) entryAttribute.getValue().get(0)).getFirstChild() != null) {
+                        attributeList.add(((Element) entryAttribute.getValue().get(0)).getFirstChild().getTextContent());
+                    }
+                    resultMap.put(entryAttribute.getName(), attributeList);
+                }
+            }
+        }
+
+        return resultMap;
     }
 
     protected StoragePortType createStorageController() {

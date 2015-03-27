@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -862,6 +864,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         persistenceSession.update(client);
 
         fill(client);
+
+        if (client.getSsoid() != null && !client.getSsoid().equals("")) {
+            EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+            processor.updateNotificationParams(client);
+        }
     }
 
     public void removeClient(Session persistenceSession) throws Exception {

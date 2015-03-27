@@ -777,6 +777,10 @@
         <rich:panelMenuItem id="cancelBenefits" binding="#{mainPage.cancelCategoryBenefitsPage.mainMenuComponent}" label="Отмена льготных категорий по всем учащимся"
                             action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
+                        label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

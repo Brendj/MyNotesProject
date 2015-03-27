@@ -43,6 +43,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -3427,6 +3428,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (!DAOService.getInstance().enableClientNotificationBySMS(contractId, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
+        } else {
+            EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+            processor.updateNotificationParams(contractId);
         }
         return r;
     }
@@ -3442,6 +3446,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (!DAOService.getInstance().enableClientNotificationByPUSH(contractId, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
+        } else {
+            EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+            processor.updateNotificationParams(contractId);
         }
         return r;
     }
@@ -3457,6 +3464,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (!DAOService.getInstance().enableClientNotificationByEmail(contractId, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
+        } else {
+            EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+            processor.updateNotificationParams(contractId);
         }
         return r;
     }
