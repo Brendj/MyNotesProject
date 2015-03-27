@@ -190,7 +190,10 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                       "select o.idoforg, o.shortname, t1, t2 "
                     + "from (select sync1.idoforg as idoforg, "
                     + "             sync1.syncstarttime as t1, "
-                    + "             (select sync2.syncstarttime from cf_synchistory sync2 where sync2.syncstarttime<sync1.syncstarttime order by syncstarttime desc limit 1) t2 "
+                    + "             (select sync2.syncstarttime "
+                    + "              from cf_synchistory sync2 "
+                    + "              where sync2.syncstarttime<sync1.syncstarttime and sync1.idoforg=sync2.idoforg "
+                    + "              order by syncstarttime desc limit 1) t2 "
                     + "      from cf_synchistory sync1 "
                     + "      where sync1.syncstarttime>=:start and sync1.syncstarttime<:end " + orgCondition + " ) as history "
                     + "join cf_orgs o on history.idoforg=o.idoforg "
@@ -252,9 +255,9 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
                 StringBuilder builder = new StringBuilder();
                 for(String id : stringOrgList) {
-                    builder.append(builder.length() > 0 ? " or " : "").append("sync1.idoforg=").append(id);
+                    builder.append(builder.length() > 0 ? " or " : "").append("org.idoforg=").append(id);
                 }
-                orgCondition = "            and (" + builder.toString() + ") ";
+                orgCondition = "            (" + builder.toString() + ") and ";
             }
 
             String sql =
@@ -270,9 +273,9 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     + "      from cf_clientsms sms "
                     + "      join cf_clients c on sms.idofclient=c.idofclient "
                     + "      join cf_orgs org on org.idoforg=c.idoforg "
-                    + "      where (contentstype=" + ClientSms.TYPE_ENTER_EVENT_NOTIFY + " or contentstype=" + ClientSms.TYPE_PAYMENT_NOTIFY + ") and "
-                    + "            (sms.servicesenddate>=:start and sms.servicesenddate<:end) "
-                    + orgCondition
+                    + "      where " + orgCondition
+                    + "            (sms.servicesenddate>=:start and sms.servicesenddate<:end) and "
+                    + "            (contentstype=" + ClientSms.TYPE_ENTER_EVENT_NOTIFY + " or contentstype=" + ClientSms.TYPE_PAYMENT_NOTIFY + ") "
                     + "      order by 1) as d "
                     + "where d.eventdate is not null";
             Query query = session.createSQLQuery(sql);
@@ -359,17 +362,16 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 t1.setTimeInMillis(ts[0]);
                 t2.setTimeInMillis(ts[1]);
                 long diff = t1.getTimeInMillis() - t2.getTimeInMillis();
+                if(diff < MAX_DELAY) {
+                    continue;
+                }
 
                 if(t1.get(Calendar.HOUR_OF_DAY) >= 8 && t1.get(Calendar.HOUR_OF_DAY) < 16) {
                     maxDelayMidday = Math.max(diff, maxDelayMidday);
-                    if(diff >= MAX_DELAY) {
-                        sumDelayMidday += diff;
-                    }
-                } else if(t1.get(Calendar.HOUR_OF_DAY) >= 16 && t1.get(Calendar.HOUR_OF_DAY) < 8) {
+                    sumDelayMidday += diff;
+                } else if(t1.get(Calendar.HOUR_OF_DAY) >= 16 || t1.get(Calendar.HOUR_OF_DAY) < 8) {
                     maxDelayNight = Math.max(diff, maxDelayNight);
-                    if(diff >= MAX_DELAY) {
-                        sumDelayNight += diff;
-                    }
+                    sumDelayNight += diff;
                 }
                 lastSync = Math.max(lastSync, t1.getTimeInMillis());
             }
@@ -437,13 +439,13 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }*/
             //DateFormat df = new SimpleDateFormat(String.format("HH:mm:ss"));
             DateFormat df = new SimpleDateFormat(String.format("'%s':mm:ss", time / 3600000L));
-            Date d = new Date(time*1000);
+            Date d = new Date(time);
             return df.format(d);
         }
 
         protected static String calcDate(long time){
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            Date d = new Date(time*1000);
+            Date d = new Date(time);
             return df.format(d);
         }
     }
