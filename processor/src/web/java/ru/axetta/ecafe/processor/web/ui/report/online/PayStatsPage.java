@@ -6,11 +6,14 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,9 +27,11 @@ import java.util.List;
 
 @Component
 @Scope(value = "session")
-public class PayStatsPage extends BasicWorkspacePage {
+public class PayStatsPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
 
     private Date fromDate, toDate;
+
+    private Contragent contragent;
 
     @Autowired
     private ReportDAOService daoService;
@@ -102,7 +107,7 @@ public class PayStatsPage extends BasicWorkspacePage {
         if (fromDate==null) { printError("Не указана начальная дата"); return; }
         if (toDate==null) { printError("Не указана конечная дата"); return; }
         statItems = new LinkedList<StatItem>();
-        List<Object[]> vals = daoService.getStatPaymentsByContragents(fromDate, toDate);
+        List<Object[]> vals = daoService.getStatPaymentsByContragents(fromDate, toDate, contragent);
         for (Object[] d : vals) {
             String caName = "" + d[0];
             Integer payMethod = Integer.parseInt(d[1].toString());
@@ -128,10 +133,36 @@ public class PayStatsPage extends BasicWorkspacePage {
     }
 
     public void setToDate(Date toDate) {
+        this.toDate = toDate;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
+        if (null != idOfContragent) {
+            this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
+        } else {
+            clear();
+        }
+    }
+
+    /*public void setToDate(Date toDate) {
         localCalendar.setTime(toDate);
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         localCalendar.add(Calendar.SECOND, -1);
         this.toDate = localCalendar.getTime();
         //this.toDate = toDate;
+    }*/
+
+    private void clear() {
+        contragent = null;
     }
 }

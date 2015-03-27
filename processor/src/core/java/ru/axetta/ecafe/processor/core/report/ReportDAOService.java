@@ -498,11 +498,20 @@ public class ReportDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Object[]> getStatPaymentsByContragents(Date fromDate, Date toDate) {
-        Query q = entityManager.createNativeQuery(
-                "SELECT contragentName, paymentMethod, AVG(paysum), SUM(paysum), COUNT(*) FROM cf_clientpayments cp JOIN cf_contragents cc ON cp.idOfContragent=cc.idOfContragent WHERE cp.createdDate>=:fromDate AND cp.createdDate<=:toDate GROUP BY contragentName, paymentMethod ORDER BY contragentName, paymentMethod");
-        q.setParameter("fromDate", fromDate.getTime());
-        q.setParameter("toDate", toDate.getTime());
+    public List<Object[]> getStatPaymentsByContragents(Date fromDate, Date toDate, Contragent contragent) {
+        Query q = null;
+        if (contragent != null) {
+            q = entityManager.createNativeQuery(
+                    "SELECT contragentName, paymentMethod, AVG(paysum), SUM(paysum), COUNT(*) FROM cf_clientpayments cp JOIN cf_contragents cc ON cp.idOfContragent=cc.idOfContragent WHERE cp.createdDate>=:fromDate AND cp.createdDate<=:toDate AND cp.idOfContragentReceiver in (:idOfContragentReceiver) GROUP BY contragentName, paymentMethod ORDER BY contragentName, paymentMethod");
+            q.setParameter("fromDate", fromDate.getTime());
+            q.setParameter("toDate", toDate.getTime());
+            q.setParameter("idOfContragentReceiver", contragent.getIdOfContragent());
+        } else {
+            q = entityManager.createNativeQuery(
+                    "SELECT contragentName, paymentMethod, AVG(paysum), SUM(paysum), COUNT(*) FROM cf_clientpayments cp JOIN cf_contragents cc ON cp.idOfContragent=cc.idOfContragent WHERE cp.createdDate>=:fromDate AND cp.createdDate<=:toDate GROUP BY contragentName, paymentMethod ORDER BY contragentName, paymentMethod");
+            q.setParameter("fromDate", fromDate.getTime());
+            q.setParameter("toDate", toDate.getTime());
+        }
         return (List<Object[]>) q.getResultList();
     }
 

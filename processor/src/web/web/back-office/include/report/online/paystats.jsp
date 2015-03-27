@@ -18,6 +18,19 @@
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{payStatsPage.toDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
+
+        <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{payStatsPage.contragent.contragentName}" readonly="true"
+                         styleClass="input-text" style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                               reRender="modalContragentSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            </a4j:commandButton>
+        </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{payStatsPage.updateData}"
                            reRender="workspaceTogglePanel, payStatsPageReportTable"
                            styleClass="command-button" />
