@@ -1686,6 +1686,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         /* Флаги увидомлений клиента (Истина/ложь)*/
         clientSummaryExt.setNotifyViaEmail(client.isNotifyViaEmail());
         clientSummaryExt.setNotifyViaSMS(client.isNotifyViaSMS());
+        clientSummaryExt.setNotifyViaPUSH(client.isNotifyViaPUSH());
         /* контактный телефон и емайл адрес электронной почты */
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
