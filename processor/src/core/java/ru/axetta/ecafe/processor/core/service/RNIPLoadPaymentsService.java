@@ -778,8 +778,8 @@ public class RNIPLoadPaymentsService {
             OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
                     OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
                     ClientPayment.ATM_PAYMENT_METHOD,
-                    Long.parseLong(p.get("PAYMENT_TO")), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
-                                                            поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
+                    Long.parseLong(contractId), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
+                                                   поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
                     paymentID, SERVICE_NAME + "/" + paymentDate + "/" + bic, amt,
                     false);
             OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()

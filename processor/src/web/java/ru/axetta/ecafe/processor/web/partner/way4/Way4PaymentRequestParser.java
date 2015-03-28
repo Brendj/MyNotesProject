@@ -27,6 +27,25 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
     boolean bPayRequest;
     String rrn;
 
+    protected boolean isBlockedTerminal(String termId, String[] blockedTerminals) {
+        if(termId == null || termId.trim().length() < 1) {
+            return false;
+        }
+        if(blockedTerminals == null || blockedTerminals.length < 1) {
+            return false;
+        }
+
+        for(String blockedTermId : blockedTerminals) {
+            if(blockedTermId.trim().length() < 1) {
+                continue;
+            }
+            if(blockedTermId.equals(termId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public OnlinePaymentProcessor.PayRequest parsePayRequest(long defaultContragentId, HttpServletRequest httpRequest)
             throws Exception {
@@ -56,7 +75,9 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         //linkConfig.remoteAddressMask = ".*";
         //linkConfig.idOfContragent = 12;
         //linkConfig.authType= 0;
-        if (function.equals("bank_account") || linkConfig.checkOnly) {
+        if (function.equals("bank_account") ||
+            isBlockedTerminal(termId, linkConfig.blockedTerminals)
+            /*linkConfig.checkOnly*/) {
             return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
                     linkConfig.idOfContragent, null, paymentMethod, clientId,
                     ""+opId, null, 0L, false, bmId);

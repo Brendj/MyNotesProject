@@ -27,7 +27,8 @@ public class StdPayConfig {
     private static final String PARAM_ALLOWED_CLIENT_ORGS = ".allowedClientOrgs";
     private static final String PARAM_AUTH_TYPE = ".authType";
     private static final String PARAM_ADAPTER = ".adapter";
-    private static final String PARAM_CHECK_ONLY = ".checkOnly";
+    //private static final String PARAM_CHECK_ONLY = ".checkOnly";
+    private static final String BLOCKED_TERMINALS = ".blockTerminal";
 
 
     private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2;
@@ -41,7 +42,8 @@ public class StdPayConfig {
         public int authType;
         public boolean checkSignature;
         public String adapter;
-        public boolean checkOnly;
+        public String[] blockedTerminals;
+        //public boolean checkOnly;
     }
     LinkedList<LinkConfig> linkConfigs = new LinkedList<LinkConfig>();
 
@@ -56,7 +58,8 @@ public class StdPayConfig {
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
             String authTypeParam = paramBaseName + n + PARAM_AUTH_TYPE;
-            String checkOnlyParam = paramBaseName + n + PARAM_CHECK_ONLY;
+            //String checkOnlyParam = paramBaseName + n + PARAM_CHECK_ONLY;
+            String blockedTerminalsParam = paramBaseName + n + BLOCKED_TERMINALS;
             String adapterParam = paramBaseName + n + PARAM_ADAPTER;
 
             LinkConfig linkConfig = new LinkConfig();
@@ -66,9 +69,22 @@ public class StdPayConfig {
             if (properties.containsKey(checkSignatureParam)) {
                 linkConfig.checkSignature = Boolean.parseBoolean(getRequiredParam(checkSignatureParam, properties));
             }
-            if (properties.containsKey(checkOnlyParam)) {
+            /*if (properties.containsKey(checkOnlyParam)) {
                 linkConfig.checkOnly = Boolean.parseBoolean(getRequiredParam(checkOnlyParam, properties));
+            }*/
+            if(properties.containsKey(blockedTerminalsParam)) {
+                String blockedTerminalsStr = getRequiredParam(blockedTerminalsParam, properties);
+                if(blockedTerminalsStr != null && blockedTerminalsStr.trim().length() > 0) {
+                    blockedTerminalsStr = blockedTerminalsStr.trim();
+                    String[] list = blockedTerminalsStr.split(",");
+                    if(list != null) {
+                        linkConfig.blockedTerminals = list;
+                    }
+                } else {
+                    linkConfig.blockedTerminals = new String [] {};
+                }
             }
+
             if (properties.containsKey(authTypeParam)) {
                 String authType = properties.getProperty(authTypeParam);
                 if (0==authType.compareToIgnoreCase("none")) linkConfig.authType = AUTH_TYPE_NONE;
