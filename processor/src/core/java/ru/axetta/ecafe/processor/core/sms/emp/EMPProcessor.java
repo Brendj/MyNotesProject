@@ -10,6 +10,7 @@ import generated.emp_storage.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +23,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
@@ -571,22 +573,14 @@ public class EMPProcessor {
 
         return request;
     }
-
+    @Async
     public void updateNotificationParams(Long contractId) {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession;
-        Client client = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            Criteria criteria = persistenceSession.createCriteria(Client.class);
-            criteria.add(Restrictions.eq("contractId", contractId));
-            List resultList = criteria.list();
-            client = (Client) resultList.get(0);
-        } catch (Exception e) {
-            logger.error("Failed to get Client from persistence for {contractId :" + contractId + "\"} : ", e);
+        Client client = ClientReadOnlyRepository.getInstance().findByContractId(contractId);
+        if (client != null){
+            updateNotificationParams(client);
         }
-        updateNotificationParams(client);
     }
+    @Async
     public void updateNotificationParams(Client client) {
 
         StoragePortType storage = createStorageController();
