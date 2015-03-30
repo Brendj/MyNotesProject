@@ -58,7 +58,20 @@ public class AllOrgsDiscountsReport extends BasicReport {
     }
 
     public static class Builder {
+
+        Properties reportProperties = new Properties();
+
+        public Properties getReportProperties() {
+            return reportProperties;
+        }
+
+        public void setReportProperties(Properties reportProperties) {
+            this.reportProperties = reportProperties;
+        }
+
         public AllOrgsDiscountsReport build(Session session) throws Exception{
+
+            Object region = reportProperties.getProperty("region");
 
             Date generateTime = new Date();
 
@@ -82,13 +95,21 @@ public class AllOrgsDiscountsReport extends BasicReport {
                 dynamicColumnNames.add((String)objs[1]);
             }
 
-            // запрос на количество льготных по ОУ
-            String queryFullDiscount = "select cl.org.id, count(distinct cl.idOfClient), cl.org.shortName "
-                    + " from Client cl , ClientsCategoryDiscount cc "
-                    + " where cc.idOfClient=cl.idOfClient "
-                    + " and cc.idOfCategoryDiscount >= 0 "
-                    + " group by cl.org.id, cl.org.shortName "
-                    + " order by cl.org.id ";
+            String queryFullDiscount;
+
+            if (region != null) {
+                queryFullDiscount = "select cl.org.id, count(distinct cl.idOfClient), cl.org.shortName "
+                        + " from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
+                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region + "%' group by cl.org.id, cl.org.shortName "
+                        + " order by cl.org.id ";
+
+            } else {
+                // запрос на количество льготных по ОУ
+                queryFullDiscount = "select cl.org.id, count(distinct cl.idOfClient), cl.org.shortName "
+                        + " from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
+                        + " and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName "
+                        + " order by cl.org.id ";
+            }
 
             List resultFullDiscountsList = session.createQuery(queryFullDiscount).list();
 
@@ -103,13 +124,20 @@ public class AllOrgsDiscountsReport extends BasicReport {
                 result.put(orgId, item);
             }
 
-            // запрос количества льготников по категориям
-            String q = "select cl.org.id, cc.idOfCategoryDiscount, count (cl.idOfClient) "
-                    + " from Client cl, ClientsCategoryDiscount cc "
-                    + " where cc.idOfClient=cl.idOfClient "
-                    + " and cc.idOfCategoryDiscount >= 0 "
-                    + " group by cl.org.id, cc.idOfCategoryDiscount "
-                    + " order by cl.org.id, cc.idOfCategoryDiscount";
+            String q;
+
+            if (region != null) {
+                q = "select cl.org.id, cc.idOfCategoryDiscount, count (cl.idOfClient) "
+                        + " from Client cl, ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
+                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region + "%' group by cl.org.id, cc.idOfCategoryDiscount "
+                        + " order by cl.org.id, cc.idOfCategoryDiscount";
+            } else {
+                // запрос количества льготников по категориям
+                q = "select cl.org.id, cc.idOfCategoryDiscount, count (cl.idOfClient) "
+                        + " from Client cl, ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
+                        + " and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cc.idOfCategoryDiscount "
+                        + " order by cl.org.id, cc.idOfCategoryDiscount";
+            }
 
             List resultDiscountsList = session.createQuery(q).list(); // лист результата запроса
 

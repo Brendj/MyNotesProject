@@ -5,13 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AllOrgsDiscountsReport;
 
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +26,7 @@ import java.util.List;
 public class AllOrgsDiscountsReportPage extends OnlineReportPage {
     private AllOrgsDiscountsReport allOrgsDiscountsReport;
 
+    private String region;
 
     public String getPageFilename() {
         return "report/online/orgs_discounts_report";
@@ -34,9 +38,39 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
 
     public void buildReport(Session session) throws Exception {
         //allOrgsDiscountsReport = new AllOrgsDiscountsReport();
+        Properties props = addRegionProperty(null, region);
+
         AllOrgsDiscountsReport.Builder builder = new AllOrgsDiscountsReport.Builder();
+        builder.setReportProperties(props);
         allOrgsDiscountsReport = builder.build(session);
     }
 
+    public List<SelectItem> getRegions() {
+        List<String> regions = DAOService.getInstance().getRegions();
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(""));
+        for(String reg : regions) {
+            items.add(new SelectItem(reg));
+        }
+        return items;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public Properties addRegionProperty(Properties props, String region) {
+        if(props == null) {
+            props = new Properties();
+        }
+        if(region != null && region.trim().length() > 0) {
+            props.put("region", region);
+        }
+        return props;
+    }
 
 }

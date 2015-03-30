@@ -19,6 +19,12 @@
 
 <h:panelGrid id="orgsDiscountReportPanelGrid" binding="#{mainPage.allOrgsDiscountsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
+
+        <h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:selectOneMenu id="regionsList" value="#{mainPage.allOrgsDiscountsReportPage.region}" style="width:100px;" >
+            <f:selectItems value="#{mainPage.allOrgsDiscountsReportPage.regions}"/>
+        </h:selectOneMenu>
+
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllOrgsDiscountsReport}"
                            reRender="workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
                            styleClass="commandButton" status="sReportGeneratorStatus" />
