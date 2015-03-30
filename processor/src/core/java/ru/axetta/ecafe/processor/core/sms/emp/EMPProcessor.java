@@ -636,13 +636,7 @@ public class EMPProcessor {
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("mobile", clientMobileString));
             List resultList = criteria.list();
-            if (resultList.size() == 1) {
-                client = (Client) resultList.get(0);
-            } else if (resultList.size() == 0) {
-                throw new Exception("Error: no persistence data");
-            } else if (resultList.size() > 1) {
-                throw new Exception("Too many data, clean the database");
-            }
+            client = (Client) resultList.get(0);
         } catch (Exception e) {
             logger.warn("Failed to get Client from persistence for {contractId :" + clientMobileString + "\"} : ", e);
         }
