@@ -23,7 +23,6 @@ public class CardTemp {
     private Date createDate;
     private Date validDate;
     private Client client;
-    asfd
     private Visitor visitor;
     //private ClientTypeEnum clientTypeEnum;
     private int visitorType;
