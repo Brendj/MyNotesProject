@@ -203,7 +203,8 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 startDate = tempDate;
             }
 
-            Calendar startCal = GregorianCalendar.getInstance();
+            // Если ошибка не повториться Infinity - то этот код можно удалить.
+/*            Calendar startCal = GregorianCalendar.getInstance();
             startCal.setTime(startDate);
             startCal.set(Calendar.HOUR_OF_DAY, 0);
             startCal.set(Calendar.MINUTE, 0);
@@ -215,9 +216,9 @@ public class AggregateCostsAndSalesReport extends BasicReport {
             endCal.set(Calendar.HOUR_OF_DAY, 0);
             endCal.set(Calendar.MINUTE, 0);
             endCal.set(Calendar.SECOND, 0);
-            long endTime = endCal.getTimeInMillis();
+            long endTime = endCal.getTimeInMillis();*/
 
-            double tmpDays = (endTime - startTime) / MILLISECONDS_IN_DAY;
+            double tmpDays = (endDate.getTime() - startDate.getTime()) / MILLISECONDS_IN_DAY;
             return Math.round(tmpDays);
         }
 
