@@ -6,10 +6,10 @@ package ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.persistence.AccountOperations;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.dao.operations.account.AccountOperationsRepository;
-import ru.axetta.ecafe.processor.core.service.regularPaymentService.DuplicatePaymentException;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.InternalException;
 
@@ -47,41 +47,44 @@ public class AccountOperationsRegistryHandler {
     private ResAccountOperationItem handle(AccountOperationItem accountOperationItem,SyncRequest request) {
         AccountOperationsRepository accountOperationsRepository = AccountOperationsRepository.getInstance();
         OnlinePaymentProcessor.PayResponse payResponse = null;
-        ResAccountOperationItem resAccountOperationItem = null;
         try {
             payResponse = sendRequestToPayment(accountOperationItem);
             AccountOperations accountOperations = new AccountOperations(accountOperationItem, request, payResponse);
             accountOperationsRepository.create(accountOperations);
         } catch (InternalException e) {
-            logger.error("Внутренняя ошибка процесинга: " + accountOperationItem.getIdOfOperation(),e);
+            logger.error("Внутренняя ошибка процесинга: " + accountOperationItem.getModifiedIdOfOperation(),e);
             return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
-        } catch (DuplicatePaymentException e){
-            logger.error(
-                    "Операция с данным идентификатором зарегистрирована: " + accountOperationItem.getIdOfOperation(), e);
+        }
 
-            AccountOperations byIdOfOperation = accountOperationsRepository
-                    .findByIdOfOperation(accountOperationItem.getIdOfOperation(), request.getIdOfOrg());
+        if (payResponse.getResultCode() == PaymentProcessResult.OK.getCode() ){
+            return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
+        }
+
+        if (payResponse.getResultCode() == PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode()){
+            logger.error("Операция с данным идентификатором зарегистрирована: " + accountOperationItem.getModifiedIdOfOperation());
+
+            AccountOperations byIdOfOperation = accountOperationsRepository.findByIdOfOperation(accountOperationItem.getIdOfOperation(), request.getIdOfOrg());
             if(byIdOfOperation != null){
                 AccountOperations tempAOperations = new AccountOperations(accountOperationItem, request);
                 if (byIdOfOperation.equals(tempAOperations)){
                     return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
                 }
+            }else {
+                AccountOperations accountOperations = new AccountOperations(accountOperationItem, request, payResponse);
+                accountOperationsRepository.create(accountOperations);
             }
             return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.DUPLICATE, "Операция с данным идентификатором зарегистрирована");
         }
 
-        if (payResponse != null ){
-            return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
-        }else {
-            logger.error("Внутренняя ошибка процесинга#2: " + accountOperationItem.getIdOfOperation());
-            return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
-        }
+        logger.error("Внутренняя ошибка процесинга#2: " + accountOperationItem.getModifiedIdOfOperation() + ", ErrorCode: " + payResponse.getResultCode());
+        return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
+
     }
 
     /*
     * Отправка запроса на оплату внутри ИСПП
     * */
-    private OnlinePaymentProcessor.PayResponse sendRequestToPayment(AccountOperationItem accountOperationItem) throws DuplicatePaymentException, InternalException{
+    private OnlinePaymentProcessor.PayResponse sendRequestToPayment(AccountOperationItem accountOperationItem) throws InternalException{
         if (accountOperationItem.getIdOfContragent() == null){
             throw new InternalException("Контрагент не установлен. Contragent not found.");
         }
@@ -103,9 +106,6 @@ public class AccountOperationsRegistryHandler {
         }
         OnlinePaymentProcessor.PayResponse payResponse = RuntimeContext.getInstance().getOnlinePaymentProcessor()
                 .processPayRequest(payRequest);
-        if (payResponse.getResultCode() == 140) {
-            throw new DuplicatePaymentException();
-        }
         return payResponse;
     }
 

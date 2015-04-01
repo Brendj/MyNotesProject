@@ -415,6 +415,7 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         this.ogrn = contragent.getOgrn();
         if (contragent.getDefaultPayContragent() != null) {
             this.defaultPayContragentName = contragent.getDefaultPayContragent().getContragentName();
+            this.defaultPayContragent = contragent.getDefaultPayContragent();
         }else {
             this.defaultPayContragentName = null;
             this.defaultPayContragent = null;

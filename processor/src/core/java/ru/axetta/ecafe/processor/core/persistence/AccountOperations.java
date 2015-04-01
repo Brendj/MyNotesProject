@@ -70,7 +70,7 @@ public class AccountOperations implements Serializable {
         staffGuid = accountOperationItem.getStaffGuid();
         idOfPos = accountOperationItem.getIdOfPos();
         idOfContragent = accountOperationItem.getIdOfContragent();
-        idOfClientPayment = payResponse.getIdOfClientPayment();
+        idOfClientPayment = payResponse!=null?payResponse.getIdOfClientPayment(): null;
     }
 
     public long getIdOfAccountOperation() {
