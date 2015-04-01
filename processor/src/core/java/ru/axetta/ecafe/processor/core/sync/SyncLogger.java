@@ -18,4 +18,6 @@ public interface SyncLogger {
     void registerSyncRequest(Document requestDocument, long idOfOrg, String idOfSync);
 
     void registerSyncResponse(Document responseDocument, long idOfOrg, String idOfSync);
+
+    boolean registerSyncRequestInDb(long idOfOrg, String idOfSync);
 }

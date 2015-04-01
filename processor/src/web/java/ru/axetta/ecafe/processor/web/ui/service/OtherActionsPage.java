@@ -137,6 +137,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Повторная отправка не доставленных СМС завершена");
     }
 
+    public void runSmsDeliveryRecalculation() throws Exception {
+        RuntimeContext.getAppContext().getBean(SmsDeliveryCalculationService.class).run(); //DEF
+        printMessage("Пересчет показателей по СМС завершен");
+    }
+
 
 
     @Override

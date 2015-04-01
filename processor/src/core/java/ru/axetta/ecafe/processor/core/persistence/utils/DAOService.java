@@ -1752,4 +1752,21 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         query.setParameter("idOfOrg", org.getIdOfOrg());
         return (String) query.getSingleResult();
     }
+
+    @Transactional
+    public boolean registerSyncRequest(long idOfOrg, String idOfSync) {
+        long dateAt = System.currentTimeMillis();
+        try {
+            Query q = entityManager.createNativeQuery(
+                    "INSERT INTO cf_synchistory_daily (idofsync, idoforg, syncdate) VALUES "
+                    + "(:idofsync, :idoforg, :syncdate)");
+            q.setParameter("idofsync", idOfSync);
+            q.setParameter("idoforg", idOfOrg);
+            q.setParameter("syncdate", dateAt);
+            return q.executeUpdate() > 0;
+        } catch (Exception e) {
+            logger.error("Failed to add new synch daily history entry", e);
+        }
+        return false;
+    }
 }

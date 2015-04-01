@@ -81,6 +81,7 @@
         <task:scheduled ref="EMPProcessor" method="runStorageMerge" cron="*/30 * * * * *"/>
         <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"  />
         <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup" fixed-delay="60000" />
+        <task:scheduled ref="smsDeliveryCalculationService" method="run" cron="0 0 4 ? * *"/>
     </task:scheduled-tasks>
     <task:scheduler id="myScheduler" pool-size="5"/>
 

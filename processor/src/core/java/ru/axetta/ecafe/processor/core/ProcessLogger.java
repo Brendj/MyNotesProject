@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 
@@ -116,6 +117,11 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
             logger.error(String.format("Failed to save sync request, idOfOrg == %s, idOfSync == %s", idOfOrg, idOfSync),
                     e);
         }
+    }
+
+    public boolean registerSyncRequestInDb(long idOfOrg, String idOfSync) {
+        boolean res = DAOService.getInstance().registerSyncRequest(idOfOrg, idOfSync);
+        return res;
     }
 
     public void registerSyncResponse(Document responseDocument, long idOfOrg, String idOfSync) {

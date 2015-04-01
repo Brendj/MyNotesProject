@@ -136,6 +136,11 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
 
+
+            //  Daily logging for sync request
+            syncLogger.registerSyncRequestInDb(idOfOrg, idOfSync);
+
+
             // Parse XML request
             SyncRequest syncRequest;
             try {

@@ -18,6 +18,7 @@ import java.util.Map;
  */
 public class SMSDeliveryReportItem implements Serializable {
     private int uniqueId;
+    private long orgId;
     private String orgName;
     private int columnId;
     public Map<String, String> values;
@@ -38,6 +39,14 @@ public class SMSDeliveryReportItem implements Serializable {
 
     public void setUniqueId(int uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public long getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(long orgId) {
+        this.orgId = orgId;
     }
 
     public String getOrgName() {

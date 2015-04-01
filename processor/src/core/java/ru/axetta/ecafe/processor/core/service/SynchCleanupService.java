@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +34,7 @@ public class SynchCleanupService {
     private EntityManager entityManager;
 
     private static final long WEEK_MILLISECONDS = 604800000L;
+    private static final long DAY_MILLISECONDS  = 86400000L;
 
 
     public static boolean isOn() {
@@ -57,6 +60,7 @@ public class SynchCleanupService {
         Session session = (Session) entityManager.getDelegate();
         clearExceptionsEntries(session);
         clearEntries(session);
+        clearDaily(session);
     }
 
     protected void clearExceptionsEntries(Session session) {
@@ -68,6 +72,18 @@ public class SynchCleanupService {
         long datelimit = System.currentTimeMillis() - WEEK_MILLISECONDS;
         Query q = session.createSQLQuery("delete from cf_synchistory where syncendtime<:datelimit");
         q.setParameter("datelimit", datelimit);
+        q.executeUpdate();
+    }
+
+    protected void clearDaily(Session session) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(System.currentTimeMillis() - DAY_MILLISECONDS);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        Query q = session.createSQLQuery("delete from cf_synchistory where syncdate<:datelimit");
+        q.setParameter("datelimit", cal.getTimeInMillis());
         q.executeUpdate();
     }
 }

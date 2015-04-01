@@ -14,6 +14,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.service.SmsDeliveryCalculationService;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -151,22 +153,161 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         }
 
         public List<SMSDeliveryReportItem> findDeliveryEntries(Session session, Date start, Date end) {
-            List<SMSDeliveryReportItem> items = new ArrayList<SMSDeliveryReportItem>();
-            findInternal(items, session, start, end);
-            findExternal(items, session, start, end);
+            try {
+                List<SMSDeliveryReportItem> items = new ArrayList<SMSDeliveryReportItem>();
+                Calendar cal = new GregorianCalendar();
+                cal.setTimeInMillis(System.currentTimeMillis());
+                cal = SmsDeliveryCalculationService.resetCalendar(cal);
+                if(end.getTime() >= cal.getTimeInMillis() &&
+                   start.getTime() >= cal.getTimeInMillis()) {
+                } else {
+                    if(end.getTime() >= cal.getTimeInMillis()) {
+                        throw new IllegalArgumentException("Конечная дата может быть указана текущим днем только в том случае, если начальная дата так же указана текщим днем");
+                    }
+                    findConsolidated(items, session, start, end);
+                }
+                findExternal(items, session, start, end);
+                return items;
+            } catch (Exception e) {
+                logger.error("Failed to build SMSDelivery report", e);
+                throw new RuntimeException("Failed to build report: " + e.getMessage());
+            }
+        }
+
+        public List<SMSDeliveryReportItem> findDaily(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
+            String orgsList = reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG);
+            items = SMSDeliveryReport.Builder.findSmsSyncItem(items, session, start, end, orgsList);
             return items;
         }
 
-        public List<SMSDeliveryReportItem> findInternal(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
+        public static List<SMSDeliveryReportItem> findSmsSyncItem(Session session, Date start, Date end, String orgsList) {
+            List<SMSDeliveryReportItem> items = new ArrayList<SMSDeliveryReportItem>();
+            return findSmsSyncItem(items, session, start, end, orgsList);
+        }
+
+        public List<SMSDeliveryReportItem> findConsolidated(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
+            String orgsList = reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG);
+            items = SMSDeliveryReport.Builder.findConsolidated(items, session, start, end, orgsList);
+            return items;
+        }
+
+        protected static final String getDataTypeNameForReport(int dataType) {
+            String k = SmsDeliveryCalculationService.getDataTypeName(dataType);
+            if(k.endsWith(SmsDeliveryCalculationService.POSTFIX)) {
+                k = k.substring(0, k.length() - SmsDeliveryCalculationService.POSTFIX.length());
+            }
+            return k;
+        }
+
+        public static List<SMSDeliveryReportItem> findConsolidated(List<SMSDeliveryReportItem> items, Session session, Date start, Date end, String orgsList) {
             String orgCondition = "";
-            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            if(idOfOrgs != null && !StringUtils.isBlank(idOfOrgs)) {
-                List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
-                StringBuilder builder = new StringBuilder();
-                for(String id : stringOrgList) {
-                    builder.append(builder.length() > 0 ? " or " : "").append("sync1.idoforg=").append(id);
+            if(orgsList != null) {
+                String idOfOrgs = StringUtils.trimToEmpty(orgsList);
+                if(idOfOrgs != null && !StringUtils.isBlank(idOfOrgs)) {
+                    List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+                    StringBuilder builder = new StringBuilder();
+                    for(String id : stringOrgList) {
+                        builder.append(builder.length() > 0 ? " or " : "").append("sync.idoforg=").append(id);
+                    }
+                    orgCondition = "            and (" + builder.toString() + ") ";
                 }
-                orgCondition = "            and (" + builder.toString() + ") ";
+            }
+
+            String sql =
+                    "select o.idoforg, o.shortname, calctype, round(avg(sync.calcValue)) "
+                    + "from cf_synchistory_calc sync "
+                    + "join cf_orgs o on o.idoforg=sync.idoforg "
+                    + "where sync.calcDateAt>=:start and sync.calcDateAt<:end " + orgCondition
+                    + "group by o.idoforg, calctype "
+                    + "order by o.idoforg";
+            Query query = session.createSQLQuery(sql);
+            query.setParameter("start", start.getTime());
+            query.setParameter("end", end.getTime());
+            List res = query.list();
+
+            SMSDeliveryReportItem it = null;
+            long prevOrgId = -1L;
+            int i=0;
+            for(Object entry : res) {
+                Object e[] = (Object[]) entry;
+                long idoforg = ((BigInteger) e[0]).longValue();
+                String officialname = (String) e[1];
+                int dataType = ((Integer) e[2]).intValue();
+                long ts = ((BigDecimal) e[3]).longValue();
+
+                if(it == null || idoforg != prevOrgId) {
+                    if(it != null) {
+                        items.add(it);
+                    }
+                    it = new SMSDeliveryReportItem();
+                    it.setUniqueId(i);
+                    it.setOrgName(officialname);
+                    it.setOrgId(idoforg);
+                    it.setColumnId(1);
+                    prevOrgId = idoforg;
+                }
+
+                String k = getDataTypeNameForReport(dataType);
+                String v = calcTimeout(ts);
+                it.addValue(k, v);
+                i++;
+            }
+            if(it != null) {
+                items.add(it);
+            }
+
+
+            //  get max sync latest sync date
+            sql = "select o.idoforg, o.shortname, calctype, max(sync.calcValue) "
+                  + "from cf_synchistory_calc sync "
+                  + "join cf_orgs o on o.idoforg=sync.idoforg "
+                  + "where sync.calcDateAt>=:start and sync.calcDateAt<:end "
+                  + "      and calctype=:calctype "
+                  + orgCondition
+                  + "group by o.idoforg, calctype "
+                  + "order by o.idoforg";
+            query = session.createSQLQuery(sql);
+            query.setParameter("start", start.getTime());
+            query.setParameter("end", end.getTime());
+            query.setParameter("calctype", SmsDeliveryCalculationService.getDataTypeId("0_lastSyncTs"));
+            res = query.list();
+            for(Object entry : res) {
+                Object e[] = (Object[]) entry;
+                long idoforg = ((BigInteger) e[0]).longValue();
+                String officialname = (String) e[1];
+                int dataType = ((Integer) e[2]).intValue();
+                long ts = ((BigInteger) e[3]).longValue();
+                SMSDeliveryReportItem targetItem = null;
+
+                for(SMSDeliveryReportItem it2 : items) {
+                    if(it2.getOrgId() == idoforg) {
+                        targetItem = it2;
+                        break;
+                    }
+                }
+                if(targetItem == null) {
+                    continue;
+                }
+
+                String k = getDataTypeNameForReport(dataType);
+                String v = calcDate(ts);
+                targetItem.addValue(k, v);
+            }
+            return items;
+        }
+
+        public static List<SMSDeliveryReportItem> findSmsSyncItem(List<SMSDeliveryReportItem> items, Session session, Date start, Date end, String orgsList) {
+            String orgCondition = "";
+            if(orgsList != null) {
+                String idOfOrgs = StringUtils.trimToEmpty(orgsList);
+                if(idOfOrgs != null && !StringUtils.isBlank(idOfOrgs)) {
+                    List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+                    StringBuilder builder = new StringBuilder();
+                    for(String id : stringOrgList) {
+                        builder.append(builder.length() > 0 ? " or " : "").append("sync1.idoforg=").append(id);
+                    }
+                    orgCondition = "            and (" + builder.toString() + ") ";
+                }
             }
             /*String orgCondition = "";
             if (org != null) {
@@ -186,7 +327,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             endCal.set(Calendar.SECOND, 0);
             endCal.set(Calendar.MILLISECOND, 0);
 
-            String sql =
+            /*String sql =
                       "select o.idoforg, o.shortname, t1, t2 "
                     + "from (select sync1.idoforg as idoforg, "
                     + "             sync1.syncstarttime as t1, "
@@ -197,6 +338,19 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     + "      from cf_synchistory sync1 "
                     + "      where sync1.syncstarttime>=:start and sync1.syncstarttime<:end " + orgCondition + " ) as history "
                     + "join cf_orgs o on history.idoforg=o.idoforg "
+                    + "order by idoforg, t1 asc";*/
+            String sql =
+                    "select o.idoforg, o.shortname, t1, t2 "
+                    + "from (select sync1.idoforg as idoforg, "
+                    + "             sync1.syncdate as t1, "
+                    + "             (select sync2.syncdate "
+                    + "              from cf_synchistory_daily sync2 "
+                    + "              where sync2.syncdate<sync1.syncdate and sync1.idoforg=sync2.idoforg "
+                    + "              order by syncdate desc limit 1) t2 "
+                    + "      from cf_synchistory_daily sync1 "
+                    + "      where sync1.syncdate>=:start and sync1.syncdate<:end " + orgCondition + " ) as history "
+                    + "join cf_orgs o on history.idoforg=o.idoforg "
+                    + " where t2 is not null "
                     + "order by idoforg, t1 asc";
             Query query = session.createSQLQuery(sql);
             query.setParameter("start", startCal.getTimeInMillis());
@@ -381,6 +535,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }
             if(res.getOrgName() == null || StringUtils.isBlank(res.getOrgName())) {
                 res.setOrgName(entry.getOrgName());
+                res.setOrgId(entry.getIdOfOrg());
                 res.setColumnId(1);
             }
             if(uniqueId != null) {
@@ -391,6 +546,12 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             res.addValue("0_maxDelayNight", calcTimeout(maxDelayNight));
             res.addValue("0_sumDelayNight", calcTimeout(sumDelayNight));
             res.addValue("0_lastSync", calcDate(lastSync));
+
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(0), "" + maxDelayMidday);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(1), "" + sumDelayMidday);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(2), "" + maxDelayNight);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(3), "" + sumDelayNight);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(4), "" + lastSync);
             return res;
         }
 
@@ -414,6 +575,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }
             if(res.getOrgName() == null || StringUtils.isBlank(res.getOrgName())) {
                 res.setOrgName(items.get(0).getOrgName());
+                res.setOrgId(items.get(0).getIdOfOrg());
                 res.setColumnId(1);
             }
             if(uniqueId != null) {
