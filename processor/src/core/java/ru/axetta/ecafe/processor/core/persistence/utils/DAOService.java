@@ -1757,6 +1757,9 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public boolean registerSyncRequest(long idOfOrg, String idOfSync) {
         long dateAt = System.currentTimeMillis();
         try {
+            if(idOfSync.length() > 30) {
+                idOfSync = idOfSync.substring(0, 30);
+            }
             Query q = entityManager.createNativeQuery(
                     "INSERT INTO cf_synchistory_daily (idofsync, idoforg, syncdate) VALUES "
                     + "(:idofsync, :idoforg, :syncdate)");

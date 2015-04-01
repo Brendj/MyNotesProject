@@ -1,6 +1,6 @@
 -- Временное хранение данных о быстрой и полной синхронизации с ОУ
 CREATE TABLE cf_synchistory_daily (
-  idOfSync bigint NOT NULL,
+  idOfSync CHARACTER VARYING(30) NOT NULL,
   idOfOrg bigint NOT NULL,
   syncDate bigint NOT NULL,
 
