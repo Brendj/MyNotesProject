@@ -14,5 +14,5 @@ CREATE TABLE cf_synchistory_calc (
   calcType int NOT NULL,
   calcValue bigint NOT NULL,
 
-  CONSTRAINT cf_synchistory_calc_pk PRIMARY KEY (idOfOrg, calDateAt, calcDateAt)
+  CONSTRAINT cf_synchistory_calc_pk PRIMARY KEY (idOfOrg, calcDateAt, calcType)
 );
