@@ -110,4 +110,8 @@ public class ClientPaymentsPage extends OnlineReportPage {
             this.clientPaymentsReport = reportBuilder.build(session, startDate, endDate, idOfOrgList);
         }
     }
+
+    public void buildClientPaymentsReportExcel(Session session) throws Exception {
+
+    }
 }

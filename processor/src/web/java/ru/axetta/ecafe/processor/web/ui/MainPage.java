@@ -5840,10 +5840,14 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientPaymentsReportPage.buildReport(persistenceSession);
+
+            if (!clientPaymentsReportPage.getClientPaymentsReport().getClientPaymentItems().isEmpty()) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+            }
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
@@ -5852,8 +5856,6 @@ public class MainPage implements Serializable {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }
@@ -5905,10 +5907,6 @@ public class MainPage implements Serializable {
 
     public String showPayComplexCSVList() {
         return "showPayComplexCSVList";
-    }
-
-    public String showSalesCSVList() {
-        return "showSaleCSVList";
     }
 
     public SyncReportPage getSyncReportPage() {

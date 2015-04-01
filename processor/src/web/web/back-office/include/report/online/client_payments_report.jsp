@@ -36,6 +36,7 @@
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientPaymentsReport}"
                            reRender="workspaceTogglePanel, clientPaymentsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Генерировать в Excel" actionListener="#{mainPage.clientPaymentsReportPage.buildClientPaymentsReportExcel}" styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -56,7 +57,7 @@
                         <h:outputText styleClass="column-header" escape="true" value="Организация" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="ТСП" />
+                        <h:outputText styleClass="column-header" escape="true" value="Поставщик питания" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Пополнения л/c" />
@@ -105,7 +106,6 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" rendered="false"/>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

@@ -255,6 +255,7 @@ public class ClientPaymentsReport extends BasicReport {
         private Long payments; // Сумма платежей
         private Long sales; // Сумма продаж
         private Long discounts; // Сумма льготных продаж
+        private String diff;
 
         public long getIdOfOrg() {
             return idOfOrg;
@@ -289,6 +290,9 @@ public class ClientPaymentsReport extends BasicReport {
             return longToMoney((payments == null ? 0L : payments) - (sales == null ? 0L : sales));
         }
 
+        public void setDiff(String diff) {
+            this.diff = diff;
+        }
 
         public void setPayments (Long payments) {
             this.payments = payments;
