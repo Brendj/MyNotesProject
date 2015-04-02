@@ -35,9 +35,13 @@ public class AccountOperationsRegistryHandler {
         ResAccountOperationsRegistry resAccountOperationsRegistry = new ResAccountOperationsRegistry();
 
         for (AccountOperationItem accountOperationItem : accountOperationsRegistry.getOperationItemList()) {
-            accountOperationItem.setModifiedIdOfOperation(preapreIdOfOperation(request, accountOperationItem.getIdOfOperation()));
-            ResAccountOperationItem resAccountOperationItem = handle(accountOperationItem, request);
-            resAccountOperationsRegistry.getItemsList().add(resAccountOperationItem);
+            try {
+                accountOperationItem.setModifiedIdOfOperation(preapreIdOfOperation(request, accountOperationItem.getIdOfOperation()));
+                ResAccountOperationItem resAccountOperationItem = handle(accountOperationItem, request);
+                resAccountOperationsRegistry.getItemsList().add(resAccountOperationItem);
+            }catch (Exception e){
+                logger.error("AccountOperationsRegistryHandler #3: " + accountOperationItem.getModifiedIdOfOperation(), e);
+            }
         }
 
         return resAccountOperationsRegistry;

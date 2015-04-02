@@ -8,7 +8,11 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.AccountOperations" table="cf_account_operations">
         <id name="idOfAccountOperation" column="idofaccountoperation" type="long">
-            <generator class="increment"/>
+            <generator class="hilo">
+                <param name="table">CF_Generators</param>
+                <param name="column">IdOfAccountOperations</param>
+                <param name="max_lo">3</param>
+            </generator>
 
 
         </id>
