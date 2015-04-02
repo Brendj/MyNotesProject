@@ -16,3 +16,10 @@ CREATE TABLE cf_synchistory_calc (
 
   CONSTRAINT cf_synchistory_calc_pk PRIMARY KEY (idOfOrg, calcDateAt, calcType)
 );
+
+
+ALTER TABLE CF_Generators ADD COLUMN IdOfAccountOperations BIGINT NOT NULL DEFAULT 0;
+update cf_generators set IdOfAccountOperations= (select  case when max(idofaccountoperation) is null THEN  0 else (max(idofaccountoperation)+1) end  from cf_account_operations );
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150402) НЕ МЕНЯТЬ
