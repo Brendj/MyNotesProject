@@ -130,14 +130,14 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             List<String> districtNames = service.loadDistrictNames();
 
             for (String district : districtNames) {
-                Long stateServiceAct = service.getStatByDistrictName(district, "0", ac, startTime, groupRestrict);
-                Long stateServiceActNot = service.getStatByDistrictName(district, "0", lc, startTime, groupRestrict);
+                Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict);
+                Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict);
 
                 Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict);
                 Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict);
 
-                Long stateOthAct = service.getStatByDistrictName(district, "1,2,4", ac, startTime, groupRestrict);
-                Long stateOthActNot = service.getStatByDistrictName(district, "1,2,4", lc, startTime, groupRestrict);
+                Long stateOthAct = service.getStatByDistrictName(district, "0,2,4", ac, startTime, groupRestrict);
+                Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4", lc, startTime, groupRestrict);
 
                 Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct;
                 Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot;
@@ -155,9 +155,9 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                     for (TypesOfCardOrgItem typesOfCardOrgItem : idListByDistrict) {
 
                         Long stateServiceActSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0", ac, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "1", ac, startTime, groupRestrict);
                         Long stateServiceActNotSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0", lc, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "1", lc, startTime, groupRestrict);
 
                         Long stateScuActSub = service
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3", ac, startTime, groupRestrict);
@@ -165,9 +165,9 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3", lc, startTime, groupRestrict);
 
                         Long stateOthActSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "1,2,4", ac, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0,2,4", ac, startTime, groupRestrict);
                         Long stateOthActNotSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "1,2,4", lc, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0,2,4", lc, startTime, groupRestrict);
 
                         Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub;
                         Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub;
