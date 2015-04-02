@@ -52,13 +52,12 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     public Object buildReportHTML() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFileName = checkIsExistFile();
-        if (StringUtils.isEmpty(templateFileName)) {
-            printError("Не указана организация");
+        String templateFilename = checkIsExistFile();
+        if (templateFilename == null) {
             return null;
         }
         String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFileName, subReportDir);
+        TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -105,51 +104,51 @@ public class TypesOfCardReportPage extends OnlineReportPage {
     public void generateXLS(ActionEvent event) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
-        if (StringUtils.isEmpty(templateFilename)) {
-            printError(String.format("Не найден файл шаблона '%s'", templateFilename));
-            return;
-        }
-        String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
-        builder.setReportProperties(buildProperties());
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        try {
-            if (report != null) {
-                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-                ServletOutputStream servletOutputStream = response.getOutputStream();
-                facesContext.getResponseComplete();
-                facesContext.responseComplete();
-                response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=typesOfCardReport.xls");
-                JRXlsExporter xlsExporter = new JRXlsExporter();
-                xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                xlsExporter.exportReport();
-                servletOutputStream.close();
+        if (templateFilename == null) {
+        } else {
+            String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+            TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
+            builder.setReportProperties(buildProperties());
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            BasicReportJob report = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
-        } catch (Exception e) {
-            logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            try {
+                if (report != null) {
+                    HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                            .getResponse();
+                    ServletOutputStream servletOutputStream = response.getOutputStream();
+                    facesContext.getResponseComplete();
+                    facesContext.responseComplete();
+                    response.setContentType("application/xls");
+                    response.setHeader("Content-disposition", "inline;filename=typesOfCardReport.xls");
+                    JRXlsExporter xlsExporter = new JRXlsExporter();
+                    xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                    xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                    xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                    xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                    xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                    xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                    xlsExporter.exportReport();
+                    servletOutputStream.close();
+                }
+            } catch (Exception e) {
+                logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+            }
         }
     }
 
@@ -176,10 +175,10 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = TypesOfCardReport.class.getSimpleName() + ".jasper";
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        String templateShortFilename = TypesOfCardReport.class.getSimpleName() + ".jasper";
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
-            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            printError(String.format("Не найден файл шаблона '%s'", templateFilename));
             return null;
         }
         return templateFilename;

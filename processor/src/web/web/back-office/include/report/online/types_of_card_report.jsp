@@ -43,6 +43,8 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty  mainPage.typesOfCardReportPage.htmlReport}">
             <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
