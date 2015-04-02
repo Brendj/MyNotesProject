@@ -691,7 +691,7 @@ public class FrontController extends HttpServlet {
 
         //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
-        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
+        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов, idOfOrg: " + orgId);
         Org org = DAOService.getInstance().getOrg(orgId);
         if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
         PublicKey publicKey = null;
