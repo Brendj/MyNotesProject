@@ -5909,6 +5909,10 @@ public class MainPage implements Serializable {
         return "showPayComplexCSVList";
     }
 
+    public String showSalesCSVList() {
+        return "showSaleCSVList";
+    }
+
     public SyncReportPage getSyncReportPage() {
         return syncReportPage;
     }
