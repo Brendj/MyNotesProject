@@ -7,3 +7,5 @@ delete from cf_account_operations a where a.idofaccountoperation  in (select tem
 
 
 ALTER TABLE cf_account_operations ADD CONSTRAINT account_operations_UQ UNIQUE (idoforg,idofoperation)
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150403) НЕ МЕНЯТЬ
