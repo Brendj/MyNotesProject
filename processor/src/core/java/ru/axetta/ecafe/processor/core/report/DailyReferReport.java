@@ -67,7 +67,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     public static Map<String, String> GROUP1_REPLACEMENTS;
     static {
         GROUP1_REPLACEMENTS = new HashMap<String, String>();
-        GROUP1_REPLACEMENTS.put("Обучающиеся 1-4 классов", "Обучающиеся, не получающие питание по льготам");
+        GROUP1_REPLACEMENTS.put("Обучающиеся 1-4 классов", "Обучающиеся 1-4 классов"/*"Обучающиеся, не получающие питание по льготам"*/);
     }
 
 
