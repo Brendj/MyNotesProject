@@ -53,14 +53,15 @@ public class AccountOperationsRegistryHandler {
         OnlinePaymentProcessor.PayResponse payResponse = null;
         try {
             payResponse = sendRequestToPayment(accountOperationItem);
-            AccountOperations accountOperations = new AccountOperations(accountOperationItem, request, payResponse);
-            accountOperationsRepository.create(accountOperations);
         } catch (InternalException e) {
             logger.error("Внутренняя ошибка процесинга: " + accountOperationItem.getModifiedIdOfOperation(),e);
             return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(),ResAccountOperationItem.ERROR, "Внутренняя ошибка процесинга");
         }
 
         if (payResponse.getResultCode() == PaymentProcessResult.OK.getCode() ){
+            AccountOperations accountOperations = new AccountOperations(accountOperationItem, request, payResponse);
+            accountOperationsRepository.create(accountOperations);
+
             return new ResAccountOperationItem(accountOperationItem.getIdOfOperation(), ResAccountOperationItem.OK, "");
         }
 
