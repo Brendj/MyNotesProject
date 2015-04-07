@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -369,6 +369,13 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                         newValue.append(",");
                     }
                     newValue.append(idOfOrgList.get(i));
+                }
+                if(newValue.length()> RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD-100 ){
+                    newValue.delete(RuleCondition.SIZE_OF_CONFITIONCONSTANT_FIELD -100, newValue.length() );
+                    int i = newValue.lastIndexOf(",");
+                    if(i >  0){
+                        newValue.delete(i, newValue.length());
+                    }
                 }
             } else if (hint.getType().equals(Hint.CLIENT)) {
                 //  TODO: Добавить!
