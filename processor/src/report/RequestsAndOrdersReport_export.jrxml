@@ -159,7 +159,7 @@
 						<bucketExpression><![CDATA[$F{orgDistrict}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents style="Crosstab_CD">
 							<textField>
 								<reportElement uuid="281a35bf-dc4a-44ef-bd84-329d806aeb13" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="61"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -492,6 +492,13 @@
 						<box>
 							<topPen lineWidth="0.0"/>
 						</box>
+						<textField>
+							<reportElement uuid="8d75592a-9a93-427a-8481-bbc08f2ea2ed" x="0" y="0" width="60" height="20"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true" isUnderline="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{count_MEASURE1} == null ? 0L : $V{count_MEASURE1}]]></textFieldExpression>
+						</textField>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="60" height="20" rowTotalGroup="orgNum1" columnTotalGroup="dateString1">
