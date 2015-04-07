@@ -107,6 +107,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         private String address;
         private Long sourceMenuOrg;
         private Boolean selected = false;
+        private String orgDistrict;
         public OrgShortItem() {
             selected = false;
         }
@@ -174,6 +175,14 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
         public void setSourceMenuOrg(Long sourceMenuOrg) {
             this.sourceMenuOrg = sourceMenuOrg;
+        }
+
+        public String getOrgDistrict() {
+            return orgDistrict;
+        }
+
+        public void setOrgDistrict(String orgDistrict) {
+            this.orgDistrict = orgDistrict;
         }
     }
 
