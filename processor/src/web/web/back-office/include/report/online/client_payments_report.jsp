@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <h:panelGrid id="paymentsReportPanelGrid" binding="#{mainPage.clientPaymentsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -33,80 +34,34 @@
                 <f:selectItems value="#{mainPage.clientPaymentsReportPage.organizationTypeModifyMenu.customItems}" />
             </h:selectOneMenu>
         </h:panelGroup>
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientPaymentsReport}"
-                           reRender="workspaceTogglePanel, clientPaymentsReportTable"
-                           styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Генерировать в Excel" actionListener="#{mainPage.clientPaymentsReportPage.buildClientPaymentsReportExcel}" styleClass="command-button" />
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientPaymentsReportPage.buildReportHTML}"
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           status="reportGenerateStatus" />
+        <h:commandButton value="Генерировать в Excel"
+                         actionListener="#{mainPage.clientPaymentsReportPage.generateXLS}"
+                         styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Отчет по начислениям" styleClass="output-text" />
-        <rich:dataTable id="clientPaymentsReportTable" value="#{mainPage.clientPaymentsReportPage.clientPaymentsReport.clientPaymentItems}"
-                        var="payment" rowKeyVar="row" rows="10" footerClass="data-table-footer"
-                        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
-            <f:facet name="header">
-                <rich:columnGroup>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="№" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Организация" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Поставщик питания" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Пополнения л/c" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Продажи л/с" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Сальдо л/с"  />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Продажи льготные" />
-                    </rich:column>
-                </rich:columnGroup>
-            </f:facet>
-            <rich:column styleClass="center-aligned-column">
-                <h:outputText value="#{row + 1}" styleClass="output-text" />
-            </rich:column>
-            <rich:column styleClass="left-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.orgName}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.agent}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.payments}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.sales}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.diff}" />
-            </rich:column>
-            <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{payment.discounts}" />
-            </rich:column>
-            <f:facet name="footer">
-                <rich:datascroller for="clientPaymentsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
-                    <f:facet name="previous">
-                        <h:graphicImage value="/images/16x16/left-arrow.png" />
-                    </f:facet>
-                    <f:facet name="next">
-                        <h:graphicImage value="/images/16x16/right-arrow.png" />
-                    </f:facet>
-                </rich:datascroller>
-            </f:facet>
-        </rich:dataTable>
-    </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+    <h:panelGrid styleClass="borderless-grid">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty mainPage.clientPaymentsReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по начислениям"
+                          styleClass="output-text" />
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent"> ${mainPage.clientPaymentsReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
+    </h:panelGrid>
 </h:panelGrid>

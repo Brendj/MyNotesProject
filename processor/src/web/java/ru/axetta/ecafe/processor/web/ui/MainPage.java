@@ -5827,39 +5827,6 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object buildClientPaymentsReport() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        if (clientPaymentsReportPage.validateFormData()) {
-            return null;
-        }
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            clientPaymentsReportPage.buildReport(persistenceSession);
-
-            if (!clientPaymentsReportPage.getClientPaymentsReport().getClientPaymentItems().isEmpty()) {
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-            }
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to build sales report", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return null;
-    }
-
     public Object showSalesReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {

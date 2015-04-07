@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="clientPaymentsReport" language="groovy" pageWidth="700" pageHeight="842" columnWidth="660" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ee20fead-a442-456d-9cd6-6c94643966f1">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="clientPaymentsReport" pageWidth="890" pageHeight="10000" columnWidth="850" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ee20fead-a442-456d-9cd6-6c94643966f1">
 	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -7,30 +7,23 @@
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="organizationNames" class="java.lang.String"/>
 	<parameter name="orgType" class="java.lang.String"/>
-	<field name="numRow" class="java.lang.Long"/>
 	<field name="orgName" class="java.lang.String"/>
 	<field name="agent" class="java.lang.String"/>
-	<field name="payments" class="java.lang.Double"/>
-	<field name="diff" class="java.lang.Double"/>
-	<field name="sales" class="java.lang.Double"/>
-	<field name="discounts" class="java.lang.Double"/>
-	<variable name="paymentsTotal" class="java.lang.Double" resetType="Column" calculation="Sum">
-		<variableExpression><![CDATA[$F{payments}]]></variableExpression>
-	</variable>
-	<variable name="salesTotal" class="java.lang.Double" resetType="Column" calculation="Sum">
-		<variableExpression><![CDATA[$V{salesTotal}]]></variableExpression>
-	</variable>
-	<variable name="diffTotal" class="java.lang.Double" resetType="Column" calculation="Sum">
-		<variableExpression><![CDATA[$F{diff}]]></variableExpression>
-	</variable>
-	<variable name="discountsTotal" class="java.lang.Double" resetType="Column" calculation="Sum"/>
+	<field name="payments" class="java.lang.String"/>
+	<field name="sales" class="java.lang.String"/>
+	<field name="discounts" class="java.lang.String"/>
+	<field name="diff" class="java.lang.String"/>
+	<field name="totalPayments" class="java.lang.String"/>
+	<field name="totalSales" class="java.lang.String"/>
+	<field name="totalDiff" class="java.lang.String"/>
+	<field name="totalDiscounts" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="40" splitType="Stretch">
 			<textField>
-				<reportElement uuid="e9de8adc-69d9-4a2e-8978-528d0289e94c" x="0" y="0" width="660" height="40"/>
+				<reportElement uuid="e9de8adc-69d9-4a2e-8978-528d0289e94c" x="0" y="0" width="850" height="40"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
@@ -39,141 +32,151 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="80" splitType="Stretch">
+		<band height="225" splitType="Stretch">
 			<textField>
-				<reportElement uuid="7a2ee8c2-5234-44b6-856e-e07eb593b9c4" x="0" y="0" width="660" height="20"/>
+				<reportElement uuid="7a2ee8c2-5234-44b6-856e-e07eb593b9c4" x="0" y="0" width="850" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Период отчета: " +  $P{beginDate} + " - " + $P{endDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="2d8621d9-117d-4f2d-b569-1239c7f37a5e" x="0" y="20" width="660" height="20"/>
+				<reportElement uuid="2d8621d9-117d-4f2d-b569-1239c7f37a5e" stretchType="RelativeToTallestObject" x="0" y="20" width="161" height="144"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Организации: " + $P{organizationNames}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Организации: "]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
-				<reportElement uuid="f241aa6d-3f48-499f-97d6-886ea1b782b7" x="0" y="40" width="130" height="20"/>
-				<textElement verticalAlignment="Middle">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="f241aa6d-3f48-499f-97d6-886ea1b782b7" x="0" y="164" width="161" height="20"/>
+				<textElement verticalAlignment="Top">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Тип организации: "]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="a5e68e60-c92b-427f-8f6c-e59d2fa113c8" x="0" y="60" width="660" height="20"/>
+			<staticText>
+				<reportElement uuid="3bda22b9-90e8-415a-be12-a87a0b2ab707" mode="Opaque" x="0" y="204" width="36" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[№]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6b285af2-1ef2-40f2-94b8-9e2d9516ad73" mode="Opaque" x="36" y="204" width="200" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Организация]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="67e216cf-63aa-420e-ad9f-474510034458" mode="Opaque" x="236" y="204" width="200" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Поставщик питания]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b710ad0b-3cb8-48f7-9d1b-16729c3ef930" mode="Opaque" x="436" y="204" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Пополнения л/с]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fcab3366-70f5-4718-a102-c0e594275b4d" mode="Opaque" x="536" y="204" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Продажи л/с]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2c8bee3e-bdf4-47e2-ba09-35f50b02fc08" mode="Opaque" x="636" y="204" width="100" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Сальдо л/с]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a41b5fd1-9cca-4565-9b55-2cb131fe2c3e" mode="Opaque" x="736" y="204" width="114" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Продажи льготные]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a9fa30a-3d31-445e-97de-2ecea088789b" x="0" y="184" width="850" height="20"/>
 				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="70ee9c7a-18bc-498d-aeee-1aa73def2ebf" x="161" y="20" width="689" height="144"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{organizationNames}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="09937a15-5e2e-4ee8-984f-75f8d6ff7524" x="130" y="40" width="530" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
+			<textField>
+				<reportElement uuid="0e6579d5-15e3-4608-b560-fe1ff885427b" x="161" y="164" width="689" height="20"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{orgType}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="41" splitType="Stretch">
-			<staticText>
-				<reportElement uuid="3bda22b9-90e8-415a-be12-a87a0b2ab707" x="0" y="0" width="36" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[№]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6b285af2-1ef2-40f2-94b8-9e2d9516ad73" x="36" y="0" width="124" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Организация]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="67e216cf-63aa-420e-ad9f-474510034458" x="160" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Поставщик питания]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b710ad0b-3cb8-48f7-9d1b-16729c3ef930" x="260" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Пополнения л/с]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="fcab3366-70f5-4718-a102-c0e594275b4d" x="360" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Продажи л/с]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="2c8bee3e-bdf4-47e2-ba09-35f50b02fc08" x="460" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Сальдо л/с]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a41b5fd1-9cca-4565-9b55-2cb131fe2c3e" x="560" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Продажи льготные]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="65014407-5386-41c0-87a8-4eb07133d879" x="0" y="20" width="36" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numRow}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="4e7837fe-d0cf-4e6d-896e-9a3ccc483e0b" x="36" y="20" width="124" height="20"/>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="4e7837fe-d0cf-4e6d-896e-9a3ccc483e0b" x="36" y="0" width="200" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -184,20 +187,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="8c02eefd-8549-439f-af6c-2b1d1f1d1096" x="260" y="20" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{payments}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="a9fa1bde-576b-431a-b6e2-11428c339942" x="160" y="20" width="100" height="20"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a9fa1bde-576b-431a-b6e2-11428c339942" x="236" y="0" width="200" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -209,7 +200,7 @@
 				<textFieldExpression><![CDATA[$F{agent}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="884853d9-c58d-474d-9cb8-551f9f16df5e" x="360" y="20" width="100" height="20"/>
+				<reportElement uuid="9f8ca9a8-c0bd-434d-a25c-248171061894" x="0" y="0" width="36" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -218,10 +209,10 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{sales}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="89cbd998-a2ca-4d92-a4d9-235f15032d7c" x="460" y="20" width="100" height="20"/>
+				<reportElement uuid="df43f5ef-431b-4be2-aee1-468fb4916786" x="436" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -230,10 +221,10 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{diff}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{payments} + " р."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="b79b80cb-c885-4337-a8cc-af3e2fc70fca" x="560" y="20" width="100" height="20"/>
+				<reportElement uuid="bd0c20c4-335f-4152-ab03-ea8f309bf8d4" x="536" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -242,28 +233,77 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{discounts}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sales} + " р."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c67fd85d-4afb-44d9-abb3-39122bbc6ed1" x="736" y="0" width="114" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{discounts} + " р."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0297f987-3060-42bc-83ec-c56f2af6b680" x="636" y="0" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{diff} + " р."]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<summary>
 		<band height="21" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="5623eb25-3986-4415-9897-421e96e966cd" x="0" y="0" width="160" height="20"/>
+				<reportElement uuid="5623eb25-3986-4415-9897-421e96e966cd" x="0" y="0" width="236" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
 					<leftPen lineWidth="1.0"/>
 					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
+					<paragraph lineSpacing="Single" leftIndent="40" rightIndent="10"/>
 				</textElement>
 				<text><![CDATA[Итого]]></text>
 			</staticText>
+			<staticText>
+				<reportElement uuid="b05e12ba-cc8a-4aeb-a757-1111fada2e8b" x="236" y="0" width="200" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="18a68db2-e69e-4db5-b4da-c9ffee14b2f1" x="436" y="0" width="414" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
 			<textField>
-				<reportElement uuid="689e1467-cf13-4faa-b91d-aabc0f03b6f5" x="160" y="0" width="100" height="20"/>
+				<reportElement uuid="00af6a9d-b7b5-45f2-89d1-f5ece3b375d7" x="436" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -274,9 +314,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
+				<textFieldExpression><![CDATA[$F{totalPayments} + " р."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="f1e08abb-a4e4-4a89-a338-127b5301c93a" x="260" y="0" width="100" height="20"/>
+				<reportElement uuid="984ebce7-1994-4e9a-99fb-964b560fc10d" x="536" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -287,10 +328,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{paymentsTotal}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalSales} + " р."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="6fa748e5-75cd-44c4-9444-fd0b3e46046d" x="360" y="0" width="100" height="20"/>
+				<reportElement uuid="9bc40ad2-b99c-441a-abb6-444f8fc8a996" x="636" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -301,10 +342,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{salesTotal}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalDiff} + " р."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="c0eaac10-c45d-428f-b716-549d85b363e3" x="460" y="0" width="100" height="20"/>
+				<reportElement uuid="cc25ae14-d7c8-4dc9-815f-6ef42f9b9b0a" x="736" y="0" width="114" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -315,21 +356,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{diffTotal}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="2102fcad-4c10-4015-a3c6-7e1a63969287" x="560" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{discountsTotal}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalDiscounts} + " р."]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
