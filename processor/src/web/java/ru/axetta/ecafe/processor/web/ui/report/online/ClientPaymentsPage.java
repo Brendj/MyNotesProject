@@ -165,7 +165,7 @@ public class ClientPaymentsPage extends OnlineReportPage {
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
                 response.setHeader("Content-disposition",
-                        "inline;filename=detailedDeviationsWithoutCorpsNewReport.xls");
+                        "inline;filename=ClientPaymentsReport.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
