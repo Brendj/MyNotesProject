@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class RuleCondition {
 
-    public static final int SIZE_OF_CONFITIONCONSTANT_FIELD = 1099;
+    public static final int SIZE_OF_CONFITIONCONSTANT_FIELD = 2099;
 
     public static final String TYPE_CONDITION_ARG = "class";
     public static final int TAUTOLOGY_OPERTAION = 0;

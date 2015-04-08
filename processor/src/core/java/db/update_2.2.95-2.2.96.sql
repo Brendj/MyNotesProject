@@ -4,4 +4,4 @@
 
 -- Пакет обновлений 2.2.95
 
-ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (1100);
+ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (2100);
