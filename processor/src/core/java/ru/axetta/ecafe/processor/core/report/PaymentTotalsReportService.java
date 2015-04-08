@@ -6,15 +6,12 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
@@ -38,7 +35,7 @@ public class PaymentTotalsReportService {
     final private Session session;
     final private static String STR_YEAR_DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
     final private static DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
-    private Long debugLevel = 0L;
+    private Long debugLevel = 2L;
 
 
     public PaymentTotalsReportService(Session session) {
@@ -52,13 +49,8 @@ public class PaymentTotalsReportService {
 
         List<Long> reportOrgSet = DAOUtils.complementIdOfOrgSet(session, idOfOrgList);
 
-        Date date = new Date();
-        Long iterator = 0L;
-
         List<Item> reportItems = new ArrayList<Item>();
         for (Long idOfOrg : reportOrgSet) {
-
-            date = printTime(date, " ms " + iterator++ + " (idOfOrg - " + idOfOrg + "). Main cycle", 2L);
 
             Org org = (Org) session.load(Org.class, idOfOrg);
 
@@ -69,18 +61,19 @@ public class PaymentTotalsReportService {
 
             String orgName = org.getShortName();
 
-            String lastSyncTime = YEAR_DATE_FORMAT.format(getLastSyncTime(idOfOrg));
+            Date lastSyncTimeDate = getLastSyncTime(idOfOrg);
+            if (lastSyncTimeDate == null) {
+                lastSyncTimeDate = CalendarUtils.addDays(endTime, -1);
+            }
+            String lastSyncTime = YEAR_DATE_FORMAT.format(lastSyncTimeDate);
 
-            Long startCash = getOrgClientsBalance(idOfOrg, startTime, ClientGroupMenu.CLIENT_STUDENTS);
-            // getOrgClientsBalanceOnDateBeforeRubicon(idOfOrg, startTime, ClientGroupMenu.CLIENT_STUDENTS);
+            Long startCash = getOrgStudentsBalanceSumToDate(idOfOrg, startTime);
 
-            Long income = getOrgClientsIncomeOnPeriod(idOfOrg, startTime, endTime, ClientGroupMenu.CLIENT_STUDENTS);
+            Long income = getOrgClientsIncomeOnPeriod(idOfOrg, startTime, endTime);
 
-            Long paid = getPaidOrdersSum(idOfOrg, startTime, endTime);
+            Long paid = getPaidComplexOrdersSum(idOfOrg, startTime, endTime);
 
-            //paid = getPaidOrdersSumSQL(idOfOrg, startTime, endTime); // todo must be optimized
-
-            Long paidSnack = getPaidSnackSum(idOfOrg, startTime, endTime);
+            Long paidSnack = getPaidSnackOrdersSum(idOfOrg, startTime, endTime);
 
             Long paidTotal = paid + paidSnack;
 
@@ -88,44 +81,198 @@ public class PaymentTotalsReportService {
 
             Long cashMoved = getCashMovedSum(idOfOrg, startTime, endTime);
 
-            Long endCash = getOrgClientsBalance(idOfOrg, endTime, ClientGroupMenu.CLIENT_STUDENTS);
+            Long endCash = getOrgStudentsBalanceSumToDate(idOfOrg, endTime);
 
             Long endCash1 = startCash + income - paidTotal - repayment + cashMoved;
 
-            Long endCash2 = getOrgClientsBalance2(idOfOrg, ClientGroupMenu.CLIENT_STUDENTS);
+            Long endCash2 = getAllOrdersSum(idOfOrg, startTime, endTime);
 
             String comment = getStatusDetail(idOfOrg);
 
+            TreeMap<Long, AccountTransaction> transactions = getTransactions(idOfOrg, startTime, endTime);
+            TreeMap<CompositeIdOfOrder, Order> orders = getOrders(idOfOrg, startTime, endTime);
+            Long transactionsSum = 0L;
+            Long ordersSum = 0L;
+
+
             Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack, paidTotal,
                     repayment, cashMoved, endCash, endCash1, endCash2, comment);
-            if (notZeroCash(item) || !hideNullRows)
+            if (!zeroCash(item) || !hideNullRows) {
                 reportItems.add(item);
+            }
         }
-
-        date = printTime(date, " ms - Main cycle passed.", 2L);
 
         return reportItems;
     }
 
-    private Long getOrgClientsBalance2(Long idOfOrg, Long clientStudents) {
-        Criteria orgClientsCriteria = session.createCriteria(Client.class);
-        orgClientsCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-        String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
-        if (!clientStudents.equals(ClientGroupMenu.CLIENT_ALL))
-            if (clientStudents.equals(ClientGroupMenu.CLIENT_STUDENTS))
-                orgClientsCriteria.add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
-            else
-                orgClientsCriteria.add(Restrictions.eq(cgFieldName, clientStudents));
-        orgClientsCriteria.createCriteria("org", "o");
-        orgClientsCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-        List result = orgClientsCriteria.list();
+    /**
+     * Разница между
+     *      1) суммой текущих балансов клиентов (принадлежащих данной ОО на дату toDate)
+     *      2) и суммой транзакций этих клиентов с даты toDate по текущий момент.
+     * @param idOfOrg
+     * @param toDate
+     * @return
+     */
 
-        Long sum = 0L;
-        for (Object o : result) {
-            Client client = (Client) o;
-            sum += client.getBalance();
+    private Long getOrgStudentsBalanceSumToDate(Long idOfOrg, Date toDate) {
+
+        Set<Client> clientMap = getOrgClientsToDate(idOfOrg, toDate);
+
+        List<Long> clientIdList = new ArrayList<Long>();
+        for (Client client : clientMap) {
+            clientIdList.add(client.getIdOfClient());
         }
-        return sum;
+
+        Criteria orgClientsToDateCriteria = session.createCriteria(Client.class);
+        orgClientsToDateCriteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
+        orgClientsToDateCriteria.add(Restrictions.in("idOfClient", clientIdList));
+        orgClientsToDateCriteria.setProjection(Projections.sum("balance"));
+        Long orgClientsBalanceToDate = (Long) orgClientsToDateCriteria.uniqueResult();
+
+        Criteria transactionsFromDateCriteria = session.createCriteria(AccountTransaction.class);
+        transactionsFromDateCriteria.createAlias("client", "c");
+        transactionsFromDateCriteria.add(Restrictions.in("c.idOfClient", clientIdList));
+        transactionsFromDateCriteria.add(Restrictions.gt("transactionTime", toDate));
+        transactionsFromDateCriteria.setProjection(Projections.sum("transactionSum"));
+        Long orgClientsTransactionsSumFromDate = (Long) transactionsFromDateCriteria.uniqueResult();
+        if (orgClientsTransactionsSumFromDate == null) {
+            orgClientsTransactionsSumFromDate = 0L;
+        }
+
+        return orgClientsBalanceToDate - orgClientsTransactionsSumFromDate;
+    }
+
+    /**
+     * Клиенты ОО на дату toDate
+     * @param idOfOrg
+     * @param toDate
+     * @return
+     */
+
+    private Set<Client> getOrgClientsToDate(Long idOfOrg, Date toDate) {
+
+        HashMap<Client, List<ClientMigration>> clientMigrationListsMap = getClientMigrationsListHashMap(idOfOrg, toDate);
+
+        Criteria orgClientsCriteria = session.createCriteria(Client.class);
+        orgClientsCriteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
+        orgClientsCriteria.createAlias("org", "o");
+        orgClientsCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        List<Client> todayClientList = orgClientsCriteria.list();
+        Set<Client> clientMap = new HashSet<Client>();
+        clientMap.addAll(todayClientList);
+
+        for (Client client : clientMigrationListsMap.keySet()) {
+            ClientMigration firstClientMigration = null;
+            Date registrationDate = new Date();
+            for (ClientMigration clientMigration : clientMigrationListsMap.get(client)) {
+                if (clientMigration.getRegistrationDate().before(registrationDate)) {
+                    firstClientMigration = clientMigration;
+                    registrationDate = clientMigration.getRegistrationDate();
+                }
+            }
+            if (firstClientMigration != null && firstClientMigration.getOldOrg() != null && firstClientMigration.getOldOrg().getIdOfOrg() == idOfOrg && !clientMap.contains(firstClientMigration.getClient())) {
+                clientMap.add(client);
+            }
+            if (firstClientMigration != null && firstClientMigration.getOrg() != null && firstClientMigration.getOrg().getIdOfOrg() == idOfOrg && clientMap.contains(firstClientMigration.getClient())) {
+                clientMap.remove(client);
+            }
+        }
+
+        return clientMap;
+    }
+
+    private HashMap<Client, List<ClientMigration>> getClientMigrationsListHashMap(Long idOfOrg, Date startDate) {
+        return getClientMigrationsListHashMap(idOfOrg, startDate, new Date());
+    }
+
+    private HashMap<Client, List<ClientMigration>> getClientMigrationsListHashMap(Long idOfOrg, Date toDate, Date endDate) {
+        Org org = null;
+        try {
+            org = DAOUtils.findOrg(session, idOfOrg);
+        } catch (Exception e) {
+            logger.warn("Org by idOfOrg not found. ", e);
+        }
+        List<ClientMigration> clientMigrations =
+                org != null ? getClientMigrationsForOrg(org, toDate, endDate) : new ArrayList<ClientMigration>();
+
+        HashMap<Client, List<ClientMigration>> clientMigrationListsMap = new HashMap<Client, List<ClientMigration>>();
+        for (ClientMigration clientMigration : clientMigrations) {
+            if (clientMigrationListsMap.containsKey(clientMigration.getClient())) {
+                clientMigrationListsMap.get(clientMigration.getClient()).add(clientMigration);
+            } else {
+                List<ClientMigration> clientMigrationList = new ArrayList<ClientMigration>();
+                clientMigrationList.add(clientMigration);
+                clientMigrationListsMap.put(clientMigration.getClient(), clientMigrationList);
+            }
+        }
+        return clientMigrationListsMap;
+    }
+
+    private List<ClientMigration> getClientMigrationsForOrg(Org org, Date start, Date end) {
+        Criteria clientMigrationCriteria = session.createCriteria(ClientMigration.class);
+        //clientMigrationCriteria.createAlias("org", "o");
+        //clientMigrationCriteria.createAlias("oldOrg", "oo");
+        clientMigrationCriteria.add(
+                Restrictions.or(
+                        Restrictions.eq("org", org),
+                        Restrictions.eq("oldOrg", org)));
+        clientMigrationCriteria.add(Restrictions.between("registrationDate", start, end));
+        List<ClientMigration> clientMigrations = clientMigrationCriteria.list();
+        return clientMigrations != null ? clientMigrations : new ArrayList<ClientMigration>();
+    }
+
+    /**
+     * Поступления на счета клиентов ОО за период (транзакции ОО с положительной суммой за период)
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+
+    private Long getOrgClientsIncomeOnPeriod(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.gt("transactionTime", startTime));
+        criteria.add(Restrictions.lt("transactionTime", endTime));
+        criteria.add(Restrictions.gt("transactionSum", 0L));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
+        Long income = (Long) criteria.uniqueResult();
+        if (income == null) {
+            income = 0L;
+        }
+        return income;
+    }
+
+    private TreeMap<Long, AccountTransaction> getTransactions(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.gt("transactionTime", startTime));
+        criteria.add(Restrictions.lt("transactionTime", endTime));
+        criteria.add(Restrictions.gt("transactionSum", 0L));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        List<AccountTransaction> transactions = criteria.list();
+        TreeMap<Long, AccountTransaction> transactionsTreeMap = new TreeMap<Long, AccountTransaction>();
+        if (transactions != null) {
+            for (AccountTransaction accountTransaction : transactions) {
+                transactionsTreeMap.put(accountTransaction.getIdOfTransaction(), accountTransaction);
+            }
+        }
+        return transactionsTreeMap;
+    }
+
+    private TreeMap<CompositeIdOfOrder, Order> getOrders(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(OrderDetail.class, "od");
+        criteria.createAlias("order", "o");
+        criteria.add(Restrictions.eq("od.state", 0));
+        criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.between("o.createTime", startTime, endTime));
+        List<OrderDetail> orderDetails = criteria.list();
+        TreeMap<CompositeIdOfOrder, Order> orders = new TreeMap<CompositeIdOfOrder, Order>();
+        if (orderDetails == null) {
+            for (OrderDetail orderDetail : orderDetails) {
+                orders.put(orderDetail.getOrder().getCompositeIdOfOrder(), orderDetail.getOrder());
+            }
+        }
+        return orders;
     }
 
     private String getStatusDetail(Long idOfOrg) {
@@ -136,55 +283,17 @@ public class PaymentTotalsReportService {
         return "";
     }
 
-    private Long getOrgClientsBalance(Long idOfOrg, Date toTime, Long clientGroup) {
-        Long result = 0L;
-        Date rubicon = new Date(113, 2, 14); // 2013-03-14 00:00:00
-        result = getOrgClientsBalanceOnDateBeforeRubicon(idOfOrg, rubicon, clientGroup);
-        if (toTime.after(rubicon))
-            result += getOrgClientsBalanceChangeOnPeriodAfterRubicon(idOfOrg, rubicon, toTime, clientGroup);
-        return result;
-    }
-
-    private Long getOrgClientsBalanceChangeOnPeriodAfterRubicon(Long idOfOrg, Date rubicon, Date toTime,
-            Long clientGroup) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getOrgClientsBalanceChangeOnPeriodAfterRubicon, idOfOrg - " + idOfOrg, 4L);
-
-        Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.between("transactionTime", rubicon, toTime));
-        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.setProjection(Projections.sum("transactionSum"));
-        List list = criteria.list();
-
-        Long cashSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) cashSum = (Long) list.get(0);
-
-        date = printTime(date,  " ms - getOrgClientsBalanceChangeOnPeriodAfterRubicon, idOfOrg - " + idOfOrg, 4L);
-
-        return cashSum;
-    }
-
-    private boolean notZeroCash(Item item) {
-        //if (item.getStartCash() == 0L
-        //    && item.getIncome() == 0L
-        //    && item.getPaid() == 0L
-        //    && item.getPaidSnack() == 0L
-        //    && item.getPaidTotal() == 0L
-        //    && item.getRepayment() == 0L
-        //    && item.getCashMoved() == 0L
-        //    && item.getEndCash() == 0L) {
-        //    return false;
-        //}
+    private boolean zeroCash(Item item) {
         if (item.getIncome() != 0L
             || item.getPaid() != 0L
             || item.getPaidSnack() != 0L
             || item.getPaidTotal() != 0L
             || item.getRepayment() != 0L
             || item.getCashMoved() != 0L) {
+            return false;
+        } else {
             return true;
         }
-        return false;
     }
 
     private Date printTime(Date date, String message, Long debugLevel) {
@@ -199,84 +308,111 @@ public class PaymentTotalsReportService {
         return date;
     }
 
+    /**
+     * Сумма балансов клиентов на момент перемещения из или в ОО
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+
     private Long getCashMovedSum(Long idOfOrg, Date startTime, Date endTime) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getCashMovedSum, idOfClient - " + idOfOrg, 4L);
-
         Criteria criteria = session.createCriteria(ClientMigration.class, "c");
         criteria.add(Restrictions.between("c.registrationDate", startTime, endTime));
-        criteria.add(Restrictions.or(Restrictions.eq("c.org.idOfOrg", idOfOrg),
-                Restrictions.eq("c.oldOrg.idOfOrg", idOfOrg)));
+        criteria.add(
+                Restrictions.or(Restrictions.eq("c.org.idOfOrg", idOfOrg), Restrictions.eq("c.oldOrg.idOfOrg", idOfOrg)));
         List<ClientMigration> list = criteria.list();
         Long cashMovedSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) {
+        if (list != null) {
             for (ClientMigration clientMigration : list) {
                 if (clientMigration.getOrg().getIdOfOrg() == idOfOrg) {
-                    cashMovedSum += getClientsBalanceOnDate(clientMigration.getClient(), clientMigration.getRegistrationDate(), 1L);
+                    cashMovedSum += getClientBalanceOnDate(clientMigration.getClient(),
+                            clientMigration.getRegistrationDate());
                 } else if (clientMigration.getOldOrg().getIdOfOrg() == idOfOrg) {
-                    cashMovedSum -= getClientsBalanceOnDate(clientMigration.getClient(), clientMigration.getRegistrationDate(), 1L);
-                } else {
-                    logger.info("Clients migration processing error " + clientMigration.toString());
+                    cashMovedSum -= getClientBalanceOnDate(clientMigration.getClient(),
+                            clientMigration.getRegistrationDate());
                 }
             }
         }
-
-        date = printTime(date, " ms - getCashMovedSum, idOfClient - " + idOfOrg, 4L);
-
         return cashMovedSum;
     }
 
-    private Long getClientsBalanceOnDate(Client client, Date registrationDate, Long debugLevel) {
+    /**
+     * Вспомогательная функция для getCashMovedSum
+     * @param client
+     * @param registrationDate
+     * @return
+     */
 
-        Date date = new Date();
-        date = printTime(date, " ms - getClientsBalanceOnDate, idOfClient - " + client.getIdOfClient(), 4L);
-
+    private Long getClientBalanceOnDate(Client client, Date registrationDate) {
+        Long balance = client.getBalance();
         Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.lt("transactionTime", registrationDate));
+        criteria.add(Restrictions.gt("transactionTime", registrationDate));
         criteria.add(Restrictions.eq("client", client));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
-        List list = criteria.list();
-
-        Long balance = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) balance = (Long) list.get(0);
-
-        date = printTime(date, " ms - getClientsBalanceOnDate, idOfClient - " + client.getIdOfClient(), 4L);
-
+        balance -= (Long) criteria.uniqueResult();
         return balance;
     }
 
+    /**
+     * Сумма возвратов клиентам ОО за период
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+
     private Long getRepaymentSum(Long idOfOrg, Date startTime, Date endTime) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getRepaymentSum, idOfOrg - " + idOfOrg, 4L);
-
         Criteria criteria = session.createCriteria(AccountTransaction.class, "at");
         criteria.createAlias("org", "o");
         criteria.add(Restrictions.eq("at.sourceType", AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE));
         criteria.add(Restrictions.between("at.transactionTime", startTime, endTime));
-
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
                         new Type[]{LongType.INSTANCE}))
         );
-        List list = criteria.list();
-
-        Long repaymentSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) repaymentSum = (Long) list.get(0);
-
-        date = printTime(date, " ms - getRepaymentSum, idOfOrg - " + idOfOrg, 4L);
-
+        Long repaymentSum = (Long) criteria.uniqueResult();
+        if (repaymentSum == null) {
+            repaymentSum = 0L;
+        }
         return repaymentSum;
     }
 
-    private Long getPaidSnackSum(Long idOfOrg, Date startTime, Date endTime) {
+    /**
+     * Сумма всех оплат в ОО за период
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
 
-        Date date = new Date();
-        date = printTime(date, " ms - getPaidSnackSum, idOfOrg - " + idOfOrg, 4L);
+    private Long getAllOrdersSum(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(OrderDetail.class, "od");
+        criteria.createAlias("order", "o");
+        criteria.add(Restrictions.eq("od.state", 0));
+        criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.between("o.createTime", startTime, endTime));
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE}))
+        );
+        Long allOrdersSum = (Long) criteria.uniqueResult();
+        if (allOrdersSum == null) {
+            allOrdersSum = 0L;
+        }
+        return allOrdersSum;
+    }
 
+    /**
+     * Сумма оплат за буфетную продукцию в ОО за период
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+
+    private Long getPaidSnackOrdersSum(Long idOfOrg, Date startTime, Date endTime) {
         Criteria criteria = session.createCriteria(OrderDetail.class, "od");
         criteria.createAlias("order", "o");
         criteria.add(Restrictions.eq("od.state", 0));
@@ -284,28 +420,26 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("od.menuType", OrderDetail.TYPE_DISH_ITEM));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-        // не нужно - удалить
-        //Org org = (Org) session.load(Org.class, idOfOrg);
-        //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
                         new Type[]{LongType.INSTANCE}))
         );
-        List list = criteria.list();
-
-        Long paidSnackSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) paidSnackSum = (Long) list.get(0);
-
-        date = printTime(date, " ms - getPaidSnackSum, idOfOrg - " + idOfOrg, 4L);
-
+        Long paidSnackSum = (Long) criteria.uniqueResult();
+        if (paidSnackSum == null) {
+            paidSnackSum = 0L;
+        }
         return paidSnackSum;
     }
 
-    private Long getPaidOrdersSum(Long idOfOrg, Date startTime, Date endTime) {
+    /**
+     * Сумма оплат за комплексы в ОО за период
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
 
-        Date date = new Date();
-        date = printTime(date, " ms - getPaidOrdersSum, idOfOrg - " + idOfOrg, 4L);
-
+    private Long getPaidComplexOrdersSum(Long idOfOrg, Date startTime, Date endTime) {
         Criteria criteria = session.createCriteria(OrderDetail.class, "od");
         criteria.createAlias("order", "o");
         criteria.add(Restrictions.eq("od.state", 0));
@@ -314,145 +448,40 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.between("od.menuType", OrderDetail.TYPE_COMPLEX_MIN, OrderDetail.TYPE_COMPLEX_MAX));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-        // не нужно - удалить
-        //Org org = (Org) session.load(Org.class, idOfOrg);
-        //criteria.add(Restrictions.eq("o.contragent", org.getDefaultSupplier()));
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
                         new Type[]{LongType.INSTANCE}))
         );
-        List list = criteria.list();
-
-        Long paidOrdersSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) paidOrdersSum = (Long) list.get(0);
-
-        date = printTime(date, " ms - getPaidOrdersSum, idOfOrg - " + idOfOrg, 4L);
-
+        Long paidOrdersSum = (Long) criteria.uniqueResult();
+        if (paidOrdersSum == null) {
+            paidOrdersSum = 0L;
+        }
         return paidOrdersSum;
     }
 
-    private Long getPaidOrdersSumSQL(Long idOfOrg, Date startTime, Date endTime) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getPaidOrdersSumSQL, idOfOrg - " + idOfOrg, 4L);
-
-        Query query = session.createSQLQuery(
-                "SELECT sum(this_.rprice * this_.qty) AS sum " + "FROM " + "CF_OrderDetails this_ "
-                        + "INNER JOIN CF_Orders o1_ "
-                        + "ON this_.IdOfOrg = o1_.IdOfOrg AND this_.IdOfOrder = o1_.IdOfOrder " + "WHERE "
-                        + "this_.State = :state " + "AND o1_.OrderType IN (:ordertype) "
-                //+ "AND this_.MenuType BETWEEN :menutypemin AND :menutypemax "
-                //+ "AND o1_.IdOfOrg IN (:idoforgs) "
-                //+ "AND o1_.CreatedDate BETWEEN :startdate AND :enddate "
-        );
-        query.setParameter("state", 0);
-        query.setParameterList("ordertype", new Long[]{1L, 3L, 7L});
-        //query.setParameter("menutypemin", 0);
-        //query.setParameter("menutypemax", 0);
-        //query.setParameter("idoforgs", idOfOrg);
-        //query.setParameter("startdate", startTime.getTime());
-        //query.setParameter("enddate", endTime.getTime());
-        List list = query.list();
-
-        Long paidOrdersSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) paidOrdersSum = (Long) list.get(0);
-
-        date = printTime(date, " ms - getPaidOrdersSumSQL, idOfOrg - " + idOfOrg, 4L);
-
-        return paidOrdersSum;
-    }
-
-    private Long getOrgClientsIncomeOnPeriod(Long idOfOrg, Date startTime, Date endTime, Long clientGroupId) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getOrgClientsIncomeOnPeriod, idOfOrg - " + idOfOrg, 4L);
-
-        DetachedCriteria orgClientsDetachedCriteria = DetachedCriteria.forClass(Client.class);
-        orgClientsDetachedCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-        String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
-        if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL))
-            if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS))
-                orgClientsDetachedCriteria.add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
-            else
-                orgClientsDetachedCriteria.add(Restrictions.eq(cgFieldName, clientGroupId));
-        orgClientsDetachedCriteria.createCriteria("org", "o");
-        orgClientsDetachedCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-        orgClientsDetachedCriteria.setProjection(Property.forName("idOfClient"));
-
-        Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.gt("transactionTime", startTime));
-        criteria.add(Restrictions.lt("transactionTime", endTime));
-        criteria.add(Restrictions.gt("transactionSum", 0L));
-        criteria.add(Property.forName("client.idOfClient").in(orgClientsDetachedCriteria));
-        criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
-        List list = criteria.list();
-
-        Long income = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) income = (Long) list.get(0);
-
-        date = printTime(date, " ms - getOrgClientsIncomeOnPeriod, idOfOrg - " + idOfOrg, 4L);
-
-        return income;
-    }
-
-    private Long getOrgClientsBalanceOnDateBeforeRubicon(Long idOfOrg, Date toTime, Long clientGroupId) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getOrgClientsBalanceOnDateBeforeRubicon, idOfOrg - " + idOfOrg, 4L);
-
-        DetachedCriteria orgClientsDetachedCriteria = DetachedCriteria.forClass(Client.class);
-        orgClientsDetachedCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-        String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
-        if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL))
-            if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS))
-                orgClientsDetachedCriteria.add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
-            else
-                orgClientsDetachedCriteria.add(Restrictions.eq(cgFieldName, clientGroupId));
-        orgClientsDetachedCriteria.createCriteria("org", "o");
-        orgClientsDetachedCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-        orgClientsDetachedCriteria.setProjection(Property.forName("idOfClient"));
-
-        Criteria criteria = session.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.lt("transactionTime", toTime));
-        criteria.add(Property.forName("client.idOfClient").in(orgClientsDetachedCriteria));
-        criteria.setProjection(Projections.sum("transactionSum"));
-        List list = criteria.list();
-
-        Long cashSum = 0L;
-        if (list != null && list.size() > 0 && list.get(0) != null) cashSum = (Long) list.get(0);
-
-        date = printTime(date,  " ms - getOrgClientsBalanceOnDateBeforeRubicon, idOfOrg - " + idOfOrg, 4L);
-
-        return cashSum;
-    }
+    /**
+     * Дата последней синхронизации
+     * @param idOfSyncOrg
+     * @return
+     */
 
     private Date getLastSyncTime(Long idOfSyncOrg) {
-
-        Date date = new Date();
-        date = printTime(date, " ms - getLastSyncTime, idOfOrg - " + idOfSyncOrg, 4L);
-
-        Criteria orgCriteria = session.createCriteria(SyncHistory.class);
-        orgCriteria.createAlias("org", "o");
-        orgCriteria.add(Restrictions.eq("o.idOfOrg", idOfSyncOrg));
-        orgCriteria.add(Restrictions.eq("syncResult", 0));
-        orgCriteria.setProjection(Projections.projectionList().add(Projections.property("syncEndTime")));
-        List<Date> syncTimes = orgCriteria.list();
-        Date lastSyncTime = new Date(0L);
-        if (syncTimes != null && syncTimes.size() > 0 && syncTimes.get(0) != null) {
-            lastSyncTime = syncTimes.get(0);
-            for (Date syncTime : syncTimes)
-                if (syncTime.after(lastSyncTime))
-                    lastSyncTime = syncTime;
-        }
-
-        date = printTime(date, " ms - getLastSyncTime, idOfOrg - " + idOfSyncOrg, 4L);
-
+        Criteria syncHistoryCriteria = session.createCriteria(SyncHistory.class);
+        syncHistoryCriteria.createAlias("org", "o");
+        syncHistoryCriteria.add(Restrictions.eq("o.idOfOrg", idOfSyncOrg));
+        syncHistoryCriteria.add(Restrictions.eq("syncResult", 0));
+        syncHistoryCriteria.setProjection(Projections.projectionList().add(Projections.max("syncEndTime")));
+        Date lastSyncTime = (Date) syncHistoryCriteria.uniqueResult();
         return lastSyncTime;
     }
 
     private List<Long> getOrgs(Long idOfContragent) {
         List<Long> orgList = new ArrayList<Long>();
-        Set<Org> orgs = ((Contragent) session.load(Contragent.class, idOfContragent)).getOrgs();
+        Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+        Set<Org> orgs = new HashSet<Org>();
+        if (contragent != null) {
+            orgs = contragent.getOrgs();
+        }
         for (Org org : orgs) orgList.add(org.getIdOfOrg());
         return orgList;
     }

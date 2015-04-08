@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-06T14:53:18 -->
+<!-- 2015-04-07T11:35:49 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry_Landscape" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
@@ -1189,6 +1189,7 @@
 					<reportElement style="Column header" x="6" y="3" width="197" height="20" forecolor="#000000" uuid="a2cedcf9-e1e4-4ece-ac36-e341c5f9936a">
 						<property name="local_mesure_unitx" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<printWhenExpression><![CDATA[false]]></printWhenExpression>
 					</reportElement>
 					<textElement verticalAlignment="Middle">
 						<font fontName="SansSerif" size="10" isBold="false"/>

@@ -52,12 +52,12 @@
                              actionListener="#{mainPage.paymentTotalsReportPage.onEndDateSpecified}" />
             </rich:calendar>
 
-            <h:outputText escape="true" value="Скрывать ОО по которым не было движения за период" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{mainPage.paymentTotalsReportPage.hideNullRows}"
-                                     styleClass="output-text">
-                <a4j:support event="onclick" reRender="paymentTotalsReportPanelGrid" ajaxSingle="true"
-                        actionListener="#{mainPage.paymentTotalsReportPage.onHideNullRowsChange}"/>
-            </h:selectBooleanCheckbox>
+            <%--<h:outputText escape="true" value="Скрывать ОО по которым не было движения за период" styleClass="output-text" />--%>
+            <%--<h:selectBooleanCheckbox value="#{mainPage.paymentTotalsReportPage.hideNullRows}"--%>
+                                     <%--styleClass="output-text">--%>
+                <%--<a4j:support event="onclick" reRender="paymentTotalsReportPanelGrid" ajaxSingle="true"--%>
+                        <%--actionListener="#{mainPage.paymentTotalsReportPage.onHideNullRowsChange}"/>--%>
+            <%--</h:selectBooleanCheckbox>--%>
 
         </h:panelGrid>
     </rich:simpleTogglePanel>
