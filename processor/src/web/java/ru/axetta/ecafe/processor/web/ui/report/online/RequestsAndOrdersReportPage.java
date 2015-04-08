@@ -10,11 +10,11 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
-import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RequestsAndOrdersReport;
+import ru.axetta.ecafe.processor.core.report.model.requestsandorders.FeedingPlanType;
+import ru.axetta.ecafe.processor.core.report.requestsAndOrdersReport.NoDataFoundException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -28,16 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,6 +53,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     private Boolean hideMissedColumns = true;
     private Boolean showOnlyDivergence = false;
     private Boolean useColorAccent = false;
+    private String feedingPlanType = "Все";
     private User currentUser;
 
     public RequestsAndOrdersReportPage() {
@@ -102,15 +101,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         } else {
             filter = "Не выбрано";
         }
-    }
-
-    // Транзакционный метод
-    @Override
-    public void fill(Session persistenceSession, User currentUser) throws Exception {
-        this.currentUser = currentUser;
-        Properties properties = DAOUtils.extractPropertiesByUserReportSetting(persistenceSession, currentUser,
-                UserReportSetting.GOOD_REQUEST_REPORT);
-        htmlReport = null;
     }
 
     public void onReportPeriodChanged(ActionEvent event) {
@@ -240,6 +230,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     }
 
     public Object buildReportHTML() {
+        htmlReport = null;
         if (validateFormData()) {
             return null;
         }
@@ -259,6 +250,9 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        } catch (NoDataFoundException e) {
+            logger.warn("Failed export report : ", e);
+            printWarn("Ошибка при подготовке отчета: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -342,6 +336,9 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        } catch (NoDataFoundException e) {
+            logger.warn("Failed export report : ", e);
+            printWarn("Ошибка при подготовке отчета: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -380,26 +377,14 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
-    // todo delete - not used
-    //public Object clear() {
-    //    idOfOrg = null;
-    //    filter = null;
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    localCalendar = runtimeContext
-    //            .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
-    //
-    //    localCalendar.setTime(new Date());
-    //    this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
-    //
-    //    localCalendar.setTime(this.startDate);
-    //    localCalendar.add(Calendar.DATE, 1);
-    //    localCalendar.add(Calendar.SECOND, -1);
-    //    this.endDate = localCalendar.getTime();
-    //    htmlReport = null;
-    //    return null;
-    //}
+    public List<SelectItem> getFeedingPlanTypes() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem("Все"));
+        items.add(new SelectItem(FeedingPlanType.REDUCED_PRICE_PLAN.toString()));
+        items.add(new SelectItem(FeedingPlanType.PAY_PLAN.toString()));
+        items.add(new SelectItem(FeedingPlanType.SUBSCRIPTION_FEEDING.toString()));
+        return items;
+    }
 
     private Properties buildProperties() {
         Properties properties = new Properties();
@@ -413,6 +398,9 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS, Boolean.toString(hideMissedColumns));
         properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, Boolean.toString(useColorAccent));
         properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, Boolean.toString(showOnlyDivergence));
+        if (feedingPlanType != null) {
+            properties.setProperty(RequestsAndOrdersReport.P_FEEDING_TYPE, feedingPlanType.toString());
+        }
         return properties;
     }
 
@@ -468,5 +456,13 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
 
     public void setUseColorAccent(Boolean useColorAccent) {
         this.useColorAccent = useColorAccent;
+    }
+
+    public String getFeedingPlanType() {
+        return feedingPlanType;
+    }
+
+    public void setFeedingPlanType(String feedingPlanType) {
+        this.feedingPlanType = feedingPlanType;
     }
 }
