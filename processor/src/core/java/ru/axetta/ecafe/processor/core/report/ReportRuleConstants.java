@@ -195,6 +195,12 @@ public class ReportRuleConstants {
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не использовать,{true}Включить"),//41
             new ParamHint(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, "Режим вывода данных")
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Все данные,{true}Только расхождения"),//42
+            new ParamHint(RequestsAndOrdersReport.P_FEEDING_TYPE, "Тип питания")
+                    .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
+                            + "{Все}Все,"
+                            + "{Платное питание}Платное питание,"
+                            + "{Льготное питание}Льготное питание,"
+                            + "{Абонементное питание}Абонементное питание"),//43
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -259,7 +265,7 @@ public class ReportRuleConstants {
             new ReportHint(FeedingAndVisitReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(FeedingAndVisitSReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 32, 40, 41, 42}),
+            new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 32, 40, 41, 42, 43}),
             new ReportHint(PaymentTotalsReport.class.getCanonicalName(), new int[]{20, 3, 35}),
             new ReportHint(BeneficiaryByAllOrgReport.class.getCanonicalName(), new int[]{})
     };
