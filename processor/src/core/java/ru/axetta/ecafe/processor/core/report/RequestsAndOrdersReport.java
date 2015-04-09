@@ -133,7 +133,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
                         String feedingPlanType = rule.getExpressionValue(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE);
                         properties.setProperty(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE,
-                                reportPeriodType == null ? "Все" : feedingPlanType);
+                                feedingPlanType == null ? "Все" : feedingPlanType);
 
                         BasicReportForAllOrgJob report = createInstance();
                         report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
