@@ -195,7 +195,7 @@ public class ReportRuleConstants {
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не использовать,{true}Включить"),//41
             new ParamHint(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, "Режим вывода данных")
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Все данные,{true}Только расхождения"),//42
-            new ParamHint(RequestsAndOrdersReport.P_FEEDING_TYPE, "Тип питания")
+            new ParamHint(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE, "Тип питания")
                     .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
                             + "{Все}Все,"
                             + "{Платное питание}Платное питание,"

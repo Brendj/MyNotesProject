@@ -399,7 +399,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, Boolean.toString(useColorAccent));
         properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, Boolean.toString(showOnlyDivergence));
         if (feedingPlanType != null) {
-            properties.setProperty(RequestsAndOrdersReport.P_FEEDING_TYPE, feedingPlanType.toString());
+            properties.setProperty(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE, feedingPlanType.toString());
         }
         return properties;
     }

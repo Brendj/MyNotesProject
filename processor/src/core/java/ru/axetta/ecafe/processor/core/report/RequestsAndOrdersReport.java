@@ -38,7 +38,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
     final public static String P_HIDE_MISSED_COLUMNS = "hideMissedColumns";
     final public static String P_USE_COLOR_ACCENT = "useColorAccent";
     final public static String P_SHOW_ONLY_DIVERGENCE = "showOnlyDivergence";
-    final public static String P_FEEDING_TYPE = "feedingType";
+    final public static String P_FEEDING_PLAN_TYPE = "feedingPlanType";
     final private static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReport.class);
     final private static long OVERALL = Long.MAX_VALUE - 10;
     final private static String OVERALL_TITLE = "ИТОГО";
@@ -130,6 +130,10 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                         String reportPeriodType = rule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE);
                         properties.setProperty(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
                                 reportPeriodType == null ? "5" : reportPeriodType);
+
+                        String feedingPlanType = rule.getExpressionValue(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE);
+                        properties.setProperty(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE,
+                                reportPeriodType == null ? "Все" : feedingPlanType);
 
                         BasicReportForAllOrgJob report = createInstance();
                         report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
@@ -235,7 +239,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                     .parseBoolean(getReportProperties().getProperty(P_SHOW_ONLY_DIVERGENCE, "false"));
 
             HashSet<FeedingPlanType> feedingPlanTypes = getFeedingPlanTypes(
-                    getReportProperties().getProperty(P_FEEDING_TYPE, "Все"));
+                    getReportProperties().getProperty(P_FEEDING_PLAN_TYPE, "Все"));
 
             RequestsAndOrdersReportService service;
             service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE);
