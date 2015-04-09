@@ -30,6 +30,7 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,8 @@ import java.util.List;
 public class ClientPaymentsPage extends OnlineReportPage {
 
     private String htmlReport;
+
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
 
     private List<Long> orgList = new ArrayList<Long>();
 
@@ -101,7 +104,7 @@ public class ClientPaymentsPage extends OnlineReportPage {
                 orgList = sortedOrganizationsByType;
             } else {
                 List<Long> idOfOrganizationsForReport = new ArrayList<Long>();
-                for (Long orgId: idOfOrgList) {
+                for (Long orgId : idOfOrgList) {
                     sortedOrganizationsByType.contains(orgId);
                     idOfOrganizationsForReport.add(orgId);
                 }
@@ -144,7 +147,13 @@ public class ClientPaymentsPage extends OnlineReportPage {
             persistenceTransaction = null;
         } catch (Exception e) {
             getLogger().error("Failed build ClientPaymentReport", e);
-            printError("Ошибка при построение отчета: " + e.getMessage());
+            if (e.getMessage() == null) {
+                printError(String.format(
+                        "Ошибка построения отчета \"%s\". В указанный период времени (%s - %s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
+                        this.getClass().getCanonicalName(), dateFormat.format(startDate), dateFormat.format(endDate)));
+            } else {
+                printError("Ошибка при построение отчета: " + e.getMessage());
+            }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(session, getLogger());
