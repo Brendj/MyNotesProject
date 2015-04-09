@@ -374,14 +374,14 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
         for (Object result : res) {
             Object[] o = (Object[]) result;
             long idOfOrg = ((BigInteger) o[0]).longValue();
-            String orgNumber = (String) o[1];
+            //String orgNumber = (String) o[1];
             String agent = (String) o[2];
             String orgFullName = (String) o[5];
             Long sales = null;
             Long discounts = null;
-            if (o[2] != null) {
-                sales = ((BigInteger) o[3]).longValue();
-            }
+           // if (o[2] != null) {
+           sales = ((BigInteger) o[3]).longValue();
+           // }
             if (o[3] != null) {
                 discounts = ((BigInteger) o[4]).longValue();
             }
