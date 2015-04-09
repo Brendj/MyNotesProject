@@ -44,8 +44,14 @@ public class ClientPaymentsPage extends OnlineReportPage {
 
     private String htmlReport;
 
+    private List<Long> orgList = new ArrayList<Long>();
+
     public String getHtmlReport() {
         return htmlReport;
+    }
+
+    public void onShow() throws Exception {
+        idOfOrgList.clear();
     }
 
     // тип организации
@@ -82,21 +88,36 @@ public class ClientPaymentsPage extends OnlineReportPage {
             }
         }
 
-        if (organizationTypeModify != null && organizationTypeModify.toString().equals("")) {
+        if (organizationTypeModify.toString().equals("")) {
             if (idOfOrgList.isEmpty()) {
                 printError("Выберите Организации или Тип организации");
                 return true;
             }
+            orgList = idOfOrgList;
         } else {
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
-            idOfOrgList = getOrgsByOrgType(session, findOrganizationType(organizationTypeModify.name()));
+            List<Long> sortedOrganizationsByType = sortedByFiltersOrganizations(session, organizationTypeModify);
             if (idOfOrgList.isEmpty()) {
-                printError("Не найдено ни одной организации с Типом организации: " + organizationTypeModify.toString());
-                return true;
+                orgList = sortedOrganizationsByType;
+            } else {
+                List<Long> idOfOrganizationsForReport = new ArrayList<Long>();
+                for (Long orgId: idOfOrgList) {
+                    sortedOrganizationsByType.contains(orgId);
+                    idOfOrganizationsForReport.add(orgId);
+                }
+                orgList = idOfOrganizationsForReport;
             }
         }
 
         return false;
+    }
+
+    private List<Long> sortedByFiltersOrganizations(Session session, OrganizationTypeModify organizationTypeModify) {
+        List<Long> idOfOrgListByType = getOrgsByOrgType(session, findOrganizationType(organizationTypeModify.name()));
+        if (idOfOrgListByType.isEmpty()) {
+            printError("Не найдено ни одной организации с Типом организации: " + organizationTypeModify.toString());
+        }
+        return idOfOrgListByType;
     }
 
     public ClientPaymentsReport buildReport() {
@@ -109,7 +130,7 @@ public class ClientPaymentsPage extends OnlineReportPage {
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "ClientPaymentsReport.jasper";
 
         ClientPaymentsBuilder builder = new ClientPaymentsBuilder(templateFilename);
-        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        String idOfOrgString = StringUtils.join(orgList.iterator(), ",");
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         builder.getReportProperties().setProperty("organizationTypeModify", organizationTypeModify.name());
         builder.getReportProperties().setProperty("organizationNames", getFilter());
@@ -164,8 +185,7 @@ public class ClientPaymentsPage extends OnlineReportPage {
                 ServletOutputStream servletOutputStream = response.getOutputStream();
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
-                response.setHeader("Content-disposition",
-                        "inline;filename=ClientPaymentsReport.xls");
+                response.setHeader("Content-disposition", "inline;filename=ClientPaymentsReport.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
