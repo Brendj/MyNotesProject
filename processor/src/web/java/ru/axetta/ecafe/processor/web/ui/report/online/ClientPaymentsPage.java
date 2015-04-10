@@ -93,7 +93,7 @@ public class ClientPaymentsPage extends OnlineReportPage {
 
         if (organizationTypeModify.toString().equals("")) {
             if (idOfOrgList.isEmpty()) {
-                printError("Выберите Организации или Тип организации");
+                printError("Выберите \"Организации\" или \"Тип организации\"");
                 return true;
             }
             orgList = idOfOrgList;
@@ -105,10 +105,17 @@ public class ClientPaymentsPage extends OnlineReportPage {
             } else {
                 List<Long> idOfOrganizationsForReport = new ArrayList<Long>();
                 for (Long orgId : idOfOrgList) {
-                    sortedOrganizationsByType.contains(orgId);
-                    idOfOrganizationsForReport.add(orgId);
+                    if (sortedOrganizationsByType.contains(orgId)) {
+                        idOfOrganizationsForReport.add(orgId);
+                    }
                 }
-                orgList = idOfOrganizationsForReport;
+                if (!idOfOrganizationsForReport.isEmpty()) {
+                    orgList = idOfOrganizationsForReport;
+                } else {
+                    printError(
+                            "Ошибка построения отчета \"ru.axetta.ecafe.processor.web.ui.report.online.ClientPaymentsPage \". Не правильно задана информация в фильтрах, фильтры \"Организация\" и \"Тип организации\". Попробуйте изменить параметры отчета.");
+                    return true;
+                }
             }
         }
 
