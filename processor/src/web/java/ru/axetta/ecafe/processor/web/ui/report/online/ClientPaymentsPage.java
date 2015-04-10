@@ -101,7 +101,13 @@ public class ClientPaymentsPage extends OnlineReportPage {
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             List<Long> sortedOrganizationsByType = sortedByFiltersOrganizations(session, organizationTypeModify);
             if (idOfOrgList.isEmpty()) {
-                orgList = sortedOrganizationsByType;
+                if (!sortedOrganizationsByType.isEmpty()) {
+                    orgList = sortedOrganizationsByType;
+                } else {
+                    printError(
+                            "Ошибка построения отчета \"ru.axetta.ecafe.processor.web.ui.report.online.ClientPaymentsPage \". Не правильно задана информация в фильтрах, фильтры \"Организация\" и \"Тип организации\". Попробуйте изменить параметры отчета.");
+                    return true;
+                }
             } else {
                 List<Long> idOfOrganizationsForReport = new ArrayList<Long>();
                 for (Long orgId : idOfOrgList) {
