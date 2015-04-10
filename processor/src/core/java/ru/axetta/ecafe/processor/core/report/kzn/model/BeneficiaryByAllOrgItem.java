@@ -17,7 +17,7 @@ import java.util.Map;
  * Time: 2:23
  */
 public class BeneficiaryByAllOrgItem implements Comparable {
-    public final static int MIN_BEN_COMPLEX = 500;
+    public final static int MIN_BEN_COMPLEX = 200;
 
     private int monthNumb;
     private String monthName;

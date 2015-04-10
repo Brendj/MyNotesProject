@@ -88,43 +88,18 @@ public class OrdersRepository extends BaseJpaDao {
     * sum - sum
     *
     * */
-    public List<OrderItem> findAllBuffetOrders(Date startDate, Date endDate){
+    public List<OrderItem> findAllBuffetOrders(List<Long> idOfOrgsList, Date startDate, Date endDate){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
 
         Query nativeQuery = entityManager.createNativeQuery("SELECT org.ShortName AS name, o.createdDate, (od.rPrice *od.qty)AS sum "
                 + "FROM CF_Orders o "
                 + "JOIN CF_OrderDetails od ON (o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg) "
                 + "JOIN CF_Orgs org ON (org.idOfOrg = od.idOfOrg) "
-                + "WHERE o.createdDate >= :startDate AND o.createdDate <= :endDate "
+                + "WHERE o.idoforg in (:idoforgs) "
+                + " AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
                 + "AND od.menuType = 0  AND o.state=0 AND od.state=0 "
                 + "ORDER BY org.officialName")
-                .setParameter("startDate",startDate.getTime())
-                .setParameter("endDate",endDate.getTime());
-
-        List<Object[]> temp = nativeQuery.getResultList();
-        for(Object[] o : temp){
-            orderItemList.add(new OrderItem((String)o[0],((BigInteger)o[1]).longValue(),((BigInteger)o[2]).longValue()));
-        }
-        return orderItemList;
-    }
-
-    /*
-    * return
-    * orgName - org ShortName
-    * orderDate - orderDate
-    * sum - sum
-    *
-    * */
-    public List<OrderItem> findAllFreeComplex(Date startDate, Date endDate){
-        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
-
-        Query nativeQuery = entityManager.createNativeQuery("SELECT org.ShortName AS name, o.createdDate, (od.discount*od.qty)AS sum "
-                + "from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
-                + "where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
-                + "and o.idOfOrg = od.idOfOrg   and org.idOfOrg = od.idOfOrg " + "and o.createdDate >= :startDate "
-                + " and o.createdDate <= :endDate  and (od.menuType >= 50 and od.menuType <= 99) "
-                + " and (od.socDiscount > 0) "
-                + "order by org.officialName")
+                .setParameter("idoforgs", idOfOrgsList)
                 .setParameter("startDate", startDate.getTime())
                 .setParameter("endDate",endDate.getTime());
 
@@ -142,15 +117,47 @@ public class OrdersRepository extends BaseJpaDao {
     * sum - sum
     *
     * */
-    public List<OrderItem> findAllPayComplex(Date startDate, Date endDate){
+    public List<OrderItem> findAllFreeComplex(List<Long> idOfOrgsList, Date startDate, Date endDate){
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Query nativeQuery = entityManager.createNativeQuery("SELECT org.ShortName AS name, o.createdDate, (od.discount*od.qty)AS sum "
+                + "from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
+                + "where o.idoforg in (:idoforgs) "
+                + " AND o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
+                + "and o.idOfOrg = od.idOfOrg   and org.idOfOrg = od.idOfOrg " + "and o.createdDate >= :startDate "
+                + " and o.createdDate <= :endDate  and (od.menuType >= 50 and od.menuType <= 99) "
+                + " and (od.socDiscount > 0) "
+                + "order by org.officialName")
+                .setParameter("idoforgs", idOfOrgsList)
+                .setParameter("startDate", startDate.getTime())
+                .setParameter("endDate",endDate.getTime());
+
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orderItemList.add(new OrderItem((String)o[0],((BigInteger)o[1]).longValue(),((BigInteger)o[2]).longValue()));
+        }
+        return orderItemList;
+    }
+
+    /*
+    * return
+    * orgName - org ShortName
+    * orderDate - orderDate
+    * sum - sum
+    *
+    * */
+    public List<OrderItem> findAllPayComplex(List<Long> idOfOrgsList, Date startDate, Date endDate){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
 
         Query nativeQuery = entityManager.createNativeQuery("SELECT org.shortname,o.createdDate , (od.rPrice * od.qty) "
-                + " FROM CF_Orders o, CF_OrderDetails od, CF_Orgs org  WHERE o.idOfOrder = od.idOfOrder   "
+                + " FROM CF_Orders o, CF_OrderDetails od, CF_Orgs org "
+                + " WHERE o.idoforg in (:idoforgs) "
+                + " AND o.idOfOrder = od.idOfOrder   "
                 + " AND o.idOfOrg = od.idOfOrg AND org.idOfOrg = od.idOfOrg  "
                 + " AND o.createdDate >= :startDate AND o.createdDate <= :endDate   AND (od.menuType >= 50 AND od.menuType <= 99) "
                 + "  AND (od.socDiscount = 0) AND o.state=0 AND od.state=0  "
                 + "   ORDER BY org.officialName")
+                .setParameter("idoforgs", idOfOrgsList)
                 .setParameter("startDate", startDate.getTime())
                 .setParameter("endDate",endDate.getTime());
 
@@ -188,7 +195,7 @@ public class OrdersRepository extends BaseJpaDao {
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
 
         Query nativeQuery = entityManager.createNativeQuery(
-                "SELECT distinct on (o.idofclient) o.idoforg,o.ordertype, o.idofclient, o.createddate, o.socdiscount  FROM cf_orders o "
+                "SELECT o.idoforg,o.ordertype, o.idofclient, o.createddate, o.socdiscount  FROM cf_orders o "
                         + " INNER JOIN cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder=od.idoforder "
                         + " WHERE o.socdiscount > 0 "
                         + " AND o.ordertype IN (4,6,8)"

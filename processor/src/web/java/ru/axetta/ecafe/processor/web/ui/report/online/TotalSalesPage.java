@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Онлайн отчеты / Сводный отчет по продажам
  * User: shamil
  * Date: 27.01.15
  * Time: 15:52
@@ -159,7 +160,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             printMessage("Отчет по питанию и посещению построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
-            logger.error("Failed build report ",e);
+            logger.error("Failed build report ",e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
