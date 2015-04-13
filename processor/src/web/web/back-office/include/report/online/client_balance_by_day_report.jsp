@@ -92,6 +92,9 @@
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Баланс" />
                     </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Дата и время последних изменений" />
+                    </rich:column>
                 </rich:columnGroup>
             </f:facet>
             <rich:column styleClass="center-aligned-column">
@@ -123,6 +126,9 @@
             </rich:column>
             <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.totalBalance}" converter="copeckSumConverter" />
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.date}" />
             </rich:column>
             <f:facet name="footer">
                 <rich:columnGroup rendered="#{not empty mainPage.clientBalanceByDayReportPage.clientsBalance}">

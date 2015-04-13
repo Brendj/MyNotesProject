@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -88,8 +89,9 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             private long totalBalance;
             private Long idOfClient;
             private Long limit;
+            private String date;
 
-            ClientBalanceInfo(Client client, long totalBalance) {
+            ClientBalanceInfo(Client client, long totalBalance, String date) {
                 this.orgShortName = client.getOrg().getShortName();
                 this.contractId = client.getContractId();
                 final Person person = client.getPerson();
@@ -104,6 +106,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 this.totalBalance = totalBalance;
                 this.idOfClient = client.getIdOfClient();
                 this.limit = client.getLimit();
+                this.date = date;
             }
 
             public Long getLimit() {
@@ -112,6 +115,14 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
             public void setLimit(Long limit) {
                 this.limit = limit;
+            }
+
+            public String getDate() {
+                return date;
+            }
+
+            public void setDate(String date) {
+                this.date = date;
             }
 
             public Long getIdOfClient() {
@@ -259,7 +270,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             criteria.add(Restrictions.lt("transactionTime", endTime));    // <
             criteria.add(Property.forName("client.idOfClient").in(idOfClientCriteria));
             criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum"))
-                    .add(Projections.groupProperty("client")));
+                    .add(Projections.groupProperty("client")).add(Projections.max("transactionTime")));
             criteria.addOrder(Order.asc("client"));
             //criteria.addOrder(Order.asc("client.person.fullName"));
             List list = criteria.list();
@@ -267,7 +278,8 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 Object[] row = (Object[]) obj;
                 long balance = Long.valueOf(row[0].toString());
                 Client client = (Client) row[1];
-                ClientBalanceInfo clientItem = new ClientBalanceInfo(client, balance);
+                String date = CalendarUtils.dateTimeToString((Date) row[2]);
+                ClientBalanceInfo clientItem = new ClientBalanceInfo(client, balance, date);
                 result.add(clientItem);
             }
             return result;
