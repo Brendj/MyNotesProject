@@ -243,7 +243,6 @@ public class SubscriptionFeedingService {
     // isParant при ложном занчении вернет комплексы только для детей
     public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addOneDay(today);
         Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
         for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
             idOfComplex.add(i);
@@ -267,21 +266,12 @@ public class SubscriptionFeedingService {
               + " where ci.org = :org and usedSubscriptionFeeding = 1 "
               + " and menuDate >= :startDate and menuDate < :endDate "
               + " and ci.idOfComplex in :idOfComplex";
+        Date endDate = today;
+        endDate = CalendarUtils.addDays(endDate, 7);
         TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
               ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
-              .setParameter("endDate", tomorrow).setParameter("idOfComplex", idOfComplex);
+              .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);
         List<ComplexInfo> res = query.getResultList();
-        // Если комплексов на сегодня нет, то ищем их на каждый день в течение недели.
-        int dayCount = 1;
-        Date beginDate;
-        Date endDate = tomorrow;
-        while (res.isEmpty() && dayCount < 8) {
-            beginDate = endDate;
-            endDate = CalendarUtils.addDays(endDate, 1);
-            res = query.setParameter("org", org).setParameter("startDate", beginDate).setParameter("endDate", endDate)
-                  .setParameter("idOfComplex", idOfComplex).getResultList();
-            dayCount++;
-        }
         return res;
     }
 
