@@ -82,7 +82,7 @@ public class SynchCleanupService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.HOUR_OF_DAY, 0);
-        Query q = session.createSQLQuery("delete from cf_synchistory where syncdate<:datelimit");
+        Query q = session.createSQLQuery("delete from cf_synchistory_daily where syncdate<:datelimit");
         q.setParameter("datelimit", cal.getTimeInMillis());
         q.executeUpdate();
     }
