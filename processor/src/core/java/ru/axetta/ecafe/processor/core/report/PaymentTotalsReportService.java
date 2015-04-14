@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -350,7 +351,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.gt("transactionTime", registrationDate));
         criteria.add(Restrictions.eq("client", client));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
-        balance -= (Long) criteria.uniqueResult();
+        try {
+            balance -= (Long) criteria.uniqueResult();
+        } catch (HibernateException e) {}
         return balance;
     }
 
