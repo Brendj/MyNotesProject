@@ -203,7 +203,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long clientGroupId) throws Exception {
+                Long clientGroupId, Integer clientBalanceCondition) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -226,25 +226,25 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, startTime, idOfOrgList, clientGroupId));
+                    createDataSource(session, startTime, idOfOrgList, clientGroupId, clientBalanceCondition));
             Date generateEndTime = new Date();
             return new ClientBalanceByDayReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, idOfContragent1);
         }
 
-        private JRDataSource createDataSource(Session session, Date endTime, List<Long> idOfOrgList, Long clientGroupId)
-                throws Exception {
+        private JRDataSource createDataSource(Session session, Date endTime, List<Long> idOfOrgList, Long clientGroupId,
+                Integer clientBalanceCondition) throws Exception {
             Long idOfContragent1 = null;
             if (contragent != null) {
                 idOfContragent1 = contragent.getIdOfContragent();
             }
             List<ClientBalanceInfo> result = buildReportItems(session, idOfContragent1, idOfOrgList, endTime,
-                    clientGroupId);
+                    clientGroupId, clientBalanceCondition);
             return new JRBeanCollectionDataSource(result);
         }
 
         public List<ClientBalanceInfo> buildReportItems(Session session, Long idOfContragent, List<Long> idOfOrgList,
-                Date endTime, Long clientGroupId) {
+                Date endTime, Long clientGroupId, Integer clientBalanceCondition) {
             List<ClientBalanceInfo> result = new ArrayList<ClientBalanceInfo>();
             DetachedCriteria idOfClientCriteria = DetachedCriteria.forClass(Client.class);
             idOfClientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
@@ -280,7 +280,27 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 Client client = (Client) row[1];
                 String date = CalendarUtils.dateTimeToString((Date) row[2]);
                 ClientBalanceInfo clientItem = new ClientBalanceInfo(client, balance, date);
-                result.add(clientItem);
+
+                switch (clientBalanceCondition) {
+                    case 0:
+                        result.add(clientItem);
+                        break;
+                    case 1:
+                        if (clientItem.getTotalBalance() < 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                    case 2:
+                        if (clientItem.getTotalBalance() == 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                    case 3:
+                        if (clientItem.getTotalBalance() > 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                }
             }
             return result;
         }

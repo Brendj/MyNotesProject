@@ -45,6 +45,13 @@
             <a4j:support event="onchange" reRender="clientBalanceByDayReportPanelGrid" />
         </h:selectOneMenu>
     </h:panelGrid>
+    <h:panelGroup>
+        <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientBalanceCondition}"
+                         styleClass="input-text" style="margin-left: 10px; width: 100px;">
+            <f:selectItems value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientBalanceMenu.items}" />
+        </h:selectOneMenu>
+    </h:panelGroup>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.buildReport}"
                            reRender="clientBalanceByDayReportTable, clientBalanceByDayReportTableDatascroller"

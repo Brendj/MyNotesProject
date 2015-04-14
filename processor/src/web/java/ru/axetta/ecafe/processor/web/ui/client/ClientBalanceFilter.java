@@ -5,8 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import javax.faces.model.SelectItem;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.

@@ -111,7 +111,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
             ClientBalanceByDayReport.Builder reportBuilder = new ClientBalanceByDayReport.Builder("");
             final Long idOfContragent = contragent == null ? null : contragent.getIdOfContragent();
             clientsBalance = reportBuilder.buildReportItems(persistenceSession, idOfContragent, idOfOrgList, startDate,
-                    clientFilter.getClientGroupId());
+                    clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             totalBalance = 0L;
@@ -158,7 +158,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
                 builder.setContragent(contragent);
             }
             report = builder
-                    .build(persistenceSession, startDate, endDate, localCalendar, clientFilter.getClientGroupId());
+                    .build(persistenceSession, startDate, endDate, localCalendar, clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
