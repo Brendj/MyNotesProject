@@ -50,6 +50,7 @@
         <h:selectOneMenu value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientBalanceCondition}"
                          styleClass="input-text" style="margin-left: 10px; width: 100px;">
             <f:selectItems value="#{mainPage.clientBalanceByDayReportPage.clientFilter.clientBalanceMenu.items}" />
+            <a4j:support event="onchange" reRender="clientBalanceByDayReportPanelGrid" />
         </h:selectOneMenu>
     </h:panelGroup>
     <h:panelGrid styleClass="borderless-grid" columns="3">

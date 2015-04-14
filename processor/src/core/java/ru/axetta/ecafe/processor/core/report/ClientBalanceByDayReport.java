@@ -206,13 +206,12 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 Long clientGroupId, Integer clientBalanceCondition) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            calendar.setTime(startTime);
+            calendar.setTime(endTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
-            parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             Long idOfContragent1 = -1L;
             if (contragent != null) {
@@ -226,7 +225,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, startTime, idOfOrgList, clientGroupId, clientBalanceCondition));
+                    createDataSource(session, endTime, idOfOrgList, clientGroupId, clientBalanceCondition));
             Date generateEndTime = new Date();
             return new ClientBalanceByDayReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, idOfContragent1);

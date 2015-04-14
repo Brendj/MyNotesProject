@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="1280" pageHeight="500" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="1240" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="1300" pageHeight="500" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="1260" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
 	<property name="ireport.zoom" value="1.1000000000000005"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -32,10 +32,7 @@
 	<parameter name="month" class="java.lang.Integer"/>
 	<parameter name="year" class="java.lang.Integer"/>
 	<parameter name="day" class="java.lang.Integer"/>
-	<parameter name="endTime" class="java.lang.Long"/>
-	<parameter name="startTime" class="java.lang.Long"/>
 	<parameter name="totalSum" class="java.lang.Float"/>
-	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
 	<field name="firstName" class="java.lang.String"/>
 	<field name="secondName" class="java.lang.String"/>
@@ -144,7 +141,7 @@
 				<text><![CDATA[Наименование группы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2c117c6d-6108-4735-ae1b-deb31e244144" x="1060" y="47" width="180" height="20"/>
+				<reportElement uuid="2c117c6d-6108-4735-ae1b-deb31e244144" x="1060" y="47" width="200" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -152,7 +149,7 @@
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дата и время последних изменений]]></text>
 			</staticText>
 		</band>
@@ -245,7 +242,7 @@
 				<textFieldExpression><![CDATA[$F{groupName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="cb7248d2-e764-43e2-b9b1-5e7c70853739" x="1060" y="0" width="180" height="20"/>
+				<reportElement uuid="cb7248d2-e764-43e2-b9b1-5e7c70853739" x="1060" y="0" width="200" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -284,7 +281,7 @@
 				<text><![CDATA[ИТОГО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="98aea6a0-56a9-48e1-af41-d33786024502" x="1060" y="0" width="180" height="20"/>
+				<reportElement uuid="98aea6a0-56a9-48e1-af41-d33786024502" x="1060" y="0" width="200" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>

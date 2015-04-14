@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ClientBalanceByDayReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -32,10 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -110,6 +108,10 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientBalanceByDayReport.Builder reportBuilder = new ClientBalanceByDayReport.Builder("");
             final Long idOfContragent = contragent == null ? null : contragent.getIdOfContragent();
+            Date date = CalendarUtils.addOneDay(startDate);
+            localCalendar.setTime(date);
+            localCalendar.add(Calendar.SECOND, -1);
+            startDate = localCalendar.getTime();
             clientsBalance = reportBuilder.buildReportItems(persistenceSession, idOfContragent, idOfOrgList, startDate,
                     clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
             persistenceTransaction.commit();
