@@ -51,7 +51,7 @@
                     <rich:calendar value="#{manualReportRunnerPage.startDate}" datePattern="dd.MM.yyyy"
                                    converter="dateConverter" inputClass="input-text"
                                    showWeeksBar="false">
-                        <a4j:support event="onchanged" reRender="endDateCalendar,goodRequestsNewReportPanel"
+                        <a4j:support event="onchanged" reRender="endDateCalendar,manualReportRunnerViewGrid"
                                      actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />
                     </rich:calendar>
 
@@ -198,7 +198,7 @@
 
 
             <h:panelGrid columns="2">
-            <h:commandButton value="Сформировать" action="#{manualReportRunnerPage.triggerJob}"
+            <a4j:commandButton value="Сформировать" action="#{manualReportRunnerPage.triggerJob}" reRender="manualReportRunnerViewGrid"
                              styleClass="command-button" onclick="document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:manualReport_waiting').style.display='block';"/>
             <h:graphicImage id="manualReport_waiting" value="/images/gif/waiting.gif" alt="waiting" style="display: none" />
             </h:panelGrid>

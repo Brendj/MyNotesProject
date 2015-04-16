@@ -58,59 +58,50 @@ public class RequestsAndOrdersReportService {
     }
 
     public List<Item> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
-            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean useColorAccent,
-            boolean showOnlyDivergence, HashSet<FeedingPlanType> feedingPlanTypes) throws Exception {
+            List<Long> idOfMenuSourceOrgList, Boolean hideMissedColumns, Boolean useColorAccent,
+            Boolean showOnlyDivergence, HashSet<FeedingPlanType> feedingPlanTypes, Boolean noNullReport) throws Exception {
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getOrgMap(idOfOrgList, idOfMenuSourceOrgList);
         List<Item> itemList = new LinkedList<Item>();
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date endDate = CalendarUtils.endOfDay(endTime);
         List complexList = getComplexList(orgMap, beginDate, endDate);
-        if (complexList.size() <= 0) {
-            logger.warn(String.format(
-                    "Ошибка построения отчета \"%s\". В течении заданного периода (\"%s - \"%s) данные по комплексам отсутствуют. Попробуйте изменить параметры отчета.",
-                    this.getClass().getCanonicalName(), startTime.toString(), endTime.toString()));
-        }
-        ReportDataMap reportDataMap;
-        reportDataMap = new ReportDataMap();
-        Map<Long, ComplexInfoItem> orgsComplexDictionary = new HashMap<Long, ComplexInfoItem>();
-        for (Object complexObj : complexList) {
-            ComplexInfo complexInfo = (ComplexInfo) complexObj;
-            FeedingPlanType complexFeedingPlanType = null;
-            if (complexInfo != null) {
-                if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
-                        == 1)) {
-                    complexFeedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING; //complexFeedingPlanType = "Абонементное питание";
-                } else {
-                    if (complexInfo.getModeFree() == 1) {
-                        complexFeedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN; //complexFeedingPlanType = "Льготное питание";
+        ReportDataMap reportDataMap = new ReportDataMap();
+        if (complexList.size() > 0) {
+            Map<Long, ComplexInfoItem> orgsComplexDictionary = new HashMap<Long, ComplexInfoItem>();
+            for (Object complexObj : complexList) {
+                ComplexInfo complexInfo = (ComplexInfo) complexObj;
+                FeedingPlanType complexFeedingPlanType = null;
+                if (complexInfo != null) {
+                    if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
+                            == 1)) {
+                        complexFeedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING; //complexFeedingPlanType = "Абонементное питание";
                     } else {
-                        complexFeedingPlanType = FeedingPlanType.PAY_PLAN; //complexFeedingPlanType = "Платное питание";
+                        if (complexInfo.getModeFree() == 1) {
+                            complexFeedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN; //complexFeedingPlanType = "Льготное питание";
+                        } else {
+                            complexFeedingPlanType = FeedingPlanType.PAY_PLAN; //complexFeedingPlanType = "Платное питание";
+                        }
                     }
                 }
+                final Long complexGoodGlobalId = complexInfo.getGood().getGlobalId();
+                final Long complexOrgId = complexInfo.getOrg().getIdOfOrg();
+                ComplexInfoItem complexInfoItem = orgsComplexDictionary.get(complexOrgId);
+                if (complexInfoItem == null) {
+                    complexInfoItem = new ComplexInfoItem(complexOrgId);
+                }
+                GoodInfo complexGoodInfo = new GoodInfo(complexGoodGlobalId, "", complexFeedingPlanType);
+                complexInfoItem.goodInfos.put(complexGoodGlobalId, complexGoodInfo);
+                orgsComplexDictionary.put(complexOrgId, complexInfoItem);
             }
-            final Long complexGoodGlobalId = complexInfo.getGood().getGlobalId();
-            final Long complexOrgId = complexInfo.getOrg().getIdOfOrg();
-            ComplexInfoItem complexInfoItem = orgsComplexDictionary.get(complexOrgId);
-            if (complexInfoItem == null) {
-                complexInfoItem = new ComplexInfoItem(complexOrgId);
+            getRequestGoodsInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
+            getPaidOrdersInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
+            if (!hideMissedColumns) {
+                reportDataMap.complement(beginDate, endDate);
+            } else {
+                reportDataMap.complement();
             }
-            GoodInfo complexGoodInfo = new GoodInfo(complexGoodGlobalId, "", complexFeedingPlanType);
-            complexInfoItem.goodInfos.put(complexGoodGlobalId, complexGoodInfo);
-            orgsComplexDictionary.put(complexOrgId, complexInfoItem);
         }
-        getRequestGoodsInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
-        getPaidOrdersInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
-        if (!hideMissedColumns) {
-            reportDataMap.complement(beginDate, endDate);
-        } else {
-            reportDataMap.complement();
-        }
-        populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence, orgMap, feedingPlanTypes);
-        if ((itemList == null) || (itemList.size() == 0)) {
-            throw new NoDataFoundException(String.format(
-                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
-                    this.getClass().getCanonicalName(), startTime.toString(), endTime.toString()));
-        }
+        populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence, orgMap, feedingPlanTypes, noNullReport);
         return itemList;
     }
 
@@ -148,7 +139,7 @@ public class RequestsAndOrdersReportService {
 
     private void populateDataList(ReportDataMap reportDataMap, List<Item> itemList, Boolean useColorAccent,
             Boolean showOnlyDivergence, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
-            HashSet<FeedingPlanType> feedingPlanTypes) {
+            HashSet<FeedingPlanType> feedingPlanTypes, Boolean noNullReport) {
         for (String orgName : reportDataMap.keySet()) {
             for (FeedingPlanType feedingPlanType : reportDataMap.get(orgName).keySet()) {
                 if (feedingPlanTypes.contains(feedingPlanType)) {
@@ -185,6 +176,9 @@ public class RequestsAndOrdersReportService {
                     }
                 }
             }
+        }
+        if (itemList.size() < 1 && noNullReport) {
+            itemList.add(new Item(null, null, null, null, null, null, (String) null, null, null));
         }
     }
 
@@ -399,7 +393,7 @@ public class RequestsAndOrdersReportService {
             this.complexName = complexName;
             this.stateString = stateString;
             try {
-                this.date = simpleDateFormat.parse(dateString);
+                this.date = dateString == null ? null : simpleDateFormat.parse(dateString);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

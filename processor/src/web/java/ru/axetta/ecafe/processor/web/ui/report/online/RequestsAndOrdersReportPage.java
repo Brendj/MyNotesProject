@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RequestsAndOrdersReport;
 import ru.axetta.ecafe.processor.core.report.model.requestsandorders.FeedingPlanType;
-import ru.axetta.ecafe.processor.core.report.requestsAndOrdersReport.NoDataFoundException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -49,11 +48,12 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     private final static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReportPage.class);
     private String htmlReport = null;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-    private Boolean applyUserSettings = false; // todo delete - not necessary
+    private Boolean applyUserSettings = false; 
     private Boolean hideMissedColumns = true;
     private Boolean showOnlyDivergence = false;
     private Boolean useColorAccent = false;
     private String feedingPlanType = "Все";
+    private Boolean noNullReport = false;
     private User currentUser;
 
     public RequestsAndOrdersReportPage() {
@@ -171,13 +171,21 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         }
     }
 
+    public void onFeedingPlanTypeChange(ActionEvent event) {
+        htmlReport = null;
+    }
+
+    public void onNoNullReportChange(ActionEvent event) {
+        htmlReport = null;
+    }
+
     @Override
     public String getContragentStringIdOfOrgList() {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]", "");
     }
 
     public Object reportHTMLSendEmail() {
-        if (validateFormData()) {
+        if (invalidFormData()) {
             return null;
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -225,13 +233,19 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
             }
+        } else {
+            String errorMsg = String.format(
+                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
+                    this.getClass().getCanonicalName(), startDate.toString(), endDate.toString());
+            logger.warn(errorMsg);
+            printWarn(errorMsg);
         }
         return null;
     }
 
     public Object buildReportHTML() {
         htmlReport = null;
-        if (validateFormData()) {
+        if (invalidFormData()) {
             return null;
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -250,9 +264,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } catch (NoDataFoundException e) {
-            logger.warn("Failed export report : ", e);
-            printWarn("Ошибка при подготовке отчета: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -280,6 +291,12 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
             }
+        } else {
+            String errorMsg = String.format(
+                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
+                    this.getClass().getCanonicalName(), startDate.toString(), endDate.toString());
+            logger.warn(errorMsg);
+            printWarn(errorMsg);
         }
         return null;
     }
@@ -295,7 +312,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         return templateFilename;
     }
 
-    private boolean validateFormData() {
+    private boolean invalidFormData() {
         if (CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)) {
             printError("Выберите список организаций или поставщиков");
             return true;
@@ -316,7 +333,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
-        if (validateFormData()) {
+        if (invalidFormData()) {
             return;
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -336,9 +353,6 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } catch (NoDataFoundException e) {
-            logger.warn("Failed export report : ", e);
-            printWarn("Ошибка при подготовке отчета: " + e.getMessage());
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -374,6 +388,12 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 logger.error("Failed export report : ", e);
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
             }
+        } else {
+            String errorMsg = String.format(
+                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
+                    this.getClass().getCanonicalName(), startDate.toString(), endDate.toString());
+            logger.warn(errorMsg);
+            printWarn(errorMsg);
         }
     }
 
@@ -401,6 +421,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
         if (feedingPlanType != null) {
             properties.setProperty(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE, feedingPlanType.toString());
         }
+        properties.setProperty(RequestsAndOrdersReport.P_NO_NULL_REPORT, Boolean.toString(noNullReport));
         return properties;
     }
 
@@ -464,5 +485,13 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
 
     public void setFeedingPlanType(String feedingPlanType) {
         this.feedingPlanType = feedingPlanType;
+    }
+
+    public Boolean getNoNullReport() {
+        return noNullReport;
+    }
+
+    public void setNoNullReport(Boolean noNullReport) {
+        this.noNullReport = noNullReport;
     }
 }

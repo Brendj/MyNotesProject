@@ -39,6 +39,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
     final public static String P_USE_COLOR_ACCENT = "useColorAccent";
     final public static String P_SHOW_ONLY_DIVERGENCE = "showOnlyDivergence";
     final public static String P_FEEDING_PLAN_TYPE = "feedingPlanType";
+    final public static String P_NO_NULL_REPORT = "noNullReport";
     final private static Logger logger = LoggerFactory.getLogger(RequestsAndOrdersReport.class);
     final private static long OVERALL = Long.MAX_VALUE - 10;
     final private static String OVERALL_TITLE = "ИТОГО";
@@ -135,6 +136,10 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                         properties.setProperty(RequestsAndOrdersReport.P_FEEDING_PLAN_TYPE,
                                 feedingPlanType == null ? "Все" : feedingPlanType);
 
+                        String noNullReport = rule.getExpressionValue(RequestsAndOrdersReport.P_NO_NULL_REPORT);
+                        properties.setProperty(RequestsAndOrdersReport.P_NO_NULL_REPORT,
+                                noNullReport == null ? "false" : noNullReport);
+
                         BasicReportForAllOrgJob report = createInstance();
                         report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
                                 autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
@@ -195,14 +200,14 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
             Date generateTime = new Date();
 
+            JRDataSource dataSource = createDataSource(session, startTime, endTime);
+
             boolean useColorAccent = Boolean
                     .parseBoolean(getReportProperties().getProperty(P_USE_COLOR_ACCENT, "false"));
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             parameterMap.put("useColorAccent", useColorAccent);
-
-            JRDataSource dataSource = createDataSource(session, startTime, endTime);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -229,23 +234,26 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
 
-            boolean hideMissedColumns = Boolean
+            Boolean hideMissedColumns = Boolean
                     .parseBoolean(getReportProperties().getProperty(P_HIDE_MISSED_COLUMNS, "false"));
 
-            boolean useColorAccent = Boolean
+            Boolean useColorAccent = Boolean
                     .parseBoolean(getReportProperties().getProperty(P_USE_COLOR_ACCENT, "false"));
 
-            boolean showOnlyDivergence = Boolean
+            Boolean showOnlyDivergence = Boolean
                     .parseBoolean(getReportProperties().getProperty(P_SHOW_ONLY_DIVERGENCE, "false"));
 
             HashSet<FeedingPlanType> feedingPlanTypes = getFeedingPlanTypes(
                     getReportProperties().getProperty(P_FEEDING_PLAN_TYPE, "Все"));
 
+            Boolean noNullReport = Boolean
+                    .parseBoolean(getReportProperties().getProperty(P_NO_NULL_REPORT, "false"));
+
             RequestsAndOrdersReportService service;
             service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE);
             return new JRBeanCollectionDataSource(
                     service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns,
-                            useColorAccent, showOnlyDivergence, feedingPlanTypes));
+                            useColorAccent, showOnlyDivergence, feedingPlanTypes, noNullReport));
         }
     }
 

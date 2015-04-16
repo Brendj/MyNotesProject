@@ -201,6 +201,8 @@ public class ReportRuleConstants {
                             + "{Платное питание}Платное питание,"
                             + "{Льготное питание}Льготное питание,"
                             + "{Абонементное питание}Абонементное питание"),//43
+            new ParamHint(RequestsAndOrdersReport.P_NO_NULL_REPORT, "При отстуствии данных для отчета:")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}ничего не создавать,{true}создать отчет с пустой строкой") //44
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -265,7 +267,7 @@ public class ReportRuleConstants {
             new ReportHint(FeedingAndVisitReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(FeedingAndVisitSReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 32, 40, 41, 42, 43}),
+            new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 32, 40, 41, 42, 43, 44}),
             new ReportHint(PaymentTotalsReport.class.getCanonicalName(), new int[]{20, 3, 35}),
             new ReportHint(BeneficiaryByAllOrgReport.class.getCanonicalName(), new int[]{})
     };

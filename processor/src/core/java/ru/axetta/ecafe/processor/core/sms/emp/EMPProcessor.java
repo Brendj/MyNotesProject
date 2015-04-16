@@ -379,7 +379,7 @@ public class EMPProcessor {
         List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
         log(synchDate + "С телефоном [SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size()
-                + " клиентов [" + idsList + "]. Для всех них будут обновлены следующие параметры: {Email: " + newEmail
+                + " клиентов [" + idsList + "]. Для полученного списка клиентов будут обновлены параметры: {Email: " + newEmail
                 + "}, {SSOID: " + newSsoid + "}, {notifyViaEmail: " + newNotifyViaEmail + "}, {notifyViaSMS: "
                 + newNotifyViaSMS + "}, {notifyViaPUSH: " + newNotifyViaPUSH + "}");
         for(Client cl : clients) {
