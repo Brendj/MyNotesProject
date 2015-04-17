@@ -202,7 +202,13 @@ public class ReportRuleConstants {
                             + "{Льготное питание}Льготное питание,"
                             + "{Абонементное питание}Абонементное питание"),//43
             new ParamHint(RequestsAndOrdersReport.P_NO_NULL_REPORT, "При отстуствии данных для отчета:")
-                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}ничего не создавать,{true}создать отчет с пустой строкой") //44
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}ничего не создавать,{true}создать отчет с пустой строкой"), //44
+            new ParamHint(ClientBalanceByDayReport.P_CLIENT_BALANCE_CONDITION_TYPE, "Текущий баланс") //45
+                    .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
+                            +"{Не задано}Не задано,"
+                            +"{Меньше 0}Меньше 0,"
+                            +"{Равен 0}Равен 0,"
+                            +"{Больше}Больше 0,")
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -251,7 +257,7 @@ public class ReportRuleConstants {
                     new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
-            new ReportHint(ClientBalanceByDayReport.class.getCanonicalName(), new int[]{20}),
+            new ReportHint(ClientBalanceByDayReport.class.getCanonicalName(), new int[]{20, 3, 45}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{32}),
             new ReportHint(StatisticsPaymentPreferentialSupplyJasperReport.class.getCanonicalName(), new int[]{3, -20}),

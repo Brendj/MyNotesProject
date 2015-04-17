@@ -35,6 +35,8 @@ import java.util.*;
  */
 public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
+    final public static String P_CLIENT_BALANCE_CONDITION_TYPE = "clientBalanceCondition";
+
     public static class Builder extends BasicReportForContragentJob.Builder {
 
         public String getTemplateFilename() {

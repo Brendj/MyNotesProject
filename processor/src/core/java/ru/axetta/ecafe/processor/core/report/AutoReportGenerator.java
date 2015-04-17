@@ -1429,7 +1429,7 @@ public class AutoReportGenerator {
             persistenceTransaction = BasicReport.createTransaction(persistenceSession);
             persistenceTransaction.begin();
             SchedulerJob schedulerJob = (SchedulerJob) persistenceSession.load(SchedulerJob.class, idOfSchedulerJob);
-            triggerJob(getJobId(schedulerJob), startDate, endDate);
+            triggerJob(getJobId(schedulerJob), schedulerJob.getJobName(), startDate, endDate);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -1518,9 +1518,9 @@ public class AutoReportGenerator {
         this.scheduler.deleteJob(jobId, Scheduler.DEFAULT_GROUP);
     }
 
-    private void triggerJob(String jobName, Date startDate, Date endDate) throws Exception {
-        JobDetail jobDetail=this.scheduler.getJobDetail(jobName, Scheduler.DEFAULT_GROUP);
-        if(jobDetail == null) throw new Exception(String.format("Задача с именем '%s' не найдена попробуйте перезапустить сервер", jobName));
+    private void triggerJob(String jobId, String jobName, Date startDate, Date endDate) throws Exception {
+        JobDetail jobDetail=this.scheduler.getJobDetail(jobId, Scheduler.DEFAULT_GROUP);
+        if(jobDetail == null) throw new Exception(String.format("Задача с Названием задачи '%s' не включена попробуйте поставить галочку \"Включено\" и перезапустить сервер", jobName));
         if (startDate!=null) {
             Object executeEnvironmentObject = jobDetail.getJobDataMap().put(BasicReportJob.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, startDate);
             if (executeEnvironmentObject!=null && executeEnvironmentObject instanceof BasicReportJob.AutoReportBuildJob.ExecuteEnvironment) {
@@ -1529,7 +1529,7 @@ public class AutoReportGenerator {
                 executeEnvironment.setEndDate(endDate);
             }
         }
-        this.scheduler.triggerJob(jobName, Scheduler.DEFAULT_GROUP);
+        this.scheduler.triggerJob(jobId, Scheduler.DEFAULT_GROUP);
     }
 
     public static String restoreFilename(String defaultPath, String filename) {

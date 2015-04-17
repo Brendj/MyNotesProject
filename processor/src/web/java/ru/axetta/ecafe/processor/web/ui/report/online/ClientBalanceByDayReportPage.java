@@ -159,6 +159,12 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
             if (contragent != null) {
                 builder.setContragent(contragent);
             }
+            Date date = CalendarUtils.addOneDay(startDate);
+            localCalendar.setTime(date);
+            localCalendar.add(Calendar.SECOND, -1);
+
+            startDate = localCalendar.getTime();
+            endDate = localCalendar.getTime();
             report = builder
                     .build(persistenceSession, startDate, endDate, localCalendar, clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
             persistenceTransaction.commit();
