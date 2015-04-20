@@ -23,6 +23,10 @@ public class OrderItem {
 
     private long createdDateEqualsOrderDate;
 
+
+    private long socDiscount;
+    private int menutype;
+
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname, long createdDateEqualsOrderDate) {
         this.idOfOrg = idOfOrg;
@@ -56,6 +60,14 @@ public class OrderItem {
         this.orderDate = orderDate;
         this.sum = sum;
     }
+    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype) {
+        this.idOfOrg = idOfOrg;
+        this.orderDate = orderDate;
+        this.sum = sum;
+        this.socDiscount = socDiscount;
+        this.menutype = menutype;
+    }
+
 
     public OrderItem(long idOfOrg, int ordertype, long sum) {
         this.idOfOrg = idOfOrg;
@@ -192,5 +204,13 @@ public class OrderItem {
 
     public void setCreatedDateEqualsOrderDate(long createdDateEqualsOrderDate) {
         this.createdDateEqualsOrderDate = createdDateEqualsOrderDate;
+    }
+
+    public long getSocDiscount() {
+        return socDiscount;
+    }
+
+    public int getMenutype() {
+        return menutype;
     }
 }

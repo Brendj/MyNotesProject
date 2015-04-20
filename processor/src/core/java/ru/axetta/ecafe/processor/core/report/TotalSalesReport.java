@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.order.OrdersRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
@@ -89,24 +90,24 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
                 Map<String, Object> parameterMap) throws Exception {
+            long l = System.currentTimeMillis();
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             List<String> dates = CalendarUtils.datesBetween(startTime, endTime);
-            Map<String, List<TotalSalesItem>> totalListMap = new HashMap<String, List<TotalSalesItem>>();
+            Map<Long, List<TotalSalesItem>> totalListMap = new HashMap<Long, List<TotalSalesItem>>();
             //Получаем список всех школ, заполняем ими списов
             List<Long> idOfOrgsList = new LinkedList<Long>();
             retreiveAllOrgs(totalListMap, dates, idOfOrgsList);
             if(idOfOrgsList.size() == 0){
                 return new JREmptyDataSource();
             }
+            logger.error("e1 : " + (System.currentTimeMillis() - l));
             TotalSalesData totalSalesTMP = new TotalSalesData();
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
-
-            retreiveAndHandleBuffetOrders(totalListMap, idOfOrgsList, startTime, endTime);
-            retreiveAndHandleFreeComplexes(totalListMap, idOfOrgsList, startTime, endTime);
-            retreiveAndHandlePayComplexes(totalListMap,idOfOrgsList, startTime, endTime);
+            retreiveAllOrders(totalListMap, idOfOrgsList, startTime, endTime);
+            logger.error("e2 : " + (System.currentTimeMillis() - l));
 
             //Вывод, разбивка по районам.
             Map<String,TotalSalesData> totalSalesResult = new HashMap<String, TotalSalesData>();
@@ -125,52 +126,45 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             return new JRBeanCollectionDataSource(totalSalesResult.values());
         }
 
-        private void retreiveAndHandleBuffetOrders(Map<String, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, Date startTime, Date endTime) {
+        private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap,
+                List<Long> idOfOrgsList, Date startTime, Date endTime){
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            List<OrderItem> allBuffetOrders = ordersRepository.findAllBuffetOrders(idOfOrgsList,startTime, endTime);
-            sumBuffet = handleOrders(totalListMap, allBuffetOrders, NAME_BUFFET);
-        }
+            List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
-        private void retreiveAndHandleFreeComplexes(Map<String, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, Date startTime, Date endTime) {
-            OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            List<OrderItem> allBuffetOrders = ordersRepository.findAllFreeComplex(idOfOrgsList, startTime, endTime);
-            sumBen = handleOrders(totalListMap, allBuffetOrders, NAME_BEN);
+            for (OrderItem allOrder : allOrders) {
+                if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
+                    sumBuffet = handleOrders(totalListMap, allOrder, NAME_BUFFET);
+                }else if(allOrder.getSocDiscount() == 0L){//Pay
+                    sumComplex = handleOrders(totalListMap, allOrder, NAME_COMPLEX);
 
-        }
+                }else{ // free
+                    sumBen = handleOrders(totalListMap, allOrder, NAME_BEN);
 
-        private void retreiveAndHandlePayComplexes(Map<String, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, Date startTime, Date endTime) {
-            OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
-            List<OrderItem> allBuffetOrders = ordersRepository.findAllPayComplex(idOfOrgsList,startTime, endTime);
-            sumComplex = handleOrders(totalListMap, allBuffetOrders, NAME_COMPLEX);
-
-        }
-
-        private long handleOrders(Map<String, List<TotalSalesItem>> totalListMap, List<OrderItem> allBuffetOrders,
-                String type) {
-            List<TotalSalesItem> totalSalesItemList;
-            long sum = 0L;
-            for (OrderItem allBuffetOrder : allBuffetOrders) {
-                totalSalesItemList = totalListMap.get(allBuffetOrder.getOrgName());
-                if (totalSalesItemList == null) {
-                    continue;
-                }
-                String date = CalendarUtils.dateShortToString(allBuffetOrder.getOrderDate());
-                for (TotalSalesItem totalSalesItem : totalSalesItemList) {
-                    if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))) {
-                        totalSalesItem.setSum(totalSalesItem.getSum() + allBuffetOrder.getSum());
-                        sum += allBuffetOrder.getSum();
-                    }
                 }
             }
 
-            return sum;
         }
 
 
-        private void retreiveAllOrgs(Map<String, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
+        private long handleOrders(Map<Long, List<TotalSalesItem>> totalListMap, OrderItem buffetOrder, String type) {
+            List<TotalSalesItem> totalSalesItemList;
+            long sum = 0L;
+
+            totalSalesItemList = totalListMap.get(buffetOrder.getIdOfOrg());
+            if (totalSalesItemList == null) {
+                return 0L;
+            }
+            String date = CalendarUtils.dateShortToString(buffetOrder.getOrderDate());
+            for (TotalSalesItem totalSalesItem : totalSalesItemList) {
+                if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))) {
+                    totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
+                    sum += buffetOrder.getSum();
+                }
+            }
+            return sum;
+        }
+
+        private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
                 List<Long> idOfOrgsList) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
             if(idOfContragent != -1){
@@ -185,7 +179,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BEN));
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_COMPLEX));
                 }
-                totalSalesItemMap.put(orgItem.getOfficialName(), totalSalesItemList);
+                totalSalesItemMap.put(orgItem.getIdOfOrg(), totalSalesItemList);
                 idOfOrgsList.add(orgItem.getIdOfOrg());
             }
         }

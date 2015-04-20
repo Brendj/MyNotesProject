@@ -160,7 +160,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             printMessage("Отчет по питанию и посещению построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
-            logger.error("Failed build report ",e.getMessage());
+            logger.error("Failed build report: " + e.getMessage(), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
