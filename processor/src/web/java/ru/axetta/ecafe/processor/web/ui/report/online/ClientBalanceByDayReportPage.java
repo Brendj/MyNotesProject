@@ -136,6 +136,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
         if (validateFormData()) {
             return;
         }
+        Properties properties = new Properties();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFileName = ClientBalanceByDayReport.class.getSimpleName() + ".jasper";
@@ -145,7 +146,6 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
         }
         ClientBalanceByDayReport.Builder builder = new ClientBalanceByDayReport.Builder(templateFilename);
         if (!CollectionUtils.isEmpty(idOfOrgList)) {
-            Properties properties = new Properties();
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
             builder.setReportProperties(properties);
@@ -165,8 +165,10 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
 
             startDate = localCalendar.getTime();
             endDate = localCalendar.getTime();
-            report = builder
-                    .build(persistenceSession, startDate, endDate, localCalendar, clientFilter.getClientGroupId(), clientFilter.getClientBalanceCondition());
+            properties.setProperty("clientGroupId", String.valueOf(clientFilter.getClientGroupId()));
+            properties.setProperty("clientBalanceCondition", String.valueOf(clientFilter.getClientBalanceCondition()));
+            builder.setReportProperties(properties);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

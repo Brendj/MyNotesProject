@@ -200,12 +200,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            return null;
-        }
-
-        @Override
-        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long clientGroupId, Integer clientBalanceCondition) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(endTime);
@@ -221,6 +215,8 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 idOfContragent1 = contragent.getIdOfContragent();
             }
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            Long clientGroupId = Long.valueOf(reportProperties.getProperty("clientGroupId"));
+            int clientBalanceCondition = Integer.parseInt(reportProperties.getProperty("clientBalanceCondition"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {

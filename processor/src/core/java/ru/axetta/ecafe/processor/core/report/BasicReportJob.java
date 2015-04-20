@@ -92,11 +92,6 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
         public abstract BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                         throws Exception;
-
-        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long clientGroupId, Integer clientBalanceCondition) throws Exception {
-            return null;
-        }
     }
 
     public static class OrgShortItem {
