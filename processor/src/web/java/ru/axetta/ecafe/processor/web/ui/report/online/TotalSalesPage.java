@@ -157,7 +157,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 htmlReport = os.toString("UTF-8");
                 os.close();
             }
-            printMessage("Отчет по питанию и посещению построен");
+            printMessage("Отчет построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
             logger.error("Failed build report: " + e.getMessage(), e);
