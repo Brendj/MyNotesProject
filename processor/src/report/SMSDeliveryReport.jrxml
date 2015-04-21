@@ -103,35 +103,35 @@
 		<band height="68" splitType="Stretch">
 			<elementGroup/>
 			<staticText>
-				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="800" height="20"/>
+				<reportElement x="0" y="0" width="800" height="20" uuid="24f636d2-0418-42b4-9970-a94414684b99"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Отчет по времени доставки СМС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="32" width="120" height="20"/>
+				<reportElement x="0" y="32" width="120" height="20" uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Период отчета: ]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="120" y="32" width="81" height="20"/>
+				<reportElement x="120" y="32" width="81" height="20" uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="229" y="32" width="102" height="20"/>
+				<reportElement x="229" y="32" width="102" height="20" uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="201" y="32" width="28" height="20"/>
+				<reportElement x="201" y="32" width="28" height="20" uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7"/>
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -151,18 +151,18 @@
 	<summary>
 		<band height="237">
 			<crosstab>
-				<reportElement uuid="4b094aa8-df5e-4b52-b7a7-7889439ff734" x="0" y="0" width="802" height="237"/>
+				<reportElement x="0" y="0" width="802" height="237" uuid="4b094aa8-df5e-4b52-b7a7-7889439ff734"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="30" y="0" width="250" height="120"/>
+							<reportElement style="Crosstab Data Text" x="30" y="0" width="250" height="120" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 							<textElement>
 								<font size="9" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Наименование ОУ]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="0" y="0" width="30" height="120"/>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="120" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 							<textElement>
 								<font size="9" isBold="true"/>
 							</textElement>
@@ -177,14 +177,14 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="0" y="0" width="30" height="12"/>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="30" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 								<textElement>
 									<font size="9"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="30" y="0" width="250" height="12"/>
+								<reportElement style="Crosstab Data Text" x="30" y="0" width="250" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 								<textElement>
 									<font size="9"/>
 								</textElement>
@@ -206,21 +206,21 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="352e33a5-9628-40dd-aca3-979441bf2719" style="Crosstab Data Text" x="0" y="0" width="350" height="15"/>
+								<reportElement style="Crosstab Data Text" x="0" y="0" width="380" height="15" uuid="352e33a5-9628-40dd-aca3-979441bf2719"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Время без обмена более 2 минут]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="350" y="0" width="370" height="15"/>
+								<reportElement style="Crosstab Data Text" x="380" y="0" width="370" height="15" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Время от регистрации события прохода до отправки в ЕМП]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="0" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="0" y="15" width="70" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -231,7 +231,7 @@
 08:00-16:00 ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="70" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="70" y="15" width="70" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -244,7 +244,7 @@
 ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="140" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="140" y="15" width="70" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -255,7 +255,7 @@
 16:00-08:00 ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="210" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="210" y="15" width="70" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -267,17 +267,17 @@
 16:00-08:00  ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="280" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="280" y="15" width="100" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Дата и время
 последней
 быстрой
-синхронизации ]]></text>
+синхронизации  ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="350" y="15" width="70" height="105"/>
+								<reportElement style="Crosstab Data Text" x="380" y="15" width="70" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -285,7 +285,7 @@
 событий]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="420" y="15" width="100" height="105"/>
+								<reportElement style="Crosstab Data Text" x="450" y="15" width="100" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -293,7 +293,7 @@
 время]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="520" y="15" width="100" height="105"/>
+								<reportElement style="Crosstab Data Text" x="550" y="15" width="100" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -301,7 +301,7 @@
 время]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="620" y="15" width="100" height="105"/>
+								<reportElement style="Crosstab Data Text" x="650" y="15" width="100" height="105" uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57"/>
 								<textElement>
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -324,69 +324,69 @@
 				<measure name="values" class="java.lang.Object">
 					<measureExpression><![CDATA[$F{values}]]></measureExpression>
 				</measure>
-				<crosstabCell width="720" height="12">
+				<crosstabCell width="750" height="15">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="0" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="70" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayMidday").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="70" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="70" y="0" width="70" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayMidday").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="140" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="140" y="0" width="70" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayNight").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="210" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="210" y="0" width="70" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayNight").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="280" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="280" y="0" width="100" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_lastSync").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="350" y="0" width="70" height="12"/>
+							<reportElement style="Crosstab Data Text" x="380" y="0" width="70" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_eventsCount").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="420" y="0" width="100" height="12"/>
+							<reportElement style="Crosstab Data Text" x="450" y="0" width="100" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_minTimeout").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="520" y="0" width="100" height="12"/>
+							<reportElement style="Crosstab Data Text" x="550" y="0" width="100" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_avgTimeout").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="620" y="0" width="100" height="12"/>
+							<reportElement style="Crosstab Data Text" x="650" y="0" width="100" height="15" uuid="dea8f075-8b48-4a4a-8959-029c9a063022"/>
 							<textElement>
 								<font size="9"/>
 							</textElement>

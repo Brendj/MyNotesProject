@@ -78,20 +78,24 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     public void buildReport(Session session) throws Exception {
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder();
+        addOrgFilter(reportBuilder);
+        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+    }
+
+    protected void addOrgFilter(SMSDeliveryReport.Builder builder) {
         if (idOfOrgList != null && idOfOrgList.size() > 0) {
             /*Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
                 org = DAOService.getInstance().findOrById(idOfOrg);
             }
             reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));*/
-            Properties properties = reportBuilder.getReportProperties();
+            Properties properties = builder.getReportProperties();
             String idOfOrgString = "";
             if(idOfOrgList != null) {
                 idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             }
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         }
-        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
     }
 
 
@@ -119,9 +123,10 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
             SMSDeliveryReport.Builder builder = new SMSDeliveryReport.Builder(templateFilename);
-            if(idOfOrg != null) {
+            addOrgFilter(builder);
+            /*if(idOfOrg != null) {
                 builder.setOrg(new BasicReportJob.OrgShortItem(idOfOrg, filter, filter));
-            }
+            }*/
             SMSDeliveryReport smsDeliveryReport = builder.build(session, startDate, endDate, new GregorianCalendar());
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
