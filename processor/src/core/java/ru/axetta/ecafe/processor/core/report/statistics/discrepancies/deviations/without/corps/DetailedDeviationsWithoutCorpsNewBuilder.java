@@ -17,7 +17,10 @@ import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInf
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.*;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.ComplexInfoItem;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DeviationPaymentNewItem;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DeviationPaymentNewSubReportItem;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.PlanOrderItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -116,8 +119,12 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 ++rowNum;
 
                 List<Long> idOfOrgList = new ArrayList<Long>();
-                for (Org org : orgSet) {
-                    idOfOrgList.add(org.getIdOfOrg());
+                if (orgSet.isEmpty()) {
+                    idOfOrgList.add(organizationsInfoModel.getIdOfOrg());
+                } else {
+                    for (Org org : orgSet) {
+                        idOfOrgList.add(org.getIdOfOrg());
+                    }
                 }
 
                 for (Long idOfOrg : idOfOrgList) {
@@ -135,8 +142,8 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
                 collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, idOfOrgList, deviationPaymentSubReportItemList, rulesForOrgMap,
-                        complexInfoItemListByPlanMap, onlyPaidCategories);
+                        conditionNotDetectedEat, conditionReserve, idOfOrgList, deviationPaymentSubReportItemList,
+                        rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
 
@@ -155,8 +162,12 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 Set<Org> orgSet = organizationsInfoModel.getFriendlyOrganizationsSet();
                 ++rowNum;
                 List<Long> idOfOrgList = new ArrayList<Long>();
-                for (Org org : orgSet) {
-                    idOfOrgList.add(org.getIdOfOrg());
+                if (orgSet.isEmpty()) {
+                    idOfOrgList.add(organizationsInfoModel.getIdOfOrg());
+                } else {
+                    for (Org org : orgSet) {
+                        idOfOrgList.add(org.getIdOfOrg());
+                    }
                 }
 
                 for (Long idOfOrg : idOfOrgList) {
@@ -174,8 +185,8 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
                 collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, deviationPaymentSubReportItemList, idOfOrgList, rulesForOrgMap,
-                        complexInfoItemListByPlanMap, onlyPaidCategories);
+                        conditionNotDetectedEat, conditionReserve, deviationPaymentSubReportItemList, idOfOrgList,
+                        rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
 
@@ -197,8 +208,8 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
     }
 
     public void collectingReportItems(Session session, String orderType, Date startTime, Date addOneDayEndTime,
-            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve, List<Long> idOfOrgList,
-            List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList,
+            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve,
+            List<Long> idOfOrgList, List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList,
             HashMap<Long, List<DiscountRule>> rulesForOrgMap,
             HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
 
@@ -383,14 +394,16 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 groupName = planOrderItem.getGroupName();
                 rowNum = 1L;
             }
-            DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = createReportItem(rowNum, condition, planOrderItem);
+            DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = createReportItem(rowNum, condition,
+                    planOrderItem);
             deviationPaymentNewSubReportItemList.add(deviationPaymentNewSubReportItem);
         }
     }
 
-    public DeviationPaymentNewSubReportItem createReportItem(Long rowNum, String condition, PlanOrderItem planOrderItem) {
-        DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = new DeviationPaymentNewSubReportItem(rowNum, condition,
-                planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
+    public DeviationPaymentNewSubReportItem createReportItem(Long rowNum, String condition,
+            PlanOrderItem planOrderItem) {
+        DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = new DeviationPaymentNewSubReportItem(rowNum,
+                condition, planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),
                 planOrderItem.getComplexName());
         return deviationPaymentNewSubReportItem;
     }
