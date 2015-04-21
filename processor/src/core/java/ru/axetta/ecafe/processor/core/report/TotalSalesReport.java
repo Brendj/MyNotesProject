@@ -133,12 +133,12 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             for (OrderItem allOrder : allOrders) {
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
-                    sumBuffet = handleOrders(totalListMap, allOrder, NAME_BUFFET);
+                    sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
                 }else if(allOrder.getSocDiscount() == 0L){//Pay
-                    sumComplex = handleOrders(totalListMap, allOrder, NAME_COMPLEX);
+                    sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX);
 
                 }else{ // free
-                    sumBen = handleOrders(totalListMap, allOrder, NAME_BEN);
+                    sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
 
                 }
             }
