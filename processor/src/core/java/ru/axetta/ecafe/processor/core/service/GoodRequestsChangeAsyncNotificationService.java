@@ -292,7 +292,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                     } else if (modifyTypeEdit) {
                         reportType = "К";
                     }else {
-                        return;
+                        continue;
                     }
 
                     String[] values = {
@@ -341,8 +341,8 @@ public class GoodRequestsChangeAsyncNotificationService {
                                             values);
                         }
                     }
-                    eventNotificationService.sendEmailAsync("ziganshin@axetta.ru",
-                            EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    //eventNotificationService.sendEmailAsync("ziganshin@axetta.ru",
+                    //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 } else {
                     LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
