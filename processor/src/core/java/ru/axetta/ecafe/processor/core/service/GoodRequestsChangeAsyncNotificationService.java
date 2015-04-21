@@ -59,7 +59,6 @@ public class GoodRequestsChangeAsyncNotificationService {
     //}
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GoodRequestsChangeAsyncNotificationService.class);
-
     private Map<Long, ContragentItem> contragentItems;
     private Map<Long, OrgItem> orgItems = new HashMap<Long, OrgItem>();
     private RuntimeContext runtimeContext;
@@ -239,75 +238,18 @@ public class GoodRequestsChangeAsyncNotificationService {
 
             Collections.reverse(intervals);
 
+            Date currentDate = new Date();
+
             for (DateInterval interval : intervals) {
-
-
-                try {
-                    try {
-                        //persistenceSession = runtimeContext.createReportPersistenceSession();
-                        persistenceSession = runtimeContext.createPersistenceSession();
-                        persistenceTransaction = persistenceSession.beginTransaction();
-                        reportJob = builder
-                                .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
-                        //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                        persistenceTransaction.commit();
-                        persistenceTransaction = null;
-                    } finally {
-                        HibernateUtils.rollback(persistenceTransaction, LOGGER);
-                        HibernateUtils.close(persistenceSession, LOGGER);
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Failed export report : ", e);
-                }
-                if (reportJob != null) {
-                    try {
-                        ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        JRHtmlExporter exporter = new JRHtmlExporter();
-                        exporter.setParameter(JRExporterParameter.JASPER_PRINT, reportJob.getPrint());
-                        exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                        exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                        exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                        exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                        exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                        exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                        exporter.exportReport();
-                        htmlReport = os.toString("UTF-8");
-                        os.close();
-                    } catch (Exception e) {
-                        LOGGER.error("Failed build report ", e);
-                    }
-                } else {
-                    LOGGER.debug("IdOfOrg: " + idOfOrg + " reportJob is null");
-                }
-
-                if (StringUtils.isNotEmpty(htmlReport)) {
-                    boolean modifyTypeEdit = htmlReport.contains("#FF6666");
-                    boolean modifyTypeCreate = htmlReport.contains("#92D050");
-                    String reportType = "-";
-                    if (modifyTypeCreate && modifyTypeEdit) {
-                        reportType = "О";
-                    } else if (modifyTypeCreate) {
-                        reportType = "Н";
-                    } else if (modifyTypeEdit) {
-                        reportType = "К";
-                    }else {
-                        continue;
-                    }
-
-                    String[] values = {
-                            "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport,
-                            "reportType", reportType};
-                    List<String> strings = Arrays
-                            .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
-                    Set<String> addresses = new HashSet<String>(strings);
-
-                /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
+                if (interval.endDate.after(currentDate)) {
                     try {
                         try {
-                            persistenceSession = runtimeContext.createReportPersistenceSession();
+                            //persistenceSession = runtimeContext.createReportPersistenceSession();
+                            persistenceSession = runtimeContext.createPersistenceSession();
                             persistenceTransaction = persistenceSession.beginTransaction();
-                            addEmailFromClient(persistenceSession, idOfOrg, addresses);
+                            reportJob = builder
+                                    .build(persistenceSession, interval.beginDate, interval.endDate, localCalendar);
+                            //reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                             persistenceTransaction.commit();
                             persistenceTransaction = null;
                         } finally {
@@ -315,36 +257,95 @@ public class GoodRequestsChangeAsyncNotificationService {
                             HibernateUtils.close(persistenceSession, LOGGER);
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Find email from clients : ", e);
+                        LOGGER.error("Failed export report : ", e);
+                    }
+                    if (reportJob != null) {
+                        try {
+                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                            JRHtmlExporter exporter = new JRHtmlExporter();
+                            exporter.setParameter(JRExporterParameter.JASPER_PRINT, reportJob.getPrint());
+                            exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                            exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                            exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                            exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                            exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                            exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS,
+                                    Boolean.TRUE);
+                            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                            exporter.exportReport();
+                            htmlReport = os.toString("UTF-8");
+                            os.close();
+                        } catch (Exception e) {
+                            LOGGER.error("Failed build report ", e);
+                        }
+                    } else {
+                        LOGGER.debug("IdOfOrg: " + idOfOrg + " reportJob is null");
                     }
 
-                    try {
+                    if (StringUtils.isNotEmpty(htmlReport)) {
+                        boolean modifyTypeEdit = htmlReport.contains("#FF6666");
+                        boolean modifyTypeCreate = htmlReport.contains("#92D050");
+                        String reportType = "-";
+                        if (modifyTypeCreate && modifyTypeEdit) {
+                            reportType = "О";
+                        } else if (modifyTypeCreate) {
+                            reportType = "Н";
+                        } else if (modifyTypeEdit) {
+                            reportType = "К";
+                        } else {
+                            continue;
+                        }
+
+                        String[] values = {
+                                "address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport,
+                                "reportType", reportType};
+                        List<String> strings = Arrays
+                                .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
+                        Set<String> addresses = new HashSet<String>(strings);
+
+                    /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
                         try {
-                            persistenceSession = runtimeContext.createReportPersistenceSession();
-                            persistenceTransaction = persistenceSession.beginTransaction();
-                            addEmailFromUser(persistenceSession, idOfOrg, addresses);
-                            persistenceTransaction.commit();
-                            persistenceTransaction = null;
-                        } finally {
-                            HibernateUtils.rollback(persistenceTransaction, LOGGER);
-                            HibernateUtils.close(persistenceSession, LOGGER);
+                            try {
+                                persistenceSession = runtimeContext.createReportPersistenceSession();
+                                persistenceTransaction = persistenceSession.beginTransaction();
+                                addEmailFromClient(persistenceSession, idOfOrg, addresses);
+                                persistenceTransaction.commit();
+                                persistenceTransaction = null;
+                            } finally {
+                                HibernateUtils.rollback(persistenceTransaction, LOGGER);
+                                HibernateUtils.close(persistenceSession, LOGGER);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Find email from clients : ", e);
                         }
-                    } catch (Exception e) {
-                        LOGGER.error("Find email from user : ", e);
-                    }
-                    LOGGER.debug("addresses " + addresses.toString());
-                    //boolean sended = false;
-                    for (String address : addresses) {
-                        if (StringUtils.trimToNull(address) != null) {
-                            eventNotificationService
-                                    .sendEmailAsync(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
-                                            values);
+
+                        try {
+                            try {
+                                persistenceSession = runtimeContext.createReportPersistenceSession();
+                                persistenceTransaction = persistenceSession.beginTransaction();
+                                addEmailFromUser(persistenceSession, idOfOrg, addresses);
+                                persistenceTransaction.commit();
+                                persistenceTransaction = null;
+                            } finally {
+                                HibernateUtils.rollback(persistenceTransaction, LOGGER);
+                                HibernateUtils.close(persistenceSession, LOGGER);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Find email from user : ", e);
                         }
+                        LOGGER.debug("addresses " + addresses.toString());
+                        //boolean sended = false;
+                        for (String address : addresses) {
+                            if (StringUtils.trimToNull(address) != null) {
+                                eventNotificationService.sendEmailAsync(address,
+                                        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                            }
+                        }
+                        //eventNotificationService.sendEmailAsync("ziganshin@axetta.ru",
+                        //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                    } else {
+                        LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                     }
-                    //eventNotificationService.sendEmailAsync("ziganshin@axetta.ru",
-                    //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                } else {
-                    LOGGER.debug("IdOfOrg: " + idOfOrg + " email text is empty");
                 }
             }
         } else {
