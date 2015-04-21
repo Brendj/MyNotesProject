@@ -193,7 +193,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="df76537f-1d13-4361-965b-53de2f39449e" style="Crosstab Data Text" x="0" y="0" width="522" height="33"/>
+								<reportElement uuid="df76537f-1d13-4361-965b-53de2f39449e" style="Crosstab Data Text" x="0" y="0" width="526" height="33"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -201,7 +201,7 @@
 									<rightPen lineWidth="0.5"/>
 								</box>
 								<textElement verticalAlignment="Middle">
-									<font size="9"/>
+									<font size="12" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{f05}]]></textFieldExpression>
 							</textField>
@@ -245,7 +245,7 @@
 								<text><![CDATA[Присутствие]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="979ef54f-a42e-4320-a831-37c37410f010" style="Crosstab Data Text" x="222" y="33" width="300" height="30"/>
+								<reportElement uuid="979ef54f-a42e-4320-a831-37c37410f010" style="Crosstab Data Text" x="222" y="33" width="304" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -275,7 +275,7 @@
 				<measure name="f09" class="java.lang.String">
 					<measureExpression><![CDATA[$F{f09}]]></measureExpression>
 				</measure>
-				<crosstabCell width="522" height="50">
+				<crosstabCell width="526" height="50">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -320,7 +320,7 @@
 							<textFieldExpression><![CDATA[$V{f08}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="73a775cc-28e2-48eb-bcac-0e2b865c4e5f" style="Crosstab Data Text" x="222" y="0" width="300" height="50"/>
+							<reportElement uuid="73a775cc-28e2-48eb-bcac-0e2b865c4e5f" style="Crosstab Data Text" x="222" y="0" width="304" height="50"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
