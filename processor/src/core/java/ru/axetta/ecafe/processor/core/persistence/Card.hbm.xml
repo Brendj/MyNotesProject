@@ -15,8 +15,7 @@
             </generator>
         </id>
         <version name="version" column="Version" type="long"/>
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
-                     not-null="false"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"/>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
         <property name="cardType" column="CardType" type="integer" not-null="true"/>
         <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"

@@ -450,7 +450,7 @@ public class Processor implements SyncProcessor,
         }
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
-        if (c != null) {
+        if (c != null && c.getClient()!=null) {
             throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
         }
         logger.debug("check exist temp card");
@@ -549,7 +549,7 @@ public class Processor implements SyncProcessor,
                 lockActiveCards(persistenceSession, clientCards);
             }
 
-            final long oldClient = updatedCard.getClient().getIdOfClient();
+            final long oldClient = (updatedCard.getClient()!= null)?updatedCard.getClient().getIdOfClient():-1;
             final long newClient = newCardOwner.getIdOfClient();
 
             //История карты при обновлении информации
@@ -641,7 +641,7 @@ public class Processor implements SyncProcessor,
 
             lockActiveCards(persistenceSession, newCardOwner.getCards());
 
-            final long oldClient = updatedCard.getClient().getIdOfClient();
+            final long oldClient = (updatedCard.getClient()!= null)?updatedCard.getClient().getIdOfClient():-1;
             final long newClient = newCardOwner.getIdOfClient();
 
             //История карты при смене владельца

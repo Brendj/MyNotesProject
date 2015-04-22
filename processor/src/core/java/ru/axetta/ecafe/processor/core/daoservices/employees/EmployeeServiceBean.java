@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -145,7 +144,7 @@ public class EmployeeServiceBean {
             throw new RuntimeException("Последний день действия карты не может быть меньше текущего дня.");
         }
         Card c = DAOUtils.findCardByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
-        if (c != null) {
+        if (c != null && c.getClient() != null) {
             final String format = "карта уже зарегистрирована на клиента: %d.";
             final String message = String.format(format, c.getClient().getIdOfClient());
             throw new Exception(message);

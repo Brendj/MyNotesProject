@@ -42,7 +42,7 @@ public class SyncResponse {
             private final long cardNo;
             private final Long cardPrintedNo;
             private final int cardType;
-            private final long idOfClient;
+            private final Long idOfClient;
             private final Date updateTime;
             private final long balance;
             private final Long subBalance1;
@@ -57,7 +57,7 @@ public class SyncResponse {
                 this.cardNo = card.getCardNo();
                 this.cardPrintedNo = card.getCardPrintedNo();
                 this.cardType = card.getCardType();
-                this.idOfClient = card.getClient().getIdOfClient();
+                this.idOfClient = (card.getClient()!= null)?card.getClient().getIdOfClient():null;
                 this.updateTime = card.getUpdateTime();
                 Client client = card.getClient();
                 if(client.getSubBalance1()==null){
@@ -78,7 +78,7 @@ public class SyncResponse {
                 this.cardNo = card.getCardNo();
                 this.cardPrintedNo = card.getCardPrintedNo();
                 this.cardType = card.getCardType();
-                this.idOfClient = card.getClient().getIdOfClient();
+                this.idOfClient = (card.getClient()!= null)?card.getClient().getIdOfClient():null;
                 this.updateTime = card.getUpdateTime();
                 //Client client = card.getClient();
                 if(client.getSubBalance1()==null){
@@ -138,7 +138,7 @@ public class SyncResponse {
                     element.setAttribute("CardPrintedNo", Long.toString(cardPrintedNo));
                 }
                 element.setAttribute("CardType", Integer.toString(cardType));
-                element.setAttribute("IdOfClient", Long.toString(idOfClient));
+                element.setAttribute("IdOfClient", idOfClient.toString());
                 element.setAttribute("LastUpdate", timeFormat.format(updateTime));
                 element.setAttribute("Balance", Long.toString(balance));
                 element.setAttribute("SubBalance1", Long.toString(subBalance1));
