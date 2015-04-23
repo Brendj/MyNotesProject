@@ -940,7 +940,7 @@ public class Processor implements SyncProcessor,
                 }
             }
         } catch (Exception e) {
-            String message = String.format("processTempCardsOperations: %s", e.getMessage());
+            String message = String.format("processClientRequestsOperations: %s", e.getMessage());
             createSyncHistory(request.getIdOfOrg(),syncHistory, message);
             logger.error(message, e);
         }
