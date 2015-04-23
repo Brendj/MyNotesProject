@@ -767,7 +767,10 @@ public class FrontController extends HttpServlet {
     public int registerCardWithoutClient(@WebParam(name = "orgId")long idOfOrg,
             @WebParam(name = "cardNo")long cardNo,
             @WebParam(name = "cardPrintedNo")long cardPrintedNo,
-            @WebParam(name = "type")int type ){
+            @WebParam(name = "type")int type )
+            throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+
         CardService cardService = CardService.getInstance();
         try{
             Card card = cardService.createCard(idOfOrg, cardNo, cardPrintedNo, type);

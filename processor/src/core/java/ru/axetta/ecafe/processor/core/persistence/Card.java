@@ -29,7 +29,7 @@ public class Card {
     public static final String UNKNOWN_STATE_NAME = "Неизвестно";
 
     public static final String[] LIFE_STATE_NAMES = {
-            "На складе", "Выдана клиенту", "Утеряна", "Возращена клиентом", "Уничтожена"};
+            "На складе", "Выдана клиенту", "Утеряна", "Возвращена клиентом", "Уничтожена"};
     public static final int ISSUED_LIFE_STATE = 1;
     public static final String UNKNOWN_LIFE_STATE_NAME = "Неизвестно";
 
