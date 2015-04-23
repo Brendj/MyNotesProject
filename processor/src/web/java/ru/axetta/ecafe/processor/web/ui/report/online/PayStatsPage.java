@@ -51,11 +51,21 @@ public class PayStatsPage extends BasicWorkspacePage implements ContragentSelect
     }
 
     public String getFromDateAsString() {
-        return CalendarUtils.dateToString(fromDate);
+        if (fromDate != null) {
+            return CalendarUtils.dateToString(fromDate);
+        } else {
+            return "";
+        }
+
     }
 
     public String getToDateAsString() {
-        return CalendarUtils.dateToString(toDate);
+        if (toDate != null) {
+            return CalendarUtils.dateToString(toDate);
+        } else {
+            return "";
+        }
+
     }
 
     public static class StatItem {
@@ -104,18 +114,29 @@ public class PayStatsPage extends BasicWorkspacePage implements ContragentSelect
 
 
     public void updateData() {
-        if (fromDate==null) { printError("Не указана начальная дата"); return; }
-        if (toDate==null) { printError("Не указана конечная дата"); return; }
+        if (fromDate == null) {
+            printError("Не указана \"Начальная дата\"");
+            return;
+        }
+        if (toDate == null) {
+            printError("Не указана \"Конечная дата\"");
+            return;
+        }
+        if (contragent == null) {
+            printError("Не заполнено поле \"Поставщик\"");
+            return;
+        }
         statItems = new LinkedList<StatItem>();
         List<Object[]> vals = daoService.getStatPaymentsByContragents(fromDate, toDate, contragent);
         for (Object[] d : vals) {
             String caName = "" + d[0];
             Integer payMethod = Integer.parseInt(d[1].toString());
-            Long avgPay = (long)Float.parseFloat(d[2].toString());
+            Long avgPay = (long) Float.parseFloat(d[2].toString());
             Long totalPay = Long.parseLong(d[3].toString());
             Long payCount = Long.parseLong(d[4].toString());
-            statItems.add(new StatItem(caName, ClientPayment.PAYMENT_METHOD_NAMES[payMethod], CurrencyStringUtils.copecksToRubles(avgPay),
-                    CurrencyStringUtils.copecksToRubles(totalPay), "" + payCount));
+            statItems.add(new StatItem(caName, ClientPayment.PAYMENT_METHOD_NAMES[payMethod],
+                    CurrencyStringUtils.copecksToRubles(avgPay), CurrencyStringUtils.copecksToRubles(totalPay),
+                    "" + payCount));
         }
     }
 
