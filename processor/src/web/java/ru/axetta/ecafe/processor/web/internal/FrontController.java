@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.internal;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
@@ -23,6 +24,7 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
@@ -759,6 +761,24 @@ public class FrontController extends HttpServlet {
             this.success = success;
             this.error = error;
         }
+    }
+
+    @WebMethod(operationName = "registerCardWithoutClient")
+    public int registerCardWithoutClient(@WebParam(name = "orgId")long idOfOrg,
+            @WebParam(name = "cardNo")long cardNo,
+            @WebParam(name = "cardPrintedNo")long cardPrintedNo,
+            @WebParam(name = "type")int type ){
+        CardService cardService = CardService.getInstance();
+        try{
+            Card card = cardService.createCard(idOfOrg, cardNo, cardPrintedNo, type);
+        }catch (PersistenceException e){
+            logger.error(e.getMessage());
+            return 160;
+        }catch (Exception e1){
+            logger.error(e1.getMessage());
+            return 170;
+        }
+        return 0;
     }
 
 }

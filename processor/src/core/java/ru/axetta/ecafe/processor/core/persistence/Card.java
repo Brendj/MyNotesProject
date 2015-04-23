@@ -43,6 +43,7 @@ public class Card {
     private Long idOfCard;
     private long version;
     private Client client;
+    private Org org;
     private Long cardNo;
     private Integer cardType;
     private Date createTime;
@@ -76,6 +77,18 @@ public class Card {
         this.cardPrintedNo = cardPrintedNo;
     }
 
+    public Card( Org org, long cardNo, int cardType, int state, Long cardPrintedNo)
+            {
+        this.org = org;
+        this.cardNo = cardNo;
+        this.cardType = cardType;
+        Date currentTime = new Date();
+        this.createTime = currentTime;
+        this.updateTime = currentTime;
+        this.state = state;
+        this.cardPrintedNo = cardPrintedNo;
+    }
+
     public Long getIdOfCard() {
         return idOfCard;
     }
@@ -101,6 +114,14 @@ public class Card {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
     }
 
     public Long getCardNo() {
