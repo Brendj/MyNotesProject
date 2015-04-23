@@ -34,6 +34,8 @@ public class EnterEvent {
     private Long guardianId;
     private Integer childPassChecker;
     private Long childPassCheckerId;
+    private ClientGroup clientGroup;
+    private Long idOfClientGroup;
 
 
     //pass direction
@@ -227,6 +229,22 @@ public class EnterEvent {
 
     public void setChildPassCheckerId(Long childPassCheckerId) {
         this.childPassCheckerId = childPassCheckerId;
+    }
+
+    public ClientGroup getClientGroup() {
+        return clientGroup;
+    }
+
+    public void setClientGroup(ClientGroup clientGroup) {
+        this.clientGroup = clientGroup;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
     }
 
     @Override

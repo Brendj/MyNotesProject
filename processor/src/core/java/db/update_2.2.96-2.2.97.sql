@@ -6,3 +6,5 @@
 
 
 ALTER TABLE cf_cards ADD COLUMN IdOfOrg BIGINT;
+
+ALTER TABLE cf_enterevents ADD COLUMN IdOfClientGroup BIGINT;

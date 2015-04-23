@@ -1772,4 +1772,12 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         }
         return false;
     }
+
+    public Long getClientGroupByClientId(Long idOfClient) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        Client client = (Client) criteria.uniqueResult();
+        return client.getIdOfClientGroup();
+    }
 }

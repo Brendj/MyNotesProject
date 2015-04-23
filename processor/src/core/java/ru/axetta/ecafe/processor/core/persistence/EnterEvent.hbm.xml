@@ -34,5 +34,11 @@
         <property name="guardianId" column="GuardianId" type="long" not-null="false"/>
         <property name="childPassChecker" column="ChildPassChecker" type="integer" not-null="false"/>
         <property name="childPassCheckerId" column="ChildPassCheckerId" type="long" not-null="false"/>
+        <property name="idOfClientGroup" column="IdOfClientGroup" type="long"/>
+        <many-to-one name="clientGroup" class="ru.axetta.ecafe.processor.core.persistence.ClientGroup" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfClientGroup"/>
+        </many-to-one>
     </class>
 </hibernate-mapping>
