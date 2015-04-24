@@ -6,13 +6,17 @@ package ru.axetta.ecafe.processor.core.utils;
 
 import ru.axetta.ecafe.processor.core.sync.SyncType;
 
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 public class SyncCollector {
 
-    Date startTime = new Date();
-    List<SyncData> syncList = new ArrayList<SyncData>();
-    Map<Long, SyncData> tempSyncs = new HashMap<Long, SyncData>();
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SyncStatsManager.class);
+    private static Date startTime = new Date();
+    private static List<SyncData> syncList = new ArrayList<SyncData>();
+    private static Map<Long, SyncData> tempSyncs = new HashMap<Long, SyncData>();
+
 
     private SyncCollector() {
     }
@@ -21,12 +25,22 @@ public class SyncCollector {
         return SyncCollectorHolder.INSTANCE;
     }
 
+    private void clearOldData() {
+        if (startTime.getTime() < new Date().getTime() - 7200000L) {
+            startTime = new Date();
+            syncList = new ArrayList<SyncData>();
+            tempSyncs = new HashMap<Long, SyncData>();
+        }
+    }
+
     public void registerSyncStart(Long syncTime) {
+        clearOldData();
         tempSyncs.put(syncTime, new SyncData());
         tempSyncs.get(syncTime).setSyncStartTime(new Date());
     }
 
     public void registerSyncEnd(Long syncTime) {
+        clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
             tempSyncs.get(syncTime).setSyncEndTime(new Date());
             syncList.add(tempSyncs.get(syncTime));
@@ -35,24 +49,28 @@ public class SyncCollector {
     }
 
     public void setIdOfOrg(Long syncTime, long idOfOrg) {
+        clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
             tempSyncs.get(syncTime).setIdOfOrg(idOfOrg);
         }
     }
 
     public void setIdOfSync(Long syncTime, String idOfSync) {
+        clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
             tempSyncs.get(syncTime).setIdOfSync(idOfSync);
         }
     }
 
     public void setSyncType(Long syncTime, SyncType syncType) {
+        clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
             tempSyncs.get(syncTime).setSyncType(syncType);
         }
     }
 
     public void setErrMessage(Long syncTime, String errMessage) {
+        clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
             tempSyncs.get(syncTime).setErrorMessage(errMessage);
         }
