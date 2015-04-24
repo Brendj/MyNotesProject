@@ -152,6 +152,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORDER_PUBLICATION_CANT_BE_DELETED_DESC = "Заказ не может быть удален";
     private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
     private static final int MAX_RECS = 50;
+    private static final int MAX_RECS_getPurchaseList = 500;
+
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
 
@@ -1842,7 +1844,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List ordersList = ordersCriteria.list();
         PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
         for (Object o : ordersList) {
-            if (nRecs++ > MAX_RECS) {
+            if (nRecs++ > MAX_RECS_getPurchaseList) {
                 break;
             }
             Order order = (Order) o;
