@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.sync.SyncType;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -12,9 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,8 +46,19 @@ public class SyncStatsManager {
             time = syncCollector.startTime.getTime();
             syncCollector.startTime = new Date();
         }
-        logger.error(syncListCopy.size() + " syncs completed after " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+        logger.info(syncListCopy.size() + " syncs completed after " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .format(new Date(time)) + ".");
+        Map<SyncType, Long> syncTypesCount = new HashMap<SyncType, Long>();
+        for (SyncCollector.SyncData syncData : syncListCopy) {
+            Long syncTypeCount = 1L;
+            if (syncTypesCount.containsKey(syncData.getSyncType())) {
+                syncTypeCount += syncTypesCount.get(syncData.getSyncType());
+            }
+            syncTypesCount.put(syncData.getSyncType(), syncTypeCount);
+        }
+        for (SyncType syncType : syncTypesCount.keySet()) {
+            logger.info("Sync type " + syncType.toString() + " completed " + syncTypesCount.get(syncType) + " times.");
+        }
         // Если SyncData не обработан в течении часа, то есть проблема
         for (Long syncTime : syncCollector.tempSyncs.keySet()) {
             if (syncTime < (time - 3600000L)) {
