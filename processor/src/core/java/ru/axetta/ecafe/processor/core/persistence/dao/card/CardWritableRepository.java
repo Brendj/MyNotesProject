@@ -36,7 +36,7 @@ public class CardWritableRepository extends WritableJpaDao {
 
     @Transactional
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type) {
-        Card card = new Card(org,cardNo,type,Card.TEMPORARY_LOCKED_STATE,cardPrintedNo);
+        Card card = new Card(org,cardNo,type,Card.TEMPORARY_LOCKED_STATE,cardPrintedNo,Card.READY_LIFE_STATE);
         entityManager.persist(card);
         return card;
     }

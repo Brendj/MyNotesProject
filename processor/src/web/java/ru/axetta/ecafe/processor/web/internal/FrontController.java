@@ -17,6 +17,7 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -769,13 +770,16 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardPrintedNo")long cardPrintedNo,
             @WebParam(name = "type")int type )
             throws FrontControllerException {
-        checkRequestValidity(idOfOrg);
+        //checkRequestValidity(idOfOrg);
 
         CardService cardService = CardService.getInstance();
         try{
             Card card = cardService.createCard(idOfOrg, cardNo, cardPrintedNo, type);
         }catch (PersistenceException e){
             logger.error(e.getMessage());
+            return 160;
+        }catch (ConstraintViolationException e2){
+            logger.error(e2.getMessage());
             return 160;
         }catch (Exception e1){
             logger.error(e1.getMessage());

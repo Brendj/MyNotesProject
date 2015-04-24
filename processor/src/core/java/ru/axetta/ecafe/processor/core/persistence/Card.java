@@ -29,8 +29,9 @@ public class Card {
     public static final String UNKNOWN_STATE_NAME = "Неизвестно";
 
     public static final String[] LIFE_STATE_NAMES = {
-            "На складе", "Выдана клиенту", "Утеряна", "Возвращена клиентом", "Уничтожена"};
+            "На складе", "Выдана клиенту", "Утеряна", "Возвращена клиентом", "Уничтожена", "Готова к выдаче"};
     public static final int ISSUED_LIFE_STATE = 1;
+    public static final int READY_LIFE_STATE = 1;
     public static final String UNKNOWN_LIFE_STATE_NAME = "Неизвестно";
 
     public static int parseCardType(String type) throws Exception {
@@ -77,16 +78,17 @@ public class Card {
         this.cardPrintedNo = cardPrintedNo;
     }
 
-    public Card( Org org, long cardNo, int cardType, int state, Long cardPrintedNo)
-            {
+    public Card( Org org, long cardNo, int cardType, int state, Long cardPrintedNo, int lifeState){
         this.org = org;
         this.cardNo = cardNo;
         this.cardType = cardType;
         Date currentTime = new Date();
         this.createTime = currentTime;
         this.updateTime = currentTime;
+        this.validTime = currentTime;
         this.state = state;
         this.cardPrintedNo = cardPrintedNo;
+        this.lifeState = lifeState;
     }
 
     public Long getIdOfCard() {
