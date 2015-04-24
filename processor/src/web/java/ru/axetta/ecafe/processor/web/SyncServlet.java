@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.SyncCollector;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.CharEncoding;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -43,12 +45,12 @@ import java.util.zip.GZIPOutputStream;
  * User: Developer
  * Date: 21.07.2009
  * Time: 16:02:24
- * To change this template use File | Settings | File Templates.
  */
 public class SyncServlet extends HttpServlet {
 
     private static final String CONTENT_TYPE = "text/xml", CONTENT_TYPE_GZIPPED= "application/octet-stream";
     private static final Logger logger = LoggerFactory.getLogger(SyncServlet.class);
+    private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
 
     static class RequestData {
         public boolean isCompressed;
@@ -57,6 +59,8 @@ public class SyncServlet extends HttpServlet {
 
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RuntimeContext runtimeContext = null;
+        Long syncTime = new Date().getTime();
+        SYNC_COLLECTOR.registerSyncStart(syncTime);
         try {
             runtimeContext = RuntimeContext.getInstance();
 
@@ -81,8 +85,11 @@ public class SyncServlet extends HttpServlet {
                 envelopeNode = SyncRequest.Builder.findEnvelopeNode(requestData.document);
                 namedNodeMap = envelopeNode.getAttributes();
                 idOfOrg = SyncRequest.Builder.getIdOfOrg(namedNodeMap);
+                SYNC_COLLECTOR.setIdOfOrg(syncTime, idOfOrg);
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
+                SYNC_COLLECTOR.setIdOfSync(syncTime, idOfSync);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
+                SYNC_COLLECTOR.setSyncType(syncTime, syncType);
                 if(syncType==null) throw new Exception("Unknown sync type");
             } catch (Exception e) {
                 final String message = String.format("Failed to extract required packet attribute [remote address: %s]",
@@ -195,7 +202,10 @@ public class SyncServlet extends HttpServlet {
             final String message = String.format("End of synchronization with %s", request.getRemoteAddr());
             logger.info(message);
         } catch (RuntimeContext.NotInitializedException e) {
+            SYNC_COLLECTOR.setErrMessage(syncTime, e.getMessage());
             throw new UnavailableException(e.getMessage());
+        } finally {
+            SYNC_COLLECTOR.registerSyncEnd(syncTime);
         }
     }
 

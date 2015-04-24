@@ -79,6 +79,7 @@
         <task:scheduled ref="synchCleanupService" method="run" cron="0 0 1 ? * *" />
         <task:scheduled ref="RNIPLoadPaymentsService" method="run" fixed-delay="60000" />
         <task:scheduled ref="EMPProcessor" method="runStorageMerge" cron="*/30 * * * * *"/>
+        <task:scheduled ref="syncStatsManager" method="logData" cron="0 0/10 * * * ?"/>
         <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"  />
         <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup" fixed-delay="60000" />
         <task:scheduled ref="smsDeliveryCalculationService" method="run" cron="0 0 4 ? * *"/>
