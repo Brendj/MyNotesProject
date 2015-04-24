@@ -62,10 +62,13 @@ public class SyncStatsManager {
         // Если SyncData не обработан в течении часа, то есть проблема
         for (Long syncTime : syncCollector.tempSyncs.keySet()) {
             if (syncTime < (time - 3600000L)) {
+                SyncCollector.SyncData syncData = null;
                 synchronized (SyncCollector.class) {
-                    SyncCollector.SyncData syncData = syncCollector.tempSyncs.get(syncTime);
-                    errList.add(syncData);
-                    syncCollector.tempSyncs.remove(syncTime);
+                    if (syncCollector.tempSyncs.containsKey(syncTime)) {
+                        syncData = syncCollector.tempSyncs.get(syncTime);
+                        errList.add(syncData);
+                        syncCollector.tempSyncs.remove(syncTime);
+                    }
                 }
             }
         }
