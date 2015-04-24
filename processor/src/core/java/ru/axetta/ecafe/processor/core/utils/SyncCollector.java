@@ -76,6 +76,30 @@ public class SyncCollector {
         }
     }
 
+    public static Date getStartTime() {
+        return startTime;
+    }
+
+    public static void setStartTime(Date startTime) {
+        SyncCollector.startTime = startTime;
+    }
+
+    public static List<SyncData> getSyncList() {
+        return syncList;
+    }
+
+    public static void setSyncList(List<SyncData> syncList) {
+        SyncCollector.syncList = syncList;
+    }
+
+    public static Map<Long, SyncData> getTempSyncs() {
+        return tempSyncs;
+    }
+
+    public static void setTempSyncs(Map<Long, SyncData> tempSyncs) {
+        SyncCollector.tempSyncs = tempSyncs;
+    }
+
     private static class SyncCollectorHolder {
 
         private static final SyncCollector INSTANCE = new SyncCollector();

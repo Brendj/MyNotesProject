@@ -41,10 +41,10 @@ public class SyncStatsManager {
         List<SyncCollector.SyncData> errList = new ArrayList<SyncCollector.SyncData>();
         Long time;
         synchronized (SyncCollector.class) {
-            syncListCopy = syncCollector.syncList;
-            syncCollector.syncList = new ArrayList<SyncCollector.SyncData>();
-            time = syncCollector.startTime.getTime();
-            syncCollector.startTime = new Date();
+            syncListCopy = syncCollector.getSyncList();
+            syncCollector.setSyncList(new ArrayList<SyncCollector.SyncData>());
+            time = syncCollector.getStartTime().getTime();
+            syncCollector.setStartTime(new Date());
         }
         logger.info(syncListCopy.size() + " syncs completed after " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .format(new Date(time)) + ".");
@@ -60,14 +60,14 @@ public class SyncStatsManager {
             logger.info("Sync type " + syncType.toString() + " completed " + syncTypesCount.get(syncType) + " times.");
         }
         // Если SyncData не обработан в течении часа, то есть проблема
-        for (Long syncTime : syncCollector.tempSyncs.keySet()) {
+        for (Long syncTime : syncCollector.getTempSyncs().keySet()) {
             if (syncTime < (time - 3600000L)) {
-                SyncCollector.SyncData syncData = null;
+                SyncCollector.SyncData syncData;
                 synchronized (SyncCollector.class) {
-                    if (syncCollector.tempSyncs.containsKey(syncTime)) {
-                        syncData = syncCollector.tempSyncs.get(syncTime);
+                    if (syncCollector.getTempSyncs().containsKey(syncTime)) {
+                        syncData = syncCollector.getTempSyncs().get(syncTime);
                         errList.add(syncData);
-                        syncCollector.tempSyncs.remove(syncTime);
+                        syncCollector.getTempSyncs().remove(syncTime);
                     }
                 }
             }
