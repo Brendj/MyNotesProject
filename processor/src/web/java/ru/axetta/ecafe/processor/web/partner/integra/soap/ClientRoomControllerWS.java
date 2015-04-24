@@ -153,6 +153,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
+    private static final int MAX_RECS_getEventsList = 1000;
 
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
@@ -2805,7 +2806,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         int nRecs = 0;
         Map<Long, Client> guardianMap = new HashMap<Long, Client>();
         for (EnterEvent enterEvent : enterEvents) {
-            if (nRecs++ > MAX_RECS) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
                 break;
             }
             EnterEventWithRepItem enterEventWithRepItem = objectFactory.createEnterEventWithRepItem();
@@ -2850,7 +2851,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         EnterEventList enterEventList = objectFactory.createEnterEventList();
         int nRecs = 0;
         for (EnterEvent enterEvent : enterEvents) {
-            if (nRecs++ > MAX_RECS) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
                 break;
             }
             EnterEventItem enterEventItem = objectFactory.createEnterEventItem();
