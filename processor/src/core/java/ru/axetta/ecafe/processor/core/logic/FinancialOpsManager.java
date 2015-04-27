@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
@@ -172,6 +173,9 @@ public class FinancialOpsManager {
                 payment.getSocDiscount(), payment.getTrdDiscount(), payment.getGrant(), payment.getRSum(),
                 payment.getTime(),payment.getOrderDate(), payment.getSumByCard(), payment.getSumByCash(),payment.getComments(), client, card, orderTransaction, pos,
                 supplier, payment.getOrderType());
+
+        Long idOfClientGroup = DAOService.getInstance().getClientGroupByClientId(client.getIdOfClient());
+        order.setIdOfClientGroup(idOfClientGroup);
 
         Long sumByCard = order.getSumByCard();
         Long budgetSum = order.getSocDiscount() + order.getGrantSum();

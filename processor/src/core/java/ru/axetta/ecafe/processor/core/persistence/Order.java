@@ -44,6 +44,7 @@ public class Order{
     private Date orderDate;
     private String comments;
     private OrderTypeEnumType orderType;
+    private Long idOfClientGroup;
 
     public OrderTypeEnumType getOrderType() {
         return orderType;
@@ -254,6 +255,14 @@ public class Order{
 
     public Set<OrderDetail> getOrderDetails() {
         return Collections.unmodifiableSet(getOrderDetailsInternal());
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
     }
 
     @Override
