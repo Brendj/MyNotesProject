@@ -113,20 +113,21 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG,
                                 idOfOrgsString == null ? "" : idOfOrgsString);
 
-                        String hideMissedColumnsString = rule
-                                .getExpressionValue(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
-                        properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS,
-                                hideMissedColumnsString == null ? "false" : hideMissedColumnsString);
+                        String showOnlyDivergenceString = "false";
+                        showOnlyDivergenceString = rule.getExpressionValue(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
+                        properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, showOnlyDivergenceString);
 
-                        String useColorAccentString = rule
-                                .getExpressionValue(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
-                        properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT,
-                                useColorAccentString == null ? "true" : useColorAccentString);
+                        String hideMissedColumnsString = "false";
+                        if (showOnlyDivergenceString.equals("true")) {
+                            hideMissedColumnsString = "true";
+                        } else {
+                            hideMissedColumnsString = rule.getExpressionValue(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
+                        }
+                        properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS, hideMissedColumnsString);
 
-                        String showOnlyDivergenceString = rule
-                                .getExpressionValue(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE);
-                        properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE,
-                                showOnlyDivergenceString == null ? "false" : showOnlyDivergenceString);
+                        String useColorAccentString = "true";
+                        useColorAccentString = rule.getExpressionValue(RequestsAndOrdersReport.P_USE_COLOR_ACCENT);
+                        properties.setProperty(RequestsAndOrdersReport.P_USE_COLOR_ACCENT, useColorAccentString);
 
                         String reportPeriodType = rule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE);
                         properties.setProperty(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
