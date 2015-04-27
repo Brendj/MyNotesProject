@@ -124,13 +124,28 @@ public class RequestsAndOrdersReportService {
         orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
         for (Object obj : orgList) {
             Object[] row = (Object[]) obj;
-            long idOfOrg = Long.parseLong(row[0].toString());
-            BasicReportJob.OrgShortItem educationItem;
-            educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
-            educationItem.setOrgDistrict(row[4].toString());
+            Long idOfOrg = null;
+            if (row[0] != null) {
+                idOfOrg = Long.parseLong(row[0].toString());
+            }
+            String shortName = null;
+            if (row[1] != null) {
+                shortName = row[1].toString();
+            }
+            String officialName = null;
+            if (row[2] != null) {
+                officialName = row[2].toString();
+            }
+            BasicReportJob.OrgShortItem educationItem = new BasicReportJob.OrgShortItem(idOfOrg, shortName, officialName);
             if (row[3] != null) {
                 Long sourceMenuOrg = Long.parseLong(row[3].toString());
                 educationItem.setSourceMenuOrg(sourceMenuOrg);
+            }
+            String orgDistrict = "";
+            if (row[4] != null) {
+                educationItem.setOrgDistrict(row[4].toString());
+            } else {
+                orgDistrict = "";
             }
             orgMap.put(idOfOrg, educationItem);
         }
