@@ -50,7 +50,9 @@
                  styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
+    <%--@elvariable id="runtimeContext" type="ru.axetta.ecafe.processor.core.RuntimeContext"--%>
     <a4j:commandButton value="Редактировать" action="#{mainPage.showCardEditPage}"
+                       disabled="#{runtimeContext.settingsConfig.cardsEditDisabled}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
 <%--Панель истории изменения владельца карты--%>

@@ -118,7 +118,9 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showCardEditPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+            <%--@elvariable id="runtimeContext" type="ru.axetta.ecafe.processor.core.RuntimeContext"--%>
+            <a4j:commandLink action="#{mainPage.showCardEditPage}" styleClass="command-link" reRender="mainMenu, workspaceForm"
+                    disabled="#{runtimeContext.settingsConfig.cardsEditDisabled}">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
             </a4j:commandLink>

@@ -11,6 +11,7 @@ package ru.axetta.ecafe.processor.core;
  */
 public class SettingsConfig {
     private Boolean ecafeAutopaymentBkEnabled;
+    private Boolean cardsEditDisabled;
 
     public SettingsConfig() {
     }
@@ -28,5 +29,16 @@ public class SettingsConfig {
 
     public void setEcafeAutopaymentBkEnabled(boolean ecafeAutopaymentBkEnabled) {
         this.ecafeAutopaymentBkEnabled = ecafeAutopaymentBkEnabled;
+    }
+
+
+    public boolean isCardsEditDisabled(){
+        if (cardsEditDisabled == null){
+            cardsEditDisabled = Boolean.valueOf((String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.cards.edit.disabled"));
+            if (cardsEditDisabled == null){
+                cardsEditDisabled = false;
+            }
+        }
+        return cardsEditDisabled;
     }
 }
