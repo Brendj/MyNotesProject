@@ -774,7 +774,7 @@ public class FrontController extends HttpServlet {
 
         CardService cardService = CardService.getInstance();
         try{
-            Card card = cardService.createCard(idOfOrg, cardNo, cardPrintedNo, type);
+            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type);
         }catch (PersistenceException e){
             logger.error(e.getMessage());
             return 160;

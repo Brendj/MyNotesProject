@@ -34,6 +34,9 @@ public class Card {
     public static final int READY_LIFE_STATE = 1;
     public static final String UNKNOWN_LIFE_STATE_NAME = "Неизвестно";
 
+    public static final long DEFAULT_TEMP_CARD_VALID_TIME = 2000L;
+    public static final long DEFAULT_CARD_VALID_TIME = 3000L;
+
     public static int parseCardType(String type) throws Exception {
         for (int n=0;n<TYPE_NAMES.length;++n) {
             if (TYPE_NAMES[n].equalsIgnoreCase(type)) return n;
