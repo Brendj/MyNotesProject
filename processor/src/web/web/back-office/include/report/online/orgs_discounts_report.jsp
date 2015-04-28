@@ -27,10 +27,12 @@
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllOrgsDiscountsReport}"
                            reRender="workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
-                           styleClass="commandButton" status="sReportGeneratorStatus" />
+                           styleClass="commandButton" status="sReportGenerateStatus" />
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid">
         <a4j:status id="sReportGenerateStatus">
             <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
     </h:panelGrid>
