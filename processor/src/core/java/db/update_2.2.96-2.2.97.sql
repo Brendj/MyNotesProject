@@ -11,3 +11,4 @@ ALTER TABLE cf_cards alter IdOfClient drop not null;
 
 ALTER TABLE cf_enterevents ADD COLUMN IdOfClientGroup BIGINT;
 ALTER TABLE cf_orders ADD COLUMN IdOfClientGroup BIGINT;
+ALTER TABLE cf_orders ADD COLUMN IdOfPayForClient BIGINT;

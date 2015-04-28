@@ -45,6 +45,7 @@ public class Order{
     private String comments;
     private OrderTypeEnumType orderType;
     private Long idOfClientGroup;
+    private Long idOfPayForClient;
 
     public OrderTypeEnumType getOrderType() {
         return orderType;
@@ -60,7 +61,7 @@ public class Order{
 
     public Order(CompositeIdOfOrder compositeIdOfOrder, long idOfCashier, long socDiscount, Long trdDiscount, long grantSum, long rSum,
             Date createTime, Date orderDate, long sumByCard, long sumByCash, String comments, Client client, Card card, AccountTransaction transaction,
-            POS pos, Contragent contragent, OrderTypeEnumType orderType) {
+            POS pos, Contragent contragent, OrderTypeEnumType orderType, Long idOfPayForClient) {
         this.compositeIdOfOrder = compositeIdOfOrder;
         this.idOfCashier = idOfCashier;
         this.socDiscount = socDiscount;
@@ -78,6 +79,7 @@ public class Order{
         this.contragent = contragent;
         this.comments = comments;
         this.orderType = orderType;
+        this.idOfPayForClient = idOfPayForClient;
     }
 
     public CompositeIdOfOrder getCompositeIdOfOrder() {
@@ -263,6 +265,14 @@ public class Order{
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getIdOfPayForClient() {
+        return idOfPayForClient;
+    }
+
+    public void setIdOfPayForClient(Long idOfPayForClient) {
+        this.idOfPayForClient = idOfPayForClient;
     }
 
     @Override

@@ -35,6 +35,8 @@ public class PosPayment {
     protected Long grant;
     @XmlAttribute(name = "IdOfClient")
     protected Long idOfClient;
+    @XmlAttribute(name = "IdOfPayForClient")
+    protected Long idOfPayForClient;
     @XmlAttribute(name = "IdOfOrder")
     protected Long idOfOrder;
     @XmlAttribute(name = "IdOfCashier")
@@ -117,6 +119,14 @@ public class PosPayment {
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
+    }
+
+    public Long getIdOfPayForClient() {
+        return idOfPayForClient;
+    }
+
+    public void setIdOfPayForClient(Long idOfPayForClient) {
+        this.idOfPayForClient = idOfPayForClient;
     }
 
     public Long getIdOfOrder() {

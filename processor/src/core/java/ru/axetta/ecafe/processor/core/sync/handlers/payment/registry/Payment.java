@@ -32,6 +32,7 @@ public class Payment {
     private final Long confirmerId;
     private final long grant;
     private final Long idOfClient;
+    private final Long idOfPayForClient;
     private final long idOfOrder;
     private final long idOfCashier;
     private final long sumByCard;
@@ -78,6 +79,7 @@ public class Payment {
         Long confirmerId = getLongValueNullSafe(namedNodeMap, "ConfirmerId");
         long grant = getLongValue(namedNodeMap, "Grant");
         Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
+        Long idOfPayForClient = getLongValueNullSafe(namedNodeMap, "IdOfPayForClient");
         long idOfOrder = getLongValue(namedNodeMap, "IdOfOrder");
         long idOfCashier = getLongValue(namedNodeMap, "IdOfCashier");
         long sumByCard = getLongValue(namedNodeMap, "SumByCard");
@@ -112,11 +114,11 @@ public class Payment {
             state = Integer.parseInt(stateStr);
         }
 
-        return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
+        return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfClient, idOfPayForClient, idOfOrder,
                 idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType), purchases);
     }
 
-    public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long idOfClient,
+    public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long idOfClient, Long idOfPayForClient,
             long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS, Long confirmerId,
             int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
         this.cardNo = cardNo;
@@ -127,6 +129,7 @@ public class Payment {
         this.confirmerId = confirmerId;
         this.grant = grant;
         this.idOfClient = idOfClient;
+        this.idOfPayForClient = idOfPayForClient;
         this.idOfOrder = idOfOrder;
         this.idOfCashier = idOfCashier;
         this.sumByCard = sumByCard;
@@ -169,6 +172,10 @@ public class Payment {
 
     public Long getIdOfClient() {
         return idOfClient;
+    }
+
+    public Long getIdOfPayForClient() {
+        return idOfPayForClient;
     }
 
     public Long getIdOfOrder() {
