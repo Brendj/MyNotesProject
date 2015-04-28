@@ -39,7 +39,6 @@ import java.util.*;
  * User: Developer
  * Date: 21.10.2010
  * Time: 18:28:59
- * To change this template use File | Settings | File Templates.
  */
 public class DAOUtils {
 
@@ -1728,7 +1727,7 @@ public class DAOUtils {
         return (Integer) query.uniqueResult();
     }
 
-    public static void createSyncHistory(Session session, long idOfOrg, SyncHistory history, String s) throws Exception {
+    public static void createSyncHistoryException(Session session, long idOfOrg, SyncHistory history, String s) throws Exception {
         Org org = DAOUtils.getOrgReference(session, idOfOrg);
         SyncHistoryException syncHistoryException = new SyncHistoryException(org, history, s);
         session.save(syncHistoryException);

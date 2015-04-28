@@ -11,7 +11,6 @@ import java.util.Date;
  * User: damir
  * Date: 03.06.13
  * Time: 13:55
- * To change this template use File | Settings | File Templates.
  */
 public class Sync {
 

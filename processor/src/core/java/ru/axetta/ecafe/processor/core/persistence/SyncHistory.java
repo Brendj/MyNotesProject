@@ -13,7 +13,6 @@ import java.util.Set;
  * User: Developer
  * Date: 02.06.2009
  * Time: 10:39:31
- * To change this template use File | Settings | File Templates.
  */
 public class SyncHistory {
 

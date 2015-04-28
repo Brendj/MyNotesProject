@@ -42,7 +42,6 @@ import java.util.*;
  * User: damir
  * Date: 23.08.12
  * Time: 17:27
- * To change this template use File | Settings | File Templates.
  */
 
 public class Manager {

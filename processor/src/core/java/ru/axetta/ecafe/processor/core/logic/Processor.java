@@ -776,7 +776,7 @@ public class Processor implements SyncProcessor,
         try {
             if (request.getPaymentRegistry().getPayments().hasNext()) {
                 if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
-                    createSyncHistory(request.getIdOfOrg(),syncHistory, "no license slots available");
+                    createSyncHistoryException(request.getIdOfOrg(), syncHistory, "no license slots available");
                     throw new Exception("no license slots available");
                 }
             }
@@ -784,7 +784,7 @@ public class Processor implements SyncProcessor,
                     request.getPaymentRegistry(), errorClientIds);
         } catch (Exception e) {
             String message = String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
             bError = true;
         }
@@ -794,7 +794,7 @@ public class Processor implements SyncProcessor,
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(), errorClientIds);
         } catch (Exception e) {
             String message = String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -816,7 +816,7 @@ public class Processor implements SyncProcessor,
             }
         } catch (Exception e) {
             String message = String.format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -827,11 +827,11 @@ public class Processor implements SyncProcessor,
                 resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure(), syncHistory);
             }
             if(resOrgStructure!=null && resOrgStructure.getResult()>0)
-                createSyncHistory(request.getIdOfOrg(), syncHistory, resOrgStructure.getError());
+                createSyncHistoryException(request.getIdOfOrg(), syncHistory, resOrgStructure.getError());
         } catch (Exception e) {
             resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
             String message = String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -840,7 +840,7 @@ public class Processor implements SyncProcessor,
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(), errorClientIds);
         } catch (Exception e) {
             String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -849,7 +849,7 @@ public class Processor implements SyncProcessor,
             processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
         } catch (Exception e) {
             String message = String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -865,7 +865,7 @@ public class Processor implements SyncProcessor,
                     DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
         } catch (Exception e) {
             String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -877,7 +877,7 @@ public class Processor implements SyncProcessor,
             }
         } catch (Exception e){
             String message = String.format("Failed to build prohibitions menu, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             prohibitionsMenu = new ProhibitionsMenu(100, String.format("Internal error: %s", e.getMessage()));
             logger.error(message, e);
         }
@@ -888,7 +888,7 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
 
         }
@@ -901,7 +901,7 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             resDiary = new SyncResponse.ResDiary(1, "Unexpected error");
             String message = "SyncResponse.ResDiary: Unexpected error";
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -911,7 +911,7 @@ public class Processor implements SyncProcessor,
                 if (request.getEnterEvents().getEvents().size() > 0) {
                     if (!RuntimeContext.getInstance()
                             .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
-                        createSyncHistory(request.getIdOfOrg(),syncHistory, "no license slots available");
+                        createSyncHistoryException(request.getIdOfOrg(), syncHistory, "no license slots available");
                         throw new Exception("no license slots available");
                     }
                 }
@@ -928,7 +928,7 @@ public class Processor implements SyncProcessor,
             }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -941,7 +941,7 @@ public class Processor implements SyncProcessor,
             }
         } catch (Exception e) {
             String message = String.format("processClientRequestsOperations: %s", e.getMessage());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -950,7 +950,7 @@ public class Processor implements SyncProcessor,
             resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process categories and rules, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -967,7 +967,7 @@ public class Processor implements SyncProcessor,
             correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process numbers of Orders and EnterEvent, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(), syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -975,7 +975,7 @@ public class Processor implements SyncProcessor,
             orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(), syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -983,7 +983,7 @@ public class Processor implements SyncProcessor,
             questionaryData = processQuestionaryData(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process questionary data, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -991,7 +991,7 @@ public class Processor implements SyncProcessor,
             goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process goods basic basket data , IdOfOrg == %s",request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -1092,7 +1092,7 @@ public class Processor implements SyncProcessor,
             orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistory(request.getIdOfOrg(), syncHistory, message);
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -1184,7 +1184,7 @@ public class Processor implements SyncProcessor,
                             SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
                                     clientVersion, request.getRemoteAddr());
                             final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
-                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
+                            createSyncHistoryException(request.getIdOfOrg(), syncHistory, s);
                             throw new Exception("no license slots available");
                         }
                     }
@@ -1318,7 +1318,7 @@ public class Processor implements SyncProcessor,
                             SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
                                     clientVersion, request.getRemoteAddr());
                             final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
-                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
+                            createSyncHistoryException(request.getIdOfOrg(), syncHistory, s);
                             throw new Exception("no license slots available");
                         }
                     }
@@ -1433,7 +1433,7 @@ public class Processor implements SyncProcessor,
                             SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
                                     clientVersion, request.getRemoteAddr());
                             final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
-                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
+                            createSyncHistoryException(request.getIdOfOrg(), syncHistory, s);
                             throw new Exception("no license slots available");
                         }
                     }
@@ -1513,18 +1513,18 @@ public class Processor implements SyncProcessor,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
     }
 
-    private void createSyncHistory(long idOfOrg, SyncHistory syncHistory, String s) {
+    private void createSyncHistoryException(long idOfOrg, SyncHistory syncHistory, String s) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.createSyncHistory(persistenceSession, idOfOrg, syncHistory, s);
+            DAOUtils.createSyncHistoryException(persistenceSession, idOfOrg, syncHistory, s);
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("createSyncHistory exception: ",e);
+            logger.error("createSyncHistoryException exception: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1732,7 +1732,7 @@ public class Processor implements SyncProcessor,
             String message = String.format("Load Client Guardian to database error, IdOfOrg == %s :",idOfOrg);
             logger.error(message, ex);
             clientGuardianData = new ClientGuardianData(new ResultOperation(100, ex.getMessage()));
-            createSyncHistory(idOfOrg, syncHistory, message);
+            createSyncHistoryException(idOfOrg, syncHistory, message);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1770,7 +1770,7 @@ public class Processor implements SyncProcessor,
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
                     resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
-                    createSyncHistory(idOfOrg, syncHistory, message);
+                    createSyncHistoryException(idOfOrg, syncHistory, message);
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
                     HibernateUtils.close(persistenceSession, logger);
@@ -1796,7 +1796,7 @@ public class Processor implements SyncProcessor,
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
                     resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
-                    createSyncHistory(idOfOrg, syncHistory, message);
+                    createSyncHistoryException(idOfOrg, syncHistory, message);
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
                     HibernateUtils.close(persistenceSession, logger);
@@ -2168,7 +2168,7 @@ public class Processor implements SyncProcessor,
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if(syncHistory!=null) {
-                        createSyncHistory(idOfOrg,syncHistory, message);
+                        createSyncHistoryException(idOfOrg, syncHistory, message);
                     }
                     logger.error(message, e);
                 }
