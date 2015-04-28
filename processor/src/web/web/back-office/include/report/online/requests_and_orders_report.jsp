@@ -120,7 +120,7 @@
             <h:selectOneMenu id="feedingTypeList" value="#{mainPage.requestsAndOrdersReportPage.feedingPlanType}"
                              style="width:100px;">
                 <f:selectItems value="#{mainPage.requestsAndOrdersReportPage.feedingPlanTypes}" />
-                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
+                <a4j:support event="onchange" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
                              actionListener="#{mainPage.requestsAndOrdersReportPage.onFeedingPlanTypeChange}" />
             </h:selectOneMenu>
 
