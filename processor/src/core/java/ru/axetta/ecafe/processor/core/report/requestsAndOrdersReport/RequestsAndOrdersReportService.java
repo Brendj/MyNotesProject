@@ -216,7 +216,7 @@ public class RequestsAndOrdersReportService {
 
             Long totalCount = position.getTotalCount() / 1000;
 
-            String orgName = org.getOfficialName() != null ? org.getOfficialName() : org.getShortName();
+            String orgName = getOrgName(org);
             FeedingPlanType feedingPlanType = getFeedingPlanType(complexOrgDictionary, position);
             String complexName = position.getGood().getFullName() != null ? position.getGood().getFullName()
                     : position.getGood().getNameOfGood();
@@ -307,7 +307,7 @@ public class RequestsAndOrdersReportService {
             Long totalCount = detail.getQty();
             ;
 
-            String orgName = org.getOfficialName() != null ? org.getOfficialName() : org.getShortName();
+            String orgName = getOrgName(org);
             FeedingPlanType feedingPlanType = getFeedingPlanType(complexOrgDictionary, detail);
             String complexName = detail.getGood().getFullName() != null ? detail.getGood().getFullName()
                     : detail.getGood().getNameOfGood();
@@ -327,6 +327,10 @@ public class RequestsAndOrdersReportService {
 
             reportDataMap.put(orgName, feedingPlan);
         }
+    }
+
+    private String getOrgName(BasicReportJob.OrgShortItem org) {
+        return org.getShortName() != null ? org.getShortName() : org.getOfficialName();
     }
 
     private List getComplexList(HashMap<Long, BasicReportJob.OrgShortItem> orgMap, Date beginDate, Date endDate) {
