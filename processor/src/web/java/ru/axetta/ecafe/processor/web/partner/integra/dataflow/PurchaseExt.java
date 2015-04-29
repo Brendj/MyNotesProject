@@ -1,15 +1,10 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -64,6 +59,8 @@ public class PurchaseExt {
     protected Long byCard;
     @XmlAttribute(name = "IdOfCard")
     protected Long idOfCard;
+    @XmlAttribute(name = "s")
+    protected Integer state;
 
     /**
      * Gets the value of the e property.
@@ -284,5 +281,13 @@ public class PurchaseExt {
      */
     public void setIdOfCard(Long value) {
         this.idOfCard = value;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

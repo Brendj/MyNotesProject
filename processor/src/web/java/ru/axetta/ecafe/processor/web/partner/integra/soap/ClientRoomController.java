@@ -51,15 +51,15 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getPurchaseList")
     PurchaseListResult getPurchaseList(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate, @WebParam(name = "mode") Short mode);
 
     @WebMethod(operationName = "getPurchaseListBySan")
     PurchaseListResult getPurchaseList(@WebParam(name = "san") String san, @WebParam(name = "startDate") Date startDate,
-          @WebParam(name = "endDate") Date endDate);
+          @WebParam(name = "endDate") Date endDate,@WebParam(name = "mode") Short mode);
 
     @WebMethod(operationName = "getPurchaseSubscriptionFeedingListBySan")
     PurchaseListResult getPurchaseSubscriptionFeedingList(@WebParam(name = "san") String san,
-          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,@WebParam(name = "mode") Short mode);
 
     @WebMethod(operationName = "getPaymentList")
     PaymentListResult getPaymentList(@WebParam(name = "contractId") Long contractId,

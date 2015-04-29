@@ -1756,7 +1756,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
+    public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate, final Short mode) {
 
         Long clientContractId = contractId;
         String contractIdstr = String.valueOf(contractId);
@@ -1775,11 +1775,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                   Session session, Transaction transaction) throws Exception {
                 if (subBalanceNum.equals(0)) {
-                    processPurchaseList(client, data, objectFactory, session, endDate, startDate, null);
+                    processPurchaseList(client, data, objectFactory, session, endDate, startDate, null,mode);
                 }
                 if (subBalanceNum.equals(1)) {
                     processPurchaseList(client, data, objectFactory, session, endDate, startDate,
-                          OrderTypeEnumType.SUBSCRIPTION_FEEDING);
+                          OrderTypeEnumType.SUBSCRIPTION_FEEDING, mode);
                 }
             }
         });
@@ -1792,14 +1792,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate) {
+    public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate, final Short mode) {
         authenticateRequest(null);
 
         Data data = new ClientRequest()
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processPurchaseList(client, data, objectFactory, session, endDate, startDate, null);
+                      processPurchaseList(client, data, objectFactory, session, endDate, startDate, null,mode);
                   }
               });
 
@@ -1811,7 +1811,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PurchaseListResult getPurchaseSubscriptionFeedingList(String san, final Date startDate, final Date endDate) {
+    public PurchaseListResult getPurchaseSubscriptionFeedingList(String san, final Date startDate, final Date endDate, final Short mode) {
         authenticateRequest(null);
 
         Data data = new ClientRequest()
@@ -1819,7 +1819,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
                       processPurchaseList(client, data, objectFactory, session, endDate, startDate,
-                            OrderTypeEnumType.SUBSCRIPTION_FEEDING);
+                            OrderTypeEnumType.SUBSCRIPTION_FEEDING,mode);
                   }
               });
 
@@ -1831,7 +1831,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
-          Date endDate, Date startDate, OrderTypeEnumType orderType) throws DatatypeConfigurationException {
+          Date endDate, Date startDate, OrderTypeEnumType orderType, Short mode) throws DatatypeConfigurationException {
         int nRecs = 0;
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria ordersCriteria = session.createCriteria(Order.class);
@@ -1863,7 +1863,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
             purchaseExt.setTime(toXmlDateTime(order.getCreateTime()));
-
+            if (mode!=null && mode == 1){
+                purchaseExt.setState(order.getState());
+            }
             Set<OrderDetail> orderDetailSet = ((Order) o).getOrderDetails();
             for (OrderDetail od : orderDetailSet) {
                 PurchaseElementExt purchaseElementExt = objectFactory.createPurchaseElementExt();
