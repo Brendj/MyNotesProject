@@ -42,7 +42,8 @@ public class AllOrgsDiscountsReport extends BasicReport {
         return itemsList;
     }
 
-    public AllOrgsDiscountsReport(Date generateTime, long generateDuration, List<OrgDiscounts> itemsList, List<String> dynamicColumnNames) {
+    public AllOrgsDiscountsReport(Date generateTime, long generateDuration, List<OrgDiscounts> itemsList,
+            List<String> dynamicColumnNames) {
         super(generateTime, generateDuration);
         this.itemsList = itemsList;
         columnNames = new ArrayList<String>();
@@ -69,17 +70,15 @@ public class AllOrgsDiscountsReport extends BasicReport {
             this.reportProperties = reportProperties;
         }
 
-        public AllOrgsDiscountsReport build(Session session) throws Exception{
-
+        public AllOrgsDiscountsReport build(Session session) throws Exception {
             Object region = reportProperties.getProperty("region");
+            Boolean showAllOrgs = Boolean.valueOf(reportProperties.getProperty("showAllOrgs"));
 
             Date generateTime = new Date();
 
             // запрос id, name льгот
-            String queryCategoryIds = "select cd.idOfCategoryDiscount, cd.categoryName "
-                    + " from CategoryDiscount cd "
-                    + " where cd.idOfCategoryDiscount >= 0 "
-                    + " order by idOfCategoryDiscount";
+            String queryCategoryIds = "select cd.idOfCategoryDiscount, cd.categoryName " + " from CategoryDiscount cd "
+                    + " where cd.idOfCategoryDiscount >= 0 " + " order by idOfCategoryDiscount";
             List categoryDiscountList = session.createQuery(queryCategoryIds).list();
 
             // лист наименований категорий льгот
@@ -90,18 +89,20 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
             int i = 0;
             for (Object cc : categoryDiscountList) {
-                Object objs[] = (Object[])cc;
-                categoryIndexMap.put((Long)objs[0], i++);
-                dynamicColumnNames.add((String)objs[1]);
+                Object objs[] = (Object[]) cc;
+                categoryIndexMap.put((Long) objs[0], i++);
+                dynamicColumnNames.add((String) objs[1]);
             }
 
             String queryFullDiscount;
 
+            List<OrgDiscounts> itemsList = new ArrayList<OrgDiscounts>();
+
             if (region != null) {
                 queryFullDiscount = "select cl.org.id, count(distinct cl.idOfClient), cl.org.shortName "
                         + " from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
-                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region + "%' group by cl.org.id, cl.org.shortName "
-                        + " order by cl.org.id ";
+                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region
+                        + "%' group by cl.org.id, cl.org.shortName " + " order by cl.org.id ";
 
             } else {
                 // запрос на количество льготных по ОУ
@@ -113,12 +114,34 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
             List resultFullDiscountsList = session.createQuery(queryFullDiscount).list();
 
+            String queryAllOrgs;
+
+            List resultQueryAllOrgsList = null;
+
+            if (showAllOrgs) {
+                //Запрос всех орг
+                if (region != null) {
+                    queryAllOrgs =
+                            "select org.id, cast(0 as long), org.shortName from Org org where org.district like '%"
+                                    + region
+                                    + "%' and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
+                                    + region + "%' group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                } else {
+                    queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                }
+                resultQueryAllOrgsList = session.createQuery(queryAllOrgs).list();
+            }
+
+            if (resultQueryAllOrgsList != null) {
+                resultFullDiscountsList.addAll(resultQueryAllOrgsList);
+            }
+
             Map<Long, OrgDiscounts> result = new HashMap<Long, OrgDiscounts>(resultFullDiscountsList.size());
 
             // создаем бины строк таблицы отчета
             for (Object obj : resultFullDiscountsList) {
-                Object orgDiscounts[] = (Object[])obj;
-                Long orgId = (Long)orgDiscounts[0];
+                Object orgDiscounts[] = (Object[]) obj;
+                Long orgId = (Long) orgDiscounts[0];
                 // наименование, общее количество льготных, количество полей
                 OrgDiscounts item = new OrgDiscounts(orgDiscounts[2], orgDiscounts[1], categoryDiscountList.size() + 2);
                 result.put(orgId, item);
@@ -129,7 +152,8 @@ public class AllOrgsDiscountsReport extends BasicReport {
             if (region != null) {
                 q = "select cl.org.id, cc.idOfCategoryDiscount, count (cl.idOfClient) "
                         + " from Client cl, ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient "
-                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region + "%' group by cl.org.id, cc.idOfCategoryDiscount "
+                        + " and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%" + region
+                        + "%' group by cl.org.id, cc.idOfCategoryDiscount "
                         + " order by cl.org.id, cc.idOfCategoryDiscount";
             } else {
                 // запрос количества льготников по категориям
@@ -142,19 +166,20 @@ public class AllOrgsDiscountsReport extends BasicReport {
             List resultDiscountsList = session.createQuery(q).list(); // лист результата запроса
 
             for (Object obj : resultDiscountsList) {
-                Object discount[] = (Object [])obj;
-                OrgDiscounts item = result.get((Long)discount[0]);
+                Object discount[] = (Object[]) obj;
+                OrgDiscounts item = result.get((Long) discount[0]);
                 if (item == null) {
-                    throw new Exception("Ошибка при формирования отчета по льготам: в таблице ClientsCategoryDiscount обнаружен клиент, которого нет в таблице Clients.");
+                    throw new Exception(
+                            "Ошибка при формирования отчета по льготам: в таблице ClientsCategoryDiscount обнаружен клиент, которого нет в таблице Clients.");
                 } else {
                     item.setValue(categoryIndexMap.get((Long) discount[1]) + 2, (Long) discount[2]);
                 }
             }
 
-            List<OrgDiscounts> itemsList = new ArrayList<OrgDiscounts>(result.size());
             itemsList.addAll(result.values());
 
-            return new AllOrgsDiscountsReport(generateTime, new Date().getTime() - generateTime.getTime(), itemsList, dynamicColumnNames);
+            return new AllOrgsDiscountsReport(generateTime, new Date().getTime() - generateTime.getTime(), itemsList,
+                    dynamicColumnNames);
         }
     }
 

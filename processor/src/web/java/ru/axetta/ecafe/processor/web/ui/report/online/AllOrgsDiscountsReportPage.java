@@ -4,14 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AllOrgsDiscountsReport;
 
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -28,6 +26,8 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
 
     private String region;
 
+    private Boolean showAllOrgs = false;
+
     public String getPageFilename() {
         return "report/online/orgs_discounts_report";
     }
@@ -39,7 +39,7 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
     public void buildReport(Session session) throws Exception {
         //allOrgsDiscountsReport = new AllOrgsDiscountsReport();
         Properties props = addRegionProperty(null, region);
-
+        props.put("showAllOrgs", Boolean.toString(showAllOrgs));
         AllOrgsDiscountsReport.Builder builder = new AllOrgsDiscountsReport.Builder();
         builder.setReportProperties(props);
         allOrgsDiscountsReport = builder.build(session);
@@ -73,4 +73,11 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
         return props;
     }
 
+    public Boolean getShowAllOrgs() {
+        return showAllOrgs;
+    }
+
+    public void setShowAllOrgs(Boolean showAllOrgs) {
+        this.showAllOrgs = showAllOrgs;
+    }
 }

@@ -25,6 +25,11 @@
             <f:selectItems value="#{mainPage.allOrgsDiscountsReportPage.regions}"/>
         </h:selectOneMenu>
 
+        <h:outputText escape="false" value="Показать все организации" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.allOrgsDiscountsReportPage.showAllOrgs}"
+                                 styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllOrgsDiscountsReport}"
                            reRender="workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
                            styleClass="commandButton" status="sReportGenerateStatus" />
