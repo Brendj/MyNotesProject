@@ -919,6 +919,31 @@ public class DAOUtils {
     }
 
     /**
+     * Возвращает список данных синхронизации укзанного типа за интервал времени для указанной организации
+     *
+     * @param persistenceSession ссылка на сессию
+     * @param idOfOrg            id организации
+     * @param fromDateTime       время с которого учитывается >
+     * @param toDateTime         время до которого учитывается <=
+     * @param syncType           список типов транзакций если путо не будет учитываться в криетрии
+     * @return возвращается список транзакций клиентов
+     */
+    @SuppressWarnings("unchecked")
+    public static List<SyncHistoryCalc> getSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date fromDateTime,
+            Date toDateTime, Integer syncType) {
+        Criteria criteria = persistenceSession.createCriteria(SyncHistoryCalc.class);
+        if (idOfOrg != null) {
+            criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        }
+        criteria.add(Restrictions.ge("syncDay", fromDateTime)); // >=
+        criteria.add(Restrictions.le("syncDay", toDateTime));   // <=
+        if (syncType != null) {
+            criteria.add(Restrictions.eq("dataType", syncType));
+        }
+        return criteria.list();
+    }
+
+    /**
      * Возвращает список транзакций произведенных в интревале времени, для конкретной организации
      * и с укзазанием спика необходимого типа транзакций (если список пуст то не будет оганичеваться по данному критерию)
      * @param persistenceSession ссылка на сессию

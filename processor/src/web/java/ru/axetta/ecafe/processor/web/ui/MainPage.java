@@ -31,6 +31,7 @@ import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
+import ru.axetta.ecafe.processor.web.ui.monitoring.SyncStatsPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
 import ru.axetta.ecafe.processor.web.ui.option.ReportTemplateManagerPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -204,6 +205,7 @@ public class MainPage implements Serializable {
     private final GroupControlSubscriptionsPage groupControlSubscriptionsPage = new GroupControlSubscriptionsPage();
     private final GroupControlBenefitsPage groupControlBenefitsPage = new GroupControlBenefitsPage();
     private final CancelCategoryBenefitsPage cancelCategoryBenefitsPage = new CancelCategoryBenefitsPage();
+    private final SyncStatsPage syncStatsPage = new SyncStatsPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -8028,5 +8030,22 @@ public class MainPage implements Serializable {
             logger.error("getContragentsListForTooltip Error", e);
             return "";
         }
+    }
+
+    public Object showSyncStatsPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = syncStatsPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sync stats page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы с данными по синхронизациям: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public SyncStatsPage getSyncStatsPage() {
+        return syncStatsPage;
     }
 }

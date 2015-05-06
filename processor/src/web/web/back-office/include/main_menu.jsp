@@ -781,6 +781,9 @@
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
                         label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="syncStats" binding="#{mainPage.syncStatsPage.mainMenuComponent}"
+                        label="Статистика по синхронизациям" action="#{mainPage.showSyncStatsPage}" reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

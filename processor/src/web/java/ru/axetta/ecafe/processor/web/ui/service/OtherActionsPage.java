@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -34,7 +35,17 @@ public class OtherActionsPage extends BasicWorkspacePage {
     private String passwordForSearch;
     private List<Long> clientsIds = null;
 
-    public void rubBIExport () throws Exception {
+    private static void close(Closeable resource) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void rubBIExport() throws Exception {
         RuntimeContext.getAppContext().getBean(BIDataExportService.class).run(); // DEF
         printMessage("Генерация данных ключевых показателей выполнена");
     }
@@ -47,7 +58,6 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
-
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
@@ -58,27 +68,27 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Пересчет льготных правил выполнен");
     }
 
-    public void runClientGuardSANRebuild () throws Exception {
+    public void runClientGuardSANRebuild() throws Exception {
         RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).rebuild(); //DEF
         printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
         /*RuntimeContext.getAppContext().getBean(ClientRoomControllerWS.class).attachGuardSan("14414414452", "14414414453"); //DEF
         printMessage("Переформирование Guard SAN для клиентов выполнено успешно");*/
     }
 
-    public void runImportRNIPPayment () throws Exception {
+    public void runImportRNIPPayment() throws Exception {
         RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).run(); //DEF
         printMessage("Импорт платежей RNIP был импортирован успешно");
-    }
-
-    public void runRepositoryReportsCleanup() throws Exception {
-        RuntimeContext.getAppContext().getBean(CleanupReportsService.class).run(); //DEF
-        printMessage("Очистка Репозитория успешно завершена");
     }
 
     /*public void runClientGuardSANRemove () throws Exception {
         RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).delete(); //DEF
         printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
     }*/
+
+    public void runRepositoryReportsCleanup() throws Exception {
+        RuntimeContext.getAppContext().getBean(CleanupReportsService.class).run(); //DEF
+        printMessage("Очистка Репозитория успешно завершена");
+    }
 
     public void runSynchCleanup() throws Exception {
         RuntimeContext.getAppContext().getBean(SynchCleanupService.class).run(); //DEF
@@ -102,14 +112,10 @@ public class OtherActionsPage extends BasicWorkspacePage {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(new Date(System.currentTimeMillis()));
         String[] values = new String[]{
-                "paySum", CurrencyStringUtils.copecksToRubles(100000),
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
-                "contractId",String.valueOf(client.getContractId()),
-                "surname","Тестеров"/*client.getPerson().getSurname()*/,
-                "firstName","Тест"/*client.getPerson().getFirstName()*/,
-                "empTime", empTime,
-                "targetId", "" + 1
-        };
+                "paySum", CurrencyStringUtils.copecksToRubles(100000), "balance",
+                CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                String.valueOf(client.getContractId()), "surname", "Тестеров"/*client.getPerson().getSurname()*/,
+                "firstName", "Тест"/*client.getPerson().getFirstName()*/, "empTime", empTime, "targetId", "" + 1};
         values = EventNotificationService.attachTargetIdToValues(1L, values);
 
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
@@ -128,8 +134,19 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runRegularPayments() throws Exception {
-        RegularPaymentSubscriptionService regularPaymentSubscriptionService =  RuntimeContext.getInstance().getRegularPaymentSubscriptionService();
+        RegularPaymentSubscriptionService regularPaymentSubscriptionService = RuntimeContext.getInstance()
+                .getRegularPaymentSubscriptionService();
         regularPaymentSubscriptionService.checkClientBalances();
+    }
+
+    public void runShowShortLog() throws Exception {
+        SyncStatsManager syncStatsManager = new SyncStatsManager();
+        syncStatsManager.shortDataLog();
+    }
+
+    public void runShowDailyLog() throws Exception {
+        SyncStatsManager syncStatsManager = new SyncStatsManager();
+        syncStatsManager.processLogData(0);
     }
 
     public void runTest() throws Exception {
@@ -142,19 +159,17 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Пересчет показателей по СМС завершен");
     }
 
-
-
     @Override
     public String getPageFilename() {
         return "service/other_actions";
     }
 
-    public void setPasswordForSearch(String passwordForSearch) {
-        this.passwordForSearch = passwordForSearch;
-    }
-
     public String getPasswordForSearch() {
         return passwordForSearch;
+    }
+
+    public void setPasswordForSearch(String passwordForSearch) {
+        this.passwordForSearch = passwordForSearch;
     }
 
     public void runPasswordReplacer() {
@@ -167,9 +182,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
-
     public void download() throws IOException {
-        if( (clientsIds == null)||(clientsIds.isEmpty())){
+        if ((clientsIds == null) || (clientsIds.isEmpty())) {
             return;
         }
         FacesContext fc = FacesContext.getCurrentInstance();
@@ -178,7 +192,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
         response.reset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
         //response.setContentType(contentType); // Check http://www.iana.org/assignments/media-types for all types. Use if necessary ServletContext#getMimeType() for auto-detection based on filename.
         //response.setContentLength(contentLength); // Set it with the file size. This header is optional. It will work if it's omitted, but the download progress will be unknown.
-        response.setHeader("Content-Disposition", "attachment; filename=\"text.txt\""); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"text.txt\""); // The Save As popup magic is done here. You can give it any file name you want, this only won't work in MSIE, it will use current request URL as file name instead.
 
 
         // Now you can write the InputStream of the file to the above OutputStream the usual way.
@@ -213,17 +228,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
 
     }
-    private static void close(Closeable resource) {
-        if (resource != null) {
-            try {
-                resource.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     public boolean isDownloadable() {
-        return clientsIds!=null&&!clientsIds.isEmpty();
+        return clientsIds != null && !clientsIds.isEmpty();
     }
 }

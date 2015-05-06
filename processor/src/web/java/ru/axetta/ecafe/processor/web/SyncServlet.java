@@ -60,7 +60,7 @@ public class SyncServlet extends HttpServlet {
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
-        SYNC_COLLECTOR.registerSyncStart(syncTime);
+        SyncCollector.registerSyncStart(syncTime);
         try {
             runtimeContext = RuntimeContext.getInstance();
 
@@ -70,32 +70,30 @@ public class SyncServlet extends HttpServlet {
                 requestData = readRequest(request);
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
-                final String format = String.format("Failed to parse request: %s", e.getMessage());
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, format);
+                String message = String.format("Failed to parse request: %s", e.getMessage());
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
+            Node envelopeNode;
+            NamedNodeMap namedNodeMap;
             long idOfOrg;
             String idOfSync;
             SyncType syncType;
-            Node envelopeNode;
-            NamedNodeMap namedNodeMap;
             try {
                 envelopeNode = SyncRequest.Builder.findEnvelopeNode(requestData.document);
                 namedNodeMap = envelopeNode.getAttributes();
                 idOfOrg = SyncRequest.Builder.getIdOfOrg(namedNodeMap);
-                SYNC_COLLECTOR.setIdOfOrg(syncTime, idOfOrg);
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
-                SYNC_COLLECTOR.setIdOfSync(syncTime, idOfSync);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
-                SYNC_COLLECTOR.setSyncType(syncTime, syncType);
+                SyncCollector.setIdData(syncTime, idOfOrg, idOfSync, syncType);
                 if(syncType==null) throw new Exception("Unknown sync type");
             } catch (Exception e) {
-                final String message = String.format("Failed to extract required packet attribute [remote address: %s]",
+                String message = String.format("Failed to extract required packet attribute [remote address: %s]",
                         request.getRemoteAddr());
                 logger.error(message, e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
@@ -114,7 +112,7 @@ public class SyncServlet extends HttpServlet {
             if (!verifySignature || bLogPackets) {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             } else {
-                final String message = "Synchronization with %s - type: %s - packets not logged";
+                String message = "Synchronization with %s - type: %s - packets not logged";
                 logger.info(String.format(message, request.getRemoteAddr(), syncType.toString()));
             }
 
@@ -125,21 +123,22 @@ public class SyncServlet extends HttpServlet {
                 org = findOrg(runtimeContext, idOfOrg);
                 publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
-                    final String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
+                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
                     logger.error(message);
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-                final String format = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, format);
+                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
@@ -155,8 +154,8 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync, request.getRemoteAddr());
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
-                final String msg = String.format("Failed to parse XML request: %s", e.getMessage());
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+                String msg = String.format("Failed to parse XML request: %s", e.getMessage());
+                sendError(response, syncTime, msg, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
@@ -168,8 +167,8 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = null;
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
-                final String format = String.format("Failed to serialize response: %s", e.getMessage());
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
+                String message = String.format("Failed to serialize response: %s", e.getMessage());
+                sendError(response, syncTime, message, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
@@ -181,8 +180,8 @@ public class SyncServlet extends HttpServlet {
                 DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to serialize response", e);
-                final String format = String.format("Failed to serialize response: %s", e.getMessage());
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
+                String format = String.format("Failed to serialize response: %s", e.getMessage());
+                sendError(response, syncTime, format, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
@@ -202,11 +201,19 @@ public class SyncServlet extends HttpServlet {
             final String message = String.format("End of synchronization with %s", request.getRemoteAddr());
             logger.info(message);
         } catch (RuntimeContext.NotInitializedException e) {
-            SYNC_COLLECTOR.setErrMessage(syncTime, e.getMessage());
+            SyncCollector.setErrMessage(syncTime, e.getMessage());
+            SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());
         } finally {
-            SYNC_COLLECTOR.registerSyncEnd(syncTime);
+            SyncCollector.registerSyncEnd(syncTime);
         }
+    }
+
+    private void sendError(HttpServletResponse response, Long syncTime, String msgString, int responseResultCode) throws IOException {
+        String errorMsg = ((Integer) responseResultCode).toString() + ": " + msgString;
+        SyncCollector.setErrMessage(syncTime, errorMsg);
+        SyncCollector.registerSyncEnd(syncTime);
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, msgString);
     }
 
     private static RequestData readRequest(HttpServletRequest httpRequest) throws Exception {
