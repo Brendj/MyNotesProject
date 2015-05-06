@@ -11,7 +11,10 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
@@ -36,10 +39,10 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
     }
 
     public static class Builder extends BasicReportJob.Builder {
-
 
 
         private final String templateFilename;
@@ -49,8 +52,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         }
 
         @Override
-        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
-                throws Exception {
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
@@ -73,12 +75,11 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
 
 
-
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
             String friendlyOrgsIds = "" + org.getIdOfOrg();
             List<Long> ids = new ArrayList<Long>();
-            for(ShortBuilding building : friendlyOrgs) {
+            for (ShortBuilding building : friendlyOrgs) {
                 friendlyOrgsIds += "," + building.getId();
                 ids.add(building.getId());
             }
@@ -114,11 +115,10 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
                             + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
-                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg "
-                            + " WHERE ee.idoforg IN (" + friendlyOrgsIds + ") AND cs.idoforg IN ("+ friendlyOrgsIds + ") "
-                            + " AND ee.evtdatetime BETWEEN " + startTime.getTime()
-                            + " AND " + endTime.getTime() + "     AND ee.idofclient IS NOT null "
-                            + " AND ee.PassDirection in (0, 1, 6, 7) "
+                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg " + " WHERE ee.idoforg IN ("
+                            + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
+                            + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
+                            + "     AND ee.idofclient IS NOT null " + " AND ee.PassDirection in (0, 1, 6, 7) "
 
                             + "     AND cs.idofclientgroup != 1100000060 "
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
@@ -127,31 +127,31 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             List rList = query.list();
 
             //парсим данные
-            for(Object o: rList){
-                Map<String,Object> row = (Map<String,Object>)o;
+            for (Object o : rList) {
+                Map<String, Object> row = (Map<String, Object>) o;
                 if (!stClassMap.containsKey(row.get("groupname"))) {
                     stClassMap.put((String) row.get("groupname"),
-                            new StClass((String)row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
+                            new StClass((String) row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
                 }
-                currentClassList = stClassMap.get((String)row.get("groupname")).getDataList();
+                currentClassList = stClassMap.get((String) row.get("groupname")).getDataList();
 
-                if (!clientIdList.contains(((BigInteger)row.get("idofclient")).longValue())) {
+                if (!clientIdList.contains(((BigInteger) row.get("idofclient")).longValue())) {
                     currentClassList.addAll(prepareDataList(row, friendlyOrgs, startTime, endTime));
-                    clientIdList.add(((BigInteger)row.get("idofclient")).longValue());
+                    clientIdList.add(((BigInteger) row.get("idofclient")).longValue());
                 }
                 for (Data event : currentClassList) {
-                    if ((event.getF01().equals(((BigInteger)row.get("idofclient")).toString()))
-                            && (event.getF03().equals((String)row.get("groupname")))
-                            && (event.getF04().equals(CalendarUtils.dateShortToString(new Date(((BigInteger)row.get("evtdatetime")).longValue()))))
-                            && (event.getF05().equals((String)row.get("officialname")))) {
+                    if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03()
+                            .equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
+                            .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event
+                            .getF05().equals((String) row.get("officialname")))) {
                         updateEventData(event, row);
                     }
                 }
             }
             //заполняем время внутри
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
-            for(StClass stClass : stClassList){
-                for (Data data : stClass.getDataList()){
+            for (StClass stClass : stClassList) {
+                for (Data data : stClass.getDataList()) {
                     updateInsideSummaryTime(data);
                 }
             }
@@ -173,7 +173,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 for (String entry : f09Splited) {
                     String temp = entry.replaceAll("[()]+", "");
                     if (temp.charAt(temp.length() - 1) == '+') {
-                        enter=format.parse(temp.substring(0, temp.length() - 1)).getTime();
+                        enter = format.parse(temp.substring(0, temp.length() - 1)).getTime();
                         exit = 0L;
                     } else if (temp.charAt(temp.length() - 1) == '-') {
                         exit = format.parse(temp.substring(0, temp.length() - 1)).getTime();
@@ -187,14 +187,15 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                 if (value > 0) {
                     long hours = value / (60 * 60 * 1000);
                     long minutes = value / (60 * 1000) % 60;
-                    data.setF08("" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
+                    data.setF08(
+                            "" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
                 }
             }
         }
 
         //возвращает список Data с заполненными дата-корпусами
-        private static List<Data> prepareDataList(Map<String,Object> rs, List<ShortBuilding> friendlyOrgs, Date begin, Date end)
-                throws SQLException {
+        private static List<Data> prepareDataList(Map<String, Object> rs, List<ShortBuilding> friendlyOrgs, Date begin,
+                Date end) throws SQLException {
             List<Data> resultList = new LinkedList<Data>();
             List<String> dateList = new LinkedList<String>();
             dateList.add(CalendarUtils.dateShortToString(begin));
@@ -202,19 +203,19 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             beginC.setTime(begin);
             Calendar endC = Calendar.getInstance();
             endC.setTime(end);
-            while ( beginC.compareTo(endC) == -1) {
+            while (beginC.compareTo(endC) == -1) {
                 beginC.add(Calendar.DAY_OF_MONTH, 1);
                 dateList.add(CalendarUtils.dateShortToString(beginC.getTime()));
             }
-            if(dateList.size() > 1){
-                dateList.remove(dateList.size()-1);
+            if (dateList.size() > 1) {
+                dateList.remove(dateList.size() - 1);
             }
 
             for (String date : dateList) {
                 for (ShortBuilding building : friendlyOrgs) {
                     Data eventData = new Data();
-                    eventData.setEventId(((BigInteger)rs.get("idofenterevent")).longValue());
-                    eventData.setF01(((BigInteger)rs.get("idofclient")).toString());
+                    eventData.setEventId(((BigInteger) rs.get("idofenterevent")).longValue());
+                    eventData.setF01(((BigInteger) rs.get("idofclient")).toString());
                     eventData.setF02(rs.get("surname") + " " + rs.get("firstname") + " " + rs.get("secondname"));
                     eventData.setF03((String) rs.get("groupname"));
                     eventData.setF04(date);
@@ -236,12 +237,12 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             beginC.setTime(begin);
             Calendar endC = Calendar.getInstance();
             endC.setTime(end);
-            while ( beginC.compareTo(endC) == -1) {
+            while (beginC.compareTo(endC) == -1) {
                 beginC.add(Calendar.DAY_OF_MONTH, 1);
                 dateList.add(CalendarUtils.dateShortToString(beginC.getTime()));
             }
-            if(dateList.size() > 1){
-                dateList.remove(dateList.size()-1);
+            if (dateList.size() > 1) {
+                dateList.remove(dateList.size() - 1);
             }
 
             for (String date : dateList) {
@@ -261,7 +262,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         }
 
         //Добавляет событие прохода к записи
-        private static void updateEventData(Data data, Map<String,Object> rs) throws SQLException {
+        private static void updateEventData(Data data, Map<String, Object> rs) throws SQLException {
             Data newData = new Data(rs);
 
             if (newData.getF06() != null) {
@@ -303,16 +304,22 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
 
         //находим список корпусов
-        private static List<ShortBuilding> getFriendlyOrgs(Session session,Long idOfOrg) {
-
+        private static List<ShortBuilding> getFriendlyOrgs(Session session, Long idOfOrg) {
             List<ShortBuilding> resultList = new LinkedList<ShortBuilding>();
-            Query query = session.createSQLQuery("SELECT o.idoforg, o.officialname FROM cf_friendly_organization f "
-                    + "LEFT JOIN cf_orgs o ON o.idoforg = f.friendlyorg WHERE currentorg = " + idOfOrg + " ORDER BY o.officialname");
-            query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
-            List rList = query.list();
-            for (Object o: rList){
-                Map<String,Object> row = (Map<String,Object>)o;
-                resultList.add(new ShortBuilding(((BigInteger)row.get("idoforg")).longValue(),(String)row.get("officialname"), "2"));
+
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            Set<Org> friendlyOrgs = org.getFriendlyOrg();
+
+            for (Org organization : friendlyOrgs) {
+                if (organization.isMainBuilding()) {
+                    resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getOfficialName(), "2"));
+                }
+            }
+
+            for (Org organization : friendlyOrgs) {
+                if (!organization.isMainBuilding()) {
+                    resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getOfficialName(), "2"));
+                }
             }
             return resultList;
         }
@@ -321,12 +328,13 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
     public AutoEnterEventV2Report(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime, Long idOfOrg) {
-        super(generateTime, generateDuration, print, startTime, endTime,
-                idOfOrg);
+        super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
     }
+
     private static final Logger logger = LoggerFactory.getLogger(AutoEnterEventV2Report.class);
 
-    public AutoEnterEventV2Report() {}
+    public AutoEnterEventV2Report() {
+    }
 
     @Override
     public BasicReportForOrgJob createInstance() {
