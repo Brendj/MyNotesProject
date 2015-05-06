@@ -12,6 +12,8 @@ public class SyncCollector {
 
     private static Date startTime = new Date();
     private static List<SyncData> syncList = new ArrayList<SyncData>();
+    // todo проработать вопрос об изменении ключа, т.к. могут случаться коллизии,
+    // todo когда два клиента будут пытаться синхронизироваться одновременно
     private static Map<Long, SyncData> tempSyncs = new HashMap<Long, SyncData>();
     private static SyncCollector INSTANCE = new SyncCollector();
 
