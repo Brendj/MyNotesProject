@@ -565,19 +565,15 @@ public class ImportRegisterClientsService {
         }
 
         String clientGuid = emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
-        String registryGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
-        if(registryGroupName != null && StringUtils.isBlank(registryGroupName) && registryGroupName.length() > 64) {
-            String replace = registryGroupName.substring(0, 63);
-            logger.error(String.format("ВНИМАНИЕ! Наименование группы (%s) ученика (%s) в Реестрах "
-                                       + "слишком длинное, будет применено ограничение на длинну "
-                                       + "наименования группы (%s)", registryGroupName, clientGuid, replace));
-            registryGroupName = replace;
-        }
+        String name = trim(fieldConfig.getValue(ClientManager.FieldId.NAME), 64, clientGuid, "Имя ученика");
+        String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, clientGuid, "Отчество ученика");
+        String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
+        String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 64, clientGuid, "Наименование группы");
         RegistryChange ch = new RegistryChange();
         ch.setClientGUID(clientGuid);
-        ch.setFirstName(fieldConfig.getValue(ClientManager.FieldId.NAME));
-        ch.setSecondName(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME));
-        ch.setSurname(fieldConfig.getValue(ClientManager.FieldId.SURNAME));
+        ch.setFirstName(name);
+        ch.setSecondName(secondname);
+        ch.setSurname(surname);
         ch.setGroupName(registryGroupName);
         ch.setIdOfClient(currentClient == null ? null : currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
@@ -610,6 +606,17 @@ public class ImportRegisterClientsService {
             ch.setSurnameFrom(currentClient.getPerson().getSurname());
         }
         sess.save(ch);
+    }
+
+    protected static String trim(String source, int maxLen, String clientGuid, String fieldName) {
+        if(source != null && StringUtils.isBlank(source) && source.length() > maxLen) {
+            String replace = source.substring(0, maxLen - 1);
+            logger.error(String.format("ВНИМАНИЕ! %s (%s) ученика (%s) в Реестрах "
+                    + "слишком длинное, будет применено ограничение на длинну поля "
+                    + "%s (%s)", fieldName, source, clientGuid, fieldName, replace));
+            return replace;
+        }
+        return source;
     }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
