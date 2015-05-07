@@ -179,7 +179,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "WHERE " + orgRestrict
                     //+ "      c.discountmode<>0 and "
                     + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.Discount>0) AND "
-                    + "      (o.orderdate>=:startTime AND o.orderdate<=:endTime) "
+                    + "      (o.orderdate>=:startTime AND o.orderdate<=:endTime) and o.state = 0 "
                     + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
                     + "       od.menuDetailName, od.socdiscount "
