@@ -40,7 +40,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
             + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
             + "                       cf_orders.createddate between :fromCreatedDate and :toCreatedDate "
             + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
-            + "where cf_orgs.idOfOrg in (:ids) "
+            + "where cf_orgs.idOfOrg in (:ids) and cf_orders.state = 0 "
             + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
             + "order by cf_orgs.shortname, cf_contragents.contragentname";
 
@@ -51,7 +51,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
             + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
             + "                       cf_orders.createddate <= :toCreatedDate "
             + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
-            + "where cf_orgs.idOfOrg in (:ids) "
+            + "where cf_orgs.idOfOrg in (:ids) and cf_orders.state = 0 "
             + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
             + "order by cf_orgs.shortname, cf_contragents.contragentname";
 
