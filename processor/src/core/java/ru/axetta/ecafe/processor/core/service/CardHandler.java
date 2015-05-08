@@ -43,17 +43,27 @@ public class CardHandler {
     }
 
     //3. Выдача новой активной карты клиенту взамен старой
-    public void issueToClientInsteadOld(){
+    public void issueToClientInsteadOld(Client client, Card newCard){
+        for(Card card : client.getCards()){
+            cardService.blockAndReset(card);
+            cardService.unblock(card);
+        }
 
+        cardService.issueToClient(newCard, client);
     }
 
     //4. Выдача новой временно-активной карты клиенту с блокировкой основной карты.
-    public void issueToClientWithBlockingPrev(){
+    public void issueToClientWithBlockingPrev(Client client, Card newCard){
+        for(Card card : client.getCards()){
+            cardService.block(card);
+        }
+        cardService.issueToClientTemp(newCard, client);
+
 
     }
     //5. Выдача новой временно-активной карты без блокировки основной карты
-    public void issueToClientNoBlockingPrev(){
-
+    public void issueToClientNoBlockingPrev(Client client, Card newCard){
+        cardService.issueToClientTemp(newCard, client);
     }
     //6. Возврат (сброс, аннулирование) активной  карты
     public void returnOfActiveCard(){

@@ -40,6 +40,8 @@ import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.process.ClientGuardianDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.response.*;
+import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -751,6 +753,8 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
 
         boolean bError = false;
 
@@ -1029,12 +1033,29 @@ public class Processor implements SyncProcessor,
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
+        try {
+            resCardsOperationsRegistry= resCardsOperationsRegistry.handler(request,request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
+        accountsRegistry = new AccountsRegistry();
+        try {
+        accountsRegistry.handlerFull(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
+
+
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry);
     }
     /*
     * Запуск авто пополнения
@@ -1083,6 +1104,8 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
 
         boolean bError = false;
 
@@ -1123,7 +1146,8 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1157,7 +1181,8 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
-
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
 
         boolean bError = false;
 
@@ -1260,7 +1285,8 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1294,6 +1320,8 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
 
         //Process AccountOperationsRegistry
         try {
@@ -1377,7 +1405,8 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1408,6 +1437,8 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
 
         boolean bError = false;
 
@@ -1510,7 +1541,8 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry);
     }
 
     private void createSyncHistoryException(long idOfOrg, SyncHistory syncHistory, String s) {

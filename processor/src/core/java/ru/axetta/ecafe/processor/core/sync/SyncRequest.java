@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
@@ -2246,11 +2247,12 @@ public class SyncRequest {
                 manager.buildRO(roNode);
             }
 
+            CardsOperationsRegistry cardsOperationsRegistry = CardsOperationsRegistry.find(envelopeNode,loadContext);
 
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry);
         }
 
 
@@ -2285,13 +2287,14 @@ public class SyncRequest {
     private final AccRegistryUpdateRequest accRegistryUpdateRequest;
     private final ClientGuardianRequest clientGuardianRequest;
     private final ProhibitionMenuRequest prohibitionMenuRequest;
+    private final CardsOperationsRegistry cardsOperationsRegistry;
 
-    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org,
-          Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry, AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
-          ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-          EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
-          AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
-          ProhibitionMenuRequest prohibitionMenuRequest) {
+    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
+            AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
+            ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
+            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
+            AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
+            ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2317,6 +2320,7 @@ public class SyncRequest {
         this.reqDiary = reqDiary;
         this.message = message;
         this.enterEvents = enterEvents;
+        this.cardsOperationsRegistry = cardsOperationsRegistry;
     }
 
     public String getClientVersion() {
@@ -2409,6 +2413,10 @@ public class SyncRequest {
 
     public ProhibitionMenuRequest getProhibitionMenuRequest() {
         return prohibitionMenuRequest;
+    }
+
+    public CardsOperationsRegistry getCardsOperationsRegistry() {
+        return cardsOperationsRegistry;
     }
 
     @Override

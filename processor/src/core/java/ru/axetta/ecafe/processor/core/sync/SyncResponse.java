@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.*;
+import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1209,6 +1211,9 @@ public class SyncResponse {
     private final ClientGuardianData clientGuardians;
     private final AccRegistryUpdate accRegistryUpdate;
     private final ProhibitionsMenu prohibitionsMenu;
+    private final ResCardsOperationsRegistry resCardsOperationsRegistry;
+    private final AccountsRegistry accountsRegistry;
+
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
             String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
@@ -1219,7 +1224,8 @@ public class SyncResponse {
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
-            ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu) {
+            ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
+            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1253,6 +1259,8 @@ public class SyncResponse {
         this.clientGuardians = clientGuardians;
         this.accRegistryUpdate = accRegistryUpdate;
         this.prohibitionsMenu = prohibitionsMenu;
+        this.accountsRegistry = accountsRegistry;
+        this.resCardsOperationsRegistry = resCardsOperationsRegistry;
     }
 
     public Document toDocument() throws Exception {
@@ -1396,6 +1404,14 @@ public class SyncResponse {
 
         if(goodsBasicBasketData != null) {
             ecafeEnvelopeElement.appendChild(goodsBasicBasketData.toElement(document));
+        }
+
+        if(accountsRegistry != null) {
+            ecafeEnvelopeElement.appendChild(accountsRegistry.toElement(document));
+        }
+
+        if(resCardsOperationsRegistry != null) {
+            ecafeEnvelopeElement.appendChild(resCardsOperationsRegistry.toElement(document));
         }
 
         if(directiveElement != null) {

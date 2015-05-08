@@ -26,3 +26,4 @@ CREATE TABLE cf_synchistory_calc2 (
 
 ALTER TABLE CF_Generators ADD COLUMN idOfSyncHistoryCalc BIGINT NOT NULL DEFAULT 0;
 update cf_generators set idOfSyncHistoryCalc= (select  case when max(idOfSyncHistoryCalc) is null THEN 0 else (max(idOfSyncHistoryCalc)+1) end  from cf_synchistory_calc2 );
+

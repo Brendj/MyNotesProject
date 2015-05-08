@@ -220,7 +220,9 @@ public class CalendarUtils {
         return MMMMYYYY.format(date);
     }
 
-
+    /**
+     * @return  dd.MM.yyyy HH:mm:ss
+     */
     public static String dateTimeToString(Date date) {
         return dateTimeFormat.format(date);
     }
