@@ -888,7 +888,7 @@ public class Processor implements SyncProcessor,
 
         // Build AccRegistry
         try {
-            accRegistry = getAccRegistry(request.getIdOfOrg(), null);
+            accRegistry = getAccRegistry(request.getIdOfOrg(), null, request.getClientVersion());
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -1235,9 +1235,9 @@ public class Processor implements SyncProcessor,
         // Build AccRegistry
         try {
             if(accRegistryUpdateRequest!=null){
-                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds());
+                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds(), request.getClientVersion());
             } else {
-                accRegistry = getAccRegistry(request.getIdOfOrg(), null);
+                accRegistry = getAccRegistry(request.getIdOfOrg(), null, request.getClientVersion());
             }
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
@@ -1371,9 +1371,9 @@ public class Processor implements SyncProcessor,
         // Build AccRegistry
         try {
             if(accRegistryUpdateRequest!=null){
-                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds());
+                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds(), request.getClientVersion());
             } else {
-                accRegistry = getAccRegistry(request.getIdOfOrg(), null);
+                accRegistry = getAccRegistry(request.getIdOfOrg(), null, request.getClientVersion());
             }
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
@@ -2625,7 +2625,10 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private SyncResponse.AccRegistry getAccRegistry(Long idOfOrg, List<Long> clientIds) throws Exception {
+    private SyncResponse.AccRegistry getAccRegistry(Long idOfOrg, List<Long> clientIds, String clientVerision) throws Exception {
+        if (SyncRequest.versionIsAfter(clientVerision, "2.7")){
+            return null;
+        }
         SyncResponse.AccRegistry accRegistry = new SyncResponse.AccRegistry();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

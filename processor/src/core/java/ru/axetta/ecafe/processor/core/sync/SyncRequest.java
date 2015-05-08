@@ -2441,4 +2441,19 @@ public class SyncRequest {
         String replacedString = calString.replaceAll(",", ".");
         return Double.parseDouble(replacedString);
     }
+
+
+
+    public static boolean versionIsAfter(String clientVersion, String expectedVersion){
+        List<String> cVL =  Arrays.asList(clientVersion.split("\\."));
+        List<String> eVL =  Arrays.asList(expectedVersion.split("\\."));
+        for (int i = 0; i< eVL.size(); i++){
+            if(Integer.valueOf(cVL.get(i)) > Integer.valueOf(eVL.get(i))){
+                return true;
+            }else if(Integer.valueOf(cVL.get(i)) < Integer.valueOf(eVL.get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
 }
