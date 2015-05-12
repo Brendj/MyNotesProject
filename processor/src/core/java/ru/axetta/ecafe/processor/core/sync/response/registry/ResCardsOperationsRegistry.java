@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.response.registry;
 
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryItem;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,17 +38,5 @@ public class ResCardsOperationsRegistry {
         return element;
     }
 
-    public ResCardsOperationsRegistry handler(SyncRequest request, long idOfOrg) {
-        if(request.getCardsOperationsRegistry() == null){
-            return null;
-        }
 
-
-        ResCardsOperationsRegistry resCardsOperationsRegistry = new ResCardsOperationsRegistry();
-        for (CardsOperationsRegistryItem o : request.getCardsOperationsRegistry().getItems()) {
-            itemList.add(new ResCardsOperationsRegistryItem(o.getIdOfOperation(), 400, "Внутреняя ошибка"));
-        }
-
-        return resCardsOperationsRegistry;
-    }
 }

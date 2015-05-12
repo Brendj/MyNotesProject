@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.service.card;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryItem;
+import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,9 @@ public class CardService {
 
     @Autowired
     private OrgRepository orgRepository;
+
+    @Autowired
+    private ClientWritableRepository clientWritableRepository;
 
     public static CardService getInstance(){
         return RuntimeContext.getAppContext().getBean(CardService.class);
@@ -58,9 +64,9 @@ public class CardService {
     }
 
     //1. Регистрация карты
-    public Card registerNew(){
+    public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
         //todo
-        return null;
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
     }
 
     //2. Выдача карты клиенту
@@ -69,6 +75,15 @@ public class CardService {
         client.getCards().add(card);
         card.setState(CardState.ISSUED.getValue());
         updateCard(card, Card.DEFAULT_CARD_VALID_TIME);
+    }
+
+    public ResCardsOperationsRegistryItem issueToClient(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Client client = clientWritableRepository.find(o.getIdOfClient());
+
+        issueToClient(card, client);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
     }
 
     //3.Выдача карты клиенту во временное пользование
@@ -80,10 +95,28 @@ public class CardService {
         updateCard(card, Card.DEFAULT_TEMP_CARD_VALID_TIME);
     }
 
+    public ResCardsOperationsRegistryItem issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Client client = clientWritableRepository.find(o.getIdOfClient());
+
+        issueToClientTemp(card, client);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+    }
+
     //4. Выдача карты посетителю
     public void issueToVisitor(Card card, Visitor visitor){
         //card.//todo
     }
+    public ResCardsOperationsRegistryItem issueToVisitor(CardsOperationsRegistryItem o, long idOfOrg) {
+        //Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        //Client client = clientWritableRepository.find(o.getIdOfClient());
+        //
+        //issueToClientTemp(card, client);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+    }
+
     //5. Сброс (возврат, аннулирование) карты
     public void reset(Card card){
         card.setClient(null);
@@ -92,17 +125,44 @@ public class CardService {
 
         updateCard(card);
     }
+
+    public ResCardsOperationsRegistryItem reset(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+
+
+        reset(card);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+    }
     //6.	Блокировка карты
     public void block(Card card){
         card.setState(CardState.BLOCKED.getValue());
 
         updateCard(card);
     }
+
+    public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+
+
+        block(card);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+    }
     //7.	Блокировка карты со сбросом
     public void blockAndReset(Card card){
         card.setState(CardState.BLOCKEDANDRESET.getValue());
 
         updateCard(card);
+    }
+
+    public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+
+
+        blockAndReset(card);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
     }
     //8.	Разблокировка карты
     public void unblock(Card card){
@@ -118,4 +178,14 @@ public class CardService {
             reset(card);
         }
     }
+
+    public ResCardsOperationsRegistryItem unblock(CardsOperationsRegistryItem o, long idOfOrg) {
+        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+
+
+        unblock(card);
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+    }
+
 }

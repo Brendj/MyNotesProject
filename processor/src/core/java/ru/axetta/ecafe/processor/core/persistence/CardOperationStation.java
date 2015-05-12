@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence;
  * Time: 10:38
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public enum CardOperationStation {
 
     REGISTRATION("Зарегистрирована"),

@@ -16,6 +16,11 @@ public class ResCardsOperationsRegistryItem {
 
     public static final String SYNC_NAME = "RCO";
 
+    public static final int OK= 0;
+    public static final String OK_MESSAGE= "Ok.";
+    public static final int ERROR = 160;
+    public static final String ERROR_MESSAGE= "ERROR";
+
     private long idOfOperation;
     private int result;
     private String error; // 1024

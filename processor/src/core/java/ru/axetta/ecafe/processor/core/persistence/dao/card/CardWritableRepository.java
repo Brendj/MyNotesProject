@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 
@@ -38,7 +39,7 @@ public class CardWritableRepository extends WritableJpaDao {
 
     @Transactional
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type) {
-        Card card = new Card(org,cardNo,type,Card.TEMPORARY_LOCKED_STATE,cardPrintedNo,Card.READY_LIFE_STATE);
+        Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         entityManager.persist(card);
         return card;

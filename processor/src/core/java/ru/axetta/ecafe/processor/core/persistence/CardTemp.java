@@ -13,6 +13,7 @@ import java.util.Date;
  * Time: 10:39:31
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class CardTemp {
 
     private Long idOfCartTemp;

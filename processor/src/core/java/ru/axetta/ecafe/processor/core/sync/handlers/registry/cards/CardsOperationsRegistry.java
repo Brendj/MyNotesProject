@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
+import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +20,14 @@ import java.util.List;
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
 
 /**
- * 3.8.	Реестр операций по счетам
+ * 3.11.	Реестр операций по постоянным картам
  *
  * User: shamil
  * Date: 30.04.15
  * Time: 10:55
  */
 public class CardsOperationsRegistry {
-    public static final String SYNC_NAME = "COR";
+    public static final String SYNC_NAME = "CardsOperationsRegistry";
     private static final Logger logger = LoggerFactory.getLogger(CardsOperationsRegistry.class);
 
     private List<CardsOperationsRegistryItem> items = new LinkedList<CardsOperationsRegistryItem>();
@@ -50,7 +54,7 @@ public class CardsOperationsRegistry {
 
     public static CardsOperationsRegistry find(Node envelopeNode, LoadContext loadContext) {
         CardsOperationsRegistry cardsOperationsRegistry = null;
-        Node CardsOperationsRegistryNode = findFirstChildElement(envelopeNode, "TempCardsOperations");
+        Node CardsOperationsRegistryNode = findFirstChildElement(envelopeNode, SYNC_NAME);
         if (CardsOperationsRegistryNode != null) {
             try {
                 cardsOperationsRegistry = build(CardsOperationsRegistryNode, loadContext);
@@ -59,5 +63,61 @@ public class CardsOperationsRegistry {
             }
         }
         return cardsOperationsRegistry;
+    }
+
+    public ResCardsOperationsRegistry handler(SyncRequest request, long idOfOrg) {
+
+        if(request.getCardsOperationsRegistry()== null ||request.getCardsOperationsRegistry().getItems()== null ||request.getCardsOperationsRegistry().getItems().size()  == 0){
+            return null;
+        }
+
+
+        ResCardsOperationsRegistry resCardsOperationsRegistry = new ResCardsOperationsRegistry();
+        ResCardsOperationsRegistryItem item;
+        for (CardsOperationsRegistryItem o : request.getCardsOperationsRegistry().getItems()) {
+            try{
+                item = handle(o, idOfOrg);
+            }catch (Exception e){
+                logger.error("CardsOperationsRegistry.handler org:"+idOfOrg + " , idOfOperation:" + o.getIdOfOperation()+ " , error:" + e.getMessage(), e);
+                item = new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+            }
+            resCardsOperationsRegistry.getItemList().add(item);
+        }
+
+        return resCardsOperationsRegistry;
+    }
+
+    private ResCardsOperationsRegistryItem handle(CardsOperationsRegistryItem o,long idOfOrg) {
+        CardService cardService = CardService.getInstance();
+        ResCardsOperationsRegistryItem registryItem;
+        switch (o.getType()){
+            case 0:
+                registryItem = cardService.registerNew(o, idOfOrg);
+                break;
+            case 1:
+                registryItem = cardService.issueToClient(o, idOfOrg);
+                break;
+            case 2:
+                registryItem = cardService.issueToClientTemp(o, idOfOrg);
+                break;
+            case 3:
+                registryItem = cardService.issueToVisitor(o, idOfOrg);
+                break;
+            case 4:
+                registryItem = cardService.reset(o, idOfOrg);
+                break;
+            case 5:
+                registryItem = cardService.block(o, idOfOrg);
+                break;
+            case 6:
+                registryItem = cardService.blockAndReset(o, idOfOrg);
+                break;
+            case 7:
+                registryItem = cardService.unblock(o, idOfOrg);
+                break;
+            default:
+                registryItem = null;
+        }
+        return registryItem;
     }
 }

@@ -55,9 +55,12 @@ public class CardsOperationsRegistryItem {
         Date operationDate = loadContext.getTimeFormat().parse(
                 namedNodeMap.getNamedItem("OperationDate").getTextContent());
         Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
-        long globalId = getLongValue(namedNodeMap, "GlobalId");
+        Long globalId = getLongValueNullSafe(namedNodeMap, "GlobalId");
         String staffGuid = getStringValueNullSafe(namedNodeMap, "StaffGuid");
-        Date validDate = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("ValidDate").getTextContent());
+        Date validDate = null;
+        if(namedNodeMap.getNamedItem("ValidDate") != null){
+             validDate = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("ValidDate").getTextContent());
+        }
         String comment = getStringValueNullSafe(namedNodeMap, "Comment");
 
         return new CardsOperationsRegistryItem(idOfOperation,idOfCard,type,operationDate,idOfClient,globalId,staffGuid,validDate,comment);
