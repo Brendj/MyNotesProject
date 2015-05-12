@@ -312,13 +312,13 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
             for (Org organization : friendlyOrgs) {
                 if (organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getOfficialName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getOfficialName(), "2"));
                 }
             }
 
             for (Org organization : friendlyOrgs) {
                 if (!organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getOfficialName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getOfficialName(), "2"));
                 }
             }
             return resultList;

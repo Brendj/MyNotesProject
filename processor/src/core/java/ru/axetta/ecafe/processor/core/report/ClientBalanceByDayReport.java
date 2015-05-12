@@ -314,6 +314,11 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
         return new Builder(templateFilename);
     }
 
+    @Override
+    public int getDefaultReportPeriod() {
+        return BasicReportJob.REPORT_PERIOD_TODAY;
+    }
+
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
 
     }
