@@ -29,6 +29,10 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return RuntimeContext.getAppContext().getBean(CardReadOnlyRepository.class);
     }
 
+    public Card find( Long id ){
+        return entityManager.find( Card.class, id );
+    }
+
 
     public List<Card> findAllByOrg(long idOfOrg){
         Query query = entityManager

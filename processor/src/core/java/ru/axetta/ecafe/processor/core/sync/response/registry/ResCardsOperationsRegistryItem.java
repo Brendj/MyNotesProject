@@ -20,6 +20,7 @@ public class ResCardsOperationsRegistryItem {
     public static final String OK_MESSAGE= "Ok.";
     public static final int ERROR = 160;
     public static final String ERROR_MESSAGE= "ERROR";
+    public static final String CARD_NOT_FOUND_MESSAGE= "Карта не найдена";
 
     private long idOfOperation;
     private int result;

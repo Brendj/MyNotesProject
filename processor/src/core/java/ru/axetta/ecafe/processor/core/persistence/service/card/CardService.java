@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.service.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
@@ -32,6 +33,9 @@ public class CardService {
     private static final Logger logger = LoggerFactory.getLogger(CardService.class);
     @Autowired
     private CardWritableRepository cardWritableRepository;
+
+    @Autowired
+    private CardReadOnlyRepository cardReadOnlyRepository;
 
     @Autowired
     private OrgRepository orgRepository;
@@ -65,8 +69,12 @@ public class CardService {
 
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
-        //todo
-        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+        Card card = cardReadOnlyRepository.find(o.getIdOfCard());
+        if(card != null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+        }else {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.CARD_NOT_FOUND_MESSAGE);
+        }
     }
 
     //2. Выдача карты клиенту

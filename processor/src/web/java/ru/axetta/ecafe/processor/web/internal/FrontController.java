@@ -25,7 +25,6 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
@@ -765,27 +764,30 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerCardWithoutClient")
-    public int registerCardWithoutClient(@WebParam(name = "orgId")long idOfOrg,
-            @WebParam(name = "cardNo")long cardNo,
-            @WebParam(name = "cardPrintedNo")long cardPrintedNo,
-            @WebParam(name = "type")int type )
+    public  ResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
+            @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
+            @WebParam(name = "type") int type)
             throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
 
         CardService cardService = CardService.getInstance();
         try{
             cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type);
-        }catch (PersistenceException e){
+        }catch (Exception e){
             logger.error(e.getMessage());
-            return 160;
-        }catch (ConstraintViolationException e2){
-            logger.error(e2.getMessage());
-            return 160;
-        }catch (Exception e1){
-            logger.error(e1.getMessage());
-            return 170;
+            Throwable t = e.getCause();
+            while ((t != null) && !(t instanceof ConstraintViolationException)) {
+                t = t.getCause();
+            }
+            if (t != null) {
+                return new ResponseItem(160, "Данная карта уже зарегистрирована.");
+            }else {
+                return new ResponseItem(180, "Внутренняя ошибка приложения.");
+            }
         }
-        return 0;
+        return new ResponseItem();
     }
+
+
 
 }
