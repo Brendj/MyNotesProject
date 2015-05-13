@@ -17,10 +17,13 @@ public class ResCardsOperationsRegistryItem {
     public static final String SYNC_NAME = "RCO";
 
     public static final int OK= 0;
-    public static final String OK_MESSAGE= "Ok.";
-    public static final int ERROR = 160;
-    public static final String ERROR_MESSAGE= "ERROR";
-    public static final String CARD_NOT_FOUND_MESSAGE= "Карта не найдена";
+    public static final String OK_MESSAGE = null;
+    public static final int ERROR_CARD_NOT_FOUND = 150;
+    public static final String ERROR_CARD_NOT_FOUND_MESSAGE = "Карта не найдена";
+    public static final int ERROR_DUPLICATE = 160;
+    public static final String ERROR_DUPLICATE_MESSAGE = "Такая карта уже существует";
+    public static final int ERROR = 170;
+    public static final String ERROR_MESSAGE = "ERROR";
 
     private long idOfOperation;
     private int result;
