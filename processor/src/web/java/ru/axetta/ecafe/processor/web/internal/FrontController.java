@@ -780,9 +780,9 @@ public class FrontController extends HttpServlet {
                 t = t.getCause();
             }
             if (t != null) {
-                return new ResponseItem(160, "Данная карта уже зарегистрирована.");
+                return new ResponseItem(ResponseItem.ERROR_DUPLICATE, ResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);
             }else {
-                return new ResponseItem(180, "Внутренняя ошибка приложения.");
+                return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
             }
         }
         return new ResponseItem();
