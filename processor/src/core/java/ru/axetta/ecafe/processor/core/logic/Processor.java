@@ -897,6 +897,12 @@ public class Processor implements SyncProcessor,
 
         }
 
+        try {
+            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
         // Process ReqDiary
         try {
             if(request.getReqDiary()!=null){
@@ -1032,12 +1038,6 @@ public class Processor implements SyncProcessor,
         }
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
-
-        try {
-            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
-        } catch (Exception e) {
-            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
-        }
 
         accountsRegistry = new AccountsRegistry();
         try {
