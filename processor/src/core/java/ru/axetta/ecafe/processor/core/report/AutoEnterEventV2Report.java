@@ -146,11 +146,22 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     }
                 }
             }
+            Map<Long, Long> usersEntrySummaryMap = new HashMap<Long, Long>();
             //заполняем время внутри
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
             for (StClass stClass : stClassList) {
                 for (Data data : stClass.getDataList()) {
-                    updateInsideSummaryTime(data);
+                    usersEntrySummaryMap.put(Long.parseLong(data.getF01()), 0L);
+                }
+            }
+            for (StClass stClass : stClassList) {
+                for (Data data : stClass.getDataList()) {
+                    updateInsideSummaryTime(data, usersEntrySummaryMap);
+                }
+            }
+            for (StClass stClass : stClassList) {
+                for (Data data : stClass.getDataList()) {
+                    updateEntrySummaryTime(data, usersEntrySummaryMap);
                 }
             }
             Collections.sort(stClassList);
@@ -158,7 +169,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         }
 
 
-        private static void updateInsideSummaryTime(Data data) throws ParseException {
+        private static void updateInsideSummaryTime(Data data, Map<Long, Long> entrySummaryMap) throws ParseException {
             if (data.getF09() != null) {
                 Long value = 0L;
                 Long enter = 0L;
@@ -183,9 +194,25 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     }
                 }
                 if (value > 0) {
+                    if (entrySummaryMap.containsKey(Long.parseLong(data.getF01()))) {
+                        Long sumEntry = entrySummaryMap.get(Long.parseLong(data.getF01())) + value;
+                        entrySummaryMap.put(Long.parseLong(data.getF01()), sumEntry);
+                    }
                     long hours = value / (60 * 60 * 1000);
                     long minutes = value / (60 * 1000) % 60;
                     data.setF08(
+                            "" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
+                }
+            }
+        }
+
+        private static void updateEntrySummaryTime(Data data, Map<Long, Long> entrySummaryMap) throws ParseException {
+            if (entrySummaryMap.containsKey(Long.parseLong(data.getF01()))) {
+                Long sumEntry = entrySummaryMap.get(Long.parseLong(data.getF01()));
+                if (sumEntry > 0) {
+                    long hours = sumEntry / (60 * 60 * 1000);
+                    long minutes = sumEntry / (60 * 1000) % 60;
+                    data.setF10(
                             "" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
                 }
             }

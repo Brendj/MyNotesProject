@@ -26,6 +26,7 @@ public class Data {
     private String f07 ; //exit
     private String f08 ; // insideTime
     private String f09 ; // enters
+    private String f10 ; // entersSummary
 
     public Data() {
     }
@@ -138,5 +139,13 @@ public class Data {
 
     public void setF09(String f09) {
         this.f09 = f09;
+    }
+
+    public String getF10() {
+        return f10;
+    }
+
+    public void setF10(String f10) {
+        this.f10 = f10;
     }
 }
