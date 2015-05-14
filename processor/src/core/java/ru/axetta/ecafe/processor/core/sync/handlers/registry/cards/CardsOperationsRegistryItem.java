@@ -24,7 +24,7 @@ public class CardsOperationsRegistryItem {
 
 
     private long idOfOperation;
-    private long idOfCard;
+    private long cardNo;
     private int type;
     private Date operationDate;
     private Long idOfClient;
@@ -33,10 +33,10 @@ public class CardsOperationsRegistryItem {
     private Date validDate;
     private String comment;
 
-    public CardsOperationsRegistryItem(long idOfOperation, long idOfCard, int type, Date operationDate, Long idOfClient,
+    public CardsOperationsRegistryItem(long idOfOperation, long cardNo, int type, Date operationDate, Long idOfClient,
             Long globalId, String staffGuid, Date validDate, String comment) {
         this.idOfOperation = idOfOperation;
-        this.idOfCard = idOfCard;
+        this.cardNo = cardNo;
         this.type = type;
         this.operationDate = operationDate;
         this.idOfClient = idOfClient;
@@ -50,7 +50,7 @@ public class CardsOperationsRegistryItem {
         NamedNodeMap namedNodeMap = CardsOperationRegistry.getAttributes();
 
         Long idOfOperation = getLongValueNullSafe(namedNodeMap, "IdOfOperation");
-        Long idOfCard = getLongValueNullSafe(namedNodeMap, "IdOfCard");
+        Long cardNo = getLongValueNullSafe(namedNodeMap, "CardNo");
         int type = getIntValue(namedNodeMap, "Type");
         Date operationDate = loadContext.getTimeFormat().parse(
                 namedNodeMap.getNamedItem("OperationDate").getTextContent());
@@ -63,15 +63,15 @@ public class CardsOperationsRegistryItem {
         }
         String comment = getStringValueNullSafe(namedNodeMap, "Comment");
 
-        return new CardsOperationsRegistryItem(idOfOperation,idOfCard,type,operationDate,idOfClient,globalId,staffGuid,validDate,comment);
+        return new CardsOperationsRegistryItem(idOfOperation,cardNo,type,operationDate,idOfClient,globalId,staffGuid,validDate,comment);
     }
 
     public long getIdOfOperation() {
         return idOfOperation;
     }
 
-    public long getIdOfCard() {
-        return idOfCard;
+    public long getCardNo() {
+        return cardNo;
     }
 
     public int getType() {

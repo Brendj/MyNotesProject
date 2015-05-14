@@ -610,12 +610,12 @@ public class Client {
         this.clientGUID = clientGUID;
     }
 
-    private Set<Card> getCardsInternal() {
+    public Set<Card> getCardsInternal() {
         // For Hibernate only
         return cards;
     }
 
-    private void setCardsInternal(Set<Card> cards) {
+    public void setCardsInternal(Set<Card> cards) {
         // For Hibernate only
         this.cards = cards;
     }

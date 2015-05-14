@@ -48,13 +48,14 @@ public class CardService {
     }
 
     private Card updateCard(Card card){
+        card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
         cardWritableRepository.update(card);
         return card;
     }
 
     private Card updateCard(Card card, long l){
-        card.setIssueTime(new Date());
+
         card.setValidTime(new Date(System.currentTimeMillis() + l));
 
         return updateCard(card);
@@ -69,7 +70,7 @@ public class CardService {
 
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
-        Card card = cardReadOnlyRepository.find(o.getIdOfCard());
+        Card card = cardReadOnlyRepository.findByCardNo(o.getCardNo());
         if(card != null){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
         }else {
@@ -80,14 +81,22 @@ public class CardService {
     //2. Выдача карты клиенту
     public void issueToClient(Card card, Client client){
         card.setClient(client);
-        client.getCards().add(card);
+        client.getCardsInternal().add(card);
         card.setState(CardState.ISSUED.getValue());
-        updateCard(card, Card.DEFAULT_CARD_VALID_TIME);
+        updateCard(card);
     }
 
     public ResCardsOperationsRegistryItem issueToClient(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
-        Client client = clientWritableRepository.find(o.getIdOfClient());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
+        if(card == null) {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
+        Client client = clientWritableRepository.findWithCards(o.getIdOfClient());
+        if(client == null) {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+        }
+        card.setValidTime(o.getValidDate());
+        card.setIssueTime(o.getOperationDate());
 
         issueToClient(card, client);
 
@@ -97,16 +106,23 @@ public class CardService {
     //3.Выдача карты клиенту во временное пользование
     public void issueToClientTemp(Card card, Client client){
         card.setClient(client);
-        client.getCards().add(card);
+        client.getCardsInternal().add(card);
         card.setState(CardState.ISSUEDTEMP.getValue());
 
-        updateCard(card, Card.DEFAULT_TEMP_CARD_VALID_TIME);
+        updateCard(card);
     }
 
     public ResCardsOperationsRegistryItem issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
-        Client client = clientWritableRepository.find(o.getIdOfClient());
-
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
+        if(card == null) {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
+        Client client = clientWritableRepository.findWithCards(o.getIdOfClient());
+        if(client == null) {
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+        }
+        card.setIssueTime(o.getOperationDate());
+        card.setValidTime(o.getValidDate());
         issueToClientTemp(card, client);
 
         return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
@@ -117,7 +133,7 @@ public class CardService {
         //card.//todo
     }
     public ResCardsOperationsRegistryItem issueToVisitor(CardsOperationsRegistryItem o, long idOfOrg) {
-        //Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        //Card card = cardWritableRepository.findByCardNo(o.getCardNo());
         //Client client = clientWritableRepository.find(o.getIdOfClient());
         //
         //issueToClientTemp(card, client);
@@ -135,7 +151,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem reset(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
 
 
         reset(card);
@@ -150,7 +166,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
 
 
         block(card);
@@ -165,7 +181,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
 
 
         blockAndReset(card);
@@ -188,7 +204,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem unblock(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findOne(o.getIdOfCard());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
 
 
         unblock(card);

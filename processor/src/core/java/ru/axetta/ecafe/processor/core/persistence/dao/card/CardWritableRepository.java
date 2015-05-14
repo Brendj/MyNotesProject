@@ -13,7 +13,9 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TypedQuery;
 import java.util.Date;
+import java.util.List;
 
 /**
  * User: shamil
@@ -32,15 +34,25 @@ public class CardWritableRepository extends WritableJpaDao {
         return entityManager.find( Card.class, id );
     }
 
+    public Card findByCardNo( Long cardno ){
+        TypedQuery<Card> query = entityManager.createQuery("from Card c where c.cardNo=:cardno", Card.class);
+        query.setParameter("cardno",cardno);
+        List<Card> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return query.getResultList().get(0);
+        }else return null;
+    }
+
     public void saveEntity(Card card) {
         entityManager.merge(card);
     }
 
-
-    @Transactional
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type) {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
+        card.setValidTime(new Date());
+        card.setCreateTime(new Date());
+
         entityManager.persist(card);
         return card;
     }

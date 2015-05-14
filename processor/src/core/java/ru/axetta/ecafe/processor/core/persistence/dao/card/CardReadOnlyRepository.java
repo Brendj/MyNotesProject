@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -31,6 +32,15 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public Card find( Long id ){
         return entityManager.find( Card.class, id );
+    }
+
+    public Card findByCardNo( Long cardno ){
+        TypedQuery<Card> query = entityManager.createQuery("from Card c where c.cardNo=:cardno", Card.class);
+        query.setParameter("cardno",cardno);
+        List<Card> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return query.getResultList().get(0);
+        }else return null;
     }
 
 

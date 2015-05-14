@@ -11,6 +11,9 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.TypedQuery;
+import java.util.List;
+
 /**
  * User: shamil
  * Date: 22.04.15
@@ -24,8 +27,20 @@ public class ClientWritableRepository extends WritableJpaDao {
         return RuntimeContext.getAppContext().getBean(ClientWritableRepository.class);
     }
 
-    public Client find( Long id ){
+    public Client find( Long id ) {
         return entityManager.find( Client.class, id );
+    }
+
+    public Client findWithCards( Long id ){
+        TypedQuery<Client> query = entityManager
+                .createQuery("select c from Client c left join fetch c.cardsInternal where c.idOfClient=:idOfClient", Client.class);
+        query.setParameter("idOfClient",id);
+        List<Client> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return resultList.get(0);
+        }else {
+            return null;
+        }
     }
 
     public void saveEntity(Client client) {

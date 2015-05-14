@@ -20,6 +20,8 @@ public class ResCardsOperationsRegistryItem {
     public static final String OK_MESSAGE = null;
     public static final int ERROR_CARD_NOT_FOUND = 150;
     public static final String ERROR_CARD_NOT_FOUND_MESSAGE = "Карта не найдена";
+    public static final int ERROR_CLIENT_NOT_FOUND = 155;
+    public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE = "Карта не найдена";
     public static final int ERROR_DUPLICATE = 160;
     public static final String ERROR_DUPLICATE_MESSAGE = "Такая карта уже существует";
     public static final int ERROR = 170;
