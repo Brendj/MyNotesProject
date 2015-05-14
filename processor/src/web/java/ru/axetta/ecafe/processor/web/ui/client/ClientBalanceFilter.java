@@ -11,7 +11,6 @@ import javax.faces.model.SelectItem;
  * User: damir
  * Date: 24.05.12
  * Time: 11:32
- * To change this template use File | Settings | File Templates.
  */
 public class ClientBalanceFilter {
 

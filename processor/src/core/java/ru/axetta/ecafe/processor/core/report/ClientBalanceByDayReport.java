@@ -9,9 +9,11 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +36,11 @@ import java.util.*;
  * Отчет по балансам клиентов на дату
  */
 public class ClientBalanceByDayReport extends BasicReportForContragentJob {
+
+    public static final int NO_CONDITION = 0;
+    public static final int LT_ZERO = 1;
+    public static final int EQ_ZERO = 2;
+    public static final int GT_ZERO = 3;
 
     final public static String P_CLIENT_BALANCE_CONDITION_TYPE = "clientBalanceCondition";
 
@@ -215,8 +222,14 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 idOfContragent1 = contragent.getIdOfContragent();
             }
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            Long clientGroupId = Long.valueOf(reportProperties.getProperty("clientGroupId"));
-            int clientBalanceCondition = Integer.parseInt(reportProperties.getProperty("clientBalanceCondition"));
+            String clientGroupIdString = reportProperties.getProperty("clientGroupId");
+            Long clientGroupId = null;
+            try {
+                clientGroupId = Long.valueOf(clientGroupIdString);
+            } catch (NumberFormatException e) {
+                clientGroupId = ClientGroupMenu.CLIENT_ALL;
+            }
+            Integer clientBalanceCondition = getClientBalanceCondiotion(reportProperties.getProperty("clientBalanceCondition"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {
@@ -342,4 +355,83 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ClientBalanceByDayReport.class);
+
+    private static Integer getClientBalanceCondiotion(String s) {
+        if (s.equals("Не задано")) {
+            return NO_CONDITION;
+        } else if (s.equals("Меньше 0")) {
+            return LT_ZERO;
+        } else if (s.equals("Равен 0")) {
+            return EQ_ZERO;
+        } else if (s.equals("Больше 0")) {
+            return GT_ZERO;
+        }
+        return null;
+    }
+
+    @Override
+    public AutoReportRunner getAutoReportRunner() {
+        return new AutoReportRunner(){
+            @Override
+            public void run(AutoReportBuildTask autoReportBuildTask) {
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(String.format("Building auto reports \"%s\"",
+                            getMyClass().getCanonicalName()));
+                }
+                String classPropertyValue = getMyClass().getCanonicalName();
+                List<AutoReport> autoReports = new ArrayList<AutoReport>();
+                Session session = null;
+                org.hibernate.Transaction transaction = null;
+                try {
+                    session = autoReportBuildTask.sessionFactory.openSession();
+                    transaction = BasicReport.createTransaction(session);
+                    transaction.begin();
+                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
+
+                    for (Object object: thisReportRulesList){
+                        RuleProcessor.Rule rule = (RuleProcessor.Rule) object;
+                        if (getLogger().isDebugEnabled()) {
+                            getLogger().debug(String.format("Building report \"%s\" for contragent: %s", classPropertyValue));
+                        }
+                        Properties properties = new Properties();
+                        ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
+                        String clientBalanceCondition = rule.getExpressionValue("clientBalanceCondition");
+                        if (clientBalanceCondition != null) {
+                            properties.setProperty("clientBalanceCondition", clientBalanceCondition);
+                        }
+                        Long idOfContragent = null;
+                        try {
+                            idOfContragent = Long.parseLong(rule.getExpressionValue("idOfContragent"));
+                        } catch (NumberFormatException ignored) {}
+                        if (idOfContragent != null) {
+                            properties.setProperty("idOfContragent", idOfContragent.toString());
+                        }
+                        Long idOfOrg = null;
+                        try {
+                            idOfOrg = Long.parseLong(rule.getExpressionValue("idOfOrg"));
+                        } catch (NumberFormatException ignored) {}
+                        if (idOfOrg != null) {
+                            properties.setProperty("idOfOrg", idOfOrg.toString());
+                        }
+
+                        BasicReportForContragentJob report = createInstance();
+                        report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
+                                idOfContragent, autoReportBuildTask.templateFileName,
+                                autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
+                        autoReports.add(new AutoReport(report, properties));
+                    }
+                    transaction.commit();
+                    transaction = null;
+                    autoReportBuildTask.executorService.execute(
+                            new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
+                                    autoReportBuildTask.documentBuilders));
+                } catch (Exception e) {
+                    getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
+                } finally {
+                    HibernateUtils.rollback(transaction, getLogger());
+                    HibernateUtils.close(session, getLogger());
+                }
+            }
+        };
+    }
 }

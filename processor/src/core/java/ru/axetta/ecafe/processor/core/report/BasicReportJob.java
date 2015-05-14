@@ -6,11 +6,14 @@ package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JasperPrint;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.quartz.JobExecutionContext;
@@ -54,6 +57,26 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
     // call initialize after this constructor
     public BasicReportJob() {
+    }
+
+    public Class getMyClass() { return getClass(); }
+
+    protected List<RuleProcessor.Rule> getThisReportRulesList(Session session) throws Exception {
+        List<RuleProcessor.Rule> newRules = new LinkedList<RuleProcessor.Rule>();
+        Criteria reportRulesCriteria = ReportHandleRule.createEnabledReportRulesCriteria(session);
+        List rules = reportRulesCriteria.list();
+        for (Object currObject : rules) {
+            ReportHandleRule currRule = (ReportHandleRule) currObject;
+            if (currRule.isEnabled()) {
+                for (RuleCondition ruleCondition : currRule.getRuleConditions()) {
+                    if (ruleCondition.getConditionConstant().equals(getMyClass().getCanonicalName())) {
+                        newRules.add(new RuleProcessor.Rule(currRule));
+                        break;
+                    }
+                }
+            }
+        }
+        return newRules;
     }
 
     public interface AutoReportRunner {

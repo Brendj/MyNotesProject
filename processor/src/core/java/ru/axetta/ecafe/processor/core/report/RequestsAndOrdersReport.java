@@ -11,15 +11,12 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.model.requestsandorders.FeedingPlanType;
 import ru.axetta.ecafe.processor.core.report.requestsAndOrdersReport.RequestsAndOrdersReportService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,6 @@ import java.util.*;
  * User: ziganshin
  * Date: 28.10.14
  * Time: 13:23
- * To change this template use File | Settings | File Templates.
  */
 public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
@@ -162,24 +158,6 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
             }
         };
-    }
-
-    private List<RuleProcessor.Rule> getThisReportRulesList(Session session) throws Exception {
-        List<RuleProcessor.Rule> newRules = new LinkedList<RuleProcessor.Rule>();
-        Criteria reportRulesCriteria = ReportHandleRule.createEnabledReportRulesCriteria(session);
-        List rules = reportRulesCriteria.list();
-        for (Object currObject : rules) {
-            ReportHandleRule currRule = (ReportHandleRule) currObject;
-            if (currRule.isEnabled()) {
-                for (RuleCondition ruleCondition : currRule.getRuleConditions()) {
-                    if (ruleCondition.getConditionConstant().equals(getMyClass().getCanonicalName())) {
-                        newRules.add(new RuleProcessor.Rule(currRule));
-                        break;
-                    }
-                }
-            }
-        }
-        return newRules;
     }
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {

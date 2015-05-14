@@ -15,7 +15,6 @@ import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -27,7 +26,6 @@ import java.util.*;
  * User: damir
  * Date: 10.09.12
  * Time: 15:28
- * To change this template use File | Settings | File Templates.
  */
 public abstract class BasicReportForContragentJob extends BasicReportJob {
 
@@ -35,7 +33,6 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
     public final static String PARAM_CONTRAGENT_PAYER_ID = "idOfContragentPayer";   // ищем контргентов агента по платежам
     public final static String PARAM_CONTRAGENT_ID = "idOfContragent";   // всех контрагентов
 
-    protected Class getMyClass() { return getClass(); }
     public abstract BasicReportForContragentJob createInstance();
     //protected abstract Builder createBuilder(String templateFilename);
     protected abstract Logger getLogger();

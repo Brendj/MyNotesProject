@@ -7,12 +7,9 @@ package ru.axetta.ecafe.processor.core.report;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -24,10 +21,9 @@ import java.util.*;
  * User: damir
  * Date: 10.09.12
  * Time: 15:28
- * To change this template use File | Settings | File Templates.
  */
 public abstract class BasicReportForAllOrgJob extends BasicReportJob {
-    public Class getMyClass() { return getClass(); }
+
     public abstract BasicReportForAllOrgJob createInstance();
     public abstract Builder createBuilder(String templateFilename);
 
@@ -136,4 +132,5 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
             }
         }
     }
+
 }
