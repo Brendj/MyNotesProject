@@ -25,6 +25,7 @@ public class OrgSync implements Serializable {
     private Date lastUnSuccessfulBalanceSync;
     private String clientVersion;
     private String remoteAddress;
+    private Date lastAccRegistrySync;
 
 
     public Long getIdOfOrg() {
@@ -89,6 +90,14 @@ public class OrgSync implements Serializable {
 
     public void setRemoteAddress(String remoteAddress) {
         this.remoteAddress = remoteAddress;
+    }
+
+    public Date getLastAccRegistrySync() {
+        return lastAccRegistrySync;
+    }
+
+    public void setLastAccRegistrySync(Date lastAccRegistrySync) {
+        this.lastAccRegistrySync = lastAccRegistrySync;
     }
 
     @Override

@@ -4,12 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.response.registry.accounts;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
-
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -33,23 +27,6 @@ public class AccountsRegistry {
 
     public AccountsRegistry handler(){
         return new AccountsRegistry();
-    }
-
-    @Transactional
-    public void handlerFull(long idOfOrg) {
-        ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
-        List<Client> clientList = clientDao.findAllActiveByOrg(idOfOrg);
-        for (Client client : clientList) {
-            accountItems.add(new AccountItem(client));
-        }
-
-        //todo visitor
-
-        CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
-        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrg);
-        for (Card card : allFreeByOrg) {
-            freeCardsItems.add(new CardsItem(card, null));
-        }
     }
 
     public Element toElement(Document document) throws Exception {

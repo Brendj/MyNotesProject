@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -31,6 +32,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -1039,9 +1041,8 @@ public class Processor implements SyncProcessor,
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
-        accountsRegistry = new AccountsRegistry();
         try {
-        accountsRegistry.handlerFull(request.getIdOfOrg());
+        accountsRegistry = new AccountsRegistryHandler().handlerFull(request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
@@ -1536,6 +1537,15 @@ public class Processor implements SyncProcessor,
             runRegularPayments(request);
         }
 
+
+        try {
+            accountsRegistry = new AccountsRegistryHandler().handleAccRegistry(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
+        updateOrgSyncDate(request.getIdOfOrg());
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
@@ -1543,6 +1553,11 @@ public class Processor implements SyncProcessor,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
                 accountsRegistry, resCardsOperationsRegistry);
+    }
+
+    private void updateOrgSyncDate(long idOfOrg) {
+        OrgSyncWritableRepository orgSyncWritableRepository = OrgSyncWritableRepository.getInstance();
+        orgSyncWritableRepository.updateAccRegistryDate(idOfOrg);
     }
 
     private void createSyncHistoryException(long idOfOrg, SyncHistory syncHistory, String s) {

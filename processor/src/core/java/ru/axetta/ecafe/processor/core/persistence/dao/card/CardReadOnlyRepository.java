@@ -65,4 +65,13 @@ public class CardReadOnlyRepository extends BaseJpaDao {
                 .setParameter("client",client.getIdOfClient())
                 .getResultList();
     }
+
+    public List<Card> findAllFreeByOrgAndUpdateDate(long idOfOrg, long lastUpdateDate) {
+        Query query = entityManager
+                .createQuery("from Card c where c.org.idOfOrg=:idOfOrg and c.client = null and c.updateTime>:lastUpdateDate ", Card.class)
+                .setParameter("idOfOrg",idOfOrg)
+                .setParameter("lastUpdateDate",lastUpdateDate);
+
+        return query.getResultList();
+    }
 }

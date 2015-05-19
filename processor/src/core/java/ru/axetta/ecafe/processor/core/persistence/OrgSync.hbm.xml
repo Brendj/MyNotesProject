@@ -31,7 +31,8 @@
         <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
 
 
-
+        <property name="lastAccRegistrySync" column="LastAccRegistrySync"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
     </class>
 </hibernate-mapping>

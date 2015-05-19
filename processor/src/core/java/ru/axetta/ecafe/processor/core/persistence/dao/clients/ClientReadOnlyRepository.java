@@ -41,4 +41,14 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
 
         return query.getResultList();
     }
+
+    public List<Client> findAllActiveByOrgAndUpdateDate(long idOfOrg, long lastUpdateDate) {
+        Query query = entityManager
+                .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.contractState=:contractState and c.updateTime > :lastUpdateDate ")
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("contractState", Client.ACTIVE_CONTRACT_STATE)
+                .setParameter("lastUpdateDate", lastUpdateDate);
+
+        return query.getResultList();
+    }
 }
