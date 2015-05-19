@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class OrgSyncReadOnlyRepository extends BaseJpaDao {
                 .createNativeQuery("select lastAccRegistrySync from CF_Orgs_sync where IdOfOrg = :idOfOrg")
                 .setParameter("idOfOrg", idOfOrg).getResultList();
         if(resultList.size() > 0){
-            return (Long) resultList.get(0);
+            return ((BigInteger)resultList.get(0)).longValue();
         }else{
             return null;
         }

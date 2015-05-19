@@ -8,5 +8,8 @@
 --обновляем орг ид у карт
 update cf_cards set idoforg=s.i
 from (select c.idofcard a, cl.idoforg as i from cf_cards c inner join cf_clients cl on c.idofclient = cl.idofclient) as s
-where s.a = cf_cards.idofcard
+where s.a = cf_cards.idofcard;
 
+
+
+alter table cf_orgs_sync add column LastAccRegistrySync bigint  ;

@@ -1279,6 +1279,13 @@ public class Processor implements SyncProcessor,
                     e);
         }
 
+        try {
+            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),request.getOrg().getShortName(),
@@ -1398,6 +1405,13 @@ public class Processor implements SyncProcessor,
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
         }
+
+        try {
+            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
 
         Date syncEndTime = new Date();
 
@@ -1537,6 +1551,11 @@ public class Processor implements SyncProcessor,
             runRegularPayments(request);
         }
 
+        try {
+            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
 
         try {
             accountsRegistry = new AccountsRegistryHandler().handleAccRegistry(request.getIdOfOrg());
@@ -1556,8 +1575,12 @@ public class Processor implements SyncProcessor,
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
+        try{
         OrgSyncWritableRepository orgSyncWritableRepository = OrgSyncWritableRepository.getInstance();
         orgSyncWritableRepository.updateAccRegistryDate(idOfOrg);
+        }catch (Exception e){
+            logger.error("Не удалось обновить время синхронизации, idOfOrg: "+ idOfOrg);
+        }
     }
 
     private void createSyncHistoryException(long idOfOrg, SyncHistory syncHistory, String s) {
@@ -3695,7 +3718,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     private static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {
-                card.setState(Card.LOCKED_STATE);
+                card.setState(CardState.BLOCKED.getValue());
                 card.setLockReason("Выпуск новой карты");
                 persistenceSession.update(card);
             }

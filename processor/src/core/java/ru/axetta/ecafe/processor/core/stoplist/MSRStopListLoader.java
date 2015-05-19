@@ -10,10 +10,10 @@ import generated.msr.stoplist.LongRunningStopListService_Service;
 import generated.msr.stoplist.schema.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +25,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.*;
 import javax.xml.ws.BindingProvider;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.HandlerResolver;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.PortInfo;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -220,7 +220,7 @@ public class MSRStopListLoader {
                         card.getCurrentState().trim().equals("21") ||
                         card.getCurrentState().trim().equals("22")) {
                     //log(card.getIdentifier() + " is blocked. Update it's status...");
-                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), Card.LOCKED_STATE,
+                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), CardState.BLOCKED.getValue(),
                             "Заблокировано МСР");
                 }
                 if (card.getCurrentState().trim().equals("5")) {

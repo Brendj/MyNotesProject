@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,18 +38,19 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
 
     public List<Client> findAllActiveByOrg(long idOfOrg) {
         Query query = entityManager
-                .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.contractState=:contractState ")
-                .setParameter("idOfOrg", idOfOrg).setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
+                .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.idOfClientGroup < :idOfClientGroup ")
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
 
         return query.getResultList();
     }
 
     public List<Client> findAllActiveByOrgAndUpdateDate(long idOfOrg, long lastUpdateDate) {
         Query query = entityManager
-                .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.contractState=:contractState and c.updateTime > :lastUpdateDate ")
+                .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.idOfClientGroup<:idOfClientGroup and c.updateTime > :lastUpdateDate ")
                 .setParameter("idOfOrg", idOfOrg)
-                .setParameter("contractState", Client.ACTIVE_CONTRACT_STATE)
-                .setParameter("lastUpdateDate", lastUpdateDate);
+                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                .setParameter("lastUpdateDate", new Date(lastUpdateDate));
 
         return query.getResultList();
     }

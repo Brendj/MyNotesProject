@@ -65,7 +65,11 @@ public class CardsItem {
         this.lockReason = card.getLockReason();
         this.validDate = card.getValidTime();
         this.issueDate = card.getIssueTime();
-        this.orgOwner = card.getOrg().getIdOfOrg();
+        if(card.getOrg() != null){
+            this.orgOwner = card.getOrg().getIdOfOrg();
+        }else {
+            this.orgOwner = client.getOrg().getIdOfOrg();
+        }
         isTemp = (card.getState() == CardState.ISSUEDTEMP.getValue());
         //this.visistorId = card.visistorId;
         if(client != null){

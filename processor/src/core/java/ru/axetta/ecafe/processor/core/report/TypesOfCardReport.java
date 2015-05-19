@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -18,7 +19,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -95,7 +95,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             List<TypesOfCardReportItem> result = new ArrayList<TypesOfCardReportItem>();
 
             int ac = Card.ACTIVE_STATE; // активная карта
-            int lc = Card.LOCKED_STATE; // заблокированная карта
+            int lc = CardState.BLOCKED.getValue(); // заблокированная карта
 
             TypesOfCardService service = new TypesOfCardService();
             service.setSession(session);

@@ -24,8 +24,6 @@ public class Card {
 
     public static final String[] STATE_NAMES = {"Активна", "Временно заблокирована", "Окончательно заблокирована"};
     public static final int ACTIVE_STATE = 0;
-    public static final int TEMPORARY_LOCKED_STATE = 1;
-    public static final int LOCKED_STATE = 2;
     public static final String UNKNOWN_STATE_NAME = "Неизвестно";
 
     public static final String[] LIFE_STATE_NAMES = {
