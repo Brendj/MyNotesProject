@@ -13,8 +13,10 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -94,6 +96,21 @@ public class Ksu2Record extends LibraryDistributedObject {
             throw distributedObjectException;
         }
         setFund(f);
+
+        Criteria criteria = session.createCriteria(Ksu2Record.class);
+        criteria.add(Restrictions.eq("recordNumber", getRecordNumber()));
+        criteria.add(Restrictions.eq("fund", getFund()));
+        criteria.add(Restrictions.eq("deletedState", true));
+        criteria.addOrder(Order.asc("globalId"));
+        List<Ksu2Record> ksuList = criteria.list();
+        session.clear();
+        if ((ksuList == null) || (ksuList.size() == 0)) return;
+        Ksu2Record ksu = ksuList.get(0);
+        if(!(ksu==null || guid.equals(ksu.getGuid()))){
+            DistributedObjectException distributedObjectException =  new DistributedObjectException("KSU2Record DATA_EXIST_VALUE");
+            distributedObjectException.setData(ksu.getGuid());
+            throw  distributedObjectException;
+        }
     }
 
     @Override
