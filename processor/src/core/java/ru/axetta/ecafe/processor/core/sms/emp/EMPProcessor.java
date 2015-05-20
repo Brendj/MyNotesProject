@@ -143,8 +143,13 @@ public class EMPProcessor {
     }
 
     public void runStorageMerge() throws EMPException {
+        long l = System.currentTimeMillis();
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runBindClients();
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
+        l = System.currentTimeMillis() - l;
+        if(l > 50000){
+            logger.warn("EMPProcessor time:" +  l);
+        }
     }
 
     public void runBindClients() throws EMPException {
