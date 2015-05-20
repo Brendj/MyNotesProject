@@ -49,4 +49,8 @@ public class ClientWritableRepository extends WritableJpaDao {
     public void update(Client client) {
         entityManager.merge(client);
     }
+
+    public void refresh(Client client){
+        entityManager.refresh(client);
+    }
 }

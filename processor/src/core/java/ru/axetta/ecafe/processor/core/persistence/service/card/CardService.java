@@ -54,11 +54,9 @@ public class CardService {
         return card;
     }
 
-    private Card updateCard(Card card, long l){
-
-        card.setValidTime(new Date(System.currentTimeMillis() + l));
-
-        return updateCard(card);
+    private void updateClient(Client client){
+        client.setUpdateTime(new Date());
+        clientWritableRepository.update(client);
     }
 
 
@@ -83,7 +81,10 @@ public class CardService {
         card.setClient(client);
         client.getCardsInternal().add(card);
         card.setState(CardState.ISSUED.getValue());
-        updateCard(card);
+        //updateCard(card);
+        card.setIssueTime(new Date());
+        card.setUpdateTime(new Date());
+        updateClient(client);
     }
 
     public ResCardsOperationsRegistryItem issueToClient(CardsOperationsRegistryItem o, long idOfOrg) {
@@ -108,8 +109,11 @@ public class CardService {
         card.setClient(client);
         client.getCardsInternal().add(card);
         card.setState(CardState.ISSUEDTEMP.getValue());
+        card.setIssueTime(new Date());
+        card.setUpdateTime(new Date());
+        //updateCard(card);
+        updateClient(client);
 
-        updateCard(card);
     }
 
     public ResCardsOperationsRegistryItem issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
@@ -143,12 +147,19 @@ public class CardService {
 
     //5. Сброс (возврат, аннулирование) карты
     public void reset(Card card){
+        Client client = card.getClient();
         card.setClient(null);
         card.setState(CardState.FREE.getValue());
         card.setValidTime(new Date());
-
-        updateCard(card);
+        card.setIssueTime(new Date());
+        card.setUpdateTime(new Date());
+        if(client == null){
+            updateCard(card);
+        }else {
+            updateClient(client);
+        }
     }
+
 
     public ResCardsOperationsRegistryItem reset(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
@@ -161,8 +172,14 @@ public class CardService {
     //6.	Блокировка карты
     public void block(Card card){
         card.setState(CardState.BLOCKED.getValue());
-
-        updateCard(card);
+        card.setValidTime(new Date());
+        card.setIssueTime(new Date());
+        card.setUpdateTime(new Date());
+        if(card.getClient() == null){
+            updateCard(card);
+        }else {
+            updateClient(card.getClient());
+        }
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
@@ -176,8 +193,14 @@ public class CardService {
     //7.	Блокировка карты со сбросом
     public void blockAndReset(Card card){
         card.setState(CardState.BLOCKEDANDRESET.getValue());
-
-        updateCard(card);
+        card.setValidTime(new Date());
+        card.setIssueTime(new Date());
+        card.setUpdateTime(new Date());
+        if(card.getClient() == null){
+            updateCard(card);
+        }else {
+            updateClient(card.getClient());
+        }
     }
 
     public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
@@ -196,8 +219,14 @@ public class CardService {
             }else{
                 card.setState(CardState.ISSUEDTEMP.getValue());
             }
-
-            updateCard(card);
+            card.setValidTime(card.getValidTime());
+            card.setIssueTime(new Date());
+            card.setUpdateTime(new Date());
+            if(card.getClient() == null){
+                updateCard(card);
+            }else {
+                updateClient(card.getClient());
+            }
         }else if (CardState.BLOCKEDANDRESET.getValue() == card.getState()){
             reset(card);
         }
@@ -207,6 +236,8 @@ public class CardService {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
 
 
+        card.setValidTime(o.getValidDate());
+        card.setIssueTime(o.getOperationDate());
         unblock(card);
 
         return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
