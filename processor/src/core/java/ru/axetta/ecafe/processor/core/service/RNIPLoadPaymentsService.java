@@ -266,9 +266,10 @@ public class RNIPLoadPaymentsService {
 
         long l = System.currentTimeMillis();
         info("Загрузка платежей РНИП..");
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).receiveContragentPayments(contragent);
+                rnipLoadPaymentsService.receiveContragentPayments(contragent);
             } catch (Exception e) {
                 logger.error("Failed to receive or proceed payments", e);
             }
@@ -746,12 +747,19 @@ public class RNIPLoadPaymentsService {
                 continue;
             }
             String contractId = p.get("PAYMENT_TO");
-            Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
-            info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
-                    paymentID, paymentDate, contragentKey, bic, contractId, amount);
-            if (client == null) {
-                //throw new Exception ("Клиент с номером контракта " + p.get("PAYMENT_TO") + " не найден");
-                errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("PAYMENT_TO")));
+            if(!StringUtils.isBlank(contractId)){
+                Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
+                info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
+                        paymentID, paymentDate, contragentKey, bic, contractId, amount);
+                if (client == null) {
+                    //throw new Exception ("Клиент с номером контракта " + p.get("PAYMENT_TO") + " не найден");
+                    errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("PAYMENT_TO")));
+                    continue;
+                }
+            }else {
+                errorWriter.write(String.format(
+                        "%s: поставщик %s идентификатор %s без номера ЛС (отсутствует атрибут PAYMENT_TO)", workDate,
+                        contragentKey, paymentID));
                 continue;
             }
             Long idOfPaymentContragent = null;
