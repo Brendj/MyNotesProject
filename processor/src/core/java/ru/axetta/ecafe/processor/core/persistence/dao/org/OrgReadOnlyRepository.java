@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * User: shamil
  * Date: 22.10.14
@@ -29,5 +31,10 @@ public class OrgReadOnlyRepository extends BaseJpaDao {
         return entityManager.find( Org.class, id );
     }
 
+    public  List<Long> findFriendlyOrgIds(Long orgId) {
+        return entityManager
+                .createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg")
+                .setParameter("idOfOrg", orgId).getResultList();
 
+    }
 }
