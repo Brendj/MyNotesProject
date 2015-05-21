@@ -784,6 +784,8 @@
     <rich:panelMenuItem id="syncStats" binding="#{mainPage.syncStatsPage.mainMenuComponent}"
                         label="Статистика по синхронизациям" action="#{mainPage.showSyncStatsPage}" reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="serviceRNIP" binding="#{mainPage.serviceRNIPPage.mainMenuComponent}"
+                        label="РНИП" action="#{mainPage.serviceRNIPPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

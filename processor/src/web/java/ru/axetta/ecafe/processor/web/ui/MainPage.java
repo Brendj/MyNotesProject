@@ -184,6 +184,7 @@ public class MainPage implements Serializable {
     private final ClientOperationListPage clientOperationListPage = new ClientOperationListPage();
     private final BasicWorkspacePage thinClientUserGroupPage = new BasicWorkspacePage();
     private final EmpInfoPage empInfoPage = new EmpInfoPage();
+    private final ServiceRNIPPage serviceRNIPPage = new ServiceRNIPPage();
 
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
@@ -7782,6 +7783,10 @@ public class MainPage implements Serializable {
 
     public EmpInfoPage getEmpInfoPage() {
         return empInfoPage;
+    }
+
+    public ServiceRNIPPage getServiceRNIPPage() {
+        return serviceRNIPPage;
     }
 
     /*

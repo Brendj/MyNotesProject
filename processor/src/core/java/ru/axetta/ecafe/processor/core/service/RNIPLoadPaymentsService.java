@@ -111,6 +111,10 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
 
+    public static RNIPLoadPaymentsService getInstance() {
+        return RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
+    }
+
     protected void info(String str, Object ... args) {
         //if(logger.isInfoEnabled()) {
         try {
@@ -260,6 +264,9 @@ public class RNIPLoadPaymentsService {
 
 
     public void run() {
+        run(null, null);
+    }
+    public void run(Date startDate, Date endDate) {
         if (/*!RuntimeContext.getInstance().isMainNode() || */!isOn()) {
             return;
         }
@@ -269,7 +276,7 @@ public class RNIPLoadPaymentsService {
         RNIPLoadPaymentsService rnipLoadPaymentsService = RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                rnipLoadPaymentsService.receiveContragentPayments(contragent);
+                rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
             } catch (Exception e) {
                 logger.error("Failed to receive or proceed payments", e);
             }
@@ -282,7 +289,7 @@ public class RNIPLoadPaymentsService {
     }
 
     // @Transactional
-    public void receiveContragentPayments(Contragent contragent) throws Exception{
+    public void receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
         Date updateTime = new Date(System.currentTimeMillis());
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
@@ -295,7 +302,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent);
+            response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -341,8 +348,12 @@ public class RNIPLoadPaymentsService {
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
     }
 
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
+        return executeRequest(updateTime, requestType, contragent,null,null);
+    }
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {String fileName;
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception {
+        String fileName;
         if (requestType==REQUEST_MODIFY_CATALOG) {
             fileName = MODIFY_CATALOG_TEMPLATE;
         } else if (requestType==REQUEST_CREATE_CATALOG) {
@@ -353,7 +364,7 @@ public class RNIPLoadPaymentsService {
             throw new Exception("Invalid request type: "+requestType);
         }
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType);
+        SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate), requestType);
         String timestamp = "" + System.currentTimeMillis();
 
         File dir = new File(RNIP_DIR);
@@ -814,19 +825,35 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent) throws Exception {
+    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date startDate, Date endDate) throws Exception {
         InputStream is = ss.getInputStream();
         byte[] data = new byte[is.available()];
         is.read(data);
 
         String content = new String(data, "UTF-8");
         if (content.indexOf("%START_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getLastUpdateDate(contragent));
+            String str;
+
+            if(startDate == null){
+                logger.warn("Auto");
+                 str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getLastUpdateDate(contragent));
+            }else {
+                logger.warn("Manual start: "+startDate);
+                str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(startDate);
+            }
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 986400000));
             content = content.replaceAll("%START_DATE%", formatString(str.trim()));
+
         }
         if (content.indexOf("%END_DATE%") > 1) {
-            String str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
+            String str;
+            if(endDate == null){
+                logger.warn("Auto");
+                str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
+            }else {
+                logger.warn("Manual end: "+endDate);
+                str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(endDate);
+            }
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() + 986400000));
             content = content.replaceAll("%END_DATE%", formatString(str.trim()));
         }
