@@ -29,6 +29,7 @@ public class CalendarUtils {
     private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private final static SimpleDateFormat timeUnderscoreFormat = new SimpleDateFormat("HH_mm");
     private final static SimpleDateFormat dateShortdd_mmFormat = new SimpleDateFormat("dd.MM");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
     private final static SimpleDateFormat dateShortUnderscoreFormat = new SimpleDateFormat("yy_MM_dd");
@@ -184,9 +185,17 @@ public class CalendarUtils {
     public static String timeToString(Date date) {
         return timeFormat.format(date);
     }
-    // new SimpleDateFormat("HH:mm");
+    /**
+     *   @return  new SimpleDateFormat("HH:mm");
+     * */
     public static String timeToString(Long date) {
         return timeFormat.format(new Date(date));
+    }
+    /**
+     *   @return  new SimpleDateFormat("HH_mm");
+     * */
+    public static String formatTimeUnderscoreToString(Long date) {
+        return timeUnderscoreFormat.format(new Date(date));
     }
 
     public static Date parseDayInWeek(String validTime) throws ParseException {

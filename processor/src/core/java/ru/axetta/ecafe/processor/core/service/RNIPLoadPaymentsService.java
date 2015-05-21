@@ -366,7 +366,7 @@ public class RNIPLoadPaymentsService {
         }
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate), requestType);
-        String timestamp = "" + System.currentTimeMillis();
+        long timestamp = System.currentTimeMillis();
 
         File dir = new File(RNIP_DIR);
         if(!dir.exists()) {
@@ -377,9 +377,9 @@ public class RNIPLoadPaymentsService {
         if(!paymentDir.exists()) {
             paymentDir.mkdirs();
         }
-        Array.writeFile(paymentDirPath + RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+        Array.writeFile(paymentDirPath + RNIP_OUTPUT_FILE + "_" + CalendarUtils.formatTimeUnderscoreToString(timestamp) + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
         SOAPMessage in = send(out);
-        Array.writeFile(paymentDirPath + RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        Array.writeFile(paymentDirPath + RNIP_INPUT_FILE + "_" + CalendarUtils.formatTimeUnderscoreToString(timestamp) + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
     
