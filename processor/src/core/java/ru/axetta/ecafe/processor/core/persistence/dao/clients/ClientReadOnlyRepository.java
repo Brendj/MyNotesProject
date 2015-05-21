@@ -45,6 +45,16 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
         return query.getResultList();
     }
 
+    public List<Client> findAllActiveByOrg(List<Long> idOfOrg) {
+        Query query = entityManager
+                .createQuery("from Client c where c.org.idOfOrg in (:idOfOrg) and c.idOfClientGroup < :idOfClientGroup ")
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+
+        return query.getResultList();
+    }
+
+
     public List<Client> findAllActiveByOrgAndUpdateDate(long idOfOrg, long lastUpdateDate) {
         Query query = entityManager
                 .createQuery("from Client c where c.org.idOfOrg=:idOfOrg and c.idOfClientGroup<:idOfClientGroup and c.updateTime > :lastUpdateDate ")

@@ -76,9 +76,10 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return query.getResultList();
     }
 
-    public List<Card> findById(List<Long> idOfCards) {
-       return entityManager
-                .createQuery("from Card c where c.cardNo in (:idOfCards) ", Card.class)
-                .setParameter("idOfCards",idOfCards).getResultList();
+    public List<Card> findByIdAndState(List<Long> idOfCards, int state) {
+        return entityManager.createQuery("from Card c where c.cardNo in (:idOfCards) and state=:state ", Card.class)
+                .setParameter("idOfCards", idOfCards)
+                .setParameter("state", state)
+                .getResultList();
     }
 }

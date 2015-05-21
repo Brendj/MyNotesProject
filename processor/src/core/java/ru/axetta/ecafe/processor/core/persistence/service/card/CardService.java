@@ -157,11 +157,10 @@ public class CardService {
         card.setValidTime(new Date());
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
-        if(client == null){
-            updateCard(card);
-        }else {
+        if(client != null){
             updateClient(client);
         }
+        updateCard(card);
     }
 
 
@@ -224,7 +223,9 @@ public class CardService {
     //8.	Разблокировка карты
     public void unblock(Card card){
         if(CardState.BLOCKED.getValue() == card.getState()){
-            if(card.getValidTime().getTime() > (System.currentTimeMillis() + Card.DEFAULT_TEMP_CARD_VALID_TIME)){
+            if(card.getValidTime() == null){
+                card.setState(CardState.ISSUED.getValue());
+            }else if(card.getValidTime().getTime() > (System.currentTimeMillis() + Card.DEFAULT_TEMP_CARD_VALID_TIME)){
                 card.setState(CardState.ISSUED.getValue());
             }else{
                 card.setState(CardState.ISSUEDTEMP.getValue());
@@ -248,7 +249,7 @@ public class CardService {
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
         }
 
-        card.setValidTime(o.getValidDate());
+        //card.setValidTime(o.getValidDate());
         card.setIssueTime(o.getOperationDate());
         unblock(card);
 
