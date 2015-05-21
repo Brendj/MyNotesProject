@@ -48,15 +48,9 @@ import java.util.*;
  * Created with IntelliJ IDEA.
  * User: damir
  * Date: 03.12.13
- * Time: 16:23
- * To change this template use File | Settings | File Templates.
  */
 @Service
 public class GoodRequestsChangeAsyncNotificationService {
-
-    //static enum NotifyType{
-    //
-    //}
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GoodRequestsChangeAsyncNotificationService.class);
     private Map<Long, ContragentItem> contragentItems;
@@ -106,8 +100,8 @@ public class GoodRequestsChangeAsyncNotificationService {
 
                     /**
                      * Запрос:
-                     *  Select max(gr.doneDate), min(gr.doneDate) from cf_GoodRequestPositions as pos
-                     *  inner join cf_GoodRequests gr on gr.idofcfGoodRequest = pos.idofcfGoodRequest
+                     *  Select max(gr.doneDate), min(gr.doneDate) from cf_Goods_Requests_Positions as pos
+                     *  inner join cf_Goods_Requests gr on gr.idofGoodRequest = pos.idofGoodRequest
                      *  where pos.guid in (:guid)
                      */
 
@@ -118,11 +112,13 @@ public class GoodRequestsChangeAsyncNotificationService {
                             .add(Projections.max("gr.doneDate")).add(Projections.min("gr.doneDate")));
                     List list = requestCriteria.list();
 
-                    if (!list.isEmpty()) {
+                    if (list != null && !list.isEmpty()) {
                         Object[] objects = (Object[]) list.get(0);
                         maxDone = (Date) objects[0];
                         minDone = (Date) objects[1];
-                        minDone = CalendarUtils.truncateToDayOfMonth(minDone);
+                        if (minDone != null) {
+                            minDone = CalendarUtils.truncateToDayOfMonth(minDone);
+                        }
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -231,6 +227,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             properties.setProperty(GoodRequestsNewReport.P_HIDE_DAILY_SAMPLE_COUNT, Boolean.toString(false));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(false));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
+            properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
             builder.setReportProperties(properties);
             BasicReportJob reportJob = null;
             /* создаем отчет */
@@ -281,11 +278,10 @@ public class GoodRequestsChangeAsyncNotificationService {
                     } else {
                         LOGGER.debug("IdOfOrg: " + idOfOrg + " reportJob is null");
                     }
-
                     if (StringUtils.isNotEmpty(htmlReport)) {
                         boolean modifyTypeEdit = htmlReport.contains("#FF6666");
                         boolean modifyTypeCreate = htmlReport.contains("#92D050");
-                        String reportType = "-";
+                        String reportType;
                         if (modifyTypeCreate && modifyTypeEdit) {
                             reportType = "О";
                         } else if (modifyTypeCreate) {
@@ -303,7 +299,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                                 .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
                         Set<String> addresses = new HashSet<String>(strings);
 
-                    /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
+                        /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
                         try {
                             try {
                                 persistenceSession = runtimeContext.createReportPersistenceSession();

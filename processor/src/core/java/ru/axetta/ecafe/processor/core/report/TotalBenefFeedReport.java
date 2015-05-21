@@ -120,7 +120,7 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
                 List<Long> idOfOrgList = new ArrayList<Long>(mainBuildingMap.keySet());//orgRepository.findAllActiveIds();
                 items = service
                         .buildReportItems(startDate,endDate, "", 1, 1, new Date(), new Date(),
-                                idOfOrgList, new ArrayList<Long>(), true, true, 1);
+                                idOfOrgList, new ArrayList<Long>(), true, true, 1, false);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {

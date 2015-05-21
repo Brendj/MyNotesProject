@@ -133,11 +133,19 @@ public class SyncStatsManager {
             }
             if (errorMessage == null || errorMessage.equals("")) {
                 successfulSyncCount++;
-            } else if (Integer.parseInt(errorMessage) == 429) {
-                filteredSyncCount++;
-                filteredSyncEndTime = syncData.getSyncEndTime();
             } else {
-                errorSyncCount++;
+                int errCode = 0;
+                try {
+                    errCode = Integer.parseInt(errorMessage);
+                } catch (NumberFormatException e) {
+                    logger.error("Error message int parsing error: ", e);
+                }
+                if (errCode == 429) {
+                    filteredSyncCount++;
+                    filteredSyncEndTime = syncData.getSyncEndTime();
+                } else {
+                    errorSyncCount++;
+                }
             }
         }
 

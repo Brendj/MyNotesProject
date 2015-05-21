@@ -15,12 +15,14 @@ import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,12 +31,18 @@ import java.util.*;
  * Created with IntelliJ IDEA.
  * User: damir
  * Date: 19.03.14
- * Time: 14:59
- * To change this template use File | Settings | File Templates.
  */
 public class GoodRequestsNewReportService {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportService.class);
+    private static HashMap<FeedingPlanType, String> priorety = new HashMap<FeedingPlanType, String>();
+
+    static {
+        priorety.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
+        priorety.put(FeedingPlanType.PAY_PLAN, "Платное питание");
+        priorety.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
+    }
+
     final private String OVERALL;
     final private String OVERALL_TITLE;
     final private boolean hideTotalRow;
@@ -49,36 +57,10 @@ public class GoodRequestsNewReportService {
 
     public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
             int hideDailySampleValue, Date generateBeginTime, Date generateEndTime, List<Long> idOfOrgList,
-            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue) {
-        boolean isNew = false;
-        boolean isUpdate = false;
+            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
+            boolean notification) {
 
-        Criteria orgCriteria = session.createCriteria(Org.class);
-        if (!CollectionUtils.isEmpty(idOfOrgList)) {
-            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-        }
-        orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
-        if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
-            orgCriteria.add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
-        }
-        orgCriteria.setProjection(
-                Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
-                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
-        List orgList = orgCriteria.list();
-        HashMap<Long, BasicReportJob.OrgShortItem> orgMap;
-        orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
-        for (Object obj : orgList) {
-            Object[] row = (Object[]) obj;
-            long idOfOrg = Long.parseLong(row[0].toString());
-            BasicReportJob.OrgShortItem educationItem;
-            educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
-            if (row[3] != null) {
-                Long sourceMenuOrg = Long.parseLong(row[3].toString());
-                educationItem.setSourceMenuOrg(sourceMenuOrg);
-                idOfMenuSourceOrgList.add(sourceMenuOrg);
-            }
-            orgMap.put(idOfOrg, educationItem);
-        }
+        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(idOfOrgList, idOfMenuSourceOrgList);
 
         List<Item> itemList = new LinkedList<Item>();
 
@@ -90,19 +72,20 @@ public class GoodRequestsNewReportService {
         criteriaComplex.createAlias("org", "o");
         criteriaComplex.add(Restrictions.isNotNull("good"));
         criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
-        criteriaComplex.add(Restrictions.between("menuDate", beginDate,endDate));
+        criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
         List complexList = criteriaComplex.list();
         Map<Long, ComplexInfoItem> complexOrgDictionary = new HashMap<Long, ComplexInfoItem>();
         Map<Long, GoodInfo> allGoodsInfo = new HashMap<Long, GoodInfo>();
-        for (Object obj: complexList){
+        for (Object obj : complexList) {
             ComplexInfo complexInfo = (ComplexInfo) obj;
             FeedingPlanType feedingPlanType = null;
-            if(complexInfo!=null){
-                if((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()==1)){
+            if (complexInfo != null) {
+                if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
+                        == 1)) {
                     //feedingPlanType = "Абонементное питание";
                     feedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING;
                 } else {
-                    if(complexInfo.getModeFree()==1){
+                    if (complexInfo.getModeFree() == 1) {
                         //feedingPlanType = "Льготное питание";
                         feedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN;
                     } else {
@@ -114,8 +97,8 @@ public class GoodRequestsNewReportService {
             final Long globalId = complexInfo.getGood().getGlobalId();
             final Long idOfOrg = complexInfo.getOrg().getIdOfOrg();
             ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
-            GoodInfo info = new GoodInfo(globalId,"",feedingPlanType);
-            if(infoItem==null){
+            GoodInfo info = new GoodInfo(globalId, "", feedingPlanType);
+            if (infoItem == null) {
                 infoItem = new ComplexInfoItem(idOfOrg);
             }
             infoItem.goodInfos.put(globalId, info);
@@ -123,93 +106,20 @@ public class GoodRequestsNewReportService {
             allGoodsInfo.put(globalId, info);
         }
 
-        String sqlWhere = "{alias}.created_at > DATE_SUB(startTime, INTERVAL 1 DAY)";
-
-        Criteria goodRequestPositionCriteria = session.createCriteria(GoodRequestPosition.class);
-        goodRequestPositionCriteria.createAlias("goodRequest", "gr");
-        goodRequestPositionCriteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
-        goodRequestPositionCriteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
-        goodRequestPositionCriteria.add(Restrictions.isNotNull("good"));
-        goodRequestPositionCriteria.add(Restrictions.eq("deletedState", false));
-        goodRequestPositionCriteria.add(Restrictions.eq("gr.deletedState", false));
-        if (hideGeneratePeriod) {
-            Disjunction dateDisjunction = Restrictions.disjunction();
-            dateDisjunction.add(Restrictions.le("createdDate", generateEndTime));
-            dateDisjunction.add(Restrictions.le("lastUpdate", generateEndTime));
-            goodRequestPositionCriteria.add(dateDisjunction);
+        List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(nameFilter, generateEndTime,
+                hideGeneratePeriod, false, orgMap, beginDate, endDate);
+        if (notification) {
+            List<GoodRequestPosition> goodRequestPositionListN = getGoodRequestPositions(nameFilter, generateEndTime,
+                    hideGeneratePeriod, true, orgMap, beginDate, endDate);
+            if (goodRequestPositionListN.size() > 0) {
+                goodRequestPositionList.addAll(goodRequestPositionListN);
+            }
         }
-        if (StringUtils.isNotEmpty(nameFilter)) {
-            goodRequestPositionCriteria.createAlias("good", "g");
-            goodRequestPositionCriteria.add(Restrictions
-                    .or(Restrictions.ilike("g.fullName", nameFilter, MatchMode.ANYWHERE),
-                            Restrictions.ilike("g.nameOfGood", nameFilter, MatchMode.ANYWHERE)));
-        }
-
-        List goodRequestPositionList = goodRequestPositionCriteria.list();
-
-        Date doneDate = endDate;
         Map<Long, GoodInfo> requestGoodsInfo = new HashMap<Long, GoodInfo>();
         for (Object obj : goodRequestPositionList) {
-            GoodRequestPosition position = (GoodRequestPosition) obj;
-            BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
-
-            Long totalCount = position.getTotalCount() / 1000;
-            Long dailySampleCount = position.getDailySampleCount();
-            if (dailySampleCount != null) {
-                dailySampleCount = dailySampleCount / 1000;
-            }
-
-            Long newTotalCount = 0L;
-            Long newDailySample = 0L;
-
-            if (hideGeneratePeriod) {
-                Date createDate = position.getCreatedDate();
-                if (CalendarUtils.betweenDate(createDate, generateBeginTime, generateEndTime)) {
-                    newTotalCount = totalCount;
-                    if (dailySampleCount != null) {
-                        newDailySample = dailySampleCount;
-                    }
-                }
-
-                Date lastDate = position.getLastUpdate();
-                if (lastDate != null) {
-                    if (CalendarUtils.betweenDate(lastDate, generateBeginTime, generateEndTime)) {
-                        newTotalCount = totalCount - position.getLastTotalCount() / 1000;
-                        if (dailySampleCount != null) {
-                            newDailySample = dailySampleCount - position.getLastDailySampleCount() / 1000;
-                        }
-                    }
-                }
-            }
-
-            doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
-
-            final Good good = position.getGood();
-            FeedingPlanType feedingPlanType = null;
-            if(complexOrgDictionary.containsKey(position.getOrgOwner())){
-                if(complexOrgDictionary.get(position.getOrgOwner()).goodInfos.containsKey(good.getGlobalId())){
-                    feedingPlanType = complexOrgDictionary.get(position.getOrgOwner()).goodInfos.get(good.getGlobalId()).feedingPlanType;
-                }
-            }
-            String name = good.getFullName();
-            if (StringUtils.isEmpty(name)) {
-                name = good.getNameOfGood();
-            }
-            if(!requestGoodsInfo.containsKey(good.getGlobalId())){
-                requestGoodsInfo.put(good.getGlobalId(), new GoodInfo(good.getGlobalId(), name, feedingPlanType));
-            }
-            // чтобы хотя бы раз выполнилмся, для уведомлений
-            if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(obj)==0) {
-                while (beginDate.getTime() <= endDate.getTime()) {
-                    itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType));
-                    dates.add(beginDate);
-                    beginDate = CalendarUtils.addOneDay(beginDate);
-                }
-            }
-
-            addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, newTotalCount, newDailySample,
-                    hideDailySampleValue, hideLastValue, feedingPlanType);
-            dates.add(doneDate);
+            processPosition(hideDailySampleValue, generateBeginTime, generateEndTime, hideMissedColumns,
+                    hideGeneratePeriod, hideLastValue, orgMap, itemList, beginDate, endDate, dates,
+                    complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notification);
         }
 
         if (orgFilter == 0 && !idOfMenuSourceOrgList.isEmpty()) {
@@ -222,12 +132,9 @@ public class GoodRequestsNewReportService {
                         goodCriteria.add(Restrictions.or(Restrictions.ilike("fullName", nameFilter, MatchMode.ANYWHERE),
                                 Restrictions.ilike("nameOfGood", nameFilter, MatchMode.ANYWHERE)));
                     }
-                    goodCriteria.setProjection(Projections.projectionList()
-                            .add(Projections.property("fullName"))
-                            .add(Projections.property("nameOfGood"))
-                            .add(Projections.property("orgOwner"))
-                            .add(Projections.property("globalId"))
-                    );
+                    goodCriteria.setProjection(Projections.projectionList().add(Projections.property("fullName"))
+                            .add(Projections.property("nameOfGood")).add(Projections.property("orgOwner"))
+                            .add(Projections.property("globalId")));
                     List goodNames = goodCriteria.list();
                     for (Object obj : goodNames) {
                         Object[] row = (Object[]) obj;
@@ -237,28 +144,28 @@ public class GoodRequestsNewReportService {
                         if (StringUtils.isEmpty(nameOfGood)) {
                             nameOfGood = row[1].toString();
                         }
-                        if(!requestGoodsInfo.containsKey(idOfGood)){
+                        if (!requestGoodsInfo.containsKey(idOfGood)) {
                             FeedingPlanType feedingPlanType = null;
-                            if(allGoodsInfo.containsKey(idOfGood)){
+                            if (allGoodsInfo.containsKey(idOfGood)) {
                                 feedingPlanType = allGoodsInfo.get(idOfGood).feedingPlanType;
                             }
                             fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType));
                         }
                     }
-                    if(fullNameProviderMap.getCollection(item.getSourceMenuOrg())!=null){
+                    if (fullNameProviderMap.getCollection(item.getSourceMenuOrg()) != null) {
                         for (Object object : fullNameProviderMap.getCollection(item.getSourceMenuOrg())) {
                             GoodInfo goodInfo = (GoodInfo) object;
                             if (hideMissedColumns) {
                                 for (Date date : dates) {
                                     addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType);
+                                            hideLastValue, goodInfo.feedingPlanType, 0L);
                                 }
                             } else {
                                 beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
                                 endDate = CalendarUtils.endOfDay(endTime);
                                 while (beginDate.getTime() <= endDate.getTime()) {
                                     addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType);
+                                            hideLastValue, goodInfo.feedingPlanType, 0L);
                                     beginDate = CalendarUtils.addOneDay(beginDate);
                                 }
                             }
@@ -271,35 +178,189 @@ public class GoodRequestsNewReportService {
         if (itemList.isEmpty() && !hideTotalRow) {
             for (BasicReportJob.OrgShortItem item : orgMap.values()) {
                 itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                        hideLastValue, null));
+                        hideLastValue, null, 0L));
             }
             itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null));
+                    hideDailySampleValue, hideLastValue, null, 0L));
         }
         return itemList;
     }
 
-    private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
-            int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType) {
-        itemList.add(new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType));
-        if (!hideTotalRow) {
-            itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType));
+    private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(List<Long> idOfOrgList,
+            List<Long> idOfMenuSourceOrgList) {
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        if (!CollectionUtils.isEmpty(idOfOrgList)) {
+            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+        }
+        orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
+        if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
+            orgCriteria.add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
+        }
+        orgCriteria.setProjection(
+                Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
+                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
+        List orgList = orgCriteria.list();
+        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(
+                orgList.size());
+        for (Object obj : orgList) {
+            Object[] row = (Object[]) obj;
+            long idOfOrg = Long.parseLong(row[0].toString());
+            BasicReportJob.OrgShortItem educationItem;
+            educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
+            if (row[3] != null) {
+                Long sourceMenuOrg = Long.parseLong(row[3].toString());
+                educationItem.setSourceMenuOrg(sourceMenuOrg);
+                idOfMenuSourceOrgList.add(sourceMenuOrg);
+            }
+            orgMap.put(idOfOrg, educationItem);
+        }
+        return orgMap;
+    }
+
+    private void processPosition(int hideDailySampleValue, Date generateBeginTime, Date generateEndTime,
+            boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
+            HashMap<Long, BasicReportJob.OrgShortItem> orgMap, List<Item> itemList, Date beginDate, Date endDate,
+            TreeSet<Date> dates, Map<Long, ComplexInfoItem> complexOrgDictionary, List goodRequestPositionList,
+            Map<Long, GoodInfo> requestGoodsInfo, Object obj, boolean notification) {
+        Date doneDate;
+        GoodRequestPosition position = (GoodRequestPosition) obj;
+        BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
+
+        Long totalCount = position.getTotalCount() / 1000;
+        Long dailySampleCount = getSafeValue(position.getDailySampleCount()) / 1000L;
+
+        Long newTotalCount = 0L;
+        Long newDailySample = 0L;
+
+        if (hideGeneratePeriod) {
+            Date createDate = position.getCreatedDate();
+            if (CalendarUtils.betweenDate(createDate, generateBeginTime, generateEndTime)) {
+                newTotalCount = totalCount;
+                newDailySample = dailySampleCount;
+            }
+
+            Date lastDate = position.getLastUpdate();
+            if (lastDate != null) {
+                if (CalendarUtils.betweenDate(lastDate, generateBeginTime, generateEndTime)) {
+                    newTotalCount = totalCount - getSafeValue(position.getLastTotalCount()) / 1000L;
+                    newDailySample = dailySampleCount - getSafeValue(position.getLastDailySampleCount()) / 1000L;
+                }
+            }
+        }
+
+        Long notificationMark = 0L;
+        if (position.getDeletedState()) {
+            totalCount = 0L;
+            notificationMark = 1L;
+        }
+
+        doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
+
+        final Good good = position.getGood();
+        FeedingPlanType feedingPlanType = null;
+        if (complexOrgDictionary.containsKey(position.getOrgOwner())) {
+            if (complexOrgDictionary.get(position.getOrgOwner()).goodInfos.containsKey(good.getGlobalId())) {
+                feedingPlanType = complexOrgDictionary.get(position.getOrgOwner()).goodInfos
+                        .get(good.getGlobalId()).feedingPlanType;
+            }
+        }
+        String name = good.getFullName();
+        if (StringUtils.isEmpty(name)) {
+            name = good.getNameOfGood();
+        }
+        if (!requestGoodsInfo.containsKey(good.getGlobalId())) {
+            requestGoodsInfo.put(good.getGlobalId(), new GoodInfo(good.getGlobalId(), name, feedingPlanType));
+        }
+        // чтобы хотя бы раз выполнилмся, для уведомлений
+        if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(obj) == 0) {
+            while (beginDate.getTime() <= endDate.getTime()) {
+                itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
+                        feedingPlanType, 0L));
+                dates.add(beginDate);
+                beginDate = CalendarUtils.addOneDay(beginDate);
+            }
+        }
+
+        addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, newTotalCount, newDailySample,
+                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark);
+        dates.add(doneDate);
+        if (notification) {
+            position.setNotified(true);
+            session.persist(position);
         }
     }
 
+    private Long getSafeValue(Long number) {
+        return number != null ? number : 0L;
+    }
+
+    private List<GoodRequestPosition> getGoodRequestPositions(String nameFilter, Date generateEndTime,
+            boolean hideGeneratePeriod, boolean notification, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
+            Date beginDate, Date endDate) {
+        Criteria criteria = session.createCriteria(GoodRequestPosition.class);
+        criteria.createAlias("goodRequest", "gr");
+        criteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
+        criteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
+        criteria.add(Restrictions.isNotNull("good"));
+
+        if (notification) {
+            criteria.add(Restrictions.eq("deletedState", true));
+            criteria.add(Restrictions.eq("gr.deletedState", true));
+            criteria.add(Restrictions.or(Restrictions.eq("notified", false), Restrictions.isNull("notified")));
+        } else {
+            criteria.add(Restrictions.eq("deletedState", false));
+            criteria.add(Restrictions.eq("gr.deletedState", false));
+        }
+
+        if (hideGeneratePeriod) {
+            Disjunction dateDisjunction = Restrictions.disjunction();
+            dateDisjunction.add(Restrictions.le("createdDate", generateEndTime));
+            dateDisjunction.add(Restrictions.le("lastUpdate", generateEndTime));
+            criteria.add(dateDisjunction);
+        }
+        if (StringUtils.isNotEmpty(nameFilter)) {
+            criteria.createAlias("good", "g");
+            criteria.add(Restrictions.or(Restrictions.ilike("g.fullName", nameFilter, MatchMode.ANYWHERE),
+                    Restrictions.ilike("g.nameOfGood", nameFilter, MatchMode.ANYWHERE)));
+        }
+        List list = criteria.list();
+        List<GoodRequestPosition> resultList = new ArrayList<GoodRequestPosition>();
+        for (Object o : list) {
+            GoodRequestPosition grp = (GoodRequestPosition) o;
+            resultList.add(grp);
+        }
+        return resultList;
+    }
+
+    private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
+            int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+        itemList.add(
+                new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark));
+        if (!hideTotalRow) {
+            itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
+                    feedingPlanType, notificationMark));
+        }
+    }
 
     private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
             Long totalCount, Long dailySampleCount, Long newTotalCount, Long newDailySample, int hideDailySampleValue,
-            int hideLastValue, FeedingPlanType feedingPlanType) {
+            int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
         itemList.add(new Item(org, name, doneDate, totalCount, dailySampleCount, newTotalCount, newDailySample,
-                hideDailySampleValue, hideLastValue, feedingPlanType));
+                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, newTotalCount,
-                    newDailySample, hideDailySampleValue, hideLastValue, feedingPlanType));
+                    newDailySample, hideDailySampleValue, hideLastValue, feedingPlanType, 0L));
         }
     }
 
-    private static class ComplexInfoItem{
+    private static enum FeedingPlanType {
+        /*0*/ REDUCED_PRICE_PLAN,
+        /*1*/ PAY_PLAN,
+        /*2*/ SUBSCRIPTION_FEEDING
+    }
+
+    private static class ComplexInfoItem {
+
         final long idOfOrg;
         final Map<Long, GoodInfo> goodInfos = new HashMap<Long, GoodInfo>();
 
@@ -309,7 +370,8 @@ public class GoodRequestsNewReportService {
 
     }
 
-    private static class GoodInfo{
+    private static class GoodInfo {
+
         final long idOfGood;
         final String name;
         final FeedingPlanType feedingPlanType;
@@ -344,19 +406,6 @@ public class GoodRequestsNewReportService {
         }
     }
 
-    private static HashMap<FeedingPlanType, String> priorety = new HashMap<FeedingPlanType, String>();
-    static {
-        priorety.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
-        priorety.put(FeedingPlanType.PAY_PLAN, "Платное питание");
-        priorety.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
-    }
-
-    private static enum FeedingPlanType{
-        /*0*/ REDUCED_PRICE_PLAN,
-        /*1*/ PAY_PLAN,
-        /*2*/ SUBSCRIPTION_FEEDING
-    }
-
     public static class Item implements Comparable {
 
         final private static String STR_YEAR_DATE_FORMAT = "EE dd.MM";
@@ -375,19 +424,17 @@ public class GoodRequestsNewReportService {
         private Long dailySample;
         private Long newTotalCount;
         private Long newDailySample;
+        private Long notificationMark;
 
         protected Item(Item item, Date doneDate) {
             this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L,
-                    item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType());
+                    item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType(),
+                    item.getNotificationMark());
         }
 
-        @Override
-        public int compareTo(Object o) {
-            return Integer.valueOf(hashCode()).compareTo(o.hashCode());
-        }
-
-        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType) {
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount,
+                Long dailySample, Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
+                FeedingPlanType feedingPlanType, Long notificationMark) {
             this.orgNum = orgNum;
             this.officialName = officialName;
             this.goodName = goodName;
@@ -400,14 +447,41 @@ public class GoodRequestsNewReportService {
             this.hideDailySample = hideDailySampleValue;
             this.hideLastValue = hideLastValue;
             this.feedingPlanType = feedingPlanType;
-            if (feedingPlanType==null) {
+            if (feedingPlanType == null) {
                 feedingPlanTypeStr = "";
                 feedingPlanTypeNum = -1;
             } else {
                 feedingPlanTypeStr = priorety.get(feedingPlanType);
                 feedingPlanTypeNum = feedingPlanType.ordinal();
             }
+            this.notificationMark = notificationMark;
 
+        }
+
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
+                    feedingPlanType, notificationMark);
+        }
+
+        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
+                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
+                FeedingPlanType feedingPlanType, Long notificationMark) {
+            this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName, doneDate,
+                    totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue, hideLastValue,
+                    feedingPlanType, notificationMark);
+
+        }
+
+        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue,
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType,
+                    notificationMark);
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            return Integer.valueOf(hashCode()).compareTo(o.hashCode());
         }
 
         @Override
@@ -432,24 +506,6 @@ public class GoodRequestsNewReportService {
             result = 31 * result + goodName.hashCode();
             result = 31 * result + doneDate.hashCode();
             return result;
-        }
-
-        public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType ) {
-            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType);
-        }
-
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType) {
-            this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName,
-                    doneDate, totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue,
-                    hideLastValue, feedingPlanType);
-
-        }
-
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType) {
-            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType);
         }
 
         public String getOrgNum() {
@@ -540,28 +596,6 @@ public class GoodRequestsNewReportService {
             this.hideLastValue = hideLastValue;
         }
 
-        //public FeedingPlanType getFeedingPlanType() {
-        //    return feedingPlanType;
-        //}
-        //
-        //public void setFeedingPlanType(FeedingPlanType feedingPlanType) {
-        //    this.feedingPlanType = feedingPlanType;
-        //}
-
-        //public String getFeedingPlanTypeStr() {
-        //    if (feedingPlanType==null) return "";
-        //    return priorety.get(feedingPlanType);
-        //}
-        //
-        //public Integer getFeedingPlanTypeNum() {
-        //    return feedingPlanType.ordinal();
-        //}
-
-        //public void setFeedingPlanTypeStr(String feedingPlanType) {
-        //    this.feedingPlanType = feedingPlanType;
-        //}
-
-
         public FeedingPlanType getFeedingPlanType() {
             return feedingPlanType;
         }
@@ -584,6 +618,14 @@ public class GoodRequestsNewReportService {
 
         public void setFeedingPlanTypeNum(Integer feedingPlanTypeNum) {
             this.feedingPlanTypeNum = feedingPlanTypeNum;
+        }
+
+        public Long getNotificationMark() {
+            return notificationMark;
+        }
+
+        public void setNotificationMark(Long notificationMark) {
+            this.notificationMark = notificationMark;
         }
     }
 }

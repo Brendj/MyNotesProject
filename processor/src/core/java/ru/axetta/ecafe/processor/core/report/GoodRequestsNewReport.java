@@ -37,6 +37,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_GENERATE_END_DATE = "generateEndDate";
     final public static String P_LAST_CREATE_OR_UPDATE_DATE = "lastCreateOrUpdateDate";
     final public static String P_HIDE_TOTAL_ROW = "hideTotalRow";
+    final public static String P_NOTIFICATION = "notification";
 
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
@@ -113,6 +114,9 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
 
+            String notificationString = reportProperties.getProperty(P_NOTIFICATION, "false");
+            final boolean notification = Boolean.parseBoolean(notificationString);
+
             // пока нет необходимости
             //parameterMap.put("overall",Long.toString(OVERALL));
             //parameterMap.put("overall_all",Long.toString(OVERALL_TOTAL));
@@ -122,7 +126,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
             return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod, hideLastValue));
+                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification));
         }
 
 

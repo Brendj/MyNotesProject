@@ -333,7 +333,7 @@ public class Manager {
     private void refreshStaffs(DOSyncClass doSyncClass, Set<DistributedObject> currentResultDOSet,
             List<DistributedObject> distributedObjectsList) {
 
-        if (!distributedObjectsList.isEmpty() && distributedObjectsList != null) {
+        if (distributedObjectsList != null && !distributedObjectsList.isEmpty()) {
             List<DistributedObject> refreshedStaffList = new ArrayList<DistributedObject>(currentResultDOSet);
             for (DistributedObject distributedObject : distributedObjectsList) {
                 if (distributedObject.getTagName().equals("M") && distributedObject.getGlobalVersion() != null) {
@@ -813,6 +813,9 @@ public class Manager {
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
+            if (GoodRequestPosition.class.isInstance(distributedObject)) {
+                ((GoodRequestPosition) distributedObject).setNotified(false);
+            }
             persistenceSession.persist(distributedObject);
             distributedObject.setTagName("C");
         }

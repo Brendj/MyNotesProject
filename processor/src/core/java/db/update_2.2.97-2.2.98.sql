@@ -18,3 +18,5 @@ alter table cf_orgs_sync add column LastAccRegistrySync bigint  ;
 update cf_cards
 set state =1
 where state =2;
+
+ALTER TABLE cf_goods_requests_positions ADD COLUMN notified BOOLEAN DEFAULT TRUE;

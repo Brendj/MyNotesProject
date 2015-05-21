@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,12 +19,9 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,11 +35,9 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private UnitScale unitsScale;
     private Long totalCount;
     private Long dailySampleCount; // суточная проба
-
     /* старые значения всего и суточной пробы */
     private Long lastTotalCount;
     private Long lastDailySampleCount; // суточная проба
-
     private Long netWeight;
     private Product product;
     private String guidOfP;
@@ -48,12 +45,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private String guidOfGR;
     private Good good;
     private String guidOfG;
+    private Boolean notified;
 
     @Override
     public void createProjections(Criteria criteria) {
-        criteria.createAlias("goodRequest","gr", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("product","p", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("goodRequest", "gr", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("good", "g", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
@@ -81,7 +79,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (!StringUtils.isEmpty(guidOfGR))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
         else {
-            System.out.println(guid+ ": guidOfGR "+guidOfGR);
+            System.out.println(guid + ": guidOfGR " + guidOfGR);
         }
         if (!StringUtils.isEmpty(guidOfG))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", guidOfG);
@@ -91,17 +89,20 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        GoodRequest gr =  DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
-        if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
+        GoodRequest gr = DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
+        if (gr == null)
+            throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
         setGoodRequest(gr);
         Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
-        if(g==null && p==null) {
+        if (g == null && p == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE PRODUCT OR GOOD");
         }
-        if(g!=null) setGood(g);
-        if(p!=null) setProduct(p);
-        if(!gr.getOrgOwner().equals(orgOwner)){
+        if (g != null)
+            setGood(g);
+        if (p != null)
+            setProduct(p);
+        if (!gr.getOrgOwner().equals(orgOwner)) {
             orgOwner = gr.getOrgOwner();
         }
     }
@@ -148,31 +149,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         /* старые значения всего и суточной пробы */
         setLastTotalCount(lastTotalCount);
         setLastDailySampleCount(lastDailySampleCount); // суточная проба
-
-
-        //String lastHistory = getUpdateHistory();
-        //Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
-        //String newHistory="";
-        //final String strDate = CalendarUtils.dateToString(date);
-        //if(lastDailySampleCount==null){
-        //    newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
-        //} else {
-        //    newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
-        //}
-        //if(StringUtils.isEmpty(lastHistory)){
-        //    setUpdateHistory(newHistory);
-        //} else {
-        //    setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
-        //}
+        setNotified(false);
     }
-
-    //public String getUpdateHistory() {
-    //    return updateHistory;
-    //}
-    //
-    //public void setUpdateHistory(String updateHistory) {
-    //    this.updateHistory = updateHistory;
-    //}
 
     public String getGuidOfP() {
         return guidOfP;
@@ -250,12 +228,12 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         return unitsScale;
     }
 
-    public Boolean getFloatScale(){
-        return unitsScale.equals(UnitScale.UNITS) || unitsScale.equals(UnitScale.PORTIONS);
-    }
-
     public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
+    }
+
+    public Boolean getFloatScale() {
+        return unitsScale.equals(UnitScale.UNITS) || unitsScale.equals(UnitScale.PORTIONS);
     }
 
     public String getCurrentElementValue() {
@@ -288,5 +266,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setLastDailySampleCount(Long lastDailySampleCount) {
         this.lastDailySampleCount = lastDailySampleCount;
+    }
+
+    public Boolean getNotified() {
+        return notified;
+    }
+
+    public void setNotified(Boolean notified) {
+        this.notified = notified;
     }
 }
