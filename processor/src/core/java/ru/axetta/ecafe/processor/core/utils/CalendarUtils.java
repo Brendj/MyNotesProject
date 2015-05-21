@@ -31,6 +31,7 @@ public class CalendarUtils {
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final static SimpleDateFormat dateShortdd_mmFormat = new SimpleDateFormat("dd.MM");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
+    private final static SimpleDateFormat dateShortUnderscoreFormat = new SimpleDateFormat("yy_MM_dd");
     private final static SimpleDateFormat dateShortFormatFullYear = new SimpleDateFormat("dd.MM.yyyy");
     private final static SimpleDateFormat MMMMYYYY = new SimpleDateFormat("MMMM yyyy");
     private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
@@ -208,6 +209,12 @@ public class CalendarUtils {
     }
     public static String dateShortToString(Date date) {
         return dateShortFormat.format(date);
+    }
+    /**
+    * @return new SimpleDateFormat("yy_MM_dd");
+    * */
+    public static String formatToDateShortUnderscoreFormat(Date date) {
+        return dateShortUnderscoreFormat.format(date);
     }
 
     public static String dateShortToString(Calendar date) {

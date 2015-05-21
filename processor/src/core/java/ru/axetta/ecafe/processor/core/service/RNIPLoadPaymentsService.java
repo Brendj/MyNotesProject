@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.contragent.ContragentService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -283,7 +284,7 @@ public class RNIPLoadPaymentsService {
         }
         l = System.currentTimeMillis() - l;
         if(l > 50000){
-            logger.warn("RNIPLoadPaymentsService time:" +  l);
+            logger.warn("RNIPLoadPaymentsService time:" + l);
         }
         info("Загрузка платежей РНИП завершена");
     }
@@ -371,9 +372,14 @@ public class RNIPLoadPaymentsService {
         if(!dir.exists()) {
             dir.mkdirs();
         }
-        Array.writeFile(RNIP_DIR + RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+        String paymentDirPath = RNIP_DIR + contragent.getContragentName() + "_"+ CalendarUtils.formatToDateShortUnderscoreFormat(new Date()) + "/";
+        File paymentDir = new File(paymentDirPath);
+        if(!paymentDir.exists()) {
+            paymentDir.mkdirs();
+        }
+        Array.writeFile(paymentDirPath + RNIP_OUTPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
         SOAPMessage in = send(out);
-        Array.writeFile(RNIP_DIR + RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        Array.writeFile(paymentDirPath + RNIP_INPUT_FILE + "_" + timestamp + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
     
