@@ -33,6 +33,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRegistryHandler;
+import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -900,7 +901,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+            resCardsOperationsRegistry= new CardsOperationsRegistryHandler().handler(request, request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
@@ -1280,7 +1281,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+            resCardsOperationsRegistry= new CardsOperationsRegistryHandler().handler(request, request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
@@ -1407,9 +1408,15 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+            resCardsOperationsRegistry= new CardsOperationsRegistryHandler().handler(request, request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+
+        try {
+            accountsRegistry= new AccountsRegistryHandler().accRegisgtryUpdateHandler(request);
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
 
 
@@ -1552,13 +1559,13 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            resCardsOperationsRegistry= request.getCardsOperationsRegistry().handler(request, request.getIdOfOrg());
+            resCardsOperationsRegistry= new CardsOperationsRegistryHandler().handler(request, request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
 
         try {
-            accountsRegistry = new AccountsRegistryHandler().handleAccRegistry(request.getIdOfOrg());
+            accountsRegistry = new AccountsRegistryHandler().accRegistryHandler(request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }

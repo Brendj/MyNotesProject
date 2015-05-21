@@ -54,4 +54,11 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
 
         return query.getResultList();
     }
+
+    public List<Client> findById(List<Long> idOfClients) {
+        return entityManager
+                .createQuery("from Client c where c.idOfClient in (:idOfClients)")
+                .setParameter("idOfClients", idOfClients)
+                .getResultList();
+    }
 }

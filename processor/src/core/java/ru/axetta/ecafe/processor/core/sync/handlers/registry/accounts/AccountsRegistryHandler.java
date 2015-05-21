@@ -9,12 +9,15 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -49,7 +52,7 @@ public class AccountsRegistryHandler {
     }
 
 
-    public AccountsRegistry handleAccRegistry(long idOfOrg) {
+    public AccountsRegistry accRegistryHandler(long idOfOrg) {
         OrgSyncReadOnlyRepository orgSyncReadOnlyRepository = OrgSyncReadOnlyRepository.getInstance();
 
         Long lastAccRegistrySyncDate = orgSyncReadOnlyRepository.findLastAccRegistrySyncDate(idOfOrg);
@@ -68,8 +71,8 @@ public class AccountsRegistryHandler {
         //todo visitor
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
-        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrg, lastAccRegistrySyncDate);
-        for (Card card : allFreeByOrg) {
+        List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrg, lastAccRegistrySyncDate);
+        for (Card card : freeCards) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
         }
 
@@ -77,4 +80,38 @@ public class AccountsRegistryHandler {
     }
 
 
+    public AccountsRegistry accRegisgtryUpdateHandler(SyncRequest request) {
+        if ( request.getAccountsRegistryRequest() == null ||  request.getAccountsRegistryRequest().getItems().size()== 0){
+            return null;
+        }
+        AccountsRegistry accountsRegistry = new AccountsRegistry();
+
+        List<Long> idOfClients = new LinkedList<Long>();
+
+        List<Long> idOfCards = new LinkedList<Long>();
+        for (AccountsRegistryRequestItem item : request.getAccountsRegistryRequest().getItems()) {
+            if(item.getIdOfClient()!= null) {
+                idOfClients.add(item.getIdOfClient());
+            }else if (item.getIdOfCard() != null ){
+                idOfCards.add(item.getIdOfCard());
+            }
+        }
+        if (idOfClients.size()> 0){
+            ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
+            List<Client> clientList = clientDao.findById(idOfClients );
+            for (Client client : clientList) {
+                accountsRegistry.getAccountItems().add(new AccountItem(client));
+            }
+        }
+
+        if (idOfCards.size()> 0){
+            CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
+            List<Card> freeCards = cardReadOnlyRepository.findById(idOfCards);
+            for (Card card : freeCards) {
+                accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
+            }
+        }
+
+        return accountsRegistry;
+    }
 }

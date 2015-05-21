@@ -10,12 +10,14 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.request.*;
+import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
+import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestBuilder;
+import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -2059,6 +2061,7 @@ public class SyncRequest {
         private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder;
         private final ClientGuardianBuilder clientGuardianBuilder;
         private final ProhibitionMenuRequestBuilder prohibitionMenuRequestBuilder;
+        private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2085,6 +2088,7 @@ public class SyncRequest {
             this.accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
             this.clientGuardianBuilder = new ClientGuardianBuilder();
             this.prohibitionMenuRequestBuilder = new ProhibitionMenuRequestBuilder();
+            this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2227,6 +2231,9 @@ public class SyncRequest {
             prohibitionMenuRequestBuilder.createMainNode(envelopeNode);
             ProhibitionMenuRequest prohibitionMenuRequest = prohibitionMenuRequestBuilder.build();
 
+            accountsRegistryRequestBuilder.createMainNode(envelopeNode);
+            AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
+
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
             if (roNode != null){
@@ -2252,7 +2259,7 @@ public class SyncRequest {
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest);
         }
 
 
@@ -2288,13 +2295,15 @@ public class SyncRequest {
     private final ClientGuardianRequest clientGuardianRequest;
     private final ProhibitionMenuRequest prohibitionMenuRequest;
     private final CardsOperationsRegistry cardsOperationsRegistry;
+    private final AccountsRegistryRequest accountsRegistryRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
             AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
             ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
             EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
-            ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry) {
+            ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
+            AccountsRegistryRequest accountsRegistryRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2321,6 +2330,7 @@ public class SyncRequest {
         this.message = message;
         this.enterEvents = enterEvents;
         this.cardsOperationsRegistry = cardsOperationsRegistry;
+        this.accountsRegistryRequest = accountsRegistryRequest;
     }
 
     public String getClientVersion() {
@@ -2417,6 +2427,10 @@ public class SyncRequest {
 
     public CardsOperationsRegistry getCardsOperationsRegistry() {
         return cardsOperationsRegistry;
+    }
+
+    public AccountsRegistryRequest getAccountsRegistryRequest() {
+        return accountsRegistryRequest;
     }
 
     @Override

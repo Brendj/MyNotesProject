@@ -13,3 +13,8 @@ where s.a = cf_cards.idofcard;
 
 
 alter table cf_orgs_sync add column LastAccRegistrySync bigint  ;
+
+
+update cf_cards
+set state =1
+where state =2;

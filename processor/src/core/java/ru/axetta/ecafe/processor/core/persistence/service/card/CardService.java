@@ -10,8 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
+import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +138,9 @@ public class CardService {
     }
     public ResCardsOperationsRegistryItem issueToVisitor(CardsOperationsRegistryItem o, long idOfOrg) {
         //Card card = cardWritableRepository.findByCardNo(o.getCardNo());
+        //if (card == null){
+        //    return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        //}
         //Client client = clientWritableRepository.find(o.getIdOfClient());
         //
         //issueToClientTemp(card, client);
@@ -147,6 +150,7 @@ public class CardService {
 
     //5. Сброс (возврат, аннулирование) карты
     public void reset(Card card){
+
         Client client = card.getClient();
         card.setClient(null);
         card.setState(CardState.FREE.getValue());
@@ -163,7 +167,9 @@ public class CardService {
 
     public ResCardsOperationsRegistryItem reset(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
-
+        if (card == null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
 
         reset(card);
 
@@ -184,7 +190,9 @@ public class CardService {
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
-
+        if (card == null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
 
         block(card);
 
@@ -205,7 +213,9 @@ public class CardService {
 
     public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
-
+        if (card == null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
 
         blockAndReset(card);
 
@@ -234,7 +244,9 @@ public class CardService {
 
     public ResCardsOperationsRegistryItem unblock(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
-
+        if (card == null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
 
         card.setValidTime(o.getValidDate());
         card.setIssueTime(o.getOperationDate());

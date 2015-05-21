@@ -35,7 +35,7 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public Card findByCardNo( Long cardno ){
-        TypedQuery<Card> query = entityManager.createQuery("from Card c where c.cardNo=:cardno", Card.class);
+        TypedQuery<Card> query = entityManager.createQuery("from Card c join fetch c.client where c.cardNo=:cardno", Card.class);
         query.setParameter("cardno",cardno);
         List<Card> resultList = query.getResultList();
         if(resultList.size()> 0){
