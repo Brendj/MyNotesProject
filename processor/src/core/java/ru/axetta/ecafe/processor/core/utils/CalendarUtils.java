@@ -93,7 +93,7 @@ public class CalendarUtils {
 
     public static Calendar truncateToMonth(Date date) {
         GregorianCalendar calendar = new GregorianCalendar(RuntimeContext.getInstance().getLocalTimeZone(null));
-        calendar.setTime (date);
+        calendar.setTime(date);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -499,4 +499,10 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date addMinute(Date date, int i) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE, i);
+        return calendar.getTime();
+    }
 }

@@ -842,7 +842,9 @@ public class RNIPLoadPaymentsService {
 
             if(startDate == null){
                 logger.warn("Auto");
-                 str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getLastUpdateDate(contragent));
+                Date lastUpdateDate = getLastUpdateDate(contragent);
+                lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
+                str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(lastUpdateDate);
             }else {
                 logger.warn("Manual start: "+startDate);
                 str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(startDate);
