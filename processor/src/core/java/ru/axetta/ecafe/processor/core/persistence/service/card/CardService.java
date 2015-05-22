@@ -227,8 +227,10 @@ public class CardService {
                 card.setState(CardState.ISSUED.getValue());
             }else if(card.getValidTime().getTime() > (System.currentTimeMillis() + Card.DEFAULT_TEMP_CARD_VALID_TIME)){
                 card.setState(CardState.ISSUED.getValue());
-            }else{
+            }else if (card.getClient()!= null){
                 card.setState(CardState.ISSUEDTEMP.getValue());
+            }else {
+                card.setState(CardState.FREE.getValue());
             }
             card.setValidTime(card.getValidTime());
             card.setIssueTime(new Date());
