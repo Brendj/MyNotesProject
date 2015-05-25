@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-17T18:27:37 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-05-21T17:37:40 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" pageWidth="900" pageHeight="95" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="900" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
@@ -13,13 +13,13 @@
 	<property name="ireport.zoom" value="1.0000000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ExelSampleData"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="Crosstab Data Text" hTextAlign="Center" hImageAlign="Center"/>
 	<style name="style1">
 		<box>
 			<rightPen lineWidth="1.0"/>
@@ -61,6 +61,7 @@
 	<field name="hideLastValue" class="java.lang.Integer"/>
 	<field name="feedingPlanTypeStr" class="java.lang.String"/>
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
+	<field name="notificationMark" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -225,14 +226,17 @@
 				<measure name="hideLastValueSum" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[$F{hideLastValue}]]></measureExpression>
 				</measure>
+				<measure name="notificationMark" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{notificationMark}]]></measureExpression>
+				</measure>
 				<crosstabCell width="100" height="24">
 					<cellContents style="table">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
 						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" forecolor="#FFFFFF" backcolor="#FF6666" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
-								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
-!$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[(!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
+!$V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 								<font size="12" isBold="false"/>
@@ -245,15 +249,15 @@
 new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue() )
   +
 ( $V{hideDailySampleSum}==0L || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
-    new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue() )
+new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue() )
 )
 + ")"
 )) + "</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#92D050" uuid="67da7250-646f-4951-8566-1635493f6071">
-								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
-!$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[($V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
+!$V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 								<font size="12"/>
@@ -264,8 +268,8 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
-								<printWhenExpression><![CDATA[!Integer.valueOf($V{doneDate}.getDay()).equals(0)
-&& $V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[(!Integer.valueOf($V{doneDate}.getDay()).equals(0)
+&& $V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 								<font size="12"/>
@@ -276,8 +280,8 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#CCCCCC" uuid="317b030e-0775-4653-b428-52ae97c008ec">
-								<printWhenExpression><![CDATA[Integer.valueOf($V{doneDate}.getDay()).equals(0)
-&& $V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[(Integer.valueOf($V{doneDate}.getDay()).equals(0)
+&& $V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 								<font size="12"/>
@@ -285,6 +289,26 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
 ($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
     ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
+						</textField>
+						<textField isStretchWithOverflow="true">
+							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" forecolor="#FFFFFF" backcolor="#FF6666" uuid="d8c9d2f0-0c77-4aeb-a23f-d0eb3cde29ac">
+								<printWhenExpression><![CDATA[!$V{notificationMark}.equals(0L)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+								<font size="12" isBold="false"/>
+							</textElement>
+							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
+( $V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0 ? "" : " / "+ $V{dailySampleMeasure} )
++($V{hideLastValueSum}==0L?"":
+(
+" (" +
+$V{newTotalCountMeasure}.longValue()
+  +
+( $V{hideDailySampleSum}==0L || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
+$V{newDailySampleMeasure}.longValue()
+)
++ ")"
+)) + "</font>"]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>

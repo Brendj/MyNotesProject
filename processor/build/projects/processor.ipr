@@ -544,7 +544,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="756791487">
+  <component name="DataSourceManagerImpl" format="xml" hash="1113412670">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -613,6 +613,20 @@
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <schema-pattern>aspb.public</schema-pattern>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Moscow Last" product="PostgreSQL" version="9.3.6" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://172.18.16.25:5432/moscow_1503</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow_1503.public</schema-pattern>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
