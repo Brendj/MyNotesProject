@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.card;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 
 import javax.faces.model.SelectItem;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,22 +20,20 @@ import javax.faces.model.SelectItem;
 public class CardStateFilterMenu {
 
     public static final int NO_CONDITION = -1;
-    private SelectItem[] items = readAllItems();
+    private List<SelectItem> items = readAllItems();
 
-    private static SelectItem[] readAllItems() {
-        SelectItem[] items = new SelectItem[Card.STATE_NAMES.length + 1];
-        items[0] = new SelectItem(NO_CONDITION, "Не имеет значения");
-        for (int i = 1, j = 0; i != items.length; ++i, ++j) {
-            items[i] = new SelectItem(j, Card.STATE_NAMES[j]);
+    private static List<SelectItem> readAllItems() {
+        List<SelectItem> items = new LinkedList<SelectItem>();
+        items.add(new SelectItem(NO_CONDITION, "Не имеет значения"));
+        for (CardState cardState : CardState.values()) {
+            items.add(new SelectItem(cardState.getValue(), cardState.getDescription()));
         }
+
+
         return items;
     }
 
-    public SelectItem[] getItems() {
+    public List<SelectItem> getItems() {
         return items;
-    }
-
-    public void setItems(SelectItem[] items) {
-        this.items = items;
     }
 }

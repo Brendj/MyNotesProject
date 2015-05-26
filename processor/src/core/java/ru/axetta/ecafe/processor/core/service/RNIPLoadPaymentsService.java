@@ -373,6 +373,7 @@ public class RNIPLoadPaymentsService {
             dir.mkdirs();
         }
         String paymentDirPath = RNIP_DIR + contragent.getContragentName() + "_"+ CalendarUtils.formatToDateShortUnderscoreFormat(new Date()) + "/";
+        paymentDirPath = paymentDirPath.replace(" ","_");
         File paymentDir = new File(paymentDirPath);
         if(!paymentDir.exists()) {
             paymentDir.mkdirs();

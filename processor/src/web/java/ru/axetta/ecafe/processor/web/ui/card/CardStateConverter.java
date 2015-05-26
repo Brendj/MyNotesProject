@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.card;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -25,9 +25,11 @@ public class CardStateConverter implements Converter {
 
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
         int value = (Integer) object;
-        if (value >= 0 && value < Card.STATE_NAMES.length) {
-            return Card.STATE_NAMES[value];
+        for (CardState cardState : CardState.values()) {
+            if(cardState.getValue() == value){
+                return cardState.getDescription();
+            }
         }
-        return Card.UNKNOWN_STATE_NAME;
+        return CardState.UNKNOWN.getDescription();
     }
 }
