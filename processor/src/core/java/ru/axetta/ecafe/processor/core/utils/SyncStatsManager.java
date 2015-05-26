@@ -124,6 +124,10 @@ public class SyncStatsManager {
         Long errorSyncCount = 0L;
         Long averageReconnectTime = 0L; // in ms
         List<Long> reconnectIntervals = new ArrayList<Long>();
+        Long minSyncDuration = 0L; // in ms
+        Long averageSyncDuration = 0L; // in ms
+        Long maxSyncDuration = 0L; // in ms
+        List<Long> syncDurations = new ArrayList<Long>();
         Date filteredSyncEndTime = null;
         for (SyncData syncData : syncDataList) {
             String errorMessage = syncData.getErrorMessage();
@@ -147,8 +151,26 @@ public class SyncStatsManager {
                     errorSyncCount++;
                 }
             }
+            if (syncData.getDuration() != null) {
+                syncDurations.add(syncData.getDuration());
+            }
+            if (syncData.getDuration() < minSyncDuration) {
+                minSyncDuration = syncData.getDuration();
+            }
+            if (syncData.getDuration() > maxSyncDuration) {
+                maxSyncDuration = syncData.getDuration();
+            }
         }
 
+        Map<Integer, String> stats = getStats(successfulSyncCount, filteredSyncCount, errorSyncCount,
+                averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration, maxSyncDuration,
+                syncDurations);
+        return stats;
+    }
+
+    private static Map<Integer, String> getStats(Long successfulSyncCount, Long filteredSyncCount, Long errorSyncCount,
+            Long averageReconnectTime, List<Long> reconnectIntervals, Long minSyncDuration, Long averageSyncDuration,
+            Long maxSyncDuration, List<Long> syncDurations) {
         Map<Integer, String> stats = new HashMap<Integer, String>();
         if (successfulSyncCount > 0L) {
             stats.put(SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION, successfulSyncCount.toString());
@@ -165,6 +187,19 @@ public class SyncStatsManager {
             }
             averageReconnectTime /= reconnectIntervals.size();
             stats.put(SyncHistoryCalc.AVG_RESYNC_TIME_POSITION, averageReconnectTime.toString());
+        }
+        if (minSyncDuration != null) {
+            stats.put(SyncHistoryCalc.MIN_SYNC_DURATION, minSyncDuration.toString());
+        }
+        if (syncDurations.size() > 0) {
+            for (Long duration : syncDurations) {
+                averageSyncDuration += duration;
+            }
+            averageSyncDuration /= syncDurations.size();
+            stats.put(SyncHistoryCalc.AVG_SYNC_DURATION, averageSyncDuration.toString());
+        }
+        if (maxSyncDuration != null) {
+            stats.put(SyncHistoryCalc.MAX_SYNC_DURATION, maxSyncDuration.toString());
         }
         return stats;
     }
@@ -346,7 +381,6 @@ public class SyncStatsManager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        Map<Integer, String> stats = new HashMap<Integer, String>();
         for (Long idOfOrg : syncMapByOrg.keySet()) {
             List<SyncHistoryCalc> orgShorSyncData = syncMapByOrg.get(idOfOrg);
             Long successfullSyncCount = 0L;
@@ -354,6 +388,10 @@ public class SyncStatsManager {
             Long errorSyncCount = 0L;
             Long averageReconnectTime = 0L; // in ms
             List<Long> reconnectIntervals = new ArrayList<Long>();
+            Long minSyncDuration = 0L; // in ms
+            Long averageSyncDuration = 0L; // in ms
+            Long maxSyncDuration = 0L; // in ms
+            List<Long> syncDurations = new ArrayList<Long>();
             for (SyncHistoryCalc syncHistoryCalc : orgShorSyncData) {
                 switch (syncHistoryCalc.getDataType()) {
                     case SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION:
@@ -368,26 +406,26 @@ public class SyncStatsManager {
                     case SyncHistoryCalc.AVG_RESYNC_TIME_POSITION:
                         reconnectIntervals.add(Long.parseLong(syncHistoryCalc.getValue()));
                         break;
+                    case SyncHistoryCalc.MIN_SYNC_DURATION:
+                        if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                            minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        }
+                        break;
+                    case SyncHistoryCalc.AVG_SYNC_DURATION:
+                        syncDurations.add(Long.parseLong(syncHistoryCalc.getValue()));
+                        break;
+                    case SyncHistoryCalc.MAX_SYNC_DURATION:
+                        if (maxSyncDuration < Long.parseLong(syncHistoryCalc.getValue())) {
+                            maxSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        }
+                        break;
                     default:
 
                 }
             }
-            if (successfullSyncCount > 0L) {
-                stats.put(SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION, successfullSyncCount.toString());
-            }
-            if (filteredSyncCount > 0L) {
-                stats.put(SyncHistoryCalc.FILTERED_SYNC_COUNT_POSITION, filteredSyncCount.toString());
-            }
-            if (errorSyncCount > 0L) {
-                stats.put(SyncHistoryCalc.ERROR_SYNC_COUNT_POSITION, errorSyncCount.toString());
-            }
-            if (reconnectIntervals.size() > 0) {
-                for (Long interval : reconnectIntervals) {
-                    averageReconnectTime += interval;
-                }
-                averageReconnectTime /= reconnectIntervals.size();
-                stats.put(SyncHistoryCalc.AVG_RESYNC_TIME_POSITION, averageReconnectTime.toString());
-            }
+            Map<Integer, String> stats = getStats(successfullSyncCount, filteredSyncCount, errorSyncCount,
+                    averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration,
+                    maxSyncDuration, syncDurations);
             for (Integer type : stats.keySet()) {
                 createSyncHistoryCalc(idOfOrg, periodStart, type, stats.get(type));
             }

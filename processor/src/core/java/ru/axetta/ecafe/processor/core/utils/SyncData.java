@@ -11,11 +11,12 @@ import java.util.Date;
 public class SyncData {
 
     private String idOfSync;
-    private long idOfOrg;
+    private Long idOfOrg;
     private SyncType syncType;
     private Date syncStartTime;
     private Date syncEndTime;
     private String errorMessage;
+    private Long duration;
 
     public String getIdOfSync() {
         return idOfSync;
@@ -25,7 +26,7 @@ public class SyncData {
         this.idOfSync = idOfSync;
     }
 
-    public long getIdOfOrg() {
+    public Long getIdOfOrg() {
         return idOfOrg;
     }
 
@@ -63,5 +64,13 @@ public class SyncData {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 }

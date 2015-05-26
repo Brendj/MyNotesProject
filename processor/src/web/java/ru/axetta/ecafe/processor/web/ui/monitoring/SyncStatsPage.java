@@ -42,11 +42,15 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
 
     private List<Item> updateSyncStatsOnPeriod() {
         List<Item> result = new ArrayList<Item>();
-        Long succesfulSyncCount = 0L;
+        Long successfulSyncCount = 0L;
         Long filteredSyncCount = 0L;
         Long errorSyncCount = 0L;
-        List<Long> averageResyncTimeList = new ArrayList<Long>();
         Long averageResyncTime = 0L;
+        List<Long> resyncTimes = new ArrayList<Long>();
+        Long minSyncDuration = 0L;
+        Long averageSyncDuration = 0L;
+        Long maxSyncDuration = 0L;
+        List<Long> syncDurations = new ArrayList<Long>();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -66,7 +70,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
             for (SyncHistoryCalc syncHistoryCalc : existedSyncHistoryCalcList) {
                 switch (syncHistoryCalc.getDataType()) {
                     case SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION:
-                        succesfulSyncCount += Long.parseLong(syncHistoryCalc.getValue());
+                        successfulSyncCount += Long.parseLong(syncHistoryCalc.getValue());
                         break;
                     case SyncHistoryCalc.FILTERED_SYNC_COUNT_POSITION:
                         filteredSyncCount += Long.parseLong(syncHistoryCalc.getValue());
@@ -75,16 +79,36 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
                         errorSyncCount += Long.parseLong(syncHistoryCalc.getValue());
                         break;
                     case SyncHistoryCalc.AVG_RESYNC_TIME_POSITION:
-                        averageResyncTimeList.add(Long.parseLong(syncHistoryCalc.getValue()));
+                        resyncTimes.add(Long.parseLong(syncHistoryCalc.getValue()));
+                        break;
+                    case SyncHistoryCalc.MIN_SYNC_DURATION:
+                        if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                            minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        }
+                        break;
+                    case SyncHistoryCalc.AVG_SYNC_DURATION:
+                        syncDurations.add(Long.parseLong(syncHistoryCalc.getValue()));
+                        break;
+                    case SyncHistoryCalc.MAX_SYNC_DURATION:
+                        if (maxSyncDuration < Long.parseLong(syncHistoryCalc.getValue())) {
+                            maxSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        }
                         break;
                 }
             }
 
-            if (averageResyncTimeList.size() > 0) {
-                for (Long currentValue : averageResyncTimeList) {
+            if (resyncTimes.size() > 0) {
+                for (Long currentValue : resyncTimes) {
                     averageResyncTime += currentValue;
                 }
-                averageResyncTime /= averageResyncTimeList.size();
+                averageResyncTime /= resyncTimes.size();
+            }
+
+            if (syncDurations.size() > 0) {
+                for (Long currentValue : syncDurations) {
+                    averageSyncDuration += currentValue;
+                }
+                averageSyncDuration /= syncDurations.size();
             }
 
             persistenceSession.flush();
@@ -96,10 +120,13 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        result.add(new Item("Успешных синхронизаций", succesfulSyncCount.toString()));
+        result.add(new Item("Успешных синхронизаций", successfulSyncCount.toString()));
         result.add(new Item("Отбитых синхронизаций", filteredSyncCount.toString()));
         result.add(new Item("Не завершенных синхронизаций", errorSyncCount.toString()));
         result.add(new Item("Среднее время реконнекта (мс)", averageResyncTime.toString()));
+        result.add(new Item("Минимальное время синхронизации", minSyncDuration.toString()));
+        result.add(new Item("Среднее время синхронизации", averageSyncDuration.toString()));
+        result.add(new Item("Максимальное время синхронизации", maxSyncDuration.toString()));
 
         return result;
     }

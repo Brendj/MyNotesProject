@@ -18,14 +18,20 @@ public class SyncHistoryCalc {
      * dataType - тип данных сохраняемых в таблице
      * 0 - успешных синхронизаций
      * 1 - отбитых синхронизаций
-     * 3 - ошибок (при нормальной работе алгоритма их быть не должно)
-     * 4 - Среднее время до следующей синхронизации
+     * 2 - ошибок (при нормальной работе алгоритма их быть не должно)
+     * 3 - Среднее время до следующей синхронизации
+     * 4 - Минимальная длительность синхронизации
+     * 5 - Средняя длительность синхронизации
+     * 6 - Максимальная длительность синхронизации
      * todo переписать для нормальной работы с enum
      */
     public static final int SUCCESSFUL_SYNC_COUNT_POSITION = 0;
     public static final int FILTERED_SYNC_COUNT_POSITION = 1;
     public static final int ERROR_SYNC_COUNT_POSITION = 2;
     public static final int AVG_RESYNC_TIME_POSITION = 3;
+    public static final int MIN_SYNC_DURATION = 4;
+    public static final int AVG_SYNC_DURATION = 5;
+    public static final int MAX_SYNC_DURATION = 6;
     private Integer dataType;
     private Long idOfSyncHistoryCalc;
     private Long idOfOrg;

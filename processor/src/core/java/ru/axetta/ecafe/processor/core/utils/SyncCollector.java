@@ -41,8 +41,14 @@ public class SyncCollector {
     public static void registerSyncEnd(Long syncTime) {
         clearOldData();
         if (tempSyncs.containsKey(syncTime)) {
-            tempSyncs.get(syncTime).setSyncEndTime(new Date());
-            syncList.add(tempSyncs.get(syncTime));
+            SyncData sync = tempSyncs.get(syncTime);
+            sync.setSyncEndTime(new Date());
+            Date endTime = sync.getSyncEndTime();
+            Date startTime = sync.getSyncStartTime();
+            if (endTime != null && startTime != null) {
+                sync.setDuration(endTime.getTime() - startTime.getTime());
+            }
+            syncList.add(sync);
             tempSyncs.remove(syncTime);
         }
     }
