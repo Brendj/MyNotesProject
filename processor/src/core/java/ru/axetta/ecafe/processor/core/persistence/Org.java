@@ -115,6 +115,7 @@ public class Org implements Serializable {
     private String statusDetailing;
     private OrgSync orgSync;
     private Boolean payByCashier;
+    private Boolean oneActiveCard;
     private Set<Card> cards = new HashSet<Card>();
 
 
@@ -843,6 +844,14 @@ public class Org implements Serializable {
 
     public void setPayByCashier(Boolean payByCashier) {
         this.payByCashier = payByCashier;
+    }
+
+    public Boolean getOneActiveCard() {
+        return oneActiveCard;
+    }
+
+    public void setOneActiveCard(Boolean oneActiveCard) {
+        this.oneActiveCard = oneActiveCard;
     }
 
     public Set<Card> getCards() {

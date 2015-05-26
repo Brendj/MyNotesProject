@@ -146,6 +146,9 @@
 
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.payByCashier}"  styleClass="input-text"  />
+
+    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать новую организацию" action="#{mainPage.createOrg}"

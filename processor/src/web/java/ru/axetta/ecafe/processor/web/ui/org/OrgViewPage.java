@@ -74,6 +74,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String statusDetailing;
 
     private Boolean payByCashier;
+    private Boolean oneActiveCard;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
@@ -224,6 +225,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         }
 
         this.payByCashier = org.getPayByCashier();
+        this.oneActiveCard = org.getOneActiveCard();
 
     }
 
@@ -523,5 +525,9 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public Boolean getPayByCashier() {
         return payByCashier;
+    }
+
+    public Boolean getOneActiveCard() {
+        return oneActiveCard;
     }
 }

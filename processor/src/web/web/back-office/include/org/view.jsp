@@ -146,6 +146,9 @@
 
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.payByCashier}"  styleClass="input-text" disabled="true"  />
+
+    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.oneActiveCard}"  styleClass="input-text" disabled="true"  />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

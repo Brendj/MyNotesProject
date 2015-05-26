@@ -100,6 +100,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String statusDetailing;
 
     private Boolean payByCashier;
+    private Boolean oneActiveCard;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
@@ -277,6 +278,7 @@ public class OrgEditPage extends BasicWorkspacePage
         }
 
         org.setPayByCashier(payByCashier);
+        org.setOneActiveCard(oneActiveCard);
 
         session.update(org);
         fill(org);
@@ -401,7 +403,8 @@ public class OrgEditPage extends BasicWorkspacePage
             this.statusTextArea = "";
         }
 
-        this.payByCashier = payByCashier;
+        this.payByCashier = org.getPayByCashier();
+        this.oneActiveCard = org.getOneActiveCard();
 
     }
 
@@ -984,5 +987,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setPayByCashier(Boolean payByCashier) {
         this.payByCashier = payByCashier;
+    }
+
+    public Boolean getOneActiveCard() {
+        return oneActiveCard;
+    }
+
+    public void setOneActiveCard(Boolean oneActiveCard) {
+        this.oneActiveCard = oneActiveCard;
     }
 }

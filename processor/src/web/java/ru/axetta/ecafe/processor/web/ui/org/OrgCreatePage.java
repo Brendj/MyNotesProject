@@ -77,6 +77,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String statusDetailing;
 
     private Boolean payByCashier;
+    private Boolean oneActiveCard;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
@@ -456,6 +457,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         }
         org.setRefectoryType(refectoryType);
         org.setPayByCashier(payByCashier);
+        org.setOneActiveCard(oneActiveCard);
 
 
 
@@ -586,5 +588,13 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setPayByCashier(Boolean payByCashier) {
         this.payByCashier = payByCashier;
+    }
+
+    public Boolean getOneActiveCard() {
+        return oneActiveCard;
+    }
+
+    public void setOneActiveCard(Boolean oneActiveCard) {
+        this.oneActiveCard = oneActiveCard;
     }
 }

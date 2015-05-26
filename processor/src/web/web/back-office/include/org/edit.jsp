@@ -211,6 +211,9 @@
 
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.payByCashier}"  styleClass="input-text"  />
+
+    <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.oneActiveCard}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"

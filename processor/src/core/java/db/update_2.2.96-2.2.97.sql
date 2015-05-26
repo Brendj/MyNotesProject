@@ -46,4 +46,7 @@ where state =2;
 ALTER TABLE cf_goods_requests_positions ADD COLUMN notified BOOLEAN DEFAULT TRUE;
 
 
+ALTER TABLE cf_orgs ADD COLUMN OneActiveCard integer;
+
+
 --! ФИНАЛИЗИРОВАН (Сунгатов, 150526) НЕ МЕНЯТЬ

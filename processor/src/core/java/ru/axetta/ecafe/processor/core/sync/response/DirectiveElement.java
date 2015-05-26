@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
@@ -56,6 +57,9 @@ public class DirectiveElement {
         OrgRepository orgRepository = OrgRepository.getInstance();
         Long paymentContragentId = orgRepository.isPaymentByCashierEnabled(org.getIdOfOrg());
         directiveItemList.add(new DirectiveItem("UseAccountDepositInPos",paymentContragentId != null?"1":"0", paymentContragentId!=null?""+paymentContragentId:null));
+
+        Boolean oneActiveCard = OrgReadOnlyRepository.getInstance().isOneActiveCard(org.getIdOfOrg());
+        directiveItemList.add(new DirectiveItem("UseOnlyOneActiveMainCard",oneActiveCard ?"1":"0"));
     }
 
     public Element toElement(Document document) throws Exception {
