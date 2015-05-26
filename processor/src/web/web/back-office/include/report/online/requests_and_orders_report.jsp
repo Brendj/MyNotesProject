@@ -124,13 +124,6 @@
                              actionListener="#{mainPage.requestsAndOrdersReportPage.onFeedingPlanTypeChange}" />
             </h:selectOneMenu>
 
-            <h:outputText escape="true" value="Построить отчет с пустой строкой при отсутствии данных на период" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{mainPage.requestsAndOrdersReportPage.noNullReport}"
-                                     styleClass="output-text">
-                <a4j:support event="onclick" reRender="requestsAndOrdersReportFilterPanelGrid" ajaxSingle="true"
-                             actionListener="#{mainPage.requestsAndOrdersReportPage.onNoNullReportChange}" />
-            </h:selectBooleanCheckbox>
-
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
