@@ -111,6 +111,7 @@ public class CardService {
         card.setState(CardState.ISSUEDTEMP.getValue());
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
+
         //updateCard(card);
         updateClient(client);
 
@@ -151,16 +152,17 @@ public class CardService {
     //5. Сброс (возврат, аннулирование) карты
     public void reset(Card card){
 
-        Client client = card.getClient();
+        //Client client = card.getClient();
         card.setClient(null);
         card.setState(CardState.FREE.getValue());
         card.setValidTime(new Date());
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
-        if(client != null){
-            updateClient(client);
-        }
         updateCard(card);
+        //if(client != null){
+        //    client.getCards().remove(card);
+        //    updateClient(client);
+        //}
     }
 
 
@@ -180,9 +182,8 @@ public class CardService {
         card.setValidTime(new Date());
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
-        if(card.getClient() == null){
-            updateCard(card);
-        }else {
+        updateCard(card);
+        if(card.getClient() != null){
             updateClient(card.getClient());
         }
     }
@@ -199,16 +200,21 @@ public class CardService {
     }
     //7.	Блокировка карты со сбросом
     public void blockAndReset(Card card){
+
+        //Client client = card.getClient();
+        card.setClient(null);
         card.setState(CardState.BLOCKEDANDRESET.getValue());
         card.setValidTime(new Date());
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
-        if(card.getClient() == null){
-            updateCard(card);
-        }else {
-            updateClient(card.getClient());
-        }
+        updateCard(card);
+        //if(client != null){
+        //    client.getCards().remove(card);
+        //    updateClient(client);
+        //}
     }
+
+
 
     public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());
@@ -221,23 +227,20 @@ public class CardService {
         return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
     }
     //8.	Разблокировка карты
-    public void unblock(Card card){
+    public void unblock(Card card, CardsOperationsRegistryItem o){
         if(CardState.BLOCKED.getValue() == card.getState()){
-            if(card.getValidTime() == null){
-                card.setState(CardState.ISSUED.getValue());
-            }else if(card.getValidTime().getTime() > (System.currentTimeMillis() + Card.DEFAULT_TEMP_CARD_VALID_TIME)){
-                card.setState(CardState.ISSUED.getValue());
-            }else if (card.getClient()!= null){
-                card.setState(CardState.ISSUEDTEMP.getValue());
-            }else {
+            if (card.getClient()!= null){
+                if(o.getTemp() != null && o.getTemp() ){
+                    card.setState(CardState.ISSUEDTEMP.getValue());
+                }else{
+                    card.setState(CardState.ISSUED.getValue());
+                }
+            } else {
                 card.setState(CardState.FREE.getValue());
             }
-            card.setValidTime(card.getValidTime());
-            card.setIssueTime(new Date());
             card.setUpdateTime(new Date());
-            if(card.getClient() == null){
-                updateCard(card);
-            }else {
+            updateCard(card);
+            if(card.getClient() != null){
                 updateClient(card.getClient());
             }
         }else if (CardState.BLOCKEDANDRESET.getValue() == card.getState()){
@@ -250,10 +253,11 @@ public class CardService {
         if (card == null){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
         }
-
-        //card.setValidTime(o.getValidDate());
+        if(o.getValidDate() != null){
+            card.setValidTime(o.getValidDate());
+        }
         card.setIssueTime(o.getOperationDate());
-        unblock(card);
+        unblock(card, o);
 
         return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
     }

@@ -1043,7 +1043,7 @@ public class Processor implements SyncProcessor,
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
         try {
-        accountsRegistry = new AccountsRegistryHandler().handlerFull(request.getIdOfOrg());
+        accountsRegistry = new AccountsRegistryHandler().handlerFull(request,request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
@@ -1565,7 +1565,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            accountsRegistry = new AccountsRegistryHandler().accRegistryHandler(request.getIdOfOrg());
+            accountsRegistry = new AccountsRegistryHandler().accRegistryHandler(request,request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }

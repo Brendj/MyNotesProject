@@ -31,7 +31,7 @@
         <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
 
 
-        <property name="lastAccRegistrySync" column="LastAccRegistrySync"
+        <property name="lastAccRegistrySync" column="lastaccregistrysync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
     </class>

@@ -32,9 +32,10 @@ public class CardsOperationsRegistryItem {
     private String staffGuid;
     private Date validDate;
     private String comment;
+    private Boolean isTemp;
 
     public CardsOperationsRegistryItem(long idOfOperation, long cardNo, int type, Date operationDate, Long idOfClient,
-            Long globalId, String staffGuid, Date validDate, String comment) {
+            Long globalId, String staffGuid, Date validDate, String comment, Boolean isTemp) {
         this.idOfOperation = idOfOperation;
         this.cardNo = cardNo;
         this.type = type;
@@ -44,6 +45,7 @@ public class CardsOperationsRegistryItem {
         this.staffGuid = staffGuid;
         this.validDate = validDate;
         this.comment = comment;
+        this.isTemp = isTemp;
     }
 
     public static CardsOperationsRegistryItem build(Node CardsOperationRegistry, LoadContext loadContext) throws Exception {
@@ -62,8 +64,11 @@ public class CardsOperationsRegistryItem {
              validDate = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("ValidDate").getTextContent());
         }
         String comment = getStringValueNullSafe(namedNodeMap, "Comment");
-
-        return new CardsOperationsRegistryItem(idOfOperation,cardNo,type,operationDate,idOfClient,globalId,staffGuid,validDate,comment);
+        Boolean isTemp = false;
+        if("1".equals(getStringValueNullSafe(namedNodeMap, "IsTemp")) ){
+            isTemp = true;
+        }
+        return new CardsOperationsRegistryItem(idOfOperation,cardNo,type,operationDate,idOfClient,globalId,staffGuid,validDate,comment, isTemp);
     }
 
     public long getIdOfOperation() {
@@ -100,5 +105,9 @@ public class CardsOperationsRegistryItem {
 
     public String getComment() {
         return comment;
+    }
+
+    public Boolean getTemp() {
+        return isTemp;
     }
 }

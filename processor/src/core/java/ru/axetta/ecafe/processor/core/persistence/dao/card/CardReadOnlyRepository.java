@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,9 +68,13 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public List<Card> findAllFreeByOrgAndUpdateDate(long idOfOrg, long lastUpdateDate) {
         Query query = entityManager
-                .createQuery("from Card c where c.org.idOfOrg=:idOfOrg and c.client = null and c.updateTime>:lastUpdateDate ", Card.class)
-                .setParameter("idOfOrg",idOfOrg)
-                .setParameter("lastUpdateDate",new Date(lastUpdateDate));
+                .createQuery("select c from Card c , OrgSync os " + " where c.org.idOfOrg=:idOfOrg "
+                        + " and c.client = null " + " and c.org = os.org "
+                        + " and c.updateTime >  os.lastAccRegistrySync "
+                        //+ " and c.updateTime>:lastUpdateDate "
+                        , Card.class)
+                .setParameter("idOfOrg", idOfOrg);
+                //.setParameter("lastUpdateDate",new Date(lastUpdateDate));
 
         return query.getResultList();
     }

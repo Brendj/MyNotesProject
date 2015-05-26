@@ -32,7 +32,10 @@ import java.util.List;
 public class AccountsRegistryHandler {
 
     @Transactional
-    public AccountsRegistry handlerFull(long idOfOrg) {
+    public AccountsRegistry handlerFull(SyncRequest request,long idOfOrg) {
+        if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
+            return null;
+        }
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
         List<Long> idOfOrgs = OrgReadOnlyRepository.getInstance().findFriendlyOrgIds(idOfOrg);
@@ -55,7 +58,10 @@ public class AccountsRegistryHandler {
     }
 
 
-    public AccountsRegistry accRegistryHandler(long idOfOrg) {
+    public AccountsRegistry accRegistryHandler(SyncRequest request,long idOfOrg) {
+        if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
+            return null;
+        }
         OrgSyncReadOnlyRepository orgSyncReadOnlyRepository = OrgSyncReadOnlyRepository.getInstance();
 
         Long lastAccRegistrySyncDate = orgSyncReadOnlyRepository.findLastAccRegistrySyncDate(idOfOrg);
@@ -63,10 +69,12 @@ public class AccountsRegistryHandler {
             return null;
         }
 
+        List<Long> idOfOrgs = OrgReadOnlyRepository.getInstance().findFriendlyOrgIds(idOfOrg);
+
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
         ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
-        List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrg, lastAccRegistrySyncDate);
+        List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrgs, lastAccRegistrySyncDate);
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
@@ -84,6 +92,9 @@ public class AccountsRegistryHandler {
 
 
     public AccountsRegistry accRegisgtryUpdateHandler(SyncRequest request) {
+        if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
+            return null;
+        }
         if ( request.getAccountsRegistryRequest() == null ||  request.getAccountsRegistryRequest().getItems().size()== 0){
             return null;
         }
