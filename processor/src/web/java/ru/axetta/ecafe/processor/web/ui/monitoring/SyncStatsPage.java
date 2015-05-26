@@ -47,7 +47,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
         Long errorSyncCount = 0L;
         Long averageResyncTime = 0L;
         List<Long> resyncTimes = new ArrayList<Long>();
-        Long minSyncDuration = 0L;
+        Long minSyncDuration = null;
         Long averageSyncDuration = 0L;
         Long maxSyncDuration = 0L;
         List<Long> syncDurations = new ArrayList<Long>();
@@ -82,8 +82,12 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
                         resyncTimes.add(Long.parseLong(syncHistoryCalc.getValue()));
                         break;
                     case SyncHistoryCalc.MIN_SYNC_DURATION:
-                        if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                        if (minSyncDuration == null) {
                             minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        } else {
+                            if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                                minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                            }
                         }
                         break;
                     case SyncHistoryCalc.AVG_SYNC_DURATION:

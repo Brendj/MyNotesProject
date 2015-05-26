@@ -124,7 +124,7 @@ public class SyncStatsManager {
         Long errorSyncCount = 0L;
         Long averageReconnectTime = 0L; // in ms
         List<Long> reconnectIntervals = new ArrayList<Long>();
-        Long minSyncDuration = 0L; // in ms
+        Long minSyncDuration = null; // in ms
         Long averageSyncDuration = 0L; // in ms
         Long maxSyncDuration = 0L; // in ms
         List<Long> syncDurations = new ArrayList<Long>();
@@ -154,8 +154,12 @@ public class SyncStatsManager {
             if (syncData.getDuration() != null) {
                 syncDurations.add(syncData.getDuration());
             }
-            if (syncData.getDuration() < minSyncDuration) {
+            if (minSyncDuration == null) {
                 minSyncDuration = syncData.getDuration();
+            } else {
+                if (syncData.getDuration() < minSyncDuration) {
+                    minSyncDuration = syncData.getDuration();
+                }
             }
             if (syncData.getDuration() > maxSyncDuration) {
                 maxSyncDuration = syncData.getDuration();
@@ -388,7 +392,7 @@ public class SyncStatsManager {
             Long errorSyncCount = 0L;
             Long averageReconnectTime = 0L; // in ms
             List<Long> reconnectIntervals = new ArrayList<Long>();
-            Long minSyncDuration = 0L; // in ms
+            Long minSyncDuration = null; // in ms
             Long averageSyncDuration = 0L; // in ms
             Long maxSyncDuration = 0L; // in ms
             List<Long> syncDurations = new ArrayList<Long>();
@@ -407,8 +411,12 @@ public class SyncStatsManager {
                         reconnectIntervals.add(Long.parseLong(syncHistoryCalc.getValue()));
                         break;
                     case SyncHistoryCalc.MIN_SYNC_DURATION:
-                        if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                        if (minSyncDuration == null) {
                             minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                        } else {
+                            if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                                minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                            }
                         }
                         break;
                     case SyncHistoryCalc.AVG_SYNC_DURATION:
