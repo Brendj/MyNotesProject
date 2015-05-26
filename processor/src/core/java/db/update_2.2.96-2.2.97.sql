@@ -27,3 +27,23 @@ CREATE TABLE cf_synchistory_calc2 (
 ALTER TABLE CF_Generators ADD COLUMN idOfSyncHistoryCalc BIGINT NOT NULL DEFAULT 0;
 update cf_generators set idOfSyncHistoryCalc= (select  case when max(idOfSyncHistoryCalc) is null THEN 0 else (max(idOfSyncHistoryCalc)+1) end  from cf_synchistory_calc2 );
 
+
+
+--обновляем орг ид у карт
+update cf_cards set idoforg=s.i
+from (select c.idofcard a, cl.idoforg as i from cf_cards c inner join cf_clients cl on c.idofclient = cl.idofclient) as s
+where s.a = cf_cards.idofcard;
+
+
+
+alter table cf_orgs_sync add column LastAccRegistrySync bigint  ;
+
+
+update cf_cards
+set state =1
+where state =2;
+
+ALTER TABLE cf_goods_requests_positions ADD COLUMN notified BOOLEAN DEFAULT TRUE;
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150526) НЕ МЕНЯТЬ

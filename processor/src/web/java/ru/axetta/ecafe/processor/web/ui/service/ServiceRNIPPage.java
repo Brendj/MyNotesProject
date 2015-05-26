@@ -33,7 +33,7 @@ public class ServiceRNIPPage extends BasicWorkspacePage {
 
     public void run(){
         endDate = CalendarUtils.endOfDay(endDate);
-        logger.warn("Manual launch RNIPService startDate:" + startDate.toString() + ", endDate:" + endDate.toString());
+        logger.error("Manual launch RNIPService startDate:" + startDate.toString() + ", endDate:" + endDate.toString());
 
         RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getInstance();
         rnipLoadPaymentsService.run(startDate,endDate);
