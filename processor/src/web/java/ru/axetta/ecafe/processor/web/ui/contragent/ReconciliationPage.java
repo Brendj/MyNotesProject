@@ -30,7 +30,8 @@ import java.util.regex.Pattern;
 @Scope("session")
 public class ReconciliationPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
     final static String FIELD_ID_OF_PAYMENT="idOfPayment", FIELD_ID_OF_CONTRACT="idOfContract", FIELD_SUM="sum",
-        FIELD_SEPARATORS="separators", FIELD_DATE="date", PAYMENT_TRANSFORM="paymentTransform", SKIP_LINE="skipLine";
+        FIELD_SEPARATORS="separators", FIELD_DATE="date", PAYMENT_TRANSFORM="paymentTransform", SKIP_LINE="skipLine",
+        FIELD_ID_SIZE="idSize", FIELD_ID_SKIP_PATTERN="idSkipPattern";
     
     private Long caAgent;
     private Long caReceiver;
@@ -44,7 +45,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private String settings;
     private List<UploadItem> fileItems = new ArrayList<UploadItem>();
     private int exportType = 0;
-    private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
+    private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal1();
     private LineConfig defaultLineConfig;
     private boolean dateDependent = false;
 
@@ -126,8 +127,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
 
     public static class LineConfig {
         Pattern separators;
-        Integer nIdOfContractField, nIdOfPaymentField, nSumField, nDateField;
-        String paymentTransform;
+        Integer nIdOfContractField, nIdOfPaymentField, nSumField, nDateField, idSize;
+        String paymentTransform, idSkipPattern;
         boolean skipFirst, skipLast;
     }
 
@@ -230,6 +231,26 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         if (lineConfig.paymentTransform != null) {
             idOfPayment = lineConfig.paymentTransform + idOfPayment;
         }
+        if (lineConfig.idSkipPattern != null && lineConfig.idSkipPattern.length() > 0) {
+            Boolean isMatch = true;
+            Integer cycleSize =
+                    lineConfig.idSkipPattern.length() < idOfPayment.length() ? lineConfig.idSkipPattern.length()
+                            : idOfPayment.length();
+            for (int i = 0; i < cycleSize; i++) {
+                if (idOfPayment.charAt(i) != lineConfig.idSkipPattern.charAt(i)) {
+                    isMatch = false;
+                    break;
+                }
+            }
+            if (isMatch) {
+                idOfPayment = idOfPayment.substring(lineConfig.idSkipPattern.length() - 1, idOfPayment.length());
+            }
+        }
+        if (lineConfig.idSize != null) {
+            if (idOfPayment.length() > lineConfig.idSize) {
+                idOfPayment = idOfPayment.substring(idOfPayment.length() - lineConfig.idSize, idOfPayment.length());
+            }
+        }
         String dtNormal = localDateFormat.format(df.parse(dt));
         return new PaymentReconciliationManager.RegistryItem(dt, dtNormal, sum, idOfContract, idOfPayment);
     }
@@ -268,6 +289,10 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
                     lineConfig.skipLast = true;
                 }
             }
+        } else if (n.compareToIgnoreCase(FIELD_ID_SIZE) == 0) {
+            lineConfig.idSize = Integer.parseInt(v);
+        } else if (n.compareToIgnoreCase(FIELD_ID_SKIP_PATTERN) == 0) {
+            lineConfig.idSkipPattern = StringUtils.substringBefore(v, "#");
         } else {
             throw new Exception("Неизвестный параметр: " + n);
         }
