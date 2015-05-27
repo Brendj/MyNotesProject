@@ -373,13 +373,6 @@ public class CalendarUtils {
         return df;
     }
 
-
-    public static DateFormat getDateFormatLocal1() {
-        DateFormat df = new SimpleDateFormat("ddMMyyyy");
-        df.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
-        return df;
-    }
-
     public static boolean isWorkingDate(Date date) {
         int day = getDayOfMonth(date);
         return day != Calendar.SUNDAY;
