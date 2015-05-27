@@ -45,7 +45,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private String settings;
     private List<UploadItem> fileItems = new ArrayList<UploadItem>();
     private int exportType = 0;
-    private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal1();
+    private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
     private LineConfig defaultLineConfig;
     private boolean dateDependent = false;
 
