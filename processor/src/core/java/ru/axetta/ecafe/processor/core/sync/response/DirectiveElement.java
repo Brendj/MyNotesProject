@@ -60,6 +60,9 @@ public class DirectiveElement {
 
         Boolean oneActiveCard = OrgReadOnlyRepository.getInstance().isOneActiveCard(org.getIdOfOrg());
         directiveItemList.add(new DirectiveItem("UseOnlyOneActiveMainCard",oneActiveCard ?"1":"0"));
+
+        Boolean commodityAccounting = org.getCommodityAccounting();
+        directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
     }
 
     public Element toElement(Document document) throws Exception {
