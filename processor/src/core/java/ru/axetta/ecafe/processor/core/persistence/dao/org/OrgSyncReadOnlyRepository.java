@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,15 +34,16 @@ public class OrgSyncReadOnlyRepository extends BaseJpaDao {
     }
 
 
-    public Long findLastAccRegistrySyncDate(long idOfOrg){
+    public Date findLastAccRegistrySyncDate(long idOfOrg){
         List resultList = entityManager
                 .createNativeQuery("select lastAccRegistrySync from CF_Orgs_sync where IdOfOrg = :idOfOrg")
                 .setParameter("idOfOrg", idOfOrg).getResultList();
         if(resultList.size() > 0){
-            return ((BigInteger)resultList.get(0)).longValue();
-        }else{
-            return null;
+            if (resultList.get(0) != null) {
+                long l = ((BigInteger) resultList.get(0)).longValue();
+                return new Date(l);
+            }
         }
-
+        return null;
     }
 }

@@ -135,7 +135,11 @@ public class CardListPage extends BasicWorkspacePage implements OrgSelectPage.Co
 
         public Item(Card card) {
             this.idOfCard = card.getIdOfCard();
-            this.client = new ClientItem(card.getClient());
+            if(card.getClient() != null){
+                this.client = new ClientItem(card.getClient());
+            }else {
+                client= null;
+            }
             this.cardNo = card.getCardNo();
             this.cardType = card.getCardType();
             this.createTime = card.getCreateTime();

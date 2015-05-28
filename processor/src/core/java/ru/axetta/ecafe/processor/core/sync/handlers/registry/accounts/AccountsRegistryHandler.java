@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class AccountsRegistryHandler {
         }
         OrgSyncReadOnlyRepository orgSyncReadOnlyRepository = OrgSyncReadOnlyRepository.getInstance();
 
-        Long lastAccRegistrySyncDate = orgSyncReadOnlyRepository.findLastAccRegistrySyncDate(idOfOrg);
+        Date lastAccRegistrySyncDate = orgSyncReadOnlyRepository.findLastAccRegistrySyncDate(idOfOrg);
         if(lastAccRegistrySyncDate == null){
             return null;
         }
@@ -74,7 +75,7 @@ public class AccountsRegistryHandler {
         AccountsRegistry accountsRegistry = new AccountsRegistry();
 
         ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
-        List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrgs, lastAccRegistrySyncDate);
+        List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
@@ -82,7 +83,7 @@ public class AccountsRegistryHandler {
         //todo visitor
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
-        List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrg, lastAccRegistrySyncDate);
+        List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
         for (Card card : freeCards) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
         }
