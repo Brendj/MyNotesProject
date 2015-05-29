@@ -41,9 +41,17 @@
     <rich:calendar value="#{mainPage.cardEditPage.validTime}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />
     <h:outputText escape="true" value="Статус карты" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.cardEditPage.state}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.cardEditPage.cardStateMenu.items}" />
-    </h:selectOneMenu>
+    <h:panelGroup>
+        <h:selectOneMenu value="#{mainPage.cardEditPage.state}"
+                         rendered="#{!mainPage.cardEditPage.tempCard}"
+                         styleClass="input-text">
+            <f:selectItems value="#{mainPage.cardEditPage.cardStateMenu.items}" />
+        </h:selectOneMenu>
+        <a4j:commandButton value="Возврат карты"
+                           reRender="mainMenu, workspaceForm"
+                           action="#{mainPage.cardEditPage.returnCard(request.remoteUser)}"
+                           rendered="#{mainPage.cardEditPage.tempCard}"/>
+    </h:panelGroup>
     <h:outputText escape="true" value="Причина блокировки карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardEditPage.lockReason}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Статус расположения карты" styleClass="output-text" />

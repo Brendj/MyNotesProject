@@ -165,6 +165,10 @@ public class CardService {
         //}
     }
 
+    public void reset(long cardNo){
+        Card card = cardWritableRepository.findByCardNo(cardNo);
+        reset(card);
+    }
 
     public ResCardsOperationsRegistryItem reset(CardsOperationsRegistryItem o, long idOfOrg) {
         Card card = cardWritableRepository.findByCardNo(o.getCardNo());

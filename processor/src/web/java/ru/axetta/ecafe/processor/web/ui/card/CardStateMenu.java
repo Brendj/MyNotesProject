@@ -21,7 +21,7 @@ public class CardStateMenu {
 
     private List<SelectItem> items = readAllItems();
 
-    private static List<SelectItem> readAllItems() {
+    public static List<SelectItem> readAllItems() {
         //SelectItem[] items = new SelectItem[Card.STATE_NAMES.length];
         //for (int i = 0; i < items.length; ++i) {
         //    items[i] = new SelectItem(i, Card.STATE_NAMES[i]);
@@ -52,5 +52,9 @@ public class CardStateMenu {
 
     public List<SelectItem> getItems() {
         return items;
+    }
+
+    public  void prepareItemForTempCard(){
+        items.clear();
     }
 }

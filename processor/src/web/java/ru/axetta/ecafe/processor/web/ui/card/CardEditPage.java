@@ -7,10 +7,14 @@ package ru.axetta.ecafe.processor.web.ui.card;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
@@ -156,6 +160,11 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         return cardLifeStateMenu;
     }
 
+    public void fill( Long idOfCard) throws Exception {
+        Card card = CardReadOnlyRepository.getInstance().find(idOfCard);
+        fill(card);
+    }
+
     public void fill(Session session, Long idOfCard) throws Exception {
         Card card = (Card) session.load(Card.class, idOfCard);
         fill(card);
@@ -179,7 +188,12 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public void fill(Card card) throws Exception {
         this.idOfCard = card.getIdOfCard();
-        this.client = new ClientItem(card.getClient());
+        if(card.getClient() != null){
+            this.client = new ClientItem(card.getClient());
+        }else {
+            client = new ClientItem();
+        }
+
         this.cardNo = card.getCardNo();
         this.cardType = card.getCardType();
         this.updateTime = card.getUpdateTime();
@@ -190,6 +204,30 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         this.lifeState = card.getLifeState();
         this.cardPrintedNo = card.getCardPrintedNo();
         this.externalId = card.getExternalId();
+
+        if (state == CardState.ISSUEDTEMP.getValue()) {
+            cardStateMenu.prepareItemForTempCard();
+        }else {
+            cardStateMenu.getItems().clear();
+            cardStateMenu.getItems().addAll(CardStateMenu.readAllItems());
+        }
     }
 
+    public Object returnCard(String userName) {
+
+        getLogger().error("Return cardNo:" + cardNo + ", username:" + userName);
+        CardService.getInstance().reset(cardNo);
+        try {
+            fill(this.idOfCard);
+        } catch (Exception e) {
+            getLogger().error("Ошибка ",e);
+        }
+        MainPage.getSessionInstance().showCardListPage();
+        MainPage.getSessionInstance().updateSelectedMainMenu();
+        return null;
+    }
+
+    public boolean isTempCard(){
+        return state == CardState.ISSUEDTEMP.getValue();
+    }
 }
