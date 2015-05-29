@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -22,8 +24,10 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
+    private boolean useOnlyOneActiveMainCard;
 
     private ClientItem client = new ClientItem();
+    private long idOfOrg;
     private Long cardNo;
     private Integer cardType;
     private Integer state;
@@ -136,12 +140,14 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         this.validTime = new Date();
         this.issueTime = null;
         this.lifeState = 0;
+        this.idOfOrg = -1;
     }
 
     public void completeClientSelection(Session session, Long idOfClient) throws Exception {
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
             this.client = new ClientItem(client);
+
         }
     }
 

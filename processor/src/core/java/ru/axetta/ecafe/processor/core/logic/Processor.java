@@ -473,6 +473,18 @@ public class Processor implements SyncProcessor,
             }
         }
 
+        if (state == CardState.ISSUED.getValue()){
+            boolean haveActiveCard = false;
+            for (Card card : client.getCards()) {
+                if (CardState.ISSUED.getValue() == card.getState()){
+                    haveActiveCard = true;
+                }
+            }
+            if(haveActiveCard && client.getOrg().getOneActiveCard()){
+                throw new Exception("У клиента уже есть активная карта.");
+            }
+        }
+
         logger.debug("clear active card");
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
@@ -482,6 +494,7 @@ public class Processor implements SyncProcessor,
         Card card = new Card(client, cardNo, cardType, state, validTime, lifeState, cardPrintedNo);
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);
+        card.setOrg(client.getOrg());
         persistenceSession.save(card);
 
         //История карты при создании новой карты

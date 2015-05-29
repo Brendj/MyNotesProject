@@ -13,6 +13,7 @@ import java.util.Date;
 public class ClientItem {
 
     private Long idOfClient;
+    private long idOfOrg;
     private String orgShortName;
     private final PersonItem person;
     private final PersonItem contractPerson;
@@ -40,6 +41,7 @@ public class ClientItem {
 
     public ClientItem(Client client) {
         this.idOfClient = client.getIdOfClient();
+        this.idOfOrg = client.getOrg().getIdOfOrg();
         this.orgShortName = client.getOrg().getShortName();
         this.person = new PersonItem(client.getPerson());
         this.contractPerson = new PersonItem(client.getContractPerson());
@@ -74,5 +76,9 @@ public class ClientItem {
 
     public Integer getContractState() {
         return contractState;
+    }
+
+    public long getIdOfOrg() {
+        return idOfOrg;
     }
 }
