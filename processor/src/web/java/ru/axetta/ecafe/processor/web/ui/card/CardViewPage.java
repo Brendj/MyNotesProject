@@ -105,7 +105,12 @@ public class CardViewPage extends BasicWorkspacePage {
     public void fill(Session session, Long idOfCard) throws Exception {
         Card card = (Card) session.load(Card.class, idOfCard);
         this.idOfCard = card.getIdOfCard();
-        this.client = new ClientItem(card.getClient());
+        if(card.getClient() != null){
+            this.client = new ClientItem(card.getClient());
+        }else {
+            this.client = new ClientItem();
+        }
+
         this.cardNo = card.getCardNo();
         this.cardType = card.getCardType();
         this.createTime = card.getCreateTime();
