@@ -137,6 +137,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         this.state = 0;
         this.lockReason = null;
         this.validTime = new Date();
+        this.validTime = CalendarUtils.addYear(validTime, 2);
         this.issueTime = null;
         this.lifeState = 0;
         this.idOfOrg = -1;
