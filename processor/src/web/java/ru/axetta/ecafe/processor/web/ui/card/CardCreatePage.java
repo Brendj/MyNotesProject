@@ -6,8 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -154,6 +153,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     public void createCard(Session session) throws Exception {
         RuntimeContext runtimeContext = null;
         runtimeContext = RuntimeContext.getInstance();
+        validTime = CalendarUtils.endOfDay(validTime);
         runtimeContext.getCardManager()
                 .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, this.state, this.validTime,
                         this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo);

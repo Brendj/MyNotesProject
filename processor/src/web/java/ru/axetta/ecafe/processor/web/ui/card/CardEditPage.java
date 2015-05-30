@@ -5,14 +5,12 @@
 package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
-import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
@@ -180,6 +178,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     public void updateCard(Session session, Long idOfCard) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (externalId!=null && externalId.length()==0) externalId=null;
+        validTime = CalendarUtils.endOfDay(validTime);
         runtimeContext.getCardManager()
                 .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
                         this.lifeState, this.lockReason, this.issueTime, this.externalId);
