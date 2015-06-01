@@ -128,7 +128,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
         result.add(new Item("Отбитых синхронизаций", filteredSyncCount.toString()));
         result.add(new Item("Не завершенных синхронизаций", errorSyncCount.toString()));
         result.add(new Item("Среднее время реконнекта (мс)", averageResyncTime.toString()));
-        result.add(new Item("Минимальное время синхронизации (мс)", minSyncDuration.toString()));
+        result.add(new Item("Минимальное время синхронизации (мс)", minSyncDuration !=  null ? minSyncDuration.toString() : "null"));
         result.add(new Item("Среднее время синхронизации (мс)", averageSyncDuration.toString()));
         result.add(new Item("Максимальное время синхронизации (мс)", maxSyncDuration.toString()));
 
