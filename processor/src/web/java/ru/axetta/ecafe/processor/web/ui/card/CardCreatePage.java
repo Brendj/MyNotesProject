@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
@@ -152,6 +153,8 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     }
 
     public void createCard(Session session) throws Exception {
+        CardService.getInstance().resetAllCards(client.getIdOfClient());
+
         RuntimeContext runtimeContext = null;
         runtimeContext = RuntimeContext.getInstance();
         validTime = CalendarUtils.endOfDay(validTime);

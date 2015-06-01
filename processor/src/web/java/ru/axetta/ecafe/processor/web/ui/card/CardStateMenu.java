@@ -32,6 +32,7 @@ public class CardStateMenu {
         items.add(item);
         item = new SelectItem(CardState.ISSUED.getValue(),CardState.ISSUED.getDescription());
         items.add(item);
+
         item = new SelectItem(CardState.ISSUEDTEMP.getValue(),CardState.ISSUEDTEMP.getDescription());
         item.setDisabled(true);
         items.add(item);

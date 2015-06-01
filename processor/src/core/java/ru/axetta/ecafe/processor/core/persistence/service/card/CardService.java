@@ -96,6 +96,11 @@ public class CardService {
         if(client == null) {
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CLIENT_NOT_FOUND_MESSAGE);
         }
+        if(client.getCards().size()>0){
+            for (Card card1 : client.getCards()) {
+                reset(card1);
+            }
+        }
         card.setValidTime(o.getValidDate());
         card.setIssueTime(o.getOperationDate());
 
@@ -163,6 +168,18 @@ public class CardService {
         //    client.getCards().remove(card);
         //    updateClient(client);
         //}
+    }
+    public void resetAllCards(long idOfClient){
+        Client client = clientWritableRepository.findWithCards(idOfClient);
+        if(client!= null){
+            resetAllCards(client);
+        }
+    }
+
+    public void resetAllCards(Client client){
+        for (Card card : client.getCards()) {
+            reset(card);
+        }
     }
 
     public void reset(long cardNo){

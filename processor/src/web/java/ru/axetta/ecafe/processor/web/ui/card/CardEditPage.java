@@ -176,6 +176,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     }
 
     public void updateCard(Session session, Long idOfCard) throws Exception {
+        checkCardStateOnUpdate();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (externalId!=null && externalId.length()==0) externalId=null;
         validTime = CalendarUtils.endOfDay(validTime);
@@ -209,6 +210,14 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         }else {
             cardStateMenu.getItems().clear();
             cardStateMenu.getItems().addAll(CardStateMenu.readAllItems());
+        }
+    }
+
+    private void checkCardStateOnUpdate(){
+        if( (CardState.ISSUED.getValue()!=state)
+                &&(CardState.BLOCKED.getValue() != state)
+                &&(CardState.ISSUEDTEMP.getValue() != state)){
+            throw new IllegalStateException("Требуется изменить статус карты");
         }
     }
 
