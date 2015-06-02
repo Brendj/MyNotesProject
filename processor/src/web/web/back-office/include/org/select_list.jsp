@@ -32,17 +32,19 @@
 </style>
 
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
-    <rich:hotKey key="ctrl+a" handler="selectAll();return false;"/>
-    <rich:hotKey key="ctrl+d" handler="deselectAll();return false;"/>
+    <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;" />
+    <rich:hotKey key="ctrl+a" handler="selectAll();return false;" />
+    <rich:hotKey key="ctrl+d" handler="deselectAll();return false;" />
 
     <f:facet name="header">
         <h:outputText escape="true" value="#{mainPage.orgFilterPageName}" />
     </f:facet>
-    <a4j:form id="modalOrgListSelectorForm" binding="#{mainPage.orgListSelectPage.pageComponent}" styleClass="borderless-form"
-              eventsQueue="modalOrgListSelectorFormEventsQueue">
-        <a4j:jsFunction name="selectAll" action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
-        <a4j:jsFunction name="deselectAll" action="#{mainPage.clearOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
+    <a4j:form id="modalOrgListSelectorForm" binding="#{mainPage.orgListSelectPage.pageComponent}"
+              styleClass="borderless-form" eventsQueue="modalOrgListSelectorFormEventsQueue">
+        <a4j:jsFunction name="selectAll" action="#{mainPage.selectAllOrgListSelectedItemsList}"
+                        reRender="modalOrgListSelectorForm" />
+        <a4j:jsFunction name="deselectAll" action="#{mainPage.clearOrgListSelectedItemsList}"
+                        reRender="modalOrgListSelectorForm" />
 
         <table class="borderless-grid" width="750">
             <tr>
@@ -62,7 +64,8 @@
                                                         alt="" />
                                     </h:panelGrid>
                                     <h:outputText id="objects" style="font-weight:bold" styleClass="output-text" />
-                                    <rich:suggestionbox limitToList="5" height="200" width="790" usingSuggestObjects="true"
+                                    <rich:suggestionbox limitToList="5" height="200" width="790"
+                                                        usingSuggestObjects="true"
                                                         onobjectchange="printObjectsSelected(#{rich:element('objects')}, #{rich:component('suggestion')});"
                                                         suggestionAction="#{mainPage.orgListSelectPage.autoComplete}"
                                                         var="orgShortName" for="statesinput" frame="box"
@@ -73,8 +76,7 @@
                                         </h:column>
                                     </rich:suggestionbox>
                                 </h:panelGrid>
-                                <rich:simpleTogglePanel label="Показать фильтры" switchType="client"
-                                                        opened="false"
+                                <rich:simpleTogglePanel label="Показать фильтры" switchType="client" opened="false"
                                                         styleClass="borderNone" timeout="10"
                                                         headerClass="imageNone borderNone linkClass"
                                                         bodyClass="imageNone borderNone">
@@ -85,6 +87,13 @@
                                         <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                         <h:inputText value="#{mainPage.orgListSelectPage.idFilter}" size="110"
                                                      maxlength="120" styleClass="input-text" />
+                                        <h:outputText escape="true" value="Фильтр по округу: "
+                                                      styleClass="output-text" />
+                                        <h:selectOneMenu id="regionsList" value="#{mainPage.orgListSelectPage.region}"
+                                                         style="width:325px;"
+                                                         disabled="#{mainPage.orgListSelectPage.districtFilterDisabled}">
+                                            <f:selectItems value="#{mainPage.orgListSelectPage.regions}" />
+                                        </h:selectOneMenu>
                                     </h:panelGrid>
                                     <h:panelGrid id="radioButtons" columns="1" styleClass="borderless-grid">
                                         <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}"
@@ -93,9 +102,16 @@
                                                          action="#{mainPage.updateOrgListSelectPageWithItemDeselection}"
                                                          reRender="modalOrgListSelectorForm" />
 
-                                            <f:selectItem itemValue="0" itemLabel="Любые организации" itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}" />
-                                            <f:selectItem itemValue="1" itemLabel="Только ОУ" itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}" />
-                                            <f:selectItem itemValue="2" itemLabel="Только поставщики" itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
+                                            <f:selectItem itemValue="0" itemLabel="Любые организации"
+                                                          itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}" />
+                                            <f:selectItem itemValue="1" itemLabel="Только ОУ"
+                                                          itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}" />
+                                            <f:selectItem itemValue="4" itemLabel="Только ДОУ"
+                                                          itemDisabled="#{mainPage.orgListSelectPage.primarySchoolFilterDisabled}" />
+                                            <f:selectItem itemValue="5" itemLabel="Только СОШ"
+                                                          itemDisabled="#{mainPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
+                                            <f:selectItem itemValue="2" itemLabel="Только поставщики"
+                                                          itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
                                         </h:selectOneRadio>
                                     </h:panelGrid>
                                 </rich:simpleTogglePanel>
@@ -111,13 +127,16 @@
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.tagFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.idFilter}" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.region}" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
-                        <a4j:commandButton action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"
-                                         styleClass="command-link" value="Выбрать все" />
-                        <a4j:commandButton action="#{mainPage.clearOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"
-                                         styleClass="command-link" value="Очистить выбор" />
+                        <a4j:commandButton action="#{mainPage.selectAllOrgListSelectedItemsList}"
+                                           reRender="modalOrgListSelectorForm" styleClass="command-link"
+                                           value="Выбрать все" />
+                        <a4j:commandButton action="#{mainPage.clearOrgListSelectedItemsList}"
+                                           reRender="modalOrgListSelectorForm" styleClass="command-link"
+                                           value="Очистить выбор" />
                     </h:panelGrid>
                 </td>
             </tr>
@@ -140,12 +159,12 @@
                                           styleClass="output-text" />
                         </rich:column>
                         <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{item.address}"
-                                          styleClass="output-text" />
+                            <h:outputText escape="true" value="#{item.address}" styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">
-                            <rich:datascroller for="modalOrgListSelectorOrgTable" renderIfSinglePage="false" maxPages="5"
-                                               fastControls="hide" stepControls="auto" boundaryControls="hide">
+                            <rich:datascroller for="modalOrgListSelectorOrgTable" renderIfSinglePage="false"
+                                               maxPages="5" fastControls="hide" stepControls="auto"
+                                               boundaryControls="hide">
                                 <a4j:support event="onpagechange" />
                                 <f:facet name="previous">
                                     <h:graphicImage value="/images/16x16/left-arrow.png" />

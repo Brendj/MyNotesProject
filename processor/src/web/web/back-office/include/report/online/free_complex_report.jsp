@@ -8,7 +8,8 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid id="freeComplexReportPanelGrid" binding="#{mainPage.freeComplexReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="freeComplexReportPanelGrid" binding="#{mainPage.freeComplexReportPage.pageComponent}"
+             styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{mainPage.freeComplexReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -16,21 +17,23 @@
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{mainPage.freeComplexReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="#{mainPage.freeComplexReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{mainPage.freeComplexReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.freeComplexReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildFreeComplexReport}"
-                           reRender="workspaceTogglePanel, freeComplexReportTable"
-                           styleClass="command-button" status="cReportGenerateStatus" />
+                           reRender="workspaceTogglePanel, freeComplexReportTable" styleClass="command-button"
+                           status="cReportGenerateStatus" />
         <a4j:status id="cReportGenerateStatus">
             <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
     </h:panelGrid>
@@ -112,8 +115,8 @@
                 <h:outputText styleClass="output-text" value="#{complex.lastTimeSale}" converter="timeConverter" />
             </rich:column>
             <f:facet name="footer">
-                <rich:datascroller for="freeComplexReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
+                <rich:datascroller for="freeComplexReportTable" renderIfSinglePage="false" maxPages="10"
+                                   fastControls="hide" stepControls="auto" boundaryControls="hide">
                     <f:facet name="previous">
                         <h:graphicImage value="/images/16x16/left-arrow.png" />
                     </f:facet>
@@ -123,7 +126,8 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showFreeComplexCSVList}" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showFreeComplexCSVList}"
+                         styleClass="command-button" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

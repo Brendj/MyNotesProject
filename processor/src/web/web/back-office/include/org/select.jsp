@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalOrgSelectorPanel" autosized="true" width="700" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
+    <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;" />
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор организации" />
     </f:facet>
@@ -23,7 +23,8 @@
                                      styleClass="input-text" />
                         <a4j:commandLink styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}" reRender="modalOrgSelectorForm"/>
+                            <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}"
+                                         reRender="modalOrgSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="3" styleClass="borderless-grid">
@@ -34,22 +35,36 @@
                             <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.tagFilter}" size="48" maxlength="128"
                                          styleClass="input-text" />
-                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
+                            <h:outputText escape="true" value="Фильтр по 1ID: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.idFilter}" size="48" maxlength="128"
                                          styleClass="input-text" />
+                            <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text" />
+                            <h:selectOneMenu id="regionsList" value="#{mainPage.orgSelectPage.region}"
+                                             style="width:325px;"
+                                             disabled="#{mainPage.orgSelectPage.districtFilterDisabled}">
+                                <f:selectItems value="#{mainPage.orgSelectPage.regions}" />
+                            </h:selectOneMenu>
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
                         </a4j:commandLink>
                     </h:panelGrid>
-                    <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
-                                      styleClass="output-text" >
-                        <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}" reRender="modalOrgSelectorForm"/>
+                    <h:selectOneRadio value="#{mainPage.orgSelectPage.supplierFilter}" converter="javax.faces.Integer"
+                                      styleClass="output-text">
+                        <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
+                                     reRender="modalOrgSelectorForm" />
 
-                        <f:selectItem itemValue="0" itemLabel="Любые организации" itemDisabled="#{mainPage.orgSelectPage.allOrgFilterDisabled}"/>
-                        <f:selectItem itemValue="1" itemLabel="Только ОУ" itemDisabled="#{mainPage.orgSelectPage.schoolFilterDisabled}"/>
-                        <f:selectItem itemValue="2" itemLabel="Только поставщики" itemDisabled="#{mainPage.orgSelectPage.supplierFilterDisabled}"/>
+                        <f:selectItem itemValue="0" itemLabel="Любые организации"
+                                      itemDisabled="#{mainPage.orgSelectPage.allOrgFilterDisabled}" />
+                        <f:selectItem itemValue="1" itemLabel="Только ОУ"
+                                      itemDisabled="#{mainPage.orgSelectPage.schoolFilterDisabled}" />
+                        <f:selectItem itemValue="4" itemLabel="Только ДОУ"
+                                      itemDisabled="#{mainPage.orgSelectPage.primarySchoolFilterDisabled}" />
+                        <f:selectItem itemValue="5" itemLabel="Только СОШ"
+                                      itemDisabled="#{mainPage.orgSelectPage.secondarySchoolFilterDisabled}" />
+                        <f:selectItem itemValue="2" itemLabel="Только поставщики"
+                                      itemDisabled="#{mainPage.orgSelectPage.supplierFilterDisabled}" />
                     </h:selectOneRadio>
                 </td>
             </tr>
@@ -72,8 +87,7 @@
                                           styleClass="output-text" />
                         </rich:column>
                         <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{item.address}"
-                                          styleClass="output-text" />
+                            <h:outputText escape="true" value="#{item.address}" styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller for="modalOrgSelectorOrgTable" renderIfSinglePage="false" maxPages="5"

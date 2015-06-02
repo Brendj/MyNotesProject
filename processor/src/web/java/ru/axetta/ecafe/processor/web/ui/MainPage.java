@@ -1490,8 +1490,6 @@ public class MainPage implements Serializable {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-
-
             }
         }
         return null;
@@ -1528,9 +1526,10 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setTagFilter("");
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setRegion("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1570,9 +1569,10 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setTagFilter("");
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setRegion("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1608,9 +1608,10 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setTagFilter("");
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setRegion("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1705,12 +1706,22 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgListSelectPageWithItemDeselection() {
+        if (orgListSelectPage.getSupplierFilter() == 2) {
+            orgListSelectPage.setDistrictFilterDisabled(true);
+        } else {
+            orgListSelectPage.setDistrictFilterDisabled(false);
+        }
         updateOrgListSelectPage();
         orgListSelectPage.deselectAllItems();
         return null;
     }
 
     public Object updateOrgSelectPageWithItemDeselection() {
+        if (orgSelectPage.getSupplierFilter() == 2) {
+            orgSelectPage.setDistrictFilterDisabled(true);
+        } else {
+            orgSelectPage.setDistrictFilterDisabled(false);
+        }
         updateOrgSelectPage();
         return null;
     }
