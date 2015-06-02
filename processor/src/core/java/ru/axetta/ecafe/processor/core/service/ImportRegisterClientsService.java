@@ -609,7 +609,7 @@ public class ImportRegisterClientsService {
     }
 
     protected static String trim(String source, int maxLen, String clientGuid, String fieldName) {
-        if(source != null && StringUtils.isBlank(source) && source.length() > maxLen) {
+        if(source != null && !StringUtils.isBlank(source) && source.length() > maxLen) {
             String replace = source.substring(0, maxLen - 1);
             logger.error(String.format("ВНИМАНИЕ! %s (%s) ученика (%s) в Реестрах "
                     + "слишком длинное, будет применено ограничение на длинну поля "
