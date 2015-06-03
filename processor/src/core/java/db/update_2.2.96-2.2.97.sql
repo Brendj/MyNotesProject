@@ -48,5 +48,9 @@ ALTER TABLE cf_goods_requests_positions ADD COLUMN notified BOOLEAN DEFAULT TRUE
 
 ALTER TABLE cf_orgs ADD COLUMN OneActiveCard integer;
 
+update cf_orgs set oneactivecard=1;
+
+update cf_cards  set idoforg=c.idoforg from  cf_clients c
+where cf_cards.idofclient = c.idofclient;
 
 --! ФИНАЛИЗИРОВАН (Сунгатов, 150526) НЕ МЕНЯТЬ
