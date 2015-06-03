@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.dao.card;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,5 +61,26 @@ public class CardWritableRepository extends WritableJpaDao {
 
     public void update(Card card) {
         entityManager.merge(card);
+    }
+
+    public void resetAllWithStateBlockAndResetInOrg(long idOfOrg) {
+        List<Card> resultList = entityManager.createQuery("from Card c where c.org.idOfOrg = :idOfOrg and c.state=:state")
+                .setParameter("idOfOrg", idOfOrg)
+                .setParameter("state", CardState.BLOCKEDANDRESET.getValue())
+                .getResultList();
+        ClientWritableRepository clientWritableRepository = null;
+        if(resultList.size() > 0){
+             clientWritableRepository = ClientWritableRepository.getInstance();
+        }
+        for (Card card : resultList) {
+            //Client client  = card.getClient();
+            //client.getCards().remove(card);
+            card.setClient(null);
+            card.setState(CardState.FREE.getValue());
+            card.setValidTime(new Date());
+            card.setIssueTime(new Date());
+            card.setUpdateTime(new Date());
+            //clientWritableRepository.update(client);
+        }
     }
 }

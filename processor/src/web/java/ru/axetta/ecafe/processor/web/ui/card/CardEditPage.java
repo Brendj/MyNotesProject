@@ -177,6 +177,9 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public void updateCard(Session session, Long idOfCard) throws Exception {
         checkCardStateOnUpdate();
+        if(state == CardState.BLOCKED.getValue()){
+            state = CardState.BLOCKEDANDRESET.getValue();
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (externalId!=null && externalId.length()==0) externalId=null;
         validTime = CalendarUtils.endOfDay(validTime);

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncReadOnlyRepository;
@@ -34,6 +35,7 @@ public class AccountsRegistryHandler {
 
     @Transactional
     public AccountsRegistry handlerFull(SyncRequest request,long idOfOrg) {
+        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
@@ -60,6 +62,7 @@ public class AccountsRegistryHandler {
 
 
     public AccountsRegistry accRegistryHandler(SyncRequest request,long idOfOrg) {
+        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
@@ -93,6 +96,7 @@ public class AccountsRegistryHandler {
 
 
     public AccountsRegistry accRegisgtryUpdateHandler(SyncRequest request) {
+        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(request.getIdOfOrg());
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }

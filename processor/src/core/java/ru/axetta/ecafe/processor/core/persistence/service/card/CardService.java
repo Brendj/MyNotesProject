@@ -161,8 +161,6 @@ public class CardService {
         card.setClient(null);
         card.setState(CardState.FREE.getValue());
         card.setValidTime(new Date());
-        card.setIssueTime(new Date());
-        card.setUpdateTime(new Date());
         updateCard(card);
         //if(client != null){
         //    client.getCards().remove(card);

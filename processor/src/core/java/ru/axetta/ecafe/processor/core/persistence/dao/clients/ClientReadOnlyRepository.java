@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,6 @@ import java.util.List;
  * Time: 13:03
  */
 @Repository
-
 public class ClientReadOnlyRepository  extends BaseJpaDao {
 
     public static ClientReadOnlyRepository getInstance() {
@@ -72,5 +72,17 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
                 .createQuery("from Client c where c.idOfClient in (:idOfClients)")
                 .setParameter("idOfClients", idOfClients)
                 .getResultList();
+    }
+
+    public Client findWithCards( Long id ){
+        TypedQuery<Client> query = entityManager
+                .createQuery("select c from Client c left join fetch c.cardsInternal where c.idOfClient=:idOfClient", Client.class);
+        query.setParameter("idOfClient",id);
+        List<Client> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return resultList.get(0);
+        }else {
+            return null;
+        }
     }
 }

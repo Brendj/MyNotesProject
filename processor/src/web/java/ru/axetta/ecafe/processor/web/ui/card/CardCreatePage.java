@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -14,6 +17,8 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import org.hibernate.Session;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.Date;
 
 /**
@@ -39,6 +44,8 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     private final CardTypeMenu cardTypeMenu = new CardTypeMenu();
     private final CardStateMenu cardStateMenu = new CardStateMenu();
     private final CardLifeStateMenu cardLifeStateMenu = new CardLifeStateMenu();
+
+    private boolean clientHasActiveCard = false;
 
     public String getPageFilename() {
         return "card/create";
@@ -148,11 +155,19 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
             this.client = new ClientItem(client);
-
+            for (Card card : client.getCards()) {
+                if(card.getState() == CardState.ISSUED.getValue()
+                        || card.getState() == CardState.BLOCKED.getValue() ){
+                    clientHasActiveCard = true;
+                }
+            }
         }
     }
 
     public void createCard(Session session) throws Exception {
+        if (isClientHasActiveCard()){
+            throw new IllegalStateException("У данного клиента уже есть активная карта.");
+        }
         CardService.getInstance().resetAllCards(client.getIdOfClient());
 
         RuntimeContext runtimeContext = null;
@@ -163,4 +178,8 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
                         this.lifeState, this.lockReason, this.issueTime, this.cardPrintedNo);
     }
 
+
+    public boolean isClientHasActiveCard() {
+        return clientHasActiveCard;
+    }
 }

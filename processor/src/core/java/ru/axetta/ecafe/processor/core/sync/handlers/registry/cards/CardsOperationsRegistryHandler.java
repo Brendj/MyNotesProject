@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
@@ -40,12 +44,22 @@ public class CardsOperationsRegistryHandler {
             resCardsOperationsRegistry.getItemList().add(item);
         }
 
+        dropAllBlockedWithResetCards(idOfOrg);
+
         return resCardsOperationsRegistry;
+    }
+
+    private void dropAllBlockedWithResetCards(long idOfOrg){
+        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
     }
 
     private ResCardsOperationsRegistryItem handle(CardsOperationsRegistryItem o,long idOfOrg) {
         CardService cardService = CardService.getInstance();
         ResCardsOperationsRegistryItem registryItem;
+        Card byCardNo = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
+        if (byCardNo != null && byCardNo.getState() == CardState.BLOCKEDANDRESET.getValue()){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE );
+        }
         switch (o.getType()){
             case 0:
                 registryItem = cardService.registerNew(o, idOfOrg);
