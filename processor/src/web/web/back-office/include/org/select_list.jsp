@@ -108,7 +108,7 @@
                                                           itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}" />
                                             <f:selectItem itemValue="4" itemLabel="Только ДОУ"
                                                           itemDisabled="#{mainPage.orgListSelectPage.primarySchoolFilterDisabled}" />
-                                            <f:selectItem itemValue="5" itemLabel="Только СОШ"
+                                            <f:selectItem itemValue="5" itemLabel="Только СОУ"
                                                           itemDisabled="#{mainPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
                                             <f:selectItem itemValue="2" itemLabel="Только поставщики"
                                                           itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
