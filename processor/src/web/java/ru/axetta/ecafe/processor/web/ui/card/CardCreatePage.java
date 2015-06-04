@@ -155,11 +155,8 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
             this.client = new ClientItem(client);
-            for (Card card : client.getCards()) {
-                if(card.getState() == CardState.ISSUED.getValue()
-                        || card.getState() == CardState.BLOCKED.getValue() ){
-                    clientHasActiveCard = true;
-                }
+            if (client.getCards().size() > 0) {
+                clientHasActiveCard = true;
             }
         }
     }
