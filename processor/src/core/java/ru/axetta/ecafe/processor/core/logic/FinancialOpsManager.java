@@ -173,9 +173,10 @@ public class FinancialOpsManager {
                 payment.getSocDiscount(), payment.getTrdDiscount(), payment.getGrant(), payment.getRSum(),
                 payment.getTime(),payment.getOrderDate(), payment.getSumByCard(), payment.getSumByCash(),payment.getComments(), client, card, orderTransaction, pos,
                 supplier, payment.getOrderType(), payment.getIdOfPayForClient());
-
-        Long idOfClientGroup = DAOService.getInstance().getClientGroupByClientId(client.getIdOfClient());
-        order.setIdOfClientGroup(idOfClientGroup);
+        if(client != null){
+            Long idOfClientGroup = DAOService.getInstance().getClientGroupByClientId(client.getIdOfClient());    //
+            order.setIdOfClientGroup(idOfClientGroup);
+        }
 
         Long sumByCard = order.getSumByCard();
         Long budgetSum = order.getSocDiscount() + order.getGrantSum();
