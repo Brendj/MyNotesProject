@@ -687,6 +687,10 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
+        if (RuntimeContext.getInstance().isTestMode()){
+            return;
+        }
+
         MessageContext msgContext = wsContext.getMessageContext();
         HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
         X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");

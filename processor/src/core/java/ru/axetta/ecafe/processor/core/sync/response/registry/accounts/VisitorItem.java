@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.response.registry.accounts;
 
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardTemp;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -21,6 +25,13 @@ public class VisitorItem {
     private long idOfVisitor;
 
     private List<CardsItem> cardsItems = new LinkedList<CardsItem>();
+
+    public VisitorItem(Visitor visitor) {
+        idOfVisitor = visitor.getIdOfVisitor();
+        for (Card card : visitor.getCardsInternal()) {
+            cardsItems.add(new CardsItem(card, visitor));
+        }
+    }
 
     public long getIdOfVisitor() {
         return idOfVisitor;

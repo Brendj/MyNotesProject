@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.response.registry.accounts;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
@@ -54,30 +55,36 @@ public class CardsItem {
     }
 
     public CardsItem(Card card, Client client) {
-        this.cardNo = card.getCardNo();
-        this.cardType = card.getCardType();
-        this.state = card.getState();
+        this(card);
         if(client != null){
+            this.contractId = client.getContractId();
             this.idOfClient = client.getIdOfClient();
         }else {
             this.idOfClient = null;
         }
-        this.lockReason = card.getLockReason();
-        this.validDate = card.getValidTime();
-        this.issueDate = card.getIssueTime();
+
         if(card.getOrg() != null){
             this.orgOwner = card.getOrg().getIdOfOrg();
         }else {
             this.orgOwner = client.getOrg().getIdOfOrg();
         }
+    }
+    public CardsItem(Card card){
+        this.cardNo = card.getCardNo();
+        this.cardType = card.getCardType();
+        this.state = card.getState();
+        this.lockReason = card.getLockReason();
+        this.validDate = card.getValidTime();
+        this.issueDate = card.getIssueTime();
         isTemp = (card.getState() == CardState.ISSUEDTEMP.getValue());
-        //this.visistorId = card.visistorId;
-        if(client != null){
-            this.contractId = client.getContractId();
-            this.idOfClient = client.getIdOfClient();
-        }
         this.printedNo = card.getCardPrintedNo();
     }
+
+    public CardsItem(Card card, Visitor visitor){
+        this(card);
+        this.visistorId = visitor.getIdOfVisitor();
+    }
+
 
     public long getCardNo() {
         return cardNo;

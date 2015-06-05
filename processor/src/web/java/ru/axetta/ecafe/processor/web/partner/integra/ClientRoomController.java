@@ -32,6 +32,7 @@ import java.util.*;
 
 @Controller("ClientRoomController")
 @RequestMapping("/client")
+@Deprecated // Что это такое и где это используется.
 public class ClientRoomController {
     final Logger logger = LoggerFactory.getLogger(ClientRoomController.class);
     final static String XML_VIEW_NAME="xmlView";

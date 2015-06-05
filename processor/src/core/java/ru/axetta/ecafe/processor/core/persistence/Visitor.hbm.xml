@@ -40,5 +40,10 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardTemp"/>
         </set>
 
+        <set name="cardsInternal" inverse="true" cascade="all">
+            <key column="IdOfVisitor"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
+        </set>
+
     </class>
 </hibernate-mapping>

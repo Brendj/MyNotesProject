@@ -45,6 +45,7 @@ public class Card {
     private Long idOfCard;
     private long version;
     private Client client;
+    private Visitor visitor;
     private Org org;
     private Long cardNo;
     private Integer cardType;
@@ -117,6 +118,14 @@ public class Card {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public Visitor getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(Visitor visitor) {
+        this.visitor = visitor;
     }
 
     public Org getOrg() {

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.card;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 
 import org.springframework.stereotype.Repository;
@@ -83,6 +84,24 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return entityManager.createQuery("from Card c where c.cardNo in (:idOfCards) and state=:state ", Card.class)
                 .setParameter("idOfCards", idOfCards)
                 .setParameter("state", state)
+                .getResultList();
+    }
+
+    public List<Visitor> findVisitorsWithCardsByOrg(List<Long> idOfOrgs) {
+        return entityManager.createQuery(
+                "select c.visitor from Card c where c.cardNo in (:idOfOrgs) and c.client is null and c.visitor is not null",
+                Visitor.class)
+                .setParameter("idOfOrgs", idOfOrgs)
+                .getResultList();
+    }
+
+    public List<Visitor> findVisitorsWithCardsByOrgAndDate(List<Long> idOfOrgs, Date lastAccRegistrySyncDate) {
+        return entityManager.createQuery(
+                "select c.visitor from Card c where c.cardNo in (:idOfOrgs) and c.client is null and c.visitor is not null"
+                + " and c.updateTime >  :lastAccRegistrySync ",
+                Visitor.class)
+                .setParameter("idOfOrgs", idOfOrgs)
+                .setParameter("lastAccRegistrySync", lastAccRegistrySyncDate)
                 .getResultList();
     }
 }

@@ -4196,6 +4196,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
+        if (RuntimeContext.getInstance().isTestMode()){
+            return null;
+        }
         MessageContext jaxwsContext = context.getMessageContext();
         HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
         String clientAddress = request.getRemoteAddr();

@@ -28,6 +28,7 @@ public class Visitor {
     //private VisitorType visitorType;
     private Integer visitorType;
     private Set<CardTemp> cards = new HashSet<CardTemp>();
+    private Set<Card> cardsInternal = new HashSet<Card>();
     private boolean deleted;
 
     protected Visitor() {}
@@ -127,6 +128,14 @@ public class Visitor {
     @Override
     public String toString() {
         return "Visitor{idOfVisitor=" + idOfVisitor +'}';
+    }
+
+    public Set<Card> getCardsInternal() {
+        return cardsInternal;
+    }
+
+    public void setCardsInternal(Set<Card> cardsInternal) {
+        this.cardsInternal = cardsInternal;
     }
 
     @Override

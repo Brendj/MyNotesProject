@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepositor
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorWritableRepository;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
@@ -81,8 +82,6 @@ public class CardService {
         card.setClient(client);
         client.getCardsInternal().add(card);
         card.setState(CardState.ISSUED.getValue());
-        //updateCard(card);
-        card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
         updateClient(client);
     }
@@ -114,12 +113,8 @@ public class CardService {
         card.setClient(client);
         client.getCardsInternal().add(card);
         card.setState(CardState.ISSUEDTEMP.getValue());
-        card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
-
-        //updateCard(card);
         updateClient(client);
-
     }
 
     public ResCardsOperationsRegistryItem issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
@@ -139,33 +134,35 @@ public class CardService {
     }
 
     //4. Выдача карты посетителю
-    public void issueToVisitor(Card card, Visitor visitor){
-        //card.//todo
+    public Visitor issueToVisitor(Card card, Visitor visitor){
+        card.setClient(null);
+        card.setVisitor(visitor);
+        visitor.getCardsInternal().add(card);
+        card.setState(CardState.ISSUED.getValue());
+        card.setUpdateTime(new Date());
+        return visitor;
     }
     public ResCardsOperationsRegistryItem issueToVisitor(CardsOperationsRegistryItem o, long idOfOrg) {
-        //Card card = cardWritableRepository.findByCardNo(o.getCardNo());
-        //if (card == null){
-        //    return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
-        //}
-        //Client client = clientWritableRepository.find(o.getIdOfClient());
-        //
-        //issueToClientTemp(card, client);
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
+        if (card == null){
+            return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
+        }
+        VisitorWritableRepository visitorWritableRepository = VisitorWritableRepository.getInstance();
 
-        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
+        Visitor visitor = visitorWritableRepository.find(o.getGlobalId());
+        card.setIssueTime(o.getOperationDate());
+        card.setValidTime(o.getValidDate());
+        visitorWritableRepository.update(issueToVisitor(card, visitor));
+
+        return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
     }
 
     //5. Сброс (возврат, аннулирование) карты
     public void reset(Card card){
-
-        //Client client = card.getClient();
         card.setClient(null);
         card.setState(CardState.FREE.getValue());
         card.setValidTime(new Date());
         updateCard(card);
-        //if(client != null){
-        //    client.getCards().remove(card);
-        //    updateClient(client);
-        //}
     }
     public void resetAllCards(long idOfClient){
         Client client = clientWritableRepository.findWithCards(idOfClient);
@@ -227,10 +224,6 @@ public class CardService {
         card.setIssueTime(new Date());
         card.setUpdateTime(new Date());
         updateCard(card);
-        //if(client != null){
-        //    client.getCards().remove(card);
-        //    updateClient(client);
-        //}
     }
 
 
