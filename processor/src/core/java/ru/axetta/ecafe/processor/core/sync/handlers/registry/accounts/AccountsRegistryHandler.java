@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
@@ -17,6 +18,7 @@ import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsReg
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
+import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.VisitorItem;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,11 +52,17 @@ public class AccountsRegistryHandler {
         }
 
         //todo visitor
-
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
+        List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrg(idOfOrgs);
+        for (Visitor visitor : visitorsWithCardsByOrg) {
+            accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
+        }
+
+
+        //todo visitor
         List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrg);
         for (Card card : allFreeByOrg) {
-            accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
+            accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
 
         return accountsRegistry;
@@ -84,11 +92,16 @@ public class AccountsRegistryHandler {
         }
 
         //todo visitor
-
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
+        List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrgAndDate(idOfOrgs,lastAccRegistrySyncDate);
+        for (Visitor visitor : visitorsWithCardsByOrg) {
+            accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
+        }
+
+
         List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
         for (Card card : freeCards) {
-            accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
+            accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
 
         return accountsRegistry;
@@ -128,7 +141,7 @@ public class AccountsRegistryHandler {
             CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
             List<Card> freeCards = cardReadOnlyRepository.findByIdAndState(idOfCards, CardState.FREE.getValue());
             for (Card card : freeCards) {
-                accountsRegistry.getFreeCardsItems().add(new CardsItem(card, null));
+                accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
             }
         }
 
