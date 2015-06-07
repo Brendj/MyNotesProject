@@ -97,7 +97,7 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public List<Visitor> findVisitorsWithCardsByOrgAndDate(List<Long> idOfOrgs, Date lastAccRegistrySyncDate) {
         return entityManager.createQuery(
-                "select c.visitor from Card c where c.cardNo in (:idOfOrgs) and c.client is null and c.visitor is not null"
+                "select c.visitor from Card c inner join fetch c.visitor.cardsInternal where c.cardNo in (:idOfOrgs) and c.client is null and c.visitor is not null"
                 + " and c.updateTime >  :lastAccRegistrySync ",
                 Visitor.class)
                 .setParameter("idOfOrgs", idOfOrgs)

@@ -11,6 +11,9 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.TypedQuery;
+import java.util.List;
+
 /**
  * User: shamil
  * Date: 05.06.15
@@ -30,4 +33,15 @@ public class VisitorWritableRepository extends WritableJpaDao {
         entityManager.merge(visitor);
     }
 
+    public Visitor findWithCards( Long id ){
+        TypedQuery<Visitor> query = entityManager
+                .createQuery("select v from Visitor v left join fetch v.cardsInternal where v.idOfVisitor=:idOfVisitor", Visitor.class);
+        query.setParameter("idOfVisitor",id);
+        List<Visitor> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return resultList.get(0);
+        }else {
+            return null;
+        }
+    }
 }

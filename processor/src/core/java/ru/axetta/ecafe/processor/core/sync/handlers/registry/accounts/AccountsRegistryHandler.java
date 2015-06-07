@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountIte
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.VisitorItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,20 +52,16 @@ public class AccountsRegistryHandler {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
 
-        //todo visitor
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
         List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrg(idOfOrgs);
         for (Visitor visitor : visitorsWithCardsByOrg) {
             accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
         }
 
-
-        //todo visitor
         List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrg);
         for (Card card : allFreeByOrg) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
-
         return accountsRegistry;
     }
 
@@ -81,6 +78,8 @@ public class AccountsRegistryHandler {
             return null;
         }
 
+        lastAccRegistrySyncDate = CalendarUtils.addMinute(lastAccRegistrySyncDate, -60);
+
         List<Long> idOfOrgs = OrgReadOnlyRepository.getInstance().findFriendlyOrgIds(idOfOrg);
 
         AccountsRegistry accountsRegistry = new AccountsRegistry();
@@ -91,19 +90,16 @@ public class AccountsRegistryHandler {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
 
-        //todo visitor
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
         List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrgAndDate(idOfOrgs,lastAccRegistrySyncDate);
         for (Visitor visitor : visitorsWithCardsByOrg) {
             accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
         }
 
-
         List<Card> freeCards = cardReadOnlyRepository.findAllFreeByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
         for (Card card : freeCards) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
-
         return accountsRegistry;
     }
 

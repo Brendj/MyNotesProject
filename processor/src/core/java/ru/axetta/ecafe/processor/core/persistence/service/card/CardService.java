@@ -149,7 +149,7 @@ public class CardService {
         }
         VisitorWritableRepository visitorWritableRepository = VisitorWritableRepository.getInstance();
 
-        Visitor visitor = visitorWritableRepository.find(o.getGlobalId());
+        Visitor visitor = visitorWritableRepository.findWithCards(o.getGlobalId());
         card.setIssueTime(o.getOperationDate());
         card.setValidTime(o.getValidDate());
         visitorWritableRepository.update(issueToVisitor(card, visitor));
