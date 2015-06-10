@@ -322,7 +322,9 @@ public class SyncStatsManager {
      * @throws Exception
      */
     public void shortDataLog() throws Exception {
-        shortDataProcess();
+        if (SyncCollector.getReportOn()) {
+            shortDataProcess();
+        }
     }
 
     /**
@@ -331,7 +333,9 @@ public class SyncStatsManager {
      * @throws Exception
      */
     public void processLogData() throws Exception {
-        processLogData(1);
+        if (SyncCollector.getReportOn()) {
+            processLogData(1);
+        }
     }
 
     /**

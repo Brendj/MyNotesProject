@@ -16,6 +16,7 @@ public class SyncCollector {
     // todo когда два клиента будут пытаться синхронизироваться одновременно
     private static Map<Long, SyncData> tempSyncs = new HashMap<Long, SyncData>();
     private static SyncCollector INSTANCE = new SyncCollector();
+    private static Boolean reportOn = true;
 
     private SyncCollector() {
     }
@@ -33,51 +34,63 @@ public class SyncCollector {
     }
 
     public static void registerSyncStart(Long syncTime) {
-        clearOldData();
-        tempSyncs.put(syncTime, new SyncData());
-        tempSyncs.get(syncTime).setSyncStartTime(new Date());
+        if (reportOn) {
+            clearOldData();
+            tempSyncs.put(syncTime, new SyncData());
+            tempSyncs.get(syncTime).setSyncStartTime(new Date());
+        }
     }
 
     public static void registerSyncEnd(Long syncTime) {
-        clearOldData();
-        if (tempSyncs.containsKey(syncTime)) {
-            SyncData sync = tempSyncs.get(syncTime);
-            sync.setSyncEndTime(new Date());
-            Date endTime = sync.getSyncEndTime();
-            Date startTime = sync.getSyncStartTime();
-            if (endTime != null && startTime != null) {
-                sync.setDuration(endTime.getTime() - startTime.getTime());
+        if (reportOn) {
+            clearOldData();
+            if (tempSyncs.containsKey(syncTime)) {
+                SyncData sync = tempSyncs.get(syncTime);
+                sync.setSyncEndTime(new Date());
+                Date endTime = sync.getSyncEndTime();
+                Date startTime = sync.getSyncStartTime();
+                if (endTime != null && startTime != null) {
+                    sync.setDuration(endTime.getTime() - startTime.getTime());
+                }
+                syncList.add(sync);
+                tempSyncs.remove(syncTime);
             }
-            syncList.add(sync);
-            tempSyncs.remove(syncTime);
         }
     }
 
     public static void setIdOfOrg(Long syncTime, Long idOfOrg) {
-        clearOldData();
-        if (tempSyncs.containsKey(syncTime)) {
-            tempSyncs.get(syncTime).setIdOfOrg(idOfOrg);
+        if (reportOn) {
+            clearOldData();
+            if (tempSyncs.containsKey(syncTime)) {
+                tempSyncs.get(syncTime).setIdOfOrg(idOfOrg);
+            }
         }
     }
 
     public static void setIdOfSync(Long syncTime, String idOfSync) {
-        clearOldData();
-        if (tempSyncs.containsKey(syncTime)) {
-            tempSyncs.get(syncTime).setIdOfSync(idOfSync);
+        if (reportOn) {
+            clearOldData();
+            if (tempSyncs.containsKey(syncTime)) {
+                tempSyncs.get(syncTime).setIdOfSync(idOfSync);
+            }
         }
     }
 
     public static void setSyncType(Long syncTime, SyncType syncType) {
-        clearOldData();
-        if (tempSyncs.containsKey(syncTime)) {
-            tempSyncs.get(syncTime).setSyncType(syncType);
+        if (reportOn) {
+            clearOldData();
+            if (tempSyncs.containsKey(syncTime)) {
+                tempSyncs.get(syncTime).setSyncType(syncType);
+            }
         }
     }
 
     public static void setErrMessage(Long syncTime, String errMessage) {
-        clearOldData();
-        if (tempSyncs.containsKey(syncTime)) {
-            tempSyncs.get(syncTime).setErrorMessage(errMessage);
+        if (reportOn) {
+            clearOldData();
+            if (tempSyncs.containsKey(syncTime)) {
+                tempSyncs.get(syncTime).setErrorMessage(errMessage);
+            }
         }
     }
 
@@ -105,5 +118,20 @@ public class SyncCollector {
         setIdOfOrg(syncTime, idOfOrg);
         setIdOfSync(syncTime, idOfSync);
         setSyncType(syncTime, syncType);
+    }
+
+    public static void setProperties(Properties properties, String PROCESSOR_PARAM_BASE) {
+        String prop = properties.getProperty(PROCESSOR_PARAM_BASE + ".sync.collector.status");
+        if (prop == null || prop.equals("false")) {
+            reportOn = false;
+        }
+    }
+
+    public static void switchState(){
+        reportOn = !reportOn;
+    }
+
+    public static Boolean getReportOn() {
+        return reportOn;
     }
 }

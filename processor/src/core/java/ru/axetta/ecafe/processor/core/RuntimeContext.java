@@ -45,10 +45,7 @@ import ru.axetta.ecafe.processor.core.sync.SyncLogger;
 import ru.axetta.ecafe.processor.core.sync.SyncProcessor;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.updater.DBUpdater;
-import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CxfContextCapture;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -158,6 +155,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private Scheduler scheduler;
     private SyncProcessor syncProcessor;
     private SyncLogger syncLogger;
+    private SyncCollector syncCollector = SyncCollector.getInstance();
     private PaymentLogger paymentLogger;
     private PaymentProcessor paymentProcessor;
     private IntegroLogger integroLogger;
@@ -326,6 +324,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public PrivateKey getSyncPrivateKey() {
         return syncPrivateKey;
+    }
+
+    public SyncCollector getSyncCollector() {
+        return syncCollector;
     }
 
     public PaymentLogger getPaymentLogger() {
@@ -554,6 +556,8 @@ public class RuntimeContext implements ApplicationContextAware {
             this.syncLogger = processLogger;
             this.paymentLogger = processLogger;
             this.integroLogger = processLogger;
+
+            this.syncCollector.setProperties(properties, PROCESSOR_PARAM_BASE);
 
             eventNotificator = createEventNotificator(properties, executorService, sessionFactory, ruleProcessor);
 

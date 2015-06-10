@@ -5,6 +5,7 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryCalc;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.SyncCollector;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
 
 import org.hibernate.Session;
@@ -186,6 +187,15 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
 
     public void setApplyUserSettings(Boolean applyUserSettings) {
         this.applyUserSettings = applyUserSettings;
+    }
+
+    public Object switchState() {
+        SyncCollector.switchState();
+        return null;
+    }
+
+    public boolean getState(){
+        return SyncCollector.getReportOn();
     }
 
     public class Item {
