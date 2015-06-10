@@ -54,4 +54,6 @@ update cf_orgs set oneactivecard=1;
 update cf_cards  set idoforg=c.idoforg from  cf_clients c
 where cf_cards.idofclient = c.idofclient;
 
+
+alter table cf_clientgroups alter column groupname TYPE  character varying  (256);
 --! ФИНАЛИЗИРОВАН (Сунгатов, 150526) НЕ МЕНЯТЬ
