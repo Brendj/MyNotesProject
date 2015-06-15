@@ -23,7 +23,6 @@ public class ContractIdGenerator {
     //private static final Logger logger = LoggerFactory.getLogger(ContractIdGenerator.class);
     private static final long MIN_ORDER_ID = 0;
     private static final long MAX_ORDER_ID = 9999;
-    private static final long ALTERNATIVE_MAX_ORDER_ID = 99999;
 
     private final SessionFactory sessionFactory;
 
@@ -34,20 +33,24 @@ public class ContractIdGenerator {
     public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         long lastClientContractId = org.getLastClientContractId();
-        boolean b = Boolean.parseBoolean(
-                (String) RuntimeContext.getInstance().getConfigProperties().get("ru.ecafe.internal.contract.maxId"));
+
+        Long l = null;
+        String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ru.ecafe.internal.contract.maxId");
+        if(s != null &&!s.isEmpty()){
+            l = Long.parseLong(s);
+        }
         if (MIN_ORDER_ID > lastClientContractId
-                || (!b && MAX_ORDER_ID < lastClientContractId)
-                || (b && ALTERNATIVE_MAX_ORDER_ID < lastClientContractId) ) {
+                || ((l==null) && MAX_ORDER_ID < lastClientContractId)
+                || ((l!=null) && l < lastClientContractId) ) {
             throw new IllegalArgumentException("Too large last client contractId");
         }
         lastClientContractId++;
 
         long newClientContractId;
-        if(!b){
+        if(l == null){
             newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 10000 + lastClientContractId);
         }else {
-            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 100000 + lastClientContractId);
+            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * l + lastClientContractId);
         }
         org.setLastClientContractId(lastClientContractId);
         session.update(org);
