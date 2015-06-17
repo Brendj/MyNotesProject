@@ -76,7 +76,8 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
             String friendlyOrgsIds = "" + org.getIdOfOrg();
-            List<Long> ids = new ArrayList<Long>();
+            Set<Long> ids = new HashSet<Long>();
+            ids.add(org.getIdOfOrg());
             for (ShortBuilding building : friendlyOrgs) {
                 friendlyOrgsIds += "," + building.getId();
                 ids.add(building.getId());

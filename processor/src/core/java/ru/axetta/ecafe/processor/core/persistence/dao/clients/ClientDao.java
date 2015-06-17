@@ -22,6 +22,7 @@ import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: shamil
@@ -50,7 +51,7 @@ public class ClientDao extends WritableJpaDao {
 
 
     @Transactional
-    public List<Client> findAllByOrg(List<Long> orgsIdList ) {
+    public List<Client> findAllByOrg(Set<Long> orgsIdList ) {
         TypedQuery<Client> query = entityManager
                 .createQuery("from Client c left join fetch c.clientGroup left join fetch c.person "
                         + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060", Client.class)
