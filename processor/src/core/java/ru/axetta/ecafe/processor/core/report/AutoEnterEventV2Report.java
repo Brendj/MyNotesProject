@@ -208,15 +208,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
         }
 
         private static void updateEntrySummaryTime(Data data, Map<Long, Long> entrySummaryMap) throws ParseException {
-            if (entrySummaryMap.containsKey(Long.parseLong(data.getF01()))) {
-                Long sumEntry = entrySummaryMap.get(Long.parseLong(data.getF01()));
-                if (sumEntry > 0) {
-                    long hours = sumEntry / (60 * 60 * 1000);
-                    long minutes = sumEntry / (60 * 1000) % 60;
-                    data.setF10(
-                            "" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
-                }
-            }
+            data.getF081();
         }
 
         //возвращает список Data с заполненными дата-корпусами

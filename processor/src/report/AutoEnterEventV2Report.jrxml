@@ -6,6 +6,9 @@
 	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
 	<style name="Crosstab Data Text"/>
 	<subDataset name="New Dataset 1" uuid="a971cbe3-3501-4888-bec4-e3e95f695342">
+		<parameter name="DateFormatter" class="java.text.DateFormat">
+			<defaultValueExpression><![CDATA[$P{REPORT_FORMAT_FACTORY}.createDateFormat("yyyy-MM-dd HH:mm",$P{REPORT_LOCALE}, java.util.TimeZone.getTimeZone("Russia/Moscow"))]]></defaultValueExpression>
+		</parameter>
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
@@ -40,6 +43,7 @@
 			<fieldDescription><![CDATA[f09]]></fieldDescription>
 		</field>
 		<field name="f10" class="java.lang.String"/>
+		<field name="f081" class="java.lang.Long"/>
 	</subDataset>
 	<parameter name="orgName" class="java.lang.String"/>
 	<parameter name="beginDate" class="java.lang.String"/>
@@ -95,6 +99,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
+				<crosstabParameter name="DateFormatter" class="java.text.DateFormat">
+					<parameterValueExpression><![CDATA[$P{REPORT_FORMAT_FACTORY}.createDateFormat("HH:mm",$P{REPORT_LOCALE}, java.util.TimeZone.getTimeZone("Russia/Moscow"))]]></parameterValueExpression>
+				</crosstabParameter>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="New Dataset 1" uuid="f0a6a9ea-db39-4aa2-b3e0-db1ce1280d54">
@@ -306,7 +313,11 @@
 				<measure name="f10" class="java.lang.String" calculation="Count">
 					<measureExpression><![CDATA[$F{f10}]]></measureExpression>
 				</measure>
-				<crosstabCell width="526" height="50">
+				<measure name="f11" class="java.lang.Integer" calculation="Sum">
+					<measureExpression><![CDATA[$F{f081}
+ ]]></measureExpression>
+				</measure>
+				<crosstabCell width="526" height="51">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -357,15 +368,17 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="100" columnTotalGroup="f05">
+				<crosstabCell width="100" height="51" columnTotalGroup="f05">
 					<cellContents backcolor="#BFE1FF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField isBlankWhenNull="true">
-							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" x="0" y="0" width="100" height="50"/>
+						<textField pattern="" isBlankWhenNull="false">
+							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" x="0" y="0" width="100" height="50">
+								<printWhenExpression><![CDATA[$V{f11} != 0]]></printWhenExpression>
+							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{f10}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{DateFormatter}.format($V{f11})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
