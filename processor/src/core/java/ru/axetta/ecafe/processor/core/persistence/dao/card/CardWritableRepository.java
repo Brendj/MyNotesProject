@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,13 +87,9 @@ public class CardWritableRepository extends WritableJpaDao {
     public int block(long cardNo, long idOfOrg) {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
-                + " validTime = :validTime,"
-                + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime "
                 + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
                 .setParameter("state", CardState.BLOCKED.getValue())
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfOrg", idOfOrg)
@@ -134,8 +131,8 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
-    public int issueToVisitor(long cardNo, long idOfVisitor, long idOfOrg) {
-        Visitor visitor = VisitorReadOnlyRepository.getInstance().find(idOfVisitor);
+    public int issueToVisitor(CardsOperationsRegistryItem o,  long idOfOrg) {
+        Visitor visitor = VisitorReadOnlyRepository.getInstance().find(o.getGlobalId());
         return entityManager.createQuery("update Card set "
                 + " client = null, "
                 + " state = :state, "
@@ -145,17 +142,17 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " visitor = :visitor "
                 + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
                 .setParameter("state", CardState.ISSUED.getValue())
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
+                .setParameter("validTime", o.getValidDate())
+                .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
                 .setParameter("visitor", visitor)
-                .setParameter("cardNo", cardNo)
+                .setParameter("cardNo", o.getCardNo())
                 .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
-    public int issueToClient(long cardNo, long idOfClient, long idOfOrg) {
-        Client client = ClientReadOnlyRepository.getInstance().findById(idOfClient);
+    public int issueToClient(CardsOperationsRegistryItem o,  long idOfOrg) {
+        Client client = ClientReadOnlyRepository.getInstance().findById(o.getIdOfClient());
         return entityManager.createQuery("update Card set "
                 + " client = :client, "
                 + " state = :state, "
@@ -166,16 +163,16 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
                 .setParameter("state", CardState.ISSUED.getValue())
                 .setParameter("client", client)
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
+                .setParameter("validTime", o.getValidDate())
+                .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
-                .setParameter("cardNo", cardNo)
+                .setParameter("cardNo", o.getCardNo())
                 .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
-    public int issueToClientTemp(long cardNo, long idOfClient, long idOfOrg) {
-        Client client = ClientReadOnlyRepository.getInstance().findById(idOfClient);
+    public int issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
+        Client client = ClientReadOnlyRepository.getInstance().findById(o.getIdOfClient());
         return entityManager.createQuery("update Card set "
                 + " client = :client, "
                 + " state = :state, "
@@ -186,10 +183,10 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
                 .setParameter("state", CardState.ISSUEDTEMP.getValue())
                 .setParameter("client", client)
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
+                .setParameter("validTime", o.getValidDate())
+                .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
-                .setParameter("cardNo", cardNo)
+                .setParameter("cardNo", o.getCardNo())
                 .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }

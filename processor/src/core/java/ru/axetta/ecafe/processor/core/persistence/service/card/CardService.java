@@ -80,31 +80,31 @@ public class CardService {
     }
 
     //2. Выдача карты клиенту
-    public int issueToClient(long cardNo, long idOfClient, long idOfOrg){
-        return cardWritableRepository.issueToClient(cardNo, idOfClient, idOfOrg);
+    public int issueToClient(CardsOperationsRegistryItem o, long cardNo, long idOfClient, long idOfOrg){
+        return cardWritableRepository.issueToClient(o, idOfOrg);
     }
 
     public ResCardsOperationsRegistryItem issueToClient(CardsOperationsRegistryItem o, long idOfOrg) {
-        return cardUpdateResult(o, issueToClient(o.getCardNo(), o.getIdOfClient(), idOfOrg));
+        return cardUpdateResult(o, issueToClient(o, o.getCardNo(), o.getIdOfClient(), idOfOrg));
 
     }
 
     //3.Выдача карты клиенту во временное пользование
-    public int issueToClientTemp(long cardNo, long idOfClient, long idOfOrg){
-        return cardWritableRepository.issueToClientTemp(cardNo, idOfClient, idOfOrg);
+    public int issueToClientTemp(CardsOperationsRegistryItem o, long cardNo, long idOfClient, long idOfOrg){
+        return cardWritableRepository.issueToClientTemp(o, idOfOrg);
     }
 
     public ResCardsOperationsRegistryItem issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
-        return cardUpdateResult(o, issueToClientTemp(o.getCardNo(), o.getIdOfClient(), idOfOrg));
+        return cardUpdateResult(o, issueToClientTemp(o, o.getCardNo(), o.getIdOfClient(), idOfOrg));
     }
 
     //4. Выдача карты посетителю
-    public int issueToVisitor(long cardNo, long idOfVisitor, long idOfOrg){
-        return cardWritableRepository.issueToVisitor(cardNo, idOfVisitor, idOfOrg);
+    public int issueToVisitor(CardsOperationsRegistryItem o,long cardNo,  long idOfOrg){
+        return cardWritableRepository.issueToVisitor(o, idOfOrg);
 
     }
     public ResCardsOperationsRegistryItem issueToVisitor(CardsOperationsRegistryItem o, long idOfOrg) {
-        return cardUpdateResult(o, issueToVisitor(o.getCardNo(), o.getGlobalId(), idOfOrg));
+        return cardUpdateResult(o, issueToVisitor(o, o.getGlobalId(), idOfOrg));
     }
 
     //5. Сброс (возврат, аннулирование) карты
@@ -141,9 +141,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
-        int block = block(o.getCardNo(), idOfOrg);
-
-        return cardUpdateResult(o, block);
+        return cardUpdateResult(o, block(o.getCardNo(), idOfOrg));
     }
 
 
@@ -153,8 +151,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
-        int result = blockAndReset(o.getCardNo(), idOfOrg);
-        return cardUpdateResult(o, result);
+        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg));
     }
     //8.	Разблокировка карты
     public void unblock(Card card, CardsOperationsRegistryItem o){
