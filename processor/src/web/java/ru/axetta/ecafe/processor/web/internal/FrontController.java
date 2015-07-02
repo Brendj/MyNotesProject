@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.internal;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -506,11 +507,17 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException(String.format("Карта уже зарегистрирована как постоянная"));
             }
 
+            Org org = OrgReadOnlyRepository.getInstance().find(idOfOrg);
+            if(org == null){
+                throw new FrontControllerException(String.format("Организация не найдена"));
+            }
+
             CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
 
             if(cardTemp==null){
                 //cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), ClientTypeEnum.VISITOR);
                 cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), 1);
+                cardTemp.setOrg(org);
                 cardTemp.setVisitor(visitor);
                 persistenceSession.save(cardTemp);
             } else {
