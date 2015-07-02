@@ -33,4 +33,8 @@ public class VisitorReadOnlyRepository   extends BaseJpaDao {
 
         return query.getResultList();
     }
+
+    public Visitor find(long id) {
+        return entityManager.find( Visitor.class, id );
+    }
 }

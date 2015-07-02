@@ -85,4 +85,8 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
             return null;
         }
     }
+
+    public Client findById(long id) {
+        return entityManager.find( Client.class, id );
+    }
 }

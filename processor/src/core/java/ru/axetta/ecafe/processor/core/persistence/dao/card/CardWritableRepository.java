@@ -5,12 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
+import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorReadOnlyRepository;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,5 +81,116 @@ public class CardWritableRepository extends WritableJpaDao {
             card.setUpdateTime(new Date());
             //clientWritableRepository.update(client);
         }
+    }
+
+    public int block(long cardNo, long idOfOrg) {
+        return entityManager.createQuery("update Card set "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.BLOCKED.getValue())
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int blockAndReset(long cardNo, long idOfOrg) {
+
+        return entityManager.createQuery("update Card set "
+                + " client = null, "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.BLOCKEDANDRESET.getValue())
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int reset(long cardNo, long idOfOrg) {
+        return entityManager.createQuery("update Card set "
+                + " client = null, "
+                + " state = :state, "
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime, "
+                + " validTime = :validTime "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.FREE.getValue())
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int issueToVisitor(long cardNo, long idOfVisitor, long idOfOrg) {
+        Visitor visitor = VisitorReadOnlyRepository.getInstance().find(idOfVisitor);
+        return entityManager.createQuery("update Card set "
+                + " client = null, "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime, "
+                + " visitor = :visitor "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.ISSUED.getValue())
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("visitor", visitor)
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int issueToClient(long cardNo, long idOfClient, long idOfOrg) {
+        Client client = ClientReadOnlyRepository.getInstance().findById(idOfClient);
+        return entityManager.createQuery("update Card set "
+                + " client = :client, "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime, "
+                + " visitor = null "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.ISSUED.getValue())
+                .setParameter("client", client)
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int issueToClientTemp(long cardNo, long idOfClient, long idOfOrg) {
+        Client client = ClientReadOnlyRepository.getInstance().findById(idOfClient);
+        return entityManager.createQuery("update Card set "
+                + " client = :client, "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime, "
+                + " visitor = null "
+                + " where cardNo = :cardNo and org.idOfOrg = :idOfOrg ")
+                .setParameter("state", CardState.ISSUEDTEMP.getValue())
+                .setParameter("client", client)
+                .setParameter("validTime", new Date())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
     }
 }
