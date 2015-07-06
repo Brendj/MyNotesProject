@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="958" pageHeight="150000000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="938" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
-	<property name="ireport.zoom" value="1.000000000000012"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPaymentReport" pageWidth="993" pageHeight="150000000" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="973" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="985387f1-a851-4f0f-9992-958e40755e5d">
+	<property name="ireport.zoom" value="1.464100000000018"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="style1">
@@ -40,13 +40,14 @@
 	<field name="orgNum" class="java.lang.String"/>
 	<field name="nameOfContragentSender" class="java.lang.String"/>
 	<field name="addIdOfPayment" class="java.lang.String"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
 	<variable name="variable1" class="java.lang.Float" calculation="Sum">
 		<variableExpression><![CDATA[$F{paySum}]]></variableExpression>
 	</variable>
 	<title>
 		<band height="197" splitType="Stretch">
 			<textField>
-				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="13" width="938" height="20"/>
+				<reportElement uuid="86b2ea8a-2805-465d-a891-92219e7af8ac" x="0" y="13" width="973" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -92,27 +93,27 @@
 				<text><![CDATA[Идентификатор платежа	]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="style1" stretchType="RelativeToTallestObject" x="566" y="129" width="60" height="41"/>
+				<reportElement uuid="78f3be99-faaf-49cd-aa1e-1f885b68bf22" style="style1" stretchType="RelativeToTallestObject" x="601" y="129" width="60" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер л/с]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="style1" stretchType="RelativeToTallestObject" x="626" y="129" width="70" height="41"/>
+				<reportElement uuid="70f05207-62c4-46bd-86f0-b9ee0ece985d" style="style1" stretchType="RelativeToTallestObject" x="661" y="129" width="70" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Фамилия]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="style1" stretchType="RelativeToTallestObject" x="696" y="129" width="70" height="41"/>
+				<reportElement uuid="3561ede3-52b0-4c76-a68c-92fec3c8db4b" style="style1" stretchType="RelativeToTallestObject" x="731" y="129" width="70" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Имя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="766" y="129" width="90" height="41"/>
+				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="801" y="129" width="90" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Отчество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="style1" stretchType="RelativeToTallestObject" x="879" y="129" width="59" height="41"/>
+				<reportElement uuid="532eaa7c-1b79-49dd-b3e1-4cbe99f2c157" style="style1" stretchType="RelativeToTallestObject" x="914" y="129" width="59" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Сумма платежа]]></text>
 			</staticText>
@@ -122,12 +123,12 @@
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="856" y="129" width="23" height="41"/>
+				<reportElement uuid="6150eabb-eedc-4f83-8035-f9e6ef58aa52" style="style1" stretchType="RelativeToTallestObject" x="891" y="129" width="23" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Тип]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="531" y="129" width="35" height="41"/>
+				<reportElement uuid="b64d26ab-8ca2-42d4-a3d0-2f11be3baa08" style="style1" stretchType="RelativeToTallestObject" x="566" y="129" width="35" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[№ орг.]]></text>
 			</staticText>
@@ -140,7 +141,7 @@
 				<text><![CDATA[Контрагент-получатель:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="5e8977a5-8424-4f29-8920-fa000fe4ad0c" x="211" y="82" width="727" height="20"/>
+				<reportElement uuid="5e8977a5-8424-4f29-8920-fa000fe4ad0c" x="211" y="82" width="762" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -155,7 +156,7 @@
 				<text><![CDATA[Агент по приему платежей:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="13eaa5bb-6cc3-4309-b070-fbae89ecf670" x="211" y="59" width="727" height="20"/>
+				<reportElement uuid="13eaa5bb-6cc3-4309-b070-fbae89ecf670" x="211" y="59" width="762" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -173,6 +174,18 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дополнительный идентификатор платежа]]></text>
 			</staticText>
+			<staticText>
+				<reportElement uuid="bedc1254-5bad-4e62-ae81-9165d169e80e" x="531" y="129" width="35" height="41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ID орг.]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
@@ -185,28 +198,28 @@
 				<textFieldExpression><![CDATA[$F{createTime}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="ae276361-c685-4ed3-ae9a-e1a1a997b37b" style="style1" stretchType="RelativeToBandHeight" x="626" y="0" width="70" height="19"/>
+				<reportElement uuid="ae276361-c685-4ed3-ae9a-e1a1a997b37b" style="style1" stretchType="RelativeToBandHeight" x="661" y="0" width="70" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{surName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="style1" stretchType="RelativeToBandHeight" x="766" y="0" width="90" height="19"/>
+				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="style1" stretchType="RelativeToBandHeight" x="801" y="0" width="90" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{secondName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="696" y="0" width="70" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="731" y="0" width="70" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{firstName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="566" y="0" width="60" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="601" y="0" width="60" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -220,7 +233,7 @@
 				<textFieldExpression><![CDATA[$F{idOfPayment}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="879" y="0" width="59" height="19"/>
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="914" y="0" width="59" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -232,20 +245,6 @@
 					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="style1" stretchType="RelativeToBandHeight" x="856" y="0" width="23" height="19"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{payMethod}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="">
-				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="531" y="0" width="35" height="19"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{orgNum}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="579782c2-0f03-4d32-b8d1-747684c70af3" x="186" y="0" width="220" height="19"/>
@@ -261,25 +260,53 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{addIdOfPayment}]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true" pattern="">
+				<reportElement uuid="f39f8408-ab73-4a83-844f-1a1979a232af" style="style1" stretchType="RelativeToBandHeight" x="891" y="0" width="23" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{payMethod}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e69f46e4-b99e-4d58-ae03-5035d2968637" x="531" y="0" width="35" height="19"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="">
+				<reportElement uuid="6cbf9c75-e903-43a7-b8c4-42c4b39ebf0e" style="style1" stretchType="RelativeToBandHeight" x="566" y="0" width="35" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8" isBold="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{orgNum}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<summary>
 		<band height="21">
+			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement uuid="b4f0e020-c644-4cc2-98c2-53f18d47d001" style="style1" x="914" y="1" width="59" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalSum}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement uuid="627e8a30-64e2-4abe-9153-3b71c2b0457d" style="style1" x="0" y="1" width="879" height="20"/>
+				<reportElement uuid="627e8a30-64e2-4abe-9153-3b71c2b0457d" style="style1" x="0" y="1" width="914" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="8"/>
 					<paragraph rightIndent="15"/>
 				</textElement>
 				<text><![CDATA[ИТОГО:]]></text>
 			</staticText>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement uuid="b4f0e020-c644-4cc2-98c2-53f18d47d001" style="style1" x="879" y="1" width="59" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Sans" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{totalSum}]]></textFieldExpression>
-			</textField>
 		</band>
 	</summary>
 </jasperReport>
