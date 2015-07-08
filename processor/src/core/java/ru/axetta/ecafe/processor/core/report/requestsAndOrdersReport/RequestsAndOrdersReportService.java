@@ -57,6 +57,15 @@ public class RequestsAndOrdersReportService {
         return "";
     }
 
+    private String getAddress(String orgName, HashMap<Long,BasicReportJob.OrgShortItem> orgMap) {
+        for (BasicReportJob.OrgShortItem orgShortItem : orgMap.values()) {
+            if (orgName.equals(orgShortItem.getOfficialName())) {
+                return orgShortItem.getAddress();
+            }
+        }
+        return "";
+    }
+
     public List<Item> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
             List<Long> idOfMenuSourceOrgList, Boolean hideMissedColumns, Boolean useColorAccent,
             Boolean showOnlyDivergence, HashSet<FeedingPlanType> feedingPlanTypes, Boolean noNullReport) throws Exception {
@@ -118,7 +127,8 @@ public class RequestsAndOrdersReportService {
         orgCriteria.setProjection(
                 Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
                         .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg"))
-                        .add(Projections.property("district")));
+                        .add(Projections.property("district")).add(Projections.property("address")));
+
         List orgList = orgCriteria.list();
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap;
         orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
@@ -145,8 +155,15 @@ public class RequestsAndOrdersReportService {
             if (row[4] != null) {
                 educationItem.setOrgDistrict(row[4].toString());
             } else {
-                orgDistrict = "";
+                educationItem.setOrgDistrict(orgDistrict);
             }
+            String address = "";
+            if (row[5] != null) {
+                educationItem.setAddress(row[5].toString());
+            } else {
+                educationItem.setAddress(address);
+            }
+
             orgMap.put(idOfOrg, educationItem);
         }
         return orgMap;
@@ -169,22 +186,23 @@ public class RequestsAndOrdersReportService {
                             ordered = ordered == null ? 0L : ordered;
                             String orgDistrict = getDistrict(orgName, orgMap);
                             String orgNum = Org.extractOrgNumberFromName(orgName);
+                            String address = getAddress(orgName, orgMap);
                             Boolean differState = (requested - ordered) != 0L;
                             if (!showOnlyDivergence || differState) {
                                 if (useColorAccent) {
                                     itemList.add(
                                             new Item(orgNum, orgDistrict, orgName, feedingPlanTypeString, complexName,
-                                                    "Заказано", date, requested, differState));
+                                                    "Заказано", date, requested, differState, address));
                                     itemList.add(
                                             new Item(orgNum, orgDistrict, orgName, feedingPlanTypeString, complexName,
-                                                    "Оплачено", date, ordered, differState));
+                                                    "Оплачено", date, ordered, differState, address));
                                 } else {
                                     itemList.add(
                                             new Item(orgNum, orgDistrict, orgName, feedingPlanTypeString, complexName,
-                                                    "Заказано", date, requested, false));
+                                                    "Заказано", date, requested, false, address));
                                     itemList.add(
                                             new Item(orgNum, orgDistrict, orgName, feedingPlanTypeString, complexName,
-                                                    "Оплачено", date, ordered, false));
+                                                    "Оплачено", date, ordered, false, address));
                                 }
                             }
                         }
@@ -193,7 +211,7 @@ public class RequestsAndOrdersReportService {
             }
         }
         if (itemList.size() < 1 && noNullReport) {
-            itemList.add(new Item(null, null, null, null, null, null, (String) null, null, null));
+            itemList.add(new Item(null, null, null, null, null, null, (String) null, null, null, (String) null));
         }
     }
 
@@ -402,9 +420,10 @@ public class RequestsAndOrdersReportService {
         private String dateString;
         private Long count;
         private Boolean differState;
+        private String address;
 
         protected Item(String orgNum, String orgDistrict, String orgName, String feedingPlanTypeString,
-                String complexName, String stateString, String dateString, Long count, Boolean differState) {
+                String complexName, String stateString, String dateString, Long count, Boolean differState, String address) {
             this.orgDistrict = orgDistrict;
             this.orgNum = orgNum;
             this.orgName = orgName;
@@ -419,10 +438,11 @@ public class RequestsAndOrdersReportService {
             this.dateString = dateString;
             this.count = count;
             this.differState = differState;
+            this.address = address;
         }
 
         protected Item(String orgNum, String orgDistrict, String orgName, String feedingPlanTypeString,
-                String complexName, String stateString, Date date, Long count, Boolean differState) {
+                String complexName, String stateString, Date date, Long count, Boolean differState, String address) {
             this.orgDistrict = orgDistrict;
             this.orgNum = orgNum;
             this.orgName = orgName;
@@ -433,6 +453,7 @@ public class RequestsAndOrdersReportService {
             this.dateString = simpleDateFormat.format(date);
             this.count = count;
             this.differState = differState;
+            this.address = address;
         }
 
         @Override
@@ -543,6 +564,14 @@ public class RequestsAndOrdersReportService {
 
         public void setDifferState(Boolean differState) {
             this.differState = differState;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
         }
     }
 }
