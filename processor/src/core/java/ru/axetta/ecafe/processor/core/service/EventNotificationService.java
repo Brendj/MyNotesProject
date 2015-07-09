@@ -354,7 +354,10 @@ public class EventNotificationService {
         if (client.hasMobile()) {
             bSend |= sendSMS(client, type, values);
         }
-        if (client.hasEmail()) {
+
+        ISmsService smsService = RuntimeContext.getInstance().getSmsService();
+
+        if (client.hasEmail() && client.isNotifyViaEmail() && !smsService.emailDisabled()) {
             bSend |= sendEmail(client, type, values);
         }
         return bSend;

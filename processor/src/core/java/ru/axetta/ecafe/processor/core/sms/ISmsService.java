@@ -64,6 +64,11 @@ public abstract class ISmsService {
         return emp instanceof EMPSmsServiceImpl;
     }
 
+    public Boolean emailDisabled(){
+        ISmsService emp = RuntimeContext.getInstance().getSmsService();
+        return emp instanceof EMPSmsServiceImpl;
+    }
+
     public ISmsService() {
     }
     public ISmsService(Config config) {
