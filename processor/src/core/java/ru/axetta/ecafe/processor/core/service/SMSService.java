@@ -144,13 +144,19 @@ public class SMSService {
             }
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             TransactionStatus status = transactionManager.getTransaction(def);
-            Client client = null; String phoneNumber, sender;
+            Client client = null; String phoneNumber = null, sender = null;
+
+            ISmsService smsService = RuntimeContext.getInstance().getSmsService();
+
             try {
                 client = em.find(Client.class, idOfClient);
                 if (client == null) {
                     throw new Exception ("Client doesn't exist");
                 }
-                if(!client.isNotifyViaSMS() && messageType!=ClientSms.TYPE_LINKING_TOKEN) return false;
+
+                if (!smsService.ignoreNotifyFlags()){
+                    if(!client.isNotifyViaSMS() && messageType!=ClientSms.TYPE_LINKING_TOKEN) return false;
+                }
                 phoneNumber = client.getMobile();
                 if (!StringUtils.isNotEmpty(phoneNumber)) return false;
                 phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
@@ -164,7 +170,7 @@ public class SMSService {
             }
 
             SendResponse sendResponse = null;
-            ISmsService smsService = RuntimeContext.getInstance().getSmsService();
+
             logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber,
                                                                                            textObject.toString()});
             String textMessage = null;

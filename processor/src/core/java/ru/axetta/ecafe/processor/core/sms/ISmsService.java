@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sms;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
+
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -54,6 +57,11 @@ public abstract class ISmsService {
     protected static Logger logger;
     static {
         try {  logger = LoggerFactory.getLogger(ISmsService.class); } catch (Throwable ignored) {}
+    }
+
+    public Boolean ignoreNotifyFlags(){
+        ISmsService emp = RuntimeContext.getInstance().getSmsService();
+        return emp instanceof EMPSmsServiceImpl;
     }
 
     public ISmsService() {
