@@ -20,7 +20,7 @@ public class EMPTokenGenerateEventType extends EMPAbstractEventType {
     protected static final String TEXT = "Код активации: %token%";
 
     public EMPTokenGenerateEventType() {
-        stream = STREAM;
+        stream = INFORMATION_STREAM;
         type = EMPEventTypeFactory.TOKEN_GENERATED_EVENT;
         name = NAME;
         text = TEXT;

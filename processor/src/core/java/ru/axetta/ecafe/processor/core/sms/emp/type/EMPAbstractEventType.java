@@ -30,6 +30,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     protected static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     protected static final int STREAM = 124;
+    protected static final int INFORMATION_STREAM = 125;   //Информационный стрим
     protected int previousId;
     protected int id;
     protected int type;
