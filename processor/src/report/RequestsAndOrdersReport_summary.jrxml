@@ -143,10 +143,7 @@
 						</staticText>
 						<staticText>
 							<reportElement uuid="875e0a58-2f68-401a-bc33-ea20dde97354" mode="Opaque" x="360" y="0" width="200" height="20" forecolor="#000000" backcolor="#F0F8FF"/>
-							<box leftPadding="10">
-								<topPen lineWidth="0.75"/>
-								<bottomPen lineWidth="0.75"/>
-							</box>
+							<box leftPadding="0"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -237,20 +234,23 @@
 						<bucketExpression><![CDATA[$F{address}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents mode="Opaque">
+						<cellContents mode="Opaque" style="Crosstab_CD">
 							<textField>
-								<reportElement uuid="26b4a897-d9c5-4680-9c48-96d7c43e9d4d" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="200" height="41"/>
-								<box leftPadding="10">
-									<topPen lineWidth="0.75"/>
-									<bottomPen lineWidth="0.75"/>
-								</box>
+								<reportElement uuid="26b4a897-d9c5-4680-9c48-96d7c43e9d4d" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="200" height="40"/>
+								<box leftPadding="10"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Opaque" style="Crosstab_CD">
+							<staticText>
+								<reportElement uuid="5b73b7d2-955c-41fb-aab5-b8625ccbea97" x="274" y="170" width="100" height="20"/>
+								<textElement/>
+								<text><![CDATA[Total address]]></text>
+							</staticText>
+						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="feedingTypeString1" width="0">
