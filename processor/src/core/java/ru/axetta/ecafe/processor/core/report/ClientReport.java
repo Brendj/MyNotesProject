@@ -26,7 +26,7 @@ public class ClientReport extends BasicReport {
 
     public static class Builder {
 
-        public ClientReport build(Contragent supplier, Session session) throws Exception {
+        public ClientReport build(String contragentIds, Session session) throws Exception {
             Date generateTime = new Date();
 
             /*Criteria clientCriteria = session.createCriteria(Client.class);
@@ -45,16 +45,14 @@ public class ClientReport extends BasicReport {
             List clientItems = clientCriteria.list();*/
 
             String preparedQuery = "select org.idOfOrg, org.officialName, count(idOfClient) as clientCount, "
-                                 + "       sum(case when balance > 0 then 1 else 0 end) as posbalCount, "
-                                 + "       sum(case when balance = 0 then 1 else 0 end) as nulbalCount, "
-                                 + "       sum(case when balance < 0 then 1 else 0 end) as negbalCount, "
-                                 + "       sum(balance) as balsum, "
-                                 + "       sum(case when balance > 0 then balance else 0 end) as posbalsum, "
-                                 + "       sum(case when balance < 0 then balance else 0 end) as negbalsum "
-                                 + "  from Client "
-                                 + (supplier==null?"":"where org.defaultSupplier.idOfContragent="+supplier.getIdOfContragent())
-                                 + " group by org.idOfOrg, org.officialName "
-                                 + " order by org.idOfOrg";
+                    + "       sum(case when balance > 0 then 1 else 0 end) as posbalCount, "
+                    + "       sum(case when balance = 0 then 1 else 0 end) as nulbalCount, "
+                    + "       sum(case when balance < 0 then 1 else 0 end) as negbalCount, "
+                    + "       sum(balance) as balsum, "
+                    + "       sum(case when balance > 0 then balance else 0 end) as posbalsum, "
+                    + "       sum(case when balance < 0 then balance else 0 end) as negbalsum " + "  from Client "
+                    + "where org.defaultSupplier.idOfContragent in ( " + contragentIds + " ) "
+                    + " group by org.idOfOrg, org.officialName " + " order by org.idOfOrg";
             List resultList = null;
             Query query = session.createQuery(preparedQuery);
 

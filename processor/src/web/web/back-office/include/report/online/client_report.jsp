@@ -11,17 +11,19 @@
 <h:panelGrid styleClass="borderless-grid">
     <a4j:outputPanel ajaxRendered="true">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.clientReportPage.contragent.contragentName}" readonly="true"
-                         styleClass="input-text" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                               reRender="modalContragentSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+                               reRender="modalContragentListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="#{mainPage.clientReportPage.contragentIds}"
+                                             target="#{mainPage.contragentListSelectPage.selectedIds}" />
             </a4j:commandButton>
+            <h:outputText value=" {#{mainPage.clientReportPage.contragentFilter}}" escape="true"
+                          styleClass="output-text" />
         </h:panelGroup>
     </h:panelGrid>
     </a4j:outputPanel>

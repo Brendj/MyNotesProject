@@ -6073,14 +6073,24 @@ public class MainPage implements Serializable {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            clientReportPage.buildReport(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+            if (clientReportPage.getContragentIds() != null) {
+                if (!clientReportPage.getContragentIds().isEmpty()) {
+                    runtimeContext = RuntimeContext.getInstance();
+                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    clientReportPage.buildReport(persistenceSession);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+                } else {
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Выберите постащика : " + "", ""));
+                }
+            } else {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Выберите постащика : " + "", ""));
+            }
         } catch (Exception e) {
             logger.error("Failed to build client report", e);
             facesContext.addMessage(null,
