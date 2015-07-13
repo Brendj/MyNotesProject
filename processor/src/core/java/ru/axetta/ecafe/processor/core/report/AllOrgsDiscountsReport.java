@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
+
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import java.util.*;
 
@@ -25,6 +29,8 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
     private List<OrgDiscounts> itemsList;
     private List<String> columnNames;
+
+
 
     public Long getCount() {
         Long result = 0L;
@@ -59,6 +65,16 @@ public class AllOrgsDiscountsReport extends BasicReport {
     }
 
     public static class Builder {
+
+        private User user;
+
+        public User getUser() {
+            return user;
+        }
+
+        public void setUser(User user) {
+            this.user = user;
+        }
 
         Properties reportProperties = new Properties();
 
@@ -119,15 +135,37 @@ public class AllOrgsDiscountsReport extends BasicReport {
             List resultQueryAllOrgsList = null;
 
             if (showAllOrgs) {
-                //Запрос всех орг
-                if (region != null) {
-                    queryAllOrgs =
-                            "select org.id, cast(0 as long), org.shortName from Org org where org.district like '%"
-                                    + region
-                                    + "%' and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
-                                    + region + "%' group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                //Отчетность поставщика питания
+                if (User.DefaultRole.SUPPLIER.toString().equals(user.getRoleName())) {
+                    Query query = session.createSQLQuery("select cfu.idofcontragent from cf_usercontragents cfu where idofuser = :idOfUser");
+                    query.setParameter("idOfUser", user.getIdOfUser());
+
+                    List idOfContragents = query.list();
+
+
+                    //Запрос всех орг, с учетом роли
+                    if (region != null) {
+                        queryAllOrgs =
+                                "select org.id, cast(0 as long), org.shortName from Org org where org.district like '%"
+                                        + region
+                                        + "%' and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
+                                        + region + "%' group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                    } else {
+                        queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                    }
+
                 } else {
-                    queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+
+                    //Запрос всех орг
+                    if (region != null) {
+                        queryAllOrgs =
+                                "select org.id, cast(0 as long), org.shortName from Org org where org.district like '%"
+                                        + region
+                                        + "%' and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
+                                        + region + "%' group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                    } else {
+                        queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                    }
                 }
                 resultQueryAllOrgsList = session.createQuery(queryAllOrgs).list();
             }
