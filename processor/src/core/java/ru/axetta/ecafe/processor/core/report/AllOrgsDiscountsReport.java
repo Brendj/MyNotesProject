@@ -4,12 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.User;
-
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -29,7 +29,6 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
     private List<OrgDiscounts> itemsList;
     private List<String> columnNames;
-
 
 
     public Long getCount() {
@@ -137,21 +136,33 @@ public class AllOrgsDiscountsReport extends BasicReport {
             if (showAllOrgs) {
                 //Отчетность поставщика питания
                 if (User.DefaultRole.SUPPLIER.toString().equals(user.getRoleName())) {
-                    Query query = session.createSQLQuery("select cfu.idofcontragent from cf_usercontragents cfu where idofuser = :idOfUser");
+                    Query query = session.createSQLQuery(
+                            "SELECT cfu.idofcontragent FROM cf_usercontragents cfu WHERE idofuser = :idOfUser");
                     query.setParameter("idOfUser", user.getIdOfUser());
 
-                    List idOfContragents = query.list();
+                    List idOfContragentList = query.list();
 
+                    String idsString = null;
+
+                    int count = 0;
+
+                    for (Object id : idOfContragentList) {
+                        count++;
+                        idsString = ((BigInteger) id).toString();
+                        if (idOfContragentList.size() > 1 && count < idOfContragentList.size()) {
+                            idsString = idsString + ",";
+                        }
+                    }
 
                     //Запрос всех орг, с учетом роли
                     if (region != null) {
                         queryAllOrgs =
                                 "select org.id, cast(0 as long), org.shortName from Org org where org.district like '%"
                                         + region
-                                        + "%' and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
+                                        + "%' and org.defaultSupplier in ("+ idsString +") and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 and cl.org.district like '%"
                                         + region + "%' group by cl.org.id, cl.org.shortName order by cl.org.id) ";
                     } else {
-                        queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
+                        queryAllOrgs = "select org.id, cast(0 as long), org.shortName from Org org where org.defaultSupplier in ("+ idsString +") and org.id not in (select cl.org.id from Client cl , ClientsCategoryDiscount cc where cc.idOfClient=cl.idOfClient and cc.idOfCategoryDiscount >= 0 group by cl.org.id, cl.org.shortName order by cl.org.id) ";
                     }
 
                 } else {
