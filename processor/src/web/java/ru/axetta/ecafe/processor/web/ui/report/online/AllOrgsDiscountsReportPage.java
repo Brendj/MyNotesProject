@@ -25,8 +25,6 @@ import java.util.Properties;
 public class AllOrgsDiscountsReportPage extends OnlineReportPage {
     private AllOrgsDiscountsReport allOrgsDiscountsReport;
 
-    private User currentUser;
-
     private String region;
 
     private Boolean showAllOrgs = false;
@@ -45,7 +43,6 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
         props.put("showAllOrgs", Boolean.toString(showAllOrgs));
         AllOrgsDiscountsReport.Builder builder = new AllOrgsDiscountsReport.Builder();
         builder.setReportProperties(props);
-        builder.setUser(getCurrentUser());
         allOrgsDiscountsReport = builder.build(session);
     }
 
@@ -65,14 +62,6 @@ public class AllOrgsDiscountsReportPage extends OnlineReportPage {
 
     public void setRegion(String region) {
         this.region = region;
-    }
-
-    public User getCurrentUser() {
-        return currentUser;
-    }
-
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
     }
 
     public Properties addRegionProperty(Properties props, String region) {

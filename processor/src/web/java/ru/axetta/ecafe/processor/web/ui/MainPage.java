@@ -414,7 +414,6 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = allOrgsDiscountsReportPage;
-            allOrgsDiscountsReportPage.setCurrentUser(getCurrentUser());
         } catch (Exception e) {
             logger.error("Failed to set all orgs discount report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
