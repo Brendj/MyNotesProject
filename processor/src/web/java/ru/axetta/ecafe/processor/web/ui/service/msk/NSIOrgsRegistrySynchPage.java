@@ -132,7 +132,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
         return items;
     }
-
+    //Получаем даты обновлений реестров
     protected void loadRevisions() {
         try {
             revisions = DAOService.getInstance().getOrgRegistryChangeRevisionsList();
@@ -174,20 +174,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     }
 
     protected boolean isModifyableRevision() {
-        /*if(selectedRevision == null || revisions == null || revisions.size() < 1) {
-            return false;
-        }
-        if(!selectedRevision.equals(revisions.get(0))) {
-            return false;
-        }
-        if(items != null && items.size() > ) {
-            for() {
-
-            }
-        }
-        return true;*/
-
-
         return (selectedRevision < 0 || revisions == null || revisions.size() < 1 || revisions.get(0) == null ||
                 !selectedRevision.equals(revisions.get(0))) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
     }
@@ -195,7 +181,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void onShow() throws Exception {
         if(revisions != null) {
             revisions.clear();
-            items.clear();
+            if(items != null) items.clear();
         }
         loadRevisions();
         if(revisions != null && revisions.size() > 0) {
@@ -203,7 +189,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             doUpdate();
         }
     }
-
+    //Применяем фильтр
     public void doUpdate() {
         try {
             List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision);
@@ -213,7 +199,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             getLogger().error("Failed to load orgs from registry", e);
         }
     }
-
+    //Провести полную сверку
     public void doRefresh() {
         StringBuffer logBuffer = new StringBuffer();
         try {
@@ -228,8 +214,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             getLogger().error("Failed to refresh orgs from registry", e);
         }
     }
-
-    public void doApply() {
+    //Применить выбранные
+    public void doApply(){
         if(revisions == null || revisions.size() < 1) {
             return;
         }
@@ -241,9 +227,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             if(i.isApplied()) {
                 boolean success = RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
                                                 applyOrgRegistryChange(i.getIdOfOrgRegistryChange());
-                if(success) {
-                    i.setApplied(true);
-                }
+
+                i.setApplied(success);
+
             }
         }
     }
@@ -292,6 +278,13 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String guidFrom;
         protected Long additionalId;
 
+        protected String interdistrictCouncil;
+        protected String interdistrictCouncilFrom;
+        protected String interdistrictCouncilChief;
+        protected String interdistrictCouncilChiefFrom;
+
+
+
         public WebItem(OrgRegistryChange registryChange) {
             this.idOfOrgRegistryChange = registryChange.getIdOfOrgRegistryChange();
             this.idOfOrg = registryChange.getIdOfOrg();
@@ -315,6 +308,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guid = registryChange.getGuid();
             this.guidFrom = registryChange.getGuidFrom();
             this.additionalId = registryChange.getAdditionalId();
+
+            this.interdistrictCouncil = registryChange.getInterdistrictCouncil();
+            this.interdistrictCouncilFrom = registryChange.getInterdistrictCouncilFrom();
+            this.interdistrictCouncilChief = registryChange.getInterdistrictCouncilChief();
+            this.interdistrictCouncilChiefFrom = registryChange.getInterdistrictCouncilChiefFrom();
         }
 
         public String getOriginName() {
@@ -446,6 +444,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public void setApplied(boolean applied) {
             this.applied = applied;
+        }
+
+        public String getInterdistrictCouncil() {
+            return interdistrictCouncil;
+        }
+
+        public String getInterdistrictCouncilFrom() {
+            return interdistrictCouncilFrom;
+        }
+
+        public String getInterdistrictCouncilChief() {
+            return interdistrictCouncilChief;
+        }
+
+        public String getInterdistrictCouncilChiefFrom() {
+            return interdistrictCouncilChiefFrom;
         }
 
         public String getOperationType() {

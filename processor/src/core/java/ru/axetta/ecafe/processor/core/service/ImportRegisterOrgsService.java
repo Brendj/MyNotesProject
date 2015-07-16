@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -38,7 +38,7 @@ public class ImportRegisterOrgsService {
     private javax.persistence.EntityManager em;
 
     @Autowired
-    MskNSIService nsiService;
+    OrgMskNSIService nsiService;
 
     public static final long DEFAULT_SUPPLIER_ID = 28L;
     public static final int CREATE_OPERATION = 1;
@@ -63,7 +63,12 @@ public class ImportRegisterOrgsService {
         if(orgRegistryChange.getIdOfOrg() != null) {
             org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
         }
-
+        if (org == null && orgRegistryChange.getAdditionalId() != -1){
+            org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getAdditionalId());
+        }
+        if (org == null && orgRegistryChange.getUnom() != -1){
+            org = DAOUtils.findByBtiUnom(session,orgRegistryChange.getUnom());
+        }
         switch(orgRegistryChange.getOperationType()) {
             case OrgRegistryChange.CREATE_OPERATION:
                 try {
@@ -149,8 +154,8 @@ public class ImportRegisterOrgsService {
         String synchDate = "[Синхронизация с Реестрами от " + date + " о всем ОУ]: ";
         log(synchDate + "Производится синхронизация по всем организациям", logBuffer);
 
-        //  Итеративно загружаем клиентов, используя ограничения
-        List<OrgInfo> orgs = nsiService.getOrgs(orgName);//test();
+        //  Итеративно загружаем организации, используя ограничения
+        List<OrgInfo> orgs = nsiService.getOrgs(orgName);
         log(synchDate + "Получено " + orgs.size() + " записей", logBuffer);
         saveOrgs(synchDate, date, System.currentTimeMillis(), orgs, logBuffer);
         return logBuffer;
@@ -180,7 +185,12 @@ public class ImportRegisterOrgsService {
                      oi.getUnad(), oi.getUnadFrom(),
 
                      solveString(oi.getGuid()), oi.getGuidFrom(),
-                    oi.getAdditionalId() == null ? -1L : oi.getAdditionalId() );
+                    oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
+                            oi.getInterdistrictCouncil(),
+                            oi.getInterdistrictCouncilFrom(),
+                            oi.getInterdistrictCouncilChief(),
+                            oi.getInterdistrictCouncilChiefFrom()
+                            );
             em.persist(orgRegistryChange);
         }
     }
@@ -228,6 +238,12 @@ public class ImportRegisterOrgsService {
         protected String guidFrom;
         protected Long additionalId;
         protected Long registeryPrimaryId;
+
+        protected String interdistrictCouncil;
+        protected String interdistrictCouncilFrom;
+        protected String interdistrictCouncilChief;
+        protected String interdistrictCouncilChiefFrom;
+
 
         public Long getIdOfOrg() {
             return idOfOrg;
@@ -420,5 +436,39 @@ public class ImportRegisterOrgsService {
         public void setRegisteryPrimaryId(Long registeryPrimaryId) {
             this.registeryPrimaryId = registeryPrimaryId;
         }
+
+        public String getInterdistrictCouncil() {
+            return interdistrictCouncil;
+        }
+
+        public void setInterdistrictCouncil(String interdistrictCouncil) {
+            this.interdistrictCouncil = interdistrictCouncil;
+        }
+
+        public String getInterdistrictCouncilFrom() {
+            return interdistrictCouncilFrom;
+        }
+
+        public void setInterdistrictCouncilFrom(String interdistrictCouncilFrom) {
+            this.interdistrictCouncilFrom = interdistrictCouncilFrom;
+        }
+
+        public String getInterdistrictCouncilChief() {
+            return interdistrictCouncilChief;
+        }
+
+        public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
+            this.interdistrictCouncilChief = interdistrictCouncilChief;
+        }
+
+        public String getInterdistrictCouncilChiefFrom() {
+            return interdistrictCouncilChiefFrom;
+        }
+
+        public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
+            this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
+        }
+
+
     }
 }

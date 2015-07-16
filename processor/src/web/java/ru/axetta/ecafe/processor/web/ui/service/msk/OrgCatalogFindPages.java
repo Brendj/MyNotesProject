@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 @Scope("session")
-public class OrgCatalogFindPage extends BasicWorkspacePage {
+public class OrgCatalogFindPages extends BasicWorkspacePage {
     @Resource
     OrgMskNSIService nsiService;
     

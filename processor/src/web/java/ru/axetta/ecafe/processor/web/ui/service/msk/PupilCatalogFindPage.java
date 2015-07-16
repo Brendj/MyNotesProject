@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -39,7 +40,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
     Logger logger = LoggerFactory.getLogger(PupilCatalogFindPage.class);
     @Resource
-    MskNSIService nsiService;
+    ClientMskNSIService nsiService;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 

@@ -99,6 +99,12 @@
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.additionalIdBuilding}" styleClass="input-text" />
 
+    <h:outputText escape="true" value="В каком межрайонном совете состоит ОО" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.interdistrictCouncil}" styleClass="input-text" />
+    <h:outputText escape="true" value="Председателем какого межрайонного совета является руководитель ОО" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.interdistrictCouncilChief}" styleClass="input-text" />
+
+
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.cardLimit}" converter="copeckSumConverter"
                  styleClass="input-text" />

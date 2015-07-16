@@ -1,0 +1,290 @@
+/*
+ * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.partner.nsi;
+
+import generated.nsiws2.com.rstyle.nsi.beans.Attribute;
+import generated.nsiws2.com.rstyle.nsi.beans.GroupValue;
+import generated.nsiws2.com.rstyle.nsi.beans.Item;
+import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
+
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+/**
+ * User: shamil
+ * Date: 10.07.15
+ * Time: 10:25
+ */
+@Component
+@Scope("singleton")
+public class ClientMskNSIService extends MskNSIService {
+
+
+    private String getGroup(String currentGroup, String initialGroup) {
+        String group = currentGroup;
+        if (group == null || group.trim().length() == 0) {
+            group = initialGroup;
+        }
+        if (group != null) {
+            group = group.replaceAll("[ -]", "");
+        }
+        return group;
+    }
+
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
+            String familyName, String firstName, String secondName) throws Exception {
+        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        int importIteration = 1;
+        while (true) {
+            List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
+            iterationPupils = getClientsForOrgs(orgGuids, familyName, firstName, secondName, importIteration);
+            if (iterationPupils.size() > 0) {
+                pupils.addAll(iterationPupils);
+            } else {
+                break;
+            }
+            importIteration++;
+        }
+        /// удалить неимпортируемые группы
+        for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+            ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
+            if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+                i.remove();
+            }
+        }
+        return pupils;
+    }
+
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
+            String firstName, String secondName, int importIteration) throws Exception {
+        /*
+        От Козлова
+        */
+        /*String tbl = getNSIWorkTable();
+        String orgFilter = "";
+        if (guids != null && guids.size() > 0) {
+            for (String guid : guids) {
+                if (orgFilter.length() > 0) {
+                    orgFilter += " or ";
+                }
+                orgFilter += "item['" + tbl + "/GUID образовательного учреждения']='" + guid + "'";
+            }
+        }
+
+        String query = "select " +
+                "item['" + tbl + "/Фамилия'], " +
+                "item['" + tbl + "/Имя'], " +
+                "item['" + tbl + "/Отчество'], " +
+                "item['" + tbl + "/GUID'], " +
+                "item['" + tbl + "/Дата рождения'], " +
+                "item['" + tbl + "/Класс или группа зачисления'], " +
+                "item['" + tbl + "/Дата зачисления'], " +
+                "item['" + tbl + "/Дата отчисления'], " +
+                "item['" + tbl + "/Текущий класс или группа'], " +
+                "item['" + tbl + "/GUID образовательного учреждения'], " +
+                "item['" + tbl + "/Статус записи'] " +
+                "from catalog('Реестр обучаемых') " +
+                "where ";
+        if (orgFilter.length() > 0) {
+            query += " item['" + tbl + "/Статус записи'] not like 'Удален%'";
+            query += " and (" + orgFilter + ")";
+            if (familyName != null && familyName.length() > 0) {
+                query += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
+            }
+            if (firstName != null && firstName.length() > 0) {
+                query += " and item['" + tbl + "/Имя'] like '%" + firstName + "%'";
+            }
+            if (secondName != null && secondName.length() > 0) {
+                query += " and item['" + tbl + "/Отчество'] like '%" + secondName + "%'";
+            }
+        } else { // при поиске по ФИО используем для быстроты только полное совпадение
+            if (familyName != null && familyName.length() > 0) {
+                query += " item['" + tbl + "/Фамилия'] = '" + familyName + "'";
+            }
+            if (firstName != null && firstName.length() > 0) {
+                query += " and item['" + tbl + "/Имя'] = '" + firstName + "'";
+            }
+            if (secondName != null && secondName.length() > 0) {
+                query += " and item['" + tbl + "/Отчество'] = '" + secondName + "'";
+            }
+        }*/
+
+        if(guids == null || guids.size() < 1) {
+            throw new Exception("Запрос конитингенту без указания организации запрещен. Необходимо указывать организацию!");
+        }
+        //  Ограничение по guid'ам
+        SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Реестр обучаемых");
+        String guidCase = "";
+        if (guids != null && guids.size() > 0) {
+            for (String guid : guids) {
+                if(guidCase.length() > 0) {
+                    guidCase += ", ";
+                }
+                guidCase += guid;
+            }
+        }
+        if(guidCase.length() > 0) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("GUID образовательного учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(guidCase);
+            search.setAttributeOp("in");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  ФИО ограничения
+        if(!StringUtils.isBlank(familyName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Фамилия");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + familyName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(familyName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+        if(!StringUtils.isBlank(firstName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Имя");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + firstName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(firstName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+        if(!StringUtils.isBlank(secondName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Отчество");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + secondName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(secondName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  Запрет на удаленных
+        SearchPredicate search1 = new SearchPredicate();
+        search1.setAttributeName("Статус записи");
+        search1.setAttributeType(TYPE_STRING);
+        search1.setAttributeValue("Удален%");
+        search1.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search1);
+        SearchPredicate search2 = new SearchPredicate();
+        search2.setAttributeName("Статус записи");
+        search2.setAttributeType(TYPE_STRING);
+        search2.setAttributeValue("%Отчислен%");
+        search2.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search2);
+        SearchPredicate search3 = new SearchPredicate();
+        search3.setAttributeName("Статус записи");
+        search3.setAttributeType(TYPE_STRING);
+        search3.setAttributeValue("%Выпущен%");
+        search3.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(search3);
+
+        List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
+        LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        for(Item i : queryResults) {
+            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
+            for(Attribute attr : i.getAttribute()) {
+                if (attr.getName().equals("Фамилия")) {
+                    pupilInfo.familyName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Имя")) {
+                    pupilInfo.firstName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Отчество")) {
+                    pupilInfo.secondName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("GUID")) {
+                    pupilInfo.guid = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Дата рождения")) {
+                    pupilInfo.birthDate = attr.getValue().get(0).getValue();
+                }
+                if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
+                        attr.getName().equals("Текущий класс или группа")) {
+                    pupilInfo.group = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Класс")) {
+                    List<GroupValue> groupValues = attr.getGroupValue();
+                    boolean set = false;
+                    for(GroupValue grpVal : groupValues) {
+                        for(Attribute attr2 : grpVal.getAttribute()) {
+                            if(attr2.getName().equals("Название")) {
+                                pupilInfo.group = attr2.getValue().get(0).getValue();
+                                set = true;
+                                break;
+                            }
+                        }
+                        if(set) {
+                            break;
+                        }
+                    }
+                }
+                /*if (attr.getName().equals("Дата зачисления")) {
+                    pupilInfo.created = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("")) {
+                    pupilInfo.deleted = attr.getValue().get(0).getValue();
+                }*/
+                if (attr.getName().equals("GUID образовательного учреждения")) {
+                    pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
+                }
+                /*if (attr.getName().equals("")) {
+                    pupilInfo.recordState = attr.getValue().get(0).getValue();
+                }*/
+
+            }
+
+            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
+            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
+            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
+            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
+
+            list.add(pupilInfo);
+        }
+        /*for (QueryResult qr : queryResults) {
+            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
+            pupilInfo.familyName = qr.getQrValue().get(0);
+            pupilInfo.firstName = qr.getQrValue().get(1);
+            pupilInfo.secondName = qr.getQrValue().get(2);
+            pupilInfo.guid = qr.getQrValue().get(3);
+            pupilInfo.birthDate = qr.getQrValue().get(4);
+            pupilInfo.group = getGroup(qr.getQrValue().get(8), qr.getQrValue().get(5));
+            pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
+            pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
+            pupilInfo.guidOfOrg = qr.getQrValue().get(9);
+            pupilInfo.recordState = qr.getQrValue().get(10);
+
+            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
+            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
+            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
+            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
+
+            list.add(pupilInfo);
+        }*/
+        return list;
+    }
+}

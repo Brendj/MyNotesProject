@@ -1946,4 +1946,18 @@ public class DAOUtils {
         resultlist.addAll(idOfOrgSet);
         return resultlist;
     }
+
+
+    public static Org findByAdditionalId(Session session, long additionalIdBuildingId){
+        return (Org) session.createQuery("from Org where additionalIdBuilding =:additionalIdBuildingId")
+                .setParameter("additionalIdBuildingId", additionalIdBuildingId)
+                .uniqueResult();
+    }
+
+
+    public static Org findByBtiUnom(Session session, long btiUnom){
+        return (Org) session.createQuery("from Org where btiUnom =:btiUnom")
+                .setParameter("btiUnom", btiUnom)
+                .uniqueResult();
+    }
 }

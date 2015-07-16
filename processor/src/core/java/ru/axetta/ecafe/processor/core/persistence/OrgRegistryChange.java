@@ -44,6 +44,13 @@ public class OrgRegistryChange {
     protected String guidFrom;
     protected Long additionalId;
 
+
+    protected String interdistrictCouncil;
+    protected String interdistrictCouncilFrom;
+    protected String interdistrictCouncilChief;
+    protected String interdistrictCouncilChiefFrom;
+
+
     protected Boolean applied = false;
 
 
@@ -67,7 +74,12 @@ public class OrgRegistryChange {
                              Long unad, Long unadFrom,
 
                              String guid, String guidFrom,
-                             Long additionalId) {
+                             Long additionalId,
+             String interdistrictCouncil,
+             String interdistrictCouncilFrom,
+             String interdistrictCouncilChief,
+             String interdistrictCouncilChiefFrom
+            ) {
         this.idOfOrg = idOfOrg;
 
         this.organizationType = organizationType;
@@ -96,6 +108,11 @@ public class OrgRegistryChange {
         this.guid = guid;
         this.guidFrom = guidFrom;
         this.additionalId = additionalId;
+
+        this.interdistrictCouncil = interdistrictCouncil;
+        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
+        this.interdistrictCouncilChief = interdistrictCouncilChief;
+        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
     }
 
     public Long getAdditionalId() {
@@ -288,5 +305,37 @@ public class OrgRegistryChange {
 
     public void setIdOfOrgRegistryChange(Long idOfOrgRegistryChange) {
         this.idOfOrgRegistryChange = idOfOrgRegistryChange;
+    }
+
+    public String getInterdistrictCouncil() {
+        return interdistrictCouncil;
+    }
+
+    public void setInterdistrictCouncil(String interdistrictCouncil) {
+        this.interdistrictCouncil = interdistrictCouncil;
+    }
+
+    public String getInterdistrictCouncilFrom() {
+        return interdistrictCouncilFrom;
+    }
+
+    public void setInterdistrictCouncilFrom(String interdistrictCouncilFrom) {
+        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
+    }
+
+    public String getInterdistrictCouncilChief() {
+        return interdistrictCouncilChief;
+    }
+
+    public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
+        this.interdistrictCouncilChief = interdistrictCouncilChief;
+    }
+
+    public String getInterdistrictCouncilChiefFrom() {
+        return interdistrictCouncilChiefFrom;
+    }
+
+    public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
+        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
     }
 }

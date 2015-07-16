@@ -118,6 +118,10 @@ public class Org implements Serializable {
     private Boolean oneActiveCard;
     private Set<Card> cards = new HashSet<Card>();
 
+    private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
+    private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
+
+
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -860,6 +864,22 @@ public class Org implements Serializable {
 
     public void setCards(Set<Card> cards) {
         this.cards = cards;
+    }
+
+    public String getInterdistrictCouncil() {
+        return interdistrictCouncil;
+    }
+
+    public void setInterdistrictCouncil(String interdistrictCouncil) {
+        this.interdistrictCouncil = interdistrictCouncil;
+    }
+
+    public String getInterdistrictCouncilChief() {
+        return interdistrictCouncilChief;
+    }
+
+    public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
+        this.interdistrictCouncilChief = interdistrictCouncilChief;
     }
 
     @Override

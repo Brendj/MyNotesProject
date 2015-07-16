@@ -73,6 +73,9 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long additionalIdBuilding;
     private String statusDetailing;
 
+    private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
+    private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
+
     private Boolean payByCashier;
     private Boolean oneActiveCard;
 
@@ -227,6 +230,9 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.payByCashier = org.getPayByCashier();
         this.oneActiveCard = org.getOneActiveCard();
 
+
+        this.interdistrictCouncil = org.getInterdistrictCouncil();
+        this.interdistrictCouncilChief = org.getInterdistrictCouncilChief();
     }
 
     public String getFriendlyFilterOrgs() {
@@ -529,5 +535,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public Boolean getOneActiveCard() {
         return oneActiveCard;
+    }
+
+    public String getInterdistrictCouncil() {
+        return interdistrictCouncil;
+    }
+
+    public String getInterdistrictCouncilChief() {
+        return interdistrictCouncilChief;
     }
 }
