@@ -1014,9 +1014,11 @@ public class SyncRequest {
                         Double minP = getDoubleValue(namedNodeMap, "MinP");
                         Double minMg = getDoubleValue(namedNodeMap, "MinMg");
                         Double minFe = getDoubleValue(namedNodeMap, "MinFe");
+                        Double vitB2 = getDoubleValue(namedNodeMap, "VitB2");
+                        Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE,
-                                minCa, minP, minMg, minFe);
+                                minCa, minP, minMg, minFe, vitB2, vitPp);
                     }
 
                     private static Double getMinorComponent(NamedNodeMap namedNodeMap, String name) throws Exception {
@@ -1059,6 +1061,8 @@ public class SyncRequest {
                 private final Double carbohydrates;
                 private final Double calories;
                 private final Double vitB1;
+                private final Double vitB2;
+                private final Double vitPp;
                 private final Double vitC;
                 private final Double vitA;
                 private final Double vitE;
@@ -1074,7 +1078,7 @@ public class SyncRequest {
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
-                        Double minCa, Double minP, Double minMg, Double minFe) {
+                        Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1097,6 +1101,8 @@ public class SyncRequest {
                     this.minP = minP;
                     this.minMg = minMg;
                     this.minFe = minFe;
+                    this.vitB2 = vitB2;
+                    this.vitPp = vitPp;
                 }
 
                 public Long getIdOfMenu() {
@@ -1187,15 +1193,23 @@ public class SyncRequest {
                     return minFe;
                 }
 
+                public Double getVitB2() {
+                    return vitB2;
+                }
+
+                public Double getVitPp() {
+                    return vitPp;
+                }
+
                 @Override
                 public String toString() {
                     return "ReqMenuDetail{" + "idOfMenu=" + idOfMenu + ", path='" + path + '\'' + ", name='" + name
                             + '\'' + ", group='" + group + '\'' + ", output='" + output + '\'' + ", price=" + price
                             + ", protein=" + protein + ", fat=" + fat + ", carbohydrates=" + carbohydrates
-                            + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitC=" + vitC + ", vitA=" + vitA
-                            + ", vitE=" + vitE + ", minCa=" + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe="
-                            + minFe + ", menuOrigin=" + menuOrigin + ", availableNow=" + availableNow
-                            + ", flags=" + flags + ", priority=" + priority + '}';
+                            + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitB2=" + vitB2 + ", vitPp=" + vitPp
+                            + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
+                            + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", menuOrigin=" + menuOrigin
+                            + ", availableNow=" + availableNow + ", flags=" + flags + ", priority=" + priority + '}';
                 }
 
                 @Override

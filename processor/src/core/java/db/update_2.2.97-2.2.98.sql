@@ -64,3 +64,6 @@ ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncil character varyi
 ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncilFrom character varying  (256);
 ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncilChief character varying  (256);
 ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncilChiefFrom character varying  (256);
+
+ALTER TABLE cf_menudetails ADD COLUMN vitB2 DECIMAL(5, 2);
+ALTER TABLE cf_menudetails ADD COLUMN vitPp DECIMAL (5, 2);

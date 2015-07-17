@@ -3149,6 +3149,8 @@ public class Processor implements SyncProcessor,
                 newMenuDetail.setMinP(reqMenuDetail.getMinP());
                 newMenuDetail.setMinMg(reqMenuDetail.getMinMg());
                 newMenuDetail.setMinFe(reqMenuDetail.getMinFe());
+                newMenuDetail.setVitB2(reqMenuDetail.getVitB2());
+                newMenuDetail.setVitPp(reqMenuDetail.getVitPp());
 
                 persistenceSession.save(newMenuDetail);
                 menu.addMenuDetail(newMenuDetail);

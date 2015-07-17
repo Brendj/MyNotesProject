@@ -25,6 +25,7 @@ public class MenuDetail {
     private Double carbohydrates;
     private Double calories;
     private Double vitB1;
+    private Double vitB2;
     private Double vitC;
     private Double vitA;
     private Double vitE;
@@ -32,6 +33,7 @@ public class MenuDetail {
     private Double minP;
     private Double minMg;
     private Double minFe;
+    private Double vitPp;
     private int menuOrigin;
     private Long localIdOfMenu;
     private int availableNow;
@@ -101,8 +103,8 @@ public class MenuDetail {
         // For Hibernate only
     }
 
-    public MenuDetail(Menu menu, String menuPath, String menuDetailName, int menuOrigin,
-            int availableNow, Integer flags) {
+    public MenuDetail(Menu menu, String menuPath, String menuDetailName, int menuOrigin, int availableNow,
+            Integer flags) {
         this.menuPath = menuPath;
         this.menu = menu;
         this.menuDetailName = menuDetailName;
@@ -195,6 +197,14 @@ public class MenuDetail {
         this.vitB1 = vitB1;
     }
 
+    public Double getVitB2() {
+        return vitB2;
+    }
+
+    public void setVitB2(Double vitB2) {
+        this.vitB2 = vitB2;
+    }
+
     public Double getVitC() {
         return vitC;
     }
@@ -251,6 +261,14 @@ public class MenuDetail {
         this.minFe = minFe;
     }
 
+    public Double getVitPp() {
+        return vitPp;
+    }
+
+    public void setVitPp(Double minPp) {
+        this.vitPp = minPp;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -271,10 +289,10 @@ public class MenuDetail {
     @Override
     public String toString() {
         return "MenuDetail{" + "idOfMenuDetail=" + idOfMenuDetail + ", menu=" + menu + ", menuDetailName='"
-                + menuDetailName + ", menuDetailOutput='" + menuDetailOutput
-                + '\'' + ", price=" + price + ", protein=" + protein + ", fat=" + fat + ", carbohydrates="
-                + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitC=" + vitC + ", vitA=" + vitA
-                + ", vitE=" + vitE + ", minCa=" + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe=" + minFe
+                + menuDetailName + ", menuDetailOutput='" + menuDetailOutput + '\'' + ", price=" + price + ", protein="
+                + protein + ", fat=" + fat + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1="
+                + vitB1 + ", vitB2=" + vitB2 + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa="
+                + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", vitPp=" + vitPp
                 + ", menuOrigin=" + menuOrigin + ", flags=" + flags + ", priority=" + priority + '}';
     }
 }
