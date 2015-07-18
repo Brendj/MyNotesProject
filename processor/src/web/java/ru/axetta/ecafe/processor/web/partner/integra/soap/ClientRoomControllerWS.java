@@ -2152,6 +2152,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
@@ -2164,6 +2165,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setPrice(menuDetail.getPrice());
                 menuItemExt.setCalories(menuDetail.getCalories());
                 menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitB2(menuDetail.getVitB2());
+                menuItemExt.setVitPp(menuDetail.getVitPp());
                 menuItemExt.setVitC(menuDetail.getVitC());
                 menuItemExt.setVitA(menuDetail.getVitA());
                 menuItemExt.setVitE(menuDetail.getVitE());
@@ -2494,6 +2497,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
@@ -2506,6 +2510,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setPrice(menuDetail.getPrice());
                 menuItemExt.setCalories(menuDetail.getCalories());
                 menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitB2(menuDetail.getVitB2());
+                menuItemExt.setVitPp(menuDetail.getVitPp());
                 menuItemExt.setVitC(menuDetail.getVitC());
                 menuItemExt.setVitA(menuDetail.getVitA());
                 menuItemExt.setVitE(menuDetail.getVitE());

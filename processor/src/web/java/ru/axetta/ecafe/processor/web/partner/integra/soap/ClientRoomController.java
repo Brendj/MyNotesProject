@@ -139,8 +139,8 @@ public interface ClientRoomController {
 /*    @WebMethod(operationName = "getMenuList") MenuListResult getMenuList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);*/
 
-    @WebMethod(operationName = "getMenuList") MenuListResult getMenuFirstDay(
-            @WebParam(name = "contractId") Long contractId, @WebParam(name = "startDate") Date startDate,
+    @WebMethod(operationName = "getMenuList")
+    MenuListResult getMenuFirstDay(@WebParam(name = "contractId") Long contractId, @WebParam(name = "startDate") Date startDate,
             @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getMenuListBySan")

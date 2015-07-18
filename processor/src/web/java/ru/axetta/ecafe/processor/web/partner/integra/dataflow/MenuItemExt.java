@@ -51,6 +51,10 @@ public class MenuItemExt {
     protected String output;
     @XmlAttribute(name = "VitB1")
     protected Double vitB1;
+    @XmlAttribute(name = "VitB2")
+    protected Double vitB2;
+    @XmlAttribute(name = "VitPp")
+    private Double vitPp;
     @XmlAttribute(name = "VitC")
     protected Double vitC;
     @XmlAttribute(name = "VitA")
@@ -210,6 +214,54 @@ public class MenuItemExt {
      */
     public void setVitB1(Double value) {
         this.vitB1 = value;
+    }
+
+    /**
+     * Gets the value of the vitB2 property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Double }
+     *
+     */
+    public Double getVitB2() {
+        return vitB2;
+    }
+
+    /**
+     * Sets the value of the vitB2 property.
+     *
+     * @param vitB2
+     *     allowed object is
+     *     {@link Double }
+     *
+     */
+    public void setVitB2(Double vitB2) {
+        this.vitB2 = vitB2;
+    }
+
+    /**
+     * Gets the value of the vitPp property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Double }
+     *
+     */
+    public Double getVitPp() {
+        return vitPp;
+    }
+
+    /**
+     * Sets the value of the vitPp property.
+     *
+     * @param vitPp
+     *     allowed object is
+     *     {@link Double }
+     *
+     */
+    public void setVitPp(Double vitPp) {
+        this.vitPp = vitPp;
     }
 
     /**
