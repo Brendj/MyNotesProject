@@ -2175,6 +2175,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 
@@ -2520,6 +2521,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 

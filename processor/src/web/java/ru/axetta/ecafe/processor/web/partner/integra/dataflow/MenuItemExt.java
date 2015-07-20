@@ -49,6 +49,8 @@ public class MenuItemExt {
     protected Double calories;
     @XmlAttribute(name = "Output")
     protected String output;
+    @XmlAttribute(name = "AvailableNow")
+    protected Integer availableNow;
     @XmlAttribute(name = "VitB1")
     protected Double vitB1;
     @XmlAttribute(name = "VitB2")
@@ -142,6 +144,30 @@ public class MenuItemExt {
      */
     public void setOutput(String value) {
         this.output = value;
+    }
+
+    /**
+     * Gets the value of the availableNow property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public Integer getAvailableNow() {
+        return availableNow;
+    }
+
+    /**
+     * Sets the value of the availableNow property.
+     *
+     * @param availableNow
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setAvailableNow(Integer availableNow) {
+        this.availableNow = availableNow;
     }
 
     /**
