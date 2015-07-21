@@ -2185,6 +2185,93 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public MenuListWithComplexesResult getMenuListWithComplexes(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+        ObjectFactory objectFactory = new ObjectFactory();
+        return processMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+    }
+
+    private MenuListWithComplexesResult processMenuListWithComplexes(Long contractId, Date startDate, Date endDate, ObjectFactory objectFactory) {
+        Session session = null;
+        Transaction transaction = null;
+        MenuListWithComplexesResult result = new MenuListWithComplexesResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = findClientByContractId(session, contractId, result);
+
+            if (client == null) {
+                return result;
+            }
+
+            Org org = client.getOrg();
+
+            DAOService daoService = DAOService.getInstance();
+
+            Criteria criteria = session.createCriteria(ComplexInfo.class);
+            criteria.add(Restrictions.eq("org", org));
+            criteria.add(Restrictions.gt("menuDate", startDate));
+            criteria.add(Restrictions.lt("menuDate", endDate));
+
+            List<ComplexInfo> complexInfoList = criteria.list();
+
+            List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
+            for (ComplexInfo ci : complexInfoList) {
+
+                List<Long> complexInfoDetailList = daoService.getMenuDetailsIdsByIdOfComplexInfo(ci.getIdOfComplexInfo());
+
+                List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
+
+                for (Long id : complexInfoDetailList) {
+                    Criteria criteriaMenuDetails = session.createCriteria(MenuDetail.class);
+                    criteriaMenuDetails.add(Restrictions.eq("idOfMenuDetail", id));
+
+                    MenuDetail menuDetail = (MenuDetail) criteriaMenuDetails.uniqueResult();
+
+                    MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                    menuItemExt.setGroup(menuDetail.getGroupName());
+                    menuItemExt.setName(menuDetail.getMenuDetailName());
+                    menuItemExt.setPrice(menuDetail.getPrice());
+                    menuItemExt.setCalories(menuDetail.getCalories());
+                    menuItemExt.setVitB1(menuDetail.getVitB1());
+                    menuItemExt.setVitB2(menuDetail.getVitB2());
+                    menuItemExt.setVitPp(menuDetail.getVitPp());
+                    menuItemExt.setVitC(menuDetail.getVitC());
+                    menuItemExt.setVitA(menuDetail.getVitA());
+                    menuItemExt.setVitE(menuDetail.getVitE());
+                    menuItemExt.setMinCa(menuDetail.getMinCa());
+                    menuItemExt.setMinP(menuDetail.getMinP());
+                    menuItemExt.setMinMg(menuDetail.getMinMg());
+                    menuItemExt.setMinFe(menuDetail.getMinFe());
+                    menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                    menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+
+                    menuItemExtList.add(menuItemExt);
+                }
+
+                MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
+                menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
+
+                list.add(menuWithComplexesExt);
+            }
+            result.getMenuWithComplexesList().setList(list);
+
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        return result;
+    }
+
+    @Override
     public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId, final Date startDate,
           final Date endDate) {
         authenticateRequest(null);
