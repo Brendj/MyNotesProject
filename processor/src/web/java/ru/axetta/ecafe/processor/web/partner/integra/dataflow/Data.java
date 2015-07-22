@@ -63,6 +63,8 @@ public class Data {
     protected PurchaseList purchaseList;
     @XmlElement(name = "PurchaseListExt")
     protected PurchaseListExt purchaseListExt;
+    @XmlElement(name = "PurchaseListWithDetailsExt")
+    protected PurchaseListWithDetailsExt purchaseListWithDetailsExt;
     @XmlElement(name = "PaymentList")
     protected PaymentList paymentList;
     @XmlElement(name = "MenuList")
@@ -201,6 +203,29 @@ public class Data {
      */
     public void setPurchaseListExt(PurchaseListExt value) {
         this.purchaseListExt = value;
+    }
+
+    /**
+     * Gets the value of the PurchaseListWithDetailsExt property.
+     *
+     * @return
+     *     possible object is
+     *     {@link PurchaseListWithDetailsExt }
+     */
+    public PurchaseListWithDetailsExt getPurchaseListWithDetailsExt() {
+        return purchaseListWithDetailsExt;
+    }
+
+    /**
+     * Sets the value of the PurchaseListWithDetailsExt property.
+     *
+     * @param purchaseListWithDetailsExt
+     *     allowed object is
+     *     {@link PurchaseListWithDetailsExt }
+     *
+     */
+    public void setPurchaseListWithDetailsExt(PurchaseListWithDetailsExt purchaseListWithDetailsExt) {
+        this.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
     }
 
     /**

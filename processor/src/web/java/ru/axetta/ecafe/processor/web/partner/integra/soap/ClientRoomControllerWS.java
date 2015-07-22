@@ -1830,6 +1830,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return purchaseListResult;
     }
 
+    @Override
+    public PurchaseListWithDetailsResult getPurchaseListWithDetails(Long contractId, final Date startDate,
+            final Date endDate, final Short mode) {
+        authenticateRequest(null);
+
+        Data data = new ClientRequest()
+                .process(contractId, new Processor() {
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                            Session session, Transaction transaction) throws Exception {
+                        processPurchaseListWithDetailsResult(client, data, objectFactory, session, endDate, startDate,
+                                null, mode);
+                    }
+                });
+        PurchaseListWithDetailsResult purchaseListWithDetailsResult = new PurchaseListWithDetailsResult();
+        purchaseListWithDetailsResult.purchaseListWithDetailsExt = data.getPurchaseListWithDetailsExt();
+        purchaseListWithDetailsResult.resultCode = data.getResultCode();
+        purchaseListWithDetailsResult.description = data.getDescription();
+
+        return purchaseListWithDetailsResult;
+    }
+
+    private void processPurchaseListWithDetailsResult(Client client, Data data, ObjectFactory objectFactory,
+            Session session, Date endDate, Date startDate, Object o, Short mode) {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
           Date endDate, Date startDate, OrderTypeEnumType orderType, Short mode) throws DatatypeConfigurationException {
         int nRecs = 0;
