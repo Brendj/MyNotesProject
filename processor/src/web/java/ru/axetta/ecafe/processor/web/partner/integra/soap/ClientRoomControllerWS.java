@@ -1844,7 +1844,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 });
         PurchaseListWithDetailsResult purchaseListWithDetailsResult = new PurchaseListWithDetailsResult();
-        purchaseListWithDetailsResult.purchaseListWithDetailsExt = data.getPurchaseListWithDetailsExt();
         purchaseListWithDetailsResult.resultCode = data.getResultCode();
         purchaseListWithDetailsResult.description = data.getDescription();
 
