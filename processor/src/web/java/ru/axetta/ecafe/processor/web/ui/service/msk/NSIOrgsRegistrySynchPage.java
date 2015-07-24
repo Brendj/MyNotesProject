@@ -17,10 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -247,6 +244,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             WebItem wi = new WebItem(i);
             items.add(wi);
         }
+
+        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
     }
 
     public class WebItem {
@@ -283,6 +284,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String interdistrictCouncilChief;
         protected String interdistrictCouncilChiefFrom;
 
+        private boolean selected = false;
+
+
+        private List<WebItem> orgs = new LinkedList<WebItem>();
 
 
         public WebItem(OrgRegistryChange registryChange) {
@@ -313,6 +318,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.interdistrictCouncilFrom = registryChange.getInterdistrictCouncilFrom();
             this.interdistrictCouncilChief = registryChange.getInterdistrictCouncilChief();
             this.interdistrictCouncilChiefFrom = registryChange.getInterdistrictCouncilChiefFrom();
+
+
+            for (OrgRegistryChange orgRegistryChange : registryChange.getOrgs()) {
+                orgs.add(new WebItem(orgRegistryChange));
+            }
+
         }
 
         public String getOriginName() {
@@ -477,6 +488,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public Integer getOperation() {
             return operationType;
+        }
+
+        public List<WebItem> getOrgs() {
+            return orgs;
+        }
+
+        public void setOrgs(List<WebItem> orgs) {
+            this.orgs = orgs;
+        }
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected = selected;
         }
     }
 }

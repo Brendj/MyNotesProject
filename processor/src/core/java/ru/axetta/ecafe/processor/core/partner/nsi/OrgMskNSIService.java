@@ -131,6 +131,19 @@ public class OrgMskNSIService extends MskNSIService {
                 if (attr.getName().equals("interdistrict_council_chief")) {
                     info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
                 }
+                if (attr.getName().equals("ФИО директора")) {
+                    info.setDirectorFullName(attr.getValue().get(0).getValue());
+                }
+
+                if (attr.getName().equals("Код ОГРН")) {
+                    info.setOGRN(attr.getValue().get(0).getValue());
+                }
+                if (attr.getName().equals("ИНН образовательного учреждения")) {
+                    info.setINN(attr.getValue().get(0).getValue());
+                }
+                if (attr.getName().equals("Признак активности")) {
+                    info.setState(attr.getValue().get(0).getValue());
+                }
             }
 
             if(info.getOrganizationType() == null) {

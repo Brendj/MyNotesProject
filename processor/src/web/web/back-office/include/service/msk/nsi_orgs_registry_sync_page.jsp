@@ -68,59 +68,59 @@
                 <h:outputText value="Всего в списке: #{NSIOrgsRegistrySynchPage.totalCount}" styleClass="output-text" />
             </h:panelGrid>
             <rich:dataTable value="#{NSIOrgsRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
-                            width="350px" rows="20" id="table" rowKeyVar="row">
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                            width="350px" rows="20" columns="11" id="table" rowKeyVar="row" >
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="2" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="№"/>
                     </f:facet>
                     <h:outputText value="#{row+1}"/>
                 </rich:column>
 
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}"  rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Оригинальное наименование"/>
                     </f:facet>
                     <h:outputText value="#{e.originName}" escape="false"/>
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Новое наименование"/>
                     </f:facet>
                     <h:outputText value="#{e.newName}" escape="false"/>
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Оригинальный адрес"/>
                     </f:facet>
                     <h:outputText value="#{e.originAddress}" escape="false"/>
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Новый адрес"/>
                     </f:facet>
                     <h:outputText value="#{e.newAddress}" escape="false"/>
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Оригинальная дополнительная инф."/>
                     </f:facet>
                     <h:outputText value="#{e.originSpec}" escape="false"/>
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Новая дополнительная инф."/>
                     </f:facet>
                     <h:outputText value="#{e.newSpec}" escape="false"/>
                 </rich:column>
 
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Тип операции"/>
                     </f:facet>
                     <h:outputText value="#{e.operationType}"/>
                 </rich:column>
 
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Межрайонный совет ОО"/>
                     </f:facet>
@@ -130,7 +130,7 @@
 
                 </rich:column>
 
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Председатель межрайонного совета ОО"/>
                     </f:facet>
@@ -139,14 +139,27 @@
                     <h:outputText value="#{e.interdistrictCouncilChiefFrom}"/>
 
                 </rich:column>
-                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}">
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Применить" />
                     </f:facet>
+                    <h:selectBooleanCheckbox value="#{e.selected}" styleClass="checkboxes"
+                                             rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(e, false)}"/>
                     <h:selectBooleanCheckbox value="#{e.applied}" styleClass="checkboxes"
                                              rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(e, false)}"/>
                     <h:outputText value="применено" styleClass="output-text"
                                   rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(e, true)}"/>
+                </rich:column>
+                <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="11"  breakBefore="true">
+                    <rich:dataTable var="org" value="#{e.orgs}" >
+                        <rich:column>
+                            <h:selectBooleanCheckbox value="#{org.selected}" styleClass="checkboxes"
+                                                     rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false)}"/>
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText value="#{org.shortName}  -  #{org.originAddress}" title="Новое: #{org.originName}  -  #{org.originAddress}" escape="false" />
+                        </rich:column>
+                    </rich:dataTable>
                 </rich:column>
 
                 <f:facet name="footer">

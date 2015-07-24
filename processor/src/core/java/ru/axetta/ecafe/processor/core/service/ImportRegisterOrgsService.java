@@ -243,6 +243,10 @@ public class ImportRegisterOrgsService {
         protected String interdistrictCouncilFrom;
         protected String interdistrictCouncilChief;
         protected String interdistrictCouncilChiefFrom;
+        private String directorFullName;
+        private String OGRN;
+        private String INN;
+        private String state;
 
 
         public Long getIdOfOrg() {
@@ -470,5 +474,36 @@ public class ImportRegisterOrgsService {
         }
 
 
+        public void setDirectorFullName(String directorFullName) {
+            this.directorFullName = directorFullName;
+        }
+
+        public String getDirectorFullName() {
+            return directorFullName;
+        }
+
+        public void setOGRN(String OGRN) {
+            this.OGRN = OGRN;
+        }
+
+        public String getOGRN() {
+            return OGRN;
+        }
+
+        public void setINN(String INN) {
+            this.INN = INN;
+        }
+
+        public String getINN() {
+            return INN;
+        }
+
+        public void setState(String state) {
+            this.state = state;
+        }
+
+        public String getState() {
+            return state;
+        }
     }
 }

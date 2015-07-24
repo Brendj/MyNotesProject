@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: chirikov
@@ -50,6 +53,8 @@ public class OrgRegistryChange {
     protected String interdistrictCouncilChief;
     protected String interdistrictCouncilChiefFrom;
 
+
+    private List<OrgRegistryChange> orgs = new LinkedList<OrgRegistryChange>();
 
     protected Boolean applied = false;
 
@@ -337,5 +342,13 @@ public class OrgRegistryChange {
 
     public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
         this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
+    }
+
+    public List<OrgRegistryChange> getOrgs() {
+        return orgs;
+    }
+
+    public void setOrgs(List<OrgRegistryChange> orgs) {
+        this.orgs = orgs;
     }
 }
