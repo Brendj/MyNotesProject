@@ -12,14 +12,6 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * To change this template use File | Settings | File Templates.
  */
 public class PurchaseListWithDetailsResult extends Result {
-
     public PurchaseListWithDetailsExt purchaseListWithDetailsExt;
 
-    public PurchaseListWithDetailsExt getPurchaseListWithDetailsExt() {
-        return purchaseListWithDetailsExt;
-    }
-
-    public void setPurchaseListWithDetailsExt(PurchaseListWithDetailsExt purchaseListWithDetailsExt) {
-        this.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
-    }
 }

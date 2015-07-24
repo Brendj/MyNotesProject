@@ -37,6 +37,30 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link PurchaseListWithDetailsExt }
+     *
+     */
+    public PurchaseListWithDetailsExt createPurchaseListWithDetailsExt() {
+        return new PurchaseListWithDetailsExt();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseWithDetailsExt }
+     *
+     */
+    public PurchaseWithDetailsExt createPurchaseWithDetailsExt() {
+        return new PurchaseWithDetailsExt();
+    }
+
+    /**
+     * Create an instance of {@link PurchaseWithDetailsElementExt }
+     *
+     */
+    public PurchaseWithDetailsElementExt createPurchaseWithDetailsElementExt() {
+        return new PurchaseWithDetailsElementExt();
+    }
+
+    /**
      * Create an instance of {@link PaymentList }
      * 
      */

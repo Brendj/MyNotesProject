@@ -48,6 +48,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseWithDetailsExt;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
@@ -1830,31 +1831,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return purchaseListResult;
     }
 
-    @Override
-    public PurchaseListWithDetailsResult getPurchaseListWithDetails(Long contractId, final Date startDate,
-            final Date endDate, final Short mode) {
-        authenticateRequest(null);
-
-        Data data = new ClientRequest()
-                .process(contractId, new Processor() {
-                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                            Session session, Transaction transaction) throws Exception {
-                        processPurchaseListWithDetailsResult(client, data, objectFactory, session, endDate, startDate,
-                                null, mode);
-                    }
-                });
-        PurchaseListWithDetailsResult purchaseListWithDetailsResult = new PurchaseListWithDetailsResult();
-        purchaseListWithDetailsResult.resultCode = data.getResultCode();
-        purchaseListWithDetailsResult.description = data.getDescription();
-
-        return purchaseListWithDetailsResult;
-    }
-
-    private void processPurchaseListWithDetailsResult(Client client, Data data, ObjectFactory objectFactory,
-            Session session, Date endDate, Date startDate, Object o, Short mode) {
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
           Date endDate, Date startDate, OrderTypeEnumType orderType, Short mode) throws DatatypeConfigurationException {
         int nRecs = 0;
@@ -1912,6 +1888,97 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseListExt.getP().add(purchaseExt);
         }
         data.setPurchaseListExt(purchaseListExt);
+    }
+
+    @Override
+    public PurchaseListWithDetailsResult getPurchaseListWithDetails(Long contractId, final Date startDate,
+            final Date endDate, final Short mode) {
+        authenticateRequest(null);
+        ObjectFactory objectFactory = new ObjectFactory();
+        return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode);
+    }
+
+    private PurchaseListWithDetailsResult processPurchaseListWithDetails(Long contractId, ObjectFactory objectFactory,
+            Date startDate, Date endDate, Short mode) {
+        Session session = null;
+        Transaction transaction = null;
+        PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
+        PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = findClientByContractId(session, contractId, result);
+
+            if (client == null) {
+                return result;
+            }
+
+            int nRecs = 0;
+            Date nextToEndDate = DateUtils.addDays(endDate, 1);
+            Criteria ordersCriteria = session.createCriteria(Order.class);
+            ordersCriteria.add(Restrictions.eq("client", client));
+            ordersCriteria.add(Restrictions.ge("createTime", startDate));
+            ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+
+            ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
+            List ordersList = ordersCriteria.list();
+
+            for (Object o : ordersList) {
+                if (nRecs++ > MAX_RECS_getPurchaseList) {
+                    break;
+                }
+                Order order = (Order) o;
+                PurchaseWithDetailsExt purchaseWithDetailsExt = objectFactory.createPurchaseWithDetailsExt();
+                purchaseWithDetailsExt.setByCard(order.getSumByCard());
+                purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
+                purchaseWithDetailsExt.setTrdDiscount(order.getTrdDiscount());
+                purchaseWithDetailsExt.setDonation(order.getGrantSum());
+                purchaseWithDetailsExt.setSum(order.getRSum());
+                purchaseWithDetailsExt.setByCash(order.getSumByCash());
+                if (order.getCard() == null) {
+                    purchaseWithDetailsExt.setIdOfCard(null);
+                } else {
+                    purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
+                }
+                //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
+                purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
+                if (mode!=null && mode == 1){
+                    purchaseWithDetailsExt.setState(order.getState());
+                }
+                Set<OrderDetail> orderDetailSet = ((Order) o).getOrderDetails();
+                for (OrderDetail od : orderDetailSet) {
+                    PurchaseWithDetailsElementExt purchaseWithDetailsElementExt = objectFactory.createPurchaseWithDetailsElementExt();
+                    purchaseWithDetailsElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+                    purchaseWithDetailsElementExt.setAmount(od.getQty());
+                    purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
+                    purchaseWithDetailsElementExt.setSum(od.getRPrice());
+                    purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
+                    if (od.isComplex()) {
+                        purchaseWithDetailsElementExt.setType(1);
+                    } else if (od.isComplexItem()) {
+                        purchaseWithDetailsElementExt.setType(2);
+                    } else {
+                        purchaseWithDetailsElementExt.setType(0);
+                    }
+                    purchaseWithDetailsExt.getE().add(purchaseWithDetailsElementExt);
+                }
+
+                purchaseListWithDetailsExt.getP().add(purchaseWithDetailsExt);
+            }
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+        result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+
+        return result;
     }
 
     @Override
