@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -51,6 +52,7 @@ public class SyncServlet extends HttpServlet {
     private static final String CONTENT_TYPE = "text/xml", CONTENT_TYPE_GZIPPED= "application/octet-stream";
     private static final Logger logger = LoggerFactory.getLogger(SyncServlet.class);
     private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
+    private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
 
     static class RequestData {
         public boolean isCompressed;
@@ -96,6 +98,20 @@ public class SyncServlet extends HttpServlet {
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
+
+            /////// Недопущение двух и более одновременных синхронизаций от одной организации
+            boolean success;
+            synchronized(syncsInProgress) {
+                success = syncsInProgress.add(idOfOrg);
+            }
+            if (!success) {
+                String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
+                logger.error(message);
+                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            ///////
+
             logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
@@ -125,6 +141,7 @@ public class SyncServlet extends HttpServlet {
             } catch (Exception e) {
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -133,12 +150,14 @@ public class SyncServlet extends HttpServlet {
                     String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
                     logger.error(message);
                     sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                    removeSyncInProgress(idOfOrg);
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -156,6 +175,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error("Failed to parse XML request", e);
                 String msg = String.format("Failed to parse XML request: %s", e.getMessage());
                 sendError(response, syncTime, msg, HttpServletResponse.SC_BAD_REQUEST);
+                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -169,6 +189,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error("Failed to process request", e);
                 String message = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, message, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -182,6 +203,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error("Failed to serialize response", e);
                 String format = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, format, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -195,17 +217,25 @@ public class SyncServlet extends HttpServlet {
                 writeResponse(response, requestData.isCompressed, responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);
+                removeSyncInProgress(idOfOrg);
                 throw new ServletException(e);
             }
 
             final String message = String.format("End of synchronization with %s", request.getRemoteAddr());
             logger.info(message);
+            removeSyncInProgress(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
             SyncCollector.setErrMessage(syncTime, e.getMessage());
             SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());
         } finally {
             SyncCollector.registerSyncEnd(syncTime);
+        }
+    }
+
+    private void removeSyncInProgress(long idOfOrg) {
+        synchronized (syncsInProgress) {
+            syncsInProgress.remove(idOfOrg);
         }
     }
 
