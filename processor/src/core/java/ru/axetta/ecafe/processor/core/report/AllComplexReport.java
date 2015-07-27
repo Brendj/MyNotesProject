@@ -75,6 +75,8 @@ public class AllComplexReport extends BasicReport {
                             firstTimeSale, lastTimeSale);
                     complexItems.add(complexItem);
                 }
+            } else {
+                throw new Exception("Укажите список организаций");
             }
             return new AllComplexReport(generateTime, new Date().getTime() - generateTime.getTime(), complexItems);
         }

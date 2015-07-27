@@ -72,6 +72,8 @@ public class FreeComplexReport extends BasicReport {
                             firstTimeSale, lastTimeSale);
                     complexItems.add(complexItem);
                 }
+            } else {
+                throw new Exception("Укажите список организаций");
             }
             return new FreeComplexReport(generateTime, new Date().getTime() - generateTime.getTime(), complexItems);
         }
