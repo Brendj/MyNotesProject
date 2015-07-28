@@ -39,9 +39,11 @@ public class TotalServicesReportPage extends OnlineReportPage{
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             this.totalReport = new TotalServicesReport ();
+            if(idOfOrg == null) throw new Exception("Необходимо выбрать организацию");
+
             TotalServicesReport.Builder reportBuilder = new TotalServicesReport.Builder(session, startDate, endDate,
                     idOfOrg, showBuildingDetails);
-            if(idOfOrg == null || idOfOrg<0) throw new Exception("Необходимо выбрать организацию");
+
             this.totalReport = reportBuilder.build();
             persistenceTransaction.commit();
             persistenceTransaction = null;
