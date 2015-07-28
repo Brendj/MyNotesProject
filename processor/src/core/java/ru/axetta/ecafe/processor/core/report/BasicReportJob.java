@@ -86,8 +86,17 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public static abstract class Builder {
         protected Contragent contragent;
         protected OrgShortItem org;
+        protected long userId;
         
         Properties reportProperties = new Properties();
+
+        public void setUserId(long value) {
+            userId = value;
+        }
+
+        public long getUserId() {
+            return userId;
+        }
 
         public Properties getReportProperties() {
             return reportProperties;

@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.dao.AbstractJpaDao;
 
 import org.slf4j.Logger;
@@ -60,6 +61,17 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         }
 
         return orgItemList;
+    }
+
+    public List<OrgItem> findAllActiveBySupplier(List<Long> ids){
+        List<OrgItem> allOrgs = findAllActive();
+        List<OrgItem> supplierOrgs = new ArrayList<OrgItem>();
+        for (OrgItem item : allOrgs) {
+            if (ids.contains(item.getIdOfOrg())) {
+                supplierOrgs.add(item);
+            }
+        }
+        return supplierOrgs;
     }
 
     public List<Long> findAllActiveIds(){

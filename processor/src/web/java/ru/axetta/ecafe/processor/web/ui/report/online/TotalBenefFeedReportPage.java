@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
@@ -126,6 +127,7 @@ public class TotalBenefFeedReportPage extends OnlineReportPage{
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+            builder.setUserId(DAOUtils.findUser(session, FacesContext.getCurrentInstance().getExternalContext().getRemoteUser()).getIdOfUser());
             endDate = CalendarUtils.endOfDay(startDate);
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();

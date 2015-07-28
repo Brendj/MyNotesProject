@@ -7,10 +7,18 @@ package ru.axetta.ecafe.processor.core.report;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.DailyFileCreator;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -169,9 +176,46 @@ public class BasicReport {
         protected abstract String generateCSV(JasperPrint print, OutputStream os) throws Exception;
     }
 
+    public static class UserOrgsAndContragents {
+        private final User user;
+        private final List<Long> orgs;
+        private final List<Long> contragents;
+
+        public UserOrgsAndContragents(Session session, long idOfUser) throws Exception {
+            user = DAOUtils.findUser(session, idOfUser);
+            Set<Contragent> userContragents = user.getContragents();
+            contragents = new ArrayList<Long>();
+            if (userContragents.size() > 0) {
+                Criteria orgCriteria = session.createCriteria(Org.class);
+                for (Contragent contragent : userContragents) {
+                    contragents.add(contragent.getIdOfContragent());
+                }
+                orgCriteria.add(Restrictions.in("defaultSupplier", userContragents));
+                orgCriteria.setProjection(Property.forName("idOfOrg"));
+                orgs = orgCriteria.list();
+            }
+            else {
+                orgs = null;
+            }
+        }
+
+        public List<Long> getOrgs() {
+            return orgs;
+        }
+
+        public List<Long> getContragents() {
+            return contragents;
+        }
+
+        public User getUser() {
+            return user;
+        }
+    }
+
     private Properties reportProperties;
     private Date generateTime;
     private long generateDuration;
+    private long idOfUser;
 
     public BasicReport() {
         this.generateTime = new Date();
@@ -227,4 +271,13 @@ public class BasicReport {
     public void setReportProperties(Properties reportProperties) {
         this.reportProperties = reportProperties;
     }
+
+    public long getIdOfUser() {
+        return idOfUser;
+    }
+
+    public void setIdOfUser(long idOfUser) {
+        this.idOfUser = idOfUser;
+    }
+
 }

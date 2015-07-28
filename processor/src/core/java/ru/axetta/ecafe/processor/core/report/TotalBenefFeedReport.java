@@ -65,13 +65,14 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
             //    startTime = new Date(1409877287000L);
             //    endTime = new Date(1409963687000L);
             //}
+            UserOrgsAndContragents userOAC = new UserOrgsAndContragents(session, getUserId());
 
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
             endTime = CalendarUtils.endOfDay(endTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime));
+                    createDataSource(session, org, startTime, endTime, userOAC));
 
 
             Date generateEndTime = new Date();
@@ -79,10 +80,10 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
                     jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime, UserOrgsAndContragents userOAC) throws Exception {
             Map<Long, TotalBenefFeedItem> dataMap = new HashMap<Long, TotalBenefFeedItem>();
             Map<Long,Long> mainBuildingMap = new HashMap<Long, Long>();
-            retrieveAllOrgs(dataMap, mainBuildingMap);
+            retrieveAllOrgs(dataMap, mainBuildingMap, userOAC);
 
             retrieveStudentsCount(dataMap, mainBuildingMap);
             retrieveBeneficiaryStudentsCount(dataMap, mainBuildingMap);
@@ -231,10 +232,18 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
         }
 
 
-        private void retrieveAllOrgs(Map<Long, TotalBenefFeedItem> totalBenefFeedItemsMap, Map<Long,Long> mainBuildingMap) {
+        private void retrieveAllOrgs(Map<Long, TotalBenefFeedItem> totalBenefFeedItemsMap, Map<Long,Long> mainBuildingMap, UserOrgsAndContragents userOAC) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
             OrgService orgService = RuntimeContext.getAppContext().getBean(OrgService.class);
-            List<OrgItem> allNames = orgRepository.findAllActive();
+            List<OrgItem> allNames;
+            //если роль пользователя = поставщик ( = 2 ), то берем только организации привязанных контрагентов. Для остальных ролей - все организации
+            if (userOAC.getUser().getIdOfRole() == 2) {
+                allNames = orgRepository.findAllActiveBySupplier(userOAC.getOrgs());
+            }
+            else {
+                allNames = orgRepository.findAllActive();
+            }
+
             TotalBenefFeedItem totalBenefFeedItem;
             for (OrgItem allName : allNames) {
                 Org mainBulding = orgService.getMainBulding(allName.getIdOfOrg());
