@@ -47,12 +47,18 @@ public class AggregateCostsAndSalesReportPage extends OnlineReportPage {
 
             this.aggregateCostsAndSalesReport = new AggregateCostsAndSalesReport();
             AggregateCostsAndSalesReport.Builder reportBuilder = new AggregateCostsAndSalesReport.Builder();
-            this.aggregateCostsAndSalesReport = reportBuilder.build(persistenceSession, startDate, endDate, idOfOrgList);
+            if (!idOfOrgList.isEmpty()) {
+                this.aggregateCostsAndSalesReport = reportBuilder
+                        .build(persistenceSession, startDate, endDate, idOfOrgList);
 
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+            } else {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Укажите список организаций", null));
+            }
         } catch (Exception e) {
             logger.error("Failed to build costs and sales report", e);
             facesContext.addMessage(null,
