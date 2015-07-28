@@ -89,6 +89,8 @@ public class EnterEventReport extends BasicReport {
                             personFullName, enterEvent.getEvtDateTime(), color);
                     enterEventItems.add(enterEventItem);
                 }
+            } else {
+                throw new Exception("Укажите список организаций");
             }
             return new EnterEventReport(generateTime, new Date().getTime() - generateTime.getTime(), enterEventItems);
         }
