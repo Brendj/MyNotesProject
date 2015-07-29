@@ -63,15 +63,22 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         return orgItemList;
     }
 
-    public List<OrgItem> findAllActiveBySupplier(List<Long> ids){
-        List<OrgItem> allOrgs = findAllActive();
-        List<OrgItem> supplierOrgs = new ArrayList<OrgItem>();
-        for (OrgItem item : allOrgs) {
-            if (ids.contains(item.getIdOfOrg())) {
-                supplierOrgs.add(item);
-            }
+    public List<OrgItem> findAllActiveBySupplier(List<Long> ids, long userId){
+        List<OrgItem> orgItemList = new ArrayList<OrgItem>();
+        Query nativeQuery = entityManager.createNativeQuery("select o.IdOfOrg, o.ShortName, o.District, o.Address from cf_orgs o "
+                + "where o.defaultsupplier in ("
+                + "select uc.idofcontragent "
+                + "from cf_users u join cf_usercontragents uc on u.idofuser = uc.idofuser "
+                + "where u.idofuser = :user) "
+                + "AND State =1 and OrganizationType=0 and RefectoryType != 3 ORDER BY OfficialName ")
+                .setParameter("user", userId);
+
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orgItemList.add(new OrgItem(((BigInteger)o[0]).longValue(),(String)o[1],(String)o[2],(String)o[3]));
         }
-        return supplierOrgs;
+
+        return orgItemList;
     }
 
     public List<Long> findAllActiveIds(){

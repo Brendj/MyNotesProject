@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
@@ -20,6 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.order.OrdersRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
+import ru.axetta.ecafe.processor.core.report.model.UserOrgsAndContragents;
 import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.SubItem;
 import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.TotalBenefFeedData;
 import ru.axetta.ecafe.processor.core.report.model.totalbeneffeedreport.TotalBenefFeedItem;
@@ -237,8 +239,8 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
             OrgService orgService = RuntimeContext.getAppContext().getBean(OrgService.class);
             List<OrgItem> allNames;
             //если роль пользователя = поставщик ( = 2 ), то берем только организации привязанных контрагентов. Для остальных ролей - все организации
-            if (userOAC.getUser().getIdOfRole() == 2) {
-                allNames = orgRepository.findAllActiveBySupplier(userOAC.getOrgs());
+            if (User.DefaultRole.SUPPLIER.getIdentification().equals(userOAC.getUser().getIdOfRole())) {
+                allNames = orgRepository.findAllActiveBySupplier(userOAC.getOrgs(), userOAC.getUser().getIdOfUser());
             }
             else {
                 allNames = orgRepository.findAllActive();
