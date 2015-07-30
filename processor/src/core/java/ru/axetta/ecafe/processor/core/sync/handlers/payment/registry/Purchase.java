@@ -33,6 +33,7 @@ public class Purchase {
     private final String itemCode;
     private final String guidOfGoods;
     private final Long idOfRule;
+    private final Long idOfMenu;
 
     public static Purchase build(Node purchaseNode, SyncRequest.MenuGroups menuGroups) throws Exception {
         NamedNodeMap namedNodeMap = purchaseNode.getAttributes();
@@ -84,13 +85,15 @@ public class Purchase {
             idOfRule = Long.parseLong(idOfRuleStr);
         }
 
+        Long idOfMenu = getLongValue(namedNodeMap, "IdOfMenu");
+
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule);
+                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu);
     }
 
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-            String itemCode, String guidOfGoods, Long idOfRule) {
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu) {
         this.discount = discount;
         this.socDiscount = socDiscount;
         this.idOfOrderDetail = idOfOrderDetail;
@@ -105,6 +108,7 @@ public class Purchase {
         this.itemCode = itemCode;
         this.guidOfGoods = guidOfGoods;
         this.idOfRule = idOfRule;
+        this.idOfMenu = idOfMenu;
     }
 
     public Long getDiscount() {
@@ -163,6 +167,10 @@ public class Purchase {
         return idOfRule;
     }
 
+    public Long getIdOfMenu() {
+        return idOfMenu;
+    }
+
     @Override
     public String toString() {
         return "Purchase{" +
@@ -180,6 +188,7 @@ public class Purchase {
                 ", itemCode='" + itemCode + '\'' +
                 ", guidOfGoods='" + guidOfGoods + '\'' +
                 ", idOfRule=" + idOfRule +
+                ", idOfMenu=" + idOfMenu +
                 '}';
     }
 }

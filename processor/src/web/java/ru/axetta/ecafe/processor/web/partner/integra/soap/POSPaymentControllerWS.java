@@ -54,7 +54,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                 List<Purchase> purchases = new ArrayList<Purchase>(posPayment.getPurchases().size());
                 for (PosPurchase p: posPayment.getPurchases()){
                         Purchase purchase = new Purchase(p.getDiscount(), p.getSocDiscount(), p.getIdOfOrderDetail(), p.getName(), p.getQty(), p.getrPrice(),
-                            p.getRootMenu(), p.getMenuOutput(), p.getType(), p.getMenuGroup(), p.getMenuOrigin(), p.getItemCode(), p.getGuidOfGoods(), p.getIdOfRule());
+                            p.getRootMenu(), p.getMenuOutput(), p.getType(), p.getMenuGroup(), p.getMenuOrigin(), p.getItemCode(), p.getGuidOfGoods(), p.getIdOfRule(), p.getIdOfMenu());
                     purchases.add(purchase);
                 }
                 Payment payment = new Payment(posPayment.getCardNo(), posPayment.getTime(), posPayment.getOrderDate(), posPayment.getSocDiscount(),

@@ -41,6 +41,15 @@ public class MenuDetail {
     private Integer flags;
     private Integer priority;
     private String groupName;
+    private Long idOfMenuFromSync;
+
+    public Long getIdOfMenuFromSync() {
+        return idOfMenuFromSync;
+    }
+
+    public void setIdOfMenuFromSync(Long idofmenufromsync) {
+        this.idOfMenuFromSync = idofmenufromsync;
+    }
 
     public String getGroupName() {
         return groupName;
@@ -293,6 +302,7 @@ public class MenuDetail {
                 + protein + ", fat=" + fat + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1="
                 + vitB1 + ", vitB2=" + vitB2 + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa="
                 + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", vitPp=" + vitPp
-                + ", menuOrigin=" + menuOrigin + ", flags=" + flags + ", priority=" + priority + '}';
+                + ", menuOrigin=" + menuOrigin + ", flags=" + flags + ", priority=" + priority + ", idOfMenuFromSync=" + idOfMenuFromSync
+                + '}';
     }
 }

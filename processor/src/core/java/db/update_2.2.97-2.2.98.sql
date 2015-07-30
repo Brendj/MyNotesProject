@@ -67,3 +67,6 @@ ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncilChiefFrom charac
 
 ALTER TABLE cf_menudetails ADD COLUMN vitB2 DECIMAL(5, 2);
 ALTER TABLE cf_menudetails ADD COLUMN vitPp DECIMAL (5, 2);
+
+ALTER TABLE cf_menudetails ADD COLUMN idOfMenuFromSync bigint;
+ALTER TABLE cf_orderdetails ADD COLUMN idOfMenuFromSync bigint;

@@ -44,6 +44,8 @@ public class PosPurchase {
     private String guidOfGoods;
     @XmlAttribute(name = "IdOfRule")
     private Long idOfRule;
+    @XmlAttribute(name = "IdOfMenu")
+    private Long idOfMenu;
 
     public Long getDiscount() {
         return discount;
@@ -155,5 +157,13 @@ public class PosPurchase {
 
     public void setIdOfRule(Long idOfRule) {
         this.idOfRule = idOfRule;
+    }
+
+    public Long getIdOfMenu() {
+        return idOfMenu;
+    }
+
+    public void setIdOfMenu(Long idOfMenu) {
+        this.idOfMenu = idOfMenu;
     }
 }

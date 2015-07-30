@@ -2117,7 +2117,7 @@ public class Processor implements SyncProcessor,
                             new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
                             purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getrPrice(),
                             purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
-                            purchase.getMenuOutput(), purchase.getType());
+                            purchase.getMenuOutput(), purchase.getType(), purchase.getIdOfMenu());
                     if (purchase.getItemCode() != null) {
                         orderDetail.setItemCode(purchase.getItemCode());
                     }
@@ -3151,6 +3151,7 @@ public class Processor implements SyncProcessor,
                 newMenuDetail.setMinFe(reqMenuDetail.getMinFe());
                 newMenuDetail.setVitB2(reqMenuDetail.getVitB2());
                 newMenuDetail.setVitPp(reqMenuDetail.getVitPp());
+                newMenuDetail.setIdOfMenuFromSync(reqMenuDetail.getIdOfMenu());
 
                 persistenceSession.save(newMenuDetail);
                 menu.addMenuDetail(newMenuDetail);

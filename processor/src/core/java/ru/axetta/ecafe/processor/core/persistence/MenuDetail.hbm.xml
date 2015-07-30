@@ -40,6 +40,7 @@
         <property name="minP" column="MinP" type="double" update="false"/>
         <property name="minMg" column="MinMg" type="double" update="false"/>
         <property name="minFe" column="MinFe" type="double" update="false"/>
+        <property name="idOfMenuFromSync" column="IdOfMenuFromSync" type="long"/>
     </class>
 </hibernate-mapping>
 
