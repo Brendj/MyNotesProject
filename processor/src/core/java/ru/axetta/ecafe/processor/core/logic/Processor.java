@@ -549,6 +549,38 @@ public class Processor implements SyncProcessor,
         }
     }
 
+    public void disableClientCardsIfChangeOrg(Client client, Set<Org> oldOrgs, long newIdOfOrg) throws Exception {
+        if (client == null) {
+            return;
+        }
+        Boolean isReplaceOrg = !client.getOrg().getIdOfOrg().equals(newIdOfOrg); //сравниваем старую организацию клиента с новой
+        for (Org o : oldOrgs) {
+            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //и с дружественными организациями
+                isReplaceOrg = false;
+                break;
+            }
+        }
+        //Если новая организация не совпадает ни со старой, ни с дружественными старой, то блокируем карты клиента
+        if (isReplaceOrg) {
+            Set<Card> cards = client.getCards();
+            for (Card card : cards) {
+                if (card.getState().equals(CardState.BLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
+                    continue;
+                }
+                updateCard(client.getIdOfClient(),
+                        card.getIdOfCard(),
+                        card.getCardType(),
+                        CardState.BLOCKED.getValue(), //статус = Заблокировано
+                        card.getValidTime(),
+                        card.getLifeState(),
+                        card.getLockReason(),
+                        card.getIssueTime(),
+                        card.getExternalId()
+                );
+            }
+        }
+    }
+
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception {
@@ -2245,6 +2277,11 @@ public class Processor implements SyncProcessor,
 
             while (clientParamItems.hasNext()) {
                 SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem = clientParamItems.next();
+
+                //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
+                Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
+                disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
+
                 /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
                 *//* если группы нет то создаем *//*
                 if(clientGroup == null){

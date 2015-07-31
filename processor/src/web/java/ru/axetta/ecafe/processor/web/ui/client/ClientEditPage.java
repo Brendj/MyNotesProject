@@ -693,6 +693,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
         if(isReplaceOrg){
             clientMigration = new ClientMigration(client.getOrg());
+
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Set<Org> orgSet = client.getOrg().getFriendlyOrg();
+            runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
+
         }
         client.setOrg(org);
         client.setPerson(person);
