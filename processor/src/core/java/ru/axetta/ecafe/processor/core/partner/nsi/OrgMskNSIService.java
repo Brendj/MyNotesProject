@@ -92,6 +92,7 @@ public class OrgMskNSIService extends MskNSIService {
                 }
 
                 if (attr.getName().equals("Сведения о БТИ")) {
+                    info.setOrgInfos(parseBTIInfo(attr, info.getGuid()));
                     if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
                         info.setGuid(attr.getValue().get(0).getValue());
                     }
@@ -156,8 +157,10 @@ public class OrgMskNSIService extends MskNSIService {
                         + "не имееет первичного ключа в Реестрах, или "
                         + "он указан не корректно.", info.getShortName(), info.getGuid()));
             } else {
-                Org existingOrg = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
+                List<Org> existingOrgList = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
                         info.getGuid());
+                Org existingOrg = findOrgByAdditionalId(existingOrgList, info.getAdditionalId());
+
 
                 if (existingOrg == null && info.getAdditionalId()!= null && info.getAdditionalId() != -1){
                     existingOrg = OrgWritableRepository.getInstance().findByAdditionalId( info.getAdditionalId());
@@ -185,25 +188,16 @@ public class OrgMskNSIService extends MskNSIService {
                     }
 
                     if(requiredUpdate) {
-                        info.setIdOfOrg(existingOrg.getIdOfOrg());
-                        info.setOrganizationTypeFrom(existingOrg.getType());
+                        fillInfOWithOrg(info, existingOrg);
+                        for (ImportRegisterOrgsService.OrgInfo orgInfo : info.getOrgInfos()) {
+                            Org result = findOrgByAdditionalId(existingOrgList, orgInfo.getAdditionalId());
+                            if (result != null){
+                                fillInfOWithOrg(orgInfo, result);
+                            }else{
+                                orgInfo.setGuid(info.getGuid());
 
-                        info.setShortNameFrom(existingOrg.getShortName());
-                        info.setOfficialNameFrom(existingOrg.getOfficialName());
-
-                        info.setAddress(existingOrg.getAddress());
-                        info.setCity(existingOrg.getCity());
-                        info.setRegionFrom(existingOrg.getDistrict());
-
-                        info.setUnomFrom(existingOrg.getBtiUnom());
-                        info.setUnadFrom(existingOrg.getBtiUnad());
-
-                        info.setGuidFrom(existingOrg.getGuid());
-
-                        info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
-
-                        info.setInterdistrictCouncilFrom(existingOrg.getInterdistrictCouncil());
-                        info.setInterdistrictCouncilChiefFrom(existingOrg.getInterdistrictCouncilChief());
+                            }
+                        }
                     } else {
                         continue;
                     }
@@ -216,6 +210,68 @@ public class OrgMskNSIService extends MskNSIService {
             }
         }
         return list;
+    }
+
+    private void fillInfOWithOrg(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {
+        info.setIdOfOrg(existingOrg.getIdOfOrg());
+        info.setOrganizationTypeFrom(existingOrg.getType());
+
+        info.setShortNameFrom(existingOrg.getShortName());
+        info.setOfficialNameFrom(existingOrg.getOfficialName());
+
+        info.setAddress(existingOrg.getAddress());
+        info.setCity(existingOrg.getCity());
+        info.setRegionFrom(existingOrg.getDistrict());
+
+        info.setUnomFrom(existingOrg.getBtiUnom());
+        info.setUnadFrom(existingOrg.getBtiUnad());
+
+        info.setGuidFrom(existingOrg.getGuid());
+
+        info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+
+        info.setInterdistrictCouncilFrom(existingOrg.getInterdistrictCouncil());
+        info.setInterdistrictCouncilChiefFrom(existingOrg.getInterdistrictCouncilChief());
+    }
+
+    private Org findOrgByAdditionalId(List<Org> existingOrgList, Long additionalId) {
+        for (Org org : existingOrgList) {
+            if(org.getAdditionalIdBuilding() != null && org.getAdditionalIdBuilding().equals(additionalId)){
+                return      org;
+            }
+        }
+        return null;
+    }
+
+    private List<ImportRegisterOrgsService.OrgInfo> parseBTIInfo(Attribute attr, String guid) {
+        List<ImportRegisterOrgsService.OrgInfo> result = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
+        if (attr.getGroupValue().size()> 1){
+            for (GroupValue groupValue : attr.getGroupValue()) {
+                ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
+                info.setGuid(guid);
+                for (Attribute attribute : groupValue.getAttribute()) {
+
+                    if("БТИ.eo_address".equals(attribute.getName())){
+                        info.setAddress(attribute.getValue().get(0).getValue());
+                    }
+                    if("unique_address_id".equals(attribute.getName())){
+                        info.setAdditionalId(Long.valueOf(attribute.getValue().get(0).getValue()));
+                    }
+                    if("is_main_building".equals(attribute.getName())){
+                        if (attribute.getValue()!= null
+                                && attribute.getValue().get(0) != null
+                                && attribute.getValue().get(0).getValue() != null
+                                &&!attribute.getValue().get(0).getValue().isEmpty()){
+                            info.setMainBuilding(Integer.valueOf(attribute.getValue().get(0).getValue()) == 1);
+                        }else{
+                            info.setMainBuilding(false);
+                        }
+                    }
+                }
+                result.add(info);
+            }
+        }
+        return result;
     }
 
     private boolean checkUpdated(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {

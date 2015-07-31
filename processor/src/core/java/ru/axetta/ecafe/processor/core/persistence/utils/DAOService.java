@@ -729,13 +729,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return ((Org)l.get(0));
     }
 
-    public Org findOrgByRegistryIdOrGuid (Long registryId, String guid) {
+    public List<Org> findOrgByRegistryIdOrGuid(Long registryId, String guid) {
         javax.persistence.Query q = entityManager.createQuery("from Org where guid=:guid or additionalIdBuilding=:registryId");
         q.setParameter("guid", guid);
         q.setParameter("registryId", registryId);
-        List l = q.getResultList();
-        if (l.size()==0) return null;
-        return ((Org)l.get(0));
+        return q.getResultList();
     }
 
 

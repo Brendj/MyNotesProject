@@ -6,15 +6,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange" table="cf_orgregistrychange" optimistic-lock="version">
-        <id name="idOfOrgRegistryChange" column="idoforgregistrychange" type="long">
+    <class name="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem" table="cf_orgregistrychange_item" optimistic-lock="version">
+        <id name="idOfOrgRegistryChangeItem" column="idOfOrgRegistryChangeItem" type="long">
             <generator class="identity"/>
         </id>
         <property name="idOfOrg" column="idoforg" type="long"/>
-        <property name="createDate" column="createdate" type="long" not-null="true"/>
-        <property name="operationType" column="operationtype" type="int" not-null="true"/>
+        <property name="createDate" column="createdate" type="long"/>
+        <property name="operationType" column="operationtype" type="int"/>
 
-        <property name="applied" column="applied" type="boolean" not-null="true"/>
+        <property name="applied" column="applied" type="boolean"/>
 
         <property name="organizationType" column="organizationtype">
             <type name="org.hibernate.type.EnumType">
@@ -26,16 +26,16 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>
             </type>
         </property>
-        <property name="shortName" column="shortname" type="string" length="255" not-null="true"/>
+        <property name="shortName" column="shortname" type="string" length="255"/>
         <property name="shortNameFrom" column="shortnamefrom" type="string" length="255"/>
-        <property name="officialName" column="officialname" type="string" length="255" not-null="true"/>
+        <property name="officialName" column="officialname" type="string" length="255"/>
         <property name="officialNameFrom" column="officialnamefrom" type="string" length="255"/>
 
-        <property name="address" column="address" type="string" length="255" not-null="true"/>
+        <property name="address" column="address" type="string" length="255"/>
         <property name="addressFrom" column="addressfrom" type="string" length="255"/>
-        <property name="city" column="city" type="string" length="255" not-null="true"/>
+        <property name="city" column="city" type="string" length="255"/>
         <property name="cityFrom" column="cityfrom" type="string" length="255"/>
-        <property name="region" column="region" type="string" length="255" not-null="true"/>
+        <property name="region" column="region" type="string" length="255"/>
         <property name="regionFrom" column="regionfrom" type="string" length="255"/>
 
         <property name="unom" column="unom" type="long"/>
@@ -43,17 +43,12 @@
         <property name="unad" column="unad" type="long"/>
         <property name="unadFrom" column="unadfrom" type="long"/>
 
-        <property name="guid" column="guid" type="string" length="255" not-null="true"/>
+        <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>
         <property name="additionalId" column="additionalid" type="long"/>
         <property name="mainBuilding" column="mainBuilding" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
-        <!--<many-to-one name="orgs" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"-->
-                     <!--column="mainRegistry" />-->
-
-        <set name="orgs" lazy="false" cascade="all">
-            <key column="mainRegistry"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem"/>
-        </set>
+        <many-to-one name="orgRegistryChange" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"
+                     column="mainRegistry" />
 
 
     </class>

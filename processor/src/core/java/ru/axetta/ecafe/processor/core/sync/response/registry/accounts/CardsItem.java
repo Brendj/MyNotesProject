@@ -73,6 +73,9 @@ public class CardsItem {
         this.cardNo = card.getCardNo();
         this.cardType = card.getCardType();
         this.state = card.getState();
+        if(card.getOrg() != null){
+            this.orgOwner = card.getOrg().getIdOfOrg();
+        }
         this.lockReason = card.getLockReason();
         this.validDate = card.getValidTime();
         this.issueDate = card.getIssueTime();

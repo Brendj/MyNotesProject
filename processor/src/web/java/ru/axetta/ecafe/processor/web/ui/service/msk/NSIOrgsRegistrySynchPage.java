@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -221,12 +222,18 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         for(WebItem i : items) {
-            if(i.isApplied()) {
+            if(i.isSelected()) {
+                List<Long> buildingsList = new LinkedList<Long>();
+                for (WebItem webItem : i.getOrgs()) {
+                    if (webItem.isSelected()){
+                        buildingsList.add(webItem.getIdOfOrgRegistryChange());
+                    }
+                }
                 boolean success = RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
-                                                applyOrgRegistryChange(i.getIdOfOrgRegistryChange());
+                                                applyOrgRegistryChange(i.getIdOfOrgRegistryChange(), buildingsList);
 
                 i.setApplied(success);
-
+                i.setSelected(false);
             }
         }
     }
@@ -245,9 +252,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             items.add(wi);
         }
 
-        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
-        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
-        items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
     }
 
     public class WebItem {
@@ -319,11 +326,43 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.interdistrictCouncilChief = registryChange.getInterdistrictCouncilChief();
             this.interdistrictCouncilChiefFrom = registryChange.getInterdistrictCouncilChiefFrom();
 
-
-            for (OrgRegistryChange orgRegistryChange : registryChange.getOrgs()) {
-                orgs.add(new WebItem(orgRegistryChange));
+            this.selected = registryChange.getApplied()?true: false;
+            for (OrgRegistryChangeItem orgRegistryChangeItem : registryChange.getOrgs()) {
+                orgs.add(new WebItem(orgRegistryChangeItem));
             }
 
+        }
+
+        public WebItem(OrgRegistryChangeItem registryChangeItem) {
+            this.idOfOrgRegistryChange = registryChangeItem.getIdOfOrgRegistryChangeItem();
+            this.idOfOrg = registryChangeItem.getIdOfOrg();
+            this.createDate = registryChangeItem.getCreateDate();
+            this.operationType = registryChangeItem.getOperationType();
+            this.applied = registryChangeItem.getApplied();
+            this.shortName = registryChangeItem.getShortName();
+            this.shortNameFrom = registryChangeItem.getShortNameFrom();
+            this.officialName = registryChangeItem.getOfficialName();
+            this.officialNameFrom = registryChangeItem.getOfficialNameFrom();
+            this.address = registryChangeItem.getAddress();
+            this.addressFrom = registryChangeItem.getAddressFrom();
+            this.city = registryChangeItem.getCity();
+            this.cityFrom = registryChangeItem.getCityFrom();
+            this.region = registryChangeItem.getRegion();
+            this.regionFrom = registryChangeItem.getRegionFrom();
+            this.unom = registryChangeItem.getUnom();
+            this.unomFrom = registryChangeItem.getUnomFrom();
+            this.unad = registryChangeItem.getUnad();
+            this.unadFrom = registryChangeItem.getUnadFrom();
+            this.guid = registryChangeItem.getGuid();
+            this.guidFrom = registryChangeItem.getGuidFrom();
+            this.additionalId = registryChangeItem.getAdditionalId();
+
+            this.interdistrictCouncil = registryChangeItem.getInterdistrictCouncil();
+            this.interdistrictCouncilFrom = registryChangeItem.getInterdistrictCouncilFrom();
+            this.interdistrictCouncilChief = registryChangeItem.getInterdistrictCouncilChief();
+            this.interdistrictCouncilChiefFrom = registryChangeItem.getInterdistrictCouncilChiefFrom();
+
+            this.selected = true;
         }
 
         public String getOriginName() {

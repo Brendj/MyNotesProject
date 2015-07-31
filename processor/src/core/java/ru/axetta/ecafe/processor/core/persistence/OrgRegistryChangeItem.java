@@ -6,21 +6,14 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: chirikov
- * Date: 19.01.15
- * Time: 17:32
- * To change this template use File | Settings | File Templates.
+ * User: Shamil
+ * Date: 27.07.15
  */
-public class OrgRegistryChange {
-    public static final int CREATE_OPERATION = 1;
-    public static final int MODIFY_OPERATION = 2;
-    public static final int DELETE_OPERATION = 3;
+public class OrgRegistryChangeItem {
 
-    protected Long idOfOrgRegistryChange;
+    protected Long idOfOrgRegistryChangeItem;
     protected Long idOfOrg;
     protected Long createDate;
     protected Integer operationType;
@@ -48,6 +41,7 @@ public class OrgRegistryChange {
     protected String guidFrom;
     protected Long additionalId;
 
+    private OrgRegistryChange orgRegistryChange;
     private Boolean mainBuilding;
 
     protected String interdistrictCouncil;
@@ -55,38 +49,26 @@ public class OrgRegistryChange {
     protected String interdistrictCouncilChief;
     protected String interdistrictCouncilChiefFrom;
 
-
-    private Set<OrgRegistryChangeItem> orgs;
-
     protected Boolean applied = false;
 
 
 
-    public OrgRegistryChange() {
+    public OrgRegistryChangeItem() {
     }
 
-    public OrgRegistryChange(Long idOfOrg,
-                             OrganizationType organizationType, OrganizationType organizationTypeFrom,
-                             String shortName, String shortNameFrom,
-                             String officialName, String officialNameFrom,
-                             Long createDate, Integer operationType,
+    public OrgRegistryChangeItem(Long idOfOrg, OrganizationType organizationType, OrganizationType organizationTypeFrom,
+            String shortName, String shortNameFrom, String officialName, String officialNameFrom, Long createDate,
+            Integer operationType,
 
-                             Boolean applied,
+            Boolean applied,
 
-                             String address, String addressFrom,
-                             String city, String cityFrom,
-                             String region, String regionFrom,
+            String address, String addressFrom, String city, String cityFrom, String region, String regionFrom,
 
-                             Long unom, Long unomFrom,
-                             Long unad, Long unadFrom,
+            Long unom, Long unomFrom, Long unad, Long unadFrom,
 
-                             String guid, String guidFrom,
-                             Long additionalId,
-             String interdistrictCouncil,
-             String interdistrictCouncilFrom,
-             String interdistrictCouncilChief,
-             String interdistrictCouncilChiefFrom
-            ) {
+            String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
+            String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
+            OrgRegistryChange orgRegistryChange) {
         this.idOfOrg = idOfOrg;
 
         this.organizationType = organizationType;
@@ -120,6 +102,7 @@ public class OrgRegistryChange {
         this.interdistrictCouncilFrom = interdistrictCouncilFrom;
         this.interdistrictCouncilChief = interdistrictCouncilChief;
         this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
+        this.orgRegistryChange = orgRegistryChange;
     }
 
     public Long getAdditionalId() {
@@ -306,12 +289,12 @@ public class OrgRegistryChange {
         this.guidFrom = guidFrom;
     }
 
-    public Long getIdOfOrgRegistryChange() {
-        return idOfOrgRegistryChange;
+    public Long getIdOfOrgRegistryChangeItem() {
+        return idOfOrgRegistryChangeItem;
     }
 
-    public void setIdOfOrgRegistryChange(Long idOfOrgRegistryChange) {
-        this.idOfOrgRegistryChange = idOfOrgRegistryChange;
+    public void setIdOfOrgRegistryChangeItem(Long idOfOrgRegistryChangeItem) {
+        this.idOfOrgRegistryChangeItem = idOfOrgRegistryChangeItem;
     }
 
     public String getInterdistrictCouncil() {
@@ -346,14 +329,13 @@ public class OrgRegistryChange {
         this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
     }
 
-    public Set<OrgRegistryChangeItem> getOrgs() {
-        return orgs;
+    public OrgRegistryChange getOrgRegistryChange() {
+        return orgRegistryChange;
     }
 
-    public void setOrgs(Set<OrgRegistryChangeItem> orgs) {
-        this.orgs = orgs;
+    public void setOrgRegistryChange(OrgRegistryChange orgRegistryChange) {
+        this.orgRegistryChange = orgRegistryChange;
     }
-
 
     public Boolean getMainBuilding() {
         return mainBuilding;

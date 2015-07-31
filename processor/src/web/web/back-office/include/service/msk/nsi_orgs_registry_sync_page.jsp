@@ -80,13 +80,13 @@
                     <f:facet name="header">
                         <h:outputText value="Оригинальное наименование"/>
                     </f:facet>
-                    <h:outputText value="#{e.originName}" escape="false"/>
+                    <h:outputText value="#{e.newName}" escape="false"/>
                 </rich:column>
                 <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
                         <h:outputText value="Новое наименование"/>
                     </f:facet>
-                    <h:outputText value="#{e.newName}" escape="false"/>
+                    <h:outputText value="#{e.originName}" escape="false"/>
                 </rich:column>
                 <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="1" colspan="1">
                     <f:facet name="header">
@@ -145,8 +145,6 @@
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{e.selected}" styleClass="checkboxes"
                                              rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(e, false)}"/>
-                    <h:selectBooleanCheckbox value="#{e.applied}" styleClass="checkboxes"
-                                             rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(e, false)}"/>
                     <h:outputText value="применено" styleClass="output-text"
                                   rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(e, true)}"/>
                 </rich:column>
@@ -157,7 +155,7 @@
                                                      rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false)}"/>
                         </rich:column>
                         <rich:column>
-                            <h:outputText value="#{org.shortName}  -  #{org.originAddress}" title="Новое: #{org.originName}  -  #{org.originAddress}" escape="false" />
+                            <h:outputText value="#{org.shortName}  -  #{org.originAddress}" title="Новое: #{org.shortName}  -  #{org.address}" escape="false" />
                         </rich:column>
                     </rich:dataTable>
                 </rich:column>
