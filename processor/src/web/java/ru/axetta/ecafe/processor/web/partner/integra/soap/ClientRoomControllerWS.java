@@ -1961,6 +1961,31 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     } else {
                         purchaseWithDetailsElementExt.setType(0);
                     }
+
+                    if (od.getIdOfMenuFromSync() != null) {
+
+                        DAOService daoService = DAOService.getInstance();
+
+                        MenuDetail menuDetail = daoService
+                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg().getDefaultSupplier());
+
+                        if (menuDetail != null) {
+                            purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
+                            purchaseWithDetailsElementExt.setCalories(menuDetail.getCalories());
+                            purchaseWithDetailsElementExt.setOutput(menuDetail.getMenuDetailOutput());
+                            purchaseWithDetailsElementExt.setVitB1(menuDetail.getVitB1());
+                            purchaseWithDetailsElementExt.setVitB2(menuDetail.getVitB2());
+                            purchaseWithDetailsElementExt.setVitPp(menuDetail.getVitPp());
+                            purchaseWithDetailsElementExt.setVitC(menuDetail.getVitC());
+                            purchaseWithDetailsElementExt.setVitA(menuDetail.getVitA());
+                            purchaseWithDetailsElementExt.setVitE(menuDetail.getVitE());
+                            purchaseWithDetailsElementExt.setMinCa(menuDetail.getMinCa());
+                            purchaseWithDetailsElementExt.setMinP(menuDetail.getMinP());
+                            purchaseWithDetailsElementExt.setMinMg(menuDetail.getMinMg());
+                            purchaseWithDetailsElementExt.setMinFe(menuDetail.getMinFe());
+                        }
+                    }
+
                     purchaseWithDetailsExt.getE().add(purchaseWithDetailsElementExt);
                 }
 

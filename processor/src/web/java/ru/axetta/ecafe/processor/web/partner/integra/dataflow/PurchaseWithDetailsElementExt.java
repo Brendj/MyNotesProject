@@ -44,6 +44,33 @@ public class PurchaseWithDetailsElementExt {
     protected Integer type;
     @XmlAttribute(name = "MenuType")
     protected Integer menuType;
+    //это часть полей из menuDetails
+    @XmlAttribute(name = "Price")
+    protected Long price;
+    @XmlAttribute(name = "Calories")
+    protected Double calories;
+    @XmlAttribute(name = "Output")
+    protected String output;
+    @XmlAttribute(name = "VitB1")
+    protected Double vitB1;
+    @XmlAttribute(name = "VitB2")
+    protected Double vitB2;
+    @XmlAttribute(name = "VitPp")
+    private Double vitPp;
+    @XmlAttribute(name = "VitC")
+    protected Double vitC;
+    @XmlAttribute(name = "VitA")
+    protected Double vitA;
+    @XmlAttribute(name = "VitE")
+    protected Double vitE;
+    @XmlAttribute(name = "MinCa")
+    protected Double minCa;
+    @XmlAttribute(name = "MinP")
+    protected Double minP;
+    @XmlAttribute(name = "MinMg")
+    protected Double minMg;
+    @XmlAttribute(name = "MinFe")
+    protected Double minFe;
 
     public Long getIdOfOrderDetail() {
         return idOfOrderDetail;
@@ -155,5 +182,109 @@ public class PurchaseWithDetailsElementExt {
 
     public void setMenuType(Integer menuType) {
         this.menuType = menuType;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public Double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Double calories) {
+        this.calories = calories;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public Double getVitB1() {
+        return vitB1;
+    }
+
+    public void setVitB1(Double vitB1) {
+        this.vitB1 = vitB1;
+    }
+
+    public Double getVitB2() {
+        return vitB2;
+    }
+
+    public void setVitB2(Double vitB2) {
+        this.vitB2 = vitB2;
+    }
+
+    public Double getVitPp() {
+        return vitPp;
+    }
+
+    public void setVitPp(Double vitPp) {
+        this.vitPp = vitPp;
+    }
+
+    public Double getVitC() {
+        return vitC;
+    }
+
+    public void setVitC(Double vitC) {
+        this.vitC = vitC;
+    }
+
+    public Double getVitA() {
+        return vitA;
+    }
+
+    public void setVitA(Double vitA) {
+        this.vitA = vitA;
+    }
+
+    public Double getVitE() {
+        return vitE;
+    }
+
+    public void setVitE(Double vitE) {
+        this.vitE = vitE;
+    }
+
+    public Double getMinCa() {
+        return minCa;
+    }
+
+    public void setMinCa(Double minCa) {
+        this.minCa = minCa;
+    }
+
+    public Double getMinP() {
+        return minP;
+    }
+
+    public void setMinP(Double minP) {
+        this.minP = minP;
+    }
+
+    public Double getMinMg() {
+        return minMg;
+    }
+
+    public void setMinMg(Double minMg) {
+        this.minMg = minMg;
+    }
+
+    public Double getMinFe() {
+        return minFe;
+    }
+
+    public void setMinFe(Double minFe) {
+        this.minFe = minFe;
     }
 }

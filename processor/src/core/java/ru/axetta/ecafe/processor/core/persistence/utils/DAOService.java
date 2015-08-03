@@ -1795,4 +1795,31 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
         return result;
     }
+
+    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Contragent defaultSupplier) {
+        MenuDetail menuDetail = null;
+
+        Org org = (Org) getOrgsByDefaultSupplier(defaultSupplier);
+
+        Session session = entityManager.unwrap(Session.class);
+
+        Criteria menuCriteria = session.createCriteria(Menu.class);
+        menuCriteria.add(Restrictions.eq("org", org));
+        menuCriteria.setProjection(Projections.max("idOfMenu"));
+        menuCriteria.setProjection(Projections.max("menuDate"));
+
+        Menu menu = (Menu) menuCriteria.uniqueResult();
+
+        Set<MenuDetail> menuDetailSet = menu.getMenuDetails();
+
+        for (MenuDetail menuDetailItem : menuDetailSet) {
+            if (menuDetailItem.getIdOfMenuFromSync() == idOfMenuFromSync) {
+                menuDetail = menuDetailItem;
+                break;
+            }
+        }
+
+        return menuDetail;
+    }
+
 }
