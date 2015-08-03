@@ -68,5 +68,48 @@ ALTER TABLE cf_orgregistrychange ADD COLUMN interdistrictCouncilChiefFrom charac
 ALTER TABLE cf_menudetails ADD COLUMN vitB2 DECIMAL(5, 2);
 ALTER TABLE cf_menudetails ADD COLUMN vitPp DECIMAL (5, 2);
 
+
+alter table cf_orgregistrychange add column mainBuilding  integer;
+alter table cf_orgregistrychange add column mainRegistry  BIGSERIAL;
+
+
+CREATE TABLE cf_orgregistrychange_item
+(
+  idoforgregistrychangeitem bigserial NOT NULL,
+  idoforg bigint,
+  createdate bigint,
+  operationtype integer,
+  organizationtype integer DEFAULT 0,
+  organizationtypefrom integer,
+  shortname character varying(255),
+  shortnamefrom character varying(255),
+  officialname character varying(255),
+  officialnamefrom character varying(255),
+  applied boolean DEFAULT false,
+  address character varying(255),
+  addressfrom character varying(255),
+  city character varying(255),
+  cityfrom character varying(255),
+  region character varying(255),
+  regionfrom character varying(255),
+  unom bigint,
+  unomfrom bigint,
+  unad bigint,
+  unadfrom bigint,
+  guid character varying(255),
+  guidfrom character varying(255),
+  additionalid bigint,
+  interdistrictcouncil character varying(256),
+  interdistrictcouncilfrom character varying(256),
+  interdistrictcouncilchief character varying(256),
+  interdistrictcouncilchieffrom character varying(256),
+  mainbuilding integer,
+  mainregistry bigserial,
+  CONSTRAINT cf_orgregistrychange_item_pk PRIMARY KEY (idoforgregistrychangeitem)
+);
+
 ALTER TABLE cf_menudetails ADD COLUMN idOfMenuFromSync bigint;
 ALTER TABLE cf_orderdetails ADD COLUMN idOfMenuFromSync bigint;
+
+
+--! ФИНАЛИЗИРОВАН (Сунгатов, 150731) НЕ МЕНЯТЬ
