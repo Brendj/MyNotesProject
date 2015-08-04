@@ -377,6 +377,8 @@ public class MenuLoadPage extends BasicWorkspacePage {
                 menuDetail.setMinP(reqMenuDetail.getMinP());
                 menuDetail.setMinMg(reqMenuDetail.getMinMg());
                 menuDetail.setMinFe(reqMenuDetail.getMinFe());
+                menuDetail.setVitB2(reqMenuDetail.getVitB2());
+                menuDetail.setVitPp(reqMenuDetail.getVitPp());
 
                 //persistenceSession.save(menuDetail);
                 //menu.addMenuDetail(menuDetail);
