@@ -1367,8 +1367,10 @@ public class SyncRequest {
                         Double minP = getMinorComponent(namedNodeMap, "MinP");
                         Double minMg = getMinorComponent(namedNodeMap, "MinMg");
                         Double minFe = getMinorComponent(namedNodeMap, "MinFe");
+                        Double vitB2 = getMinorComponent(namedNodeMap, "VitB2");
+                        Double vitPp = getMinorComponent(namedNodeMap, "VitPP");
                         return new ReqAssortment(name, fullName, group, output, price, menuOrigin, protein, fat,
-                                carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg, minFe);
+                                carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg, minFe, vitB2, vitPp);
                     }
 
                     private static Double getMinorComponent(NamedNodeMap namedNodeMap, String name) throws Exception {
@@ -1404,11 +1406,13 @@ public class SyncRequest {
                 private final Double minP;
                 private final Double minMg;
                 private final Double minFe;
+                private final Double vitB2;
+                private final Double vitPp;
                 private final int menuOrigin;
 
                 public ReqAssortment(String name, String fullName, String group, String menuOutput, long price,
                         int menuOrigin, Double protein, Double fat, Double carbohydrates, Double calories, Double vitB1,
-                        Double vitC, Double vitA, Double vitE, Double minCa, Double minP, Double minMg, Double minFe) {
+                        Double vitC, Double vitA, Double vitE, Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp) {
                     this.name = name;
                     this.fullName = fullName;
                     this.group = group;
@@ -1427,6 +1431,8 @@ public class SyncRequest {
                     this.minP = minP;
                     this.minMg = minMg;
                     this.minFe = minFe;
+                    this.vitPp = vitPp;
+                    this.vitB2 = vitB2;
                 }
 
                 public String getFullName() {
@@ -1501,13 +1507,21 @@ public class SyncRequest {
                     return minFe;
                 }
 
+                public Double getVitB2() {
+                    return vitB2;
+                }
+
+                public Double getVitPp() {
+                    return vitPp;
+                }
+
                 @Override
                 public String toString() {
                     return "ReqAssortment{" + "name='" + name + '\'' + ", group='" + group + '\'' + ", menuOutput='"
                             + menuOutput + '\'' + ", price=" + price + ", protein=" + protein + ", fat=" + fat
                             + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
-                            + minP + ", minMg=" + minMg + ", minFe=" + minFe + '}';
+                            + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", vitB2=" + vitB2 + ", vitPp=" + vitPp + '}';
                 }
 
                 @Override
@@ -1570,6 +1584,12 @@ public class SyncRequest {
                     if (vitB1 != null ? !vitB1.equals(that.vitB1) : that.vitB1 != null) {
                         return false;
                     }
+                    if (vitB2 != null ? !vitB2.equals(that.vitB2) : that.vitB2 != null) {
+                        return false;
+                    }
+                    if (vitPp != null ? !vitPp.equals(that.vitPp) : that.vitPp != null) {
+                        return false;
+                    }
                     if (vitC != null ? !vitC.equals(that.vitC) : that.vitC != null) {
                         return false;
                     }
@@ -1593,6 +1613,8 @@ public class SyncRequest {
                     builder.append(carbohydrates);
                     builder.append(calories);
                     builder.append(vitB1);
+                    builder.append(vitB2);
+                    builder.append(vitPp);
                     builder.append(vitC);
                     builder.append(vitA);
                     builder.append(vitE);
