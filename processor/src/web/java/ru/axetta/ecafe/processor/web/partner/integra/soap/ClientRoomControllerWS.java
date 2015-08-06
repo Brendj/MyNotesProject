@@ -143,7 +143,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
     private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
-    private static final String RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC = "Не верная дата активация циклограммы";
+    private static final String RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC = "Неверная дата активация циклограммы";
     private static final String RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC = "Услуга не подключена";
     private static final String RC_PROHIBIT_EXIST_DESC = "Запрет с данными параметрами уже существует";
     private static final String RC_PROHIBIT_REMOVED_DESC = "Запрет с данными параметрами был удален";
@@ -6140,7 +6140,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if(suspendDate.getTime()<dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Не верная дата приостановки подписки";
+                result.description = "Неверная дата приостановки подписки";
                 return result;
             }
             subscriptionFeeding.setLastDatePauseSubscription(suspendDate);
@@ -6436,7 +6436,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cycleDiagram.getDateActivationDiagram().getTime() < dayForbid.getTime()) {
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                result.description = "Не верная дата активации циклограммы";
+                result.description = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC;
                 return result;
             }
             Criteria criteria = session.createCriteria(CycleDiagram.class);
