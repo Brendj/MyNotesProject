@@ -108,8 +108,7 @@ public class MenuDetail {
         this.menuOrigin = menuOrigin;
     }
 
-    protected MenuDetail() {
-        // For Hibernate only
+    public MenuDetail() {
     }
 
     public MenuDetail(Menu menu, String menuPath, String menuDetailName, int menuOrigin, int availableNow,

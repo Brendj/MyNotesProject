@@ -1967,7 +1967,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         DAOService daoService = DAOService.getInstance();
 
                         MenuDetail menuDetail = daoService
-                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg().getDefaultSupplier());
+                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg());
 
                         if (menuDetail != null) {
                             purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());

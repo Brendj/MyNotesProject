@@ -21,6 +21,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -51,12 +53,14 @@ public class DAOService {
     }
 
     public List<CategoryDiscount> getCategoryDiscountList() {
-        TypedQuery<CategoryDiscount> q = entityManager.createQuery("from CategoryDiscount order by idOfCategoryDiscount", CategoryDiscount.class);
+        TypedQuery<CategoryDiscount> q = entityManager
+                .createQuery("from CategoryDiscount order by idOfCategoryDiscount", CategoryDiscount.class);
         return q.getResultList();
     }
 
     public List<Contragent> getContragentsWithClassIds(List<Integer> classIds) {
-        TypedQuery<Contragent> q = entityManager.createQuery("from Contragent where classId in (:classIds)", Contragent.class);
+        TypedQuery<Contragent> q = entityManager
+                .createQuery("from Contragent where classId in (:classIds)", Contragent.class);
         q.setParameter("classIds", classIds);
         return q.getResultList();
     }
@@ -80,9 +84,11 @@ public class DAOService {
         return entityManager.merge(user);
     }
 
-    public Boolean isMenuExchange(Long idOfOrg){
-        TypedQuery<Long> query = entityManager.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",Long.class);
-        query.setParameter("idOfSourceOrg",idOfOrg);
+    public Boolean isMenuExchange(Long idOfOrg) {
+        TypedQuery<Long> query = entityManager
+                .createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",
+                        Long.class);
+        query.setParameter("idOfSourceOrg", idOfOrg);
         List<Long> list = query.getResultList();
         return !list.isEmpty();
     }
@@ -107,13 +113,15 @@ public class DAOService {
         return (List<ECafeSettings>) criteria.list();
     }
 
-    public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser, List<Long> idOfOrgList) throws Exception {
-        ConfigurationProvider cp = entityManager.find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
+    public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser,
+            List<Long> idOfOrgList) throws Exception {
+        ConfigurationProvider cp = entityManager
+                .find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
         cp.setName(configurationProvider.getName());
         cp.setLastUpdate(new Date());
         cp.setUserEdit(currentUser);
-        if(!cp.getOrgs().isEmpty()){
-            for (Org org: cp.getOrgs()){
+        if (!cp.getOrgs().isEmpty()) {
+            for (Org org : cp.getOrgs()) {
                 org = entityManager.merge(org);
                 org.setConfigurationProvider(null);
                 org = entityManager.merge(org);
@@ -121,8 +129,8 @@ public class DAOService {
         }
         cp.getOrgs().clear();
         configurationProvider = entityManager.merge(cp);
-        if(!idOfOrgList.isEmpty()){
-            for (Long idOfOrg: idOfOrgList){
+        if (!idOfOrgList.isEmpty()) {
+            for (Long idOfOrg : idOfOrgList) {
                 Org org = entityManager.find(Org.class, idOfOrg);
                 if (org != null) {
                     org.setConfigurationProvider(configurationProvider);
@@ -134,7 +142,8 @@ public class DAOService {
     }
 
     public Contragent getContragentByName(String name) {
-        TypedQuery<Contragent> query = entityManager.createQuery("from Contragent where contragentName=:name", Contragent.class);
+        TypedQuery<Contragent> query = entityManager
+                .createQuery("from Contragent where contragentName=:name", Contragent.class);
         query.setParameter("name", name);
         List<Contragent> result = query.getResultList();
 
@@ -149,13 +158,14 @@ public class DAOService {
     public void updateClientSetGUID(List<Long> clients) throws Exception {
         for (Long id : clients) {
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) entityManager.getDelegate());
-            Query query = entityManager.createQuery("update Client set clientGUID=:uuid, clientRegistryVersion=:version where idOfClient=:idOfClient");
+            Query query = entityManager.createQuery(
+                    "update Client set clientGUID=:uuid, clientRegistryVersion=:version where idOfClient=:idOfClient");
             query.setParameter("idOfClient", id);
             query.setParameter("version", clientRegistryVersion);
             query.setParameter("uuid", UUID.randomUUID().toString());
             int result = query.executeUpdate();
-            if(result==0){
-                logger.error("Error edit uuid by client: idOfClient="+id);
+            if (result == 0) {
+                logger.error("Error edit uuid by client: idOfClient=" + id);
             }
         }
 
@@ -168,7 +178,8 @@ public class DAOService {
     }
 
     public <T> T findDistributedObjectByRefGUID(Class<T> clazz, String guid) {
-        TypedQuery<T> query = entityManager.createQuery("from " + clazz.getSimpleName() + " where guid='" + guid + "'", clazz);
+        TypedQuery<T> query = entityManager
+                .createQuery("from " + clazz.getSimpleName() + " where guid='" + guid + "'", clazz);
         List<T> list = query.getResultList();
         if (list.isEmpty()) {
             return null;
@@ -204,39 +215,41 @@ public class DAOService {
         return version;
     }
 
-    public void removeTechnologicalMap(Long idOfTechnologicalMaps){
-        Query query1 = entityManager.createNativeQuery("DELETE FROM cf_technological_map_products where idoftechnologicalmaps="+idOfTechnologicalMaps);
+    public void removeTechnologicalMap(Long idOfTechnologicalMaps) {
+        Query query1 = entityManager.createNativeQuery(
+                "DELETE FROM cf_technological_map_products where idoftechnologicalmaps=" + idOfTechnologicalMaps);
         query1.executeUpdate();
-        Query query = entityManager.createNativeQuery("DELETE FROM cf_technological_map where idoftechnologicalmaps="+idOfTechnologicalMaps);
+        Query query = entityManager.createNativeQuery(
+                "DELETE FROM cf_technological_map where idoftechnologicalmaps=" + idOfTechnologicalMaps);
         query.executeUpdate();
     }
 
-    public void removeGoodGroup(GoodGroup goodGroup){
-         GoodGroup group = entityManager.merge(goodGroup);
-         entityManager.remove(group);
+    public void removeGoodGroup(GoodGroup goodGroup) {
+        GoodGroup group = entityManager.merge(goodGroup);
+        entityManager.remove(group);
     }
 
-    public void removeSetting(ECafeSettings eCafeSettings){
+    public void removeSetting(ECafeSettings eCafeSettings) {
         ECafeSettings settings = entityManager.merge(eCafeSettings);
         entityManager.remove(settings);
     }
 
-    public void removeGood(Good good){
+    public void removeGood(Good good) {
         Good g = entityManager.merge(good);
         entityManager.remove(g);
     }
 
-    public void removeProduct(Product product){
+    public void removeProduct(Product product) {
         Product p = entityManager.merge(product);
         entityManager.remove(p);
     }
 
-    public Boolean isEmptyOrgConfigurationProvider(ConfigurationProvider configurationProvider){
+    public Boolean isEmptyOrgConfigurationProvider(ConfigurationProvider configurationProvider) {
         ConfigurationProvider cp = entityManager.merge(configurationProvider);
         return cp.getOrgEmpty();
     }
 
-    public void removeConfigurationProvider(ConfigurationProvider configurationProvider) throws Exception{
+    public void removeConfigurationProvider(ConfigurationProvider configurationProvider) throws Exception {
         ConfigurationProvider cp = entityManager.merge(configurationProvider);
         entityManager.remove(cp);
     }
@@ -250,7 +263,8 @@ public class DAOService {
         if (distributedObjectList.isEmpty()) {
             return null;
         }
-        DistributedObject d = entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
+        DistributedObject d = entityManager
+                .find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
         d.fill(distributedObject);
         d.setGlobalVersion(globalVersion);
         d.setDeletedState(distributedObject.getDeletedState());
@@ -284,7 +298,7 @@ public class DAOService {
         Criteria criteria = session.createCriteria(CardTemp.class);
         criteria.createAlias("client", "cl");
         criteria.add(Restrictions.eq("cardNo", lCardId));
-        if(days>0){
+        if (days > 0) {
             Date currentDay = CalendarUtils.truncateToDayOfMonth(new Date());
             currentDay = CalendarUtils.addDays(currentDay, -days);
             criteria.add(Restrictions.ge("validDate", currentDay));
@@ -295,21 +309,24 @@ public class DAOService {
     }
 
     public boolean enableClientNotificationBySMS(Long contractId, boolean state) {
-        Query q = entityManager.createQuery("update Client set notifyViaSMS=:notifyViaSMS where contractId=:contractId");
+        Query q = entityManager
+                .createQuery("update Client set notifyViaSMS=:notifyViaSMS where contractId=:contractId");
         q.setParameter("notifyViaSMS", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
 
     public boolean enableClientNotificationByPUSH(Long contractId, boolean state) {
-        Query q = entityManager.createQuery("update Client set notifyViaPUSH=:notifyViaPUSH where contractId=:contractId");
+        Query q = entityManager
+                .createQuery("update Client set notifyViaPUSH=:notifyViaPUSH where contractId=:contractId");
         q.setParameter("notifyViaPUSH", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
 
     public boolean enableClientNotificationByEmail(Long contractId, boolean state) {
-        Query q = entityManager.createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId=:contractId");
+        Query q = entityManager
+                .createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId=:contractId");
         q.setParameter("notifyViaEmail", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
@@ -344,14 +361,16 @@ public class DAOService {
     }
 
     public boolean setClientPassword(Long contractId, String base64passwordHash) {
-        Query q = entityManager.createQuery("update Client set cypheredPassword=:base64passwordHash where contractId=:contractId");
+        Query q = entityManager
+                .createQuery("update Client set cypheredPassword=:base64passwordHash where contractId=:contractId");
         q.setParameter("base64passwordHash", base64passwordHash);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
 
     public boolean setClientExpenditureLimit(Long contractId, long limit) {
-        Query q = entityManager.createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
+        Query q = entityManager
+                .createQuery("update Client set expenditureLimit=:expenditureLimit where contractId=:contractId");
         q.setParameter("expenditureLimit", limit);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
@@ -392,17 +411,19 @@ public class DAOService {
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByTechnologicalMapGroup(TechnologicalMapGroup technologicalMapGroup){
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery(
-                "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup", TechnologicalMap.class);
-        query.setParameter("technologicalMapGroup",technologicalMapGroup);
+    public List<TechnologicalMap> findTechnologicalMapByTechnologicalMapGroup(
+            TechnologicalMapGroup technologicalMapGroup) {
+        TypedQuery<TechnologicalMap> query = entityManager
+                .createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup",
+                        TechnologicalMap.class);
+        query.setParameter("technologicalMapGroup", technologicalMapGroup);
         return query.getResultList();
     }
 
     public Org findOrById(long idOfOrg) {
         return entityManager.find(Org.class, idOfOrg);
     }
-    
+
     public ReportInfo findReportInfoById(long idOfReportInfo) {
         return entityManager.find(ReportInfo.class, idOfReportInfo);
     }
@@ -496,14 +517,16 @@ public class DAOService {
     }
 
     public void updateLastSuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update OrgSync set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager
+                .createQuery("update OrgSync set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
 
     public void updateLastUnsuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update OrgSync set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager
+                .createQuery("update OrgSync set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -518,7 +541,8 @@ public class DAOService {
         if (excludeDisabled) {
             disabledClause = " where state<>0 ";
         }
-        TypedQuery<Org> query = entityManager.createQuery("from Org " + disabledClause + " order by orgSync.lastSuccessfulBalanceSync", Org.class);
+        TypedQuery<Org> query = entityManager
+                .createQuery("from Org " + disabledClause + " order by orgSync.lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 
@@ -528,17 +552,20 @@ public class DAOService {
     }
 
     public long getStatClientsWithMobile() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE mobile IS NOT NULL AND mobile<>''");
+        Query q = entityManager
+                .createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE mobile IS NOT NULL AND mobile<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatClientsWithEmail() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE email IS NOT NULL AND email<>''");
+        Query q = entityManager
+                .createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE email IS NOT NULL AND email<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getStatUniqueClientsWithPaymentTransaction() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_clientpayments cp, cf_transactions t where cp.idoftransaction=t.idoftransaction");
+        Query q = entityManager.createNativeQuery(
+                "SELECT count(DISTINCT idofclient) FROM cf_clientpayments cp, cf_transactions t WHERE cp.idoftransaction=t.idoftransaction");
         return Long.parseLong("" + q.getSingleResult());
     }
 
@@ -568,17 +595,20 @@ public class DAOService {
     }
 
     public long callClientsWithPurchaseOfFoodPayPurchaseReducedPriceMeals() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg ");
+        Query q = entityManager.createNativeQuery(
+                "SELECT count(DISTINCT idofclient) FROM cf_orders o, cf_orderdetails od WHERE o.idoforder=od.idoforder AND o.idoforg=od.idoforg ");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long callClientsWithPurchaseOfMealBenefits() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype>50");
+        Query q = entityManager.createNativeQuery(
+                "SELECT count(DISTINCT idofclient) FROM cf_orders o, cf_orderdetails od WHERE o.idoforder=od.idoforder AND o.idoforg=od.idoforg AND od.menutype>50");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long callClientsPayPowerPurchase() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype=0");
+        Query q = entityManager.createNativeQuery(
+                "SELECT count(DISTINCT idofclient) FROM cf_orders o, cf_orderdetails od WHERE o.idoforder=od.idoforder AND o.idoforg=od.idoforg AND od.menutype=0");
         return Long.parseLong("" + q.getSingleResult());
     }
 
@@ -608,14 +638,15 @@ public class DAOService {
     }
 
 
-public boolean setCardStatus(long idOfCard, int state, String reason) {
-        Query q = entityManager.createNativeQuery("UPDATE cf_cards SET state=:state, lockreason=:reason WHERE idofCard=:idOfCard");
+    public boolean setCardStatus(long idOfCard, int state, String reason) {
+        Query q = entityManager
+                .createNativeQuery("UPDATE cf_cards SET state=:state, lockreason=:reason WHERE idofCard=:idOfCard");
         q.setParameter("state", state);
         q.setParameter("reason", reason);
         q.setParameter("idOfCard", idOfCard);
         return q.executeUpdate() > 0;
     }
-    
+
     //
     //public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
     //    Session session = (Session) entityManager.getDelegate();
@@ -642,7 +673,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return false;
     }
 
-    
+
     public List<Contragent> getContragentsList() {
         /*TypedQuery<Contragent> query = entityManager.createQuery("from Contragent", Contragent.class);
         List<Contragent> result = query.getResultList();
@@ -668,11 +699,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public List<Contragent> getContragentsList(Integer classId) {
         String q = "from Contragent";
-        if(classId != null) {
+        if (classId != null) {
             q += " c WHERE c.classId=:classId order by idOfContragent";
         }
         TypedQuery<Contragent> query = entityManager.createQuery(q, Contragent.class);
-        if(classId != null) {
+        if (classId != null) {
             query.setParameter("classId", classId);
         }
         List<Contragent> result = query.getResultList();
@@ -699,7 +730,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     @SuppressWarnings("unchecked")
     public Contragent getContragentByBIC(String bic) {
-        TypedQuery<Contragent> query = entityManager.createQuery("from Contragent where bic=:bic and classId=:classId", Contragent.class);
+        TypedQuery<Contragent> query = entityManager
+                .createQuery("from Contragent where bic=:bic and classId=:classId", Contragent.class);
         query.setParameter("bic", bic);
         query.setParameter("classId", Contragent.PAY_AGENT);
         List<Contragent> result = query.getResultList();
@@ -710,8 +742,9 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return result.get(0);
     }
 
-    public Contragent getRNIPContragent () {
-        TypedQuery<Contragent> query = entityManager.createQuery("from Contragent where remarks=:remarks", Contragent.class);
+    public Contragent getRNIPContragent() {
+        TypedQuery<Contragent> query = entityManager
+                .createQuery("from Contragent where remarks=:remarks", Contragent.class);
         query.setParameter("remarks", "RNIP_DEFAULT");
         List<Contragent> result = query.getResultList();
 
@@ -721,43 +754,45 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return result.get(0);
     }
 
-    public Org getOrgByGuid (String guid) {
+    public Org getOrgByGuid(String guid) {
         javax.persistence.Query q = entityManager.createQuery("from Org where guid=:guid");
         q.setParameter("guid", guid);
         List l = q.getResultList();
-        if (l.size()==0) return null;
-        return ((Org)l.get(0));
+        if (l.size() == 0) {
+            return null;
+        }
+        return ((Org) l.get(0));
     }
 
     public List<Org> findOrgByRegistryIdOrGuid(Long registryId, String guid) {
-        javax.persistence.Query q = entityManager.createQuery("from Org where guid=:guid or additionalIdBuilding=:registryId");
+        javax.persistence.Query q = entityManager
+                .createQuery("from Org where guid=:guid or additionalIdBuilding=:registryId");
         q.setParameter("guid", guid);
         q.setParameter("registryId", registryId);
         return q.getResultList();
     }
 
 
-
-    public Client getClientByGuid (String guid) {
+    public Client getClientByGuid(String guid) {
         return DAOUtils.findClientByGuid(entityManager, guid);
     }
 
-    public Client getClientByMobilePhone (String mobile) {
+    public Client getClientByMobilePhone(String mobile) {
         return DAOUtils.getClientByMobilePhone(entityManager, mobile);
     }
 
     public List<Client> getClientsListByMobilePhone(String mobile) {
-        if(mobile == null || mobile.length() < 1) {
+        if (mobile == null || mobile.length() < 1) {
             return Collections.EMPTY_LIST;
         }
         List res = DAOUtils.getClientsListByMobilePhone(entityManager, mobile);
-        if(res == null || res.size() < 1) {
+        if (res == null || res.size() < 1) {
             return Collections.EMPTY_LIST;
         }
         return (List<Client>) res;
     }
 
-    public ReportHandleRule getReportHandleRule (long idOfReportHandleRule) {
+    public ReportHandleRule getReportHandleRule(long idOfReportHandleRule) {
         try {
             Session session = (Session) entityManager.getDelegate();
             Criteria criteria = session.createCriteria(ReportHandleRule.class);
@@ -769,65 +804,69 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         }
     }
 
-    public String getReportHandlerType (long idOfReportHandleRule) {
-         try {
-             Session session = (Session) entityManager.getDelegate();
-             Criteria criteria = session.createCriteria(ReportHandleRule.class);
-             criteria.add(Restrictions.eq("idOfReportHandleRule", idOfReportHandleRule));
-             ReportHandleRule handleRule = (ReportHandleRule) criteria.uniqueResult();
-             String reportType = handleRule.findType(session);
-             return reportType;
-         } catch (Exception e) {
-             return "";
-         }
+    public String getReportHandlerType(long idOfReportHandleRule) {
+        try {
+            Session session = (Session) entityManager.getDelegate();
+            Criteria criteria = session.createCriteria(ReportHandleRule.class);
+            criteria.add(Restrictions.eq("idOfReportHandleRule", idOfReportHandleRule));
+            ReportHandleRule handleRule = (ReportHandleRule) criteria.uniqueResult();
+            String reportType = handleRule.findType(session);
+            return reportType;
+        } catch (Exception e) {
+            return "";
+        }
     }
 
-    public List <ReportHandleRule> getReportHandlerRules (boolean manualAllowed) {
+    public List<ReportHandleRule> getReportHandlerRules(boolean manualAllowed) {
         try {
-            Criteria reportRulesCriteria = ReportHandleRule.createAllReportRulesCriteria(manualAllowed ,(Session) entityManager
-                    .getDelegate());
-            List <ReportHandleRule> rules = reportRulesCriteria.list();
+            Criteria reportRulesCriteria = ReportHandleRule
+                    .createAllReportRulesCriteria(manualAllowed, (Session) entityManager.getDelegate());
+            List<ReportHandleRule> rules = reportRulesCriteria.list();
             return rules;
         } catch (Exception e) {
             return Collections.EMPTY_LIST;
         }
     }
 
-    public List<RuleCondition> getReportHandlerRules (Long ruleId) {
-        TypedQuery<RuleCondition> query = entityManager.createQuery("from RuleCondition where idOfRuleCondition=:handler", RuleCondition.class);
-        query.setParameter("handler",ruleId);
+    public List<RuleCondition> getReportHandlerRules(Long ruleId) {
+        TypedQuery<RuleCondition> query = entityManager
+                .createQuery("from RuleCondition where idOfRuleCondition=:handler", RuleCondition.class);
+        query.setParameter("handler", ruleId);
         List<RuleCondition> result = query.getResultList();
         return result;
     }
 
-    public Contragent getContragentById (Long idOfContragent) throws Exception {
-        return DAOUtils.findContragent ((Session) entityManager.getDelegate(), idOfContragent);
+    public Contragent getContragentById(Long idOfContragent) throws Exception {
+        return DAOUtils.findContragent((Session) entityManager.getDelegate(), idOfContragent);
     }
 
-    public Contract getContractById (Long idOfContract) throws Exception {
-        return DAOUtils.findContract ((Session) entityManager.getDelegate(), idOfContract);
+    public Contract getContractById(Long idOfContract) throws Exception {
+        return DAOUtils.findContract((Session) entityManager.getDelegate(), idOfContract);
     }
 
-    public String getContractNameById (Long idOfContract) throws Exception {
-        Contract contract = DAOUtils.findContract ((Session) entityManager.getDelegate(), idOfContract);
+    public String getContractNameById(Long idOfContract) throws Exception {
+        Contract contract = DAOUtils.findContract((Session) entityManager.getDelegate(), idOfContract);
         return contract.getContractNumber();
     }
 
     @Transactional(readOnly = true)
     public List<ConfigurationProvider> findConfigurationProvidersList() {
-        return entityManager.createQuery("from ConfigurationProvider order by id",ConfigurationProvider.class).getResultList();
+        return entityManager.createQuery("from ConfigurationProvider order by id", ConfigurationProvider.class)
+                .getResultList();
     }
 
     @Transactional(readOnly = true)
     public List<ConfigurationProvider> findConfigurationProvidersList(String filter) {
-        return entityManager.createQuery("from ConfigurationProvider where UPPER(name) like '%"+filter.toUpperCase()+"%' order by id",ConfigurationProvider.class).getResultList();
+        return entityManager.createQuery(
+                "from ConfigurationProvider where UPPER(name) like '%" + filter.toUpperCase() + "%' order by id",
+                ConfigurationProvider.class).getResultList();
     }
 
-    public void persistConfigurationProvider(ConfigurationProvider currentConfigurationProvider,
-            List<Long> idOfOrgList) throws Exception{
+    public void persistConfigurationProvider(ConfigurationProvider currentConfigurationProvider, List<Long> idOfOrgList)
+            throws Exception {
         entityManager.persist(currentConfigurationProvider);
-        if(!idOfOrgList.isEmpty()){
-            for (Long idOfOrg: idOfOrgList){
+        if (!idOfOrgList.isEmpty()) {
+            for (Long idOfOrg : idOfOrgList) {
                 //daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
                 Org org = entityManager.find(Org.class, idOfOrg);
                 if (org != null) {
@@ -840,151 +879,197 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public List<GoodGroup> findGoodGroupBySuplifier(Boolean deletedStatusSelected) {
         TypedQuery<GoodGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from GoodGroup order by globalId",GoodGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from GoodGroup order by globalId", GoodGroup.class);
         } else {
-            query = entityManager.createQuery("from GoodGroup where deletedState=false order by globalId",GoodGroup.class);
+            query = entityManager
+                    .createQuery("from GoodGroup where deletedState=false order by globalId", GoodGroup.class);
         }
         return query.getResultList();
     }
 
     public List<GoodGroup> findGoodGroupBySuplifier(List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<GoodGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from GoodGroup where orgOwner in :orgOwners order by globalId",GoodGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager
+                    .createQuery("from GoodGroup where orgOwner in :orgOwners order by globalId", GoodGroup.class);
         } else {
-            query = entityManager.createQuery("from GoodGroup where orgOwner in :orgOwners and deletedState=false order by globalId",GoodGroup.class);
+            query = entityManager
+                    .createQuery("from GoodGroup where orgOwner in :orgOwners and deletedState=false order by globalId",
+                            GoodGroup.class);
         }
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
     public List<GoodGroup> findGoodGroupBySuplifier(String filter) {
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(nameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId", GoodGroup.class);
+        TypedQuery<GoodGroup> query = entityManager.createQuery(
+                "from GoodGroup where UPPER(nameOfGoodsGroup) like '%" + filter.toUpperCase()
+                        + "%' and deletedState=false order by globalId", GoodGroup.class);
         return query.getResultList();
     }
 
     public List<GoodGroup> findGoodGroupBySuplifier(List<Long> orgOwners, String filter) {
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(nameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false  order by globalId", GoodGroup.class);
+        TypedQuery<GoodGroup> query = entityManager.createQuery(
+                "from GoodGroup where UPPER(nameOfGoodsGroup) like '%" + filter.toUpperCase()
+                        + "%' and orgOwner in :orgOwners and deletedState=false  order by globalId", GoodGroup.class);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
-    public List<Good> findGoodsByGoodGroup(GoodGroup goodGroup, Boolean deletedStatusSelected){
+    public List<Good> findGoodsByGoodGroup(GoodGroup goodGroup, Boolean deletedStatusSelected) {
         TypedQuery<Good> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Good where goodGroup=:goodGroup order by globalId",Good.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from Good where goodGroup=:goodGroup order by globalId", Good.class);
         } else {
-            query = entityManager.createQuery("from Good where goodGroup=:goodGroup and deletedState=false order by globalId",Good.class);
+            query = entityManager
+                    .createQuery("from Good where goodGroup=:goodGroup and deletedState=false order by globalId",
+                            Good.class);
         }
-        query.setParameter("goodGroup",goodGroup);
+        query.setParameter("goodGroup", goodGroup);
         return query.getResultList();
     }
 
-    public List<Good> findGoodsByGoodGroup(GoodGroup goodGroup, List<Long> orgOwners, Boolean deletedStatusSelected){
+    public List<Good> findGoodsByGoodGroup(GoodGroup goodGroup, List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<Good> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Good where goodGroup=:goodGroup and orgOwner in :orgOwner order by globalId",Good.class);
+        if (deletedStatusSelected) {
+            query = entityManager
+                    .createQuery("from Good where goodGroup=:goodGroup and orgOwner in :orgOwner order by globalId",
+                            Good.class);
         } else {
-            query = entityManager.createQuery("from Good where goodGroup=:goodGroup and orgOwner in :orgOwner and deletedState=false order by globalId",Good.class);
+            query = entityManager.createQuery(
+                    "from Good where goodGroup=:goodGroup and orgOwner in :orgOwner and deletedState=false order by globalId",
+                    Good.class);
         }
-        query.setParameter("goodGroup",goodGroup);
+        query.setParameter("goodGroup", goodGroup);
         query.setParameter("orgOwner", orgOwners);
         return query.getResultList();
     }
 
     @SuppressWarnings("unchecked")
-    public List<Good> findGoods(ConfigurationProvider configurationProvider, GoodGroup goodGroup,  List<Long> orgOwners, Boolean deletedStatusSelected){
+    public List<Good> findGoods(ConfigurationProvider configurationProvider, GoodGroup goodGroup, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         Session session = (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(Good.class);
-        if(goodGroup!=null) criteria.add(Restrictions.eq("goodGroup",goodGroup));
-        if(orgOwners!=null && !orgOwners.isEmpty()) criteria.add(Restrictions.in("orgOwner",orgOwners));
-        if(configurationProvider!=null)
-            criteria.add(Restrictions.eq("idOfConfigurationProvider",configurationProvider.getIdOfConfigurationProvider()));
-        if(deletedStatusSelected!=null && !deletedStatusSelected) criteria.add(Restrictions.eq("deletedState",false));
+        if (goodGroup != null) {
+            criteria.add(Restrictions.eq("goodGroup", goodGroup));
+        }
+        if (orgOwners != null && !orgOwners.isEmpty()) {
+            criteria.add(Restrictions.in("orgOwner", orgOwners));
+        }
+        if (configurationProvider != null) {
+            criteria.add(
+                    Restrictions.eq("idOfConfigurationProvider", configurationProvider.getIdOfConfigurationProvider()));
+        }
+        if (deletedStatusSelected != null && !deletedStatusSelected) {
+            criteria.add(Restrictions.eq("deletedState", false));
+        }
         //if(StringUtils.isNotEmpty(nameOfGoodsGroup))
         //    criteria.add(Restrictions.ilike("nameOfGoodsGroup",nameOfGoodsGroup, MatchMode.ANYWHERE));
         return criteria.list();
     }
 
     public List<GoodsBasicBasket> findGoodsBasicBasket() {
-        TypedQuery<GoodsBasicBasket> query = entityManager.createQuery("from GoodsBasicBasket order by idOfBasicGood", GoodsBasicBasket.class);
+        TypedQuery<GoodsBasicBasket> query = entityManager
+                .createQuery("from GoodsBasicBasket order by idOfBasicGood", GoodsBasicBasket.class);
         return query.getResultList();
     }
 
     public List<ProductGroup> findProductGroupByConfigurationProvider(Long idOfConfigurationProvider,
             Boolean deletedStatusSelected) {
         TypedQuery<ProductGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",ProductGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",
+                    ProductGroup.class);
         } else {
-            query = entityManager.createQuery("from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",ProductGroup.class);
+            query = entityManager.createQuery(
+                    "from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",
+                    ProductGroup.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         return query.getResultList();
     }
 
     public List<ProductGroup> findProductGroupByConfigurationProvider(Long idOfConfigurationProvider,
             List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<ProductGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",ProductGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",
+                    ProductGroup.class);
         } else {
-            query = entityManager.createQuery("from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",ProductGroup.class);
+            query = entityManager.createQuery(
+                    "from ProductGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",
+                    ProductGroup.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
-    public List<ProductGroup> findProductGroupByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<ProductGroup> findProductGroupByConfigurationProvider(List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         TypedQuery<ProductGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from ProductGroup where orgOwner in :orgOwners order by globalId",ProductGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from ProductGroup where orgOwner in :orgOwners order by globalId",
+                    ProductGroup.class);
         } else {
-            query = entityManager.createQuery("from ProductGroup where orgOwner in :orgOwners and deletedState=false order by globalId",ProductGroup.class);
+            query = entityManager.createQuery(
+                    "from ProductGroup where orgOwner in :orgOwners and deletedState=false order by globalId",
+                    ProductGroup.class);
         }
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
     public List<ProductGroup> findProductGroupByConfigurationProvider(String filter) {
-        TypedQuery<ProductGroup> query = entityManager.createQuery("from ProductGroup where UPPER(nameOfGroup) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId",ProductGroup.class);
+        TypedQuery<ProductGroup> query = entityManager.createQuery(
+                "from ProductGroup where UPPER(nameOfGroup) like '%" + filter.toUpperCase()
+                        + "%' and deletedState=false order by globalId", ProductGroup.class);
         return query.getResultList();
     }
 
     public List<ProductGroup> findProductGroupByConfigurationProvider(Boolean deletedStatusSelected) {
         TypedQuery<ProductGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from ProductGroup order by globalId",ProductGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from ProductGroup order by globalId", ProductGroup.class);
         } else {
-            query = entityManager.createQuery("from ProductGroup where deletedState=false order by globalId",ProductGroup.class);
+            query = entityManager
+                    .createQuery("from ProductGroup where deletedState=false order by globalId", ProductGroup.class);
         }
         return query.getResultList();
     }
 
     public List<ProductGroup> findProductGroupByConfigurationProvider(List<Long> orgOwners, String filter) {
-        TypedQuery<ProductGroup> query = entityManager.createQuery("from ProductGroup where UPPER(nameOfGroup) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false order by globalId",ProductGroup.class);
+        TypedQuery<ProductGroup> query = entityManager.createQuery(
+                "from ProductGroup where UPPER(nameOfGroup) like '%" + filter.toUpperCase()
+                        + "%' and orgOwner in :orgOwners and deletedState=false order by globalId", ProductGroup.class);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
     @SuppressWarnings("unchecked")
-    public List<Product> findProductByConfigurationProvider(ProductGroup pg, Long confProviderId, Boolean deleteSt, List<Long> orgOwners,
-            String productName) {
+    public List<Product> findProductByConfigurationProvider(ProductGroup pg, Long confProviderId, Boolean deleteSt,
+            List<Long> orgOwners, String productName) {
         Session session = (Session) entityManager.getDelegate();
         Criteria cr = session.createCriteria(Product.class);
         Conjunction conj = Restrictions.conjunction();
-        if (pg != null)
+        if (pg != null) {
             conj.add(Restrictions.eq("productGroup", pg));
-        if (confProviderId != null)
+        }
+        if (confProviderId != null) {
             conj.add(Restrictions.eq("idOfConfigurationProvider", confProviderId));
-        if (deleteSt != null && !deleteSt)
+        }
+        if (deleteSt != null && !deleteSt) {
             conj.add(Restrictions.eq("deletedState", false));
-        if (orgOwners != null && !orgOwners.isEmpty())
+        }
+        if (orgOwners != null && !orgOwners.isEmpty()) {
             conj.add(Restrictions.in("orgOwner", orgOwners));
-        if (productName != null && !productName.isEmpty())
+        }
+        if (productName != null && !productName.isEmpty()) {
             conj.add(Restrictions.ilike("productName", productName, MatchMode.ANYWHERE));
+        }
         cr.add(conj).addOrder(Order.asc("globalId"));
         return (List<Product>) cr.list();
     }
@@ -993,7 +1078,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return findProductByConfigurationProvider(orgOwners, false, productName);
     }
 
-    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected, String productName) {
+    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected,
+            String productName) {
         return findProductByConfigurationProvider(null, null, deletedStatusSelected, orgOwners, productName);
     }
 
@@ -1002,71 +1088,93 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return DAOUtils.findTechnologicalMapGroupByTechnologicalMap(session, technologicalMap);
     }
 
-    public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
+    public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Long idOfConfigurationProvider,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",TechnologicalMapGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",
+                    TechnologicalMapGroup.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",TechnologicalMapGroup.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",
+                    TechnologicalMapGroup.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         return query.getResultList();
     }
 
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Long idOfConfigurationProvider,
             List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",TechnologicalMapGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",
+                    TechnologicalMapGroup.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMapGroup.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMapGroup where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMapGroup.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMapGroup order by globalId",TechnologicalMapGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager
+                    .createQuery("from TechnologicalMapGroup order by globalId", TechnologicalMapGroup.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMapGroup where deletedState=false order by globalId",TechnologicalMapGroup.class);
+            query = entityManager.createQuery("from TechnologicalMapGroup where deletedState=false order by globalId",
+                    TechnologicalMapGroup.class);
         }
         return query.getResultList();
     }
 
-    public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMapGroup where orgOwner in :orgOwners order by globalId",TechnologicalMapGroup.class);
+        if (deletedStatusSelected) {
+            query = entityManager
+                    .createQuery("from TechnologicalMapGroup where orgOwner in :orgOwners order by globalId",
+                            TechnologicalMapGroup.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMapGroup where orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMapGroup.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMapGroup where orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMapGroup.class);
         }
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(String filter) {
-        TypedQuery<TechnologicalMapGroup> query = entityManager.createQuery("from TechnologicalMapGroup where UPPER(nameOfGroup) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId",TechnologicalMapGroup.class);
+        TypedQuery<TechnologicalMapGroup> query = entityManager.createQuery(
+                "from TechnologicalMapGroup where UPPER(nameOfGroup) like '%" + filter.toUpperCase()
+                        + "%' and deletedState=false order by globalId", TechnologicalMapGroup.class);
         return query.getResultList();
     }
 
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(List<Long> orgOwners,
             String filter) {
-        TypedQuery<TechnologicalMapGroup> query = entityManager.createQuery("from TechnologicalMapGroup where UPPER(nameOfGroup) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMapGroup.class);
+        TypedQuery<TechnologicalMapGroup> query = entityManager.createQuery(
+                "from TechnologicalMapGroup where UPPER(nameOfGroup) like '%" + filter.toUpperCase()
+                        + "%' and orgOwner in :orgOwners and deletedState=false order by globalId",
+                TechnologicalMapGroup.class);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
-    public List<Product> findProduct(ProductGroup productGroup, ConfigurationProvider provider, String filter, List<Long> orgOwners,
-            Boolean deletedStatusSelected) {
+    public List<Product> findProduct(ProductGroup productGroup, ConfigurationProvider provider, String filter,
+            List<Long> orgOwners, Boolean deletedStatusSelected) {
         Session session = entityManager.unwrap(Session.class);
         return DAOUtils.findProduct(session, productGroup, provider, filter, orgOwners, deletedStatusSelected);
     }
 
 
-    public List<GoodGroup> findGoodGroup(ConfigurationProvider provider, String filter, List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<GoodGroup> findGoodGroup(ConfigurationProvider provider, String filter, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         Session session = entityManager.unwrap(Session.class);
         return DAOUtils.findGoodGroup(session, provider, filter, orgOwners, deletedStatusSelected);
     }
@@ -1083,99 +1191,134 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public List<TechnologicalMapProduct> findTechnologicalMapProductByTechnologicalMap(Long idOfTechnologicalMap) {
         String sql = "from TechnologicalMapProduct where technologicalMap.globalId=:idOfTechnologicalMap and deletedState=false order by globalId";
-        TypedQuery<TechnologicalMapProduct> query = entityManager.createQuery(sql,TechnologicalMapProduct.class);
+        TypedQuery<TechnologicalMapProduct> query = entityManager.createQuery(sql, TechnologicalMapProduct.class);
         query.setParameter("idOfTechnologicalMap", idOfTechnologicalMap);
         return query.getResultList();
     }
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from TechnologicalMap order by globalId", TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery("from TechnologicalMap where deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Long idOfConfigurationProvider,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         return query.getResultList();
     }
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Long idOfConfigurationProvider,
             List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where orgOwner in :orgOwners order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery("from TechnologicalMap where orgOwner in :orgOwners order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(TechnologicalMapGroup technologicalMapGroup, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(
+            TechnologicalMapGroup technologicalMapGroup, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
         query.setParameter("technologicalMapGroup", technologicalMapGroup);
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(TechnologicalMapGroup technologicalMapGroup, Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(
+            TechnologicalMapGroup technologicalMapGroup, Long idOfConfigurationProvider,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         query.setParameter("technologicalMapGroup", technologicalMapGroup);
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(TechnologicalMapGroup technologicalMapGroup, Long idOfConfigurationProvider,
-            List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(
+            TechnologicalMapGroup technologicalMapGroup, Long idOfConfigurationProvider, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
+        query.setParameter("idOfConfigurationProvider", idOfConfigurationProvider);
         query.setParameter("orgOwners", orgOwners);
         query.setParameter("technologicalMapGroup", technologicalMapGroup);
         return query.getResultList();
     }
 
-    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(TechnologicalMapGroup technologicalMapGroup, List<Long> orgOwners, Boolean deletedStatusSelected) {
+    public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(
+            TechnologicalMapGroup technologicalMapGroup, List<Long> orgOwners, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and orgOwner in :orgOwners order by globalId",TechnologicalMap.class);
+        if (deletedStatusSelected) {
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and orgOwner in :orgOwners order by globalId",
+                    TechnologicalMap.class);
         } else {
-            query = entityManager.createQuery("from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMap.class);
+            query = entityManager.createQuery(
+                    "from TechnologicalMap where technologicalMapGroup=:technologicalMapGroup and orgOwner in :orgOwners and deletedState=false order by globalId",
+                    TechnologicalMap.class);
         }
         query.setParameter("orgOwners", orgOwners);
         query.setParameter("technologicalMapGroup", technologicalMapGroup);
@@ -1184,34 +1327,40 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(String filter) {
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap where UPPER(nameOfTechnologicalMap) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId",TechnologicalMap.class);
+        TypedQuery<TechnologicalMap> query = entityManager.createQuery(
+                "from TechnologicalMap where UPPER(nameOfTechnologicalMap) like '%" + filter.toUpperCase()
+                        + "%' and deletedState=false order by globalId", TechnologicalMap.class);
         return query.getResultList();
     }
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(List<Long> orgOwners, String filter) {
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap where UPPER(nameOfTechnologicalMap) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false order by globalId",TechnologicalMap.class);
+        TypedQuery<TechnologicalMap> query = entityManager.createQuery(
+                "from TechnologicalMap where UPPER(nameOfTechnologicalMap) like '%" + filter.toUpperCase()
+                        + "%' and orgOwner in :orgOwners and deletedState=false order by globalId",
+                TechnologicalMap.class);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
 
 
     public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight) {
-        Query query = entityManager.createQuery("update GoodsBasicBasket set nameOfGood=:nameOfGood, unitsScale=:unitsScale, netWeight=:netWeight, lastUpdate=:lastUpdate where idOfBasicGood=:idOfBasicGood");
-        query.setParameter("idOfBasicGood",idOfBasicGood);
-        query.setParameter("nameOfGood",nameOfGood);
-        query.setParameter("unitsScale",unitsScale);
-        query.setParameter("netWeight",netWeight);
-        query.setParameter("lastUpdate",new Date());
-        return query.executeUpdate()!=0;
+        Query query = entityManager.createQuery(
+                "update GoodsBasicBasket set nameOfGood=:nameOfGood, unitsScale=:unitsScale, netWeight=:netWeight, lastUpdate=:lastUpdate where idOfBasicGood=:idOfBasicGood");
+        query.setParameter("idOfBasicGood", idOfBasicGood);
+        query.setParameter("nameOfGood", nameOfGood);
+        query.setParameter("unitsScale", unitsScale);
+        query.setParameter("netWeight", netWeight);
+        query.setParameter("lastUpdate", new Date());
+        return query.executeUpdate() != 0;
     }
 
     // не рекомендуется к использованию
     @Deprecated
     @Transactional
-    public List<Client> getClientsByOrgId (long idOfOrg) {
+    public List<Client> getClientsByOrgId(long idOfOrg) {
         TypedQuery<Client> query = entityManager.createQuery("from Client where idOfOrg=:idoforg", Client.class);
-        query.setParameter("idoforg",idOfOrg);
-        List <Client> clients = query.getResultList();
+        query.setParameter("idoforg", idOfOrg);
+        List<Client> clients = query.getResultList();
         for (Client cl : clients) {
             try {
                 cl.getPerson().getFirstName();
@@ -1224,28 +1373,28 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return clients;
     }
 
-    public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception{
+    public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception {
         Query query = entityManager.createQuery("update Org set fullSyncParam=1 where idOfOrg in :idOfOrgList");
         query.setParameter("idOfOrgList", idOfOrgList);
         query.executeUpdate();
     }
 
-    public void applyUsePlanOrdersOperationByOrgList(List<Long> idOfOrgList) throws Exception{
+    public void applyUsePlanOrdersOperationByOrgList(List<Long> idOfOrgList) throws Exception {
         Query query = entityManager.createQuery("update Org set usePlanOrders=1 where idOfOrg in :idOfOrgList");
         query.setParameter("idOfOrgList", idOfOrgList);
         query.executeUpdate();
     }
 
     public List<ComplexRole> findComplexRoles() {
-        return entityManager.createQuery("from ComplexRole order by idOfRole",ComplexRole.class).getResultList();
+        return entityManager.createQuery("from ComplexRole order by idOfRole", ComplexRole.class).getResultList();
     }
 
-    public List<ComplexRole> updateComplexRoles(List<ComplexRole> complexRoles) throws Exception{
+    public List<ComplexRole> updateComplexRoles(List<ComplexRole> complexRoles) throws Exception {
         List<ComplexRole> roles = new ArrayList<ComplexRole>(complexRoles.size());
-        for (ComplexRole complexRole: complexRoles){
+        for (ComplexRole complexRole : complexRoles) {
             ComplexRole role = entityManager.find(ComplexRole.class, complexRole.getIdOfRole());
             String roleName = complexRole.getRoleName();
-            if(StringUtils.isEmpty(roleName) || StringUtils.isEmpty(roleName.trim())){
+            if (StringUtils.isEmpty(roleName) || StringUtils.isEmpty(roleName.trim())) {
                 role.setRoleName(String.format("Комплекс %d", complexRole.getIdOfRole()));
             } else {
                 role.setRoleName(roleName);
@@ -1258,20 +1407,24 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<CategoryDiscount> getCategoryDiscountListWithIds(List<Long> idOfCategoryList) {
-        TypedQuery<CategoryDiscount> q = entityManager.createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)", CategoryDiscount.class);
+        TypedQuery<CategoryDiscount> q = entityManager
+                .createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)",
+                        CategoryDiscount.class);
         q.setParameter("idOfCategoryList", idOfCategoryList);
         return q.getResultList();
     }
 
     public List<CategoryOrg> getCategoryOrgWithIds(List<Long> idOfCategoryOrgList) {
-        TypedQuery<CategoryOrg> q = entityManager.createQuery("from CategoryOrg where idOfCategoryOrg in (:idOfCategoryOrgList)", CategoryOrg.class);
+        TypedQuery<CategoryOrg> q = entityManager
+                .createQuery("from CategoryOrg where idOfCategoryOrg in (:idOfCategoryOrgList)", CategoryOrg.class);
         q.setParameter("idOfCategoryOrgList", idOfCategoryOrgList);
         return q.getResultList();
     }
 
     public List<Org> findOrgsByConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
-        TypedQuery<Org> query = entityManager.createQuery("from Org where configurationProvider=:configurationProvider",Org.class);
-        query.setParameter("configurationProvider",currentConfigurationProvider);
+        TypedQuery<Org> query = entityManager
+                .createQuery("from Org where configurationProvider=:configurationProvider", Org.class);
+        query.setParameter("configurationProvider", currentConfigurationProvider);
         return query.getResultList();
     }
 
@@ -1282,7 +1435,7 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public List<Client> findClientsForOrgAndFriendly(Long idOfOrg, boolean lazyLoadInit) throws Exception {
         List<Client> cl = DAOUtils.findClientsForOrgAndFriendly(entityManager, entityManager.find(Org.class, idOfOrg));
         if (lazyLoadInit) {
-            for (Client c: cl) {
+            for (Client c : cl) {
                 if (c == null) {
                     continue;
                 }
@@ -1308,8 +1461,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return getLastRegistryChanges(idOfOrg, revisionDate, null, null);
     }
 
-    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate,
-            Integer actionFilter, String nameFilter) throws Exception {
+    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg);
         }
@@ -1317,49 +1470,55 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             return Collections.EMPTY_LIST;
         }
         String nameStatement = "";
-        if(nameFilter != null && nameFilter.length() > 0) {
+        if (nameFilter != null && nameFilter.length() > 0) {
             nameStatement = " and lower(surname||firstname||secondname) like lower('%" + nameFilter + "%') ";
         }
         String actionStatement = "";
-        if(actionFilter != null) {
+        if (actionFilter != null) {
             actionStatement = " and operation=:operation ";
         }
-        String q = "from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement + actionStatement + " order by groupName, surname, firstName, secondName";
-        TypedQuery<RegistryChange> query = entityManager.createQuery(q,RegistryChange.class);
+        String q = "from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement
+                + actionStatement + " order by groupName, surname, firstName, secondName";
+        TypedQuery<RegistryChange> query = entityManager.createQuery(q, RegistryChange.class);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("lastUpdate", revisionDate);
-        if(actionFilter != null) {
+        if (actionFilter != null) {
             query.setParameter("operation", actionFilter);
         }
         return query.getResultList();
     }
 
     public long getLastRegistryChangeUpdate(long idOfOrg) throws Exception {
-        Query q = entityManager.createNativeQuery("SELECT max(createDate) FROM cf_RegistryChange where idOfOrg=:idOfOrg");
+        Query q = entityManager
+                .createNativeQuery("SELECT max(createDate) FROM cf_RegistryChange WHERE idOfOrg=:idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);
         Object res = q.getSingleResult();
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
     public List getRegistryChangeRevisions(long idOfOrg) throws Exception {
-        Query query = entityManager.createQuery("select distinct createDate, type from RegistryChange where idOfOrg=:idOfOrg order by createDate desc");
-        query.setParameter("idOfOrg",idOfOrg);
+        Query query = entityManager.createQuery(
+                "select distinct createDate, type from RegistryChange where idOfOrg=:idOfOrg order by createDate desc");
+        query.setParameter("idOfOrg", idOfOrg);
         return query.getResultList();
     }
-    
-    public List<RegistryChangeError> getRegistryChangeErrors(long idOfOrg) throws Exception{
+
+    public List<RegistryChangeError> getRegistryChangeErrors(long idOfOrg) throws Exception {
         String orgClause = "";
         if (idOfOrg > -1) {
             orgClause = "where idOfOrg=:idOfOrg";
         }
-        TypedQuery<RegistryChangeError> query = entityManager.createQuery("from RegistryChangeError " + orgClause + " order by createDate desc",RegistryChangeError.class);
+        TypedQuery<RegistryChangeError> query = entityManager
+                .createQuery("from RegistryChangeError " + orgClause + " order by createDate desc",
+                        RegistryChangeError.class);
         if (idOfOrg > -1) {
             query.setParameter("idOfOrg", idOfOrg);
         }
         return query.getResultList();
     }
 
-    public void addRegistryChangeErrorComment(long idOfRegistryChangeError, String comment, String author) throws Exception {
+    public void addRegistryChangeErrorComment(long idOfRegistryChangeError, String comment, String author)
+            throws Exception {
         Session session = (Session) entityManager.getDelegate();
         RegistryChangeError e = entityManager.find(RegistryChangeError.class, idOfRegistryChangeError);
         e.setComment(comment);
@@ -1368,7 +1527,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         session.update(e);
     }
 
-    public void addRegistryChangeError(long idOfOrg, long revisionDate, String error, String errorDetails) throws Exception {
+    public void addRegistryChangeError(long idOfOrg, long revisionDate, String error, String errorDetails)
+            throws Exception {
         Session session = (Session) entityManager.getDelegate();
         RegistryChangeError e = new RegistryChangeError();
         e.setIdOfOrg(idOfOrg);
@@ -1380,7 +1540,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<String> getCurrentRepositoryReportNames() {
-        TypedQuery<String> query = entityManager.createQuery("select distinct ruleName from ReportInfo order by ruleName",String.class);
+        TypedQuery<String> query = entityManager
+                .createQuery("select distinct ruleName from ReportInfo order by ruleName", String.class);
         return query.getResultList();
 
     }
@@ -1394,22 +1555,21 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         }
         Session session = (Session) entityManager.getDelegate();
         //  cf_reporthandlerules
-        org.hibernate.Query q = session.createSQLQuery("update cf_reportinfo set rulename=:newName where rulename=:previousName");
+        org.hibernate.Query q = session
+                .createSQLQuery("UPDATE cf_reportinfo SET rulename=:newName WHERE rulename=:previousName");
         q.setString("newName", newName.trim());
         q.setString("previousName", previousName.trim());
         q.executeUpdate();
     }
 
-    public List<BigInteger> getCleanupRepositoryReportsByDate() throws Exception{
+    public List<BigInteger> getCleanupRepositoryReportsByDate() throws Exception {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select idofreportinfo "
-                        + "from cf_reportinfo "
-                        + "left join cf_reporthandlerules on cf_reportinfo.rulename=cf_reporthandlerules.rulename "
-                        + "where cf_reporthandlerules.storageperiod<>-1 and "
-                        + "      (cf_reporthandlerules.storageperiod=0 or "
-                        + "       createddate<EXTRACT(EPOCH FROM now())*1000-cf_reporthandlerules.storageperiod)");
-        List <BigInteger> list = (List <BigInteger>) q.list();
+        org.hibernate.Query q = session.createSQLQuery("SELECT idofreportinfo " + "FROM cf_reportinfo "
+                + "LEFT JOIN cf_reporthandlerules ON cf_reportinfo.rulename=cf_reporthandlerules.rulename "
+                + "WHERE cf_reporthandlerules.storageperiod<>-1 AND "
+                + "      (cf_reporthandlerules.storageperiod=0 OR "
+                + "       createddate<EXTRACT(EPOCH FROM now())*1000-cf_reporthandlerules.storageperiod)");
+        List<BigInteger> list = (List<BigInteger>) q.list();
         return list;
     }
 
@@ -1421,11 +1581,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         List<Contragent> res = query.getResultList();
         return res.isEmpty() ? null : res.get(0);
     }
-    
+
     public long getSynchErrorsCount(Org org) {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select count(idoforg) from cf_synchistory_exceptions where idoforg=:idoforg");
+        org.hibernate.Query q = session
+                .createSQLQuery("SELECT count(idoforg) FROM cf_synchistory_exceptions WHERE idoforg=:idoforg");
         q.setLong("idoforg", org.getIdOfOrg());
         return ((BigInteger) q.uniqueResult()).longValue();
     }
@@ -1433,17 +1593,15 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public long getComplexPrice(long idoforg, int complex) {
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery(
-                "select currentprice, max(menudate) as d "
-                + "from cf_complexinfo "
-                + "where idoforg=:idoforg and idofcomplex=:complex "
-                + "group by currentprice "
-                + "order by d desc");
+                "SELECT currentprice, max(menudate) AS d " + "FROM cf_complexinfo "
+                        + "WHERE idoforg=:idoforg AND idofcomplex=:complex " + "GROUP BY currentprice "
+                        + "ORDER BY d DESC");
         q.setLong("idoforg", idoforg);
         q.setInteger("complex", complex);
         List res = q.list();
         for (Object o : res) {
-            Object entry [] = (Object[]) o;
-            if (entry [0] == null) {
+            Object entry[] = (Object[]) o;
+            if (entry[0] == null) {
                 return 0L;
             }
             return ((BigInteger) entry[0]).longValue();
@@ -1453,33 +1611,33 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     public long getNextIdOfOrder(Org org) {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select max(idoforder) from cf_orders where idoforg=:idoforg");
+        org.hibernate.Query q = session.createSQLQuery("SELECT max(idoforder) FROM cf_orders WHERE idoforg=:idoforg");
         q.setLong("idoforg", org.getIdOfOrg());
         return ((BigInteger) q.uniqueResult()).longValue() + 1;
     }
 
     public long getNextIdOfOrderDetail(Org org) {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select max(idoforderdetail) from cf_orderdetails where idoforg=:idoforg");
+        org.hibernate.Query q = session
+                .createSQLQuery("SELECT max(idoforderdetail) FROM cf_orderdetails WHERE idoforg=:idoforg");
         q.setLong("idoforg", org.getIdOfOrg());
         return ((BigInteger) q.uniqueResult()).longValue() + 1;
     }
 
-    public String [] getDistricts() {
+    public String[] getDistricts() {
         Session session = (Session) entityManager.getDelegate();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select distinct district from cf_orgs where district<>'' order by district");
+        org.hibernate.Query q = session
+                .createSQLQuery("SELECT DISTINCT district FROM cf_orgs WHERE district<>'' ORDER BY district");
         List<String> list = (List<String>) q.list();
         return list.toArray(new String[list.size()]);
     }
 
     public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
-            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent, String contragent) {
+            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
+            String contragent) {
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
-                endDate, reportFile, orgNum, idOfOrg, tag,idOfContragent, contragent, idOfContragentReceiver,
+                endDate, reportFile, orgNum, idOfOrg, tag, idOfContragent, contragent, idOfContragentReceiver,
                 contragentReceiver);
         entityManager.persist(ri);
         return ri;
@@ -1513,21 +1671,21 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             session.save(userOrgs);
         }
 
-        for (Long orgIdCanceled: orgIdsCancel) {
+        for (Long orgIdCanceled : orgIdsCancel) {
             Org org1 = (Org) session.load(Org.class, orgIdCanceled);
-            UserOrgs userOrgs1 = new UserOrgs(user , org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+            UserOrgs userOrgs1 = new UserOrgs(user, org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
             session.save(userOrgs1);
         }
     }
 
     @Transactional(readOnly = true)
-	public boolean existsOrgByIdAndTags(Long idOfOrg, String tag) {
+    public boolean existsOrgByIdAndTags(Long idOfOrg, String tag) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.ilike("tag", tag, MatchMode.ANYWHERE));
         List list = criteria.list();
-        return list.size()>0;
+        return list.size() > 0;
     }
 
     public List<String> getRegions() {
@@ -1558,27 +1716,28 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public long getNotBindedEMPClientsCount() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid is null and mobile<>''");
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE ssoid IS null AND mobile<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getBindedEMPClientsCount() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid is not null and ssoid<>'-1' and mobile<>''");
+        Query q = entityManager.createNativeQuery(
+                "SELECT COUNT(*) FROM cf_clients WHERE ssoid IS NOT null AND ssoid<>'-1' AND mobile<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getBindWaitingEMPClients() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid='-1'");
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE ssoid='-1'");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long getBindEMPErrorsCount() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients where ssoid like 'E:%'");
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE ssoid LIKE 'E:%'");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, Long accessoryNumber) {
-        if(accessoryNumber == null) {
+        if (accessoryNumber == null) {
             return idoforg;
         }
         return receiveIdOfOrgByAccessory(idoforg, accessoryType, "" + accessoryNumber);
@@ -1586,18 +1745,20 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     @Transactional
     public long receiveIdOfOrgByAccessory(long idoforg, int accessoryType, String accessoryNumber) {
-        if(accessoryNumber == null || StringUtils.isBlank(accessoryNumber)) {
+        if (accessoryNumber == null || StringUtils.isBlank(accessoryNumber)) {
             return idoforg;
         }
 
         try {
-            Query q = entityManager.createQuery("FROM Accessory where idOfSourceOrg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber", Accessory.class);
+            Query q = entityManager.createQuery(
+                    "FROM Accessory where idOfSourceOrg=:idoforg and accessoryType=:accessoryType and accessoryNumber=:accessoryNumber",
+                    Accessory.class);
             q.setParameter("idoforg", idoforg);
             q.setParameter("accessoryType", accessoryType);
             q.setParameter("accessoryNumber", accessoryNumber);
 
             List res = q.getResultList();
-            if(res == null || res.size() < 1) {
+            if (res == null || res.size() < 1) {
                 createAccessory(idoforg, accessoryType, accessoryNumber);
                 return idoforg;
             }
@@ -1620,24 +1781,24 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public ExternalSystemStats getAllPreviousStatsForExternalSystem(String systemName, String instance) {
-        Query q = entityManager.createNativeQuery("select CreateDate, StatisticId, StatisticValue "
-                + "from cf_external_system_stats "
-                + "where CreateDate=(select max(CreateDate) from cf_external_system_stats where SystemName=:systemName AND Instance=:instance);");
+        Query q = entityManager.createNativeQuery(
+                "SELECT CreateDate, StatisticId, StatisticValue " + "FROM cf_external_system_stats "
+                        + "WHERE CreateDate=(SELECT max(CreateDate) FROM cf_external_system_stats WHERE SystemName=:systemName AND Instance=:instance);");
         q.setParameter("systemName", systemName);
         q.setParameter("instance", instance);
         List res = q.getResultList();
         ExternalSystemStats result = null;
-        for(Object o : res) {
-            Object entry [] = (Object[]) o;
+        for (Object o : res) {
+            Object entry[] = (Object[]) o;
             BigInteger createDate = (BigInteger) entry[0];
             Integer typeId = (Integer) entry[1];
             BigDecimal value = (BigDecimal) entry[2];
-            if(result == null) {
+            if (result == null) {
                 result = new ExternalSystemStats(new Date(createDate.longValue()), systemName, instance);
             }
             result.setValue(typeId.intValue(), value.doubleValue());
         }
-        if(result == null) {
+        if (result == null) {
             result = new ExternalSystemStats(new Date(System.currentTimeMillis()), systemName, instance);
         }
         return result;
@@ -1645,8 +1806,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     @Transactional
     public ExternalSystemStats saveStatsForExtermalSystem(ExternalSystemStats stats) {
-        if(stats == null || stats.getCreateDate() == null || stats.getName() == null ||
-           StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+        if (stats == null || stats.getCreateDate() == null || stats.getName() == null ||
+                StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
             return null;
         }
 
@@ -1655,11 +1816,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         try {
             Query q = entityManager.createNativeQuery(
                     "INSERT INTO cf_external_system_stats (SystemName, Instance, CreateDate, StatisticId, StatisticValue) VALUES "
-                    + "(:systemName, :instance, :createDate, :statisticId, :statisticValue)");
+                            + "(:systemName, :instance, :createDate, :statisticId, :statisticValue)");
             q.setParameter("systemName", stats.getName());
             q.setParameter("instance", stats.getInstance());
             q.setParameter("createDate", newDate);
-            for(Integer typeId : stats.getValues().keySet()) {
+            for (Integer typeId : stats.getValues().keySet()) {
                 BigDecimal val = new BigDecimal(stats.getValue(typeId)).setScale(4);
                 q.setParameter("statisticId", typeId);
                 q.setParameter("statisticValue", val);
@@ -1674,19 +1835,18 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public boolean deleteStatsFromExternalSystem(ExternalSystemStats stats, long date) {
-        if(stats == null || stats.getCreateDate() == null || stats.getName() == null ||
-           StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+        if (stats == null || stats.getCreateDate() == null || stats.getName() == null ||
+                StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
             return false;
         }
         try {
             Query q = entityManager.createNativeQuery(
-                    "DELETE FROM cf_external_system_stats "
-                    + "WHERE SystemName=:systemName AND Instance=:instance AND "
-                    + "CreateDate=:createDate AND StatisticId=:statisticId");
+                    "DELETE FROM cf_external_system_stats " + "WHERE SystemName=:systemName AND Instance=:instance AND "
+                            + "CreateDate=:createDate AND StatisticId=:statisticId");
             q.setParameter("systemName", stats.getName());
             q.setParameter("instance", stats.getInstance());
             q.setParameter("createDate", date);
-            for(Integer typeId : stats.getValues().keySet()) {
+            for (Integer typeId : stats.getValues().keySet()) {
                 q.setParameter("statisticId", typeId);
                 q.executeUpdate();
             }
@@ -1702,10 +1862,10 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
-        return getOrgRegistryChanges(nameFilter,-1L);
+        return getOrgRegistryChanges(nameFilter, -1L);
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate) throws Exception{
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
         }
@@ -1713,11 +1873,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             return Collections.EMPTY_LIST;
         }
         String nameStatement = "";
-        if(nameFilter != null && nameFilter.length() > 0) {
+        if (nameFilter != null && nameFilter.length() > 0) {
             nameStatement = " and lower(shortname||officialname) like lower('%" + nameFilter + "%') ";
         }
         String q = "from OrgRegistryChange where createDate=:lastUpdate" + nameStatement + " order by officialname";
-        TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q,OrgRegistryChange.class);
+        TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q, OrgRegistryChange.class);
         query.setParameter("lastUpdate", revisionDate);
         return query.getResultList();
     }
@@ -1729,13 +1889,14 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     }
 
     public List<Long> getOrgRegistryChangeRevisionsList() throws Exception {
-        Query q = entityManager.createNativeQuery("SELECT distinct(createDate) FROM cf_orgregistrychange order by createDate desc limit 200");
+        Query q = entityManager.createNativeQuery(
+                "SELECT DISTINCT(createDate) FROM cf_orgregistrychange ORDER BY createDate DESC LIMIT 200");
         List<BigInteger> result = q.getResultList();
-        if(result == null || result.size() < 1) {
+        if (result == null || result.size() < 1) {
             return Collections.EMPTY_LIST;
         }
         List<Long> list = new ArrayList<Long>();
-        for(BigInteger bi : result) {
+        for (BigInteger bi : result) {
             list.add(bi.longValue());
         }
         return list;
@@ -1756,12 +1917,12 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public boolean registerSyncRequest(long idOfOrg, String idOfSync) {
         long dateAt = System.currentTimeMillis();
         try {
-            if(idOfSync.length() > 30) {
+            if (idOfSync.length() > 30) {
                 idOfSync = idOfSync.substring(0, 30);
             }
             Query q = entityManager.createNativeQuery(
                     "INSERT INTO cf_synchistory_daily (idofsync, idoforg, syncdate) VALUES "
-                    + "(:idofsync, :idoforg, :syncdate)");
+                            + "(:idofsync, :idoforg, :syncdate)");
             q.setParameter("idofsync", idOfSync);
             q.setParameter("idoforg", idOfOrg);
             q.setParameter("syncdate", dateAt);
@@ -1790,36 +1951,77 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         List idList = query.list();
         for (Object id : idList) {
 
-            result.add(((BigInteger)id).longValue());
+            result.add(((BigInteger) id).longValue());
         }
 
         return result;
     }
 
-    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Contragent defaultSupplier) {
-        MenuDetail menuDetail = null;
-
-        Org org = (Org) getOrgsByDefaultSupplier(defaultSupplier);
+    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Org orgFromOrder) {
 
         Session session = entityManager.unwrap(Session.class);
+        Long idOfOrg = findMenuExchangeSourceOrg(session, orgFromOrder.getIdOfOrg());
 
-        Criteria menuCriteria = session.createCriteria(Menu.class);
-        menuCriteria.add(Restrictions.eq("org", org));
-        menuCriteria.setProjection(Projections.max("idOfMenu"));
-        menuCriteria.setProjection(Projections.max("menuDate"));
+        SQLQuery query = session.createSQLQuery(
+                "SELECT DISTINCT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
+                        + "cfm.menudetailname AS menuDetailName, cfm.groupname AS groupName, "
+                        + "cfm.menudetailoutput AS menuDetailOutput, cfm.price AS price, "
+                        + "cfm.menuorigin AS menuOrigin, cfm.availablenow AS availableNow, "
+                        + "cfm.localidofmenu AS localIdOfMenu, cfm.protein AS protein, cfm.fat AS fat, "
+                        + "cfm.carbohydrates AS carbohydrates, cfm.calories AS calories, cfm.vitb1 AS vitB1, "
+                        + "cfm.vita AS vitA, cfm.vite AS vitE, cfm.vitc AS vitC,cfm.minca AS minCa, "
+                        + "cfm.minp AS minP, cfm.minmg AS minMg, cfm.minfe AS minFe, "
+                        + "cfm.flags AS flags, cfm.priority AS priority, cfm.vitb2 AS vitB2, "
+                        + "cfm.vitpp AS vitPp, cfm.idofmenufromsync AS idOfMenuFromSync "
+                        + "FROM cf_menudetails cfm LEFT JOIN cf_orderdetails cfo ON cfm.idofmenufromsync = cfo.idofmenufromsync "
+                        + "LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu WHERE cfm.idofmenufromsync = :idofmenufromsync AND cm.idoforg = :idoforg ORDER BY cfm.idofmenudetail DESC");
+        query.setParameter("idofmenufromsync", idOfMenuFromSync);
+        query.setParameter("idoforg", idOfOrg);
+        query.addScalar("idOfMenuDetail", StandardBasicTypes.LONG);
+        query.addScalar("menuPath", StandardBasicTypes.STRING);
+        query.addScalar("menuDetailName");
+        query.addScalar("groupName");
+        query.addScalar("menuDetailOutput");
+        query.addScalar("price", StandardBasicTypes.LONG);
+        query.addScalar("menuOrigin", StandardBasicTypes.INTEGER);
+        query.addScalar("availableNow", StandardBasicTypes.INTEGER);
+        query.addScalar("localIdOfMenu", StandardBasicTypes.LONG);
+        query.addScalar("protein", StandardBasicTypes.DOUBLE);
+        query.addScalar("fat", StandardBasicTypes.DOUBLE);
+        query.addScalar("carbohydrates", StandardBasicTypes.DOUBLE);
+        query.addScalar("calories", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitB1", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitB2", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitC", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitA", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitE", StandardBasicTypes.DOUBLE);
+        query.addScalar("minCa", StandardBasicTypes.DOUBLE);
+        query.addScalar("minP", StandardBasicTypes.DOUBLE);
+        query.addScalar("minMg", StandardBasicTypes.DOUBLE);
+        query.addScalar("minFe", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitPp", StandardBasicTypes.DOUBLE);
+        query.addScalar("flags", StandardBasicTypes.INTEGER);
+        query.addScalar("priority", StandardBasicTypes.INTEGER);
 
-        Menu menu = (Menu) menuCriteria.uniqueResult();
+        query.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
 
-        Set<MenuDetail> menuDetailSet = menu.getMenuDetails();
+        List<MenuDetail> menuDetailList = query.list();
 
-        for (MenuDetail menuDetailItem : menuDetailSet) {
-            if (menuDetailItem.getIdOfMenuFromSync() == idOfMenuFromSync) {
-                menuDetail = menuDetailItem;
-                break;
-            }
+        if (!menuDetailList.isEmpty()) {
+            return menuDetailList.get(0);
+        } else {
+            return null;
         }
+    }
 
-        return menuDetail;
+    public static Long findMenuExchangeSourceOrg(Session persistenceSession, Long idOfOrg) {
+        Criteria criteria = persistenceSession.createCriteria(MenuExchangeRule.class);
+        criteria.add(Restrictions.eq("idOfDestOrg", idOfOrg));
+        MenuExchangeRule rule = (MenuExchangeRule) criteria.uniqueResult();
+        if (rule == null) {
+            return null;
+        }
+        return rule.getIdOfSourceOrg();
     }
 
 }
