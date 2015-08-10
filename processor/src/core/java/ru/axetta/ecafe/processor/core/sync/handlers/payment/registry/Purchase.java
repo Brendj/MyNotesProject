@@ -85,7 +85,11 @@ public class Purchase {
             idOfRule = Long.parseLong(idOfRuleStr);
         }
 
-        Long idOfMenu = getLongValue(namedNodeMap, "IdOfMenu");
+        Long idOfMenu = null;;
+        String idOfMenuStr = getStringValueNullSafe(namedNodeMap, "IdOfMenu");
+        if (idOfMenuStr != null) {
+            idOfMenu = Long.parseLong(idOfMenuStr);
+        }
 
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
                 menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu);
