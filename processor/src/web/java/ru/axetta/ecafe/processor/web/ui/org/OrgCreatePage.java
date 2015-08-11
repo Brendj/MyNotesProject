@@ -72,6 +72,7 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     private Long btiUnom;
     private Long btiUnad;
+    private Long uniqueAddressId;
     private String introductionQueue;
     private Long additionalIdBuilding;
     private String statusDetailing;
@@ -443,7 +444,8 @@ public class OrgCreatePage extends BasicWorkspacePage
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
-                this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.introductionQueue, this.additionalIdBuilding, this.statusDetailing);
+                this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.uniqueAddressId,
+                this.introductionQueue, this.additionalIdBuilding, this.statusDetailing);
         org.setCity(city);
         org.setDistrict(district);
         org.setLocation(location);

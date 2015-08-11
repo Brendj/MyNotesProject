@@ -85,7 +85,8 @@ public class ImportRegisterOrgsService {
                 }
             case OrgRegistryChange.MODIFY_OPERATION:
                 try {
-                    modifyOrg(orgRegistryChange, org, session, buildingsList);
+                    //modifyOrg(orgRegistryChange, org, session, buildingsList);
+                    modifyOrg(orgRegistryChange, session, buildingsList);
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to modify org", org);
@@ -113,34 +114,53 @@ public class ImportRegisterOrgsService {
 
         Date createDate = new Date();
         if (buildingsList.size() > 0){
+            String shortName;
+            int addToShortname = 0;
             for (Long aLong : buildingsList) {
                 OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
                 if (orgRegistryChangeItem != null){
-                    Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem.getAddress(), orgRegistryChangeItem.getAdditionalId());
+                    /*Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem.getAddress(), orgRegistryChangeItem.getAdditionalId());
+                    session.persist(org);*/
+                    if (addToShortname > 0) {
+                        shortName = orgRegistryChangeItem.getShortName() + " - " + addToShortname;
+                    } else {
+                        shortName = orgRegistryChangeItem.getShortName();
+                    }
+                    Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier, orgRegistryChangeItem, shortName);
+                    addToShortname++;
                     session.persist(org);
                 }
             }
         }else{
-            Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier, null, null);
-            session.persist(org);
+            return;
+            //Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier, null, null);
+            //session.persist(org);
         }
 
     }
 
     private Org createOrg(OrgRegistryChange orgRegistryChange, Person officialPerson, Date createDate,
-            Contragent defaultSupplier, String address, Long additionalId) throws Exception {
+            Contragent defaultSupplier, OrgRegistryChangeItem orgRegistryChangeItem, String orgShortName) throws Exception {
+        String address = orgRegistryChangeItem.getAddress();
         if (address == null){
             address = orgRegistryChange.getAddress();
         }
+        Long additionalId = orgRegistryChangeItem.getAdditionalId();
         if (additionalId == null){
             additionalId = orgRegistryChange.getAdditionalId();
         }
-        Org org = new Org(orgRegistryChange.getShortName(), orgRegistryChange.getOfficialName(),
-                address, officialPerson, "",
+        /* Создание организациииии
+        Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
+                String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
+                Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
+                String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
+                Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing)*/
+        Org org = new Org(orgShortName, orgRegistryChange.getOfficialName(), address, officialPerson, "",
                 "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
-                0L, defaultSupplier, "", "", "",
-                "", "", "", orgRegistryChange.getUnom(), orgRegistryChange.getUnad(),
-                "", additionalId, "/");
+                0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
+                "", "", "",
+                orgRegistryChangeItem.getUnom(), orgRegistryChangeItem.getUnad(),
+                orgRegistryChangeItem.getUniqueAddressId(), "", additionalId, "/");
         org.setCity(orgRegistryChange.getCity());
         org.setDistrict(orgRegistryChange.getRegion());
         org.setLocation("");
@@ -156,8 +176,60 @@ public class ImportRegisterOrgsService {
         return org;
     }
 
+    /*private Org createOrg(OrgRegistryChange orgRegistryChange, Person officialPerson, Date createDate,
+            Contragent defaultSupplier, String address, Long additionalId) throws Exception {
+        if (address == null){
+            address = orgRegistryChange.getAddress();
+        }
+        if (additionalId == null){
+            additionalId = orgRegistryChange.getAdditionalId();
+        }
+        Org org = new Org(orgRegistryChange.getShortName(), orgRegistryChange.getOfficialName(),
+                address, officialPerson, "",
+                "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
+                0L, defaultSupplier, "", "", "",
+                "", "", "", orgRegistryChange.getUnom(), orgRegistryChange.getUnad(),
+                orgRegistryChange.getUniqueAddressId(), "", additionalId, "/");
+        org.setCity(orgRegistryChange.getCity());
+        org.setDistrict(orgRegistryChange.getRegion());
+        org.setLocation("");
+        org.setLongitude("");
+        org.setLatitude("");
+        org.setGuid(orgRegistryChange.getGuid());
+        org.setPhone("");
+        org.setSmsSender("");
+        org.setTag("");
+        org.setStatus(OrganizationStatus.PLANNED);
+        org.setState(0);
 
-    protected void modifyOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
+        return org;
+    }*/
+
+    protected void modifyOrg(OrgRegistryChange orgRegistryChange, Session session, List<Long> buildingsList)
+            throws Exception {
+        for (Long aLong : buildingsList) {
+            OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
+            if (orgRegistryChangeItem != null) {
+                Org org = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
+                if (org != null) {
+                    org.setAddress(orgRegistryChangeItem.getAddress());
+                    org.setCity(orgRegistryChange.getCity());
+                    org.setDistrict(orgRegistryChange.getRegion());
+
+                    org.setBtiUnom(orgRegistryChangeItem.getUnom());
+                    org.setBtiUnad(orgRegistryChangeItem.getUnad());
+                    org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
+
+                    org.setGuid(orgRegistryChange.getGuid());
+                    org.setAdditionalIdBuilding(aLong);
+                    org.setINN(orgRegistryChangeItem.getInn());
+                }
+                session.persist(org);
+            }
+        }
+    }
+
+    /*protected void modifyOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
             throws Exception {
         org.setShortName(orgRegistryChange.getShortName());
         org.setOfficialName(orgRegistryChange.getOfficialName());
@@ -168,6 +240,7 @@ public class ImportRegisterOrgsService {
 
         org.setBtiUnom(orgRegistryChange.getUnom());
         org.setBtiUnad(orgRegistryChange.getUnad());
+        org.setUniqueAddressId(orgRegistryChange.getUniqueAddressId());
 
         org.setGuid(orgRegistryChange.getGuid());
         org.setAdditionalIdBuilding(orgRegistryChange.getAdditionalId());
@@ -186,7 +259,7 @@ public class ImportRegisterOrgsService {
                     try {
                         defaultSupplier = DAOService.getInstance().getContragentById(DEFAULT_SUPPLIER_ID);
                     } catch (Exception e) { }
-                    byAdditionalId = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem.getAddress(), orgRegistryChangeItem.getAdditionalId());
+                    byAdditionalId = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem);
                 }else{
                     byAdditionalId.setShortName(orgRegistryChange.getShortName());
                     byAdditionalId.setOfficialName(orgRegistryChange.getOfficialName());
@@ -197,6 +270,7 @@ public class ImportRegisterOrgsService {
 
                     byAdditionalId.setBtiUnom(orgRegistryChangeItem.getUnom());
                     byAdditionalId.setBtiUnad(orgRegistryChange.getUnad());
+                    byAdditionalId.setUniqueAddressId(orgRegistryChange.getUniqueAddressId());
 
                     byAdditionalId.setGuid(orgRegistryChange.getGuid());
                     byAdditionalId.setAdditionalIdBuilding(aLong);
@@ -207,7 +281,7 @@ public class ImportRegisterOrgsService {
 
         }
         session.persist(org);
-    }
+    }*/
 
     protected void deleteOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList) {
         org.setState(OrganizationStatus.INACTIVE.ordinal());
@@ -271,6 +345,8 @@ public class ImportRegisterOrgsService {
 
                         oi.getUnom(), oi.getUnomFrom(),
                         oi.getUnad(), oi.getUnadFrom(),
+                        oi.getUniqueAddressId(), oi.getUniqueAddressIdFrom(),
+                        solveString(oi.getInn()), oi.getInnFrom(),
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
@@ -298,6 +374,8 @@ public class ImportRegisterOrgsService {
 
                         oi.getUnom(), oi.getUnomFrom(),
                         oi.getUnad(), oi.getUnadFrom(),
+                        oi.getUniqueAddressId(), oi.getUniqueAddressIdFrom(),
+                        solveString(oi.getInn()), oi.getInnFrom(),
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
@@ -324,6 +402,9 @@ public class ImportRegisterOrgsService {
     }
 
     public static class OrgInfo {
+        /*
+        Поля _From - данные из ИС ПП, поля без _From - данные из АИС Реестр.
+         */
         protected Long idOfOrg;
         protected Long createDate;
         protected Integer operationType;
@@ -348,6 +429,10 @@ public class ImportRegisterOrgsService {
         protected Long unomFrom;
         protected Long unad;
         protected Long unadFrom;
+        protected Long uniqueAddressId;
+        protected Long uniqueAddressIdFrom;
+        protected String inn;
+        protected String innFrom;
 
         protected String guid;
         protected String guidFrom;
@@ -360,7 +445,6 @@ public class ImportRegisterOrgsService {
         protected String interdistrictCouncilChiefFrom;
         private String directorFullName;
         private String OGRN;
-        private String INN;
         private String state;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
@@ -608,14 +692,6 @@ public class ImportRegisterOrgsService {
             return OGRN;
         }
 
-        public void setINN(String INN) {
-            this.INN = INN;
-        }
-
-        public String getINN() {
-            return INN;
-        }
-
         public void setState(String state) {
             this.state = state;
         }
@@ -638,6 +714,38 @@ public class ImportRegisterOrgsService {
 
         public Boolean getMainBuilding() {
             return mainBuilding;
+        }
+
+        public Long getUniqueAddressId() {
+            return uniqueAddressId;
+        }
+
+        public void setUniqueAddressId(Long uniqueAddressId) {
+            this.uniqueAddressId = uniqueAddressId;
+        }
+
+        public Long getUniqueAddressIdFrom() {
+            return uniqueAddressIdFrom;
+        }
+
+        public void setUniqueAddressIdFrom(Long uniqueAddressIdFrom) {
+            this.uniqueAddressIdFrom = uniqueAddressIdFrom;
+        }
+
+        public String getInn() {
+            return inn;
+        }
+
+        public void setInn(String inn) {
+            this.inn = inn;
+        }
+
+        public String getInnFrom() {
+            return innFrom;
+        }
+
+        public void setInnFrom(String innFrom) {
+            this.innFrom = innFrom;
         }
     }
 }

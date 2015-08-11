@@ -225,6 +225,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         String address = toStr(getFromColumn(tokens, columns, "address"));
         Long btiUnom = toLong(getFromColumn(tokens, columns, "btiUnom"));
         Long btiUnad = toLong(getFromColumn(tokens, columns, "btiUnad"));
+        Long uniqueAddressId = toLong(getFromColumn(tokens, columns, "uniqueAddressId"));
         String introductionQueue = toStr(getFromColumn(tokens, columns, "introductionQueue"));
         Long additionalId = toLong(getFromColumn(tokens, columns, "additionalId"));
 
@@ -267,7 +268,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 Org org = new Org(shortName, officialName, address, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
-                        "", "", "", btiUnom,  btiUnad, introductionQueue, additionalId, "/");
+                        "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/");
                 org.setCity(city);
                 org.setDistrict(region);
                 org.setLocation("");

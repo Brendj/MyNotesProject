@@ -82,6 +82,9 @@ public class OrgMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Полное название учреждения")) {
                     info.setOfficialName(attr.getValue().get(0).getValue());
                 }
+                if (attr.getName().equals("ИНН образовательного учреждения")) {
+                    info.setInn(attr.getValue().get(0).getValue());
+                }
 
                 if (attr.getName().equals("Официальный адрес")) {
                     info.setAddress(attr.getValue().get(0).getValue());
@@ -101,6 +104,9 @@ public class OrgMskNSIService extends MskNSIService {
                         for (Attribute attribute : groupValue.getAttribute()) {
                             if("БТИ.unom".equals(attribute.getName())){
                                 info.setUnom(Long.valueOf(attribute.getValue().get(0).getValue()));
+                            }
+                            if ("unique_address_id".equals(attribute.getName())){
+                                info.setUniqueAddressId(Long.valueOf(attribute.getValue().get(0).getValue()));
                             }
                         }
                     }
@@ -139,12 +145,22 @@ public class OrgMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Код ОГРН")) {
                     info.setOGRN(attr.getValue().get(0).getValue());
                 }
-                if (attr.getName().equals("ИНН образовательного учреждения")) {
-                    info.setINN(attr.getValue().get(0).getValue());
-                }
                 if (attr.getName().equals("Признак активности")) {
                     info.setState(attr.getValue().get(0).getValue());
                 }
+            }
+
+            //Здесь - переписать значение полей OrgRegistryChange в каждую запись OrgRegistryChangeItem
+            for (ImportRegisterOrgsService.OrgInfo item : info.getOrgInfos()) {
+                item.setShortName(info.getShortName());
+                item.setOfficialName(info.getOfficialName());
+                item.setCity(info.getCity());
+                item.setRegion(info.getRegion());
+                item.setGuid(info.getGuid());
+                item.setInn(info.getInn());
+
+                item.setShortNameFrom(info.getShortNameFrom());
+                item.setOfficialNameFrom(info.getOfficialNameFrom());
             }
 
             if(info.getOrganizationType() == null) {
@@ -159,7 +175,7 @@ public class OrgMskNSIService extends MskNSIService {
             } else {
                 List<Org> existingOrgList = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
                         info.getGuid());
-                Org existingOrg = findOrgByAdditionalId(existingOrgList, info.getAdditionalId());
+                Org existingOrg = findOrgByUniqueAddressId(existingOrgList, info.getUniqueAddressId());
 
 
                 if (existingOrg == null && info.getAdditionalId()!= null && info.getAdditionalId() != -1){
@@ -179,8 +195,9 @@ public class OrgMskNSIService extends MskNSIService {
                             !existingOrg.getCity().equals(info.getCity()) ||
                             !existingOrg.getDistrict().equals(info.getRegion()) ||
 
-                            (info.getUnad() != null && existingOrg.getBtiUnom() != info.getUnad()) ||
-                            (info.getUnad() != null && existingOrg.getBtiUnom() != info.getUnad()) ||
+                            (info.getUnom() != null && existingOrg.getBtiUnom() != info.getUnom()) ||
+                            (info.getUnad() != null && existingOrg.getBtiUnad() != info.getUnad()) ||
+                            (info.getUniqueAddressId() != null && existingOrg.getUniqueAddressId() != info.getUniqueAddressId()) ||
 
                             !existingOrg.getGuid().equals(info.getGuid()) ||
                             checkUpdated(info, existingOrg)) {
@@ -190,7 +207,7 @@ public class OrgMskNSIService extends MskNSIService {
                     if(requiredUpdate) {
                         fillInfOWithOrg(info, existingOrg);
                         for (ImportRegisterOrgsService.OrgInfo orgInfo : info.getOrgInfos()) {
-                            Org result = findOrgByAdditionalId(existingOrgList, orgInfo.getAdditionalId());
+                            Org result = findOrgByUniqueAddressId(existingOrgList, orgInfo.getUniqueAddressId());
                             if (result != null){
                                 fillInfOWithOrg(orgInfo, result);
                             }else{
@@ -219,12 +236,13 @@ public class OrgMskNSIService extends MskNSIService {
         info.setShortNameFrom(existingOrg.getShortName());
         info.setOfficialNameFrom(existingOrg.getOfficialName());
 
-        info.setAddress(existingOrg.getAddress());
-        info.setCity(existingOrg.getCity());
+        info.setAddressFrom(existingOrg.getAddress());
+        info.setCityFrom(existingOrg.getCity());
         info.setRegionFrom(existingOrg.getDistrict());
 
         info.setUnomFrom(existingOrg.getBtiUnom());
         info.setUnadFrom(existingOrg.getBtiUnad());
+        info.setUniqueAddressIdFrom(existingOrg.getUniqueAddressId());
 
         info.setGuidFrom(existingOrg.getGuid());
 
@@ -234,9 +252,9 @@ public class OrgMskNSIService extends MskNSIService {
         info.setInterdistrictCouncilChiefFrom(existingOrg.getInterdistrictCouncilChief());
     }
 
-    private Org findOrgByAdditionalId(List<Org> existingOrgList, Long additionalId) {
+    private Org findOrgByUniqueAddressId(List<Org> existingOrgList, Long additionalId) {
         for (Org org : existingOrgList) {
-            if(org.getAdditionalIdBuilding() != null && org.getAdditionalIdBuilding().equals(additionalId)){
+            if(org.getUniqueAddressId() != null && org.getUniqueAddressId().equals(additionalId)){
                 return      org;
             }
         }
@@ -245,7 +263,7 @@ public class OrgMskNSIService extends MskNSIService {
 
     private List<ImportRegisterOrgsService.OrgInfo> parseBTIInfo(Attribute attr, String guid) {
         List<ImportRegisterOrgsService.OrgInfo> result = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
-        if (attr.getGroupValue().size()> 1){
+        if (attr.getGroupValue().size()> 0){
             for (GroupValue groupValue : attr.getGroupValue()) {
                 ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
                 info.setGuid(guid);
@@ -267,6 +285,17 @@ public class OrgMskNSIService extends MskNSIService {
                             info.setMainBuilding(false);
                         }
                     }
+                    //====begin сюда добавляю заполнение полей для __Item
+                    if("БТИ.unom".equals(attribute.getName())){
+                        info.setUnom(Long.valueOf(attribute.getValue().get(0).getValue()));
+                    }
+                    if("БТИ.unad".equals(attribute.getName())){
+                        info.setUnad(Long.valueOf(attribute.getValue().get(0).getValue()));
+                    }
+                    if("unique_address_id".equals(attribute.getName())){
+                        info.setUniqueAddressId(Long.valueOf(attribute.getValue().get(0).getValue()));
+                    }
+                    //====end of сюда добавляю заполнение полей для __Item
                 }
                 result.add(info);
             }
@@ -299,8 +328,11 @@ public class OrgMskNSIService extends MskNSIService {
                 break;
             }
             importIteration++;
+            /////////////////////////////Здесь можно ставить break для тестовых целей;
         }
-        addDeletedOrgs(orgs);
+        if (StringUtils.isEmpty(orgName)) {
+            addDeletedOrgs(orgs);
+        }
         return orgs;
     }
 
@@ -329,6 +361,7 @@ public class OrgMskNSIService extends MskNSIService {
             info.setRegion(o.getDistrict());
             info.setUnom(o.getBtiUnom());
             info.setUnad(o.getBtiUnad());
+            info.setUniqueAddressId(o.getUniqueAddressId());
             info.setGuid(o.getGuid());
             info.setAdditionalId(o.getAdditionalIdBuilding());
             info.setCreateDate(System.currentTimeMillis());

@@ -42,6 +42,10 @@
         <property name="unomFrom" column="unomfrom" type="long"/>
         <property name="unad" column="unad" type="long"/>
         <property name="unadFrom" column="unadfrom" type="long"/>
+        <property name="uniqueAddressId" column="uniqueaddressid" type="long"/>
+        <property name="uniqueAddressIdFrom" column="uniqueaddressidfrom" type="long"/>
+        <property name="inn" column="inn" type="string" length="32"/>
+        <property name="innFrom" column="innfrom" type="string" length="32"/>
 
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>

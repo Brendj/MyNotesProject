@@ -36,6 +36,10 @@ public class OrgRegistryChangeItem {
     protected Long unomFrom;
     protected Long unad;
     protected Long unadFrom;
+    protected Long uniqueAddressId;
+    protected Long uniqueAddressIdFrom;
+    protected String inn;
+    protected String innFrom;
 
     protected String guid;
     protected String guidFrom;
@@ -64,7 +68,8 @@ public class OrgRegistryChangeItem {
 
             String address, String addressFrom, String city, String cityFrom, String region, String regionFrom,
 
-            Long unom, Long unomFrom, Long unad, Long unadFrom,
+            Long unom, Long unomFrom, Long unad, Long unadFrom, Long uniqueAddressId, Long uniqueAddressIdFrom,
+            String inn, String innFrom,
 
             String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
             String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
@@ -93,6 +98,10 @@ public class OrgRegistryChangeItem {
         this.unomFrom = unomFrom;
         this.unad = unad;
         this.unadFrom = unadFrom;
+        this.uniqueAddressId = uniqueAddressId;
+        this.uniqueAddressIdFrom = uniqueAddressIdFrom;
+        this.inn = inn;
+        this.innFrom = innFrom;
 
         this.guid = guid;
         this.guidFrom = guidFrom;
@@ -343,5 +352,37 @@ public class OrgRegistryChangeItem {
 
     public void setMainBuilding(Boolean mainBuilding) {
         this.mainBuilding = mainBuilding;
+    }
+
+    public Long getUniqueAddressId() {
+        return uniqueAddressId;
+    }
+
+    public void setUniqueAddressId(Long uniqueAddressId) {
+        this.uniqueAddressId = uniqueAddressId;
+    }
+
+    public Long getUniqueAddressIdFrom() {
+        return uniqueAddressIdFrom;
+    }
+
+    public void setUniqueAddressIdFrom(Long uniqueAddressIdFrom) {
+        this.uniqueAddressIdFrom = uniqueAddressIdFrom;
+    }
+
+    public String getInn() {
+        return inn;
+    }
+
+    public void setInn(String inn) {
+        this.inn = inn;
+    }
+
+    public String getInnFrom() {
+        return innFrom;
+    }
+
+    public void setInnFrom(String innFrom) {
+        this.innFrom = innFrom;
     }
 }

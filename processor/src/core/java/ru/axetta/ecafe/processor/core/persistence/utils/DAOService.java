@@ -1862,10 +1862,10 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
-        return getOrgRegistryChanges(nameFilter, -1L);
+        return getOrgRegistryChanges(nameFilter,-1L,0L);
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate) throws Exception {
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate, long operationType) throws Exception{
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
         }
@@ -1874,9 +1874,12 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and lower(shortname||officialname) like lower('%" + nameFilter + "%') ";
+            nameStatement = " and lower(shortName||officialName) like lower('%" + nameFilter + "%') ";
         }
-        String q = "from OrgRegistryChange where createDate=:lastUpdate" + nameStatement + " order by officialname";
+        if (operationType > 0) {
+            nameStatement += " and OperationType = " + operationType + " ";
+        }
+        String q = "from OrgRegistryChange where createDate=:lastUpdate" + nameStatement + " order by officialName";
         TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q, OrgRegistryChange.class);
         query.setParameter("lastUpdate", revisionDate);
         return query.getResultList();

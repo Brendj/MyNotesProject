@@ -110,6 +110,7 @@ public class Org implements Serializable {
     private OrganizationStatus status;
     private Long btiUnom;
     private Long btiUnad;
+    private Long uniqueAddressId; //поле unique_address_id из сверки по реестрам
     private String introductionQueue;
     private Long additionalIdBuilding;
     private String statusDetailing;
@@ -127,7 +128,7 @@ public class Org implements Serializable {
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
-            Long btiUnom, Long btiUnad, String introductionQueue, Long additionalIdBuilding, String statusDetailing) throws Exception {
+            Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing) throws Exception {
         this.shortName = shortName;
         this.officialName = officialName;
         this.address = address;
@@ -158,6 +159,7 @@ public class Org implements Serializable {
         this.status = OrganizationStatus.ACTIVE;
         this.btiUnom = btiUnom;
         this.btiUnad = btiUnad;
+        this.uniqueAddressId = uniqueAddressId;
         this.introductionQueue = introductionQueue;
         this.additionalIdBuilding = additionalIdBuilding;
         this.statusDetailing = statusDetailing;
@@ -809,6 +811,15 @@ public class Org implements Serializable {
     public void setBtiUnad(Long btiUnad) {
         this.btiUnad = btiUnad;
     }
+
+    public Long getUniqueAddressId() {
+        return uniqueAddressId;
+    }
+
+    public void setUniqueAddressId(Long uniqueAddressId) {
+        this.uniqueAddressId = uniqueAddressId;
+    }
+
 
     public String getIntroductionQueue() {
         return introductionQueue;

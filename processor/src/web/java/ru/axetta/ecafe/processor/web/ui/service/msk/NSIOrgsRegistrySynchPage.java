@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -41,6 +42,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected Long selectedRevision = -1L;
     protected List<Long> revisions;
     protected List<WebItem> items;
+    protected Long selectedOperationType = 0L;
 
 
     public String getPageFilename() {
@@ -113,6 +115,15 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setSelectedRevision(long selectedRevision) {
         this.selectedRevision = selectedRevision;
+    }
+
+    public List<SelectItem> getOperationTypes() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(0, new SelectItem(0, "Все"));
+        items.add(1, new SelectItem(OrgRegistryChange.CREATE_OPERATION, "Создание"));
+        items.add(2, new SelectItem(OrgRegistryChange.MODIFY_OPERATION, "Изменение"));
+        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Удаление"));
+        return items;
     }
 
     public List<SelectItem> getRevisions() {
@@ -190,7 +201,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     //Применяем фильтр
     public void doUpdate() {
         try {
-            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision);
+            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision, selectedOperationType);
             putDbItems(dbItems);
         } catch (Exception e) {
             errorMessages = "Не удалось произвести загрузку организаций из Реестров: " + e.getMessage();
@@ -240,6 +251,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     protected void putDbItems(List<OrgRegistryChange> dbItem) {
         if(dbItem == null || dbItem.size() < 1) {
+            items.clear();
             return;
         }
         if(items != null) {
@@ -255,6 +267,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
         //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
         //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
+    }
+
+    public Long getSelectedOperationType() {
+        return selectedOperationType;
+    }
+
+    public void setSelectedOperationType(Long selectedOperationType) {
+        this.selectedOperationType = selectedOperationType;
     }
 
     public class WebItem {
@@ -281,6 +301,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected Long unomFrom;
         protected Long unad;
         protected Long unadFrom;
+        protected Long uniqueAddressId;
+        protected Long uniqueAddressIdFrom;
+        protected String inn;
+        protected String innFrom;
 
         protected String guid;
         protected String guidFrom;
@@ -319,6 +343,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.unadFrom = registryChange.getUnadFrom();
             this.guid = registryChange.getGuid();
             this.guidFrom = registryChange.getGuidFrom();
+            this.uniqueAddressId = registryChange.getUniqueAddressId();
+            this.uniqueAddressIdFrom = registryChange.getUniqueAddressIdFrom();
+            this.inn = registryChange.getInn();
+            this.innFrom = registryChange.getInnFrom();
             this.additionalId = registryChange.getAdditionalId();
 
             this.interdistrictCouncil = registryChange.getInterdistrictCouncil();
@@ -353,6 +381,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.unomFrom = registryChangeItem.getUnomFrom();
             this.unad = registryChangeItem.getUnad();
             this.unadFrom = registryChangeItem.getUnadFrom();
+            this.uniqueAddressId = registryChangeItem.getUniqueAddressId();
+            this.uniqueAddressIdFrom = registryChangeItem.getUniqueAddressIdFrom();
+            this.inn = registryChangeItem.getInn();
+            this.innFrom = registryChangeItem.getInnFrom();
             this.guid = registryChangeItem.getGuid();
             this.guidFrom = registryChangeItem.getGuidFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
@@ -363,6 +395,41 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.interdistrictCouncilChiefFrom = registryChangeItem.getInterdistrictCouncilChiefFrom();
 
             this.selected = true;
+        }
+
+        private String getImagedString(String image, String value) {
+            return String.format("<img src=\"/processor/images/tips/%1$s.png\" style=\"border: 0; margin: 2;\"> %2$s", image, value);
+        }
+
+        private String getResultString(String value, String valueFrom) {
+            if (value == null) {
+                value = "";
+            }
+            if (valueFrom == null) {
+                valueFrom = "";
+            }
+
+            if (value.equals(valueFrom)) {
+                return value;
+            }
+
+            if (StringUtils.isEmpty(value)) {
+                return getImagedString("green", valueFrom);
+            }
+
+            if (StringUtils.isEmpty(valueFrom)) {
+                return getImagedString("red", value);
+            }
+
+            return getImagedString("red", value) + "<hr/>" + getImagedString("green", valueFrom);
+        }
+
+        private String getResultString(Long value, Long valueFrom) {
+            String v, vFrom;
+            if (value == null) { v = ""; } else { v = value.toString(); }
+            if (valueFrom == null) { vFrom = ""; } else { vFrom = valueFrom.toString(); }
+
+            return getResultString(v.toString(), vFrom.toString());
         }
 
         public String getOriginName() {
@@ -404,6 +471,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return "УНОМ: " + unomFrom + "<br/><br/>УНАД: " + unadFrom;
         }
 
+        public int getOrgsSize() {
+            if (orgs != null) {
+                return orgs.size();
+            } else {
+                return 1;
+            }
+        }
+
+        public String getComplexName() {
+            return shortName + "<br/>" + "(" + officialName + ")";
+        }
+
+        public String getComplexNameFrom() {
+            return shortNameFrom + "<br/>" + "(" + officialNameFrom + ")";
+        }
+
         public Long getIdOfOrgRegistryChange() {
             return idOfOrgRegistryChange;
         }
@@ -421,7 +504,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getShortName() {
-            return shortName;
+            return getResultString(shortName, shortNameFrom);
+        }
+
+        public String getOrgNumber() {
+            return Org.extractOrgNumberFromName(shortName);
         }
 
         public String getShortNameFrom() {
@@ -437,6 +524,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getAddress() {
+            return getResultString(address, addressFrom);
+        }
+
+        public String getAddressAISReestr() {
             return address;
         }
 
@@ -460,16 +551,16 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return regionFrom;
         }
 
-        public Long getUnom() {
-            return unom;
+        public String getUnom() {
+            return getResultString(unom, unomFrom);
         }
 
         public Long getUnomFrom() {
             return unomFrom;
         }
 
-        public Long getUnad() {
-            return unad;
+        public String getUnad() {
+            return getResultString(unad, unadFrom);
         }
 
         public Long getUnadFrom() {
@@ -477,7 +568,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getGuid() {
-            return guid;
+            return getResultString(guid, guidFrom);
         }
 
         public String getGuidFrom() {
@@ -497,7 +588,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getInterdistrictCouncil() {
-            return interdistrictCouncil;
+            return getResultString(interdistrictCouncil, interdistrictCouncilFrom);
         }
 
         public String getInterdistrictCouncilFrom() {
@@ -505,7 +596,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getInterdistrictCouncilChief() {
-            return interdistrictCouncilChief;
+            return getResultString(interdistrictCouncilChief, interdistrictCouncilChiefFrom);
         }
 
         public String getInterdistrictCouncilChiefFrom() {
@@ -543,6 +634,38 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public void setSelected(boolean selected) {
             this.selected = selected;
+        }
+
+        public String getUniqueAddressId() {
+            return getResultString(uniqueAddressId, uniqueAddressIdFrom);
+        }
+
+        public void setUniqueAddressId(Long uniqueAddressId) {
+            this.uniqueAddressId = uniqueAddressId;
+        }
+
+        public Long getUniqueAddressIdFrom() {
+            return uniqueAddressIdFrom;
+        }
+
+        public void setUniqueAddressIdFrom(Long uniqueAddressIdFrom) {
+            this.uniqueAddressIdFrom = uniqueAddressIdFrom;
+        }
+
+        public String getInn() {
+            return inn;
+        }
+
+        public void setInn(String inn) {
+            this.inn = inn;
+        }
+
+        public String getInnFrom() {
+            return innFrom;
+        }
+
+        public void setInnFrom(String innFrom) {
+            this.innFrom = innFrom;
         }
     }
 }
