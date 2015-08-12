@@ -1971,10 +1971,10 @@ public class DAOService {
         return result;
     }
 
-    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Org orgFromOrder) {
+    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Org orgFromOrder, String menuDetailName) {
 
         Session session = entityManager.unwrap(Session.class);
-        Long idOfOrg = findMenuExchangeSourceOrg(session, orgFromOrder.getIdOfOrg());
+//        Long idOfOrg = findMenuExchangeSourceOrg(session, orgFromOrder.getIdOfOrg());         //пост. пит.
 
         SQLQuery query = session.createSQLQuery(
                 "SELECT DISTINCT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
@@ -1988,9 +1988,10 @@ public class DAOService {
                         + "cfm.flags AS flags, cfm.priority AS priority, cfm.vitb2 AS vitB2, "
                         + "cfm.vitpp AS vitPp, cfm.idofmenufromsync AS idOfMenuFromSync "
                         + "FROM cf_menudetails cfm LEFT JOIN cf_orderdetails cfo ON cfm.idofmenufromsync = cfo.idofmenufromsync "
-                        + "LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu WHERE cfm.idofmenufromsync = :idofmenufromsync AND cm.idoforg = :idoforg ORDER BY cfm.idofmenudetail DESC");
+                        + "LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu WHERE cfm.idofmenufromsync = :idofmenufromsync AND cm.idoforg = :idoforg AND cfm.menudetailname = :menudetailname ORDER BY cfm.idofmenudetail DESC");
         query.setParameter("idofmenufromsync", idOfMenuFromSync);
-        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("idoforg", orgFromOrder);
+        query.setParameter("menudetailname", menuDetailName);
         query.addScalar("idOfMenuDetail", StandardBasicTypes.LONG);
         query.addScalar("menuPath", StandardBasicTypes.STRING);
         query.addScalar("menuDetailName");
