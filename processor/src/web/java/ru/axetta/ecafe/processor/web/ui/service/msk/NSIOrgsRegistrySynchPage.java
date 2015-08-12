@@ -401,6 +401,18 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return String.format("<img src=\"/processor/images/tips/%1$s.png\" style=\"border: 0; margin: 2;\"> %2$s", image, value);
         }
 
+        public String getItemType() {
+            if (operationType == OrgRegistryChange.MODIFY_OPERATION) {
+                return getImagedString("edit", "");
+            }
+            if (operationType == OrgRegistryChange.CREATE_OPERATION) {
+                return getImagedString("add", "");
+            }
+            else {
+                return "";
+            }
+        }
+
         private String getResultString(String value, String valueFrom) {
             if (value == null) {
                 value = "";

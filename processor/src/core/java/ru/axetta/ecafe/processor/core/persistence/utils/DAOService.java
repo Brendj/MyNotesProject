@@ -766,12 +766,23 @@ public class DAOService {
 
     public List<Org> findOrgByRegistryIdOrGuid(Long registryId, String guid) {
         javax.persistence.Query q = entityManager
-                .createQuery("from Org where guid=:guid or additionalIdBuilding=:registryId");
+                .createQuery("from Org where guid=:guid or uniqueaddressid=:registryId");
         q.setParameter("guid", guid);
         q.setParameter("registryId", registryId);
         return q.getResultList();
     }
 
+    public Org findOrgByRegistryIdAndGuid(Long uniqueAddressId, String guid) {
+        javax.persistence.Query q = entityManager
+                .createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
+        q.setParameter("guid", guid);
+        q.setParameter("uniqueAddressId", uniqueAddressId);
+        List<Org> orgs = q.getResultList();
+        if (orgs == null) {
+            return null;
+        }
+        return orgs.get(0);
+    }
 
     public Client getClientByGuid(String guid) {
         return DAOUtils.findClientByGuid(entityManager, guid);

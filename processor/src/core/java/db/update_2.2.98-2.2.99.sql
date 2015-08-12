@@ -10,3 +10,5 @@ ALTER TABLE cf_orgregistrychange ADD COLUMN uniqueaddressid bigint, ADD COLUMN u
 ADD COLUMN inn character varying(32), ADD COLUMN innfrom character varying(32);
 ALTER TABLE cf_orgregistrychange_item ADD COLUMN uniqueaddressid bigint, ADD COLUMN uniqueaddressidfrom bigint,
 ADD COLUMN inn character varying(32), ADD COLUMN innfrom character varying(32);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 150812) НЕ МЕНЯТЬ

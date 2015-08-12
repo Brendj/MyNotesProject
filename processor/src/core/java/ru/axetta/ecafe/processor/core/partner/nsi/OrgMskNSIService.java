@@ -151,6 +151,7 @@ public class OrgMskNSIService extends MskNSIService {
             }
 
             //Здесь - переписать значение полей OrgRegistryChange в каждую запись OrgRegistryChangeItem
+            boolean modify = false;
             for (ImportRegisterOrgsService.OrgInfo item : info.getOrgInfos()) {
                 item.setShortName(info.getShortName());
                 item.setOfficialName(info.getOfficialName());
@@ -159,8 +160,23 @@ public class OrgMskNSIService extends MskNSIService {
                 item.setGuid(info.getGuid());
                 item.setInn(info.getInn());
 
-                item.setShortNameFrom(info.getShortNameFrom());
-                item.setOfficialNameFrom(info.getOfficialNameFrom());
+
+                Org fOrg = DAOService.getInstance().findOrgByRegistryIdAndGuid(item.getUniqueAddressId(), item.getGuid());
+                if (fOrg != null) {
+                    fillInfOWithOrg(item, fOrg);
+                    item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                    item.setShortNameFrom(fOrg.getShortName());
+                    item.setOfficialNameFrom(fOrg.getOfficialName());
+                    modify = true;
+                }
+                else {
+                    item.setOperationType(OrgRegistryChange.CREATE_OPERATION);
+                }
+            }
+            if (modify) {
+                info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+            } else {
+                info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
             }
 
             if(info.getOrganizationType() == null) {
@@ -175,6 +191,11 @@ public class OrgMskNSIService extends MskNSIService {
             } else {
                 List<Org> existingOrgList = DAOService.getInstance().findOrgByRegistryIdOrGuid(info.getRegisteryPrimaryId(),
                         info.getGuid());
+                //////////////////////////////////// здесь новое
+
+                ////////////////////////////////////
+
+
                 Org existingOrg = findOrgByUniqueAddressId(existingOrgList, info.getUniqueAddressId());
 
 
@@ -184,7 +205,7 @@ public class OrgMskNSIService extends MskNSIService {
                 if (existingOrg == null&& info.getUnom()!= null && info.getUnom() != -1){
                     existingOrg = OrgWritableRepository.getInstance().findByBtiUnom( info.getUnom());
                 }
-                if(existingOrg != null) {
+                /*if(existingOrg != null) {
                     boolean requiredUpdate = false;
                     if(existingOrg.getType().ordinal() != info.getOrganizationType().ordinal() ||
 
@@ -220,7 +241,7 @@ public class OrgMskNSIService extends MskNSIService {
                     }
                 } else {
                     info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
-                }
+                }*/
                 info.setCreateDate(System.currentTimeMillis());
                 info.setAdditionalId(info.getRegisteryPrimaryId());
                 list.add(info);

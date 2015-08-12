@@ -122,6 +122,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Операция" />
+                        </f:facet>
+                        <h:outputText value="#{org.itemType}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Адрес корпуса" />
                         </f:facet>
                         <h:outputText value="#{org.address}" escape="false" />
