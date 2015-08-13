@@ -19,6 +19,7 @@ public class OrgRegistryChange {
     public static final int CREATE_OPERATION = 1;
     public static final int MODIFY_OPERATION = 2;
     public static final int DELETE_OPERATION = 3;
+    public static final int SIMILAR = 4;
 
     protected Long idOfOrgRegistryChange;
     protected Long idOfOrg;
@@ -366,6 +367,7 @@ public class OrgRegistryChange {
 
 
     public Boolean getMainBuilding() {
+        if (mainBuilding == null) return false;
         return mainBuilding;
     }
 

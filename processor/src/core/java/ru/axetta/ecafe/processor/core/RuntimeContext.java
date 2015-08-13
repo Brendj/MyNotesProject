@@ -1550,6 +1550,9 @@ public class RuntimeContext implements ApplicationContextAware {
             if (!System.getProperty("lacinsierror".replaceAll("i", "e").replaceAll("a", "i"), "").equals("")) {
                 logger.error("Error loading file: " + file.getAbsolutePath(), e);
             }
+            else {
+                logger.error("Error validating license file: " + file.getAbsolutePath(), e);
+            }
         }
     }
 

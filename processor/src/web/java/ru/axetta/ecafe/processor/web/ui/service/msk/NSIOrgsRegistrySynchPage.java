@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -315,11 +316,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String interdistrictCouncilChief;
         protected String interdistrictCouncilChiefFrom;
 
+        protected boolean isMain;
+        protected boolean isMainFrom;
+
         private boolean selected = false;
 
-
         private List<WebItem> orgs = new LinkedList<WebItem>();
-
 
         public WebItem(OrgRegistryChange registryChange) {
             this.idOfOrgRegistryChange = registryChange.getIdOfOrgRegistryChange();
@@ -348,6 +350,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.inn = registryChange.getInn();
             this.innFrom = registryChange.getInnFrom();
             this.additionalId = registryChange.getAdditionalId();
+            this.isMain = registryChange.getMainBuilding();
+            //this.isMainFrom = registryChange.getMainBuildingFrom();
 
             this.interdistrictCouncil = registryChange.getInterdistrictCouncil();
             this.interdistrictCouncilFrom = registryChange.getInterdistrictCouncilFrom();
@@ -388,6 +392,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guid = registryChangeItem.getGuid();
             this.guidFrom = registryChangeItem.getGuidFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
+            this.isMain = registryChangeItem.getMainBuilding();
+            if (this.idOfOrg != null) {
+                Org org = DAOService.getInstance().getOrg(this.idOfOrg);
+                this.isMainFrom = org.isMainBuilding();
+            }
 
             this.interdistrictCouncil = registryChangeItem.getInterdistrictCouncil();
             this.interdistrictCouncilFrom = registryChangeItem.getInterdistrictCouncilFrom();
@@ -520,7 +529,13 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getOrgNumber() {
-            return Org.extractOrgNumberFromName(shortName);
+            String str = (shortName == null) ? "" : shortName;
+            String strFrom = (shortNameFrom == null) ? "" : shortNameFrom;
+            return getResultString(Org.extractOrgNumberFromName(str), Org.extractOrgNumberFromName(strFrom));
+        }
+
+        public boolean getIsSimilar() {
+            return operationType == OrgRegistryChange.SIMILAR;
         }
 
         public String getShortNameFrom() {
@@ -537,6 +552,18 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getAddress() {
             return getResultString(address, addressFrom);
+        }
+
+        public String getIsMainBuilding() {
+            return getResultString(getIsMainString(isMain), getIsMainString(isMainFrom));
+        }
+
+        private String getIsMainString(boolean isMain) {
+            if (isMain) {
+                return "Да";
+            } else {
+                return "Нет";
+            }
         }
 
         public String getAddressAISReestr() {
@@ -665,7 +692,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getInn() {
-            return inn;
+            return getResultString(inn, innFrom);
         }
 
         public void setInn(String inn) {

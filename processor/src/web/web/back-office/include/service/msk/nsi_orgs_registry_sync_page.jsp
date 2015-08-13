@@ -115,10 +115,10 @@
                               rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(e, true)}"/>
             </rich:column>
             <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)} padding-zero" rowspan="1" colspan="1"  breakBefore="true">
-                <rich:dataTable var="org" value="#{e.orgs}" >
+                <rich:dataTable rendered="#{e.orgsSize > 0}" var="org" value="#{e.orgs}" >
                     <rich:column>
                         <h:selectBooleanCheckbox value="#{org.selected}" styleClass="checkboxes"
-                                                 rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false)}"/>
+                                                 rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -131,6 +131,12 @@
                             <h:outputText value="Адрес корпуса" />
                         </f:facet>
                         <h:outputText value="#{org.address}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Главный" />
+                        </f:facet>
+                        <h:outputText value="#{org.isMainBuilding}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -199,11 +205,11 @@
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
         </h:panelGrid>
         <h:panelGrid id="revisionInfo" columns="2">
-            <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных записей" styleClass="output-text"/></h:panelGroup>
+            <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных зданий" styleClass="output-text"/></h:panelGroup>
             <h:outputText value="#{NSIOrgsRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-            <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество удаленных записей" styleClass="output-text"/></h:panelGroup>
+            <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
             <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>
-            <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных записей" styleClass="output-text"/></h:panelGroup>
+            <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных зданий" styleClass="output-text"/></h:panelGroup>
             <h:outputText value="#{NSIOrgsRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
             <rich:spacer width="10px" />
             <rich:spacer width="10px" />

@@ -54,7 +54,7 @@
         <!--<many-to-one name="orgs" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"-->
                      <!--column="mainRegistry" />-->
 
-        <set name="orgs" lazy="false" cascade="all">
+        <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem"/>
         </set>

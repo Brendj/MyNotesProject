@@ -772,16 +772,42 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Org findOrgByRegistryIdAndGuid(Long uniqueAddressId, String guid) {
+    public Org findOrgByRegistryIdAndGuidOrAddress(Long uniqueAddressId, String guid, String address) {
         javax.persistence.Query q = entityManager
-                .createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
+                .createQuery("from Org where guid=:guid and (uniqueaddressid=:uniqueAddressId or address=:address)");
         q.setParameter("guid", guid);
         q.setParameter("uniqueAddressId", uniqueAddressId);
+        q.setParameter("address", address);
         List<Org> orgs = q.getResultList();
-        if (orgs == null) {
+        if ((orgs == null) || (orgs.size() == 0)) {
             return null;
         }
         return orgs.get(0);
+    }
+
+    public List<Org> findOrgsByGuidAddressINNOrNumber(String guid, String address, String inn, String number) {
+        String queryStr = "from Org where address = :address";
+        if (!StringUtils.isEmpty(guid)) {
+            queryStr += " or guid = :guid";
+        }
+        if (!StringUtils.isEmpty(inn)) {
+            queryStr += " or INN = :inn";
+        }
+        if (!StringUtils.isEmpty(number)) {
+            queryStr += " or shortName like :number";
+        }
+        javax.persistence.Query q = entityManager.createQuery(queryStr);
+        q.setParameter("address", address);
+        if (!StringUtils.isEmpty(guid)) {
+            q.setParameter("guid", guid);
+        }
+        if (!StringUtils.isEmpty(inn)) {
+            q.setParameter("inn", inn);
+        }
+        if (!StringUtils.isEmpty(number)) {
+            q.setParameter("number", number);
+        }
+        return q.getResultList();
     }
 
     public Client getClientByGuid(String guid) {

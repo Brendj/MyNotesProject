@@ -347,6 +347,7 @@ public class OrgRegistryChangeItem {
     }
 
     public Boolean getMainBuilding() {
+        if (mainBuilding == null) return false;
         return mainBuilding;
     }
 
