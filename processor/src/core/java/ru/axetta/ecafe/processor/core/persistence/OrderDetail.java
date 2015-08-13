@@ -129,7 +129,7 @@ public class OrderDetail {
 
     public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
-            String menuOutput, int menuType, long idOfMenuFromSync) {
+            String menuOutput, int menuType, Long idOfMenuFromSync) {
         this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
