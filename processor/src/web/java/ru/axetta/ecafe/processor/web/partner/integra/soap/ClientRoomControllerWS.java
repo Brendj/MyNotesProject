@@ -65,6 +65,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1964,10 +1966,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     if (od.getIdOfMenuFromSync() != null) {
 
-                        DAOService daoService = DAOService.getInstance();
-
-                        MenuDetail menuDetail = daoService
-                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg(), od.getMenuDetailName());
+                        MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), od.getMenuDetailName());
 
                         if (menuDetail != null) {
                             purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
@@ -2004,6 +2003,62 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
 
         return result;
+    }
+
+    public MenuDetail getMenuDetailConstitutionByOrder(Session session, Long idOfMenuFromSync, Org orgFromOrder,
+            String menuDetailName) {
+
+        SQLQuery query = session.createSQLQuery(
+                "SELECT DISTINCT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
+                        + "cfm.menudetailname AS menuDetailName, cfm.groupname AS groupName, "
+                        + "cfm.menudetailoutput AS menuDetailOutput, cfm.price AS price, "
+                        + "cfm.menuorigin AS menuOrigin, cfm.availablenow AS availableNow, "
+                        + "cfm.localidofmenu AS localIdOfMenu, cfm.protein AS protein, cfm.fat AS fat, "
+                        + "cfm.carbohydrates AS carbohydrates, cfm.calories AS calories, cfm.vitb1 AS vitB1, "
+                        + "cfm.vita AS vitA, cfm.vite AS vitE, cfm.vitc AS vitC,cfm.minca AS minCa, "
+                        + "cfm.minp AS minP, cfm.minmg AS minMg, cfm.minfe AS minFe, "
+                        + "cfm.flags AS flags, cfm.priority AS priority, cfm.vitb2 AS vitB2, "
+                        + "cfm.vitpp AS vitPp, cfm.idofmenufromsync AS idOfMenuFromSync "
+                        + "FROM cf_menudetails cfm LEFT JOIN cf_orderdetails cfo ON cfm.idofmenufromsync = cfo.idofmenufromsync "
+                        + "LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu WHERE cfm.idofmenufromsync = :idofmenufromsync AND cm.idoforg = :idoforg AND cfm.menudetailname = :menudetailname ORDER BY cfm.idofmenudetail DESC");
+        query.setParameter("idofmenufromsync", idOfMenuFromSync);
+        query.setParameter("idoforg", orgFromOrder);
+        query.setParameter("menudetailname", menuDetailName);
+        query.addScalar("idOfMenuDetail", StandardBasicTypes.LONG);
+        query.addScalar("menuPath", StandardBasicTypes.STRING);
+        query.addScalar("menuDetailName");
+        query.addScalar("groupName");
+        query.addScalar("menuDetailOutput");
+        query.addScalar("price", StandardBasicTypes.LONG);
+        query.addScalar("menuOrigin", StandardBasicTypes.INTEGER);
+        query.addScalar("availableNow", StandardBasicTypes.INTEGER);
+        query.addScalar("localIdOfMenu", StandardBasicTypes.LONG);
+        query.addScalar("protein", StandardBasicTypes.DOUBLE);
+        query.addScalar("fat", StandardBasicTypes.DOUBLE);
+        query.addScalar("carbohydrates", StandardBasicTypes.DOUBLE);
+        query.addScalar("calories", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitB1", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitB2", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitC", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitA", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitE", StandardBasicTypes.DOUBLE);
+        query.addScalar("minCa", StandardBasicTypes.DOUBLE);
+        query.addScalar("minP", StandardBasicTypes.DOUBLE);
+        query.addScalar("minMg", StandardBasicTypes.DOUBLE);
+        query.addScalar("minFe", StandardBasicTypes.DOUBLE);
+        query.addScalar("vitPp", StandardBasicTypes.DOUBLE);
+        query.addScalar("flags", StandardBasicTypes.INTEGER);
+        query.addScalar("priority", StandardBasicTypes.INTEGER);
+
+        query.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
+
+        List<MenuDetail> menuDetailList = query.list();
+
+        if (!menuDetailList.isEmpty()) {
+            return menuDetailList.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
