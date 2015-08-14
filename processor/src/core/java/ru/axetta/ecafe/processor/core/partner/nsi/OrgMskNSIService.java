@@ -337,7 +337,7 @@ public class OrgMskNSIService extends MskNSIService {
                 break;
             }
             importIteration++;
-            break; /////////////////////////////Здесь можно ставить break для тестовых целей;
+            //break; /////////////////////////////Здесь можно ставить break для тестовых целей;
         }
         if (StringUtils.isEmpty(orgName)) {
             addDeletedOrgs(orgs);

@@ -237,7 +237,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             if(i.isSelected()) {
                 List<Long> buildingsList = new LinkedList<Long>();
                 for (WebItem webItem : i.getOrgs()) {
-                    if (webItem.isSelected()){
+                    if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR){
                         buildingsList.add(webItem.getIdOfOrgRegistryChange());
                     }
                 }

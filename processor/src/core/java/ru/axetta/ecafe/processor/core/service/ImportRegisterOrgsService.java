@@ -127,6 +127,9 @@ public class ImportRegisterOrgsService {
                         shortName = orgRegistryChangeItem.getShortName();
                     }
                     Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier, orgRegistryChangeItem, shortName);
+                    if (org != null) {
+                        orgRegistryChangeItem.setApplied(true);
+                    }
                     addToShortname++;
                     session.persist(org);
                 }
@@ -221,8 +224,10 @@ public class ImportRegisterOrgsService {
                     org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
 
                     org.setGuid(orgRegistryChange.getGuid());
-                    org.setAdditionalIdBuilding(aLong);
+                    org.setAdditionalIdBuilding(org.getUniqueAddressId());
                     org.setINN(orgRegistryChangeItem.getInn());
+
+                    orgRegistryChangeItem.setApplied(true);
                 }
                 session.persist(org);
             }
