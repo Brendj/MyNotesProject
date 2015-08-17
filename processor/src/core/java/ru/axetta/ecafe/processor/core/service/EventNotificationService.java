@@ -272,7 +272,7 @@ public class EventNotificationService {
     }
 
     public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
-        if (!client.isNotifyViaSMS() && !client.isNotifyViaEmail()) {
+        if (!client.isNotifyViaSMS() && !client.isNotifyViaEmail() && !client.isNotifyViaPUSH()) {
             return;
         }
         if (!isNotificationEnabled(client, type)) {
