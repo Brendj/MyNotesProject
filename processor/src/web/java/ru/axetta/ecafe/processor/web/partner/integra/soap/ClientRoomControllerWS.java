@@ -2609,6 +2609,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
@@ -2706,6 +2707,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinMg(menuDetail.getMinMg());
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
