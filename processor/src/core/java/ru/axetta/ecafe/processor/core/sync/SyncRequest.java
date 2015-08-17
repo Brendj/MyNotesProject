@@ -23,6 +23,8 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.text.StrTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -41,6 +43,8 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
  * To change this template use File | Settings | File Templates.
  */
 public class SyncRequest {
+
+    private static Logger logger = LoggerFactory.getLogger(SyncRequest.class);
 
     public static class ClientParamRegistry {
 
@@ -1021,14 +1025,6 @@ public class SyncRequest {
                                 minCa, minP, minMg, minFe, vitB2, vitPp);
                     }
 
-                    private static Double getMinorComponent(NamedNodeMap namedNodeMap, String name) throws Exception {
-                        Node node = namedNodeMap.getNamedItem(name);
-                        if (null == node) {
-                            return null;
-                        }
-                        return ((double) Long.parseLong(node.getTextContent())) / 100;
-                    }
-
                     private static String getTextContent(Node node) throws Exception {
                         if (null == node) {
                             return null;
@@ -1045,7 +1041,31 @@ public class SyncRequest {
                         if (calString.equals("")) {
                             return null;
                         }
+
                         String replacedString = calString.replaceAll(",", ".");
+
+                        String[] parts = replacedString.split("\\.");
+
+                        if (parts[0].length() > 8) {
+                            logger.error("Ошибка при сохранении в базу элемента меню "
+                                    + "IdOfMenu = " + getTextContent(namedNodeMap.getNamedItem("IdOfMenu")) + ", "
+                                    + "Patch = " + getTextContent(namedNodeMap.getNamedItem("Path")) + ", "
+                                    + "FullName = " + getTextContent(namedNodeMap.getNamedItem("FullName"))
+                                    + ", не верно задана размерность, параметра " + name + " = " + calString);
+                            return null;
+                        }
+
+
+
+                        if (Double.parseDouble(replacedString) < 0) {
+                            logger.error("Ошибка при сохранении в базу элемента меню "
+                                    + "IdOfMenu = " + getTextContent(namedNodeMap.getNamedItem("IdOfMenu")) + ", "
+                                    + "Patch = " + getTextContent(namedNodeMap.getNamedItem("Path")) + ", "
+                                    + "FullName = " + getTextContent(namedNodeMap.getNamedItem("FullName"))
+                                    + " задано отрицательное число, в параметре " + name + " = " + calString);
+                            return null;
+                        }
+
                         return Double.parseDouble(replacedString);
                     }
                 }
