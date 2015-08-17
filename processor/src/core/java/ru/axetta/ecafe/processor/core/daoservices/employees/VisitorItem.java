@@ -37,6 +37,10 @@ public class VisitorItem {
     private Date operationDate;
     private List<CardEventOperationItem> operationItemList = new ArrayList<CardEventOperationItem>();
 
+    private String freeDocName;
+    private String freeDocNumber;
+    private Date freeDocDate;
+
     public VisitorItem(VisitorItem item) {
         this.idOfVisitor = item.getIdOfVisitor();
         this.firstName = item.getFirstName();
@@ -50,6 +54,9 @@ public class VisitorItem {
         this.warTicketDate = item.getWarTicketDate();
         this.operationDate = item.getOperationDate();
         this.deleted = item.isDeleted();
+        this.freeDocName = item.getFreeDocName();
+        this.freeDocNumber = item.getFreeDocNumber();
+        this.freeDocDate = item.getFreeDocDate();
     }
 
     public VisitorItem() {
@@ -59,6 +66,8 @@ public class VisitorItem {
         passportNumber="";
         driverLicenceNumber="";
         warTicketNumber="";
+        freeDocName="";
+        freeDocNumber="";
     }
 
     public VisitorItem(Visitor visitor) {
@@ -73,6 +82,9 @@ public class VisitorItem {
         this.warTicketNumber = visitor.getWarTicketNumber();
         this.warTicketDate = visitor.getWarTicketDate();
         this.deleted = visitor.isDeleted();
+        this.freeDocName = visitor.getFreeDocName();
+        this.freeDocNumber = visitor.getFreeDocNumber();
+        this.freeDocDate = visitor.getFreeDocDate();
     }
 
     public String getFullName(){
@@ -112,6 +124,30 @@ public class VisitorItem {
 
     public void addOperationItem(List<CardEventOperationItem> cardEventOperationItem){
         operationItemList.addAll(cardEventOperationItem);
+    }
+
+    public String getFreeDocName() {
+        return freeDocName;
+    }
+
+    public void setFreeDocName(String freeDocName) {
+        this.freeDocName = freeDocName;
+    }
+
+    public String getFreeDocNumber() {
+        return freeDocNumber;
+    }
+
+    public void setFreeDocNumber(String freeDocNumber) {
+        this.freeDocNumber = freeDocNumber;
+    }
+
+    public Date getFreeDocDate() {
+        return freeDocDate;
+    }
+
+    public void setFreeDocDate(Date freeDocDate) {
+        this.freeDocDate = freeDocDate;
     }
 
     public List<CardItem> getCardItems() {
@@ -243,6 +279,9 @@ public class VisitorItem {
                 ", driverLicenceDate=" + driverLicenceDate +
                 ", warTicketNumber='" + warTicketNumber + '\'' +
                 ", warTicketDate=" + warTicketDate +
+                ", freeDocName=" + freeDocName +
+                ", freeDocNumber=" + freeDocNumber +
+                ", freeDocDate=" + freeDocDate +
                 '}';
     }
 
@@ -292,6 +331,15 @@ public class VisitorItem {
         if (warTicketNumber != null ? !warTicketNumber.equals(that.warTicketNumber) : that.warTicketNumber != null) {
             return false;
         }
+        if (freeDocName != null ? !freeDocName.equals(that.freeDocName) : that.freeDocName != null) {
+            return false;
+        }
+        if (freeDocNumber != null ? !freeDocNumber.equals(that.freeDocNumber) : that.freeDocNumber != null) {
+            return false;
+        }
+        if (freeDocDate != null ? !freeDocDate.equals(that.freeDocDate) : that.freeDocDate != null) {
+            return false;
+        }
 
         return true;
     }
@@ -309,6 +357,9 @@ public class VisitorItem {
         result = 31 * result + (warTicketNumber != null ? warTicketNumber.hashCode() : 0);
         result = 31 * result + (warTicketDate != null ? warTicketDate.hashCode() : 0);
         result = 31 * result + (operationDate != null ? operationDate.hashCode() : 0);
+        result = 31 * result + (freeDocName != null ? freeDocName.hashCode() : 0);
+        result = 31 * result + (freeDocNumber != null ? freeDocNumber.hashCode() : 0);
+        result = 31 * result + (freeDocDate != null ? freeDocDate.hashCode() : 0);
         return result;
     }
 }

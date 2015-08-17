@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.internal.front.items;
 
-import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.Visitor;
 
 import java.util.Date;
@@ -29,6 +28,10 @@ public class VisitorItem {
     private String warTicketNumber;
     private Date warTicketDate;
 
+    private String freeDocName;
+    private String freeDocNumber;
+    private Date freeDocDate;
+
     public VisitorItem(Visitor visitor) {
         this.idOfVisitor = visitor.getIdOfVisitor();
         this.firstName = visitor.getPerson().getFirstName();
@@ -40,6 +43,9 @@ public class VisitorItem {
         this.driverLicenceDate = visitor.getDriverLicenceDate();
         this.warTicketNumber = visitor.getWarTicketNumber();
         this.warTicketDate = visitor.getWarTicketDate();
+        this.freeDocName = visitor.getFreeDocName();
+        this.freeDocNumber = visitor.getFreeDocNumber();
+        this.freeDocDate = visitor.getFreeDocDate();
     }
 
     public Long getIdOfVisitor() {
@@ -120,6 +126,30 @@ public class VisitorItem {
 
     public void setWarTicketDate(Date warTicketDate) {
         this.warTicketDate = warTicketDate;
+    }
+
+    public String getFreeDocName() {
+        return freeDocName;
+    }
+
+    public void setFreeDocName(String freeDocName) {
+        this.freeDocName = freeDocName;
+    }
+
+    public String getFreeDocNumber() {
+        return freeDocNumber;
+    }
+
+    public void setFreeDocNumber(String freeDocNumber) {
+        this.freeDocNumber = freeDocNumber;
+    }
+
+    public Date getFreeDocDate() {
+        return freeDocDate;
+    }
+
+    public void setFreeDocDate(Date freeDocDate) {
+        this.freeDocDate = freeDocDate;
     }
 
     public VisitorItem() {

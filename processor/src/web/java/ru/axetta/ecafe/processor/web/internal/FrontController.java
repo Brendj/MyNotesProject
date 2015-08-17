@@ -39,6 +39,7 @@ import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
+import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyFreeDocumentParams;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurrentDate;
 
 @WebService(targetNamespace = "http://ru.axetta.ecafe")
@@ -413,11 +414,14 @@ public class FrontController extends HttpServlet {
             * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
             * выбрасывать исключение с сообщением «Отсутствует информация об удостоверении личности»
             * */
-            if(isEmptyDocumentParams(visitorItem.getDriverLicenceNumber(), visitorItem.getDriverLicenceDate()) &&
+            if (isEmptyDocumentParams(visitorItem.getDriverLicenceNumber(), visitorItem.getDriverLicenceDate()) &&
                     isEmptyDocumentParams(visitorItem.getPassportNumber(), visitorItem.getPassportDate()) &&
-                    isEmptyDocumentParams(visitorItem.getWarTicketNumber(), visitorItem.getWarTicketDate())
-                    ) {
-                throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
+                    isEmptyDocumentParams(visitorItem.getWarTicketNumber(), visitorItem.getWarTicketDate())) {
+
+                if (isEmptyFreeDocumentParams(visitorItem.getFreeDocName(), visitorItem.getFreeDocNumber(),
+                        visitorItem.getFreeDocDate())) {
+                    throw new FrontControllerException("Отсутствует информация об удостоверении личности");
+                }
             }
 
             /**
@@ -441,6 +445,9 @@ public class FrontController extends HttpServlet {
                 visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                 visitor.setWarTicketDate(visitorItem.getWarTicketDate());
                 visitor.setVisitorType(Visitor.DEFAULT_TYPE);
+                visitor.setFreeDocName(visitorItem.getFreeDocName());
+                visitor.setFreeDocNumber(visitorItem.getFreeDocNumber());
+                visitor.setFreeDocDate(visitorItem.getFreeDocDate());
                 persistenceSession.save(visitor);
                 idOfVisitor = visitor.getIdOfVisitor();
             } else {
@@ -459,6 +466,9 @@ public class FrontController extends HttpServlet {
                     visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                     visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                     visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+                    visitor.setFreeDocName(visitorItem.getFreeDocName());
+                    visitor.setFreeDocNumber(visitorItem.getFreeDocNumber());
+                    visitor.setFreeDocDate(visitorItem.getFreeDocDate());
                     if(visitor.getVisitorType()==null){
                         visitor.setVisitorType(Visitor.DEFAULT_TYPE);
                     }

@@ -31,6 +31,10 @@ public class Visitor {
     private Set<Card> cardsInternal = new HashSet<Card>();
     private boolean deleted;
 
+    private String freeDocName;
+    private String freeDocNumber;
+    private Date freeDocDate;
+
     protected Visitor() {}
 
     public Visitor(Person person) {
@@ -125,6 +129,30 @@ public class Visitor {
         this.deleted = deleted;
     }
 
+    public String getFreeDocName() {
+        return freeDocName;
+    }
+
+    public void setFreeDocName(String freeDocName) {
+        this.freeDocName = freeDocName;
+    }
+
+    public String getFreeDocNumber() {
+        return freeDocNumber;
+    }
+
+    public void setFreeDocNumber(String freeDocNumber) {
+        this.freeDocNumber = freeDocNumber;
+    }
+
+    public Date getFreeDocDate() {
+        return freeDocDate;
+    }
+
+    public void setFreeDocDate(Date freeDocDate) {
+        this.freeDocDate = freeDocDate;
+    }
+
     @Override
     public String toString() {
         return "Visitor{idOfVisitor=" + idOfVisitor +'}';
@@ -163,5 +191,9 @@ public class Visitor {
 
     public static boolean isEmptyDocumentParams(String number, Date validDate) {
         return (validDate==null || StringUtils.isEmpty(number));
+    }
+
+    public static boolean isEmptyFreeDocumentParams(String name, String number, Date validDate) {
+        return (validDate==null || StringUtils.isEmpty(name) || StringUtils.isEmpty(number));
     }
 }
