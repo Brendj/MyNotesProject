@@ -31,6 +31,7 @@
         <property name="price" column="Price" type="long" update="false"/>
         <property name="fat" column="Fat" type="double" update="false"/>
         <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
+        <property name="protein" column="Protein" type="double" update="false"/>
         <property name="calories" column="Calories" type="double" update="false"/>
         <property name="vitB1" column="VitB1" type="double" update="false"/>
         <property name="vitC" column="VitC" type="double" update="false"/>
