@@ -20,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.PersistenceContext;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -78,6 +75,7 @@ public class ImportRegisterOrgsService {
             case OrgRegistryChange.CREATE_OPERATION:
                 try {
                     createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
+                    modifyOrg(orgRegistryChange, session, buildingsList);
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to create org", org);
@@ -87,6 +85,7 @@ public class ImportRegisterOrgsService {
                 try {
                     //modifyOrg(orgRegistryChange, org, session, buildingsList);
                     modifyOrg(orgRegistryChange, session, buildingsList);
+                    createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to modify org", org);
@@ -116,8 +115,12 @@ public class ImportRegisterOrgsService {
         if (buildingsList.size() > 0){
             String shortName;
             int addToShortname = 0;
+            List<Org> friendlyOrgs = new ArrayList<Org>();
             for (Long aLong : buildingsList) {
                 OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
+                if (orgRegistryChangeItem.getOperationType() != OrgRegistryChange.CREATE_OPERATION) {
+                    continue;
+                }
                 if (orgRegistryChangeItem != null){
                     /*Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem.getAddress(), orgRegistryChangeItem.getAdditionalId());
                     session.persist(org);*/
@@ -131,8 +134,19 @@ public class ImportRegisterOrgsService {
                         orgRegistryChangeItem.setApplied(true);
                     }
                     addToShortname++;
+                    friendlyOrgs.add(org); //все созданные организации загоняем в список, чтобы ниже связать их как дружественные
                     session.persist(org);
                 }
+            }
+            //заполняем дружественные организации всем только что созданным организациям
+            for (int i = 0; i < friendlyOrgs.size(); i++) {
+                for (int j = 0; j < friendlyOrgs.size(); j++) {
+                    if (friendlyOrgs.get(i).getFriendlyOrg() == null) {
+                        friendlyOrgs.get(i).setFriendlyOrg(new HashSet<Org>());
+                    }
+                    friendlyOrgs.get(i).getFriendlyOrg().add(friendlyOrgs.get(j));
+                }
+                session.persist(friendlyOrgs.get(i));
             }
         }else{
             return;
@@ -212,6 +226,9 @@ public class ImportRegisterOrgsService {
             throws Exception {
         for (Long aLong : buildingsList) {
             OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
+            if (orgRegistryChangeItem.getOperationType() != OrgRegistryChange.MODIFY_OPERATION) {
+                continue;
+            }
             if (orgRegistryChangeItem != null) {
                 Org org = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
                 if (org != null) {
@@ -288,12 +305,18 @@ public class ImportRegisterOrgsService {
         session.persist(org);
     }*/
 
-    protected void deleteOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList) {
+    protected void deleteOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
+            throws Exception {
         org.setState(OrganizationStatus.INACTIVE.ordinal());
         for (Long aLong : buildingsList) {
-            Org byAdditionalId = DAOUtils.findByAdditionalId(session, aLong);
-            byAdditionalId.setState(OrganizationStatus.INACTIVE.ordinal());
-            session.persist(byAdditionalId);
+            OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
+            if (orgRegistryChangeItem != null) {
+                Org item = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
+                if (item != null) {
+                    item.setState(OrganizationStatus.INACTIVE.ordinal());
+                    session.persist(item);
+                }
+            }
         }
         session.persist(org);
     }
@@ -301,7 +324,7 @@ public class ImportRegisterOrgsService {
     @Transactional
     public StringBuffer syncOrgsWithRegistry(String orgName, StringBuffer logBuffer) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-        String synchDate = "[Синхронизация с Реестрами от " + date + " о всем ОУ]: ";
+        String synchDate = "[Синхронизация с Реестрами от " + date + " по всем ОУ]: ";
         log(synchDate + "Производится синхронизация по всем организациям", logBuffer);
 
         //  Итеративно загружаем организации, используя ограничения

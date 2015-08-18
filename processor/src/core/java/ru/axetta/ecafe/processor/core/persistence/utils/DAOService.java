@@ -1911,7 +1911,7 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and lower(shortName||officialName) like lower('%" + nameFilter + "%') ";
+            nameStatement = " and lower(shortName||officialName||shortNameFrom||officialNameFrom) like lower('%" + nameFilter + "%') ";
         }
         if (operationType > 0) {
             nameStatement += " and OperationType = " + operationType + " ";

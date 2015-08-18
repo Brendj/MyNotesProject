@@ -11,6 +11,7 @@ import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -356,7 +357,7 @@ public class OrgMskNSIService extends MskNSIService {
                 }
             }
 
-            if(found) {
+            if(found || o.getState() != OrganizationStatus.ACTIVE.ordinal()) {  //если организация не обслуживается - ее не включаем в список
                 continue;
             }
 
