@@ -649,7 +649,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 case OrgRegistryChange.MODIFY_OPERATION:
                     return "Изменение";
                 case OrgRegistryChange.DELETE_OPERATION:
-                    return "Удаление";
+                    return "Отключение";
                 default:
                     return "";
             }

@@ -114,8 +114,8 @@ public class MskNSIService {
         Client client = ClientProxy.getClient(nsiService);
         HTTPConduit conduit = (HTTPConduit) client.getConduit();
         HTTPClientPolicy policy = conduit.getClient();
-        policy.setReceiveTimeout(10 * 60 * 1000);
-        policy.setConnectionTimeout(10 * 60 * 1000);
+        policy.setReceiveTimeout(15 * 60 * 1000);
+        policy.setConnectionTimeout(15 * 60 * 1000);
 
         OrgExternalType recipient = new OrgExternalType();
         recipient.setName("NSI");

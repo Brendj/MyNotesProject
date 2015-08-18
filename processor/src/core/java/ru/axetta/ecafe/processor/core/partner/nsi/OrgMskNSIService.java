@@ -347,7 +347,7 @@ public class OrgMskNSIService extends MskNSIService {
     }
 
     protected void addDeletedOrgs(List<ImportRegisterOrgsService.OrgInfo> list) {
-        List<Org> dbOrgs = DAOService.getInstance().getOrderedSynchOrgsList();
+        List<Org> dbOrgs = DAOService.getInstance().getActiveOrgsList();
         for(Org o : dbOrgs) {
             boolean found = false;
             for(ImportRegisterOrgsService.OrgInfo oi : list) {

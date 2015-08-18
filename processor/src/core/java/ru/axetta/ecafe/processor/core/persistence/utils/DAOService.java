@@ -536,10 +536,14 @@ public class DAOService {
         return getOrderedSynchOrgsList(false);
     }
 
+    public List<Org> getActiveOrgsList() {
+        return getOrderedSynchOrgsList(true);
+    }
+
     public List<Org> getOrderedSynchOrgsList(boolean excludeDisabled) {
         String disabledClause = "";
         if (excludeDisabled) {
-            disabledClause = " where state<>0 ";
+            disabledClause = " where state <> 0 ";
         }
         TypedQuery<Org> query = entityManager
                 .createQuery("from Org " + disabledClause + " order by orgSync.lastSuccessfulBalanceSync", Org.class);
@@ -1911,7 +1915,8 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and lower(shortName||officialName||shortNameFrom||officialNameFrom) like lower('%" + nameFilter + "%') ";
+            nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')" +
+                    " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
         }
         if (operationType > 0) {
             nameStatement += " and OperationType = " + operationType + " ";
