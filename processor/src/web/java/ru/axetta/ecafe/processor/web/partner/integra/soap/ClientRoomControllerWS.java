@@ -2348,6 +2348,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 
@@ -2418,6 +2421,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     menuItemExt.setMinFe(menuDetail.getMinFe());
                     menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                     menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                    menuItemExt.setProtein(menuDetail.getProtein());
+                    menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                    menuItemExt.setFat(menuDetail.getFat());
 
                     menuItemExtList.add(menuItemExt);
                 }
@@ -2610,6 +2616,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
@@ -2708,6 +2717,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
 
                 if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
@@ -2783,6 +2795,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setMinFe(menuDetail.getMinFe());
                 menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
                 menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
                 menuDateItemExt.getE().add(menuItemExt);
             }
 

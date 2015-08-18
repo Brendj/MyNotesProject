@@ -51,6 +51,12 @@ public class MenuItemExt {
     protected String output;
     @XmlAttribute(name = "AvailableNow")
     protected Integer availableNow;
+    @XmlAttribute(name = "Protein")
+    protected Double protein;
+    @XmlAttribute(name = "Fat")
+    protected Double fat;
+    @XmlAttribute(name = "Carbohydrates")
+    protected Double carbohydrates;
     @XmlAttribute(name = "VitB1")
     protected Double vitB1;
     @XmlAttribute(name = "VitB2")
@@ -168,6 +174,78 @@ public class MenuItemExt {
      */
     public void setAvailableNow(Integer availableNow) {
         this.availableNow = availableNow;
+    }
+
+    /**
+     * Gets the value of the protein property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public Double getProtein() {
+        return protein;
+    }
+
+    /**
+     * Sets the value of the protein property.
+     *
+     * @param protein
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setProtein(Double protein) {
+        this.protein = protein;
+    }
+
+    /**
+     * Gets the value of the fat property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public Double getFat() {
+        return fat;
+    }
+
+    /**
+     * Sets the value of the fat property.
+     *
+     * @param fat
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setFat(Double fat) {
+        this.fat = fat;
+    }
+
+    /**
+     * Gets the value of the carbohydrates property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public Double getCarbohydrates() {
+        return carbohydrates;
+    }
+
+    /**
+     * Sets the value of the carbohydrates property.
+     *
+     * @param carbohydrates
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setCarbohydrates(Double carbohydrates) {
+        this.carbohydrates = carbohydrates;
     }
 
     /**
