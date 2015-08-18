@@ -1966,7 +1966,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     if (od.getIdOfMenuFromSync() != null) {
 
-                        MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), od.getMenuDetailName());
+                        MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
 
                         if (menuDetail != null) {
                             purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
@@ -1982,6 +1982,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             purchaseWithDetailsElementExt.setMinP(menuDetail.getMinP());
                             purchaseWithDetailsElementExt.setMinMg(menuDetail.getMinMg());
                             purchaseWithDetailsElementExt.setMinFe(menuDetail.getMinFe());
+                            purchaseWithDetailsElementExt.setProtein(menuDetail.getProtein());
+                            purchaseWithDetailsElementExt.setFat(menuDetail.getFat());
+                            purchaseWithDetailsElementExt.setCarbohydrates(menuDetail.getCarbohydrates());
                         }
                     }
 
@@ -2006,10 +2009,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     public MenuDetail getMenuDetailConstitutionByOrder(Session session, Long idOfMenuFromSync, Org orgFromOrder,
-            String menuDetailName) {
+            Date orderDate) {
+
+        Date endDate  = CalendarUtils.addOneDay(orderDate);
 
         SQLQuery query = session.createSQLQuery(
-                "SELECT DISTINCT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
+                "SELECT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
                         + "cfm.menudetailname AS menuDetailName, cfm.groupname AS groupName, "
                         + "cfm.menudetailoutput AS menuDetailOutput, cfm.price AS price, "
                         + "cfm.menuorigin AS menuOrigin, cfm.availablenow AS availableNow, "
@@ -2019,11 +2024,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         + "cfm.minp AS minP, cfm.minmg AS minMg, cfm.minfe AS minFe, "
                         + "cfm.flags AS flags, cfm.priority AS priority, cfm.vitb2 AS vitB2, "
                         + "cfm.vitpp AS vitPp, cfm.idofmenufromsync AS idOfMenuFromSync "
-                        + "FROM cf_menudetails cfm LEFT JOIN cf_orderdetails cfo ON cfm.idofmenufromsync = cfo.idofmenufromsync "
-                        + "LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu WHERE cfm.idofmenufromsync = :idofmenufromsync AND cm.idoforg = :idoforg AND cfm.menudetailname = :menudetailname ORDER BY cfm.idofmenudetail DESC");
+                        + "FROM cf_menudetails cfm LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu "
+                        + "WHERE cfm.idofmenufromsync = :idofmenufromsync "
+                        + "AND cm.idoforg = :idoforg "
+                        + "AND cm.menudate between :orderdate and :enddate "
+                        + "ORDER BY cfm.idofmenudetail DESC limit 1");
         query.setParameter("idofmenufromsync", idOfMenuFromSync);
         query.setParameter("idoforg", orgFromOrder);
-        query.setParameter("menudetailname", menuDetailName);
+        query.setParameter("orderdate", orderDate.getTime());
+        query.setParameter("enddate", endDate.getTime());
+
         query.addScalar("idOfMenuDetail", StandardBasicTypes.LONG);
         query.addScalar("menuPath", StandardBasicTypes.STRING);
         query.addScalar("menuDetailName");
@@ -2052,13 +2062,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         query.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
 
-        List<MenuDetail> menuDetailList = query.list();
+        MenuDetail menuDetail = (MenuDetail) query.uniqueResult();
 
-        if (!menuDetailList.isEmpty()) {
-            return menuDetailList.get(0);
-        } else {
-            return null;
-        }
+        return menuDetail;
     }
 
     @Override
