@@ -639,6 +639,7 @@ public class SyncResponse {
                 private final Double carbohydrates;
                 private final Double calories;
                 private final Double vitB1;
+                private final Double vitB2;
                 private final Double vitC;
                 private final Double vitA;
                 private final Double vitE;
@@ -646,6 +647,7 @@ public class SyncResponse {
                 private final Double minP;
                 private final Double minMg;
                 private final Double minFe;
+                private final Double vitPp;
 
                 public ResMenuDetail(MenuDetail menuDetail) {
                     this.name = menuDetail.getMenuDetailName();
@@ -657,13 +659,16 @@ public class SyncResponse {
                     this.carbohydrates = menuDetail.getCarbohydrates();
                     this.calories = menuDetail.getCalories();
                     this.vitB1 = menuDetail.getVitB1();
+                    this.vitB2 = menuDetail.getVitB2();
                     this.vitC = menuDetail.getVitC();
                     this.vitA = menuDetail.getVitA();
                     this.vitE = menuDetail.getVitE();
                     this.minCa = menuDetail.getMinCa();
                     this.minP = menuDetail.getMinP();
                     this.minMg = menuDetail.getMinMg();
-                    this.minFe = menuDetail.getCalories();
+                    this.minFe = menuDetail.getMinFe();
+                    this.vitPp = menuDetail.getVitPp();
+
                 }
 
                 public String getName() {
@@ -702,6 +707,10 @@ public class SyncResponse {
                     return vitB1;
                 }
 
+                public Double getVitB2() {
+                    return vitB2;
+                }
+
                 public Double getVitC() {
                     return vitC;
                 }
@@ -730,6 +739,10 @@ public class SyncResponse {
                     return minFe;
                 }
 
+                public Double getVitPp() {
+                    return vitPp;
+                }
+
                 public Element toElement(Document document) throws Exception {
                     Element element = document.createElement("ML");
                     element.setAttribute("Name", this.name);
@@ -741,6 +754,7 @@ public class SyncResponse {
                     setMinorComponent(element, "Carbohydrates", this.carbohydrates);
                     setMinorComponent(element, "Calories", this.calories);
                     setMinorComponent(element, "VitB1", this.vitB1);
+                    setMinorComponent(element, "VitB2", this.vitB2);
                     setMinorComponent(element, "VitC", this.vitC);
                     setMinorComponent(element, "VitA", this.vitA);
                     setMinorComponent(element, "VitE", this.vitE);
@@ -748,6 +762,7 @@ public class SyncResponse {
                     setMinorComponent(element, "MinP", this.minP);
                     setMinorComponent(element, "MinMg", this.minMg);
                     setMinorComponent(element, "MinFe", this.minFe);
+                    setMinorComponent(element, "VitPp", this.vitPp);
                     return element;
                 }
 
@@ -771,9 +786,9 @@ public class SyncResponse {
                  public String toString() {
                     return "ResMenuDetail{" + "name='" + name + '\'' + ", group='" + group + '\'' + ", output='"
                             + output + '\'' + ", price=" + price + ", protein=" + protein + ", fat=" + fat
-                            + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1
+                            + ", carbohydrates=" + carbohydrates + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitB2=" + vitB2
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
-                            + minP + ", minMg=" + minMg + ", minFe=" + minFe + '}';
+                            + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", vitPp=" + vitPp + '}';
                 }
             }
 
