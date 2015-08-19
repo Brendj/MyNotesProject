@@ -299,7 +299,7 @@ public class ImportRegisterClientsService {
 
         //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
         Session session = (Session) em.getDelegate();
-        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
+        List<Client> currentClients = DAOUtils.findClientsWithoutPredefinedForOrgAndFriendly(em, org);
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
 
@@ -328,7 +328,7 @@ public class ImportRegisterClientsService {
                         break;
                     }
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
-                    //  увеличиваем количество клиентов, подлежих удалению
+                    //  увеличиваем количество клиентов, подлежащих удалению
                     Long currGroupId =
                             currGroup == null ? null : currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
                     if(currGroupId != null &&

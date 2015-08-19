@@ -500,6 +500,32 @@ public class DAOUtils {
         return findClientsForOrgAndFriendly (em, organization, orgs);
     }
 
+    public static List <Client> findClientsWithoutPredefinedForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
+        List <Org> orgs = findFriendlyOrgs (em, organization);
+        //return findClientsForOrgAndFriendly (em, organization, orgs);
+
+        String orgsClause = " where (client.org = :org0 ";
+        for (int i=0; i < orgs.size(); i++) {
+            if (orgsClause.length() > 0) {
+                orgsClause += " or ";
+            }
+            orgsClause += "client.org = :org" + (i + 1);
+        }
+        orgsClause += ") " + " and not (client.idOfClientGroup >= " +
+                ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and client.idOfClientGroup < " +
+                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ")";
+
+        javax.persistence.Query query = em.createQuery(
+                "from Client client " + orgsClause);
+        query.setParameter("org0", organization);
+        for (int i=0; i < orgs.size(); i++) {
+            query.setParameter("org" + (i + 1), orgs.get(i));
+        }
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        List <Client> cls = (List <Client>)query.getResultList();
+        return cls;
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Long> findFriendlyOrgIds(Session session, Long orgId) {
         Query query = session
