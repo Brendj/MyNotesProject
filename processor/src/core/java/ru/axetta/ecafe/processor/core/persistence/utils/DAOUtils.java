@@ -1966,8 +1966,16 @@ public class DAOUtils {
 
 
     public static Org findByBtiUnom(Session session, long btiUnom){
-        return (Org) session.createQuery("from Org where btiUnom =:btiUnom")
+        /*return (Org) session.createQuery("from Org where btiUnom =:btiUnom")
                 .setParameter("btiUnom", btiUnom)
-                .uniqueResult();
+                .uniqueResult();*/
+        Query query = session.createQuery(
+                "from Org where btiUnom =:btiUnom");
+        query.setParameter("btiUnom", btiUnom);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Org) res.get(0);
+        }
+        return null;
     }
 }

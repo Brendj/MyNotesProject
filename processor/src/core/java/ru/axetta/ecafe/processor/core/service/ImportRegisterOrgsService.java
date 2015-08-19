@@ -50,8 +50,6 @@ public class ImportRegisterOrgsService {
     @Transactional
     public boolean applyOrgRegistryChange(long idOfOrgRegistryChange, List<Long> buildingsList) {
 
-
-
         Session session = (Session) em.unwrap(Session.class);
         OrgRegistryChange orgRegistryChange = DAOUtils.getOrgRegistryChange(session, idOfOrgRegistryChange);
         if(orgRegistryChange.getApplied()) {
@@ -122,8 +120,15 @@ public class ImportRegisterOrgsService {
                     continue;
                 }
                 if (orgRegistryChangeItem != null){
-                    /*Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem.getAddress(), orgRegistryChangeItem.getAdditionalId());
-                    session.persist(org);*/
+                    Org fakeOrg = DAOUtils.findOrgByShortname(session, orgRegistryChangeItem.getShortName());
+                    int fakeCounter = 0;
+                    while(fakeOrg != null) {
+                        addToShortname++;
+                        fakeOrg = DAOUtils.findOrgByShortname(session, orgRegistryChangeItem.getShortName() + " - " + addToShortname);
+                        fakeCounter++;
+                        if (fakeCounter > 10) break;
+                    }
+
                     if (addToShortname > 0) {
                         shortName = orgRegistryChangeItem.getShortName() + " - " + addToShortname;
                     } else {

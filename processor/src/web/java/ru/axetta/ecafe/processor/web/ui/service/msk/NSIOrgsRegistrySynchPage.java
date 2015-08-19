@@ -123,7 +123,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         items.add(0, new SelectItem(0, "Все"));
         items.add(1, new SelectItem(OrgRegistryChange.CREATE_OPERATION, "Создание"));
         items.add(2, new SelectItem(OrgRegistryChange.MODIFY_OPERATION, "Изменение"));
-        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Удаление"));
+        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Отключение"));
         return items;
     }
 
@@ -233,20 +233,26 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return;
         }
 
-        for(WebItem i : items) {
-            if(i.isSelected()) {
-                List<Long> buildingsList = new LinkedList<Long>();
-                for (WebItem webItem : i.getOrgs()) {
-                    if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR){
-                        buildingsList.add(webItem.getIdOfOrgRegistryChange());
+        try {
+            for(WebItem i : items) {
+                if(i.isSelected()) {
+                    List<Long> buildingsList = new LinkedList<Long>();
+                    for (WebItem webItem : i.getOrgs()) {
+                        if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR){
+                            buildingsList.add(webItem.getIdOfOrgRegistryChange());
+                        }
                     }
-                }
-                boolean success = RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
-                                                applyOrgRegistryChange(i.getIdOfOrgRegistryChange(), buildingsList);
+                    boolean success = RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
+                            applyOrgRegistryChange(i.getIdOfOrgRegistryChange(), buildingsList);
 
-                i.setApplied(success);
-                i.setSelected(false);
+                    i.setApplied(success);
+                    i.setSelected(false);
+                }
             }
+        }
+        catch (Exception e) {
+            errorMessages = String.format("Не удается применить операцию к выбранным организациям. Текст ошибки: %s", e.getMessage());
+            getLogger().error("Failed to apply changes from registry. Error " + e.getMessage(), e);
         }
     }
 
