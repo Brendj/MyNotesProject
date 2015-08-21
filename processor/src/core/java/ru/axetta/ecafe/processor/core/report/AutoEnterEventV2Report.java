@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
+import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -147,14 +148,26 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     }
                 }
             }
-            Map<Long, Long> usersEntrySummaryMap = new HashMap<Long, Long>();
+            Map<MapKeyModel, Long> usersEntrySummaryMap = new HashMap<MapKeyModel, Long>();
             //заполняем время внутри
+
+            List<MapKeyModel> mapKeyModelList = new ArrayList<MapKeyModel>();
+
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
             for (StClass stClass : stClassList) {
-                for (Data data : stClass.getDataList()) {
-                    usersEntrySummaryMap.put(Long.parseLong(data.getF01()), 0L);
+                mapKeyModelList.add(new MapKeyModel(stClass.getDataList().get(0).getF04(), stClass.getDataList().get(0).getF01()));
+                for (int i = 1; i < stClass.getDataList().size(); i++) {
+                    MapKeyModel mapKeyModel = new MapKeyModel(stClass.getDataList().get(i).getF04(), stClass.getDataList().get(i).getF01());
+                    if (uniqueMapKeyModel(mapKeyModelList, mapKeyModel)) {
+                        mapKeyModelList.add(mapKeyModel);
+                    }
+                }
+
+                for (MapKeyModel model: mapKeyModelList) {
+                    usersEntrySummaryMap.put(model, 0L);
                 }
             }
+
             for (StClass stClass : stClassList) {
                 for (Data data : stClass.getDataList()) {
                     updateInsideSummaryTime(data, usersEntrySummaryMap);
@@ -169,8 +182,18 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             return new JRBeanCollectionDataSource(stClassList);
         }
 
+        public boolean uniqueMapKeyModel(List<MapKeyModel> mapKeyModels, MapKeyModel mapKeyModel) {
+            for (MapKeyModel model : mapKeyModels) {
+                if (model.getDate().equals(mapKeyModel.getDate()) && model.getClientID().equals(mapKeyModel.getClientID())) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-        private static void updateInsideSummaryTime(Data data, Map<Long, Long> entrySummaryMap) throws ParseException {
+
+        private static void updateInsideSummaryTime(Data data, Map<MapKeyModel, Long> entrySummaryMap)
+                throws ParseException {
             if (data.getF09() != null) {
                 Long value = 0L;
                 Long enter = 0L;
@@ -195,9 +218,18 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     }
                 }
                 if (value > 0) {
-                    if (entrySummaryMap.containsKey(Long.parseLong(data.getF01()))) {
-                        Long sumEntry = entrySummaryMap.get(Long.parseLong(data.getF01())) + value;
-                        entrySummaryMap.put(Long.parseLong(data.getF01()), sumEntry);
+                    Set<MapKeyModel> entrySummaryMapKeys = entrySummaryMap.keySet();
+
+                    for (MapKeyModel mapKey : entrySummaryMapKeys) {
+                        if (mapKey.getDate().equals(data.getF04()) && mapKey.getClientID().equals(data.getF01())) {
+
+                            if (entrySummaryMap.containsKey(mapKey)) {
+                                Long sumEntry = entrySummaryMap.get(mapKey) + value;
+                                entrySummaryMap.put(mapKey, sumEntry);
+                                System.out.println();
+                            }
+                            break;
+                        }
                     }
                     long hours = value / (60 * 60 * 1000);
                     long minutes = value / (60 * 1000) % 60;
@@ -207,8 +239,25 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
             }
         }
 
-        private static void updateEntrySummaryTime(Data data, Map<Long, Long> entrySummaryMap) throws ParseException {
-            data.getF081();
+        private static void updateEntrySummaryTime(Data data, Map<MapKeyModel, Long> entrySummaryMap)
+                throws ParseException {
+            Set<MapKeyModel> entrySummaryMapKeys = entrySummaryMap.keySet();
+
+            for (MapKeyModel mapKey : entrySummaryMapKeys) {
+                if (mapKey.getDate().equals(data.getF04()) && mapKey.getClientID().equals(data.getF01())) {
+
+                    if (entrySummaryMap.containsKey(mapKey)) {
+                        Long sumEntry = entrySummaryMap.get(mapKey);
+                        if (sumEntry > 0) {
+                            long hours = sumEntry / (60 * 60 * 1000);
+                            long minutes = sumEntry / (60 * 1000) % 60;
+                            data.setF10("" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes
+                                    : minutes));
+                        }
+                    }
+                    break;
+                }
+            }
         }
 
         //возвращает список Data с заполненными дата-корпусами

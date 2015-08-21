@@ -5,8 +5,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import javax.persistence.Transient;
 import java.math.BigInteger;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -26,7 +24,6 @@ public class Data {
     private String f06 ; // enter
     private String f07 ; //exit
     private String f08 ; // insideTime
-    private long f081 ; // insideTime
 
     private String f09 ; // enters
     private String f10 ; // entersSummary
@@ -134,22 +131,6 @@ public class Data {
 
     public void setF08(String f08) {
         this.f08 = f08;
-    }
-
-    public long getF081() {
-        if(f08 != null){
-            if(f08.contains(":")){
-                String[] split = f08.split(":");
-                Integer hour = Integer.valueOf(split[0]);
-                Integer minute = Integer.valueOf(split[1]);
-
-                f081 =  ((hour != 0)? hour : 1) *
-                        ((minute != 0)? minute  : 1) * 60 * 1000;
-            }
-        }else {
-            f081 = 0;
-        }
-        return f081;
     }
 
     public String getF09() {

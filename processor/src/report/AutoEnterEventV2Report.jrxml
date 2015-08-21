@@ -314,8 +314,7 @@
 					<measureExpression><![CDATA[$F{f10}]]></measureExpression>
 				</measure>
 				<measure name="f11" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[$F{f081}
- ]]></measureExpression>
+					<measureExpression><![CDATA[$F{f081}]]></measureExpression>
 				</measure>
 				<crosstabCell width="526" height="51">
 					<cellContents>
@@ -373,12 +372,10 @@
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField pattern="" isBlankWhenNull="false">
-							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" x="0" y="0" width="100" height="50">
-								<printWhenExpression><![CDATA[$V{f11} != 0]]></printWhenExpression>
-							</reportElement>
+						<textField pattern="" isBlankWhenNull="true">
+							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" x="0" y="0" width="100" height="50"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$P{DateFormatter}.format($V{f11})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{f10}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
