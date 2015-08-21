@@ -1757,7 +1757,7 @@ public class DAOService {
     }
 
     public long getNotBindedEMPClientsCount() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE ssoid IS null AND mobile<>''");
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_clients WHERE ssoid IS null OR mobile<>''");
         return Long.parseLong("" + q.getSingleResult());
     }
 
