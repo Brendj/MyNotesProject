@@ -95,7 +95,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         this.differencesList = null;
         DateFormat df = CalendarUtils.getDateFormatLocal();
         try {
-            this.differencesList = reconciliationManager.processRegistry(caAgent, caReceiver, dtFrom, dtTo, registryItems, dateDependent);
+            this.differencesList = reconciliationManager.processRegistry(caAgent, caReceiver, dtFrom, dtTo, registryItems, dateDependent,
+                    this.defaultLineConfig.idSize != null);
             this.differencesInfo = "Результаты сверки реестра за период: " + df.format(this.dtFrom) + " - " + df.format(this.dtTo)
                     + ": записей в реестре - " + registryItems.size() + ", различий - " + differencesList.size();
         } catch (Exception e) {

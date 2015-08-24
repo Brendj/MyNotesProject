@@ -1421,6 +1421,24 @@ public class DAOUtils {
         //
     }
 
+    public static Object[] getClientPaymentByIdSpecial(EntityManager em, String paymentId, Contragent contragent) {
+        Session session = em.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(ClientPayment.class).createAlias("transaction", "at")
+                .createAlias("at.client", "c").add(Restrictions.ilike("idOfPayment", paymentId, MatchMode.END));
+        if (contragent != null) {
+            criteria.add(Restrictions.eq("contragent", contragent));
+        }
+        criteria.setProjection(Projections.projectionList().add(Projections.property("c.contractId"))
+                .add(Projections.property("createTime")).add(Projections.property("paySum"))
+                .add(Projections.property("idOfPayment")));
+        List<Object[]> res = (List<Object[]>) criteria.list();
+        if(res.size() < 1) {
+            return null;
+        }
+        return res.get(0);
+        //
+    }
+
     public static Long getBlockedCardsCount(EntityManager em) {
         javax.persistence.Query q = em.createQuery("select count(*) from Card where state<>:activeState");
         q.setParameter("activeState", Card.ACTIVE_STATE);
