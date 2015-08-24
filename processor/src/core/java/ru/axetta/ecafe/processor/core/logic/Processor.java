@@ -3452,6 +3452,22 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             case PROFESSIONAL:
                             case SCHOOL: {
                                 values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
+
+                                if (guardianId != null) {
+                                    List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
+                                    Client guardian = DAOService.getInstance().findClientById(guardianId);
+
+                                    if(!(guardians==null || guardians.isEmpty())){
+                                        for (Client cl: guardians){
+                                            if(guardians.size() > 1 && cl.getIdOfClient().equals(guardian.getIdOfClient())) {
+                                                continue;
+                                            }
+                                            notificationService.sendNotificationAsync(cl,
+                                                    EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
+                                        }
+                                    }
+                                }
+
                                 notificationService.sendNotificationAsync(client,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                             } break;
