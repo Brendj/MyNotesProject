@@ -288,6 +288,11 @@ public class EventNotificationService {
                 }
             }
         }
+
+        if (emailDisabled()) {
+            return;
+        }
+
         Boolean email = null;
         if (client.isNotifyViaEmail()) {
             email = sendEmail(client, type, values);
@@ -304,6 +309,11 @@ public class EventNotificationService {
                 throw new RuntimeException("Failed to send notification via email");
             }
         }
+    }
+
+    public Boolean emailDisabled(){
+        ISmsService emp = RuntimeContext.getInstance().getSmsService();
+        return emp instanceof EMPSmsServiceImpl;
     }
 
     public boolean isNotificationEnabled(Client client, String type) {
