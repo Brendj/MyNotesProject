@@ -2003,7 +2003,7 @@ public class DAOUtils {
 
 
     public static Org findByAdditionalId(Session session, long additionalIdBuildingId){
-        return (Org) session.createQuery("from Org where additionalIdBuilding =:additionalIdBuildingId")
+        return (Org) session.createQuery("from Org where uniqueAddressId =:additionalIdBuildingId")
                 .setParameter("additionalIdBuildingId", additionalIdBuildingId)
                 .uniqueResult();
     }

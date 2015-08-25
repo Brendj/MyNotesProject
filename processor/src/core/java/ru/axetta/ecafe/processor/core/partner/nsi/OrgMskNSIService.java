@@ -357,7 +357,7 @@ public class OrgMskNSIService extends MskNSIService {
                 }
             }
 
-            if(found || o.getState() != OrganizationStatus.ACTIVE.ordinal()) {  //если организация не обслуживается - ее не включаем в список
+            if(found && o.getState() != OrganizationStatus.ACTIVE.ordinal()) {  //если организация не обслуживается - ее не включаем в список
                 continue;
             }
 

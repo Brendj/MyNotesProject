@@ -552,6 +552,14 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.additionalIdBuilding = additionalIdBuilding;
     }
 
+    public Long getUniqueAddressId() {
+        return uniqueAddressId;
+    }
+
+    public void setUniqueAddressId(Long uniqueAddressId) {
+        this.uniqueAddressId = uniqueAddressId;
+    }
+
     public String getStatusDetailing() {
         return statusDetailing;
     }

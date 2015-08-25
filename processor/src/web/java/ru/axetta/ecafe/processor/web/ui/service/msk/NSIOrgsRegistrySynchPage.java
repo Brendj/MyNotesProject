@@ -183,6 +183,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         return item.isApplied();
     }
 
+    public Boolean isDeleteOperation(Integer operationType) {
+        return (operationType == OrgRegistryChange.DELETE_OPERATION);
+    }
+
     protected boolean isModifyableRevision() {
         return (selectedRevision < 0 || revisions == null || revisions.size() < 1 || revisions.get(0) == null ||
                 !selectedRevision.equals(revisions.get(0))) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
@@ -254,6 +258,34 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             errorMessages = String.format("Не удается применить операцию к выбранным организациям. Текст ошибки: %s", e.getMessage());
             getLogger().error("Failed to apply changes from registry. Error " + e.getMessage(), e);
         }
+    }
+
+    public void doCheckAll() {
+        try {
+            for(WebItem i : items) {
+                i.setSelected(true);
+            }
+        }
+        catch (Exception e) {
+            errorMessages = String.format("Не удается установить выбор всех записей. Текст ошибки: %s", e.getMessage());
+            getLogger().error("Failed to check all records. Error " + e.getMessage(), e);
+        }
+    }
+
+    public void doUncheckAll() {
+        try {
+            for(WebItem i : items) {
+                i.setSelected(false);
+            }
+        }
+        catch (Exception e) {
+            errorMessages = String.format("Не удается очистить выбор всех записей. Текст ошибки: %s", e.getMessage());
+            getLogger().error("Failed to uncheck all records. Error " + e.getMessage(), e);
+        }
+    }
+
+    public boolean isRevisionLast() {
+        return (selectedRevision.equals(revisions.get(0)));
     }
 
     protected void putDbItems(List<OrgRegistryChange> dbItem) {
@@ -549,7 +581,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getOfficialName() {
-            return officialName;
+            return getResultString(officialName, officialNameFrom);
         }
 
         public String getOfficialNameFrom() {

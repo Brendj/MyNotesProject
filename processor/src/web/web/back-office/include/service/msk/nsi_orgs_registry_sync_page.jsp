@@ -58,7 +58,7 @@
     </h:panelGrid>
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <a4j:commandButton value="Обновить" action="#{NSIOrgsRegistrySynchPage.doUpdate}"
-                           reRender="synchTable,synchTableInfoPanel,revisionInfo,resultTitle" styleClass="command-button" status="updateStatus"
+                           reRender="synchTable,synchTableInfoPanel,revisionInfo,resultTitle,synchTableControl" styleClass="command-button" status="updateStatus"
                            onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
         <a4j:status id="updateStatus">
             <f:facet name="start">
@@ -92,6 +92,8 @@
             </rich:column>
 
             <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}"  rowspan="1" colspan="1">
+                <h:outputText value="Идентификатор ОО - " rendered="#{NSIOrgsRegistrySynchPage.isDeleteOperation(e.operation)}" />
+                <h:outputText value="#{e.idOfOrg}" escape="false" rendered="#{NSIOrgsRegistrySynchPage.isDeleteOperation(e.operation)}" /><br/>
                 <h:outputText value="Номер ОО"/> - <h:outputText value="#{e.orgNumber}" escape="false"/><br/>
                 <h:outputText value="Наименование"/> - <h:outputText value="#{e.shortName} (#{e.officialName})" escape="false"/><br/>
                 <h:outputText value="Межрайонный совет ОО"/> - <h:outputText value="#{e.interdistrictCouncil}" escape="false"/><br/>
@@ -131,6 +133,12 @@
                             <h:outputText value="Адрес корпуса" />
                         </f:facet>
                         <h:outputText value="#{org.address}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Ид. орг." />
+                        </f:facet>
+                        <h:outputText value="#{org.idOfOrg}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -201,6 +209,13 @@
 
     <h:panelGrid>
         <h:panelGrid id="synchTableControl">
+            <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
+                    rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
+            <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
+                               rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
+            <rich:separator lineType="solid" />
             <a4j:commandButton value="Применить выбранные" action="#{NSIOrgsRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
         </h:panelGrid>

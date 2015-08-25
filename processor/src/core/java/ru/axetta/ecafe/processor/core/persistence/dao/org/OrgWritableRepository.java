@@ -31,7 +31,7 @@ public class OrgWritableRepository extends WritableJpaDao {
         return entityManager.find(Org.class, id);
     }
 
-    public Org findByAdditionalId(long additionalIdBuildingId){
+    /*public Org findByAdditionalId(long additionalIdBuildingId){
         List<Org> additionalIdBuildingList = entityManager.createQuery("from Org where additionalIdBuilding =:additionalIdBuildingId", Org.class)
                 .setParameter("additionalIdBuildingId", additionalIdBuildingId).getResultList();
         if (additionalIdBuildingList.size() > 0) {
@@ -39,7 +39,7 @@ public class OrgWritableRepository extends WritableJpaDao {
         } else {
             return null;
         }
-    }
+    }*/
 
 
     public Org findByBtiUnom(long btiUnom) {

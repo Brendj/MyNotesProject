@@ -103,7 +103,7 @@
     <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.introductionQueue}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.additionalIdBuilding}" maxlength="9" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.uniqueAddressId}" maxlength="9" styleClass="input-text" />
 
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />

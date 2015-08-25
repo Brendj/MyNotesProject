@@ -790,7 +790,13 @@ public class DAOService {
     }
 
     public List<Org> findOrgsByGuidAddressINNOrNumber(String guid, String address, String inn, String number) {
-        String queryStr = "from Org where address = :address";
+        String queryStr;
+        if (StringUtils.isEmpty(address)) {
+            queryStr = "from Org where 1=0";
+        } else {
+            queryStr = "from Org where address = :address";
+        }
+
         if (!StringUtils.isEmpty(guid)) {
             queryStr += " or guid = :guid";
         }
@@ -801,7 +807,9 @@ public class DAOService {
             queryStr += " or shortName like :number";
         }
         javax.persistence.Query q = entityManager.createQuery(queryStr);
-        q.setParameter("address", address);
+        if (!StringUtils.isEmpty(address)) {
+            q.setParameter("address", address);
+        }
         if (!StringUtils.isEmpty(guid)) {
             q.setParameter("guid", guid);
         }

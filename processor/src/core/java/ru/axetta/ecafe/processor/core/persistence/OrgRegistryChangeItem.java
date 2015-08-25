@@ -73,7 +73,7 @@ public class OrgRegistryChangeItem {
 
             String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
             String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
-            OrgRegistryChange orgRegistryChange) {
+            OrgRegistryChange orgRegistryChange, boolean mainBuilding) {
         this.idOfOrg = idOfOrg;
 
         this.organizationType = organizationType;
@@ -112,6 +112,7 @@ public class OrgRegistryChangeItem {
         this.interdistrictCouncilChief = interdistrictCouncilChief;
         this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
         this.orgRegistryChange = orgRegistryChange;
+        this.mainBuilding = mainBuilding;
     }
 
     public Long getAdditionalId() {

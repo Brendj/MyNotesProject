@@ -64,7 +64,7 @@ public class ImportRegisterOrgsService {
             org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
         }
         if (org == null && orgRegistryChange.getAdditionalId() != -1){
-            org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getAdditionalId());
+            org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());
         }
         if (org == null && orgRegistryChange.getUnom() != -1){
             org = DAOUtils.findByBtiUnom(session,orgRegistryChange.getUnom());
@@ -312,7 +312,7 @@ public class ImportRegisterOrgsService {
 
     protected void deleteOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
             throws Exception {
-        org.setState(OrganizationStatus.INACTIVE.ordinal());
+        org.setState(0);
         for (Long aLong : buildingsList) {
             OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
             if (orgRegistryChangeItem != null) {
@@ -416,7 +416,7 @@ public class ImportRegisterOrgsService {
                         oi.getInterdistrictCouncilFrom(),
                         oi.getInterdistrictCouncilChief(),
                         oi.getInterdistrictCouncilChiefFrom(),
-                        orgRegistryChange
+                        orgRegistryChange, oi.getMainBuilding()
 
                 );
     }

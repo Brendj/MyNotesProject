@@ -94,6 +94,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private Long btiUnom;
     private Long btiUnad;
+    private Long uniqueAddressId;
     private String introductionQueue;
     private Long additionalIdBuilding;
 
@@ -264,6 +265,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setBtiUnad(btiUnad);
         org.setIntroductionQueue(introductionQueue);
         org.setAdditionalIdBuilding(additionalIdBuilding);
+        org.setUniqueAddressId(uniqueAddressId);
 
         if (this.statusTextArea != null) {
             if (this.statusDetail != null && this.statusDetail.length() > 0) {
@@ -379,6 +381,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.btiUnad = org.getBtiUnad();
         this.introductionQueue = org.getIntroductionQueue();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
+        this.uniqueAddressId = org.getUniqueAddressId();
 
         String[] strings = org.getStatusDetailing().split("/");
 
@@ -939,6 +942,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setAdditionalIdBuilding(Long additionalIdBuilding) {
         this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public Long getUniqueAddressId() {
+        return uniqueAddressId;
+    }
+
+    public void setUniqueAddressId(Long uniqueAddressId) {
+        this.uniqueAddressId = uniqueAddressId;
     }
 
     public String getStatusDetailing() {

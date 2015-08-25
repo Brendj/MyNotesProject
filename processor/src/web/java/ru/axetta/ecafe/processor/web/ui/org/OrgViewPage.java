@@ -71,6 +71,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long btiUnad;
     private String introductionQueue;
     private Long additionalIdBuilding;
+    private Long uniqueAddressId;
     private String statusDetailing;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
@@ -200,6 +201,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.btiUnom = org.getBtiUnom();
         this.btiUnad = org.getBtiUnad();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
+        this.uniqueAddressId = org.getUniqueAddressId();
         this.introductionQueue = org.getIntroductionQueue();
         this.statusDetailing = org.getStatusDetailing();
 
@@ -458,6 +460,14 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setAdditionalIdBuilding(Long additionalIdBuilding) {
         this.additionalIdBuilding = additionalIdBuilding;
+    }
+
+    public Long getUniqueAddressId() {
+        return uniqueAddressId;
+    }
+
+    public void setUniqueAddressId(Long uniqueAddressId) {
+        this.uniqueAddressId = uniqueAddressId;
     }
 
     public String getIntroductionQueue() {

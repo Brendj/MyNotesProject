@@ -97,7 +97,7 @@
     <h:outputText escape="true" value="Очередь внедрения" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.introductionQueue}" styleClass="input-text" />
     <h:outputText escape="true" value="Доп. ид. здания" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.additionalIdBuilding}" styleClass="input-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.uniqueAddressId}" styleClass="input-text" />
 
     <h:outputText escape="true" value="В каком межрайонном совете состоит ОО" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.interdistrictCouncil}" styleClass="input-text" />
