@@ -40,6 +40,8 @@
 
 <rich:simpleTogglePanel label="Параметры" switchType="client" opened="true"
                         headerClass="filter-panel-header">
+    <h:panelGrid columns="2">
+        <h:column>
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Дата сверки разногласий" styleClass="output-text" />
         <h:selectOneMenu id="revisionDates" value="#{NSIOrgsRegistrySynchPage.selectedRevision}" style="width:350px;" >
@@ -65,6 +67,40 @@
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
+    </h:panelGrid>
+            <rich:spacer height="40" />
+            <h:panelGrid>
+            <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgsRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+            </h:panelGrid>
+        </h:column>
+        <h:column>
+            <h:panelGrid>
+                <h:panelGrid id="synchTableControl">
+                    <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
+                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
+                                       rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
+                    <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
+                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
+                                       rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
+                    <rich:separator />
+                    <a4j:commandButton value="Применить выбранные" action="#{NSIOrgsRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
+                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
+                </h:panelGrid>
+                <h:panelGrid id="revisionInfo" columns="2">
+                    <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных зданий" styleClass="output-text"/></h:panelGroup>
+                    <h:outputText value="#{NSIOrgsRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
+                    <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
+                    <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>
+                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных зданий" styleClass="output-text"/></h:panelGroup>
+                    <h:outputText value="#{NSIOrgsRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
+                    <rich:spacer width="10px" />
+                    <rich:spacer width="10px" />
+                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий всего" styleClass="output-text"/></h:panelGroup>
+                    <h:outputText value="#{NSIOrgsRegistrySynchPage.totalCount}" styleClass="output-text" style="font-weight: bold;"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:column>
     </h:panelGrid>
 </rich:simpleTogglePanel>
 
@@ -200,38 +236,14 @@
                     <f:facet name="last">
                         <h:graphicImage value="/images/16x16/last.png" />
                     </f:facet>
+                    <a4j:support event="onpagechange"/>
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <a4j:commandButton value="Провести полную сверку" action="#{NSIOrgsRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
-                           onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+
     </h:panelGroup>
 
-    <h:panelGrid>
-        <h:panelGrid id="synchTableControl">
-            <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
-                    rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
-            <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
-                               rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
-            <rich:separator lineType="solid" />
-            <a4j:commandButton value="Применить выбранные" action="#{NSIOrgsRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
-        </h:panelGrid>
-        <h:panelGrid id="revisionInfo" columns="2">
-            <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных зданий" styleClass="output-text"/></h:panelGroup>
-            <h:outputText value="#{NSIOrgsRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-            <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
-            <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>
-            <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных зданий" styleClass="output-text"/></h:panelGroup>
-            <h:outputText value="#{NSIOrgsRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-            <rich:spacer width="10px" />
-            <rich:spacer width="10px" />
-            <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий всего" styleClass="output-text"/></h:panelGroup>
-            <h:outputText value="#{NSIOrgsRegistrySynchPage.totalCount}" styleClass="output-text" style="font-weight: bold;"/>
-        </h:panelGrid>
-    </h:panelGrid>
+
 </h:panelGrid>
 
 </h:panelGrid>

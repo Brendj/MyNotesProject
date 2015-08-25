@@ -10,3 +10,5 @@ alter table cf_orgs drop column IdOfPacket
 , drop column clientversion
 , drop column remoteaddress
 , drop column lastunsucbalancesync;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 150825) НЕ МЕНЯТЬ

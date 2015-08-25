@@ -200,7 +200,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         loadRevisions();
         if(revisions != null && revisions.size() > 0) {
             selectedRevision = revisions.get(0);
-            doUpdate();
+            //doUpdate();
         }
     }
     //Применяем фильтр
