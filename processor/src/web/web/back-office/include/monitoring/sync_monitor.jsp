@@ -47,6 +47,13 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
+                    <h:outputText escape="true" value="Ид" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
                     <h:outputText escape="true" value="Тэги" />
                 </f:facet>
                 <h:outputText escape="false" value="#{item.tags}" styleClass="output-text"
