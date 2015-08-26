@@ -351,6 +351,8 @@ public class MainPage implements Serializable {
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
     private final PaymentTotalsReportPage paymentTotalsReportPage = new PaymentTotalsReportPage();
+    private final FinancialControlPage financialControlPage = new FinancialControlPage();
+    private final LatePaymentReportPage latePaymentReportPage = new LatePaymentReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5545,6 +5547,14 @@ public class MainPage implements Serializable {
         return paymentTotalsReportPage;
     }
 
+    public FinancialControlPage getFinancialControlPage() {
+        return financialControlPage;
+    }
+
+    public LatePaymentReportPage getLatePaymentReportPage() {
+        return latePaymentReportPage;
+    }
+
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
@@ -5629,6 +5639,19 @@ public class MainPage implements Serializable {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showLatePaymentReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = latePaymentReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;

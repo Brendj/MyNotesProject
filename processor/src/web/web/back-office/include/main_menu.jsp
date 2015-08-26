@@ -1045,6 +1045,20 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="financialControlPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FinancialControlPage"--%>
+    <rich:panelMenuGroup id="financialControlMenu" binding="#{financialControlPage.mainMenuComponent}"
+                         label="Отчеты для службы финансового контроля"
+                         rendered="#{financialControlPage.eligibleToWorkCommodityAccounting}">
+        <a4j:support event="onclick" action="#{financialControlPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="latePaymentReportMenuItem"
+                            binding="#{mainPage.latePaymentReportPage.mainMenuComponent}"
+                            label="Статистика расхождения данных по заказам и оплате"
+                            action="#{mainPage.showLatePaymentReportPage}"
+                            reRender="workspaceForm"/>
+
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
 
