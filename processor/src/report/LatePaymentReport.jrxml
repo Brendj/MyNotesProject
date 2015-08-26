@@ -19,11 +19,11 @@
 			<textField>
 				<reportElement x="0" y="0" width="420" height="52" uuid="36958d74-d941-4189-b5e4-88048ad1b221"/>
 				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
@@ -33,7 +33,7 @@
 		</band>
 	</title>
 	<columnHeader>
-		<band height="53" splitType="Stretch">
+		<band height="52" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="40" height="52" uuid="74362b06-3d71-4fc3-b211-2d5beaf3f014"/>
 				<box>
