@@ -206,6 +206,19 @@
     </converter>
 
     <converter>
+        <description>Late Payment By One Day Count Type Converter</description>
+        <converter-id>latePaymentByOneDayCountConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.LatePaymentByOneDayCountTypeConverter
+        </converter-class>
+    </converter>
+
+    <converter>
+        <description>Late Payment Days Count Type Converter</description>
+        <converter-id>latePaymentDaysCountTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.LatePaymentDaysCountTypeConverter</converter-class>
+    </converter>
+
+    <converter>
         <converter-id>rublesStringConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
     </converter>

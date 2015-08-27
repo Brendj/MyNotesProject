@@ -1053,7 +1053,7 @@
 
         <rich:panelMenuItem id="latePaymentReportMenuItem"
                             binding="#{mainPage.latePaymentReportPage.mainMenuComponent}"
-                            label="Статистика расхождения данных по заказам и оплате"
+                            label="Сводный отчет по несвоевременной оплате питания"
                             action="#{mainPage.showLatePaymentReportPage}"
                             reRender="workspaceForm"/>
 
