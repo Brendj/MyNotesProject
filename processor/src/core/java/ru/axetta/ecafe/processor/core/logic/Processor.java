@@ -3462,7 +3462,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                             if(guardians.size() > 1 && cl.getIdOfClient().equals(guardian.getIdOfClient())) {
                                                 continue;
                                             }
-                                            notificationService.sendNotificationAsync(client,
+                                            notificationService.sendNotificationAsync(cl,
                                                     EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                                         }
                                     }
