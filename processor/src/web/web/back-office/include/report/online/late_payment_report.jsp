@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid id="LatePaymentReportPanelGrid" binding="#{mainPage.latePaymentReportPage.pageComponent}"
+<h:panelGrid id="latePaymentReportPanelGrid" binding="#{mainPage.latePaymentReportPage.pageComponent}"
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" opened="true"
@@ -79,7 +79,25 @@
                     <f:selectItems value="#{mainPage.latePaymentReportPage.latePaymentDaysCountTypeMenu.items}" />
                 </h:selectOneMenu>
             </h:panelGroup>
-
         </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="3">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.latePaymentReportPage.buildReportHTML}"
+                               reRender="latePaymentReportPanelGrid"
+                               styleClass="command-button" status="reportGenerateStatus" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.latePaymentReportPage.generateXLS}" styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{mainPage.latePaymentReportPage.clear}"
+                               reRender="latePaymentReportPanelGrid"
+                               styleClass="command-button" status="reportGenerateStatus" />
+        </h:panelGrid>
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+
     </rich:simpleTogglePanel>
 </h:panelGrid>

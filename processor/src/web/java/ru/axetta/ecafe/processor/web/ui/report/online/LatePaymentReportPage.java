@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import java.util.Date;
 
@@ -144,6 +145,21 @@ public class LatePaymentReportPage extends OnlineReportWithContragentPage {
     }
 
     public void fill() throws Exception {
+    }
+
+    // Генерировать отчет
+    public Object buildReportHTML() {
+        return null;
+    }
+
+    // Выгрузить в Excel
+    public void generateXLS(ActionEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+    }
+
+    // Очистить
+    public Object clear(){
+        return null;
     }
 
 }
