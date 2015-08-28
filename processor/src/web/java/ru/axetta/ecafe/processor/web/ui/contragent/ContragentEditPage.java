@@ -111,6 +111,7 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
     private String bank;
     private String bic;
     private String okato;
+    private String oktmo;
     private String corrAccount;
     private String account;
     private String publicKey;
@@ -339,6 +340,14 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         this.okato = okato;
     }
 
+    public String getOktmo() {
+        return oktmo;
+    }
+
+    public void setOktmo(String oktmo) {
+        this.oktmo = oktmo;
+    }
+
     public void fill(Session session, Long idOfContragent) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         fill(contragent);
@@ -365,6 +374,7 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         contragent.setBank(this.bank.trim());
         contragent.setBic(this.bic.trim());
         contragent.setOkato(this.okato.trim());
+        contragent.setOktmo(this.oktmo.trim());
         contragent.setCorrAccount(this.corrAccount.trim());
         contragent.setAccount(this.account.trim());
         contragent.setUpdateTime(new Date());
@@ -406,6 +416,7 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         this.bank = contragent.getBank();
         this.bic = contragent.getBic();
         this.okato = contragent.getOkato();
+        this.oktmo = contragent.getOktmo();
         this.corrAccount = contragent.getCorrAccount();
         this.account = contragent.getAccount();
         this.publicKey = contragent.getPublicKey();
@@ -438,12 +449,9 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
             return null;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
         }
-        /*if(isEmpty(prevId) || prevId.equals(id)) {
+        /*if(!isEmpty(prevId) && prevId.equals(id)) {
             return null;
         }*/
-        if(!isEmpty(prevId) && prevId.equals(id)) {
-            return null;
-        }
         if (isEmpty (contragent.getContragentName())) {
             throw new IllegalStateException("Необходимо указать наименование Контрагента");
         }
@@ -464,6 +472,9 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         }
         if (isEmpty(contragent.getOkato())) {
             throw new IllegalStateException("Необходимо указать ОКАТО");
+        }
+        if (isEmpty(contragent.getOktmo())) {
+            throw new IllegalStateException("Необходимо указать ОКТМО");
         }
         if (isEmpty(contragent.getCorrAccount())) {
             throw new IllegalStateException("Необходимо указать номер Коррсчета");

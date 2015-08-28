@@ -58,6 +58,7 @@ public class Contragent {
     private String bank;
     private String bic;
     private String okato;
+    private String oktmo;
     private String corrAccount;
     private String account;
     private Date createTime;
@@ -602,4 +603,11 @@ public class Contragent {
                 + ", KPP='" + kpp + '\'' + ", OGRN='" + ogrn+ '\'' + '}';
     }
 
+    public String getOktmo() {
+        return oktmo;
+    }
+
+    public void setOktmo(String oktmo) {
+        this.oktmo = oktmo;
+    }
 }

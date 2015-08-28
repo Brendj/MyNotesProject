@@ -16,10 +16,7 @@ import ru.CryptoPro.JCP.tools.Array;
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.contragent.ContragentService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -62,9 +59,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Provider;
+import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
@@ -84,6 +79,9 @@ public class RNIPLoadPaymentsService {
     private final static String LOAD_PAYMENTS_TEMPLATE = "META-INF/rnip/getPayments_byDate.xml";
     public final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
     private final static String MODIFY_CATALOG_TEMPLATE = "META-INF/rnip/modifyCatalog.xml";
+
+    public final static String CREATE_CATALOG_TEMPLATE_V116 = "META-INF/rnip/createCatalog_v116.xml";
+    private final static String MODIFY_CATALOG_TEMPLATE_V116 = "META-INF/rnip/modifyCatalog_v116.xml";
     ////
     public static final int REQUEST_CREATE_CATALOG=0, REQUEST_MODIFY_CATALOG=1, REQUEST_LOAD_PAYMENTS=2;
     ////
@@ -349,11 +347,7 @@ public class RNIPLoadPaymentsService {
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
     }
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
-        return executeRequest(updateTime, requestType, contragent,null,null);
-    }
-
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception {
+    private String getTemplateFileName(int requestType) throws Exception {
         String fileName;
         if (requestType==REQUEST_MODIFY_CATALOG) {
             fileName = MODIFY_CATALOG_TEMPLATE;
@@ -364,6 +358,47 @@ public class RNIPLoadPaymentsService {
         } else {
             throw new Exception("Invalid request type: "+requestType);
         }
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        switch (version) {
+            case RNIP_V115:
+                break;
+            case RNIP_V116:
+                fileName = fileName.replace(".xml", "_v116.xml");
+                break;
+        }
+        return fileName;
+    }
+
+    private String getRNIPUrl() {
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        String url = null;
+        switch (version) {
+            case RNIP_V115:
+                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
+                break;
+            case RNIP_V116:
+                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
+                break;
+        }
+        return url;
+    }
+
+
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
+        return executeRequest(updateTime, requestType, contragent,null,null);
+    }
+
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception {
+        String fileName = getTemplateFileName(requestType);
+        /*if (requestType==REQUEST_MODIFY_CATALOG) {
+            fileName = MODIFY_CATALOG_TEMPLATE;
+        } else if (requestType==REQUEST_CREATE_CATALOG) {
+            fileName = CREATE_CATALOG_TEMPLATE;
+        } else if (requestType==REQUEST_LOAD_PAYMENTS) {
+            fileName = LOAD_PAYMENTS_TEMPLATE;
+        } else {
+            throw new Exception("Invalid request type: "+requestType);
+        }*/
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate), requestType);
         long timestamp = System.currentTimeMillis();
@@ -594,7 +629,8 @@ public class RNIPLoadPaymentsService {
         // Use SAAJ to convert Document to SOAPElement
         SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = sfc.createConnection();
-        URL_ADDR = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
+        //URL_ADDR = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
+        URL_ADDR = getRNIPUrl();
         URL endpoint = new URL(URL_ADDR);
         SOAPMessage response = connection.call(message, endpoint);
         connection.close();
@@ -899,6 +935,9 @@ public class RNIPLoadPaymentsService {
         if (content.indexOf("%OKATO%") > 1) {
             content = content.replaceAll("%OKATO%", formatString(contragent.getOkato()));
         }
+        if (content.indexOf("%OKTMO%") > 1) {
+            content = content.replaceAll("%OKTMO%", formatString(contragent.getOktmo()));
+        }
         if (content.indexOf("%OGRN%") > 1) {
             content = content.replaceAll("%OGRN%", formatString(contragent.getOgrn()));
         }
@@ -1006,7 +1045,7 @@ public class RNIPLoadPaymentsService {
 
     public static final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-        return getRNIPIdFromRemarks (contragent.getRemarks());
+        return getRNIPIdFromRemarks(contragent.getRemarks());
     }
 
     private static class RNIPPaymentsResponse {

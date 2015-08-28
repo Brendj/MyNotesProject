@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.model.SelectItem;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -104,6 +106,10 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean smsResending;
     private Boolean smsFailureTestingMode;
     private String rnipProcessorInstance;
+    private String RNIPPaymentsURL_v116;
+    private String RNIPPaymentsWorkingVersion;
+
+    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
     private List<BankOptionItem> banks;
 
@@ -658,6 +664,30 @@ public class OptionPage extends BasicWorkspacePage {
         this.rnipProcessorInstance = rnipProcessorInstance;
     }
 
+    public String getRNIPPaymentsURL_v116() {
+        return RNIPPaymentsURL_v116;
+    }
+
+    public void setRNIPPaymentsURL_v116(String RNIPPaymentsURL_v116) {
+        this.RNIPPaymentsURL_v116 = RNIPPaymentsURL_v116;
+    }
+
+    public String getRNIPPaymentsWorkingVersion() {
+        return RNIPPaymentsWorkingVersion;
+    }
+
+    public void setRNIPPaymentsWorkingVersion(String RNIPPaymentsWorkingVersion) {
+        this.RNIPPaymentsWorkingVersion = RNIPPaymentsWorkingVersion;
+    }
+
+    public SelectItem[] getRNIPWorkingVersions() {
+        SelectItem[] items = new SelectItem[rnipVersions.length];
+        for (int i = 0; i < items.length; ++i) {
+            items[i] = new SelectItem(rnipVersions[i], rnipVersions[i]);
+        }
+        return items;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -743,7 +773,8 @@ public class OptionPage extends BasicWorkspacePage {
         smsResending = runtimeContext.getOptionValueBool(Option.OPTION_SMS_RESENDING_ON);
         smsFailureTestingMode = runtimeContext.getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
         rnipProcessorInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
-
+        RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
+        RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
 
         bankListPage.onShow();
 
@@ -871,7 +902,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SMS_RESENDING_ON, smsResending);
             runtimeContext.setOptionValue(Option.OPTION_SMS_FAILURE_TESTING_MODE, smsFailureTestingMode);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, rnipProcessorInstance);
-
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
 
 
             runtimeContext.saveOptionValues();

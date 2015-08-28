@@ -262,9 +262,14 @@
                     <h:outputText escape="true" value="Импортировать платежи из РНИП"
                                                        styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.importRNIPPayments}" styleClass="output-text" />
-                    <h:outputText escape="true" value="URL сервиса РНИП"
-                                                       styleClass="output-text" />
+                    <h:outputText escape="true" value="URL сервиса РНИП v1.15" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsURL}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="URL сервиса РНИП v1.16" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPPaymentsURL_v116}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Обращаться к сервису РНИП версии" styleClass="output-text" />
+                    <h:selectOneMenu value="#{optionPage.RNIPPaymentsWorkingVersion}" styleClass="input-text">
+                        <f:selectItems value="#{optionPage.RNIPWorkingVersions}" />
+                    </h:selectOneMenu>
                     <h:outputText escape="true" value="Имя сервера с которого проводить импорт платежей"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.rnipProcessorInstance}" styleClass="input-text" size="40" />

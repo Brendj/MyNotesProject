@@ -58,6 +58,8 @@
     <h:inputText value="#{mainPage.contragentViewPage.ogrn}" maxlength="15" styleClass="input-text" />
     <h:outputText escape="true" value="ОКАТО" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentViewPage.okato}" maxlength="11" styleClass="input-text" />
+    <h:outputText escape="true" value="ОКТMО" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentViewPage.oktmo}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ (RSA)" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.publicKey}" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ (ГОСТ) - контейнер" styleClass="output-text" />

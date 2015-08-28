@@ -139,7 +139,13 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                 criterion = Restrictions.not(criterion);
                 orgCriteria.add(Restrictions.eq("type", OrganizationType.SCHOOL));
             }
-            orgCriteria.add(criterion);
+            if (supplierFilter == 2) {
+                criterion = Restrictions.not(criterion);
+                orgCriteria.add(Restrictions.eq("type", OrganizationType.SUPPLIER));
+            }
+            if (supplierFilter != 2) {
+                orgCriteria.add(criterion);
+            }
         }
 
         orgCriteria.setProjection(
