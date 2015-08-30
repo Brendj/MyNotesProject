@@ -241,6 +241,7 @@ public class EMPProcessor {
                 addEntryToLogString(attr, logStr);
             }
             for (ReceiveDataChangesResponse.Result.Entry.Identifier id : identifiers) {
+                addEntryToLogString(id, logStr);
                 if (!StringUtils.isBlank(id.getName()) &&
                         id.getName().equals(ATTRIBUTE_RULE_ID) &&
                         id.getValue() != null && id.getValue() != null && !StringUtils
@@ -252,9 +253,8 @@ public class EMPProcessor {
                         logger.error("Failed to parse " + ATTRIBUTE_RULE_ID + " value", e1);
                     }
                 }
-                addEntryToLogString(id, logStr);
             }
-            if (!StringUtils.isBlank(ruleId) && !StringUtils.isBlank(ssoid) && NumberUtils.isNumber(ruleId)) {
+            if (!StringUtils.isBlank(ruleId) && NumberUtils.isNumber(ruleId)) {
                 ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance()
                         .getClientByContractId(NumberUtils.toLong(ruleId));
                 if (client != null) {
@@ -279,13 +279,15 @@ public class EMPProcessor {
                         "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
                         client.getMobile() + "], изменения будут применены");
                     for(Client cl : clients) {
-                        cl.setSsoid(ssoid);
+                        cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
                         DAOService.getInstance().saveEntity(cl);
                     }
                     /*log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId
                             + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile());
                     client.setSsoid(ssoid);
                     DAOService.getInstance().saveEntity(client);*/
+                } else {
+                    log(synchDate + "Полученное изменение из ЕМП не удалось связать (не найден клиент с л/c: "+ruleId+"): " + logStr.toString());
                 }
             } else {
                 log(synchDate + "Полученное изменение из ЕМП не удалось связать: " + logStr.toString());
@@ -357,7 +359,7 @@ public class EMPProcessor {
         Entry e = entries.get(0);
         boolean found = false;
         ///
-        String newSsoid = SSOID_REGISTERED_AND_WAITING_FOR_DATA;
+        String newSsoid = null;
         String newEmail = null;
         String newNotifyViaEmail = null;
         String newNotifyViaSMS = null;
@@ -380,10 +382,11 @@ public class EMPProcessor {
                 newNotifyViaPUSH = getString(client, attr);
             }
         }
+        if (newSsoid==null) newSsoid = SSOID_REGISTERED_AND_WAITING_FOR_DATA; // из ЕМП может прийти SSOID = null
 
         List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
         String idsList = getClientIdsAsString(clients);
-        log(synchDate + "С телефоном [SSOID: " + client.getMobile() + "] в ИС ПП найдено " + clients.size()
+        log(synchDate + "С телефоном [" + client.getMobile() + "] в ИС ПП найдено " + clients.size()
                 + " клиентов [" + idsList + "]. Для полученного списка клиентов будут обновлены параметры: {Email: " + newEmail
                 + "}, {SSOID: " + newSsoid + "}, {notifyViaEmail: " + newNotifyViaEmail + "}, {notifyViaSMS: "
                 + newNotifyViaSMS + "}, {notifyViaPUSH: " + newNotifyViaPUSH + "}");
@@ -441,7 +444,7 @@ public class EMPProcessor {
             List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             String newSsoid = String.format("E:[%s]", response.getErrorCode());
-            log(synchDate + "Произошла ошибка при попытке добавления клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
+            log(synchDate + "Произошла ошибка при попытке добавления клиента в ЕМП с телефоном [" + client.getMobile() +
                     "]: " + response.getErrorMessage() + ". Всем клиентам " + clients.size() + " [" + idsList +
                     "] будут обновлены следующие параметры: {SSOID: " + newSsoid + "}");
             for(Client cl : clients) {
