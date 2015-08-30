@@ -277,7 +277,7 @@ public class EMPProcessor {
                     String idsList = getClientIdsAsString(clients);
                     log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId +
                         "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
-                        client.getMobile() + "], изменения будут применены");
+                        client.getMobile() + "] сброшен SSOID для связки с каталогом");
                     for(Client cl : clients) {
                         cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
                         DAOService.getInstance().saveEntity(cl);
