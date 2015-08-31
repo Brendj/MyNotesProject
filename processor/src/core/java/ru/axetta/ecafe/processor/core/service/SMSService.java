@@ -268,4 +268,14 @@ public class SMSService {
     public static ClientSms getCreatedClientSms() {
         return createdClientSms.get();
     }
+
+    public Boolean isEmailSentByPlatform() {
+        ISmsService s = RuntimeContext.getInstance().getSmsService();
+        return s.emailDisabled();
+    }
+
+    public Boolean ignoreNotifyFlags() {
+        ISmsService s = RuntimeContext.getInstance().getSmsService();
+        return s.ignoreNotifyFlags();
+    }
 }

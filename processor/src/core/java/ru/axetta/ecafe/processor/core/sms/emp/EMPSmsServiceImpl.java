@@ -5,12 +5,9 @@
 package ru.axetta.ecafe.processor.core.sms.emp;
 
 import generated.emp_events.*;
-import generated.emp_storage.*;
-import ru.CryptoPro.JCP.tools.Array;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
@@ -18,29 +15,19 @@ import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.Element;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import java.io.FileWriter;
-import java.io.StringWriter;
-import java.math.BigInteger;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -317,5 +304,15 @@ public class EMPSmsServiceImpl extends ISmsService {
             logger.error("Failed to build request", e);
         }
         return sending;
+    }
+
+    @Override
+    public Boolean ignoreNotifyFlags() {
+        return true;
+    }
+
+    @Override
+    public Boolean emailDisabled() {
+        return true;
     }
 }

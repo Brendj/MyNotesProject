@@ -272,14 +272,12 @@ public class EventNotificationService {
     }
 
     public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
-        if (!client.isNotifyViaSMS() && !client.isNotifyViaEmail() && !client.isNotifyViaPUSH()) {
-            return;
-        }
+
         if (!isNotificationEnabled(client, type)) {
             return;
         }
         Boolean sms = null;
-        if (client.isNotifyViaSMS() || client.isNotifyViaPUSH()) {
+        if (smsService.ignoreNotifyFlags() || client.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
                 if(sendAsync != null) {
                     sms = sendSMS(client, type, values, sendAsync, passDirection, guardian);
@@ -289,7 +287,7 @@ public class EventNotificationService {
             }
         }
 
-        if (emailDisabled()) {
+        if (smsService.isEmailSentByPlatform()) {
             return;
         }
 
@@ -298,22 +296,19 @@ public class EventNotificationService {
             email = sendEmail(client, type, values);
         }
 
-        if(sms != null || email != null) {
-            if((sms != null && !sms) && (email != null && !email)) {
-                throw new RuntimeException("Failed to send notification via sms and email");
-            }
-            if(sms != null && !sms) {
-                throw new RuntimeException("Failed to send notification via sms");
-            }
-            if(email != null && !email) {
-                throw new RuntimeException("Failed to send notification via email");
+        if (!(client.getMobile() == null || client.getMobile().length() == 0) && smsService.ignoreNotifyFlags()) {
+            if (sms != null || email != null) {
+                if ((sms != null && !sms) && (email != null && !email)) {
+                    throw new RuntimeException("Failed to send notification via sms and email");
+                }
+                if (sms != null && !sms) {
+                    throw new RuntimeException("Failed to send notification via sms");
+                }
+                if (email != null && !email) {
+                    throw new RuntimeException("Failed to send notification via email");
+                }
             }
         }
-    }
-
-    public Boolean emailDisabled(){
-        ISmsService emp = RuntimeContext.getInstance().getSmsService();
-        return emp instanceof EMPSmsServiceImpl;
     }
 
     public boolean isNotificationEnabled(Client client, String type) {
