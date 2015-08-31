@@ -32,6 +32,8 @@ public interface EMPEventType {
 
     public void parse(Client client, Map<String, Object> additionalParams);
 
+    public void parse(Client child, Client guardian, Map<String, Object> additionalParams);
+
     public String getSsoid();
 
     public Long getMsisdn();

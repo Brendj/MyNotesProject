@@ -66,7 +66,7 @@ public class SupportSMSPage extends BasicWorkspacePage {
                 values = EventNotificationService.attachTargetIdToValues(1L, values);
 
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                        sendSMS(client, EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, true,
+                        sendSMS(client, null, EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, true,
                                 EnterEvent.ENTRY, client);
             } else {
                 String phone = client.getMobile();

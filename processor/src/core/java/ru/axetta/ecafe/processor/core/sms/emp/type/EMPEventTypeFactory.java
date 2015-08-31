@@ -28,7 +28,23 @@ public class EMPEventTypeFactory {
         return buildEvent(type, client, Collections.EMPTY_MAP);
     }
 
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian) {
+        return buildEvent(type, child, guardian, Collections.EMPTY_MAP);
+    }
+
     public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams) {
+        EMPEventType event = getEmpEventType(type);
+        event.parse(client, additionalParams);
+        return event;
+    }
+
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams) {
+        EMPEventType event = getEmpEventType(type);
+        event.parse(child, guardian, additionalParams);
+        return event;
+    }
+
+    private static EMPEventType getEmpEventType(int type) {
         EMPEventType event;
         switch (type) {
             case ENTER_EVENT:
@@ -52,8 +68,8 @@ public class EMPEventTypeFactory {
             default:
                 throw new IllegalArgumentException("Unknown type");
         }
-        event.parse(client, additionalParams);
         event.setTime(System.currentTimeMillis());
         return event;
     }
+
 }

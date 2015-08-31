@@ -32,4 +32,11 @@ public class EMPTokenGenerateEventType extends EMPAbstractEventType {
 
         Map<String, String> params = getParameters();
     }
+
+    @Override
+    public void parse(Client child, Client guardian, Map<String, Object> additionalParams) {
+        parseChildAndGuardianInfo(child, guardian);
+
+        Map<String, String> params = getParameters();
+    }
 }

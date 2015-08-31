@@ -239,23 +239,23 @@ public class EventNotificationService {
     }
 
     @Async
-    public void sendNotificationAsync(Client client, String type, String[] values) {
-        sendNotification(client, type, values);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values) {
+        sendNotification(destClient, dataClient, type, values);
     }
 
     @Async
-    public void sendNotificationAsync(Client client, String type, String[] values, Client guardian) {
-        sendNotification(client, type, values, null, guardian);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Client guardian) {
+        sendNotification(destClient, dataClient, type, values, null, guardian);
     }
 
     @Async
-    public void sendNotificationAsync(Client client, String type, String[] values, Integer passDirection) {
-        sendNotification(client, type, values, passDirection, null);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection) {
+        sendNotification(destClient, dataClient, type, values, passDirection, null);
     }
 
     @Async
-    public void sendNotificationAsync(Client client, String type, String[] values, Integer passDirection, Client guardian) {
-        sendNotification(client, type, values, passDirection, guardian);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian) {
+        sendNotification(destClient, dataClient, type, values, passDirection, guardian);
     }
 
     @Async
@@ -263,26 +263,26 @@ public class EventNotificationService {
         sendMessage(client, type, values);
     }
 
-    public void sendNotification(Client client, String type, String[] values) {
-        sendNotification(client, type, values, null, null);
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values) {
+        sendNotification(destClient, dataClient, type, values, null, null);
     }
 
-    public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian) {
-        sendNotification(client, type, values, passDirection, guardian, null);
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian) {
+        sendNotification(destClient, dataClient, type, values, passDirection, guardian, null);
     }
 
-    public void sendNotification(Client client, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
 
-        if (!isNotificationEnabled(client, type)) {
+        if (!isNotificationEnabled(destClient, type)) {
             return;
         }
         Boolean sms = null;
-        if (smsService.ignoreNotifyFlags() || client.isNotifyViaSMS()) {
+        if (smsService.ignoreNotifyFlags() || destClient.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
                 if(sendAsync != null) {
-                    sms = sendSMS(client, type, values, sendAsync, passDirection, guardian);
+                    sms = sendSMS(destClient, dataClient, type, values, sendAsync, passDirection, guardian);
                 } else {
-                    sms = sendSMS(client, type, values, passDirection, guardian);
+                    sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian);
                 }
             }
         }
@@ -292,11 +292,11 @@ public class EventNotificationService {
         }
 
         Boolean email = null;
-        if (client.isNotifyViaEmail()) {
-            email = sendEmail(client, type, values);
+        if (destClient.isNotifyViaEmail()) {
+            email = sendEmail(destClient, type, values);
         }
 
-        if (!(client.getMobile() == null || client.getMobile().length() == 0) && smsService.ignoreNotifyFlags()) {
+        if (!(destClient.getMobile() == null || destClient.getMobile().length() == 0) && smsService.ignoreNotifyFlags()) {
             if (sms != null || email != null) {
                 if ((sms != null && !sms) && (email != null && !email)) {
                     throw new RuntimeException("Failed to send notification via sms and email");
@@ -357,7 +357,7 @@ public class EventNotificationService {
     public boolean sendMessage(Client client, String type, String[] values) {
         boolean bSend = false;
         if (client.hasMobile()) {
-            bSend |= sendSMS(client, type, values);
+            bSend |= sendSMS(client, null, type, values);
         }
 
         ISmsService smsService = RuntimeContext.getInstance().getSmsService();
@@ -368,32 +368,32 @@ public class EventNotificationService {
         return bSend;
     }
 
-    public boolean sendSMS(Client client, String type, String[] values) {
-        return sendSMS(client, type, values, true);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values) {
+        return sendSMS(destClient, dataClient, type, values, true);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, Client guardian) {
-        return sendSMS(client, type, values, true, null, guardian);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Client guardian) {
+        return sendSMS(destClient, dataClient, type, values, true, null, guardian);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, Integer passDirection) {
-        return sendSMS(client, type, values, true, passDirection);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer passDirection) {
+        return sendSMS(destClient, dataClient, type, values, true, passDirection);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync) {
-        return sendSMS(client, type, values, sendAsync, null);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync) {
+        return sendSMS(destClient, dataClient, type, values, sendAsync, null);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync, Integer direction) {
-        return sendSMS(client, type, values, sendAsync, direction, null);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction) {
+        return sendSMS(destClient, destClient, type, values, sendAsync, direction, null);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, Integer direction, Client guardian) {
-        return sendSMS(client, type, values, true, direction, null);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer direction, Client guardian) {
+        return sendSMS(destClient, dataClient, type, values, true, direction, null);
     }
 
-    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync, Integer direction, Client guardian) {
-        if (client.getMobile() == null || client.getMobile().length() == 0) {
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian) {
+        if (destClient.getMobile() == null || destClient.getMobile().length() == 0) {
             return false;
         }
         String text = getNotificationText(type, TYPE_SMS);
@@ -430,18 +430,18 @@ public class EventNotificationService {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
 
-            Object textObject = getTextObject(text, type, client, direction, guardian, values);
+            Object textObject = getTextObject(text, type, destClient, dataClient, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
-                    smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
+                    smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                     result = true;
                 } else {
                     //result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
-                    result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
+                    result = smsService.sendSMS(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
                 }
             }
         } catch (Exception e) {
-            String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
+            String message = String.format("Failed to send SMS notification to client with contract_id = %s.", destClient.getContractId());
             logger.error(message, e);
             return false;
         }
@@ -518,19 +518,27 @@ public class EventNotificationService {
         return Integer.parseInt(id);
     }
 
-    private Object getTextObject(String text, String type, Client client, Integer direction, Client guardian, String[] values) {
+    private Object getTextObject(String text, String type, Client destClient, Client dataClient, Integer direction, Client guardianClient, String[] values) {
         ISmsService smsService = runtimeContext.getSmsService();
         if(smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
             if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, client);
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, destClient);
+                }
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, client);
-                putGuardianParams(guardian, empType);
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, destClient);
+                }
+                putGuardianParams(guardianClient, empType);
             } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, client);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, destClient);
                 String amount = findValueInParams(new String [] {"paySum"}, values);
                 String balance = findValueInParams(new String [] {"balance"}, values);
                 if(amount != null && amount.length() > 0) {
@@ -541,13 +549,13 @@ public class EventNotificationService {
                 }
             } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, client);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient);
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, client);
-                putGuardianParams(guardian, empType);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient);
+                putGuardianParams(guardianClient, empType);
             } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, client);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient);
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
                 empType.getParameters().put("token", token);
             }

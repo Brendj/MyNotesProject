@@ -144,6 +144,37 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("balance", balance.toString());
     }
 
+    protected void parseChildAndGuardianInfo(Client child, Client guardian) {
+        ssoid = guardian.getSsoid();
+        if(!StringUtils.isBlank(guardian.getMobile()) && NumberUtils.isNumber(guardian.getMobile())) {
+            msisdn = NumberUtils.toLong(guardian.getMobile().replaceAll("-", ""));
+        }
+        Person person = null;
+        try {
+            person = child.getPerson();
+            if(person.getFirstName() == null) {
+                person = null;
+            }
+        } catch (Exception e) {
+            person = null;
+        }
+        if(person == null) {
+            person = DAOService.getInstance().getPersonByClient(child);
+        }
+        Map<String, String> params = getParameters();
+        params.put("time", TIME_FORMAT.format(new Date(System.currentTimeMillis())));
+        params.put("account", "" + child.getContractId());
+        params.put("surname", person.getSurname());
+        params.put("name", person.getFirstName());
+        BigDecimal balance = null;
+        if(child.getBalance() == null || child.getBalance().longValue() == 0L) {
+            balance = new BigDecimal(0D).setScale(2);
+        } else {
+            balance = new BigDecimal(Math.ceil((double) child.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
+        }
+        params.put("balance", balance.toString());
+    }
+
     @Override
     public String toString() {
         return buildText();

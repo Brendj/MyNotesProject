@@ -330,7 +330,7 @@ public class FinancialOpsManager {
                 "empTime", empTime
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
-        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
     }
 
     private void registerSubBalance1ClientPayment(Session session,
@@ -356,7 +356,7 @@ public class FinancialOpsManager {
                 "empTime", empTime
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
-        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
     }
 
 

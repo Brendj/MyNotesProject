@@ -119,7 +119,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         values = EventNotificationService.attachTargetIdToValues(1L, values);
 
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
-                sendSMS(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values); //DEF
+                sendSMS(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 

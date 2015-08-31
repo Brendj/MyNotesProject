@@ -2185,13 +2185,13 @@ public class Processor implements SyncProcessor,
                 persistenceTransaction = null;
 
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
-                /* в случее если ананимного зака мы не знаем клиента */
+                /* в случее если анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировачных заказов */
                 if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,values);
+                            .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values);
                 }
             } else {
                 // TODO: есть ли необходимость оповещать клиента о сторне?
@@ -3396,10 +3396,10 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     }
                 } else {
                     // find client by id
-                    Client client = null;
+                    Client clientFromEnterEvent = null;
                     if (idOfClient != null) {
-                        client = (Client) persistenceSession.get(Client.class, idOfClient);
-                        if (client == null) {
+                        clientFromEnterEvent = (Client) persistenceSession.get(Client.class, idOfClient);
+                        if (clientFromEnterEvent == null) {
                             SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                     e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
                                     String.format("Client not found: %d", idOfClient));
@@ -3416,7 +3416,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     enterEvent.setPassDirection(e.getPassDirection());
                     enterEvent.setEventCode(e.getEventCode());
                     enterEvent.setIdOfCard(e.getIdOfCard());
-                    enterEvent.setClient(client);
+                    enterEvent.setClient(clientFromEnterEvent);
                     enterEvent.setIdOfTempCard(e.getIdOfTempCard());
                     enterEvent.setEvtDateTime(e.getEvtDateTime());
                     enterEvent.setIdOfVisitor(e.getIdOfVisitor());
@@ -3446,7 +3446,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                 .getBean(EventNotificationService.class);
                         //final String[] values = generateNotificationParams(persistenceSession, client,
                         //        e.getPassDirection(), e.getEvtDateTime(), guardianId);
-                        String[] values = generateNotificationParams(persistenceSession, client, e);
+                        String[] values = generateNotificationParams(persistenceSession, clientFromEnterEvent, e);
                         values = EventNotificationService.attachTargetIdToValues(e.getIdOfEnterEvent(), values);
                         switch (org.getType()){
                             case PROFESSIONAL:
@@ -3455,39 +3455,39 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
 
                                 if (guardianId != null) {
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
-                                    Client guardian = DAOService.getInstance().findClientById(guardianId);
+                                    Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
 
                                     if(!(guardians==null || guardians.isEmpty())){
-                                        for (Client cl: guardians){
-                                            if(guardians.size() > 1 && cl.getIdOfClient().equals(guardian.getIdOfClient())) {
+                                        for (Client destGuardian : guardians){
+                                            if(guardians.size() > 1 && destGuardian.getIdOfClient().equals(
+                                                    guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            notificationService.sendNotificationAsync(cl,
-                                                    EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
+                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), guardianFromEnterEvent);
                                         }
                                     }
                                 }
 
-                                notificationService.sendNotificationAsync(client,
-                                        EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
+                                notificationService.sendNotificationAsync(clientFromEnterEvent, null, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                             } break;
                             case KINDERGARTEN: {
                                 if(guardianId!=null){
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);//guardianId);
-                                    Client guardian = DAOService.getInstance().findClientById(guardianId);
-                                    values = EventNotificationService.attachGuardianIdToValues(guardian.getIdOfClient(), values);
+                                    Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
+                                    values = EventNotificationService.attachGuardianIdToValues(guardianFromEnterEvent.getIdOfClient(), values);
                                     values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
                                     if(!(guardians==null || guardians.isEmpty())){
-                                        for (Client cl: guardians){
-                                            if(guardians.size() > 1 && cl.getIdOfClient().equals(guardian.getIdOfClient())) {
+                                        for (Client destGuardian : guardians){
+                                            if(guardians.size() > 1 && destGuardian.getIdOfClient().equals(
+                                                    guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            notificationService.sendNotificationAsync(cl,
-                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), cl);
+                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent);
                                         }
                                     } else {
-                                        notificationService.sendNotificationAsync(client,
-                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardian);
+                                        notificationService.sendNotificationAsync(clientFromEnterEvent, null,
+                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent);
                                     }
                                 }
                             } break;
@@ -3530,8 +3530,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                         OGRN /*org.getOGRN()*/, TransactionJournal.SERVICE_CODE_SCHL_ACC, transCode,
                                         TransactionJournal.CARD_TYPE_CODE_UEC,
                                         TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()],
-                                        Long.toHexString(card.getCardNo()), client.getSan(), client.getContractId(),
-                                        client.getClientGroupTypeAsString(), e.getEnterName());
+                                        Long.toHexString(card.getCardNo()), clientFromEnterEvent.getSan(), clientFromEnterEvent.getContractId(),
+                                        clientFromEnterEvent.getClientGroupTypeAsString(), e.getEnterName());
                                 persistenceSession.save(transactionJournal);
                             }
                         }

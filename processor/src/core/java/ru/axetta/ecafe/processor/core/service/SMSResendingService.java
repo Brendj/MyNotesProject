@@ -100,7 +100,7 @@ public class SMSResendingService {
 
         boolean success = false;
         try {
-            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotification(cl, evtType, params, direction, guardian, false);
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotification(cl, null, evtType, params, direction, guardian, false);
             success = true;
         } catch (RuntimeException re) {
             success = false;

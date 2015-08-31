@@ -90,7 +90,7 @@ public class SubscriptionFeedingService {
             Client client = (Client) obj;
             final String contractId = String.valueOf(client.getContractId());
             String[] values = new String[]{"contractId", contractId};
-            enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, values);
+            enService.sendNotification(client, null, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, values);
         }
     }
 
@@ -156,7 +156,7 @@ public class SubscriptionFeedingService {
                 }
             }
             if(values!=null){
-                enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
+                enService.sendNotification(client, null, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
             }
         }
     }
