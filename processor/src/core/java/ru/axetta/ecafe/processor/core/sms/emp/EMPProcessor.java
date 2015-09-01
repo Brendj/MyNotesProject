@@ -187,6 +187,7 @@ public class EMPProcessor {
         //saveEMPStatistics(statistics);
     }
 
+    final String[] UPDATE_ATTRS=new String[]{ATTRIBUTE_SSOID_NAME, ATTRIBUTE_EMAIL_NAME, ATTRIBUTE_EMAIL_SEND, ATTRIBUTE_SMS_SEND, ATTRIBUTE_PUSH_SEND};
     public void runReceiveUpdates() throws EMPException {
         if (!isAllowed()) {
             return;
@@ -223,20 +224,33 @@ public class EMPProcessor {
         for (ReceiveDataChangesResponse.Result.Entry e : entries) {
             List<ReceiveDataChangesResponse.Result.Entry.Attribute> attributes = e.getAttribute();
             List<ReceiveDataChangesResponse.Result.Entry.Identifier> identifiers = e.getIdentifier();
-            String ssoid = "";
             String ruleId = "";
             StringBuilder logStr = new StringBuilder();
+            ////
+            String newSsoid = "";
+            String newEmail = null;
+            String newNotifyViaEmail = null;
+            String newNotifyViaSMS = null;
+            String newNotifyViaPUSH = null;
+            ////
             for (ReceiveDataChangesResponse.Result.Entry.Attribute attr : attributes) {
-                if (!StringUtils.isBlank(attr.getName()) &&
-                        attr.getName().equals(ATTRIBUTE_SSOID_NAME) &&
-                        attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
-                    try {
-                        ssoid = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
-                    } catch (Exception e1) {
-                        logger.error("Failed to parse " + ATTRIBUTE_SSOID_NAME + " value", e1);
+                for (String attrName : UPDATE_ATTRS) {
+                    if (!StringUtils.isBlank(attr.getName()) &&
+                            attr.getName().equals(attrName) &&
+                            attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                        try {
+                            String v = ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+                            if (attrName.equals(ATTRIBUTE_SSOID_NAME)) newSsoid = v;
+                            else if (attrName.equals(ATTRIBUTE_EMAIL_NAME)) newEmail = v;
+                            else if (attrName.equals(ATTRIBUTE_EMAIL_SEND)) newNotifyViaEmail = v;
+                            else if (attrName.equals(ATTRIBUTE_SMS_SEND)) newNotifyViaSMS = v;
+                            else if (attrName.equals(ATTRIBUTE_PUSH_SEND)) newNotifyViaPUSH = v;
+                        } catch (Exception e1) {
+                            logger.error("Failed to parse " + attrName + " value", e1);
+                        }
                     }
-                }
 
+                }
                 //  logging
                 addEntryToLogString(attr, logStr);
             }
@@ -275,11 +289,16 @@ public class EMPProcessor {
                     }
                     List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
                     String idsList = getClientIdsAsString(clients);
-                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId +
+                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + newSsoid + "}, {№ Контракта: " + ruleId +
                         "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
-                        client.getMobile() + "] сброшен SSOID для связки с каталогом");
-                    for(Client cl : clients) {
-                        cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
+                        client.getMobile() + "] применяются изменения: "+logStr.toString());
+                    for (Client cl : clients) {
+                        //cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
+                        if (newSsoid!=null) cl.setSsoid(newSsoid);
+                        if (newEmail!=null) cl.setEmail(newEmail);
+                        if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
+                        if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
+                        if (newNotifyViaPUSH!=null) cl.setNotifyViaPUSH(newNotifyViaPUSH.equalsIgnoreCase("true"));
                         DAOService.getInstance().saveEntity(cl);
                     }
                     /*log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId
@@ -393,9 +412,9 @@ public class EMPProcessor {
         for(Client cl : clients) {
             cl.setSsoid(newSsoid);
             cl.setEmail(newEmail);
-            cl.setNotifyViaEmail(newNotifyViaEmail.equals("true") ? true : false);
-            cl.setNotifyViaSMS(newNotifyViaSMS.equals("true") ? true : false);
-            cl.setNotifyViaPUSH(newNotifyViaPUSH.equals("true") ? true : false);
+            if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
+            if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
+            if (newNotifyViaPUSH!=null) cl.setNotifyViaPUSH(newNotifyViaPUSH.equalsIgnoreCase("true"));
             DAOService.getInstance().saveEntity(cl);
         }
         /*log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile()
