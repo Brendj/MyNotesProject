@@ -155,16 +155,22 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
             for (StClass stClass : stClassList) {
-                mapKeyModelList.add(new MapKeyModel(stClass.getDataList().get(0).getF04(), stClass.getDataList().get(0).getF01()));
-                for (int i = 1; i < stClass.getDataList().size(); i++) {
-                    MapKeyModel mapKeyModel = new MapKeyModel(stClass.getDataList().get(i).getF04(), stClass.getDataList().get(i).getF01());
-                    if (uniqueMapKeyModel(mapKeyModelList, mapKeyModel)) {
-                        mapKeyModelList.add(mapKeyModel);
+                if (stClass.getDataList() == null || stClass.getDataList().size() == 0) {
+                    logger.error("stClass.getDataList().size() = ", stClass.getDataList().size());
+                } else {
+                    mapKeyModelList.add(new MapKeyModel(stClass.getDataList().get(0).getF04(),
+                            stClass.getDataList().get(0).getF01()));
+                    for (int i = 1; i < stClass.getDataList().size(); i++) {
+                        MapKeyModel mapKeyModel = new MapKeyModel(stClass.getDataList().get(i).getF04(),
+                                stClass.getDataList().get(i).getF01());
+                        if (uniqueMapKeyModel(mapKeyModelList, mapKeyModel)) {
+                            mapKeyModelList.add(mapKeyModel);
+                        }
                     }
-                }
 
-                for (MapKeyModel model: mapKeyModelList) {
-                    usersEntrySummaryMap.put(model, 0L);
+                    for (MapKeyModel model : mapKeyModelList) {
+                        usersEntrySummaryMap.put(model, 0L);
+                    }
                 }
             }
 
