@@ -35,7 +35,7 @@
     <bean id="smsSendingTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
         <property name="corePoolSize" value="15"/>
         <property name="maxPoolSize" value="50"/>
-        <property name="queueCapacity" value="1000"/>
+        <property name="queueCapacity" value="10000"/>
     </bean>
 
     <!--    <jee:jndi-lookup id="dataSource" jndi-name="java:jboss/PostgresDS"/>-->
@@ -62,7 +62,7 @@
     <task:annotation-driven executor="executorWithPoolSizeRange"/>
     <task:executor id="executorWithPoolSizeRange"
                    pool-size="5-100"
-                   queue-capacity="1000"
+                   queue-capacity="10000"
                    keep-alive="120"/>
     <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
     <tx:annotation-driven transaction-manager="txManagerReports" proxy-target-class="true"/>

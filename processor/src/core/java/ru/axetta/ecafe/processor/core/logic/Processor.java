@@ -2291,7 +2291,7 @@ public class Processor implements SyncProcessor,
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if(syncHistory!=null) {
@@ -2308,7 +2308,8 @@ public class Processor implements SyncProcessor,
     }
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
-            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds) throws Exception {
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg)
+            throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -2318,7 +2319,9 @@ public class Processor implements SyncProcessor,
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 errorClientIds.add(client.getIdOfClient());
-                throw new IllegalArgumentException("Client from another organization");
+                throw new IllegalArgumentException("Client from another organization. idOfClient=" +
+                        client.getIdOfClient().toString() + ", idOfOrg=" + idOfOrg.toString() + ", clientParamItem=" +
+                        clientParamItem.toString());
             }
             /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
                 throw new IllegalArgumentException("Client from another organization");
@@ -3453,20 +3456,21 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             case SCHOOL: {
                                 values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
 
-                                if (guardianId != null) {
+                                //if (guardianId != null) {
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
-                                    Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
+                                    //Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
 
                                     if(!(guardians==null || guardians.isEmpty())){
                                         for (Client destGuardian : guardians){
-                                            if(guardians.size() > 1 && destGuardian.getIdOfClient().equals(
+                                            /*if(guardians.size() > 1 && destGuardian.getIdOfClient().equals(
                                                     guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), guardianFromEnterEvent);
+                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), guardianFromEnterEvent);*/
+                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), null);
                                         }
                                     }
-                                }
+                                //}
 
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
                             } break;

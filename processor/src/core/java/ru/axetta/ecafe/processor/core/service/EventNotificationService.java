@@ -385,11 +385,11 @@ public class EventNotificationService {
     }
 
     public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction) {
-        return sendSMS(destClient, destClient, type, values, sendAsync, direction, null);
+        return sendSMS(destClient, dataClient, type, values, sendAsync, direction, null);
     }
 
     public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer direction, Client guardian) {
-        return sendSMS(destClient, dataClient, type, values, true, direction, null);
+        return sendSMS(destClient, dataClient, type, values, true, direction, guardian);
     }
 
     public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian) {
