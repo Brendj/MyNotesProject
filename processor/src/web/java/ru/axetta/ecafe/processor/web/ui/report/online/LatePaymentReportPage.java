@@ -4,15 +4,20 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
+import ru.axetta.ecafe.processor.core.persistence.utils.LatePaymentReportService;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.finansional.settings.LatePaymentByOneDayCountTypeMenu;
 import ru.axetta.ecafe.processor.web.ui.finansional.settings.LatePaymentDaysCountTypeMenu;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,6 +154,25 @@ public class LatePaymentReportPage extends OnlineReportWithContragentPage {
 
     // Генерировать отчет
     public Object buildReportHTML() {
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            LatePaymentReportService.getCountOfBeneficiariesByOrg(session, 99L);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            getLogger().error("Filed build DetailedPaymentWithoutCorpsJasperReport", e);
+            printError("Ошибка при построении отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(session, getLogger());
+        }
+
         return null;
     }
 
