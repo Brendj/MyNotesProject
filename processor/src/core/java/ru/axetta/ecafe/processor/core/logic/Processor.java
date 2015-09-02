@@ -564,13 +564,13 @@ public class Processor implements SyncProcessor,
         if (isReplaceOrg) {
             Set<Card> cards = client.getCards();
             for (Card card : cards) {
-                if (card.getState().equals(CardState.BLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
+                if (card.getState().equals(CardState.TEMPBLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
                     continue;
                 }
                 updateCard(client.getIdOfClient(),
                         card.getIdOfCard(),
                         card.getCardType(),
-                        CardState.BLOCKED.getValue(), //статус = Заблокировано
+                        CardState.TEMPBLOCKED.getValue(), //статус = Заблокировано
                         card.getValidTime(),
                         card.getLifeState(),
                         card.getLockReason(),
@@ -1459,7 +1459,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            accountsRegistry= new AccountsRegistryHandler().accRegisgtryUpdateHandler(request);
+            accountsRegistry= new AccountsRegistryHandler().accRegistryUpdateHandler(request);
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
@@ -3798,7 +3798,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     private static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {
-                card.setState(CardState.BLOCKED.getValue());
+                card.setState(CardState.TEMPBLOCKED.getValue());
                 card.setLockReason("Выпуск новой карты");
                 persistenceSession.update(card);
             }

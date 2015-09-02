@@ -95,7 +95,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             List<TypesOfCardReportItem> result = new ArrayList<TypesOfCardReportItem>();
 
             int ac = Card.ACTIVE_STATE; // активная карта
-            int lc = CardState.BLOCKED.getValue(); // заблокированная карта
+            int lc = CardState.TEMPBLOCKED.getValue(); // заблокированная карта
 
             TypesOfCardService service = new TypesOfCardService();
             service.setSession(session);

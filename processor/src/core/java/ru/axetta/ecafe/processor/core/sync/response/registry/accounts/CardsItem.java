@@ -79,7 +79,7 @@ public class CardsItem {
         this.lockReason = card.getLockReason();
         this.validDate = card.getValidTime();
         this.issueDate = card.getIssueTime();
-        isTemp = (card.getState() == CardState.ISSUEDTEMP.getValue());
+        isTemp = (card.getState() == CardState.TEMPISSUED.getValue());
         this.printedNo = card.getCardPrintedNo();
     }
 

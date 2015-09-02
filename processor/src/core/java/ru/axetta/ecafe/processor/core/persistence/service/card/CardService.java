@@ -140,7 +140,7 @@ public class CardService {
         return cardWritableRepository.block(cardNo, idOfOrg);
     }
 
-    public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
+    public ResCardsOperationsRegistryItem tempblock(CardsOperationsRegistryItem o, long idOfOrg) {
         return cardUpdateResult(o, block(o.getCardNo(), idOfOrg));
     }
 
@@ -150,15 +150,15 @@ public class CardService {
         return cardWritableRepository.blockAndReset(cardNo, idOfOrg);
     }
 
-    public ResCardsOperationsRegistryItem blockAndReset(CardsOperationsRegistryItem o, long idOfOrg) {
+    public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg) {
         return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg));
     }
     //8.	Разблокировка карты
     public void unblock(Card card, CardsOperationsRegistryItem o){
-        if(CardState.BLOCKED.getValue() == card.getState()){
+        if(CardState.TEMPBLOCKED.getValue() == card.getState()){
             if (card.getClient()!= null){
                 if(o.getTemp() != null && o.getTemp() ){
-                    card.setState(CardState.ISSUEDTEMP.getValue());
+                    card.setState(CardState.TEMPISSUED.getValue());
                 }else{
                     card.setState(CardState.ISSUED.getValue());
                 }
@@ -170,7 +170,7 @@ public class CardService {
             if(card.getClient() != null){
                 updateClient(card.getClient());
             }
-        }else if (CardState.BLOCKEDANDRESET.getValue() == card.getState()){
+        }else if (CardState.BLOCKED.getValue() == card.getState()){
             reset(o, card.getOrg().getIdOfOrg());
         }
     }

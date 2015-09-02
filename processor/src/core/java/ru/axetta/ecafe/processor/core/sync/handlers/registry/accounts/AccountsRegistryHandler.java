@@ -38,7 +38,6 @@ public class AccountsRegistryHandler {
 
     @Transactional
     public AccountsRegistry handlerFull(SyncRequest request,long idOfOrg) {
-        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
@@ -67,7 +66,6 @@ public class AccountsRegistryHandler {
 
 
     public AccountsRegistry accRegistryHandler(SyncRequest request,long idOfOrg) {
-        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }
@@ -104,8 +102,7 @@ public class AccountsRegistryHandler {
     }
 
 
-    public AccountsRegistry accRegisgtryUpdateHandler(SyncRequest request) {
-        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(request.getIdOfOrg());
+    public AccountsRegistry accRegistryUpdateHandler(SyncRequest request) {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
         }

@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
@@ -63,10 +62,10 @@ public class CardWritableRepository extends WritableJpaDao {
         entityManager.merge(card);
     }
 
-    public void resetAllWithStateBlockAndResetInOrg(long idOfOrg) {
+    /*public void resetAllWithStateBlockAndResetInOrg(long idOfOrg) {
         List<Card> resultList = entityManager.createQuery("from Card c where c.org.idOfOrg = :idOfOrg and c.state=:state")
                 .setParameter("idOfOrg", idOfOrg)
-                .setParameter("state", CardState.BLOCKEDANDRESET.getValue())
+                .setParameter("state", CardState.BLOCKED.getValue())
                 .getResultList();
         ClientWritableRepository clientWritableRepository = null;
         if(resultList.size() > 0){
@@ -82,14 +81,14 @@ public class CardWritableRepository extends WritableJpaDao {
             card.setUpdateTime(new Date());
             //clientWritableRepository.update(client);
         }
-    }
+    }*/
 
     public int block(long cardNo, long idOfOrg) {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " updateTime = :updateTime "
                 + " where cardNo = :cardNo")
-                .setParameter("state", CardState.BLOCKED.getValue())
+                .setParameter("state", CardState.TEMPBLOCKED.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .executeUpdate();
@@ -98,13 +97,12 @@ public class CardWritableRepository extends WritableJpaDao {
     public int blockAndReset(long cardNo, long idOfOrg) {
 
         return entityManager.createQuery("update Card set "
-                + " client = null, "
                 + " state = :state, "
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime "
                 + " where cardNo = :cardNo")
-                .setParameter("state", CardState.BLOCKEDANDRESET.getValue())
+                .setParameter("state", CardState.BLOCKED.getValue())
                 .setParameter("validTime", new Date())
                 .setParameter("issueTime", new Date())
                 .setParameter("updateTime", new Date())
@@ -176,7 +174,7 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " updateTime = :updateTime, "
                 + " visitor = null "
                 + " where cardNo = :cardNo")
-                .setParameter("state", CardState.ISSUEDTEMP.getValue())
+                .setParameter("state", CardState.TEMPISSUED.getValue())
                 .setParameter("client", client)
                 .setParameter("validTime", o.getValidDate())
                 .setParameter("issueTime", o.getOperationDate())

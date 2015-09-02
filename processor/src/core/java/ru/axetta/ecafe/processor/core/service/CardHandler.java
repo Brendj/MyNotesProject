@@ -45,7 +45,7 @@
 //    //3. Выдача новой активной карты клиенту взамен старой
 //    public void issueToClientInsteadOld(Client client, Card newCard){
 //        for(Card card : client.getCards()){
-//            cardService.blockAndReset(card);
+//            cardService.block(card);
 //            //cardService.unblock(card);
 //        }
 //
@@ -55,7 +55,7 @@
 //    //4. Выдача новой временно-активной карты клиенту с блокировкой основной карты.
 //    public void issueToClientWithBlockingPrev(Client client, Card newCard){
 //        for(Card card : client.getCards()){
-//            cardService.block(card);
+//            cardService.tempblock(card);
 //        }
 //        cardService.issueToClientTemp(newCard, client);
 //
@@ -86,7 +86,7 @@
 //
 //    }
 //    //11.  Блокировка карты
-//    public void block(){
+//    public void tempblock(){
 //
 //    }
 //

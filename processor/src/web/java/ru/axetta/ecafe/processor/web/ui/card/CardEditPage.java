@@ -177,8 +177,8 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public void updateCard(Session session, Long idOfCard) throws Exception {
         checkCardStateOnUpdate();
-        if(state == CardState.BLOCKED.getValue()){
-            state = CardState.BLOCKEDANDRESET.getValue();
+        if(state == CardState.TEMPBLOCKED.getValue()){
+            state = CardState.BLOCKED.getValue();
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (externalId!=null && externalId.length()==0) externalId=null;
@@ -208,7 +208,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         this.cardPrintedNo = card.getCardPrintedNo();
         this.externalId = card.getExternalId();
 
-        if (state == CardState.ISSUEDTEMP.getValue()) {
+        if (state == CardState.TEMPISSUED.getValue()) {
             cardStateMenu.prepareItemForTempCard();
         }else {
             cardStateMenu.getItems().clear();
@@ -218,8 +218,8 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     private void checkCardStateOnUpdate(){
         if( (CardState.ISSUED.getValue()!=state)
-                &&(CardState.BLOCKED.getValue() != state)
-                &&(CardState.ISSUEDTEMP.getValue() != state)){
+                &&(CardState.TEMPBLOCKED.getValue() != state)
+                &&(CardState.TEMPISSUED.getValue() != state)){
             throw new IllegalStateException("Требуется изменить статус карты");
         }
     }
@@ -239,6 +239,6 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     }
 
     public boolean isTempCard(){
-        return state == CardState.ISSUEDTEMP.getValue();
+        return state == CardState.TEMPISSUED.getValue();
     }
 }

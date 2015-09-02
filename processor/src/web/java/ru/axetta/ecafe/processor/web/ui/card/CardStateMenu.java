@@ -28,15 +28,15 @@ public class CardStateMenu {
         //}
         List<SelectItem> items = new LinkedList<SelectItem>();
 
-        SelectItem item =  new SelectItem(CardState.BLOCKED.getValue(),CardState.BLOCKED.getDescription());
+        SelectItem item =  new SelectItem(CardState.TEMPBLOCKED.getValue(),CardState.TEMPBLOCKED.getDescription());
         items.add(item);
         item = new SelectItem(CardState.ISSUED.getValue(),CardState.ISSUED.getDescription());
         items.add(item);
 
-        item = new SelectItem(CardState.ISSUEDTEMP.getValue(),CardState.ISSUEDTEMP.getDescription());
+        item = new SelectItem(CardState.TEMPISSUED.getValue(),CardState.TEMPISSUED.getDescription());
         item.setDisabled(true);
         items.add(item);
-        item = new SelectItem(CardState.BLOCKEDANDRESET.getValue(),CardState.BLOCKEDANDRESET.getDescription());
+        item = new SelectItem(CardState.BLOCKED.getValue(),CardState.BLOCKED.getDescription());
         item.setDisabled(true);
         items.add(item);
         item = new SelectItem(CardState.FREE.getValue(),CardState.FREE.getDescription());

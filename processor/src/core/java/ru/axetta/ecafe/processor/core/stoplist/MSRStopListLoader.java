@@ -220,7 +220,7 @@ public class MSRStopListLoader {
                         card.getCurrentState().trim().equals("21") ||
                         card.getCurrentState().trim().equals("22")) {
                     //log(card.getIdentifier() + " is blocked. Update it's status...");
-                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), CardState.BLOCKED.getValue(),
+                    daoService.setCardStatus(Long.parseLong(card.getIdentifier()), CardState.TEMPBLOCKED.getValue(),
                             "Заблокировано МСР");
                 }
                 if (card.getCurrentState().trim().equals("5")) {

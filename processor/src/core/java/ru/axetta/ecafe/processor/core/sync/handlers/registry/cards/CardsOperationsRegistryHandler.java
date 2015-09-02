@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
@@ -44,20 +43,14 @@ public class CardsOperationsRegistryHandler {
             resCardsOperationsRegistry.getItemList().add(item);
         }
 
-        dropAllBlockedWithResetCards(idOfOrg);
-
         return resCardsOperationsRegistry;
-    }
-
-    private void dropAllBlockedWithResetCards(long idOfOrg){
-        CardWritableRepository.getInstance().resetAllWithStateBlockAndResetInOrg(idOfOrg);
     }
 
     private ResCardsOperationsRegistryItem handle(CardsOperationsRegistryItem o,long idOfOrg) {
         CardService cardService = CardService.getInstance();
         ResCardsOperationsRegistryItem registryItem;
         Card byCardNo = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
-        if (byCardNo != null && byCardNo.getState() == CardState.BLOCKEDANDRESET.getValue()){
+        if (byCardNo != null && byCardNo.getState() == CardState.BLOCKED.getValue()){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE );
         }
         switch (o.getType()){
@@ -77,10 +70,10 @@ public class CardsOperationsRegistryHandler {
                 registryItem = cardService.reset(o, idOfOrg);
                 break;
             case 5:
-                registryItem = cardService.block(o, idOfOrg);
+                registryItem = cardService.tempblock(o, idOfOrg);
                 break;
             case 6:
-                registryItem = cardService.blockAndReset(o, idOfOrg);
+                registryItem = cardService.block(o, idOfOrg);
                 break;
             case 7:
                 registryItem = cardService.unblock(o, idOfOrg);
