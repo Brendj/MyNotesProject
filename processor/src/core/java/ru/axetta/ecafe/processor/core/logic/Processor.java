@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import com.google.common.base.Joiner;
+
 import ru.axetta.ecafe.processor.core.AccessDiniedException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
@@ -2307,6 +2309,18 @@ public class Processor implements SyncProcessor,
 
     }
 
+    private String getCanonicalDiscounts(String discounts) {
+        String[] arr = discounts.split(",");
+        if (arr.length == 0) {
+            return "";
+        }
+        for(int i = 0; i < arr.length; i++) {
+            arr[i] = arr[i].trim();
+        }
+        Arrays.sort(arr);
+        return Joiner.on(",").join(arr);
+    }
+
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg)
             throws Exception {
@@ -2334,30 +2348,35 @@ public class Processor implements SyncProcessor,
                 client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
             }
             /**/
+            String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
+            String categoriesFromClient = getCanonicalDiscounts(client.getCategoriesDiscounts());
             if (clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY) {
                 /* распарсим строку с категориями */
                 if (clientParamItem.getCategoriesDiscounts() != null) {
-                    String categories = clientParamItem.getCategoriesDiscounts();
-                    client.setCategoriesDiscounts(categories);
-                    if (!categories.equals("")) {
-                        String[] catArray = categories.split(",");
-                        List<Long> idOfCategoryDiscount = new ArrayList<Long>();
-                        for (String number : catArray) {
-                            idOfCategoryDiscount.add(Long.parseLong(number.trim()));
+                    if (!categoriesFromPacket.equals(categoriesFromClient)) {
+                        client.setCategoriesDiscounts(categoriesFromPacket);
+                        if (!categoriesFromPacket.equals("")) {
+                            String[] catArray = categoriesFromPacket.split(",");
+                            List<Long> idOfCategoryDiscount = new ArrayList<Long>();
+                            for (String number : catArray) {
+                                idOfCategoryDiscount.add(Long.parseLong(number.trim()));
+                            }
+                            Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
+                            categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscount));
+                            Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+                            for (Object object : categoryDiscountCriteria.list()) {
+                                categoryDiscountSet.add((CategoryDiscount) object);
+                            }
+                            client.setCategories(categoryDiscountSet);
                         }
-                        Criteria categoryDiscountCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
-                        categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscount));
-                        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
-                        for (Object object : categoryDiscountCriteria.list()) {
-                            categoryDiscountSet.add((CategoryDiscount) object);
-                        }
-                        client.setCategories(categoryDiscountSet);
                     }
                 }
             } else {
-                /* Льгота по категориями то ощищаем */
-                client.setCategoriesDiscounts("");
-                client.setCategories(new HashSet<CategoryDiscount>());
+                /* Льгота по категориями то очищаем */
+                if (!categoriesFromClient.equals("")) {
+                    client.setCategoriesDiscounts("");
+                    client.setCategories(new HashSet<CategoryDiscount>());
+                }
             }
             if (clientParamItem.getAddress() != null) {
                 client.setAddress(clientParamItem.getAddress());

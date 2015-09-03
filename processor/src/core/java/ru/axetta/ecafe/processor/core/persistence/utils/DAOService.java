@@ -1878,7 +1878,7 @@ public class DAOService {
             stats.setCreateDate(new Date(newDate));
             return stats;
         } catch (Exception e) {
-            //logger.error("Failed to update external system statistics", e);
+            logger.error("Failed to update external system statistics", e);
         }
         return stats;
     }

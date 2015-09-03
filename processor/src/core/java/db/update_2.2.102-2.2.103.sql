@@ -8,3 +8,7 @@ CREATE INDEX cf_clients_phone_idx ON cf_clients USING btree (phone COLLATE pg_ca
 
 CREATE INDEX cf_clients_mobile_idx ON cf_clients USING btree (mobile COLLATE pg_catalog."default");
 
+-- Увеличение размера поля статистики
+alter table cf_external_system_stats alter column StatisticValue type DECIMAL(20, 4);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 150903) НЕ МЕНЯТЬ

@@ -49,10 +49,10 @@ public class CardsOperationsRegistryHandler {
     private ResCardsOperationsRegistryItem handle(CardsOperationsRegistryItem o,long idOfOrg) {
         CardService cardService = CardService.getInstance();
         ResCardsOperationsRegistryItem registryItem;
-        Card byCardNo = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
+        /*Card byCardNo = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
         if (byCardNo != null && byCardNo.getState() == CardState.BLOCKED.getValue()){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE );
-        }
+        }*/
         switch (o.getType()){
             case 0:
                 registryItem = cardService.registerNew(o, idOfOrg);
