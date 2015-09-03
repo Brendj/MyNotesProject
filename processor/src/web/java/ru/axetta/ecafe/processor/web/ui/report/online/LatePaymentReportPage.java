@@ -8,8 +8,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
-import ru.axetta.ecafe.processor.core.persistence.utils.LatePaymentReportService;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
+import ru.axetta.ecafe.processor.core.report.statistics.sfk.LatePaymentReportBuilder;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.finansional.settings.LatePaymentByOneDayCountTypeMenu;
@@ -32,9 +34,15 @@ import java.util.Date;
  * Time: 16:59
  * To change this template use File | Settings | File Templates.
  */
-public class LatePaymentReportPage extends OnlineReportWithContragentPage {
+public class LatePaymentReportPage extends OnlineReportPage {
 
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentReportPage.class);
+
+    private String htmlReport;
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
 
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
 
@@ -88,6 +96,31 @@ public class LatePaymentReportPage extends OnlineReportWithContragentPage {
         if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
         }
+    }
+
+    private LatePaymentReport buildReport() {
+        if (idOfOrgList.size() < 0 && idOfOrgList != null) {
+            printError("Не выбраны организации");
+            return null;
+        }
+        BasicReportJob report = null;
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
+                + "LatePaymentReport.jasper";
+        LatePaymentReportBuilder builder = new LatePaymentReportBuilder(templateFilename);
+        //builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_LIST_OF_ORG, idOfOrgList);
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+
+        } catch (Exception e) {
+            getLogger().error("Filed build LatePaymentReport", e);
+            printError("Ошибка при построении отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(session, getLogger());
+        }
+        return (LatePaymentReport) report;
     }
 
 
@@ -158,10 +191,11 @@ public class LatePaymentReportPage extends OnlineReportWithContragentPage {
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
+//            BasicReportJob report = buildReport();
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            LatePaymentReportService.getCountOfBeneficiariesByOrg(session, 99L);
+//            LatePaymentReportService.getCountOfBeneficiariesByOrg(session, 99L);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
