@@ -22,14 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
 
@@ -217,10 +214,12 @@ public class SMSService {
                 }
             }
 
-            boolean result = registerClientSMSCharge(null != sendResponse && sendResponse.isSuccess(), client,
-                    sendResponse.getMessageId(), phoneNumber, messageTargetId, messageType,
-                    textMessage);
+            boolean result = false;
 
+            if (sendResponse != null) {
+                result = registerClientSMSCharge(sendResponse.isSuccess(), client, sendResponse.getMessageId(),
+                        phoneNumber, messageTargetId, messageType, textMessage);
+            }
 
             //  Добавление в список не отправленных sms
             //if(sendResponse != null && !sendResponse.isSuccess()) {
@@ -258,9 +257,9 @@ public class SMSService {
                 clientSms = RuntimeContext.getFinancialOpsManager()
                         .createClientSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
                                 new Date(), delivered);
+                createdClientSms.set(clientSms);
                 result = true;
             }
-            createdClientSms.set(clientSms);
             return result;
         }
     }
