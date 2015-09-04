@@ -5647,6 +5647,7 @@ public class MainPage implements Serializable {
     public Object showLatePaymentReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
+            latePaymentReportPage.fill();
             currentWorkspacePage = latePaymentReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);

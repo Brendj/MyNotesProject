@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <h:panelGrid id="latePaymentReportPanelGrid" binding="#{mainPage.latePaymentReportPage.pageComponent}"
              styleClass="borderless-grid">
@@ -29,14 +30,14 @@
                               value=" {#{mainPage.latePaymentReportPage.filter}}" />
             </h:panelGroup>
 
-            <h:outputText styleClass="output-text" escape="true" value="С разбивкой по корпусам" />
+            <%--<h:outputText styleClass="output-text" escape="true" value="С разбивкой по корпусам" />
             <h:panelGroup>
                 <h:selectOneMenu value="#{mainPage.latePaymentReportPage.organizationTypeModify}"
                                  styleClass="input-text" style="width: 250px;">
                     <f:converter converterId="organizationTypeModifyConverter" />
                     <f:selectItems value="#{mainPage.latePaymentReportPage.organizationTypeModifyMenu.customItems}" />
                 </h:selectOneMenu>
-            </h:panelGroup>
+            </h:panelGroup>--%>
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.latePaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -98,6 +99,23 @@
 
         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                        warnClass="warn-messages" />
+
+        <h:panelGrid styleClass="borderless-grid">
+            <%-- не показывать пустую таблицу --%>
+            <c:if test="${not empty mainPage.latePaymentReportPage.htmlReport}">
+                <h:outputText escape="true" value="Сводный отчет по несвоевременной оплате питания"
+                              styleClass="output-text" />
+                <f:verbatim>
+                    <style type="text/css">
+                        div.htmlReportContent :empty {
+                            display: none;
+                        }
+                    </style>
+                    <div class="htmlReportContent"> ${mainPage.latePaymentReportPage.htmlReport} </div>
+                </f:verbatim>
+                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+            </c:if>
+        </h:panelGrid>
 
     </rich:simpleTogglePanel>
 </h:panelGrid>

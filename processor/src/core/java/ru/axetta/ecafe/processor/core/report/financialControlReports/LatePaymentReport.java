@@ -51,6 +51,6 @@ public class LatePaymentReport extends BasicReportForAllOrgJob {
 
     @Override
     public Logger getLogger() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return logger;
     }
 }
