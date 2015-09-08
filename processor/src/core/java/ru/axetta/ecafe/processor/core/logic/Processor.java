@@ -2197,10 +2197,11 @@ public class Processor implements SyncProcessor,
                 if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
+                    long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     values = EventNotificationService
-                            .attachToValues("amountPrice", Long.toString(totalPurchaseRSum - totalLunchRSum), values);
+                            .attachToValues("amountPrice", Long.toString(totalBuffetRSum/100) + ',' + Long.toString(totalBuffetRSum%100), values);
                     values = EventNotificationService
-                            .attachToValues("amountLunch", Long.toString(totalLunchRSum), values);
+                            .attachToValues("amountLunch", Long.toString(totalLunchRSum/100) + ',' + Long.toString(totalLunchRSum%100), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values);
                 }
