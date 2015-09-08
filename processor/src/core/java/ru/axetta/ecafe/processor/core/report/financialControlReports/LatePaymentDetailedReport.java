@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.report.financialControlReports;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
-import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment.LatePaymentReportBuilder;
 
@@ -19,33 +18,34 @@ import java.util.Date;
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
- * Date: 27.08.15
- * Time: 11:13
+ * Date: 07.09.15
+ * Time: 10:28
  */
 
-public class LatePaymentReport extends BasicReportForAllOrgJob {
+public class LatePaymentDetailedReport extends BasicReportForAllOrgJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(LatePaymentReport.class);
+    private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReport.class);
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
 
     }
 
-    public LatePaymentReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+    public LatePaymentDetailedReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
     }
 
-    public LatePaymentReport() {
+    public LatePaymentDetailedReport() {
+
     }
 
     @Override
-    public LatePaymentReport createInstance() {
-        return new LatePaymentReport();
+    public LatePaymentDetailedReport createInstance() {
+        return new LatePaymentDetailedReport();
     }
 
     @Override
-    public BasicReportForContragentJob.Builder createBuilder(String templateFilename) {
+    public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
         return new LatePaymentReportBuilder(templateFilename);
     }
 

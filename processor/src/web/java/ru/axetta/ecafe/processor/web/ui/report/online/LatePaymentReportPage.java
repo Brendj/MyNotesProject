@@ -14,8 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsBuilder;
-import ru.axetta.ecafe.processor.core.report.statistics.sfk.LatePaymentReportBuilder;
+import ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment.LatePaymentReportBuilder;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -35,7 +34,6 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -256,6 +254,7 @@ public class LatePaymentReportPage extends OnlineReportPage {
     // Очистить
     public Object clear() {
         idOfOrgList = Collections.EMPTY_LIST;
+        filter = "Не выбрано";
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         htmlReport = null;
         setLatePaymentByOneDayCountType(LatePaymentByOneDayCountType.EMPTY);

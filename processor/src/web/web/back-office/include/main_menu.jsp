@@ -1057,6 +1057,12 @@
                             action="#{mainPage.showLatePaymentReportPage}"
                             reRender="workspaceForm"/>
 
+        <rich:panelMenuItem id="latePaymentDetailedReportMenuItem"
+                            binding="#{mainPage.latePaymentDetailedReportPage.mainMenuComponent}"
+                            label="Детализированный отчет по несвоевременной оплате питания"
+                            action="#{mainPage.showLatePaymentDetailedReportPage}"
+                            reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"

@@ -1,0 +1,66 @@
+/*
+ * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: anvarov
+ * Date: 07.09.15
+ * Time: 10:15
+ */
+
+public class LatePaymentDetailedReportModel {
+
+    private String orgnum;
+    private String address;
+    private Date paymentDate;
+
+    private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList;
+
+    public LatePaymentDetailedReportModel(String orgnum, String address, Date paymentDate) {
+        this.orgnum = orgnum;
+        this.address = address;
+        this.paymentDate = paymentDate;
+    }
+
+    public LatePaymentDetailedReportModel() {
+    }
+
+    public String getOrgnum() {
+        return orgnum;
+    }
+
+    public void setOrgnum(String orgnum) {
+        this.orgnum = orgnum;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public List<LatePaymentDetailedSubReportModel> getLatePaymentDetailedSubReportModelList() {
+        return latePaymentDetailedSubReportModelList;
+    }
+
+    public void setLatePaymentDetailedSubReportModelList(
+            List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList) {
+        this.latePaymentDetailedSubReportModelList = latePaymentDetailedSubReportModelList;
+    }
+}

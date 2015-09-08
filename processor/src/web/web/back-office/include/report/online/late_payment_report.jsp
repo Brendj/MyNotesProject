@@ -82,40 +82,42 @@
             </h:panelGroup>
         </h:panelGrid>
 
-        <h:panelGrid styleClass="borderless-grid" columns="3">
-            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.latePaymentReportPage.buildReportHTML}"
-                               reRender="latePaymentReportPanelGrid"
-                               styleClass="command-button" status="reportGenerateStatus" />
-            <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.latePaymentReportPage.generateXLS}" styleClass="command-button" />
-            <a4j:commandButton value="Очистить" action="#{mainPage.latePaymentReportPage.clear}"
-                               reRender="latePaymentReportPanelGrid"
-                               styleClass="command-button" status="reportGenerateStatus" />
-        </h:panelGrid>
-        <a4j:status id="reportGenerateStatus">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-            </f:facet>
-        </a4j:status>
-
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
-
-        <h:panelGrid styleClass="borderless-grid">
-            <%-- не показывать пустую таблицу --%>
-            <c:if test="${not empty mainPage.latePaymentReportPage.htmlReport}">
-                <h:outputText escape="true" value="Сводный отчет по несвоевременной оплате питания"
-                              styleClass="output-text" />
-                <f:verbatim>
-                    <style type="text/css">
-                        div.htmlReportContent :empty {
-                            display: none;
-                        }
-                    </style>
-                    <div class="htmlReportContent"> ${mainPage.latePaymentReportPage.htmlReport} </div>
-                </f:verbatim>
-                <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
-            </c:if>
-        </h:panelGrid>
-
     </rich:simpleTogglePanel>
+
+    <h:panelGrid styleClass="borderless-grid" columns="3">
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.latePaymentReportPage.buildReportHTML}"
+                           reRender="latePaymentReportPanelGrid" styleClass="command-button"
+                           status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.latePaymentReportPage.generateXLS}"
+                         styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{mainPage.latePaymentReportPage.clear}"
+                           reRender="latePaymentReportPanelGrid, lateParametrsGrid" styleClass="command-button"
+                           status="reportGenerateStatus" />
+    </h:panelGrid>
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
+    <h:panelGrid styleClass="borderless-grid">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty mainPage.latePaymentReportPage.htmlReport}">
+            <h:outputText escape="true" value="Сводный отчет по несвоевременной оплате питания"
+                          styleClass="output-text" />
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent"> ${mainPage.latePaymentReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
+    </h:panelGrid>
+
 </h:panelGrid>

@@ -2,14 +2,13 @@
  * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.report.statistics.sfk;
+package ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.LatePaymentReportService;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
@@ -68,11 +67,11 @@ public class LatePaymentReportBuilder extends BasicReportForAllOrgJob.Builder {
         return new LatePaymentReport(generateBeginTime, generateDuration, jasperPrint, startTime, endTime);
     }
 
-    private JRDataSource buildDataSource(Session session, List<Long> idOFOrgList, Date startTime, Date endTime,
+    private JRDataSource buildDataSource(Session session, List<Long> idOfOrg, Date startTime, Date endTime,
             String latePaymentDaysCountType, String latePaymentByOneDayCountType) {
 
         LatePaymentReportService latePaymentReportService = new LatePaymentReportService();
-        List<LatePaymentReportModel> latePaymentReportModelList = latePaymentReportService.getCountOfBeneficiariesByOrg(session, idOFOrgList, startTime, endTime, latePaymentDaysCountType, latePaymentByOneDayCountType);
+        List<LatePaymentReportModel> latePaymentReportModelList = latePaymentReportService.getCountOfBeneficiariesByOrg(session, idOfOrg, startTime, endTime, latePaymentDaysCountType, latePaymentByOneDayCountType);
 
         return new JRBeanCollectionDataSource(latePaymentReportModelList);
     }

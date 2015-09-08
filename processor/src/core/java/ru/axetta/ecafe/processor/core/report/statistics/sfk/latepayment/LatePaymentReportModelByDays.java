@@ -2,7 +2,7 @@
  * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.report.statistics.sfk;
+package ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment;
 
 import java.util.Date;
 

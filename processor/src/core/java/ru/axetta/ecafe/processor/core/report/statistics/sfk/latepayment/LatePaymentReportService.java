@@ -2,12 +2,10 @@
  * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.utils;
+package ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment;
 
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
-import ru.axetta.ecafe.processor.core.report.statistics.sfk.LatePaymentReportModel;
-import ru.axetta.ecafe.processor.core.report.statistics.sfk.LatePaymentReportModelByDays;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
