@@ -485,6 +485,9 @@ public class RuntimeContext implements ApplicationContextAware {
             instanceName = properties.getProperty(INSTANCE_NAME);
 
             String nodeRoleFile = properties.getProperty(NODE_INFO_FILE);
+            if (System.getProperty(nodeRoleFile)!=null) {
+                nodeRoleFile = System.getProperty(nodeRoleFile);
+            }
             if (nodeRoleFile != null) {
                 try {
                     BufferedReader buf = new BufferedReader(new FileReader(nodeRoleFile));

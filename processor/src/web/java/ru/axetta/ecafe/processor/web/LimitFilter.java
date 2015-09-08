@@ -21,10 +21,12 @@ import java.util.Date;
  */
 public class LimitFilter implements Filter {
 
-    private final int limit = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
+    //private final int limit = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
+    //
+    private final int limit = 150; // FILTER LIMIT -> OPTION_REQUEST_SYNC_LIMITS moved to SyncServlet
     private final int RETRY_AFTER = RuntimeContext.getInstance()
             .getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
-    private final int SC_TOO_MANY_REQUESTS = 429;
+    public static final int SC_TOO_MANY_REQUESTS = 429;
     private final String SC_TOO_MANY_REQUESTS_MESSAGE = "Too Many Requests";
     private int count;
     private Object lock = new Object();

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -100,14 +101,25 @@ public class SyncServlet extends HttpServlet {
             }
 
             /////// Недопущение двух и более одновременных синхронизаций от одной организации
-            boolean success;
+            boolean success, tooManyRequests = false;
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
+                // ограничение количества одновременных синхр - срабатывает только для полных синхр
+                if (syncType==SyncType.TYPE_FULL &&
+                        syncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS)) {
+                    tooManyRequests = true;
+                }
             }
             if (!success) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
                 logger.error(message);
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            if (tooManyRequests) {
+                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests", idOfOrg);
+                logger.error(message);
+                sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
             ///////
