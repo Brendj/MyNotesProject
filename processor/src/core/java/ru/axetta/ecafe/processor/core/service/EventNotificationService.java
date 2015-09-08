@@ -549,15 +549,36 @@ public class EventNotificationService {
                 }
             } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient);
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient);
+                }
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient);
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory
+                            .buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient);
+                }
                 putGuardianParams(guardianClient, empType);
             } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient);
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
                 empType.getParameters().put("token", token);
+            }  else if(type.equals(MESSAGE_PAYMENT)) {
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, destClient);
+
+                String amountPrice = findValueInParams(new String[] {"amountPrice"}, values);
+                String amountLunch = findValueInParams(new String[] {"amountLunch"}, values);
+
+                if(amountPrice != null && amountPrice.length() > 0) {
+                    empType.getParameters().put("amountPrice", amountPrice);
+                }
+                if(amountLunch != null && amountLunch.length() > 0) {
+                    empType.getParameters().put("amountLunch", amountLunch);
+                }
             }
 
             //  Устанавливаем дату

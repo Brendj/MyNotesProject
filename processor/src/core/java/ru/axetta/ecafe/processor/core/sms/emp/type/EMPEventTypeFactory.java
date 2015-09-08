@@ -23,6 +23,7 @@ public class EMPEventTypeFactory {
     public static final int LEAVE_WITH_GUARDIAN_EVENT = 901240004;
     public static final int FILL_EVENT                = 901240005;
     public static final int TOKEN_GENERATED_EVENT     = 901250001;
+    public static final int PAYMENT_EVENT             = 901240007;
 
     public static final EMPEventType buildEvent(int type, Client client) {
         return buildEvent(type, client, Collections.EMPTY_MAP);
@@ -64,6 +65,9 @@ public class EMPEventTypeFactory {
                 break;
             case TOKEN_GENERATED_EVENT:
                 event = new EMPTokenGenerateEventType();
+                break;
+            case PAYMENT_EVENT:
+                event = new EMPPaymentEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

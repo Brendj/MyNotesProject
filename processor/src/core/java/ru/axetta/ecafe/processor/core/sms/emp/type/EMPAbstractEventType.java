@@ -131,7 +131,11 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             person = DAOService.getInstance().getPersonByClient(client);
         }
         Map<String, String> params = getParameters();
-        params.put("time", TIME_FORMAT.format(new Date(System.currentTimeMillis())));
+
+        Date currentDate = new Date(System.currentTimeMillis());
+
+        params.put("date", DATE_FORMAT.format(currentDate));
+        params.put("time", TIME_FORMAT.format(currentDate));
         params.put("account", "" + client.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
@@ -162,7 +166,11 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             person = DAOService.getInstance().getPersonByClient(child);
         }
         Map<String, String> params = getParameters();
-        params.put("time", TIME_FORMAT.format(new Date(System.currentTimeMillis())));
+
+        Date currentDate = new Date(System.currentTimeMillis());
+
+        params.put("date", DATE_FORMAT.format(currentDate));
+        params.put("time", TIME_FORMAT.format(currentDate));
         params.put("account", "" + child.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());

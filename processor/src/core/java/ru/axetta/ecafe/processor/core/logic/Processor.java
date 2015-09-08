@@ -2134,6 +2134,7 @@ public class Processor implements SyncProcessor,
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
                 long totalPurchaseDiscount = 0;
                 long totalPurchaseRSum = 0;
+                long totalLunchRSum = 0;
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
                     if (null != findOrderDetail(persistenceSession,
@@ -2167,6 +2168,10 @@ public class Processor implements SyncProcessor,
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
                     totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
+
+                    if (orderDetail.isComplexItem()) {
+                        totalLunchRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
+                    }
                 }
                 // Check payment sums
                 if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
@@ -2187,11 +2192,15 @@ public class Processor implements SyncProcessor,
                 persistenceTransaction = null;
 
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
-                /* в случее если анонимного заказа мы не знаем клиента */
-                /* не оповещаем в случае пробития корректировачных заказов */
+                /* в случае анонимного заказа мы не знаем клиента */
+                /* не оповещаем в случае пробития корректировочных заказов */
                 if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
+                    values = EventNotificationService
+                            .attachToValues("amountPrice", Long.toString(totalPurchaseRSum - totalLunchRSum), values);
+                    values = EventNotificationService
+                            .attachToValues("amountLunch", Long.toString(totalLunchRSum), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values);
                 }
