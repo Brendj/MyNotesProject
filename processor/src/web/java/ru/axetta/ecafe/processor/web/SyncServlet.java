@@ -105,8 +105,8 @@ public class SyncServlet extends HttpServlet {
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
                 // ограничение количества одновременных синхр - срабатывает только для полных синхр
-                if (syncType==SyncType.TYPE_FULL &&
-                        syncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS)) {
+                if (success && (syncType==SyncType.TYPE_FULL &&
+                        syncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS))) {
                     tooManyRequests = true;
                 }
             }
@@ -119,12 +119,13 @@ public class SyncServlet extends HttpServlet {
             if (tooManyRequests) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests", idOfOrg);
                 logger.error(message);
+                removeSyncInProgress(idOfOrg);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
             ///////
 
-            logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
+            logger.info(String.format("-Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
