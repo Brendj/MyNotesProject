@@ -11,7 +11,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentDetailedReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -40,12 +39,14 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
     }
 
     @Override
-    public BasicReportForAllOrgJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+    public BasicReportForAllOrgJob build(Session session, Date startTime, Date endTime, Calendar calendar)
+            throws Exception {
         if (!(new File(this.templateFilename)).exists()) {
             throw new Exception(String.format("Не найден файл шаблона '%s'", templateFilename));
         }
 
-        String idOfOrgString = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+        String idOfOrgString = StringUtils
+                .trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
 
         Long idOfOrg = Long.parseLong(idOfOrgString);
 
@@ -60,17 +61,19 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
         parameterMap.put("SUBREPORT_DIR", subReportDir);
-        JRDataSource dataSource = buildDataSource(session, idOfOrg,startTime, endTime, showReverse);
+        JRDataSource dataSource = buildDataSource(session, idOfOrg, startTime, endTime, showReverse);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
         return new LatePaymentDetailedReport(generateBeginTime, generateDuration, jasperPrint, startTime, endTime);
     }
 
-    private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime, Boolean showReverse) {
+    private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime,
+            Boolean showReverse) {
 
         LatePaymentDetailedReportService latePaymentDetailedReportService = new LatePaymentDetailedReportService();
-        List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService.getStatistics();
+        List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService
+                .getStatistics();
 
         return new JRBeanCollectionDataSource(latePaymentDetailedReportModelList);
     }

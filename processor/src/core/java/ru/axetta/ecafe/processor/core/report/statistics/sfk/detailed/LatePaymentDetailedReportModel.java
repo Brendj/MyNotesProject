@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 
-import java.util.Date;
 import java.util.List;
 
 /**

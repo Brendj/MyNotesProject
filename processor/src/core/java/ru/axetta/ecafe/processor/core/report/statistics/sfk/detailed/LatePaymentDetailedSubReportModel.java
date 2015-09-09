@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 
-import java.util.Date;
-
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov

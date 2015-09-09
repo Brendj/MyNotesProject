@@ -7,8 +7,6 @@ package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
