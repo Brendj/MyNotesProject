@@ -2169,7 +2169,7 @@ public class Processor implements SyncProcessor,
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
                     totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
 
-                    if (orderDetail.isComplexItem()) {
+                    if (orderDetail.isComplex() || orderDetail.isComplexItem()) {
                         totalLunchRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
                     }
                 }
