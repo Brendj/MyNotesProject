@@ -7,6 +7,10 @@ package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -19,5 +23,10 @@ public class LatePaymentDetailedReportService {
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReportService.class);
 
     public LatePaymentDetailedReportService() {
+    }
+
+    public List<LatePaymentDetailedReportModel> getStatistics() {
+
+        return null;
     }
 }

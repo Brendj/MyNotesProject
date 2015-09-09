@@ -18,11 +18,11 @@ public class LatePaymentDetailedReportModel {
 
     private String orgnum;
     private String address;
-    private Date paymentDate;
+    private String paymentDate;
 
     private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList;
 
-    public LatePaymentDetailedReportModel(String orgnum, String address, Date paymentDate) {
+    public LatePaymentDetailedReportModel(String orgnum, String address, String paymentDate) {
         this.orgnum = orgnum;
         this.address = address;
         this.paymentDate = paymentDate;
@@ -47,11 +47,11 @@ public class LatePaymentDetailedReportModel {
         this.address = address;
     }
 
-    public Date getPaymentDate() {
+    public String getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Date paymentDate) {
+    public void setPaymentDate(String paymentDate) {
         this.paymentDate = paymentDate;
     }
 

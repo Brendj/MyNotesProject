@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LatePaymentDetailedReport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="73c4be4f-ba04-484b-8ef4-74100423f375">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LatePaymentDetailedReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="73c4be4f-ba04-484b-8ef4-74100423f375">
 	<property name="ireport.zoom" value="2.415765000000001"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -14,9 +14,9 @@
 		<![CDATA[]]>
 	</queryString>
 	<field name="paymentDate" class="java.lang.String"/>
-	<field name="id" class="java.lang.Integer"/>
-	<field name="orgnum" class="java.lang.Integer"/>
+	<field name="orgnum" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
+	<field name="latePaymentDetailedSubReportModelList" class="java.util.List"/>
 	<group name="test">
 		<groupExpression><![CDATA[$F{paymentDate}]]></groupExpression>
 		<groupHeader>
@@ -96,12 +96,12 @@
 			<subreport>
 				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="0" width="555" height="25"/>
 				<subreportParameter name="id">
-					<subreportParameterExpression><![CDATA[$F{id}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="d_payment">
 					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
 				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportModelList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
 			</subreport>
 		</band>

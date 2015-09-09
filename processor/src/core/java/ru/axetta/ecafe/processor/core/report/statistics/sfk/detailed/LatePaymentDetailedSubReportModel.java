@@ -15,11 +15,11 @@ import java.util.Date;
 
 public class LatePaymentDetailedSubReportModel implements Comparable<LatePaymentDetailedSubReportModel> {
 
-    private Date foodDate;
+    private String foodDate;
     private String client;
     private String food;
 
-    public LatePaymentDetailedSubReportModel(Date foodDate, String client, String food) {
+    public LatePaymentDetailedSubReportModel(String foodDate, String client, String food) {
         this.foodDate = foodDate;
         this.client = client;
         this.food = food;
@@ -28,11 +28,11 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
     public LatePaymentDetailedSubReportModel() {
     }
 
-    public Date getFoodDate() {
+    public String getFoodDate() {
         return foodDate;
     }
 
-    public void setFoodDate(Date foodDate) {
+    public void setFoodDate(String foodDate) {
         this.foodDate = foodDate;
     }
 

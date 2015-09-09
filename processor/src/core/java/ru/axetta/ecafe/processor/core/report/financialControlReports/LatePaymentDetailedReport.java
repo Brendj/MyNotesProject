@@ -36,7 +36,6 @@ public class LatePaymentDetailedReport extends BasicReportForAllOrgJob {
     }
 
     public LatePaymentDetailedReport() {
-
     }
 
     @Override

@@ -4,16 +4,31 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.*;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentDetailedReport;
+import ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed.LatePaymentDetailedReportBuilder;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.Date;
 
@@ -25,6 +40,7 @@ import java.util.Date;
  */
 
 public class LatePaymentDetailedReportPage extends OnlineReportPage {
+
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReportPage.class);
 
     private Boolean showReserve = false;
@@ -101,7 +117,29 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
     private OrganizationTypeModify organizationTypeModify;
     private final OrganizationTypeModifyMenu organizationTypeModifyMenu = new OrganizationTypeModifyMenu();
 
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+    }
 
+    public void setPeriodTypeMenu(PeriodTypeMenu periodTypeMenu) {
+        this.periodTypeMenu = periodTypeMenu;
+    }
+
+    public OrganizationTypeModify getOrganizationTypeModify() {
+        return organizationTypeModify;
+    }
+
+    public void setOrganizationTypeModify(OrganizationTypeModify organizationTypeModify) {
+        this.organizationTypeModify = organizationTypeModify;
+    }
+
+    public OrganizationTypeModifyMenu getOrganizationTypeModifyMenu() {
+        return organizationTypeModifyMenu;
+    }
+
+    public void setReport(LatePaymentDetailedReport report) {
+        this.report = report;
+    }
 
     private LatePaymentDetailedReport report;
 
@@ -116,14 +154,85 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
     public void fill() throws Exception {
     }
 
+    private LatePaymentDetailedReport buildReport() {
+        if (idOfOrg == null) {
+            printError("Не указана организация");
+            return null;
+        }
+        BasicReportForAllOrgJob report = null;
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "LatePaymentDetailedReport.jasper";
+        LatePaymentDetailedReportBuilder builder = new LatePaymentDetailedReportBuilder(templateFilename);
+        String idOfOrgString = String.valueOf(idOfOrg);
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        builder.getReportProperties().setProperty("showReserve", showReserve.toString());
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            report = builder.build(session, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            getLogger().error("Filed build DetailedPaymentWithoutCorpsNewJasperReport", e);
+            printError("Ошибка при построении отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(session, getLogger());
+        }
+        return (LatePaymentDetailedReport) report;
+    }
+
     // Генерировать отчет
     public Object buildReportHTML() {
+        try {
+            BasicReportForAllOrgJob report = buildReport();
+            if (report != null) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                htmlReport = os.toString("UTF-8");
+                os.close();
+            }
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при построении отчета:", e);
+        }
         return null;
     }
 
     // Выгрузить в Excel
     public void generateXLS(ActionEvent event) {
-
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            BasicReportForAllOrgJob report = buildReport();
+            if (report != null) {
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                response.setHeader("Content-disposition", "inline;filename=latePaymentDetailedReport.xls");
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.close();
+            }
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+        }
     }
 
     // Очистить
