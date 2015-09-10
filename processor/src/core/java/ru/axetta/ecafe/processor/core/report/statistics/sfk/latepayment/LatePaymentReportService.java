@@ -43,7 +43,7 @@ public class LatePaymentReportService {
                 + "count(DISTINCT cl.idOfClient)benefitcount, "
                 + "count(DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
                 + "count(DISTINCT o.idoforder) feedcount, cast (to_timestamp(o.createddate/1000) AS DATE) "
-                + "FROM cf_orders o INNER JOIN cf_clients cl ON cl.idoforg = o.idoforg "
+                + "FROM cf_orders o INNER JOIN cf_clients cl ON cl.idoforg = o.idoforg and cl.idofclient = o.idofclient "
                 + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
                 + "INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg "
                 + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE)"
