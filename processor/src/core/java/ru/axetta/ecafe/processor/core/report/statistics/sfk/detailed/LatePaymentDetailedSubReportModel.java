@@ -15,12 +15,10 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
 
     private String foodDate;
     private String client;
-    private String food;
 
-    public LatePaymentDetailedSubReportModel(String foodDate, String client, String food) {
+    public LatePaymentDetailedSubReportModel(String foodDate, String client) {
         this.foodDate = foodDate;
         this.client = client;
-        this.food = food;
     }
 
     public LatePaymentDetailedSubReportModel() {
@@ -40,14 +38,6 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
 
     public void setClient(String client) {
         this.client = client;
-    }
-
-    public String getFood() {
-        return food;
-    }
-
-    public void setFood(String food) {
-        this.food = food;
     }
 
     @Override

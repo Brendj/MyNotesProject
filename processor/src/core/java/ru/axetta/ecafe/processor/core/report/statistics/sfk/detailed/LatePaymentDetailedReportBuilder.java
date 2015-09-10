@@ -69,11 +69,12 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
     }
 
     private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime,
-            Boolean showReverse) {
+            Boolean showReverse) throws Exception {
 
         LatePaymentDetailedReportService latePaymentDetailedReportService = new LatePaymentDetailedReportService();
+
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService
-                .getStatistics();
+                .getMainData(session, idOfOrg, startTime, endTime);
 
         return new JRBeanCollectionDataSource(latePaymentDetailedReportModelList);
     }
