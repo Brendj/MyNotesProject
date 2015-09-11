@@ -126,6 +126,11 @@
                 <h:inputText value="#{mainPage.clientListPage.clientFilter.mobileNumber}" maxlength="11"
                              styleClass="input-text" style="margin-left: 10px;" />
             </h:panelGroup>
+            <h:panelGroup>
+                <h:outputText escape="true" value="Адрес электронной почты" styleClass="output-text" />
+                <h:inputText value="#{mainPage.clientListPage.clientFilter.email}" maxlength="100"
+                             styleClass="input-text" style="margin-left: 29px; width: 147px;" />
+            </h:panelGroup>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">

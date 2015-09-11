@@ -943,6 +943,20 @@ public class ClientManager {
         return guardianItems;
     }
 
+    public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient) throws Exception {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        List results = criteria.list();
+        List<ClientGuardianItem> wardItems = new ArrayList<ClientGuardianItem>(results.size());
+        for (Object o: results){
+            ClientGuardian clientWard = (ClientGuardian) o;
+            Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
+            if(cl != null){
+                wardItems.add(new ClientGuardianItem(cl));
+            }
+        }
+        return wardItems;
+    }
 
     public static List<Client> loadGuardiansByChildren(Session session, Long idOfChildren) throws Exception {
         return findGuardiansByClient(session, idOfChildren, null);

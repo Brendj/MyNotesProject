@@ -138,6 +138,7 @@ public class ClientFilter {
     private boolean showDeleted;
     private boolean includeFriendlyOrg = true;
     private String mobileNumber;
+    private String email;
 
     public ClientBalanceFilter getClientBalanceMenu() {
         return clientBalanceMenu;
@@ -157,6 +158,14 @@ public class ClientFilter {
 
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getFilterClientId() {
@@ -246,7 +255,7 @@ public class ClientFilter {
     public boolean isEmpty() {
         return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty()
-                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(filterClientGUID);
+                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID);
     }
 
     public String getStatus() {
@@ -345,6 +354,9 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(this.mobileNumber)) {
             criteria.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobileNumber), MatchMode.ANYWHERE));
+        }
+        if (StringUtils.isNotEmpty(this.email)) {
+            criteria.add(Restrictions.ilike("email", email, MatchMode.ANYWHERE));
         }
         if (StringUtils.isNotEmpty(filterClientGUID)) {
             criteria.add(Restrictions.eq("clientGUID", filterClientGUID));

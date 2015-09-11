@@ -17,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadWardsByClient;
 
 /**
  * Created by IntelliJ IDEA.
@@ -374,6 +375,8 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
 
+        this.clientWardItems = loadWardsByClient(session, idOfClient);
+
         // Категории скидок старое не используется
         // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код
         //categoryDiscountNames = new ArrayList<String>();
@@ -412,6 +415,12 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public List<ClientGuardianItem> getClientGuardianItems() {
         return clientGuardianItems;
+    }
+
+    private List<ClientGuardianItem> clientWardItems;
+
+    public List<ClientGuardianItem> getClientWardItems() {
+        return clientWardItems;
     }
 
 }
