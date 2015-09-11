@@ -84,10 +84,10 @@ public class LatePaymentDetailedReportService {
     public List<LatePaymentDetailedSubReportModel> getExtraData(Session session, Long idOfOrg, Date paymentDate,
             Date startDate, Date endDate, Boolean showReverse) {
 
-        String orderType = "4";
+        String orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) ";
 
         if (showReverse) {
-            orderType = "4,6";
+            orderTypeCondition = "and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) or (o.ordertype = 6 and cc.idOfCategoryDiscount = 50)) ";
         }
 
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
@@ -100,9 +100,7 @@ public class LatePaymentDetailedReportService {
                         + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
                         + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
                         + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
-                        + " AND o.ordertype IN ( " + orderType + ")"
-                        + " AND o.state = 0 AND cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)"
-                        + " AND o.idoforg = :idOfOrg"
+                        + " AND o.state = 0 AND o.idoforg = :idOfOrg" + orderTypeCondition
                         + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, od.menudetailname, o.ordertype"
                         + " ORDER BY o.createddate");
         query.setParameter("idOfOrg", idOfOrg);
