@@ -37,21 +37,30 @@ public class LatePaymentReportService {
 
         List<LatePaymentReportModel> latePaymentReportModels = new ArrayList<LatePaymentReportModel>();
 
-        LatePaymentReportModelByDays  latePaymentReportModelByDays;
+        LatePaymentReportModelByDays latePaymentReportModelByDays;
 
-        Query query = session.createSQLQuery("SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgname, cfo.address, "
-                + "count(DISTINCT cl.idOfClient)benefitcount, "
-                + "count(DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
-                + "count(DISTINCT o.idoforder) feedcount, cast (to_timestamp(o.createddate/1000) AS DATE) "
-                + "FROM cf_orders o INNER JOIN cf_clients cl ON cl.idoforg = o.idoforg and cl.idofclient = o.idofclient "
-                + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
-                + "INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg "
-                + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE)"
-                + "AND o.ordertype = 4 AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate "
-                + "AND cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124) "
-                + "AND cl.idofclientgroup < 1100000000 AND cl.idoforg IN (:idOfOrgList)"
-                + "GROUP BY o.idoforg, cfo.shortname, cfo.address, cast (to_timestamp(o.createddate/1000) AS DATE) "
-                + "ORDER BY o.idoforg, cfo.shortname, cfo.address");
+        Query query = session.createSQLQuery(
+                "WITH a AS (SELECT count (DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
+                        + "count (DISTINCT o.idoforder) feedcount, "
+                        + "cast (to_timestamp(o.createddate/1000) AS DATE), o.idoforg FROM cf_orders o "
+                        + "INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient "
+                        + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
+                        + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE) "
+                        + "AND o.ordertype = 4 AND o.state = 0 AND o.createddate BETWEEN :startDate "
+                        + "AND :endDate AND cc.idOfCategoryDiscount "
+                        + "IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124) "
+                        + "AND cl.idofclientgroup < 1100000000 AND o.idoforg IN (:idOfOrgList)"
+                        + "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) ORDER BY o.idoforg), "
+                        + "b AS (SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgname, cfo.address, "
+                        + "count(DISTINCT  cl.idOfClient) benefitcount, cfo.idoforg FROM cf_orgs cfo "
+                        + "INNER JOIN cf_clients cl ON cl.idoforg = cfo.idoforg "
+                        + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
+                        + "INNER JOIN a ON a. idoforg = cfo.idoforg "
+                        + "WHERE cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124) "
+                        + "AND cl.idofclientgroup < 1100000000 GROUP BY cfo.idoforg, cfo.shortname, cfo.address "
+                        + "ORDER BY cfo.idoforg, cfo.shortname, cfo.address) SELECT b.orgname, b.address, "
+                        + "b.benefitcount, a.daycount, "
+                        + "a.feedcount, to_timestamp FROM a INNER JOIN b ON a.idoforg = b.idoforg");
         query.setParameterList("idOfOrgList", idOfOrgList);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
@@ -65,10 +74,8 @@ public class LatePaymentReportService {
         Long feedCount;
         Date date;
 
-
         //Уникальные номера Организаций
         SortedSet<String> latePaymentReportModelSet = new TreeSet<String>();
-
 
         for (Object res : resultList) {
 
@@ -95,9 +102,8 @@ public class LatePaymentReportService {
             }
         }
 
-
         Long rowNum = 0L;
-        for (String orgNum: latePaymentReportModelSet) {
+        for (String orgNum : latePaymentReportModelSet) {
 
             Long sumDayCount = 0L;
             Long sumFeedCount = 0L;
@@ -106,15 +112,15 @@ public class LatePaymentReportService {
 
             LatePaymentReportModel latePaymentReportModel = null;
 
-            for (LatePaymentReportModelByDays latePaymentReportModelByDay: latePaymentReportModelsByDaysList) {
+            for (LatePaymentReportModelByDays latePaymentReportModelByDay : latePaymentReportModelsByDaysList) {
                 if (latePaymentReportModelByDay.getOrgname().equals(orgNum)) {
 
                     sumDayCount += latePaymentReportModelByDay.getDaycount();
                     sumFeedCount += latePaymentReportModelByDay.getFeedcount();
 
-                    latePaymentReportModel = new LatePaymentReportModel(rowNum, latePaymentReportModelByDay.getOrgname(),
-                            latePaymentReportModelByDay.getAddress(), latePaymentReportModelByDay.getBenefitcount(),
-                            sumDayCount, sumFeedCount);
+                    latePaymentReportModel = new LatePaymentReportModel(rowNum,
+                            latePaymentReportModelByDay.getOrgname(), latePaymentReportModelByDay.getAddress(),
+                            latePaymentReportModelByDay.getBenefitcount(), sumDayCount, sumFeedCount);
                 }
             }
 
