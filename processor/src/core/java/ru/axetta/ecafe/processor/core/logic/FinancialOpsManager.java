@@ -26,6 +26,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
+
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
 @Component
 @Scope("singleton")
@@ -330,7 +333,16 @@ public class FinancialOpsManager {
                 "empTime", empTime
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
+
         eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+
+        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+
+        if (!(guardians == null || guardians.isEmpty())) {
+            for (Client destGuardian : guardians) {
+                eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+            }
+        }
     }
 
     private void registerSubBalance1ClientPayment(Session session,

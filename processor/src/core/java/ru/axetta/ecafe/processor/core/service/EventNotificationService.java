@@ -538,13 +538,19 @@ public class EventNotificationService {
                 }
                 putGuardianParams(guardianClient, empType);
             } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, destClient);
-                String amount = findValueInParams(new String [] {"paySum"}, values);
-                String balance = findValueInParams(new String [] {"balance"}, values);
-                if(amount != null && amount.length() > 0) {
+
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, destClient);
+                }
+
+                String amount = findValueInParams(new String[]{"paySum"}, values);
+                String balance = findValueInParams(new String[]{"balance"}, values);
+                if (amount != null && amount.length() > 0) {
                     empType.getParameters().put("amount", amount);
                 }
-                if(balance != null && balance.length() > 0) {
+                if (balance != null && balance.length() > 0) {
                     empType.getParameters().put("balance", balance);
                 }
             } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
@@ -568,15 +574,20 @@ public class EventNotificationService {
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
                 empType.getParameters().put("token", token);
             }  else if(type.equals(MESSAGE_PAYMENT)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, destClient);
 
-                String amountPrice = findValueInParams(new String[] {"amountPrice"}, values);
-                String amountLunch = findValueInParams(new String[] {"amountLunch"}, values);
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, destClient);
+                }
 
-                if(amountPrice != null && amountPrice.length() > 0) {
+                String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
+                String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
+
+                if (amountPrice != null && amountPrice.length() > 0) {
                     empType.getParameters().put("amountPrice", amountPrice);
                 }
-                if(amountLunch != null && amountLunch.length() > 0) {
+                if (amountLunch != null && amountLunch.length() > 0) {
                     empType.getParameters().put("amountLunch", amountLunch);
                 }
             }

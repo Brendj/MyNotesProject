@@ -2204,6 +2204,16 @@ public class Processor implements SyncProcessor,
                             .attachToValues("amountLunch", Long.toString(totalLunchRSum/100) + ',' + Long.toString(totalLunchRSum%100), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values);
+
+                    List<Client> guardians = findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
+
+                    if (!(guardians == null || guardians.isEmpty())) {
+                        for (Client destGuardian : guardians) {
+                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                    .sendNotificationAsync(destGuardian, client,
+                                            EventNotificationService.MESSAGE_PAYMENT, values);
+                        }
+                    }
                 }
             } else {
                 // TODO: есть ли необходимость оповещать клиента о сторне?
@@ -3483,26 +3493,23 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         switch (org.getType()){
                             case PROFESSIONAL:
                             case SCHOOL: {
-                                values = EventNotificationService.attachEventDirectionToValues(e.getPassDirection(), values);
+                                values = EventNotificationService
+                                        .attachEventDirectionToValues(e.getPassDirection(), values);
 
-                                //if (guardianId != null) {
-                                    List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
-                                    //Client guardianFromEnterEvent = DAOService.getInstance().findClientById(guardianId);
+                                List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);
 
-                                    if(!(guardians==null || guardians.isEmpty())){
-                                        for (Client destGuardian : guardians){
-                                            /*if(guardians.size() > 1 && destGuardian.getIdOfClient().equals(
-                                                    guardianFromEnterEvent.getIdOfClient())) {
-                                                continue;
-                                            }
-                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), guardianFromEnterEvent);*/
-                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection(), null);
-                                        }
+                                if (!(guardians == null || guardians.isEmpty())) {
+                                    for (Client destGuardian : guardians) {
+                                        notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
+                                                EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
+                                                e.getPassDirection(), null);
                                     }
-                                //}
-
-                                notificationService.sendNotificationAsync(clientFromEnterEvent, null, EventNotificationService.NOTIFICATION_ENTER_EVENT, values, e.getPassDirection());
-                            } break;
+                                }
+                                notificationService.sendNotificationAsync(clientFromEnterEvent, null,
+                                        EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
+                                        e.getPassDirection());
+                            }
+                            break;
                             case KINDERGARTEN: {
                                 if(guardianId!=null){
                                     List<Client> guardians = findGuardiansByClient(persistenceSession, idOfClient, null);//guardianId);
