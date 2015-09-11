@@ -348,7 +348,8 @@ public class RequestsAndOrdersReportService {
     }
 
     private String getOrgName(BasicReportJob.OrgShortItem org) {
-        return org.getShortName() != null ? org.getShortName() : org.getOfficialName();
+        //return org.getShortName() != null ? org.getShortName() : org.getOfficialName();
+        return org.getOfficialName();
     }
 
     private List getComplexList(HashMap<Long, BasicReportJob.OrgShortItem> orgMap, Date beginDate, Date endDate) {
