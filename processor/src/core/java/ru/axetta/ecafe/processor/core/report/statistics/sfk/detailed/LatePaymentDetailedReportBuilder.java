@@ -74,7 +74,7 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
         LatePaymentDetailedReportService latePaymentDetailedReportService = new LatePaymentDetailedReportService();
 
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService
-                .getMainData(session, idOfOrg, startTime, endTime);
+                .getMainData(session, idOfOrg, startTime, endTime, showReverse);
 
         return new JRBeanCollectionDataSource(latePaymentDetailedReportModelList);
     }
