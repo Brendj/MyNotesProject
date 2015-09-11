@@ -84,10 +84,10 @@ public class LatePaymentDetailedReportService {
     public List<LatePaymentDetailedSubReportModel> getExtraData(Session session, Long idOfOrg, Date paymentDate,
             Date startDate, Date endDate, Boolean showReverse) {
 
-        String orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) ";
+        String orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124))) ";
 
         if (showReverse) {
-            orderTypeCondition = "and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) or (o.ordertype = 6 and cc.idOfCategoryDiscount = 50)) ";
+            orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) or (o.ordertype = 6 and cc.idOfCategoryDiscount = 50)) ";
         }
 
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
@@ -97,10 +97,10 @@ public class LatePaymentDetailedReportService {
                         + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
                         + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
-                        + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
-                        + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
+                        + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
+                        + " WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
                         + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
-                        + " AND o.state = 0 AND o.idoforg = :idOfOrg" + orderTypeCondition
+                        + " AND o.state = 0 AND o.idoforg = :idOfOrg " + orderTypeCondition
                         + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, od.menudetailname, o.ordertype"
                         + " ORDER BY o.createddate");
         query.setParameter("idOfOrg", idOfOrg);
