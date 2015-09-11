@@ -28,7 +28,7 @@ public class LatePaymentDetailedReportService {
 
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReportService.class);
 
-    DateFormat dateFormat = new SimpleDateFormat("dd.mm.yyyy");
+    DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     public LatePaymentDetailedReportService() {
     }
@@ -39,15 +39,15 @@ public class LatePaymentDetailedReportService {
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
 
         Query query = session.createSQLQuery(
-                "SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgnum, cfo.address, to_timestamp( TRUNC(CAST(o.orderdate AS BIGINT) / 1000 )) paymentDate"
+                "SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgnum, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE) paymentDate"
                         + " FROM cf_orders o INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg"
                         + " INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
                         + " WHERE cast (to_timestamp(o.createddate/1000) AS DATE) <> cast (to_timestamp(o.orderdate/1000) AS DATE)"
                         + " AND o.ordertype IN (4,6) AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate"
                         + " AND o.idoforg = :idOfOrg AND cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)"
-                        + " GROUP BY cfo.shortname, cfo.address, to_timestamp( TRUNC(CAST(o.orderdate AS BIGINT) / 1000 )), o.idoforg"
-                        + " ORDER BY cfo.shortname, cfo.address, to_timestamp( TRUNC(CAST(o.orderdate AS BIGINT) / 1000 ))");
+                        + " GROUP BY cfo.shortname, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE), o.idoforg"
+                        + " ORDER BY cfo.shortname, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
