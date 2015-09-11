@@ -93,14 +93,14 @@ public class LatePaymentDetailedReportService {
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
 
         Query query = session.createSQLQuery(
-                "SELECT to_timestamp( TRUNC( CAST(o.createddate AS BIGINT  ) / 1000 )) foodDate, p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client"
+                "SELECT cast (to_timestamp(o.createddate/1000) as date) foodDate, p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client"
                         + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
-                        + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg "
-                        + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient WHERE"
-                        + " cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
+                        + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
+                        + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
+                        + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
                         + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
-                        + " AND o.ordertype IN ( "+ orderType + ")"
+                        + " AND o.ordertype IN ( " + orderType + ")"
                         + " AND o.state = 0 AND cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)"
                         + " AND o.idoforg = :idOfOrg"
                         + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, od.menudetailname, o.ordertype"

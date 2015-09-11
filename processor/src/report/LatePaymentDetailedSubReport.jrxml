@@ -32,8 +32,8 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 	</queryString>
 	<field name="foodDate" class="java.lang.String"/>
 	<field name="client" class="java.lang.String"/>
-	<group name="fooddate">
-		<groupExpression><![CDATA[]]></groupExpression>
+	<group name="foodDate" isStartNewColumn="true">
+		<groupExpression><![CDATA[$F{foodDate}]]></groupExpression>
 		<groupHeader>
 			<band height="30">
 				<textField>
