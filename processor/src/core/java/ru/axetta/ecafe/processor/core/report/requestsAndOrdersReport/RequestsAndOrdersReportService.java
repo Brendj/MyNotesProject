@@ -349,6 +349,7 @@ public class RequestsAndOrdersReportService {
 
     private String getOrgName(BasicReportJob.OrgShortItem org) {
         //return org.getShortName() != null ? org.getShortName() : org.getOfficialName();
+
         return org.getOfficialName();
     }
 
