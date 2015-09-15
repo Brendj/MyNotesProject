@@ -414,7 +414,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 orgCondition = "            (" + builder.toString() + ") and ";
             }
 
-            String sql =
+            /*String sql =
                     "select d.idoforg, d.shortname, smsdate, eventdate "
                     + "from ("
                     + "      select org.idoforg, org.shortname, sms.servicesenddate as smsdate, "
@@ -431,7 +431,15 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     + "            (sms.servicesenddate>=:start and sms.servicesenddate<:end) and "
                     + "            (contentstype=" + ClientSms.TYPE_ENTER_EVENT_NOTIFY + " or contentstype=" + ClientSms.TYPE_PAYMENT_NOTIFY + ") "
                     + "      order by 1) as d "
-                    + "where d.eventdate is not null";
+                    + "where d.eventdate is not null";*/
+            String sql =
+                    "select org.idoforg, org.shortname, sms.servicesenddate, sms.evtdate "
+                            + "from cf_clientsms sms inner join cf_orgs org on sms.idoforg=org.idoforg "
+                            + "where " + orgCondition
+                            + "            (sms.servicesenddate>=:start and sms.servicesenddate<:end) and "
+                            + "            (sms.contentstype=" + ClientSms.TYPE_ENTER_EVENT_NOTIFY + " or sms.contentstype=" + ClientSms.TYPE_PAYMENT_NOTIFY + ") and "
+                            + "            sms.evtdate is not null "
+                            + "order by 1 ";
             Query query = session.createSQLQuery(sql);
             query.setParameter("start", start.getTime());
             query.setParameter("end", end.getTime());
