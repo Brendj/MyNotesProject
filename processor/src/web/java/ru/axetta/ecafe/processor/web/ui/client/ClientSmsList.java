@@ -44,6 +44,7 @@ public class ClientSmsList {
         private final Long idOfTransaction;
         private final String eventType;
         private final Long eventId;
+        private final Date eventTime;
 
         public Item(ClientSms clientSms) {
             this.idOfSms = clientSms.getIdOfSms();
@@ -68,6 +69,7 @@ public class ClientSmsList {
             }
             this.eventType = ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()];
             this.eventId = clientSms.getContentsId();
+            this.eventTime = clientSms.getEventTime();
         }
         public static final int TYPE_NEGATIVE_BALANCE = 1;
         public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
@@ -137,6 +139,10 @@ public class ClientSmsList {
 
         public Long getEventId() {
             return eventId;
+        }
+
+        public Date getEventTime() {
+            return eventTime;
         }
     }
 

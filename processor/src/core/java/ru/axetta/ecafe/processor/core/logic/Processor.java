@@ -3502,7 +3502,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                     for (Client destGuardian : guardians) {
                                         notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
                                                 EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
-                                                e.getPassDirection(), null);
+                                                e.getPassDirection(), null, e.getEvtDateTime());
                                     }
                                 }
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null,

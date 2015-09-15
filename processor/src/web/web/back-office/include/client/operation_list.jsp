@@ -417,7 +417,7 @@
 </rich:dataTable>
 
 
-<h:outputText value="SMS-сообщения:"/>
+<h:outputText value="Сообщения:"/>
 <rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"
                 footerClass="data-table-footer">
@@ -455,16 +455,16 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
+            <h:outputText escape="true" value="Время события" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.eventTime}" converter="timeConverter" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
             <h:outputText escape="true" value="Время отправки в шлюз" />
         </f:facet>
         <h:outputText escape="true" value="#{item.serviceSendTime}" converter="timeConverter"
                       styleClass="output-text" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Время отправки" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.sendTime}" converter="timeConverter" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
