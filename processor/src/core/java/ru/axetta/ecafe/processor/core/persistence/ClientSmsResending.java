@@ -25,6 +25,8 @@ public class ClientSmsResending {
     private String paramsContents;
     private Date createDate;
     private Date lastResendingDate;
+    private Date eventTime;
+    private Long idOfOrg;
 
     public ClientSmsResending() {
         // For Hibernate only
@@ -32,7 +34,7 @@ public class ClientSmsResending {
 
     public ClientSmsResending(String idOfSms, long version, Client client, String phone, String serviceName,
             Long contentsId, Integer contentsType, String textContents, String paramsContents, Date createDate,
-            Date lastResendingDate) {
+            Date lastResendingDate, Date eventTime, Long idOfOrg) {
         this.idOfSms = idOfSms;
         this.version = version;
         this.client = client;
@@ -44,6 +46,8 @@ public class ClientSmsResending {
         this.paramsContents = paramsContents;
         this.createDate = createDate;
         this.lastResendingDate = lastResendingDate;
+        this.eventTime = eventTime;
+        this.idOfOrg = idOfOrg;
     }
 
     public String getIdOfSms() {
@@ -181,6 +185,22 @@ public class ClientSmsResending {
         }
 
         return true;
+    }
+
+    public Date getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(Date eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
     @Override

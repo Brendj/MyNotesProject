@@ -2203,7 +2203,7 @@ public class Processor implements SyncProcessor,
                     values = EventNotificationService
                             .attachToValues("amountLunch", Long.toString(totalLunchRSum/100) + ',' + Long.toString(totalLunchRSum%100), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values);
+                            .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values, payment.getOrderDate());
 
                     List<Client> guardians = findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
 
@@ -2211,7 +2211,7 @@ public class Processor implements SyncProcessor,
                         for (Client destGuardian : guardians) {
                             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                     .sendNotificationAsync(destGuardian, client,
-                                            EventNotificationService.MESSAGE_PAYMENT, values);
+                                            EventNotificationService.MESSAGE_PAYMENT, values, payment.getOrderDate());
                         }
                     }
                 }
@@ -3507,7 +3507,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                 }
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null,
                                         EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
-                                        e.getPassDirection());
+                                        e.getPassDirection(), e.getEvtDateTime());
                             }
                             break;
                             case KINDERGARTEN: {
@@ -3523,11 +3523,11 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                                 continue;
                                             }
                                             notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
-                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent);
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent, e.getEvtDateTime());
                                         }
                                     } else {
                                         notificationService.sendNotificationAsync(clientFromEnterEvent, null,
-                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent);
+                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent, e.getEvtDateTime());
                                     }
                                 }
                             } break;

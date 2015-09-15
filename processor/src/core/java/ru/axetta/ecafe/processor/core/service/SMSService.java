@@ -74,16 +74,16 @@ public class SMSService {
     }
     */
 
-    public boolean sendSMSAsync(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) {
+    public boolean sendSMSAsync(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
         RunnableSendSmsThreadWrapper wrapper = new RunnableSendSmsThreadWrapper
-                (transactionManager, em, idOfClient, messageType, messageTargetId, textObject, values);
+                (transactionManager, em, idOfClient, messageType, messageTargetId, textObject, values, eventTime);
         taskExecutor.execute(wrapper);
         return true;
     }
 
-    public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
+    public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
         SendSmsThreadWrapper wrapper = new SendSmsThreadWrapper(transactionManager, em);
-        return wrapper.sendSMS(idOfClient, messageType, messageTargetId, textObject, values);
+        return wrapper.sendSMS(idOfClient, messageType, messageTargetId, textObject, values, eventTime);
     }
 
     public static final class RunnableSendSmsThreadWrapper extends SendSmsThreadWrapper implements Runnable {
@@ -93,12 +93,13 @@ public class SMSService {
         protected Object textObject;
         protected String[] values;
         protected boolean result;
+        protected Date eventTime;
 
         public RunnableSendSmsThreadWrapper() {
         }
 
         public RunnableSendSmsThreadWrapper(org.springframework.transaction.PlatformTransactionManager transactionManager, javax.persistence.EntityManager em,
-                                            long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) {
+                                            long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
             super(transactionManager, em);
 
             this.idOfClient = idOfClient;
@@ -107,12 +108,13 @@ public class SMSService {
             this.textObject = textObject;
             this.values = values;
             this.result = false;
+            this.eventTime = eventTime;
         }
 
         @Override
         public void run() {
             try {
-                result = sendSMS(this.idOfClient, this.messageType, this.messageTargetId, this.textObject, this.values);
+                result = sendSMS(this.idOfClient, this.messageType, this.messageTargetId, this.textObject, this.values, this.eventTime);
             } catch (Exception e) {
                 logger.error("Failed to send SMS", e);
                 result = false;
@@ -132,7 +134,7 @@ public class SMSService {
             this.em = em;
         }
 
-        public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
+        public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
             if(transactionManager == null) {
                 throw new IllegalStateException("Transaction manager is null");
             }
@@ -218,7 +220,7 @@ public class SMSService {
 
             if (sendResponse != null) {
                 result = registerClientSMSCharge(sendResponse.isSuccess(), client, sendResponse.getMessageId(),
-                        phoneNumber, messageTargetId, messageType, textMessage);
+                        phoneNumber, messageTargetId, messageType, textMessage, eventTime);
             }
 
             //  Добавление в список не отправленных sms
@@ -229,7 +231,7 @@ public class SMSService {
                 String serviceName = RuntimeContext.getInstance().getConfigProperties().
                         getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
                 SMSResendingService.getInstance().addResending(sendResponse.getMessageId(), client,
-                        phoneNumber, serviceName, messageTargetId, messageType, textObject, values);
+                        phoneNumber, serviceName, messageTargetId, messageType, textObject, values, eventTime);
             }
 
             return result;
@@ -249,14 +251,14 @@ public class SMSService {
         }
 
         protected boolean registerClientSMSCharge(boolean success, Client client, String messageId,
-                                                  String phoneNumber, Long messageTargetId, int messageType, String text) throws Exception {
+                                                  String phoneNumber, Long messageTargetId, int messageType, String text, Date eventTime) throws Exception {
             ClientSms clientSms = null;
             boolean result = false;
             if (success) {
                 boolean delivered =  RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
                 clientSms = RuntimeContext.getFinancialOpsManager()
                         .createClientSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
-                                new Date(), delivered);
+                                new Date(), eventTime, delivered);
                 createdClientSms.set(clientSms);
                 result = true;
             }

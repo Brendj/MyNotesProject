@@ -4434,7 +4434,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else {
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                       .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
-                            new String[]{"linkingToken", linkingToken.getToken()});
+                            new String[]{"linkingToken", linkingToken.getToken()}, new Date());
                 result.resultCode = RC_OK;
                 result.description = "Код активации отправлен по " + info;
             }
@@ -4475,7 +4475,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                   .sendMessageAsync(clientList.get(0), EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
-                        new String[]{"linkingToken", codes});
+                        new String[]{"linkingToken", codes}, new Date());
             result.resultCode = RC_OK;
             result.description = "Код активации отправлен по SMS для " + clientList.size() + " л/с";
             return result;

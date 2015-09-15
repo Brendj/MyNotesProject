@@ -53,12 +53,14 @@ public class ClientSms {
     private Date sendTime;
     private Date deliveryTime;
     private Long price;
+    private Date eventTime;
+    private Long idOfOrg;
 
     protected ClientSms() {
         // For Hibernate only
     }
 
-    ClientSms(String idOfSms, Client client, String phone, Long contentsId, Integer contentsType, String textContents,
+    /*ClientSms(String idOfSms, Client client, String phone, Long contentsId, Integer contentsType, String textContents,
             Date serviceSendTime, Long price) {
         this.idOfSms = idOfSms;
         this.client = client;
@@ -69,10 +71,10 @@ public class ClientSms {
         this.deliveryStatus = SENT_TO_SERVICE;
         this.serviceSendTime = serviceSendTime;
         this.price = price;
-    }
+    }*/
 
     public ClientSms(String idOfSms, Client client, AccountTransaction transaction, String phone, Long contentsId, Integer contentsType,
-            String textContents, Date serviceSendTime, Long price) {
+            String textContents, Date serviceSendTime, Long price, Date eventTime, Long idOfOrg) {
         this.idOfSms = idOfSms;
         this.transaction = transaction;
         this.client = client;
@@ -83,6 +85,8 @@ public class ClientSms {
         this.serviceSendTime = serviceSendTime;
         this.price = price;
         this.contentsId = contentsId;
+        this.eventTime = eventTime;
+        this.idOfOrg = idOfOrg;
     }
 
     public String getIdOfSms() {
@@ -196,6 +200,22 @@ public class ClientSms {
     private void setPrice(Long price) {
         // For Hibernate only
         this.price = price;
+    }
+
+    public Date getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(Date eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
     @Override

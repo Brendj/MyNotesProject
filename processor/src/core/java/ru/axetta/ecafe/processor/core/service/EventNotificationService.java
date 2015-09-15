@@ -239,39 +239,39 @@ public class EventNotificationService {
     }
 
     @Async
-    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values) {
-        sendNotification(destClient, dataClient, type, values);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, eventTime);
     }
 
     @Async
-    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Client guardian) {
-        sendNotification(destClient, dataClient, type, values, null, guardian);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Client guardian, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, null, guardian, eventTime);
     }
 
     @Async
-    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection) {
-        sendNotification(destClient, dataClient, type, values, passDirection, null);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, passDirection, null, eventTime);
     }
 
     @Async
-    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian) {
-        sendNotification(destClient, dataClient, type, values, passDirection, guardian);
+    public void sendNotificationAsync(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, passDirection, guardian, eventTime);
     }
 
     @Async
-    public void sendMessageAsync(Client client, String type, String[] values) {
-        sendMessage(client, type, values);
+    public void sendMessageAsync(Client client, String type, String[] values, Date eventTime) {
+        sendMessage(client, type, values, eventTime);
     }
 
-    public void sendNotification(Client destClient, Client dataClient, String type, String[] values) {
-        sendNotification(destClient, dataClient, type, values, null, null);
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, null, null, eventTime);
     }
 
-    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian) {
-        sendNotification(destClient, dataClient, type, values, passDirection, guardian, null);
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Date eventTime) {
+        sendNotification(destClient, dataClient, type, values, passDirection, guardian, null, eventTime);
     }
 
-    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync) {
+    public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
 
         if (!isNotificationEnabled(destClient, type)) {
             return;
@@ -280,9 +280,9 @@ public class EventNotificationService {
         if (smsService.ignoreNotifyFlags() || destClient.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
                 if(sendAsync != null) {
-                    sms = sendSMS(destClient, dataClient, type, values, sendAsync, passDirection, guardian);
+                    sms = sendSMS(destClient, dataClient, type, values, sendAsync, passDirection, guardian, eventTime);
                 } else {
-                    sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian);
+                    sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian, eventTime);
                 }
             }
         }
@@ -354,10 +354,10 @@ public class EventNotificationService {
         return true;
     }
 
-    public boolean sendMessage(Client client, String type, String[] values) {
+    public boolean sendMessage(Client client, String type, String[] values, Date eventTime) {
         boolean bSend = false;
         if (client.hasMobile()) {
-            bSend |= sendSMS(client, null, type, values);
+            bSend |= sendSMS(client, null, type, values, eventTime);
         }
 
         ISmsService smsService = RuntimeContext.getInstance().getSmsService();
@@ -368,31 +368,31 @@ public class EventNotificationService {
         return bSend;
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values) {
-        return sendSMS(destClient, dataClient, type, values, true);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, true, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Client guardian) {
-        return sendSMS(destClient, dataClient, type, values, true, null, guardian);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Client guardian, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, true, null, guardian, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer passDirection) {
-        return sendSMS(destClient, dataClient, type, values, true, passDirection);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, true, passDirection, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync) {
-        return sendSMS(destClient, dataClient, type, values, sendAsync, null);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, sendAsync, null, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction) {
-        return sendSMS(destClient, dataClient, type, values, sendAsync, direction, null);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, sendAsync, direction, null, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer direction, Client guardian) {
-        return sendSMS(destClient, dataClient, type, values, true, direction, guardian);
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, Integer direction, Client guardian, Date eventTime) {
+        return sendSMS(destClient, dataClient, type, values, true, direction, guardian, eventTime);
     }
 
-    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian) {
+    public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian, Date eventTime) {
         if (destClient.getMobile() == null || destClient.getMobile().length() == 0) {
             return false;
         }
@@ -433,11 +433,11 @@ public class EventNotificationService {
             Object textObject = getTextObject(text, type, destClient, dataClient, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
-                    smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
+                    smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                     result = true;
                 } else {
                     //result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
-                    result = smsService.sendSMS(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
+                    result = smsService.sendSMS(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                 }
             }
         } catch (Exception e) {

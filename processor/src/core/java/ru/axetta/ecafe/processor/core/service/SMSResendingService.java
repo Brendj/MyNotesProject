@@ -100,7 +100,7 @@ public class SMSResendingService {
 
         boolean success = false;
         try {
-            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotification(cl, null, evtType, params, direction, guardian, false);
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotification(cl, null, evtType, params, direction, guardian, false, clientSmsResending.getEventTime());
             success = true;
         } catch (RuntimeException re) {
             success = false;
@@ -125,7 +125,7 @@ public class SMSResendingService {
 
     public ClientSmsResending addResending(String idOfSms, Client client, String phone,
                                            String serviceName, Long contentsId, Integer contentsType,
-                                           Object contents, String[] values) {
+                                           Object contents, String[] values, Date eventTime) {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             return null;
         }
@@ -164,7 +164,7 @@ public class SMSResendingService {
         Date currentDate = new Date(System.currentTimeMillis());
         ClientSmsResending clientSmsResending = new ClientSmsResending
                                                 (idOfSms, 1L, client, phone, serviceName, contentsId, contentsType,
-                                                 textContents, paramsContents, currentDate, currentDate);
+                                                 textContents, paramsContents, currentDate, currentDate, eventTime, client.getOrg().getIdOfOrg());
         try {
             clientSmsResending = getInstance().saveResending(clientSmsResending);
         } catch (Exception e) {

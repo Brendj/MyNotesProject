@@ -60,7 +60,7 @@ public class FinancialOpsManager {
         }
         long priceOfSms = client.getOrg().getPriceOfSms();
         ClientSms clientSms = new ClientSms(idOfSms, client, null, phone, contentsId, contentsType, textContents,
-                serviceSendTime, priceOfSms);
+                serviceSendTime, priceOfSms, serviceSendTime, client.getOrg().getIdOfOrg());
         clientSms.setDeliveryStatus(ClientSms.NOT_DELIVERED_TO_RECIPENT);
         session.save(clientSms);
         return clientSms;
@@ -68,13 +68,13 @@ public class FinancialOpsManager {
 
     @Transactional
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
-            String textContents, Date serviceSendTime) throws Exception {
-        return createClientSmsCharge(client, idOfSms, phone, contentsId, contentsType, textContents, serviceSendTime, false);
+            String textContents, Date serviceSendTime, Date eventTime) throws Exception {
+        return createClientSmsCharge(client, idOfSms, phone, contentsId, contentsType, textContents, serviceSendTime, eventTime, false);
     }
 
     @Transactional
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
-            String textContents, Date serviceSendTime, boolean isDelivered) throws Exception {
+            String textContents, Date serviceSendTime, Date eventTime, boolean isDelivered) throws Exception {
 
         Session session = em.unwrap(Session.class);
         long priceOfSms = client.getOrg().getPriceOfSms();
@@ -100,7 +100,7 @@ public class FinancialOpsManager {
 
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
-                serviceSendTime, priceOfSms);
+                serviceSendTime, priceOfSms, eventTime, client.getOrg().getIdOfOrg());
         clientSms.setSendTime(serviceSendTime);
         clientSms.setContentsId(contentsId);
         if(isDelivered) {
@@ -334,13 +334,13 @@ public class FinancialOpsManager {
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
 
-        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
 
         List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
 
         if (!(guardians == null || guardians.isEmpty())) {
             for (Client destGuardian : guardians) {
-                eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+                eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
             }
         }
     }
@@ -368,7 +368,7 @@ public class FinancialOpsManager {
                 "empTime", empTime
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
-        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values);
+        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
     }
 
 

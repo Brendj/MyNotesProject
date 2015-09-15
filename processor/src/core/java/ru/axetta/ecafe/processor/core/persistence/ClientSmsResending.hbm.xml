@@ -23,5 +23,7 @@
         <property name="lastResendingDate" column="LastResendingDate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
+        <property name="eventTime" column="EvtDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
     </class>
 </hibernate-mapping>

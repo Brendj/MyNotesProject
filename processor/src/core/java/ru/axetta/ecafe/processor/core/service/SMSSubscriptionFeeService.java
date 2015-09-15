@@ -92,7 +92,7 @@ public class SMSSubscriptionFeeService {
                 String[] values = {
                         "contractId", client.getContractId().toString(), "withdrawDate", withdrawDate,
                         "smsSubscriptionFee", CurrencyStringUtils.copecksToRubles(smsSubFee), "date", currentDate};
-                enService.sendSMS(client, null, EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, values);
+                enService.sendSMS(client, null, EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, values, date);
             }
         }
     }
@@ -131,7 +131,7 @@ public class SMSSubscriptionFeeService {
                 CurrencyStringUtils.copecksToRubles(smsSubFee), "withdrawDate", withdrawDate};
         if (client.getBalance() - smsSubFee < 0) {
             enService.sendSMS(client, null, EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS, values,
-                    false);
+                    false, new Date());
             client.setNotifyViaSMS(false);
         } else {
             Session session = em.unwrap(Session.class);
@@ -141,7 +141,7 @@ public class SMSSubscriptionFeeService {
             logger.info("Withdraw from client with contract_id = {}", client.getContractId());
             // Уведомляем клиента об активации услуги.
             boolean sendResult = enService
-                    .sendSMS(client, null, EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS, values, false);
+                    .sendSMS(client, null, EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS, values, false, new Date());
             if (sendResult) {
                 ClientSms clientSms = SMSService.getCreatedClientSms();
                 clientSms.setTransaction(sf.getTransaction());

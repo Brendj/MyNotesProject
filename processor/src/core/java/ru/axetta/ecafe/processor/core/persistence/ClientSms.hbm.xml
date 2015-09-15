@@ -22,6 +22,8 @@
         <property name="sendTime" column="SendDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deliveryTime" column="DeliveryDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="price" column="Price" type="long" not-null="true" update="false"/>
+        <property name="eventTime" column="EvtDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
         <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"
                      column="IdOfTransaction" fetch="join"/>
     </class>

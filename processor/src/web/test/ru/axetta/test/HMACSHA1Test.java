@@ -6,13 +6,31 @@ package ru.axetta.test;
 
 import junit.framework.TestCase;
 
+import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
 public class HMACSHA1Test extends TestCase {
+    
+    public void testMD5() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf("516"));
+        sb.append("ca9b15eff8ed4d968d3a5cb0733cd1a1");
+        sb.append("OK");
+        sb.append("108");
+        sb.append("93");
+        sb.append("07100019");
+        sb.append("YunW2hD8Zs4");
+        System.out.println("String for MD5: "+sb.toString());
+        System.out.println("MD5="+CryptoUtils.MD5(sb.toString()));
+    }
+
+    /*
     public static void testHmac() throws Exception {
         String amount = "123.0";
         String currency = "RUR";
@@ -43,5 +61,5 @@ public class HMACSHA1Test extends TestCase {
         //SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyyMMddHHmmss");
         //dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
         //System.out.println(dateFormatGmt.format(new Date()));
-    }
+    }*/
 }
