@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 import ru.axetta.ecafe.processor.core.service.SmsDeliveryCalculationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -23,6 +24,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -155,14 +157,16 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         public List<SMSDeliveryReportItem> findDeliveryEntries(Session session, Date start, Date end) {
             try {
                 List<SMSDeliveryReportItem> items = new ArrayList<SMSDeliveryReportItem>();
-                Calendar cal = new GregorianCalendar();
-                cal.setTimeInMillis(System.currentTimeMillis());
-                cal = SmsDeliveryCalculationService.resetCalendar(cal);
+                Calendar cal = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+                //cal = SmsDeliveryCalculationService.resetCalendar(cal);
+                CalendarUtils.truncateToDayOfMonth(cal);
+
                 if(end.getTime() >= cal.getTimeInMillis() &&
                    start.getTime() >= cal.getTimeInMillis()) {
                 } else {
                     if(end.getTime() >= cal.getTimeInMillis()) {
-                        throw new IllegalArgumentException("Конечная дата может быть указана текущим днем только в том случае, если начальная дата так же указана текщим днем");
+
+                        throw new IllegalArgumentException("Конечная дата может быть указана текущим днем только в том случае, если начальная дата так же указана текущим днем");
                     }
                     findConsolidated(items, session, start, end);
                 }

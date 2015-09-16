@@ -79,7 +79,15 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder();
         addOrgFilter(reportBuilder);
-        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+        try {
+            this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+        }
+        catch (IllegalArgumentException iex) {
+            printWarn(iex.getMessage());
+        }
+        catch (Exception ex) {
+            printError(ex.getMessage());
+        }
     }
 
     protected void addOrgFilter(SMSDeliveryReport.Builder builder) {
