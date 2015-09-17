@@ -10,11 +10,8 @@ import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
+import ru.axetta.ecafe.processor.core.report.IPrintWarn;import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -76,9 +73,17 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     }
 
     public void buildReport(Session session) throws Exception {
+        IPrintWarn printer = new IPrintWarn() {
+            @Override
+            public void PrintWarn(String message) {
+                printWarn(message);
+            }
+        };
+
         this.report = new SMSDeliveryReport ();
-        SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder();
+        SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder(printer);
         addOrgFilter(reportBuilder);
+
         try {
             this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
         }

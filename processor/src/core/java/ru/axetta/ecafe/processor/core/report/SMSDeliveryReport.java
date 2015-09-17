@@ -78,14 +78,16 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         private final String templateFilename;
         private boolean exportToHTML = false;
+        private IPrintWarn printer;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
 
-        public Builder() {
+        public Builder(IPrintWarn printer) {
             templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
             exportToHTML = true;
+            this.printer = printer;
         }
 
         @Override
@@ -161,8 +163,10 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 //cal = SmsDeliveryCalculationService.resetCalendar(cal);
                 CalendarUtils.truncateToDayOfMonth(cal);
 
-                if(end.getTime() >= cal.getTimeInMillis() &&
-                   start.getTime() >= cal.getTimeInMillis()) {
+                if(end.getTime() >= cal.getTimeInMillis() && start.getTime() >= cal.getTimeInMillis()) {
+                    if (printer != null) {
+                        printer.PrintWarn("Внимание! Так как дата завершения отчетного периода совпадает с текущим днем, информация по синхронизации в отчет не выводится ввиду ее отсутствия в текущем дне.");
+                    }
                 } else {
                     if(end.getTime() >= cal.getTimeInMillis()) {
 
