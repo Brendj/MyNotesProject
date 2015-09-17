@@ -2059,12 +2059,13 @@ public class Processor implements SyncProcessor,
                     if (null == client) {
                         // Client is specified if card is specified
                         client = card.getClient();
-                    } else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
+                    }
+                    /*else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
                         // Specified client isn't the owner of the specified card
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 230, String.format(
                                 "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
                                 idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                    }
+                    }*/
                 }
                 if (null != client && card != null) {
                     if (Card.ACTIVE_STATE != card.getState()) {
