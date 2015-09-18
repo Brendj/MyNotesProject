@@ -55,6 +55,8 @@
 <xs:element name="getPublicationListResponse" type="tns:getPublicationListResponse"/>
 <xs:element name="getCirculationList" type="tns:getCirculationList"/>
 <xs:element name="getCirculationListResponse" type="tns:getCirculationListResponse"/>
+<xs:element name="putClassRegisterEventListByGUID" type="tns:putClassRegisterEventListByGUID"/>
+<xs:element name="putClassRegisterEventListByGUIDResponse" type="tns:putClassRegisterEventListByGUIDResponse"/>
 <xs:element name="getEnterEventStatusListByGUID" type="tns:getEnterEventStatusListByGUID"/>
 <xs:element name="getEnterEventStatusListByGUIDResponse" type="tns:getEnterEventStatusListByGUIDResponse"/>
 <xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
@@ -632,6 +634,28 @@
     <xs:attribute name="Publisher" type="xs:string"/>
     <xs:attribute name="PublicationId" type="xs:long"/>
   </xs:complexType>
+    <xs:complexType name="putClassRegisterEventListByGUID">
+        <xs:sequence>
+            <xs:element name="classRegisterEventList" type="tns:ClassRegisterEventByGUID"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ClassRegisterEventByGUID">
+        <xs:attribute name="guid" type="xs:string"/>
+        <xs:attribute name="evtDateTime" type="xs:date"/>
+        <xs:attribute name="evtName" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="putClassRegisterEventListByGUIDResponse">
+        <xs:sequence>
+            <xs:element name="classRegisterEventList" type="tns:ClassRegisterEventListByGUIDResult"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ClassRegisterEventListByGUIDResult">
+        <xs:attribute name="classRegisterEventListItem" type="tns:ClassRegisterEventListByGUIDResultItem"/>
+    </xs:complexType>
+    <xs:complexType name="ClassRegisterEventListByGUIDResultItem">
+        <xs:attribute name="guid" type="xs:string"/>
+        <xs:attribute name="state" type="xs:integer"/>
+    </xs:complexType>
 <xs:complexType name="getEnterEventStatusListByGUID">
         <xs:sequence>
             <xs:element minOccurs="0" name="guid" type="xs:string"/>
@@ -818,6 +842,10 @@
     <wsdl:part element="tns:getCirculationList" name="parameters">
     </wsdl:part>
   </wsdl:message>
+    <wsdl:message name="putClassRegisterEventListByGUID">
+        <wsdl:part element="tns:putClassRegisterEventListByGUID" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
     <wsdl:message name="getEnterEventStatusListByGUID">
         <wsdl:part element="tns:getEnterEventStatusListByGUID" name="parameters">
         </wsdl:part>
@@ -986,6 +1014,10 @@
     <wsdl:part element="tns:getCirculationListResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+    <wsdl:message name="putClassRegisterEventListByGUIDResponse">
+        <wsdl:part element="tns:putClassRegisterEventListByGUIDResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
     <wsdl:message name="getEnterEventStatusListByGUIDResponse">
         <wsdl:part element="tns:getEnterEventStatusListByGUIDResponse" name="parameters">
         </wsdl:part>
@@ -1185,6 +1217,13 @@
       <wsdl:output message="tns:getCirculationListResponse" name="getCirculationListResponse">
     </wsdl:output>
     </wsdl:operation>
+      <wsdl:operation name="putClassRegisterEventListByGUID">
+          <wsdl:input message="tns:putClassRegisterEventListByGUID" name="putClassRegisterEventListByGUID">
+          </wsdl:input>
+          <wsdl:output message="tns:putClassRegisterEventListByGUIDResponse" name="putClassRegisterEventListByGUIDResponse">
+          </wsdl:output>
+      </wsdl:operation>
+
       <wsdl:operation name="getEnterEventStatusListByGUID">
           <wsdl:input message="tns:getEnterEventStatusListByGUID" name="getEnterEventStatusListByGUID">
           </wsdl:input>

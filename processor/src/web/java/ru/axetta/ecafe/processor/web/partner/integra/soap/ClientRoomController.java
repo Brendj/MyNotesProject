@@ -256,6 +256,9 @@ public interface ClientRoomController {
 
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
+    @WebMethod ClassRegisterEventListByGUIDResult putClassRegisterEventListByGUID(@WebParam(name = "registerEventList")
+          ClassRegisterEventListByGUID registerEventList);
+
     @WebMethod
     Result authorizeClient(@WebParam(name = "contractId") Long contractId, @WebParam(name = "token") String token);
 

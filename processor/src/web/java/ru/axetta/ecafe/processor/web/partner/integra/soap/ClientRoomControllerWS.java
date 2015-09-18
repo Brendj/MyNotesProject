@@ -4216,6 +4216,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ClassRegisterEventListByGUIDResult putClassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
+        authenticateRequest(null);
+
+        return ClassRegisterEventListByGUID(registerEventList);
+
+    }
+
+    private ClassRegisterEventListByGUIDResult ClassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
+        ClassRegisterEventListByGUIDResult result = new ClassRegisterEventListByGUIDResult();
+
+        result.registerEventList = new ArrayList<ClassRegisterEventListByGUIDResultItem>();
+        for(ClassRegisterEventByGUID item : registerEventList.registerEvent) {
+            ClassRegisterEventListByGUIDResultItem it = new ClassRegisterEventListByGUIDResultItem();
+            it.guid = item.guid;
+            it.state = 0;
+            result.registerEventList.add(it);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+//        result.registerEventList = null;
+
+        return result;
+    }
+
+    @Override
     public EnterEventStatusListResult getEnterEventStatusListByGUID(List<String> guids) {
         authenticateRequest(null);
 
