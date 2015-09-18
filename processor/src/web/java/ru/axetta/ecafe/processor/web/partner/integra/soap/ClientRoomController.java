@@ -254,6 +254,8 @@ public interface ClientRoomController {
     @WebMethod CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") int state);
 
+    @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
+
     @WebMethod
     Result authorizeClient(@WebParam(name = "contractId") Long contractId, @WebParam(name = "token") String token);
 

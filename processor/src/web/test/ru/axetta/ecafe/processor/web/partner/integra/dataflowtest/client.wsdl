@@ -55,6 +55,8 @@
 <xs:element name="getPublicationListResponse" type="tns:getPublicationListResponse"/>
 <xs:element name="getCirculationList" type="tns:getCirculationList"/>
 <xs:element name="getCirculationListResponse" type="tns:getCirculationListResponse"/>
+<xs:element name="getEnterEventStatusListByGUID" type="tns:getEnterEventStatusListByGUID"/>
+<xs:element name="getEnterEventStatusListByGUIDResponse" type="tns:getEnterEventStatusListByGUIDResponse"/>
 <xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
 <xs:element name="getClientsByGuardSanResponse" type="tns:getClientsByGuardSanResponse"/>
 <xs:element name="getContractIdByCardNo" type="tns:getContractIdByCardNo"/>
@@ -630,6 +632,34 @@
     <xs:attribute name="Publisher" type="xs:string"/>
     <xs:attribute name="PublicationId" type="xs:long"/>
   </xs:complexType>
+<xs:complexType name="getEnterEventStatusListByGUID">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="guid" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="getEnterEventStatusListByGUIDResponse">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="return" type="tns:enterEventsStatusListResult"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="enterEventsStatusListResult">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="enterEventStatusList" type="tns:EnterEventStatusItemList"/>
+            <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+            <xs:element minOccurs="0" name="description" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="EnterEventStatusItemList">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="C" type="tns:EnterEventStatusItem"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="EnterEventStatusItem">
+        <xs:attribute name="Guid" type="xs:string"/>
+        <xs:attribute name="Inside" type="xs:boolean"/>
+        <xs:attribute name="LastEnterEventDirection" type="xs:integer"/>
+        <xs:attribute name="LastEnterEventDateTime" type="xs:date"/>
+    </xs:complexType>
 <xs:complexType name="changeExpenditureLimit">
     <xs:sequence>
       <xs:element minOccurs="0" name="contractId" type="xs:long"/>
@@ -788,6 +818,10 @@
     <wsdl:part element="tns:getCirculationList" name="parameters">
     </wsdl:part>
   </wsdl:message>
+    <wsdl:message name="getEnterEventStatusListByGUID">
+        <wsdl:part element="tns:getEnterEventStatusListByGUID" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
   <wsdl:message name="getCardList">
     <wsdl:part element="tns:getCardList" name="parameters">
     </wsdl:part>
@@ -952,6 +986,10 @@
     <wsdl:part element="tns:getCirculationListResponse" name="parameters">
     </wsdl:part>
   </wsdl:message>
+    <wsdl:message name="getEnterEventStatusListByGUIDResponse">
+        <wsdl:part element="tns:getEnterEventStatusListByGUIDResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
   <wsdl:message name="getPurchaseList">
     <wsdl:part element="tns:getPurchaseList" name="parameters">
     </wsdl:part>
@@ -1147,6 +1185,12 @@
       <wsdl:output message="tns:getCirculationListResponse" name="getCirculationListResponse">
     </wsdl:output>
     </wsdl:operation>
+      <wsdl:operation name="getEnterEventStatusListByGUID">
+          <wsdl:input message="tns:getEnterEventStatusListByGUID" name="getEnterEventStatusListByGUID">
+          </wsdl:input>
+          <wsdl:output message="tns:getEnterEventStatusListByGUIDResponse" name="getEnterEventStatusListByGUIDResponse">
+          </wsdl:output>
+      </wsdl:operation>
     <wsdl:operation name="changeExpenditureLimit">
       <wsdl:input message="tns:changeExpenditureLimit" name="changeExpenditureLimit">
     </wsdl:input>

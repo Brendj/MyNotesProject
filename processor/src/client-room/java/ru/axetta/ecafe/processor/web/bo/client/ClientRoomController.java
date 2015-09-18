@@ -668,6 +668,23 @@ public interface ClientRoomController {
         int state);
 
     /**
+     *
+     * @param state
+     * @param contractId
+     * @return
+     *     returns ru.axetta.ecafe.processor.web.bo.client.getEnterEventStatusListByGUIDResult
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "getEnterEventStatusListByGUID", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.getEnterEventStatusListByGUID")
+    @ResponseWrapper(localName = "getEnterEventStatusListByGUIDResponse", targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/", className = "ru.axetta.ecafe.processor.web.bo.client.getEnterEventStatusListByGUIDResponse")
+    public EnterEventStatusListResult getEnterEventStatusListByGUID(
+            @WebParam(name = "contractId", targetNamespace = "")
+            Long contractId,
+            @WebParam(name = "state", targetNamespace = "")
+            int state);
+
+    /**
      * 
      * @param base64PasswordHash
      * @param contractId

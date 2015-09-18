@@ -57,6 +57,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
@@ -86,6 +87,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -4209,6 +4211,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public EnterEventStatusListResult getEnterEventStatusListByGUID(List<String> guids) {
+        authenticateRequest(null);
+
+        return processEnterEventStatusList(guids);
+
+    }
+
+    private EnterEventStatusListResult processEnterEventStatusList(List<String> guids) {
+        EnterEventStatusListResult result = new EnterEventStatusListResult();
+        EnterEventStatusItemList result_list = new EnterEventStatusItemList();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            String where_in = "'" + StringUtils.join(guids, "', '") + "'";
+            String query_str = String.format("select cli.clientGuid, ee.passDirection, to_timestamp(ee.evtdatetime / 1000) from cf_enterevents ee join cf_clients cli " +
+                    "on (ee.idofclient = cli.idofclient and (ee.evtdatetime = (select evtdatetime from cf_enterevents " +
+                    "where idofclient = cli.idofclient order by evtdatetime desc limit 1))) " +
+                    "where cli.clientguid in (%s)", where_in);
+            org.hibernate.Query q = persistenceSession.createSQLQuery(query_str);
+            List resultList = q.list();
+            for (Object entry : resultList) {
+                Object record[] = (Object[]) entry;
+                String guid            = (String) record[0];
+                Integer passDirection  = (Integer) record[1];
+                Date evtDate           = record[2] == null ? null : new Date(((Timestamp) record[2]).getTime());
+                Boolean inside = false;
+                switch(passDirection) {
+                    case EnterEvent.ENTRY:
+                    case EnterEvent.DETECTED_INSIDE:
+                    case EnterEvent.RE_ENTRY:
+                        inside = true;
+                        break;
+                }
+                EnterEventStatusItem result_item = new EnterEventStatusItem();
+                result_item.setGuid(guid);
+                result_item.setInside(inside);
+                GregorianCalendar c = new GregorianCalendar();
+                c.setTime(evtDate);
+                XMLGregorianCalendar date2 = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+                result_item.setLastEnterEventDateTime(date2);
+                result_item.setLastEnterEventDirection(passDirection);
+                result_list.getC().add(result_item);
+            }
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            result.enterEventStatusList = result_list;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = e.toString();
+            result.enterEventStatusList = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return result;
     }
