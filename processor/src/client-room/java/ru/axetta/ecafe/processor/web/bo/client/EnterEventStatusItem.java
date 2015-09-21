@@ -36,7 +36,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "EnterEventStatusItem", propOrder = {
+@XmlType(name = "enterEventStatusItem", propOrder = {
     "lastEnterEventDateTime"
 })
 public class EnterEventStatusItem {

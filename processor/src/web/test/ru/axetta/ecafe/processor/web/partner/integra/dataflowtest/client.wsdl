@@ -646,11 +646,18 @@
     </xs:complexType>
     <xs:complexType name="putClassRegisterEventListByGUIDResponse">
         <xs:sequence>
-            <xs:element name="classRegisterEventList" type="tns:ClassRegisterEventListByGUIDResult"/>
+            <xs:element name="return" type="tns:putClassRegisterEventListByGUIDResult"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="putClassRegisterEventListByGUIDResult">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="ClassRegisterEventListByGUIDResult" type="tns:ClassRegisterEventListByGUIDResult"/>
+            <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+            <xs:element minOccurs="0" name="description" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="ClassRegisterEventListByGUIDResult">
-        <xs:attribute name="classRegisterEventListItem" type="tns:ClassRegisterEventListByGUIDResultItem"/>
+        <xs:attribute name="ClassRegisterEventListItem" type="tns:ClassRegisterEventListByGUIDResultItem"/>
     </xs:complexType>
     <xs:complexType name="ClassRegisterEventListByGUIDResultItem">
         <xs:attribute name="guid" type="xs:string"/>

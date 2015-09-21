@@ -4225,18 +4225,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private ClassRegisterEventListByGUIDResult ClassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
         ClassRegisterEventListByGUIDResult result = new ClassRegisterEventListByGUIDResult();
+        ClassRegisterEventListByGUIDResultItem result_list = new ClassRegisterEventListByGUIDResultItem();
+        result_list.classRegisterEventListByGUIDResultItem = new ArrayList<ClassRegisterEventByGUIDItem>();
 
-        result.registerEventList = new ArrayList<ClassRegisterEventListByGUIDResultItem>();
         for(ClassRegisterEventByGUID item : registerEventList.registerEvent) {
-            ClassRegisterEventListByGUIDResultItem it = new ClassRegisterEventListByGUIDResultItem();
+            ClassRegisterEventByGUIDItem it = new ClassRegisterEventByGUIDItem();
             it.guid = item.guid;
             it.state = 0;
-            result.registerEventList.add(it);
+            result_list.classRegisterEventListByGUIDResultItem.add(it);
+
         }
         result.resultCode = RC_OK;
         result.description = RC_OK_DESC;
-
-//        result.registerEventList = null;
+        result.classRegisterEventListByGUIDResult = result_list;
 
         return result;
     }

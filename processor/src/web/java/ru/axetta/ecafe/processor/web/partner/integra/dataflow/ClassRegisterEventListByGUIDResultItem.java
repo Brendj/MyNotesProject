@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
-public class ClassRegisterEventListByGUIDResultItem {
-    public String guid;
-    public Integer state;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 
+public class ClassRegisterEventListByGUIDResultItem {
+    public List<ClassRegisterEventByGUIDItem> classRegisterEventListByGUIDResultItem;
 }
