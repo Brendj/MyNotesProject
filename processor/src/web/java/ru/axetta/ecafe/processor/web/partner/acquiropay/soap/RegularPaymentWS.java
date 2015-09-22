@@ -95,8 +95,10 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             tr = session.beginTransaction();
             Long contractId = ContractIdFormat.parse(contractID);
             Client c = DAOUtils.findClientByContractId(session, contractId);
-            if (c == null || !(clientIDType == CLIENT_ID_TYPE_SAN ? c.getSan().equals(clientID)
-                    : c.getMobile().equals(PhoneNumberCanonicalizator.canonicalize(clientID)))) {
+            // разобраться зачем была проверка по номеру телефона
+            //if (c == null || !(clientIDType == CLIENT_ID_TYPE_SAN ? c.getSan().equals(clientID)
+            //        : c.getMobile().equals(PhoneNumberCanonicalizator.canonicalize(clientID)))) {
+            if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC,
                         clientIDType == CLIENT_ID_TYPE_SAN ? "san" : "mobile phone number", clientID));

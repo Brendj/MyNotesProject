@@ -3477,7 +3477,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     enterEvent.setChildPassChecker(e.getChildPassChecker());
                     enterEvent.setChildPassCheckerId(e.getChildPassCheckerId());
                     //enterEvent.setIdOfClientGroup(e.getIdOfClientGroup());
-                    enterEvent.setIdOfClientGroup(clientFromEnterEvent.getIdOfClientGroup());
+                    enterEvent.setIdOfClientGroup(clientFromEnterEvent==null?null:clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
 
 
