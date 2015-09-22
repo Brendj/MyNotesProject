@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -51,6 +52,18 @@ public class SMSService {
     public SMSService() {
     }
 
+    public void logQueue() {
+        try {
+            int activeCount = ((ThreadPoolTaskExecutor)taskExecutor).getActiveCount();
+            int size = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().remainingCapacity();
+            int queue = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().size();
+            logger.info(String.format("Размеры очереди smsSendingTaskExecutor: выполняется потоков - %s, "+
+                    "доступно в очереди - %s, размер очереди - %s", activeCount, size, queue));
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
     /*@Async
     public void sendSMSAsync(long idOfClient, EMPEventType empEvent) throws Exception {
         RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, empEvent);
