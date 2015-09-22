@@ -87,6 +87,8 @@ public class CardReadOnlyRepository extends BaseJpaDao {
                 .getResultList();
     }
 
+    //ниже странное условие where c.cardNo in (:idOfOrgs)
+    @Deprecated
     public List<Visitor> findVisitorsWithCardsByOrg(List<Long> idOfOrgs) {
         return entityManager.createQuery(
                 "select c.visitor from Card c where c.cardNo in (:idOfOrgs) and c.client is null and c.visitor is not null",
