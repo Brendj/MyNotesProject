@@ -266,7 +266,7 @@ public class SyncServlet extends HttpServlet {
         String errorMsg = ((Integer) responseResultCode).toString() + ": " + msgString;
         SyncCollector.setErrMessage(syncTime, errorMsg);
         SyncCollector.registerSyncEnd(syncTime);
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, msgString);
+        response.sendError(responseResultCode, msgString);
     }
 
     private static RequestData readRequest(HttpServletRequest httpRequest) throws Exception {
