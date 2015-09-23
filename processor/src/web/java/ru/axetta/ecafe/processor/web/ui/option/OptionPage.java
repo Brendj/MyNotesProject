@@ -82,6 +82,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncRegisterMaxAttempts;
     private Integer syncLimits;
     private Integer retryAfter;
+    private Integer syncLimitFilter;
     private String syncRegisterSupportEmail;
     private Integer thinClientMinClaimsEditableDays;
     private int smsPaymentType;
@@ -466,6 +467,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.retryAfter = retryAfter;
     }
 
+    public Integer getSyncLimitFilter() {
+        return syncLimitFilter;
+    }
+
+    public void setSyncLimitFilter(Integer syncLimitFilter) {
+        this.syncLimitFilter = syncLimitFilter;
+    }
+
     public String getSyncRegisterSupportEmail() {
         return syncRegisterSupportEmail;
     }
@@ -757,6 +766,7 @@ public class OptionPage extends BasicWorkspacePage {
         enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
+        syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
 
         Calendar cal = new GregorianCalendar();
@@ -883,6 +893,7 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
+            runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);
             runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);
@@ -918,4 +929,5 @@ public class OptionPage extends BasicWorkspacePage {
         onShow();
         return null;
     }
+
 }
