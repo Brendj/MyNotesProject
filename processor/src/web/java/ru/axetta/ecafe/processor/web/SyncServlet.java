@@ -327,6 +327,10 @@ public class SyncServlet extends HttpServlet {
 
     private static List<Date[]> getRestrictPeriods(String option) {
         List<Date[]> result = new ArrayList<Date[]>();
+        if (option.equals("")) {
+            logger.info("Option OPTION_REQUEST_SYNC_LIMITFILTER is empty");
+            return result;
+        }
         try {
             String[] arr = option.split(";");
             for (String period : arr) {
