@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncCollector;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -37,8 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -54,6 +54,8 @@ public class SyncServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SyncServlet.class);
     private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
+    private static final List<Date[]> restrictedFullSyncPeriods =
+            getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
 
     static class RequestData {
         public boolean isCompressed;
@@ -97,6 +99,14 @@ public class SyncServlet extends HttpServlet {
                         request.getRemoteAddr());
                 logger.error(message, e);
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+
+            //Время запрета полной синхронизации
+            if (syncType==SyncType.TYPE_FULL && isRestrictedFullSyncPeriod()) {
+                String message = String.format("Full sync not allowed in this time, idOfOrg=%d", idOfOrg);
+                logger.error(message);
+                sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
 
@@ -315,4 +325,46 @@ public class SyncServlet extends HttpServlet {
         }
     }
 
+    private static List<Date[]> getRestrictPeriods(String option) {
+        List<Date[]> result = new ArrayList<Date[]>();
+        try {
+            String[] arr = option.split(";");
+            for (String period : arr) {
+                Date[] res_period = new Date[2];
+                String[] time = period.split("-");
+
+                Calendar c1 = new GregorianCalendar();
+                Date d1 = CalendarUtils.parseTime(time[0]);
+                c1.set(Calendar.HOUR_OF_DAY, d1.getHours());
+                c1.set(Calendar.MINUTE, d1.getMinutes());
+                c1.set(Calendar.SECOND,0);
+                res_period[0] = c1.getTime();
+
+                Calendar c2 = Calendar.getInstance();
+                Date d2 = CalendarUtils.parseTime(time[1]);
+                c2.set(Calendar.HOUR_OF_DAY, d2.getHours());
+                c2.set(Calendar.MINUTE, d2.getMinutes());
+                c2.set(Calendar.SECOND,0);
+                //c2.setTime(CalendarUtils.parseTime(time[1]));
+                res_period[1] = c2.getTime();
+                result.add(res_period);
+            }
+        }
+        catch(Exception ex) {
+            logger.error("Invalid option OPTION_REQUEST_SYNC_LIMITFILTER is set in config");
+        }
+        return result;
+    }
+
+    private boolean isRestrictedFullSyncPeriod() {
+        try {
+            for (Date[] period : restrictedFullSyncPeriods) {
+                if (CalendarUtils.betweenDate(new Date(), period[0], period[1])) {
+                    return true;
+                }
+            }
+        }
+        catch (Exception return_false) { }
+        return false;
+    }
 }

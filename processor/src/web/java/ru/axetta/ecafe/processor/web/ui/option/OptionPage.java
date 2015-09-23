@@ -8,11 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.banks.BankListPage;
 import ru.axetta.ecafe.processor.web.ui.option.banks.BankOptionItem;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -83,6 +85,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncLimits;
     private Integer retryAfter;
     private Integer syncLimitFilter;
+    private String syncRestrictFullSyncPeriods;
     private String syncRegisterSupportEmail;
     private Integer thinClientMinClaimsEditableDays;
     private int smsPaymentType;
@@ -475,6 +478,38 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncLimitFilter = syncLimitFilter;
     }
 
+    public String getSyncRestrictFullSyncPeriods() {
+        return syncRestrictFullSyncPeriods;
+    }
+
+    public void setSyncRestrictFullSyncPeriods(String syncRestrictFullSyncPeriods) throws InvalidPropertiesFormatException {
+        if (StringUtils.isEmpty(syncRestrictFullSyncPeriods) || isValidRestrictFormat(syncRestrictFullSyncPeriods)) {
+            this.syncRestrictFullSyncPeriods = syncRestrictFullSyncPeriods;
+        }
+        else {
+            throw new InvalidPropertiesFormatException("Неверный формат строки запрета полной синхронизации");
+        }
+    }
+
+    private boolean isValidRestrictFormat(String option) {
+        try {
+            String[] arr = option.split(";");
+            for (String period : arr) {
+                String[] time = period.split("-");
+                Date dt1 = CalendarUtils.parseTime(time[0]);
+                Date dt2 = CalendarUtils.parseTime(time[1]);
+                if (dt1.after(dt2)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch(Exception e) {
+            return false;
+        }
+
+    }
+
     public String getSyncRegisterSupportEmail() {
         return syncRegisterSupportEmail;
     }
@@ -768,6 +803,7 @@ public class OptionPage extends BasicWorkspacePage {
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
+        syncRestrictFullSyncPeriods = runtimeContext.getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS);
 
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
@@ -894,6 +930,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
+            runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);
             runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);

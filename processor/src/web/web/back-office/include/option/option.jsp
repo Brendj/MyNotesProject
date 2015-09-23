@@ -320,6 +320,9 @@
                     <h:outputText escape="true" value="Максимальное количество параллельных сессий синхронизации всех типов"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncLimitFilter}" styleClass="input-text" size="3" />
+                    <h:outputText escape="true" value="Периоды запрета полной синхронизации"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.syncRestrictFullSyncPeriods}" styleClass="input-text" size="25" />
                     <h:outputText escape="true" value="Тайм-аут"
                                                        styleClass="output-text" />
                     <h:inputText value="#{optionPage.retryAfter}" styleClass="input-text" size="5" />
