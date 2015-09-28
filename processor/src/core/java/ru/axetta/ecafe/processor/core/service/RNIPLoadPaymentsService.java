@@ -336,7 +336,7 @@ public class RNIPLoadPaymentsService {
         addPaymentsToDb(res.getPayments());
 
         if(res.getRnipDate() == null || updateTime.before(res.getRnipDate())) {
-            //  updateTime = updateTime;
+            updateTime = endDate;
         } else {
             updateTime = res.getRnipDate();
         }
@@ -400,7 +400,8 @@ public class RNIPLoadPaymentsService {
             throw new Exception("Invalid request type: "+requestType);
         }*/
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate), requestType);
+        SOAPMessage out = signRequest(
+                doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate, requestType), requestType);
         long timestamp = System.currentTimeMillis();
 
         File dir = new File(RNIP_DIR);
@@ -777,83 +778,91 @@ public class RNIPLoadPaymentsService {
 
 
         for (Map<String, String> p : payments) {
-            String paymentID = "";
-            if(p.size() < 1) {
-                logger.error("Получен пустой платеж от РНИП (без данных) или его данные не удалось обработать");
-                continue;
-            }
-            paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
-            String paymentDate    = p.get("PaymentDate").trim();
-            String contragentKey  = p.get("SRV_CODE");
-            if(contragentKey == null || contragentKey.length() < 1) {
-                String str = String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID);
-                logger.error(str);
-                errorWriter.write(String.format("%s: %s\r\n", workDate, str));
-                continue;
-            }
-            contragentKey        = contragentKey.substring(5, 10).trim();
-            String bic           = p.get("BIK");
-            String amount        = p.get("Amount");
-            long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
-            if (idOfContragent == 0) {
-                String str = String.format("Неудалось обработать платеж %s - не удалось найти контрагента по коду = %s", paymentID, contragentKey);
-                logger.error(str);
-                errorWriter.write(String.format("%s: %s\r\n", workDate, str));
-                continue;
-            }
-            String contractId = p.get("PAYMENT_TO");
-            if(!StringUtils.isBlank(contractId)){
-                Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
-                info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
-                        paymentID, paymentDate, contragentKey, bic, contractId, amount);
-                if (client == null) {
-                    //throw new Exception ("Клиент с номером контракта " + p.get("PAYMENT_TO") + " не найден");
-                    errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("PAYMENT_TO")));
+            try {
+                String paymentID = "";
+                if(p.size() < 1) {
+                    logger.error("Получен пустой платеж от РНИП (без данных) или его данные не удалось обработать");
                     continue;
                 }
-            }else {
-                errorWriter.write(String.format(
-                        "%s: поставщик %s идентификатор %s без номера ЛС (отсутствует атрибут PAYMENT_TO)", workDate,
-                        contragentKey, paymentID));
-                continue;
-            }
-            Long idOfPaymentContragent = null;
-            Contragent payContragent = DAOService.getInstance().getContragentByBIC(bic);
-            if (payContragent != null) {
-                idOfPaymentContragent = payContragent.getIdOfContragent();
-            }
-            else {
-                logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
-                errorWriter.write(String.format("%s: По полученному БИК %s от РНИП, не найдено ни одного контрагента\r\n", workDate, bic));
-                Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
-                if (rnipContragent != null) {
-                    //idOfContragent = rnipContragent.getIdOfContragent();
-                    idOfPaymentContragent = rnipContragent.getIdOfContragent();
+                paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
+                String paymentDate    = p.get("PaymentDate").trim();
+                String contragentKey  = p.get("SRV_CODE");
+                if(contragentKey == null || contragentKey.length() < 1) {
+                    String str = String.format("Неудалось обработать платеж %s - код контрагента отсутствует", paymentID);
+                    logger.error(str);
+                    errorWriter.write(String.format("%s: %s\r\n", workDate, str));
+                    continue;
                 }
+                contragentKey        = contragentKey.substring(5, 10).trim();
+                String bic           = p.get("BIK");
+                String amount        = p.get("Amount");
+                long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
+                if (idOfContragent == 0) {
+                    String str = String.format("Неудалось обработать платеж %s - не удалось найти контрагента по коду = %s", paymentID, contragentKey);
+                    logger.error(str);
+                    errorWriter.write(String.format("%s: %s\r\n", workDate, str));
+                    continue;
+                }
+                String contractId = p.get("PAYMENT_TO");
+                if(!StringUtils.isBlank(contractId)){
+                    contractId = contractId.trim();
+                    Client client = DAOService.getInstance().getClientByContractId(Long.parseLong(contractId));//DAOUtils.findClientByContractId(session, Long.parseLong(contractId));
+                    info("Обработка платежа: SystemIdentifier=%s, PaymentDate=%s, SRV_CODE=%s, BIK=%s, PAYMENT_TO=%s, Amount=%s ..",
+                            paymentID, paymentDate, contragentKey, bic, contractId, amount);
+                    if (client == null) {
+                        //throw new Exception ("Клиент с номером контракта " + p.get("PAYMENT_TO") + " не найден");
+                        errorWriter.write(String.format("%s: Клиент с номером контракта %s не найден\r\n", workDate, p.get("PAYMENT_TO")));
+                        continue;
+                    }
+                }else {
+                    errorWriter.write(String.format(
+                            "%s: поставщик %s идентификатор %s без номера ЛС (отсутствует атрибут PAYMENT_TO)", workDate,
+                            contragentKey, paymentID));
+                    continue;
+                }
+                Long idOfPaymentContragent = null;
+                Contragent payContragent = DAOService.getInstance().getContragentByBIC(bic);
+                if (payContragent != null) {
+                    idOfPaymentContragent = payContragent.getIdOfContragent();
+                }
+                else {
+                    logger.error("По полученному БИК " + bic + " от РНИП, не найдено ни одного контрагента");
+                    errorWriter.write(String.format("%s: По полученному БИК %s от РНИП, не найдено ни одного контрагента\r\n", workDate, bic));
+                    Contragent rnipContragent = DAOService.getInstance().getRNIPContragent();
+                    if (rnipContragent != null) {
+                        //idOfContragent = rnipContragent.getIdOfContragent();
+                        idOfPaymentContragent = rnipContragent.getIdOfContragent();
+                    }
+                }
+                if(idOfPaymentContragent == null) {
+                    logger.error(String.format("По БИК %s не найдено контрагента, так же для ИС ПП не указан контрагент по умолчанию "
+                                               + "(указывается в настройках RNIP_DEFAULT). Платеж не может быть обработан!", bic));
+                    continue;
+                }
+
+                long amt = Long.parseLong(amount);
+                OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
+                        OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
+                        ClientPayment.ATM_PAYMENT_METHOD,
+                        Long.parseLong(contractId), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
+                                                       поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
+                        paymentID, SERVICE_NAME + "/" + paymentDate + "/" + bic, amt,
+                        false);
+                OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
+                        .processPayRequest(req);
+                if(resp.getResultCode() == PaymentProcessResult.OK.getCode()) {
+                    info("Платеж SystemIdentifier=%s обработан. Присвоен id %s", paymentID, resp.getPaymentId());
+                } else {
+                    logger.error(String.format("Платеж SystemIdentifier=%s обработан. Присвоен id %s. Произошла ошибка с кодом %s", paymentID, resp.getPaymentId(), resp.getResultCode()));
+                }
+                /*logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
+                        resp == null ? "null" : resp.toString()));*/
             }
-            if(idOfPaymentContragent == null) {
-                logger.error(String.format("По БИК %s не найдено контрагента, так же для ИС ПП не указан контрагент по умолчанию "
-                                           + "(указывается в настройках RNIP_DEFAULT). Платеж не может быть обработан!", bic));
+            catch (Exception e) {
+                //если происходит ошибка при обработке какого-либо платежа, ее кидаем в лог, а оставшиеся платежи обрабатываем как обычно
+                errorWriter.write(String.format("Ошибка при обработке платежа %s", e.getMessage()));
                 continue;
             }
-
-            long amt = Long.parseLong(amount);
-            OnlinePaymentProcessor.PayRequest req = new OnlinePaymentProcessor.PayRequest(
-                    OnlinePaymentProcessor.PayRequest.V_0, false, idOfPaymentContragent, idOfContragent,
-                    ClientPayment.ATM_PAYMENT_METHOD,
-                    Long.parseLong(contractId), /* должен использоваться idofclient, но в OnlinePaymentProcessor, перепутаны местами два аргумента,
-                                                   поэтому используется Long.parseLong(p.get("PAYMENT_TO")) */
-                    paymentID, SERVICE_NAME + "/" + paymentDate + "/" + bic, amt,
-                    false);
-            OnlinePaymentProcessor.PayResponse resp = runtimeContext.getOnlinePaymentProcessor()
-                    .processPayRequest(req);
-            if(resp.getResultCode() == PaymentProcessResult.OK.getCode()) {
-                info("Платеж SystemIdentifier=%s обработан. Присвоен id %s", paymentID, resp.getPaymentId());
-            } else {
-                logger.error(String.format("Платеж SystemIdentifier=%s обработан. Присвоен id %s. Произошла ошибка с кодом %s", paymentID, resp.getPaymentId(), resp.getResultCode()));
-            }
-            /*logger.info(String.format("Request (%s) processed: %s", req == null ? "null" : req.toString(),
-                    resp == null ? "null" : resp.toString()));*/
         }
     }
 
@@ -869,12 +878,13 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date startDate, Date endDate) throws Exception {
+    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date startDate, Date endDate, int requestType) throws Exception {
         InputStream is = ss.getInputStream();
         byte[] data = new byte[is.available()];
         is.read(data);
 
         String content = new String(data, "UTF-8");
+        Date start_date = null;
         if (content.indexOf("%START_DATE%") > 1) {
             String str;
 
@@ -889,13 +899,29 @@ public class RNIPLoadPaymentsService {
             }
             //String str = new SimpleDateFormat(RNIP_DATE_FORMAT).format(new Date(System.currentTimeMillis() - 986400000));
             content = content.replaceAll("%START_DATE%", formatString(str.trim()));
-
+            DateFormat format = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT);
+            start_date = format.parse(str);
         }
         if (content.indexOf("%END_DATE%") > 1) {
             String str;
             if(endDate == null){
                 logger.warn("Auto");
-                str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
+                if (requestType == REQUEST_LOAD_PAYMENTS) {
+                    Date curtime = new Date(System.currentTimeMillis());
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(start_date);
+                    cal.add(Calendar.HOUR, 6);
+                    Date time2 = cal.getTime();
+                    if (curtime.before(time2)) {
+                        str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(curtime);
+                    }
+                    else {
+                        str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(time2);
+                    }
+                }
+                else {
+                    str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));
+                }
             }else {
                 logger.warn("Manual end: "+endDate);
                 str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(endDate);
