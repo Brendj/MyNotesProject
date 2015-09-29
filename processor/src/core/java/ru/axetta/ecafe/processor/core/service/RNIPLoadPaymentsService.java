@@ -218,7 +218,8 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent);
+            Date lastUpdateDate = getLastUpdateDate(contragent);
+            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent, lastUpdateDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
             throw new IllegalStateException("Failed to access RNIP service", e);
@@ -246,7 +247,8 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent);
+            Date lastUpdateDate = getLastUpdateDate(contragent);
+            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent, lastUpdateDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
             throw new IllegalStateException("Failed to access RNIP service", e);
@@ -387,8 +389,8 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
-        return executeRequest(updateTime, requestType, contragent, null, null, null);
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate) throws Exception {
+        return executeRequest(updateTime, requestType, contragent, updateDate, null, null);
     }
 
     public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
