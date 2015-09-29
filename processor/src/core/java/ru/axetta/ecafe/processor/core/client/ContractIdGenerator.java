@@ -22,7 +22,7 @@ public class ContractIdGenerator {
 
     //private static final Logger logger = LoggerFactory.getLogger(ContractIdGenerator.class);
     private static final long MIN_ORDER_ID = 0;
-    private static final long MAX_ORDER_ID = 9999;
+    private static final long MAX_ORDER_ID = 99999;
 
     private final SessionFactory sessionFactory;
 
@@ -48,7 +48,7 @@ public class ContractIdGenerator {
 
         long newClientContractId;
         if(l == null){
-            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 10000 + lastClientContractId);
+            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 100000 + lastClientContractId);
         }else {
             newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * l + lastClientContractId);
         }
