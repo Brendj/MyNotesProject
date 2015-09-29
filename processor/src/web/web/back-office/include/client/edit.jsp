@@ -211,6 +211,8 @@
         </f:facet>
     </rich:dataTable>
 
+    <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам	" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.dontShowToExternal}" styleClass="output-text" />
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

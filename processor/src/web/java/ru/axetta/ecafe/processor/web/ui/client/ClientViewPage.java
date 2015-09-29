@@ -94,6 +94,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean notifyViaEmail;
     private Boolean notifyViaSMS;
     private Boolean notifyViaPUSH;
+    private Boolean dontShowToExternal;
     private String remarks;
     private Date updateTime;
     private Long contractId;
@@ -238,6 +239,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         return notifyViaPUSH;
     }
 
+    public Boolean getDontShowToExternal() {
+        return dontShowToExternal;
+    }
+
     public String getRemarks() {
         return remarks;
     }
@@ -320,6 +325,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.notifyViaEmail = client.isNotifyViaEmail();
         this.notifyViaSMS = client.isNotifyViaSMS();
         this.notifyViaPUSH = client.isNotifyViaPUSH();
+        this.dontShowToExternal = client.isDontShowToExternal();
         this.remarks = client.getRemarks();
         this.updateTime = client.getUpdateTime();
         this.contractId = client.getContractId();

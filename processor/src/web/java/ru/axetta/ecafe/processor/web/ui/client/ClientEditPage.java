@@ -208,6 +208,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean notifyViaEmail;
     private Boolean notifyViaSMS;
     private Boolean notifyViaPUSH;
+    private Boolean dontShowToExternal;
     private String remarks;
     private boolean changePassword;
     private String plainPassword;
@@ -408,6 +409,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setNotifyViaPUSH(Boolean notifyViaPUSH) {
         this.notifyViaPUSH = notifyViaPUSH;
+    }
+
+    public Boolean getDontShowToExternal() {
+        return dontShowToExternal;
+    }
+
+    public void setDontShowToExternal(Boolean dontShowToExternal) {
+        this.dontShowToExternal = dontShowToExternal;
     }
 
     public String getRemarks() {
@@ -720,6 +729,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setNotifyViaEmail(this.notifyViaEmail);
         client.setNotifyViaSMS(this.notifyViaSMS);
         client.setNotifyViaPUSH(this.notifyViaPUSH);
+        client.setDontShowToExternal((this.dontShowToExternal));
         client.setRemarks(this.remarks);
         client.setUpdateTime(new Date());
         client.setContractTime(this.contractTime);
@@ -909,6 +919,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.notifyViaEmail = client.isNotifyViaEmail();
         this.notifyViaSMS = client.isNotifyViaSMS();
         this.notifyViaPUSH = client.isNotifyViaPUSH();
+        this.dontShowToExternal = client.isDontShowToExternal();
         this.remarks = client.getRemarks();
         this.contractId = client.getContractId();
         this.contractTime = client.getContractTime();

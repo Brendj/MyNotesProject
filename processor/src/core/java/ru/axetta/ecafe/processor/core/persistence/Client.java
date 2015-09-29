@@ -65,6 +65,7 @@ public class Client {
     private boolean notifyViaEmail;
     private boolean notifyViaSMS;
     private boolean notifyViaPUSH;
+    private boolean dontShowToExternal;
     //private Blob image = Hibernate.createBlob(new byte[]{});
     private String remarks;
     private Date updateTime;
@@ -490,6 +491,14 @@ public class Client {
 
     public void setNotifyViaPUSH(boolean notifyViaPUSH) {
         this.notifyViaPUSH = notifyViaPUSH;
+    }
+
+    public boolean isDontShowToExternal() {
+        return dontShowToExternal;
+    }
+
+    public void setDontShowToExternal(boolean dontShowToExternal) {
+        this.dontShowToExternal = dontShowToExternal;
     }
 
     /*public Blob getImage() {

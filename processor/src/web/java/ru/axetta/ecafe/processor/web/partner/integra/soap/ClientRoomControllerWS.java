@@ -3699,10 +3699,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (Object o: guardiansResults) {
                 ClientGuardian clientGuardian = (ClientGuardian) o;
                 Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
-                if (cl != null) {
+                if ((cl != null) && (!cl.isDontShowToExternal())) {
                     ClientRepresentative clientRepresentative = objectFactory.creteClientRepresentative();
                     clientRepresentative.setId(cl.getContractId());
                     clientRepresentative.setName(cl.getPerson().getSurnameAndFirstLetters());
+                    clientRepresentative.setEmail(cl.getEmail());
+                    clientRepresentative.setMobile(cl.getMobile());
+                    clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());
+                    clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
 
                     clientRepresentativesList.getRep().add(clientRepresentative);
                 }

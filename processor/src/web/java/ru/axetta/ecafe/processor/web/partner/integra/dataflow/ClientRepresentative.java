@@ -39,6 +39,18 @@ public class ClientRepresentative {
     @XmlAttribute(name = "Name")
     protected String name;
 
+    @XmlAttribute(name = "Email")
+    protected String email;
+
+    @XmlAttribute(name = "Mobile")
+    protected String mobile;
+
+    @XmlAttribute(name = "NotifyViaPush")
+    protected Boolean notifyviapush;
+
+    @XmlAttribute(name = "NotifyViaEmail")
+    protected Boolean notifyviaemail;
+
     public Long getId() {
         return id;
     }
@@ -53,5 +65,37 @@ public class ClientRepresentative {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public Boolean getNotifyviapush() {
+        return notifyviapush;
+    }
+
+    public void setNotifyviapush(Boolean notifyviapush) {
+        this.notifyviapush = notifyviapush;
+    }
+
+    public Boolean getNotifyviaemail() {
+        return notifyviaemail;
+    }
+
+    public void setNotifyviaemail(Boolean notifyviaemail) {
+        this.notifyviaemail = notifyviaemail;
     }
 }
