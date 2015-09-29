@@ -192,7 +192,7 @@ public class RNIPLoadPaymentsService {
             if(d == null || StringUtils.isBlank(d)) {
                 return new Date(0);
             }
-            info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
+            //info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             if (d == null || d.length() < 1) {
                 info("Для контрагента %s загрузок не было, используется 0 мс.", contragent.getContragentName());
                 return new Date(0);
@@ -290,13 +290,13 @@ public class RNIPLoadPaymentsService {
     // @Transactional
     public void receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
         Date updateTime = new Date(System.currentTimeMillis());
-        Date lastUpdateDate = getLastUpdateDate(contragent);
+
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
             return;
         }
-
+        Date lastUpdateDate = getLastUpdateDate(contragent);
 
         info("Попытка получения платежей для контрагента %s", contragent.getContragentName());
         //  Отправка запроса на получение платежей
