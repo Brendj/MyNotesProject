@@ -354,6 +354,7 @@ public class MainPage implements Serializable {
     private final FinancialControlPage financialControlPage = new FinancialControlPage();
     private final LatePaymentReportPage latePaymentReportPage = new LatePaymentReportPage();
     private final LatePaymentDetailedReportPage latePaymentDetailedReportPage = new LatePaymentDetailedReportPage();
+    private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5560,6 +5561,10 @@ public class MainPage implements Serializable {
         return latePaymentDetailedReportPage;
     }
 
+    public AdjustmentPaymentReportPage getAdjustmentPaymentReportPage() {
+        return adjustmentPaymentReportPage;
+    }
+
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
@@ -5654,6 +5659,20 @@ public class MainPage implements Serializable {
         try {
             latePaymentReportPage.fill();
             currentWorkspacePage = latePaymentReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showAdjustmentPaymentReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            adjustmentPaymentReportPage.fill();
+            currentWorkspacePage = adjustmentPaymentReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,

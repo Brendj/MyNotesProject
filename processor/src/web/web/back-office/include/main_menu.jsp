@@ -1063,6 +1063,12 @@
                             action="#{mainPage.showLatePaymentDetailedReportPage}"
                             reRender="workspaceForm"/>
 
+        <rich:panelMenuItem id="adjustmentPaymentReportMenuItem"
+                            binding="#{mainPage.adjustmentPaymentReportPage.mainMenuComponent}"
+                            label="Отчет по ручной корректировке оплаты льготного питания"
+                            action="#{mainPage.showAdjustmentPaymentReportPage}"
+                            reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
