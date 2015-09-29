@@ -290,6 +290,7 @@ public class RNIPLoadPaymentsService {
     // @Transactional
     public void receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
         Date updateTime = new Date(System.currentTimeMillis());
+        Date lastUpdateDate = getLastUpdateDate(contragent);
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
@@ -301,7 +302,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
+            response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent, lastUpdateDate, startDate, endDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -336,7 +337,9 @@ public class RNIPLoadPaymentsService {
         addPaymentsToDb(res.getPayments());
 
         if(res.getRnipDate() == null || updateTime.before(res.getRnipDate())) {
-            updateTime = endDate;
+            // Вычислим МИНИМАЛЬНОЕ(lastUpdateDate + 6 часов, ТекущееВремя) и присвоим updateTime
+            Date lastUpdateDatePlusDelta = CalendarUtils.addMinute(lastUpdateDate, 6*60);
+            if (lastUpdateDatePlusDelta.before(updateTime)) updateTime = lastUpdateDatePlusDelta;
         } else {
             updateTime = res.getRnipDate();
         }
@@ -385,10 +388,10 @@ public class RNIPLoadPaymentsService {
 
 
     public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
-        return executeRequest(updateTime, requestType, contragent,null,null);
+        return executeRequest(updateTime, requestType, contragent, null, null, null);
     }
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception {
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         String fileName = getTemplateFileName(requestType);
         /*if (requestType==REQUEST_MODIFY_CATALOG) {
             fileName = MODIFY_CATALOG_TEMPLATE;
@@ -401,7 +404,7 @@ public class RNIPLoadPaymentsService {
         }*/
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(
-                doMacroReplacement(updateTime, new StreamSource(is), contragent, startDate, endDate, requestType), requestType);
+                doMacroReplacement(updateTime, new StreamSource(is), contragent, updateDate, startDate, endDate, requestType), requestType);
         long timestamp = System.currentTimeMillis();
 
         File dir = new File(RNIP_DIR);
@@ -878,7 +881,7 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date startDate, Date endDate, int requestType) throws Exception {
+    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date updateDate, Date startDate, Date endDate, int requestType) throws Exception {
         InputStream is = ss.getInputStream();
         byte[] data = new byte[is.available()];
         is.read(data);
@@ -890,7 +893,7 @@ public class RNIPLoadPaymentsService {
 
             if(startDate == null){
                 logger.warn("Auto");
-                Date lastUpdateDate = getLastUpdateDate(contragent);
+                Date lastUpdateDate = new Date(updateDate.getTime());
                 lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
                 str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(lastUpdateDate);
             }else {
