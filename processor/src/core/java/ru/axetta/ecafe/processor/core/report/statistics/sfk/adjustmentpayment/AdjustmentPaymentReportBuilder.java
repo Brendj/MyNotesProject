@@ -9,6 +9,8 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.AdjustmentPaymentReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -41,16 +43,15 @@ public class AdjustmentPaymentReportBuilder extends BasicReportForAllOrgJob.Buil
             throw new Exception(String.format("Не найден файл шаблона '%s'", templateFilename));
         }
 
-        String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+        String idOfOrg = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+
+        List<Long> idOfOrgList = new ArrayList<Long>();
+        idOfOrgList.add(Long.parseLong(idOfOrg));
+
+        Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModels = OrgUtils.getMainBuildingAndFriendlyOrgsList(session, idOfOrgList);
 
         Boolean showReverse = Boolean
                 .valueOf(StringUtils.trimToEmpty(getReportProperties().getProperty("showReserve")));
-
-
-        /*List<Long> idOFOrgList = new ArrayList<Long>();
-        for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
-            idOFOrgList.add(Long.parseLong(idOfOrg));
-        }*/
 
         Date generateBeginTime = new Date();
 
@@ -58,19 +59,28 @@ public class AdjustmentPaymentReportBuilder extends BasicReportForAllOrgJob.Buil
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
-        JRDataSource dataSource = buildDataSource(session, Long.parseLong(idOfOrgs), startTime, endTime, showReverse);
+        JRDataSource dataSource = buildDataSource(session, friendlyOrganizationsInfoModels, Long.parseLong(idOfOrg), startTime, endTime, showReverse);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
         return new AdjustmentPaymentReport(generateBeginTime, generateDuration, jasperPrint, startTime, endTime);
     }
 
-    private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime, Boolean showReverse)
+    private JRDataSource buildDataSource(Session session, Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModels, Long idOfOrg, Date startTime, Date endTime, Boolean showReverse)
             throws Exception {
 
         AdjustmentPaymentReportService adjustmentPaymentReportService = new AdjustmentPaymentReportService();
 
-        List<AdjustmentPaymentReportModel> adjustmentPaymentReportModelList = adjustmentPaymentReportService.getMainData(session, idOfOrg, startTime, endTime, showReverse);
+        AdjustmentPaymentReportModel adjustmentPaymentReportModel = adjustmentPaymentReportService.getNumAndAddressByOrg(session, idOfOrg);
+
+        adjustmentPaymentReportModel.setNum(1L);
+
+        // Результирующий лист
+        List<AdjustmentPaymentReportModel> adjustmentPaymentReportModelList = new ArrayList<AdjustmentPaymentReportModel>();
+
+        adjustmentPaymentReportModelList.add(adjustmentPaymentReportModel);
+
+        //List<AdjustmentPaymentReportModel> adjustmentPaymentReportModelList = adjustmentPaymentReportService.getMainData(session, idOfOrg, startTime, endTime, showReverse);
 
         return new JRBeanCollectionDataSource(adjustmentPaymentReportModelList);
     }
