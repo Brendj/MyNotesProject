@@ -71,16 +71,18 @@ public class AdjustmentPaymentReportBuilder extends BasicReportForAllOrgJob.Buil
 
         AdjustmentPaymentReportService adjustmentPaymentReportService = new AdjustmentPaymentReportService();
 
-        AdjustmentPaymentReportModel adjustmentPaymentReportModel = adjustmentPaymentReportService.getNumAndAddressByOrg(session, idOfOrg);
+        FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = null;
 
-        adjustmentPaymentReportModel.setNum(1L);
+        for (FriendlyOrganizationsInfoModel organizationsInfoModel: friendlyOrganizationsInfoModels) {
+            friendlyOrganizationsInfoModel = organizationsInfoModel;
+        }
+
+        AdjustmentPaymentReportModel adjustmentPaymentReportModel = adjustmentPaymentReportService.getMainData(session, startTime, endTime, friendlyOrganizationsInfoModel, idOfOrg);
 
         // Результирующий лист
         List<AdjustmentPaymentReportModel> adjustmentPaymentReportModelList = new ArrayList<AdjustmentPaymentReportModel>();
 
         adjustmentPaymentReportModelList.add(adjustmentPaymentReportModel);
-
-        //List<AdjustmentPaymentReportModel> adjustmentPaymentReportModelList = adjustmentPaymentReportService.getMainData(session, idOfOrg, startTime, endTime, showReverse);
 
         return new JRBeanCollectionDataSource(adjustmentPaymentReportModelList);
     }

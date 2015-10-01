@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AdjustmentPaymentReport" pageWidth="580" pageHeight="842" columnWidth="540" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="439ea7d1-e5b2-413e-8cb8-48fee7d49170">
-	<property name="ireport.zoom" value="2.4157650000000013"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AdjustmentPaymentReport" pageWidth="670" pageHeight="842" columnWidth="630" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="439ea7d1-e5b2-413e-8cb8-48fee7d49170">
+	<property name="ireport.zoom" value="1.6500000000000008"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String"/>
@@ -20,7 +20,7 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="74fc55bc-fd63-484b-9642-d2e3aab450ad" x="0" y="0" width="540" height="79"/>
+				<reportElement uuid="74fc55bc-fd63-484b-9642-d2e3aab450ad" x="0" y="0" width="630" height="79"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -74,7 +74,7 @@
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a6a1d931-10ce-4322-a767-4c508b19b6a2" mode="Transparent" x="330" y="0" width="70" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="a6a1d931-10ce-4322-a767-4c508b19b6a2" mode="Transparent" x="330" y="0" width="100" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -89,7 +89,7 @@
 				<text><![CDATA[Проход по карте зафиксирован, питание не предоставлено (льготники, чел.)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="15396c94-b5f5-4be8-8c99-353d10a00c7d" mode="Transparent" x="400" y="0" width="70" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="15396c94-b5f5-4be8-8c99-353d10a00c7d" mode="Transparent" x="430" y="0" width="100" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -104,7 +104,7 @@
 				<text><![CDATA[Проход по карте не зафиксирован, питание предоставлено (льготники, чел.)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f82f76e0-05ac-4355-b910-cb01043bd16d" mode="Transparent" x="470" y="0" width="70" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="f82f76e0-05ac-4355-b910-cb01043bd16d" mode="Transparent" x="530" y="0" width="100" height="74" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -162,7 +162,7 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
-				<reportElement uuid="143af0b4-77ad-4ea0-981d-9174e0bf1824" mode="Transparent" x="400" y="0" width="70" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="143af0b4-77ad-4ea0-981d-9174e0bf1824" mode="Transparent" x="430" y="0" width="100" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -177,7 +177,7 @@
 				<textFieldExpression><![CDATA[$F{food}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
-				<reportElement uuid="d5008f30-116d-485c-b719-e663dd2e0e5b" mode="Transparent" x="470" y="0" width="70" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="d5008f30-116d-485c-b719-e663dd2e0e5b" mode="Transparent" x="530" y="0" width="100" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -192,7 +192,7 @@
 				<textFieldExpression><![CDATA[$F{reserve}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="false">
-				<reportElement uuid="bbbd3e13-c84b-469a-810d-acc023242012" mode="Transparent" x="330" y="0" width="70" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement uuid="bbbd3e13-c84b-469a-810d-acc023242012" mode="Transparent" x="330" y="0" width="100" height="54" forecolor="#000000" backcolor="#FFFFFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
