@@ -151,8 +151,8 @@ public class AdjustmentPaymentReportService {
             }
         }
 
-        adjustmentPaymentReportModel.setPassage(Long.valueOf(resultIntersectionInterval.size()));
-        adjustmentPaymentReportModel.setFood(Long.valueOf(resultSubtractionInterval.size()));
+        adjustmentPaymentReportModel.setFood(Long.valueOf(resultIntersectionInterval.size()));
+        adjustmentPaymentReportModel.setPassage(Long.valueOf(resultSubtractionInterval.size()));
         adjustmentPaymentReportModel.setReserve(Long.valueOf(planOrderItemsReserveByInterval.size()));
 
         return adjustmentPaymentReportModel;
