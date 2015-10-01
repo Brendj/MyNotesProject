@@ -48,13 +48,23 @@ public class ContractIdGenerator {
 
         long newClientContractId;
         if(l == null){
-            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * 100000 + lastClientContractId);
+            newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
         }else {
             newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * l + lastClientContractId);
         }
         org.setLastClientContractId(lastClientContractId);
         session.update(org);
         session.flush();
+        return newClientContractId;
+    }
+
+    protected static long getNextContractId(long idOfOrg, long lastClientContractId) {
+        long newClientContractId;
+        if (lastClientContractId > 9999) {
+            newClientContractId = addLastDigitByLuhn((10000*(long) (lastClientContractId/10000) + idOfOrg) * 10000 + ((long) (lastClientContractId%10000)));
+        } else {
+            newClientContractId = addLastDigitByLuhn(idOfOrg * 10000 + lastClientContractId);
+        }
         return newClientContractId;
     }
 

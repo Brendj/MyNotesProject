@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.client;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
+
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -16,11 +18,27 @@ public class ContractIdGeneratorTest {
 
     @Test
     public void testLuhnTest() throws Exception {
-        System.out.println("12525 " + ContractIdGenerator.luhnTest("12525"));
-        System.out.println("125 " + ContractIdGenerator.luhnTest("125"));
+        System.out.println("308430438 " + ContractIdGenerator.luhnTest("308430438"));
+        System.out.println("308499995 " + ContractIdGenerator.luhnTest("308499995"));
+        System.out.println("1308400009 " + ContractIdGenerator.luhnTest("1308400009"));
+        System.out.println("1308499993 " + ContractIdGenerator.luhnTest("1308499993"));
+        System.out.println("2308400007 " + ContractIdGenerator.luhnTest("2308400007"));
+        System.out.println("9308499996 " + ContractIdGenerator.luhnTest("9308499996"));
+        System.out.println("10308400000 " + ContractIdGenerator.luhnTest("10308400000"));
     }
 
-    //@Test
+    @Test
+    public void testGetNextContractId() throws Exception {
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 3043));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 9999));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 10000));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 19999));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 20000));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 99999));
+        System.out.println("Result=" + ContractIdGenerator.getNextContractId(3084, 100000));
+    }
+
+        //@Test
     //public void testLuhnTest() throws Exception {
     //    BufferedReader br = new BufferedReader(new FileReader("c:\\contractIds1.csv"));
     //    try {
