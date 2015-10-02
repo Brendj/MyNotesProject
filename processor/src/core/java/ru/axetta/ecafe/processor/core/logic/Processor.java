@@ -2199,7 +2199,7 @@ public class Processor implements SyncProcessor,
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
-                if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
+                if(client!=null && payment.isNotify()){
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;

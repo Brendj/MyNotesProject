@@ -215,10 +215,26 @@ public class Payment {
     }
 
     /**
-     * информирует статус заказа
+     * Проверка на статус заказа
      * @return true - заказ пробит, false - заказ отменен
      */
     public boolean isCommit() {
         return state== Order.STATE_COMMITED;
+    }
+
+    /**
+     * Проверка на необходимость информирования
+     * @return true - информирование разрешено, false - информирование запрещено
+     */
+    public boolean isNotify() {
+        switch (orderType) {
+            case DEFAULT:
+            case VENDING:
+            case PAY_PLAN:
+            case SUBSCRIPTION_FEEDING:
+                return true;
+            default:
+                return false;
+        }
     }
 }
