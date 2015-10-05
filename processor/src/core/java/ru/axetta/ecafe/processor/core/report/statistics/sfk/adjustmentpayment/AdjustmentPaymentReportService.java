@@ -136,23 +136,21 @@ public class AdjustmentPaymentReportService {
                 planOrderItemsToPayNotDetectedInterval.addAll(planOrderItemToPayNotDetectedIntervalList);
             }
         }
+        Set<Long> subtractIndividual = new HashSet<Long>();
         if (!planOrderItemsToPayDetectedInterval.isEmpty()) {
             for (PlanOrderItem planOrderItem : planOrderItemsToPayDetectedInterval) {
-                if (!planOrderItemsPaidByInterval.contains(planOrderItem)) {
-                    resultSubtractionInterval.add(planOrderItem);
-                }
+                subtractIndividual.add(planOrderItem.getIdOfClient());
             }
         }
+        Set<Long> intersectionIndividual = new HashSet<Long>();
         if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
             for (PlanOrderItem planOrderItem : planOrderItemsPaidByInterval) {
-                if (planOrderItemsToPayNotDetectedInterval.contains(planOrderItem)) {
-                    resultIntersectionInterval.add(planOrderItem);
-                }
+                intersectionIndividual.add(planOrderItem.getIdOfClient());
             }
         }
 
-        adjustmentPaymentReportModel.setFood(Long.valueOf(resultIntersectionInterval.size()));
-        adjustmentPaymentReportModel.setPassage(Long.valueOf(resultSubtractionInterval.size()));
+        adjustmentPaymentReportModel.setFood(Long.valueOf(intersectionIndividual.size()));
+        adjustmentPaymentReportModel.setPassage(Long.valueOf(subtractIndividual.size()));
         adjustmentPaymentReportModel.setReserve(Long.valueOf(planOrderItemsReserveByInterval.size()));
 
         return adjustmentPaymentReportModel;
