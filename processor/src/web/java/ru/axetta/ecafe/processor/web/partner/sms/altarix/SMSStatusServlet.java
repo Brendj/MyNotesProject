@@ -8,9 +8,11 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.UpdateClientSmsDeliveryStatusJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientList;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -111,7 +113,7 @@ public class SMSStatusServlet extends HttpServlet {
             } else if (request_type.equalsIgnoreCase(REQUEST_SUBSCRIBER_INFO)) {
                 requestSubscriberInfo(subscriber, response, session);
             } else {
-                response.getWriter().write("error=Ошибка, не известный тип запроса");
+                response.getWriter().write("error=Ошибка, неизвестный тип запроса");
                 return;
             }
         } catch (Exception e) {
@@ -122,39 +124,28 @@ public class SMSStatusServlet extends HttpServlet {
         }
     }
 
-
     public void requestSubscriberInfo(String subscriber, HttpServletResponse response, Session session)
             throws Exception {
         StringBuilder responseText = new StringBuilder("");
-        Client client = null;
-        Criteria clientSmsCriteria = session.createCriteria(Client.class);
-        clientSmsCriteria.add(Restrictions.eq("mobile", subscriber));
-        List clientsList = clientSmsCriteria.list();
-        for (Object cObj : clientsList) {
-            client = (Client) cObj;
-            String nextStr = getSubscriberInfo(client, session);
-            if (nextStr.length() < 1)
-            {
-                continue;
-            }
-            if (responseText.length() > 1)
-                {
-                responseText.append('\n');
-                }
-            responseText.append(nextStr);
-        }
-        if (client == null) {
-            response.getWriter()
-                    .write("error=Не удалось найти подписчика с таким телефонным номером (" + subscriber + ")");
+        List<Long> idOfClients = DAOUtils.extractIDFromGuardByGuardMobile(session,Client.checkAndConvertMobile(subscriber));
+        if (idOfClients.isEmpty()) {
+            response.getWriter().write("error=Не удалось найти подписчика с таким телефонным номером (" + subscriber + ")");
             return;
         }
-
-    response.getWriter().write(responseText.toString());
+        for (Long idOfClient : idOfClients) {
+                String nextStr = getSubscriberInfo(idOfClient, session);
+                if (nextStr.length() < 1) {
+                    continue;
+                }
+                if (responseText.length() > 1) {
+                    responseText.append('\n');
+                }
+                responseText.append(nextStr);
+        }
+        response.getWriter().write(responseText.toString());
     }
 
-
-
-    public String getSubscriberInfo (Client client, Session session)
+    public String getSubscriberInfo (Long idOfClient, Session session)
         {
         StringBuilder responseText = new StringBuilder("");
         org.hibernate.Query q = session.createSQLQuery(
@@ -162,11 +153,11 @@ public class SMSStatusServlet extends HttpServlet {
                         +
                         "from cf_clients " +
                         "left join cf_persons on cf_persons.idofperson=cf_clients.idofperson " +
-                        "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.evtdatetime<>0 and cf_enterevents.passdirection<>0  " +
+                        "left join cf_enterevents on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.evtdatetime<>0 " +
                         "where cf_clients.idofclient=:idofclient " +
                         "order by evtdatetime desc " +
                         "limit 1");
-        q.setParameter("idofclient", client.getIdOfClient());
+        q.setParameter("idofclient", idOfClient);
         List resultList = q.list();
         if (resultList.size() > 0) {
             Object e[]           = (Object[]) resultList.get(0);
@@ -209,7 +200,6 @@ public class SMSStatusServlet extends HttpServlet {
                 }
             }
 
-
             responseText.append(firstName).append(" ").
                     append(secondName).append(" ").
                     append(surname).append(" ").
@@ -219,7 +209,6 @@ public class SMSStatusServlet extends HttpServlet {
         }
     return responseText.toString();
     }
-
 
     public String parseDate (Date evt)
         {
