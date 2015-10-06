@@ -24,10 +24,10 @@
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
 
-            <h:outputText value="Показывать резервников: " styleClass="output-text" />
+            <%--<h:outputText value="Показывать резервников: " styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.adjustmentPaymentReportPage.showReserve}">
                 <a4j:support event="onchange" reRender="adjustmentPaymentReportPanelGrid" />
-            </h:selectBooleanCheckbox>
+            </h:selectBooleanCheckbox>--%>
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.adjustmentPaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
