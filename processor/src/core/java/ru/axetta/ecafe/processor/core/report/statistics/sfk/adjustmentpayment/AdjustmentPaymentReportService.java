@@ -68,9 +68,6 @@ public class AdjustmentPaymentReportService {
             Date endTime, List<Long> idOfOrgList, HashMap<Long, List<DiscountRule>> rulesForOrgMap,
             HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
 
-        List<PlanOrderItem> resultSubtractionInterval = new ArrayList<PlanOrderItem>(); // Разность за интервал
-        List<PlanOrderItem> resultIntersectionInterval = new ArrayList<PlanOrderItem>(); // Пересечение за интервал
-
         // Те кто дожны были получить бесплатное питание | Проход по карте зафиксирован - за интервал
         List<PlanOrderItem> planOrderItemsToPayDetectedInterval = new ArrayList<PlanOrderItem>();
 
@@ -139,13 +136,17 @@ public class AdjustmentPaymentReportService {
         Set<Long> subtractIndividual = new HashSet<Long>();
         if (!planOrderItemsToPayDetectedInterval.isEmpty()) {
             for (PlanOrderItem planOrderItem : planOrderItemsToPayDetectedInterval) {
-                subtractIndividual.add(planOrderItem.getIdOfClient());
+                if (!planOrderItemsPaidByInterval.contains(planOrderItem)) {
+                    subtractIndividual.add(planOrderItem.getIdOfClient());
+                }
             }
         }
         Set<Long> intersectionIndividual = new HashSet<Long>();
         if (!planOrderItemsToPayNotDetectedInterval.isEmpty()) {
             for (PlanOrderItem planOrderItem : planOrderItemsPaidByInterval) {
-                intersectionIndividual.add(planOrderItem.getIdOfClient());
+                if (planOrderItemsToPayNotDetectedInterval.contains(planOrderItem)) {
+                    intersectionIndividual.add(planOrderItem.getIdOfClient());
+                }
             }
         }
 
