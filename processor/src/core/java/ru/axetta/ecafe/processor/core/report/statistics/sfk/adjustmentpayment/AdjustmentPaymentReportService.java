@@ -193,6 +193,8 @@ public class AdjustmentPaymentReportService {
 
         // платные категории
         List<Long> onlyPaidCategories = DetailedDeviationsWithoutCorpsService.loadAllPaydAbleCategories(session);
+        onlyPaidCategories.add(-101L);
+        onlyPaidCategories.add(-102L);
 
         getPassageFoodReserveCount(session, adjustmentPaymentReportModel, orderTypeLgotnick, startDate, endDate,
                 idOfOrgList, rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
