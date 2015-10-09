@@ -84,6 +84,16 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
         return hoursForbidChange;
     }
 
+    public int getDaysForbidChange() {
+        int dayForbidChange = 0;
+        if (hoursForbidChange < 24) {
+            dayForbidChange++;
+        } else {
+            dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
+        }
+        return dayForbidChange ;
+    }
+
     public void setHoursForbidChange(int hoursForbidChange) {
         this.hoursForbidChange = hoursForbidChange;
     }

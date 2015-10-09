@@ -6022,35 +6022,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ECafeSettings cafeSettings = settings.get(0);
                 SubscriberFeedingSettingSettingValue parser;
                 parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-                final int hoursForbidChange = parser.getHoursForbidChange();
-
-                int dayForbidChange = 0;
-                if (hoursForbidChange < 24) {
-                    dayForbidChange++;
-                } else {
-                    dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
-                            : hoursForbidChange / 24 + 1);
-                }
-                Date currentDate = CalendarUtils.addDays(truncateToDayOfMonth(subscriptionFeeding.getDateCreateService()),1);
-
-                //Вычисление с какой даты можно активировать по поставщику ориентируясь.
-                Date dayForbid = CalendarUtils.addDays(currentDate, dayForbidChange);
-
-                if (parser.isSixWorkWeek()) {
-                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                        dayForbid = CalendarUtils.addOneDay(dayForbid);
-                    }
-                } else {
-                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
-                        dayForbid = CalendarUtils.addOneDay(dayForbid);
-                    }
-                    if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                        dayForbid = CalendarUtils.addOneDay(dayForbid);
-                    }
-                }
+                Date dayForbid = subscriptionFeeding.getFirstDateCanChangeRegister(parser);
                 if (dateActivateSubscription.getTime() < dayForbid.getTime()) {
                     result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
-                    result.description = "Неверная дата активация подписки";
+                    result.description = "Неверная дата активация подписки (" + dateActivateSubscription.toString() + " < " + dayForbid.toString() + ")";
                     return result;
                 }
                 subscriptionFeeding.setDateActivateSubscription(dateActivateSubscription);

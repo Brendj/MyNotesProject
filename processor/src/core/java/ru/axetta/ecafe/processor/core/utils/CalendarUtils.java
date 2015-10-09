@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -332,6 +333,11 @@ public class CalendarUtils {
         return calendar.get(Calendar.DAY_OF_MONTH);
     }
 
+    public static int getDayOfWeek(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.DAY_OF_WEEK);
+    }
 
     public static Date setDayOfMonth(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
@@ -380,9 +386,17 @@ public class CalendarUtils {
         return df;
     }
 
-    public static boolean isWorkingDate(Date date) {
-        int day = getDayOfMonth(date);
-        return day != Calendar.SUNDAY;
+    public static boolean isWorkDate(SubscriberFeedingSettingSettingValue parser, Date date) {
+        int day = getDayOfWeek(date);
+        return (parser.isSixWorkWeek() ? (day != Calendar.SUNDAY) : (day != Calendar.SUNDAY && day != Calendar.SATURDAY));
+    }
+
+    public static Date calculateNextWorkDate(SubscriberFeedingSettingSettingValue parser, Date date) {
+        Date firstWorkDate = CalendarUtils.addOneDay(date);
+        while (!isWorkDate(parser, firstWorkDate)) {
+            firstWorkDate = CalendarUtils.addOneDay(firstWorkDate);
+        }
+        return firstWorkDate;
     }
 
     public static Date calculateYesterdayStart(Calendar calendar, Date scheduledFireTime) {

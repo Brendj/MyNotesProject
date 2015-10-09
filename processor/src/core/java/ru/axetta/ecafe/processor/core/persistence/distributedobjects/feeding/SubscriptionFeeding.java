@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -25,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -263,6 +265,26 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setGuidOfStaff(String guidOfStaff) {
         this.guidOfStaff = guidOfStaff;
+    }
+
+    public Date getFirstDateCanChangeRegister(SubscriberFeedingSettingSettingValue parser) {
+        int workDaysCount = 0;
+        Date firstDayChange = new Date(dateCreateService.getTime());
+        while (workDaysCount < parser.getDaysForbidChange()) {
+            firstDayChange = CalendarUtils.addOneDay(firstDayChange);
+            if (CalendarUtils.isWorkDate(parser, firstDayChange)) {
+                workDaysCount++;
+            }
+        }
+        Calendar midday = Calendar.getInstance();
+        midday.setTime(firstDayChange);
+        CalendarUtils.truncateToDayOfMonth(midday);
+        midday.add(Calendar.HOUR_OF_DAY, 12);
+        if (firstDayChange.after(midday.getTime())) {
+            firstDayChange = CalendarUtils.calculateNextWorkDate(parser, firstDayChange);
+            firstDayChange = CalendarUtils.truncateToDayOfMonth(firstDayChange);
+        }
+        return firstDayChange;
     }
 
     @Override
