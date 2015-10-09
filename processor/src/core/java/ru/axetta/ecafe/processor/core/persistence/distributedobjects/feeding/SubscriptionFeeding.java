@@ -268,8 +268,12 @@ public class SubscriptionFeeding extends DistributedObject{
     }
 
     public Date getFirstDateCanChangeRegister(SubscriberFeedingSettingSettingValue parser) {
+        return getFirstDateCanChangeRegister(parser, new Date(dateCreateService.getTime()));
+    }
+
+    static public Date getFirstDateCanChangeRegister(SubscriberFeedingSettingSettingValue parser, Date date) {
         int workDaysCount = 0;
-        Date firstDayChange = new Date(dateCreateService.getTime());
+        Date firstDayChange = date;
         while (workDaysCount < parser.getDaysForbidChange()) {
             firstDayChange = CalendarUtils.addOneDay(firstDayChange);
             if (CalendarUtils.isWorkDate(parser, firstDayChange)) {
@@ -282,8 +286,8 @@ public class SubscriptionFeeding extends DistributedObject{
         midday.add(Calendar.HOUR_OF_DAY, 12);
         if (firstDayChange.after(midday.getTime())) {
             firstDayChange = CalendarUtils.calculateNextWorkDate(parser, firstDayChange);
-            firstDayChange = CalendarUtils.truncateToDayOfMonth(firstDayChange);
         }
+        firstDayChange = CalendarUtils.truncateToDayOfMonth(firstDayChange);
         return firstDayChange;
     }
 

@@ -16,7 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Su
  */
 public class TestSubscriptionFeeding {
 
-    static public void _testGetFirstDateCanChangeRegister (String sDate, String sHoursForbidChange, String sSixWorkWeek) throws Exception {
+    static public Date _testGetFirstDateCanChangeRegister (String sDate, String sHoursForbidChange, String sSixWorkWeek) throws Exception {
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm");
         Date date = df.parse(sDate);
         SubscriptionFeeding sf = new SubscriptionFeeding();
@@ -40,19 +40,22 @@ public class TestSubscriptionFeeding {
         SubscriberFeedingSettingSettingValue parser = new SubscriberFeedingSettingSettingValue(values);
         Date resultDate = sf.getFirstDateCanChangeRegister(parser);
         System.out.println("DateCreateService=" + sf.getDateCreateService().toString() + "; hoursForbidChange=" + sHoursForbidChange + "; sSixWorkWeek=" + sSixWorkWeek + "; resultDate=" + resultDate);
+        return resultDate;
     }
 
     @Test
     public void testGetFirstDateCanChangeRegister () {
         try {
-            _testGetFirstDateCanChangeRegister("08/10/2015 10:00", "36", "0");
-            _testGetFirstDateCanChangeRegister("08/10/2015 10:00", "36", "1");
-            _testGetFirstDateCanChangeRegister("08/10/2015 16:00", "36", "0");
-            _testGetFirstDateCanChangeRegister("08/10/2015 16:00", "36", "1");
-            _testGetFirstDateCanChangeRegister("05/10/2015 10:00", "36", "0");
-            _testGetFirstDateCanChangeRegister("05/10/2015 10:00", "36", "1");
-            _testGetFirstDateCanChangeRegister("05/10/2015 16:00", "36", "0");
-            _testGetFirstDateCanChangeRegister("05/10/2015 16:00", "36", "1");
+            Date result;
+
+            result = _testGetFirstDateCanChangeRegister("08/10/2015 10:00", "36", "0");
+            result = _testGetFirstDateCanChangeRegister("08/10/2015 10:00", "36", "1");
+            result = _testGetFirstDateCanChangeRegister("08/10/2015 16:00", "36", "0");
+            result = _testGetFirstDateCanChangeRegister("08/10/2015 16:00", "36", "1");
+            result = _testGetFirstDateCanChangeRegister("05/10/2015 10:00", "36", "0");
+            result = _testGetFirstDateCanChangeRegister("05/10/2015 10:00", "36", "1");
+            result = _testGetFirstDateCanChangeRegister("05/10/2015 16:00", "36", "0");
+            result = _testGetFirstDateCanChangeRegister("05/10/2015 16:00", "36", "1");
         } catch (Exception exception) {
             System.out.println(exception.toString());
         }

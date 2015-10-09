@@ -6252,42 +6252,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            // Текущая дата
-            Date date = new Date();
-
-            final int hoursForbidChange = parser.getHoursForbidChange();
-
-            int dayForbidChange = 0;
-            if (hoursForbidChange < 24) {
-                dayForbidChange++;
-            } else {
-                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
-                        : hoursForbidChange / 24 + 1);
-            }
-
-            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
-            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-
-            SimpleDateFormat sdf = new SimpleDateFormat("HH");
-            Long hours = Long.valueOf(sdf.format(dayForbid));
-            if (hours >= 12 ) {
-                dayForbid = CalendarUtils.addOneDay(dayForbid);
-            }
-
-            if (parser.isSixWorkWeek()) {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            } else {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            }
-
-            if(suspendDate.getTime()<dayForbid.getTime()){
+            Date dayForbid = subscriptionFeeding.getFirstDateCanChangeRegister(parser, new Date());
+            if(suspendDate.getTime() < dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = "Неверная дата приостановки подписки";
                 return result;
@@ -6354,40 +6320,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser;
             parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            Date date = new Date();
-
-            final int hoursForbidChange = parser.getHoursForbidChange();
-
-            int dayForbidChange = 0;
-            if (hoursForbidChange < 24) {
-                dayForbidChange++;
-            } else {
-                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24
-                        : hoursForbidChange / 24 + 1);
-            }
-
-            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
-            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-
-            SimpleDateFormat sdf = new SimpleDateFormat("HH");
-            Long hours = Long.valueOf(sdf.format(dayForbid));
-            if (hours >= 12 ) {
-                dayForbid = CalendarUtils.addOneDay(dayForbid);
-            }
-
-            if (parser.isSixWorkWeek()) {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            } else {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            }
-            if(activateDate.getTime()<dayForbid.getTime()){
+            Date dayForbid = subscriptionFeeding.getFirstDateCanChangeRegister(parser, new Date());
+            if(activateDate.getTime() < dayForbid.getTime()){
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = "Неправильная дата возобновления подписки";
                 return result;
@@ -6550,39 +6484,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings settings = (ECafeSettings) settingsList.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings
                     .getSplitSettingValue();
-            Date date = new Date();
-
-            final int hoursForbidChange = parser.getHoursForbidChange();
-
-            int dayForbidChange = 0;
-            if (hoursForbidChange < 24) {
-                dayForbidChange++;
-            } else {
-                dayForbidChange = (hoursForbidChange % 24 == 0 ? hoursForbidChange / 24 : hoursForbidChange / 24 + 1);
-            }
-
-            //Вычисление с какой даты можно активировать по поставщику ориентируясь.
-            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
-
-            SimpleDateFormat sdf = new SimpleDateFormat("HH");
-            Long hours = Long.valueOf(sdf.format(dayForbid));
-            if (hours >= 12 ) {
-                dayForbid = CalendarUtils.addOneDay(dayForbid);
-            }
-
-            if (parser.isSixWorkWeek()) {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            } else {
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Сб")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-                if (CalendarUtils.dayInWeekToString(dayForbid).equals("Вс")) {
-                    dayForbid = CalendarUtils.addOneDay(dayForbid);
-                }
-            }
-
+            Date dayForbid = SubscriptionFeeding.getFirstDateCanChangeRegister(parser, new Date());
             if (cycleDiagram.getDateActivationDiagram().getTime() < dayForbid.getTime()) {
                 result.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 result.description = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC;
