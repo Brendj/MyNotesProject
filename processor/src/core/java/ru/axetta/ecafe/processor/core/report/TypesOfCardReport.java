@@ -12,7 +12,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
+import ru.axetta.ecafe.processor.core.report.model.UserOrgsAndContragents;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
@@ -148,10 +150,19 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                         sumStateNot);
 
                 if (!withOutSummaryByDistrict) {
+                    List<Long> orgList = null;
+                    //если роль пользователя = поставщик ( = 2 ), то берем только организации привязанных контрагентов. Для остальных ролей - все организации
+                    if (getUserId() != 0) {
+                        UserOrgsAndContragents userOAC = new UserOrgsAndContragents(session, getUserId());
+                        if (User.DefaultRole.SUPPLIER.getIdentification().equals(userOAC.getUser().getIdOfRole())) {
+                            orgList = userOAC.getOrgs();
+                        }
+                    }
+
                     //Лист по орг.
                     List<TypesOfCardSubreportItem> typesOfCardSubreportItemList = new ArrayList<TypesOfCardSubreportItem>();
 
-                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district);
+                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district, orgList);
 
                     for (TypesOfCardOrgItem typesOfCardOrgItem : idListByDistrict) {
 

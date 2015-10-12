@@ -62,14 +62,23 @@ public class TypesOfCardService extends AbstractDAOService {
         return result;
     }
 
-    public List<TypesOfCardOrgItem> getAllOrgsByDistrictName(String districtName) {
+    public List<TypesOfCardOrgItem> getAllOrgsByDistrictName(String districtName, List<Long> orgList) {
         List<TypesOfCardOrgItem> resultList = new ArrayList<TypesOfCardOrgItem>();
 
-        Query query = getSession().createSQLQuery(
-                "SELECT idoforg, shortname, address FROM cf_orgs WHERE district LIKE :districtName ORDER BY substring(shortname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)')");
-        query.setString("districtName", districtName);
+        List result;
 
-        List result = query.list();
+        if (orgList != null) {
+            Query query = getSession().createSQLQuery(
+                    "SELECT idoforg, shortname, address FROM cf_orgs WHERE district LIKE :districtName AND idoforg IN (:orgList) ORDER BY substring(shortname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)')");
+            query.setString("districtName", districtName);
+            query.setParameterList("orgList", orgList);
+            result = query.list();
+        } else {
+            Query query = getSession().createSQLQuery(
+                    "SELECT idoforg, shortname, address FROM cf_orgs WHERE district LIKE :districtName ORDER BY substring(shortname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)')");
+            query.setString("districtName", districtName);
+            result = query.list();
+        }
 
         for (Object res : result) {
             Object[] resItem = (Object[]) res;
