@@ -29,7 +29,7 @@ public class RPRDataLoader {
 
     @SuppressWarnings("unchecked")
     public List<ReportItem> getReportData(Date startDate, Date endDate) {
-        Transaction tr = session.beginTransaction();
+        //Transaction tr = session.beginTransaction();
         List<ReportItem> items = new ArrayList<ReportItem>();
         Query query = session.createQuery(
                 "select rp.idOfPayment, rp.paymentAmount, rp.paymentDate, rp.clientBalance, rp.success, rp.rrn, " +
@@ -58,7 +58,7 @@ public class RPRDataLoader {
             item.setErrorMessage((String) record[12]);
             items.add(item);
         }
-        tr.commit();
+        //tr.commit();
         return items;
     }
 }

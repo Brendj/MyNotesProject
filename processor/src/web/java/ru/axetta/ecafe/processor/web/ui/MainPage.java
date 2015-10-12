@@ -351,6 +351,7 @@ public class MainPage implements Serializable {
     private final RequestsAndOrdersReportPage requestsAndOrdersReportPage = new RequestsAndOrdersReportPage();
     private final TypesOfCardReportPage typesOfCardReportPage = new TypesOfCardReportPage();
     private final PaymentTotalsReportPage paymentTotalsReportPage = new PaymentTotalsReportPage();
+    private final RegularPaymentsReportPage regularPaymentsReportPage = new RegularPaymentsReportPage();
     private final FinancialControlPage financialControlPage = new FinancialControlPage();
     private final LatePaymentReportPage latePaymentReportPage = new LatePaymentReportPage();
     private final LatePaymentDetailedReportPage latePaymentDetailedReportPage = new LatePaymentDetailedReportPage();
@@ -8135,5 +8136,9 @@ public class MainPage implements Serializable {
 
     public SyncStatsPage getSyncStatsPage() {
         return syncStatsPage;
+    }
+
+    public RegularPaymentsReportPage getRegularPaymentsReportPage() {
+        return regularPaymentsReportPage;
     }
 }
