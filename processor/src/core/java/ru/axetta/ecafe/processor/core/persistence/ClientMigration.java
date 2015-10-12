@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class ClientMigration {
 
-    public static final String MODIFY_IN_REGISTRY = "Измененно в Реестрах.";
+    public static final String MODIFY_IN_REGISTRY = "Изменено в Реестрах.";
 
 
     private Long idOfClientMigration;

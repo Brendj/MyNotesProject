@@ -365,7 +365,7 @@
             <h:inputText value="#{optionPage.monitoringAllowedTags}" styleClass="output-text" />
             <h:outputText escape="true" value="Очищать отчеты в репозитории по дате создания" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.cleanupRepositoryReports}" styleClass="output-text" />
-            <h:outputText escape="true" value="Выполнять повторную отправку не доставленных СМС" styleClass="output-text" />
+            <h:outputText escape="true" value="Выполнять повторную отправку недоставленных СМС" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.smsResending}" styleClass="output-text" />
             <h:outputText escape="true" value="Отладочный режим отправки СМС (СМС считается не отправленным)" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.smsFailureTestingMode}" styleClass="output-text" />
