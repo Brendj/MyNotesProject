@@ -181,7 +181,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String fax;
     private Boolean notifyViaEmail = false;
     private Boolean notifyViaSMS = true;
-    private Boolean notifyViaPUSH = false;
+    private Boolean notifyViaPUSH = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS);
     private String remarks;
     private String plainPassword;
     private String plainPasswordConfirmation;

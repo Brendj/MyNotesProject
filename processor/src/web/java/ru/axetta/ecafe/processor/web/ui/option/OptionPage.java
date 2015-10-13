@@ -112,6 +112,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String rnipProcessorInstance;
     private String RNIPPaymentsURL_v116;
     private String RNIPPaymentsWorkingVersion;
+    private Boolean NotifyByPushNewClients;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -732,6 +733,14 @@ public class OptionPage extends BasicWorkspacePage {
         return items;
     }
 
+    public Boolean getNotifyByPushNewClients() {
+        return NotifyByPushNewClients;
+    }
+
+    public void setNotifyByPushNewClients(Boolean notifyByPushNewClients) {
+        NotifyByPushNewClients = notifyByPushNewClients;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -821,6 +830,7 @@ public class OptionPage extends BasicWorkspacePage {
         rnipProcessorInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
         RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
+        setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
 
         bankListPage.onShow();
 
@@ -952,7 +962,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, rnipProcessorInstance);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
-
+            runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

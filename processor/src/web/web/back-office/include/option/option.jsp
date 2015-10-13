@@ -369,6 +369,8 @@
             <h:selectBooleanCheckbox value="#{optionPage.smsResending}" styleClass="output-text" />
             <h:outputText escape="true" value="Отладочный режим отправки СМС (СМС считается не отправленным)" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.smsFailureTestingMode}" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить PUSH-уведомления для создаваемых клиентов" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.notifyByPushNewClients}" styleClass="output-text" />
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Личный кабинет">

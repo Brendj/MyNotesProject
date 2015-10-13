@@ -612,6 +612,7 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
 
         boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
+        String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
 
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
@@ -642,6 +643,7 @@ public class FrontController extends HttpServlet {
                 if (cd.group!=null) fc.setValue(ClientManager.FieldId.GROUP, cd.group);
                 fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, cd.notifyBySms?"1":"0");
                 fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, cd.notifyByEmail?"1":"0");
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                 if (cd.comments!=null) fc.setValue(ClientManager.FieldId.COMMENTS, cd.comments);
                 if (cd.cardNo!=null) fc.setValue(ClientManager.FieldId.CARD_ID, cd.cardNo);
                 if (cd.cardPrintedNo!=null) fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cd.cardPrintedNo);

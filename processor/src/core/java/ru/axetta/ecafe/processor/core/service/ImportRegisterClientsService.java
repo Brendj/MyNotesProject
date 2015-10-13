@@ -925,12 +925,14 @@ public class ImportRegisterClientsService {
         switch (change.getOperation()) {
             case CREATE_OPERATION:
                 //  добавление нового клиента
+                String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                 FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
                 createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                 createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                 createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                 createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                 ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                         (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
                 break;

@@ -42,6 +42,10 @@ public class FieldProcessor {
             return currentValue;
         }
 
+        public String getCurrentValue() {
+            return currentValue;
+        }
+
         @Override
         protected Object clone() {
             return new Def(defaultPos, requiredForInsert, requiredForUpdate, fieldName, defValue, fieldId, updatable);
@@ -108,6 +112,15 @@ public class FieldProcessor {
             String v = getValue(id);
             if (v==null) return false;
             return !v.equals("0");
+        }
+
+        public boolean isValueNull(Object id) {
+            for (int n=0;n<currentConfig.length;++n) {
+                if (currentConfig[n].fieldId==id) return (currentConfig[n].getCurrentValue() == null);
+            }
+            return true;
+            //String v = getValue(id);
+            //return (v == null);
         }
 
         public Date getValueDate(Object id) throws ParseException {

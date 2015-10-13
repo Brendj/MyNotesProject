@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -191,16 +192,20 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     }
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig,
-            Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) {
+            Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) throws Exception {
         String[] tokens = line.split(";", -1);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {
             return new LineResult(lineNo, 1, e.getMessage(), null);
         }
-        //if (tokens.length < 19) {
-        //    return new LineResult(lineNo, 1, "Not enough data", null);
-        //}
+        //если флаг установки уведомления по Push не установлен в файле загрузки, устаноавливаем значение по умолчанию в соотв. с опцией
+        Boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
+        if (notifyPushIsNull) {
+            String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+            fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+        }
+
         try {
             long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
