@@ -148,7 +148,7 @@ public class ClientBalanceByDayReportPage extends OnlineReportPage implements Co
         if (!CollectionUtils.isEmpty(idOfOrgList)) {
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-            builder.setReportProperties(properties);
+            //builder.setReportProperties(properties);
         }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

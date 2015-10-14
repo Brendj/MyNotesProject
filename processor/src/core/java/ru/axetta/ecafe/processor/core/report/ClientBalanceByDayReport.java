@@ -229,7 +229,8 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             } catch (NumberFormatException e) {
                 clientGroupId = ClientGroupMenu.CLIENT_ALL;
             }
-            Integer clientBalanceCondition = getClientBalanceCondiotion(reportProperties.getProperty("clientBalanceCondition"));
+            Integer clientBalanceCondition = Integer.parseInt(reportProperties.getProperty("clientBalanceCondition"));
+                    //getClientBalanceCondiotion(reportProperties.getProperty("clientBalanceCondition"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {
