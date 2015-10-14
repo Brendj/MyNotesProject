@@ -3558,19 +3558,48 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId) {
+    public Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId, @WebParam(name = "mode") int mode) {
         authenticateRequest(null);
 
         long lCardId = Long.parseLong(cardId);
         Long contractId = null;
         try {
-            contractId = DAOService.getInstance().getContractIdByCardNo(lCardId);
-            if (contractId == null) {
-                int days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
-                contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(lCardId, days);
+            if (mode == 0) {
+                contractId = getContractIdByCardNoInternal_OLDWAY(lCardId);
+            }
+            if (mode == 1) {
+                contractId = getContractIdByCardNoInternal_NEWWAY(lCardId);
             }
         } catch (Exception e) {
             logger.error("ClientRoomController failed", e);
+        }
+        return contractId;
+    }
+
+    private Long getContractIdByCardNoInternal_OLDWAY(long cardId) throws Exception {
+        Long contractId = DAOService.getInstance().getContractIdByCardNo(cardId);
+        if (contractId == null) {
+            int days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
+            contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(cardId, days);
+        }
+        return contractId;
+    }
+
+    private Long getContractIdByCardNoInternal_NEWWAY(long cardId) throws Exception {
+        Long contractId = null;
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Card card = DAOUtils.findCardByCardNo(session, cardId);
+            if (card.getState() == Card.ACTIVE_STATE) {
+                contractId = card.getClient().getContractId();
+            }
+        }
+        finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return contractId;
     }

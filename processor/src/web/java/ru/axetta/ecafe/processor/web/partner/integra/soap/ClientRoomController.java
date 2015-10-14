@@ -202,7 +202,7 @@ public interface ClientRoomController {
     DetachGuardSanResult detachGuardSan(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "guardSan") String guardSan);
 
-    @WebMethod Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId);
+    @WebMethod Long getContractIdByCardNo(@WebParam(name = "cardId") String cardId, @WebParam(name = "mode") int mode);
 
     @WebMethod ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name = "guardSan") String guardSan);
 
