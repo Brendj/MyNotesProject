@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
@@ -59,6 +60,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
         builder.setReportProperties(buildProperties());
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -66,6 +68,8 @@ public class TypesOfCardReportPage extends OnlineReportPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                builder.setUserId(DAOUtils.findUser(persistenceSession,
+                        FacesContext.getCurrentInstance().getExternalContext().getRemoteUser()).getIdOfUser());
                 report = builder.build(persistenceSession, startDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -116,6 +120,8 @@ public class TypesOfCardReportPage extends OnlineReportPage {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                builder.setUserId(DAOUtils.findUser(persistenceSession,
+                        FacesContext.getCurrentInstance().getExternalContext().getRemoteUser()).getIdOfUser());
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception e) {

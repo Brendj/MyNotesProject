@@ -45,19 +45,38 @@ public class TypesOfCardService extends AbstractDAOService {
 
     // Сбор статистики по имени Округа например: САО, ЮВАО.
     public Long getStatByDistrictName(String districtName, String cardType, Integer cardState, Date startDate,
-            String groupRestrict) {
-        Query query = getSession().createSQLQuery(
-                "SELECT count(cfc.idofclient) FROM cf_cards cfc left join cf_clients cl on cfc.idofclient = cl.idofclient "
-                        + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
-                        + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
-                        + "where cfc.cardtype in (" + cardType
-                        + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate "
-                        + groupRestrict);
-        query.setString("districtName", districtName);
-        query.setInteger("cardState", cardState);
-        query.setLong("startDate", startDate.getTime());
+            String groupRestrict, List<Long> orgList) {
 
-        Long result = ((BigInteger) query.uniqueResult()).longValue();
+        Long result;
+
+        if (orgList != null) {
+            Query query = getSession().createSQLQuery(
+                    "SELECT count(cfc.idofclient) FROM cf_cards cfc left join cf_clients cl on cfc.idofclient = cl.idofclient "
+                            + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
+                            + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                            + "where cfc.cardtype in (" + cardType
+                            + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate AND cfo.idoforg IN (:orgList) "
+                            + groupRestrict);
+            query.setString("districtName", districtName);
+            query.setInteger("cardState", cardState);
+            query.setLong("startDate", startDate.getTime());
+            query.setParameterList("orgList", orgList);
+
+            result = ((BigInteger) query.uniqueResult()).longValue();
+        } else {
+            Query query = getSession().createSQLQuery(
+                    "SELECT count(cfc.idofclient) FROM cf_cards cfc left join cf_clients cl on cfc.idofclient = cl.idofclient "
+                            + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
+                            + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                            + "where cfc.cardtype in (" + cardType
+                            + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate "
+                            + groupRestrict);
+            query.setString("districtName", districtName);
+            query.setInteger("cardState", cardState);
+            query.setLong("startDate", startDate.getTime());
+
+            result = ((BigInteger) query.uniqueResult()).longValue();
+        }
 
         return result;
     }

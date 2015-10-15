@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.TypesOfCardService;
 import ru.axetta.ecafe.processor.core.report.model.UserOrgsAndContragents;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -133,14 +135,14 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             List<String> districtNames = service.loadDistrictNames();
 
             for (String district : districtNames) {
-                Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict);
-                Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict);
+                Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict, getSupplierOrgList(session));
 
-                Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict);
-                Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict);
+                Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict, getSupplierOrgList(session));
 
-                Long stateOthAct = service.getStatByDistrictName(district, "0,2,4", ac, startTime, groupRestrict);
-                Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4", lc, startTime, groupRestrict);
+                Long stateOthAct = service.getStatByDistrictName(district, "0,2,4", ac, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4", lc, startTime, groupRestrict, getSupplierOrgList(session));
 
                 Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct;
                 Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot;
@@ -150,19 +152,11 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                         sumStateNot);
 
                 if (!withOutSummaryByDistrict) {
-                    List<Long> orgList = null;
-                    //если роль пользователя = поставщик ( = 2 ), то берем только организации привязанных контрагентов. Для остальных ролей - все организации
-                    if (getUserId() != 0) {
-                        UserOrgsAndContragents userOAC = new UserOrgsAndContragents(session, getUserId());
-                        if (User.DefaultRole.SUPPLIER.getIdentification().equals(userOAC.getUser().getIdOfRole())) {
-                            orgList = userOAC.getOrgs();
-                        }
-                    }
 
                     //Лист по орг.
                     List<TypesOfCardSubreportItem> typesOfCardSubreportItemList = new ArrayList<TypesOfCardSubreportItem>();
 
-                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district, orgList);
+                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district, getSupplierOrgList(session));
 
                     for (TypesOfCardOrgItem typesOfCardOrgItem : idListByDistrict) {
 
@@ -202,6 +196,24 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             return build(session, startTime, calendar);
+        }
+
+        private List<Long> getSupplierOrgList(Session session) throws Exception {
+            OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
+            List orgList = null;
+
+            List<OrgItem> allNames;
+
+            //если роль пользователя = поставщик ( = 2 ), то берем только организации привязанных контрагентов. Для остальных ролей - все организации
+            UserOrgsAndContragents userOAC = new UserOrgsAndContragents(session, getUserId());
+            if (User.DefaultRole.SUPPLIER.getIdentification().equals(userOAC.getUser().getIdOfRole())) {
+                orgList = new ArrayList();
+                allNames = orgRepository.findAllActiveBySupplier(userOAC.getOrgs(), userOAC.getUser().getIdOfUser());
+                for (OrgItem orgItem: allNames) {
+                    orgList.add(orgItem.getIdOfOrg());
+                }
+            }
+            return orgList;
         }
     }
 
