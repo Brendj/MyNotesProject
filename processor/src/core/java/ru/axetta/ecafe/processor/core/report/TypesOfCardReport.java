@@ -134,15 +134,17 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
             List<String> districtNames = service.loadDistrictNames();
 
+            List<Long> orgList = getSupplierOrgList(session);
+
             for (String district : districtNames) {
-                Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict, getSupplierOrgList(session));
-                Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict, orgList);
+                Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict, orgList);
 
-                Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict, getSupplierOrgList(session));
-                Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateScuAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict, orgList);
+                Long stateScuActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict, orgList);
 
-                Long stateOthAct = service.getStatByDistrictName(district, "0,2,4", ac, startTime, groupRestrict, getSupplierOrgList(session));
-                Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4", lc, startTime, groupRestrict, getSupplierOrgList(session));
+                Long stateOthAct = service.getStatByDistrictName(district, "0,2,4", ac, startTime, groupRestrict, orgList);
+                Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4", lc, startTime, groupRestrict, orgList);
 
                 Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct;
                 Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot;
