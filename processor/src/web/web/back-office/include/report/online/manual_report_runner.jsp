@@ -13,7 +13,7 @@
 <h:panelGrid id="manualReportRunnerViewGrid" binding="#{manualReportRunnerPage.pageComponent}" styleClass="borderless-grid">
     <h:outputText value="#{manualReportRunnerPage.errorMessage}" style="color: #FF0000" styleClass="messages" rendered="#{not empty manualReportRunnerPage.errorMessage}"/>
     <h:outputText value="#{manualReportRunnerPage.infoMessage}" styleClass="messages" rendered="#{not empty manualReportRunnerPage.infoMessage}"/>
-    <rich:simpleTogglePanel label="Настройки ручного запуска" switchType="client" style="width: 800px; max-width: 800px"
+    <rich:simpleTogglePanel label="Настройки ручного запуска" switchType="client" style="width: 850px; max-width: 850px"
                             opened="true" headerClass="filter-panel-header">
         <f:verbatim>
             <style type="text/css">
@@ -91,10 +91,6 @@
                         <%--<a4j:support event="onchanged" reRender="endDatePeriodSelect" actionListener="#{manualReportRunnerPage.onEndDateSpecified}"/>--%>
                     <%--</rich:calendar>--%>
 
-                    <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
-                    <h:selectOneMenu value="#{manualReportRunnerPage.documentFormat}" styleClass="input-text">
-                        <f:selectItems value="#{manualReportRunnerPage.reportFormatMenu.items}" />
-                    </h:selectOneMenu>
                 </h:panelGrid>
 
 
@@ -197,9 +193,28 @@
             </h:panelGrid>
 
 
-            <h:panelGrid columns="2">
-            <a4j:commandButton value="Сформировать" action="#{manualReportRunnerPage.triggerJob}" reRender="manualReportRunnerViewGrid"
-                             styleClass="command-button" onclick="document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:manualReport_waiting').style.display='block';"/>
+            <h:panelGrid columns="6">
+                <h:outputText escape="true" value="Сформировать отчет в формате:" styleClass="output-text" />
+                <h:commandButton value="HTML" action="#{manualReportRunnerPage.triggerJob}"
+                                 styleClass="command-button" onclick="document.getElementById('workspaceSubView:workspaceForm:workspacePageSubView:manualReport_waiting').style.display='block';">
+                    <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="0" />
+                </h:commandButton>
+                <h:commandButton value="XLS" action="#{manualReportRunnerPage.triggerJob}"
+                                 styleClass="command-button">
+                    <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="1" />
+                </h:commandButton>
+                <h:commandButton value="CSV" action="#{manualReportRunnerPage.triggerJob}"
+                                 styleClass="command-button">
+                    <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="2" />
+                </h:commandButton>
+                <h:commandButton value="PDF" action="#{manualReportRunnerPage.triggerJob}"
+                                 styleClass="command-button">
+                    <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="3" />
+                </h:commandButton>
+                <h:commandButton value="В репозиторий" action="#{manualReportRunnerPage.triggerJob}"
+                                 styleClass="command-button">
+                    <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="4" />
+                </h:commandButton>
             <h:graphicImage id="manualReport_waiting" value="/images/gif/waiting.gif" alt="waiting" style="display: none" />
             </h:panelGrid>
         </h:panelGrid>
