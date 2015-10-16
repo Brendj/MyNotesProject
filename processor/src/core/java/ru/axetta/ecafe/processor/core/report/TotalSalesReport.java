@@ -51,9 +51,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
         private Long idOfContragent= -1L;
 
-        private long sumComplex = 0L;
-        private long sumBuffet = 0L;
-        private long sumBen = 0L;
+        private Long sumComplex = 0L;
+        private Long sumBuffet = 0L;
+        private Long sumBen = 0L;
 
         private final String templateFilename;
 
@@ -78,9 +78,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
-            parameterMap.put("sumComplex", sumComplex);
-            parameterMap.put("sumBuffet", sumBuffet);
-            parameterMap.put("sumBen", sumBen);
+            parameterMap.put("sumComplex", Double.parseDouble(sumComplex.toString()));
+            parameterMap.put("sumBuffet", Double.parseDouble(sumBuffet.toString()));
+            parameterMap.put("sumBen", Double.parseDouble(sumBen.toString()));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
