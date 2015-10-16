@@ -207,10 +207,10 @@
                                  styleClass="command-button">
                     <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="2" />
                 </h:commandButton>
-                <h:commandButton value="PDF" action="#{manualReportRunnerPage.triggerJob}"
+                <%-- <h:commandButton value="PDF" action="#{manualReportRunnerPage.triggerJob}"
                                  styleClass="command-button">
                     <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="3" />
-                </h:commandButton>
+                </h:commandButton> --%>
                 <h:commandButton value="В репозиторий" action="#{manualReportRunnerPage.triggerJob}"
                                  styleClass="command-button">
                     <f:setPropertyActionListener target="#{manualReportRunnerPage.documentFormat}" value="4" />
