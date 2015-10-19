@@ -807,8 +807,9 @@
                         label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
                         reRender="workspaceForm" />
 
+    <%-- Скрыто в соответствии с задачей EP-266
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
-                        onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />
+                        onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />--%>
 
     <rich:panelMenuItem id="ordersMonitoringMenuItem"
                         binding="#{ordersMonitoringReportPage.mainMenuComponent}"
@@ -1000,6 +1001,10 @@
                             binding="#{orgSmsStatsReportPage.mainMenuComponent}"
                             label="Общая статистика"
                             action="#{orgSmsStatsReportPage.show}" reRender="workspaceForm" />
+        <%--<rich:panelMenuItem id="SmsAddressesReportPageMenuItem"
+                            binding="#{smsAddressesReportPage.mainMenuComponent}"
+                            label="Отчет по адресам доставки сообщений"
+                            action="#{smsAddressesReportPage.show}" reRender="workspaceForm" />--%>
     </rich:panelMenuGroup>
 
     <%--@elvariable id="statisticDifferencesGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticDifferencesGroupPage"--%>
