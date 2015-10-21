@@ -265,12 +265,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         private boolean exportToHTML = false;
 
         public Builder(String templateFilename) {
-            this.templateFilename = templateFilename;
+            this.templateFilename =  RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";;
         }
 
         public Builder() {
-            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath()
-                    + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
             exportToHTML = true;
         }
 
@@ -462,12 +461,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
                 mealCountGroupTotal = 0;
                 mealSumGroupTotal = 0;
-
-                mealCountSumByCashTotal = 0;
-                mealSumSumByCashTotal = 0;
-
-                mealCountSumByCardTotal = 0;
-                mealSumSumByCardTotal = 0;
 
                 for (SubReportMealRow item : subReportDataRowList) {
                     mealCountGroupTotal += item.getCount();
