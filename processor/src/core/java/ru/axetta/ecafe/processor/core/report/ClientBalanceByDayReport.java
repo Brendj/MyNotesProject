@@ -269,9 +269,9 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 }
             }
             idOfClientCriteria.createCriteria("org", "o");
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+         /*   if (!CollectionUtils.isEmpty(idOfOrgList)) {
                 idOfClientCriteria.add(Restrictions.in("o.idOfOrg", idOfOrgList));
-            }
+            }*/
             if (idOfContragent != null) {
                 idOfClientCriteria.add(Restrictions.eq("o.defaultSupplier.idOfContragent", idOfContragent));
             }
@@ -279,6 +279,10 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
             Criteria criteria = session.createCriteria(AccountTransaction.class);
             criteria.add(Restrictions.lt("transactionTime", endTime));    // <
+            criteria.createCriteria("org", "o");
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                criteria.add(Restrictions.in("o.idOfOrg", idOfOrgList));
+            }
             criteria.add(Property.forName("client.idOfClient").in(idOfClientCriteria));
             criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum"))
                     .add(Projections.groupProperty("client")).add(Projections.max("transactionTime")));
