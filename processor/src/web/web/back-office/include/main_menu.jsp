@@ -1115,7 +1115,7 @@
 
 <%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
 <rich:panelMenuGroup id="reportRepositoryGroupMenu" binding="#{reportRepositoryListPage.groupPage.mainMenuComponent}"
-                     label="Репозиторий отчетов" rendered="#{mainPage.eligibleToWorkOnlineReport}">
+                     label="Репозиторий отчетов" rendered="#{mainPage.eligibleToShowReportsRepository}">
     <a4j:support event="onclick" action="#{reportRepositoryListPage.groupPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="reportRepositoryListMenuItem" binding="#{reportRepositoryListPage.mainMenuComponent}"

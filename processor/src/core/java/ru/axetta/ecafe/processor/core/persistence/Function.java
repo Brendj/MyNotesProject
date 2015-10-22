@@ -95,6 +95,8 @@ public class Function {
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_CLIENTS = "onlineRprtClients";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_CLIENTS = "Закрыть раздел 'Отчеты по клиентам'";
+    public static final String FUNC_SHOW_REPORTS_REPOSITORY = "showReportRepository";
+    public static final String FUNCD_SHOW_REPORTS_REPOSITORY = "Репозиторий отчетов";
 
 
     private Long idOfFunction;

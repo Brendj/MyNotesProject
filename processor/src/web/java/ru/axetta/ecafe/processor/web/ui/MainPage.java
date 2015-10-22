@@ -7830,6 +7830,10 @@ public class MainPage implements Serializable {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_CLIENTS);
     }
 
+    public boolean isEligibleToShowReportsRepository() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_SHOW_REPORTS_REPOSITORY);
+    }
+
     public Object removeClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
