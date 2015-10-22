@@ -21,7 +21,7 @@ public class ClientSms {
     public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, "Баланс меньше нуля",
                                                               "Уведомление о проходе", "Зачисление средств", "Код активации","Уведомление о покупке",
                                                               "Уведомление о скором списании абон. платы за SMS-сервис",
-                                                              "Уведомление о списании абон. платы за SMS-сервис","Уведомление о не хватке средств на субсчете"};
+                                                              "Уведомление о списании абон. платы за SMS-сервис","Уведомление о нехватке средств на субсчете"};
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
