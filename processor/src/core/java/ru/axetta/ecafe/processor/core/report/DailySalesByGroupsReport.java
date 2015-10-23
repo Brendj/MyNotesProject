@@ -808,13 +808,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             parameterMap.put("SUBREPORT_DIR",
                     RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
 
-            Set<String> hashMapKeySet = mealRowHashMap.keySet();
-
-            for (String key : hashMapKeySet) {
-                mealRows.add(mealRowHashMap.get(key));
-            }
-
-            return new JRBeanCollectionDataSource(mealRows);
+            return new JRBeanCollectionDataSource(mealRowHashMap.values());
         }
 
     }
