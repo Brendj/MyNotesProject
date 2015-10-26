@@ -130,7 +130,9 @@
 		</band>
 		<band height="100">
 			<staticText>
-				<reportElement uuid="bec87d73-e5a8-499e-ad90-1d98a94295a2" x="0" y="0" width="408" height="20"/>
+				<reportElement uuid="bec87d73-e5a8-499e-ad90-1d98a94295a2" x="0" y="0" width="408" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -144,7 +146,9 @@
 				<text><![CDATA[ИТОГО НАЛИЧНАЯ ОПЛАТА:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="340560b8-cd54-4f40-8561-0e5133b85aac" x="0" y="20" width="408" height="20"/>
+				<reportElement uuid="340560b8-cd54-4f40-8561-0e5133b85aac" x="0" y="20" width="408" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -179,7 +183,9 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{mealSumGroupTotal}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="e001956a-a63d-47ed-bd8e-27725a2725c0" x="408" y="0" width="79" height="20"/>
+				<reportElement uuid="e001956a-a63d-47ed-bd8e-27725a2725c0" x="408" y="0" width="79" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -193,7 +199,9 @@
 				<textFieldExpression><![CDATA[$F{mealCountSumByCashTotal}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="b50876ae-869f-4f49-9595-a7f48c9ae9af" x="580" y="0" width="100" height="20"/>
+				<reportElement uuid="b50876ae-869f-4f49-9595-a7f48c9ae9af" x="580" y="0" width="100" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -207,7 +215,9 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{mealSumSumByCashTotal}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="e6b21d56-d99c-49b7-896a-d07472a322ea" x="580" y="20" width="100" height="20"/>
+				<reportElement uuid="e6b21d56-d99c-49b7-896a-d07472a322ea" x="580" y="20" width="100" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -221,7 +231,9 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{mealSumSumByCardTotal}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="1cfc7434-5e12-42b7-901f-5da13d731625" x="408" y="20" width="79" height="20"/>
+				<reportElement uuid="1cfc7434-5e12-42b7-901f-5da13d731625" x="408" y="20" width="79" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -240,12 +252,16 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="49fcc091-c513-4672-8a0e-88073249af94" style="table" x="487" y="20" width="93" height="20"/>
+				<reportElement uuid="49fcc091-c513-4672-8a0e-88073249af94" style="table" x="487" y="20" width="93" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="783cd6a5-cec7-4590-8da7-1f0bdfdd96c6" style="table" x="487" y="0" width="93" height="20"/>
+				<reportElement uuid="783cd6a5-cec7-4590-8da7-1f0bdfdd96c6" style="table" x="487" y="0" width="93" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -255,7 +271,9 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="171be890-be8b-4fb7-bf74-cfd6ea33ca3e" x="408" y="40" width="79" height="20"/>
+				<reportElement uuid="171be890-be8b-4fb7-bf74-cfd6ea33ca3e" x="408" y="40" width="79" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -269,7 +287,9 @@
 				<textFieldExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="b5ba81bb-74fc-4a8d-bec8-cd59c335bb35" x="0" y="40" width="408" height="20"/>
+				<reportElement uuid="b5ba81bb-74fc-4a8d-bec8-cd59c335bb35" x="0" y="40" width="408" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -284,7 +304,9 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e2cc1ef1-e5a0-4a53-91f0-45f97c53b21a" x="487" y="40" width="93" height="20"/>
+				<reportElement uuid="e2cc1ef1-e5a0-4a53-91f0-45f97c53b21a" x="487" y="40" width="93" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -296,7 +318,9 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="021d9905-dbd4-4d43-b329-d9be6c658ad2" x="580" y="40" width="100" height="20"/>
+				<reportElement uuid="021d9905-dbd4-4d43-b329-d9be6c658ad2" x="580" y="40" width="100" height="20" isRemoveLineWhenBlank="true">
+					<printWhenExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}!=null]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>

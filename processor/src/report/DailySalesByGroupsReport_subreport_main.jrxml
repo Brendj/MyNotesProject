@@ -10,7 +10,7 @@
 	<detail>
 		<band height="20">
 			<textField isStretchWithOverflow="true" pattern="0.00">
-				<reportElement stretchType="RelativeToBandHeight" x="487" y="0" width="93" height="20" uuid="ab389974-972d-4d66-9cbf-86982d3df6d7"/>
+				<reportElement uuid="ab389974-972d-4d66-9cbf-86982d3df6d7" stretchType="RelativeToBandHeight" x="487" y="0" width="93" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -22,7 +22,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{price}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="0.00">
-				<reportElement stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20" uuid="3f66148c-74fd-410d-aa12-c5e68c836e79"/>
+				<reportElement uuid="3f66148c-74fd-410d-aa12-c5e68c836e79" stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -34,7 +34,7 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="408" y="0" width="79" height="20" uuid="f603dfcf-edc1-49df-a6ef-0f36996308ef"/>
+				<reportElement uuid="f603dfcf-edc1-49df-a6ef-0f36996308ef" stretchType="RelativeToBandHeight" x="408" y="0" width="79" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -46,7 +46,7 @@
 				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="408" height="20" uuid="a0c7fcdc-20a8-4d31-9698-c3af622518aa"/>
+				<reportElement uuid="a0c7fcdc-20a8-4d31-9698-c3af622518aa" stretchType="RelativeToBandHeight" x="0" y="0" width="408" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -54,6 +54,7 @@
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
+				<textElement/>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 		</band>

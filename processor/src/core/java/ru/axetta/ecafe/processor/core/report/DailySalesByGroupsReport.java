@@ -53,14 +53,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             private long mealCountGroupTotal;
             private long mealSumGroupTotal;
 
-            private long mealCountSumByCashTotal;
-            private long mealSumSumByCashTotal;
+            private Long mealCountSumByCashTotal;
+            private Long mealSumSumByCashTotal;
 
-            private long mealCountSumByCardTotal;
-            private long mealSumSumByCardTotal;
+            private Long mealCountSumByCardTotal;
+            private Long mealSumSumByCardTotal;
 
-            private long mealCountSumByCashAndSumByCardTotal;
-            private long mealSumSumByCardAndSumByCashTotal;
+            private Long mealCountSumByCashAndSumByCardTotal;
+            private Long mealSumSumByCardAndSumByCashTotal;
 
             private List<SubReportMealRow> subReportMealRowList;
 
@@ -68,9 +68,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             }
 
             public MealRow(String originName, long mealCountGroupTotal, long mealSumGroupTotal,
-                    long mealCountSumByCashTotal, long mealSumSumByCashTotal, long mealCountSumByCardTotal,
-                    long mealSumSumByCardTotal, long mealCountSumByCashAndSumByCardTotal,
-                    long mealSumSumByCardAndSumByCashTotal, List<SubReportMealRow> subReportMealRowList) {
+                    Long mealCountSumByCashTotal, Long mealSumSumByCashTotal, Long mealCountSumByCardTotal,
+                    Long mealSumSumByCardTotal, Long mealCountSumByCashAndSumByCardTotal,
+                    Long mealSumSumByCardAndSumByCashTotal, List<SubReportMealRow> subReportMealRowList) {
                 this.originName = originName;
                 this.mealCountGroupTotal = mealCountGroupTotal;
                 this.mealSumGroupTotal = mealSumGroupTotal;
@@ -112,51 +112,51 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 this.mealSumGroupTotal = mealSumGroupTotal;
             }
 
-            public long getMealCountSumByCashTotal() {
+            public Long getMealCountSumByCashTotal() {
                 return mealCountSumByCashTotal;
             }
 
-            public void setMealCountSumByCashTotal(long mealCountSumByCashTotal) {
+            public void setMealCountSumByCashTotal(Long mealCountSumByCashTotal) {
                 this.mealCountSumByCashTotal = mealCountSumByCashTotal;
             }
 
-            public long getMealSumSumByCashTotal() {
+            public Long getMealSumSumByCashTotal() {
                 return mealSumSumByCashTotal;
             }
 
-            public void setMealSumSumByCashTotal(long mealSumSumByCashTotal) {
+            public void setMealSumSumByCashTotal(Long mealSumSumByCashTotal) {
                 this.mealSumSumByCashTotal = mealSumSumByCashTotal;
             }
 
-            public long getMealCountSumByCardTotal() {
+            public Long getMealCountSumByCardTotal() {
                 return mealCountSumByCardTotal;
             }
 
-            public void setMealCountSumByCardTotal(long mealCountSumByCardTotal) {
+            public void setMealCountSumByCardTotal(Long mealCountSumByCardTotal) {
                 this.mealCountSumByCardTotal = mealCountSumByCardTotal;
             }
 
-            public long getMealSumSumByCardTotal() {
+            public Long getMealSumSumByCardTotal() {
                 return mealSumSumByCardTotal;
             }
 
-            public void setMealSumSumByCardTotal(long mealSumSumByCardTotal) {
+            public void setMealSumSumByCardTotal(Long mealSumSumByCardTotal) {
                 this.mealSumSumByCardTotal = mealSumSumByCardTotal;
             }
 
-            public long getMealCountSumByCashAndSumByCardTotal() {
+            public Long getMealCountSumByCashAndSumByCardTotal() {
                 return mealCountSumByCashAndSumByCardTotal;
             }
 
-            public void setMealCountSumByCashAndSumByCardTotal(long mealCountSumByCashAndSumByCardTotal) {
+            public void setMealCountSumByCashAndSumByCardTotal(Long mealCountSumByCashAndSumByCardTotal) {
                 this.mealCountSumByCashAndSumByCardTotal = mealCountSumByCashAndSumByCardTotal;
             }
 
-            public long getMealSumSumByCardAndSumByCashTotal() {
+            public Long getMealSumSumByCardAndSumByCashTotal() {
                 return mealSumSumByCardAndSumByCashTotal;
             }
 
-            public void setMealSumSumByCardAndSumByCashTotal(long mealSumSumByCardAndSumByCashTotal) {
+            public void setMealSumSumByCardAndSumByCashTotal(Long mealSumSumByCardAndSumByCashTotal) {
                 this.mealSumSumByCardAndSumByCashTotal = mealSumSumByCardAndSumByCashTotal;
             }
 
@@ -661,7 +661,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     .setMealSumSumByCardAndSumByCashTotal(mealSumSumByCardAndSumByCashTotal);
 
             // Сбор итоговых данных "Бесплатное комплексное питание"
-            List mealsUnpaidTotals;
+            /*List mealsUnpaidTotals;
 
             Query freeComplexQueryTotal = session.createSQLQuery(
                     "SELECT SUM(od.Qty) AS qtySum, SUM(od.Qty * (od.RPrice + od.socdiscount)),"
@@ -704,9 +704,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     mealCountSumByCashAndSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
                     mealSumSumByCardAndSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
                 }
-            }
+            }*/
 
-            mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCardTotal(mealCountSumByCardTotal);
+            /*mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCardTotal(mealCountSumByCardTotal);
             mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCardTotal(mealSumSumByCardTotal);
 
             mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCashTotal(mealCountSumByCashTotal);
@@ -715,7 +715,18 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             mealRowHashMap.get("Бесплатное комплексное питание")
                     .setMealCountSumByCashAndSumByCardTotal(mealCountSumByCashAndSumByCardTotal);
             mealRowHashMap.get("Бесплатное комплексное питание")
-                    .setMealSumSumByCardAndSumByCashTotal(mealSumSumByCardAndSumByCashTotal);
+                    .setMealSumSumByCardAndSumByCashTotal(mealSumSumByCardAndSumByCashTotal);*/
+
+            mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCardTotal(null);
+            mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCardTotal(null);
+
+            mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCashTotal(null);
+            mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCashTotal(null);
+
+            mealRowHashMap.get("Бесплатное комплексное питание")
+                    .setMealCountSumByCashAndSumByCardTotal(null);
+            mealRowHashMap.get("Бесплатное комплексное питание")
+                    .setMealSumSumByCardAndSumByCashTotal(null);
 
             //Сбор данных "Централизованное", "Собственное", "Закупленное", "Централизованное с доготовкой"
             List mealBuffetList;
