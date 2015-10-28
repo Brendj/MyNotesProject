@@ -37,6 +37,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     private static final String NAME_COMPLEX = "Платные комплексы";
     private static final String NAME_BUFFET = "Буфетная продукция";
     private static final String NAME_BEN = "Льготные комплексы";
+    private static final String TOTAL_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет собственное + Платные комплексы";
+    private static final String TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет все + Платные комплексы";
 
     final private static Logger logger = LoggerFactory.getLogger(TotalSalesReport.class);
 
@@ -178,6 +180,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BUFFET));
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BEN));
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_COMPLEX));
+                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_BUFFET_PLUS_NAME_COMPLEX));
+                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX));
                 }
                 totalSalesItemMap.put(orgItem.getIdOfOrg(), totalSalesItemList);
                 idOfOrgsList.add(orgItem.getIdOfOrg());

@@ -24,8 +24,8 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
             <%--<h:selectOneMenu value="#{totalSalesPage.contragentId}">--%>
-                <%--<f:selectItem />--%>
-                <%--<f:selectItems value="#{totalSalesPage.contragentsSelectItems}"/>--%>
+            <%--<f:selectItem />--%>
+            <%--<f:selectItems value="#{totalSalesPage.contragentsSelectItems}"/>--%>
             <%--</h:selectOneMenu>--%>
 
             <h:panelGroup styleClass="borderless-div">
@@ -43,8 +43,7 @@
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text"
-                           showWeeksBar="false">
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDateCalendar,registerStampReportPanel"
                              actionListener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
             </rich:calendar>
@@ -58,24 +57,40 @@
                              actionListener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar id="endDateCalendar" value="#{mainPage.totalSalesPage.endDate}"
-                           datePattern="dd.MM.yyyy" converter="dateConverter"
-                           inputClass="input-text" showWeeksBar="false">
+            <rich:calendar id="endDateCalendar" value="#{mainPage.totalSalesPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDatePeriodSelect,registerStampReportPanel"
                              actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
             </rich:calendar>
+
+            <h:outputText escape="true" value="Отображать детализацию" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showDetail}" styleClass="output-text">
+                <a4j:support event="onclick" reRender="registerStampReportPanelGrid" ajaxSingle="true" />
+            </h:selectBooleanCheckbox>
+
+            <h:outputText value="Льготные комплексы с ценой" styleClass="output-text"
+                          rendered="#{mainPage.totalSalesPage.showDetail}" />
+            <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;"
+                          rendered="#{mainPage.totalSalesPage.showDetail}">
+                <h:selectManyCheckbox id="titles" value="#{mainPage.totalSalesPage.preferentialTitleComplexes}"
+                                      layout="pageDirection" styleClass="output-text"
+                                      rendered="#{mainPage.totalSalesPage.showDetail}">
+                    <f:selectItems value="#{mainPage.totalSalesPage.availableTitleComplexes}" />
+                </h:selectManyCheckbox>
+            </h:panelGroup>
 
         </h:panelGrid>
 
     </rich:simpleTogglePanel>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.totalSalesPage.buildReportHTML}"
-                           reRender="registerStampReportPanel"
-                           styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}" styleClass="command-button" />
+                           reRender="registerStampReportPanel" styleClass="command-button"
+                           status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}"
+                         styleClass="command-button" />
         <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}"
-                           reRender="registerStampReportPanelGrid"
-                           styleClass="command-button" status="reportGenerateStatus" />
+                           reRender="registerStampReportPanelGrid" styleClass="command-button"
+                           status="reportGenerateStatus" />
     </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
@@ -88,7 +103,7 @@
 
     <h:panelGrid styleClass="borderless-grid" id="registerStampReportPanel" columnClasses="center-aligned-column">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${mainPage.totalSalesPage.htmlReport!=null && not empty mainPage.totalSalesPage.htmlReport}" >
+        <c:if test="${mainPage.totalSalesPage.htmlReport!=null && not empty mainPage.totalSalesPage.htmlReport}">
             <f:verbatim>
                 <div>${mainPage.totalSalesPage.htmlReport}</div>
             </f:verbatim>

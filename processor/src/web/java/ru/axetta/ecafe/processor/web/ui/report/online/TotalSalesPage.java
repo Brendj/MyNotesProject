@@ -9,7 +9,9 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -63,6 +65,40 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
     private List<SelectItem> contragentsSelectItems;
+
+    private Integer[] preferentialTitleComplexes;
+
+    public Integer[] getPreferentialTitleComplexes() {
+        return preferentialTitleComplexes;
+    }
+
+    public void setPreferentialTitleComplexes(Integer[] preferentialTitleComplexes) {
+        this.preferentialTitleComplexes = preferentialTitleComplexes;
+    }
+
+    private boolean showDetail;
+
+    public boolean isShowDetail() {
+        return showDetail;
+    }
+
+    public void setShowDetail(boolean showDetail) {
+        this.showDetail = showDetail;
+    }
+
+    public List<SelectItem> getAvailableTitleComplexes() {
+
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        String[] productionNamesTypes = OrderDetail.PRODUCTION_NAMES_TYPES;
+        int i = 0;
+        for (String productionNameType: productionNamesTypes) {
+            SelectItem selectItem = new SelectItem(i, productionNameType);
+            list.add(selectItem);
+            i++;
+        }
+
+        return list;
+    }
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
