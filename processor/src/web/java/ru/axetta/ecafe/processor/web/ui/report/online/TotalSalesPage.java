@@ -9,7 +9,6 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
@@ -92,10 +91,29 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         String[] productionNamesTypes = OrderDetail.PRODUCTION_NAMES_TYPES;
         int i = 0;
         for (String productionNameType: productionNamesTypes) {
-            SelectItem selectItem = new SelectItem(i, productionNameType);
+            SelectItem selectItem = new SelectItem(i, "Буфет ".concat(productionNameType));
             list.add(selectItem);
             i++;
         }
+
+        List<String> complexesWithPriceTitles = null;
+
+        if (contragent != null) {
+            Long idOfContragent = contragent.getIdOfContragent();
+
+            complexesWithPriceTitles = daoService.getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
+        }
+
+        if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
+
+            for (String title: complexesWithPriceTitles) {
+                SelectItem selectItem = new SelectItem(i, title);
+                list.add(selectItem);
+                i++;
+            }
+        }
+
+        contragentsSelectItems = list;
 
         return list;
     }
@@ -224,6 +242,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         htmlReport = null;
         contragent = null;
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        preferentialTitleComplexes = null;
         return null;
     }
 
