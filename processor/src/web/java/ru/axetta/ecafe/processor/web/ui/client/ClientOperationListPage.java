@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Reg
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.ClientSmsList;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
 

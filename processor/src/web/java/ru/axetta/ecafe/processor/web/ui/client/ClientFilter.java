@@ -17,10 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Example;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 
 import java.util.List;
@@ -344,10 +341,9 @@ public class ClientFilter {
                     .add(Example.create(examplePerson).excludeZeroes().enableLike(MatchMode.ANYWHERE).ignoreCase());
         }
         if (!this.contractPerson.isEmpty()) {
-            Person examplePerson = this.contractPerson.buildPerson();
-            Criteria contractPersonCriteria = criteria.createCriteria("contractPerson");
-            contractPersonCriteria
-                    .add(Example.create(examplePerson).excludeZeroes().enableLike(MatchMode.ANYWHERE).ignoreCase());
+            Person examplePerson = this.person.buildPerson();
+            criteria.createCriteria("person")
+            .add(Restrictions.ilike("surname", examplePerson.getSurname(), MatchMode.START));
         }
         if (StringUtils.isNotEmpty(this.filterClientId)) {
             criteria.add(Restrictions.eq("idOfClient", Long.parseLong(this.filterClientId.replaceAll("\\s", ""))));

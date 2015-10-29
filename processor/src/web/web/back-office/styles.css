@@ -106,6 +106,13 @@
     border: none;
 }
 
+.borderless-grid-all-client {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    border: none;
+    vertical-align: top;
+}
+
 .main-grid {
     margin: 0 0 0 0;
     padding: 0 0 0 0;

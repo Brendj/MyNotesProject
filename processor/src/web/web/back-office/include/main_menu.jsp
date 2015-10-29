@@ -1001,10 +1001,10 @@
                             binding="#{orgSmsStatsReportPage.mainMenuComponent}"
                             label="Общая статистика"
                             action="#{orgSmsStatsReportPage.show}" reRender="workspaceForm" />
-        <%--<rich:panelMenuItem id="SmsAddressesReportPageMenuItem"
+        <rich:panelMenuItem id="SmsAddressesReportPageMenuItem"
                             binding="#{smsAddressesReportPage.mainMenuComponent}"
-                            label="Отчет по адресам доставки сообщений"
-                            action="#{smsAddressesReportPage.show}" reRender="workspaceForm" />--%>
+                            label="Отчет по доставке сообщений адресатам"
+                            action="#{smsAddressesReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="statisticDifferencesGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticDifferencesGroupPage"--%>

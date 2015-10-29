@@ -2,7 +2,7 @@
  * Copyright (c) 2010. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.client;
+package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Card;
@@ -11,12 +11,10 @@ import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +43,12 @@ public class ClientSmsList {
         private final String eventType;
         private final Long eventId;
         private final Date eventTime;
+        private final Long contractId;
+        private final String fio;
+        private String guardian;
+        private String guardianAsString;
+        private String contentsTypeAsString;
+        private String deliveryStatusAsString;
 
         public Item(ClientSms clientSms) {
             this.idOfSms = clientSms.getIdOfSms();
@@ -70,7 +74,10 @@ public class ClientSmsList {
             this.eventType = ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()];
             this.eventId = clientSms.getContentsId();
             this.eventTime = clientSms.getEventTime();
+            this.contractId = clientSms.getClient().getContractId();
+            this.fio = clientSms.getClient().getPerson().getFullName();
         }
+
         public static final int TYPE_NEGATIVE_BALANCE = 1;
         public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
         public static final int TYPE_PAYMENT_REGISTERED = 3;
@@ -144,6 +151,40 @@ public class ClientSmsList {
         public Date getEventTime() {
             return eventTime;
         }
+
+        public Long getContractId() {
+            return contractId;
+        }
+
+        public String getFio() {
+            return fio;
+        }
+
+        public String getGuardian() {
+            return guardian;
+        }
+
+        public void setGuardian(String value) {
+            guardian = value;
+        }
+
+        /*public String getGuardianAsString() {
+            return isGuardian ? "Да" : "Нет";
+        }*/
+
+        public String getContentsTypeAsString() {
+            if (contentsType >= 0 && contentsType < ClientSms.CONTENTS_TYPE_DESCRIPTION.length) {
+                return ClientSms.CONTENTS_TYPE_DESCRIPTION[contentsType];
+            }
+            return ClientSms.UNKNOWN_CONTENTS_TYPE_DESCRIPTION;
+        }
+
+        public String getDeliveryStatusAsString() {
+            if (deliveryStatus >= 0 && deliveryStatus < ClientSms.DELIVERY_STATUS_DESCRIPTION.length) {
+                return ClientSms.DELIVERY_STATUS_DESCRIPTION[deliveryStatus];
+            }
+            return ClientSms.UNKNOWN_DELIVERY_STATUS_DESCRIPTION;
+        }
     }
 
     private List<Item> items = Collections.emptyList();
@@ -167,6 +208,25 @@ public class ClientSmsList {
         for (Object object : clientPayments) {
             ClientSms clientSms = (ClientSms) object;
             items.add(new Item(clientSms));
+        }
+        this.items = items;
+    }
+
+    public void fillWithClients(Session session, List<Client> clients, Date startTime, Date endTime, HashMap<Long, String> mapGuardians) throws Exception {
+        Criteria criteria = session.createCriteria(ClientSms.class);
+        criteria.add(Restrictions.ge("serviceSendTime", startTime));
+        criteria.add(Restrictions.le("serviceSendTime", endTime));
+        criteria.add(Restrictions.in("client", clients));
+        criteria.addOrder(Order.asc("client"));
+        criteria.addOrder(Order.asc("eventTime"));
+
+        List<Item> items = new LinkedList<Item>();
+        List clientPayments = criteria.list();
+        for (Object object : clientPayments) {
+            ClientSms clientSms = (ClientSms) object;
+            Item item = new Item(clientSms);
+            item.setGuardian(mapGuardians.get(clientSms.getClient().getIdOfClient()));
+            items.add(item);
         }
         this.items = items;
     }

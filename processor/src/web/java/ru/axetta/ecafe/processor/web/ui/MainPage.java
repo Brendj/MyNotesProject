@@ -294,6 +294,7 @@ public class MainPage implements Serializable {
     private final ContractSelectPage contractSelectPage = new ContractSelectPage();
     private final ContragentListSelectPage contragentListSelectPage = new ContragentListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
+    private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
 
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
@@ -2947,6 +2948,10 @@ public class MainPage implements Serializable {
         return clientSelectPage;
     }
 
+    public ClientSelectListPage getClientSelectListPage() {
+        return clientSelectListPage;
+    }
+
     public Object showClientSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ClientSelectPage.CompleteHandler) {
@@ -2973,6 +2978,118 @@ public class MainPage implements Serializable {
 
 
             }
+        }
+        return null;
+    }
+
+    public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
+        BasicPage currentTopMostPage = getTopMostPage();
+        //if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                clientSelectListPage.fill(persistenceSession, clientList);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
+                    clientSelectListPage.pushCompleteHandler((ClientSelectListPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(clientSelectListPage);
+                }
+
+            } catch (Exception e) {
+                logger.error("Failed to fill client selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        //}
+        return null;
+    }
+
+    public Object clearClientSelectListPageFilter() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientSelectListPage.clearClientFilter();
+            clientSelectListPage.fill(persistenceSession, null);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to clear filter for client list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object updateClientSelectListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientSelectListPage.fill(persistenceSession, null);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object completeClientListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientSelectListPage.completeClientSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == clientSelectListPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete client selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
         }
         return null;
     }
