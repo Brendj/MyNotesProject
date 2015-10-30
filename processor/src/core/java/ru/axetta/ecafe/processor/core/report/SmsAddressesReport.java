@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
@@ -63,17 +64,34 @@ public class SmsAddressesReport extends BasicReportForAllOrgJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
 
-            HashMap<Long, String> mapGuardians = new HashMap<Long, String>();
+            HashMap<Long, List<String>> mapGuardians = new HashMap<Long, List<String>>();
             List<Client> clients = new ArrayList<Client>();
             for (Long id : clientsIds) {
                 Client client =  (Client)session.load(Client.class, id);
                 clients.add(client);
-                mapGuardians.put(client.getIdOfClient(), "");
+                //mapGuardians.put(client.getIdOfClient(), new ArrayList<String>());
                 List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient(), null);
+                List<String> guardiansFIO = new ArrayList<String>();
                 for (Client qqq : guardians) {
                     clients.add(qqq);
-                    mapGuardians.put(qqq.getIdOfClient(), client.getPerson().getFullName());
+                    guardiansFIO.add(qqq.getPerson().getFullName());
                 }
+                mapGuardians.put(client.getIdOfClient(), guardiansFIO);
+
+                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient());
+                //List<String> wardsFIO = new ArrayList<String>();
+                for (ClientGuardianItem item : wards) {
+                    clients.add((Client)session.load(Client.class, item.getIdOfClient()));
+                    List<Client> guardianOfWard = ClientManager.findGuardiansByClient(session, item.getIdOfClient(), null);
+                    List<String> guardiansOfWardFIO = new ArrayList<String>();
+                    for (Client qqq : guardianOfWard) {
+                        //clients.add(qqq);
+                        guardiansOfWardFIO.add(qqq.getPerson().getFullName());
+                    }
+                    mapGuardians.put(item.getIdOfClient(), guardiansOfWardFIO);
+                    //wardsFIO.add(item.getPersonName());
+                }
+
             }
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, clients, mapGuardians);
@@ -87,7 +105,7 @@ public class SmsAddressesReport extends BasicReportForAllOrgJob {
             return new SmsAddressesReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Client> clients, HashMap<Long, String> mapGuardians) throws Exception {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Client> clients, HashMap<Long, List<String>> mapGuardians) throws Exception {
 
             ClientSmsList smsList = new ClientSmsList();
             smsList.fillWithClients(session, clients, startTime, endTime, mapGuardians);

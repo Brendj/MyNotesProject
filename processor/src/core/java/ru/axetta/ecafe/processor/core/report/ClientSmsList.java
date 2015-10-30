@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -165,7 +166,11 @@ public class ClientSmsList {
         }
 
         public void setGuardian(String value) {
-            guardian = value;
+            if (value == null) {
+                guardian = "";
+            } else {
+                guardian = value.concat("\n");
+            }
         }
 
         /*public String getGuardianAsString() {
@@ -212,7 +217,7 @@ public class ClientSmsList {
         this.items = items;
     }
 
-    public void fillWithClients(Session session, List<Client> clients, Date startTime, Date endTime, HashMap<Long, String> mapGuardians) throws Exception {
+    public void fillWithClients(Session session, List<Client> clients, Date startTime, Date endTime, HashMap<Long, List<String>> mapGuardians) throws Exception {
         Criteria criteria = session.createCriteria(ClientSms.class);
         criteria.add(Restrictions.ge("serviceSendTime", startTime));
         criteria.add(Restrictions.le("serviceSendTime", endTime));
@@ -225,7 +230,19 @@ public class ClientSmsList {
         for (Object object : clientPayments) {
             ClientSms clientSms = (ClientSms) object;
             Item item = new Item(clientSms);
-            item.setGuardian(mapGuardians.get(clientSms.getClient().getIdOfClient()));
+            List<String> guardians = mapGuardians.get(clientSms.getClient().getIdOfClient());
+            /*if (guardians == null || guardians.size() == 0) {
+                Item item = new Item(clientSms);
+                items.add(item);
+            }
+            else {
+                for (String g : guardians) {
+                    Item item = new Item(clientSms);
+                    item.setGuardian(g);
+                    items.add(item);
+                }
+            }*/
+            item.setGuardian(StringUtils.join(guardians, "\n"));
             items.add(item);
         }
         this.items = items;
