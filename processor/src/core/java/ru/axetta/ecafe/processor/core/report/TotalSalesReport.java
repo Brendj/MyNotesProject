@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.report.model.totalsales.TotalSalesData;
 import ru.axetta.ecafe.processor.core.report.model.totalsales.TotalSalesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,15 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
                 Map<String, Object> parameterMap) throws Exception {
+
+            List<String> titlesComplexes = new ArrayList<String>();
+
+            String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("titleComplexes"));
+
+            for (String title : Arrays.asList(StringUtils.split(titles, ','))) {
+                titlesComplexes.add(title);
+            }
+
             long l = System.currentTimeMillis();
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);

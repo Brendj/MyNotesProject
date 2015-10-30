@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.report.TotalSalesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
@@ -64,6 +65,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
     private List<SelectItem> contragentsSelectItems;
+    private List<String> titlesComplex;
 
     private Integer[] preferentialTitleComplexes;
 
@@ -101,16 +103,16 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         if (contragent != null) {
             Long idOfContragent = contragent.getIdOfContragent();
 
-            complexesWithPriceTitles = daoService.getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
-        }
+           /* complexesWithPriceTitles = daoService.getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
 
-        if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
+            if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
 
-            for (String title: complexesWithPriceTitles) {
-                SelectItem selectItem = new SelectItem(i, title);
-                list.add(selectItem);
-                i++;
-            }
+                for (String title: complexesWithPriceTitles) {
+                    SelectItem selectItem = new SelectItem(i, title);
+                    list.add(selectItem);
+                    i++;
+                }
+            }*/
         }
 
         contragentsSelectItems = list;
@@ -174,6 +176,19 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     }
 
     public Object buildReportHTML() {
+        titlesComplex = new ArrayList<String>();
+
+        if (preferentialTitleComplexes.length > 0) {
+            for (Integer prefer: preferentialTitleComplexes) {
+                titlesComplex.add(contragentsSelectItems.get(prefer).getLabel());
+            }
+        }
+
+        String titleComplexesString = "";
+
+        for (String titleComplexItem: titlesComplex) {
+            titleComplexesString = titleComplexesString.concat(titleComplexItem).concat(",");
+        }
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -192,6 +207,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+
+            builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
