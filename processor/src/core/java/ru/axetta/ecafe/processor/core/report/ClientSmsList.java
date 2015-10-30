@@ -4,17 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -45,11 +48,13 @@ public class ClientSmsList {
         private final Long eventId;
         private final Date eventTime;
         private final Long contractId;
+        private final Long orgId;
         private final String fio;
         private String guardian;
         private String guardianAsString;
         private String contentsTypeAsString;
         private String deliveryStatusAsString;
+        private String child;
 
         public Item(ClientSms clientSms) {
             this.idOfSms = clientSms.getIdOfSms();
@@ -77,6 +82,7 @@ public class ClientSmsList {
             this.eventTime = clientSms.getEventTime();
             this.contractId = clientSms.getClient().getContractId();
             this.fio = clientSms.getClient().getPerson().getFullName();
+            this.orgId = clientSms.getClient().getOrg().getIdOfOrg();
         }
 
         public static final int TYPE_NEGATIVE_BALANCE = 1;
@@ -190,6 +196,49 @@ public class ClientSmsList {
             }
             return ClientSms.UNKNOWN_DELIVERY_STATUS_DESCRIPTION;
         }
+
+        public String getChild() {
+            return child;
+        }
+
+        public void setChild(Session session) {
+            String childFIO = "";
+            try {
+                Client client = DAOUtils.findClientByContractId(session, this.contractId);
+                List<ClientGuardianItem> wards = ClientManager.loadWardsByClient(session, client.getIdOfClient());
+                HashSet<Long> orgs = new HashSet<Long>();
+                HashSet<Long> children = new HashSet<Long>();
+                children.add(client.getIdOfClient());
+                for (ClientGuardianItem cgi : wards) {
+                    Client ward = (Client)session.load(Client.class, cgi.getIdOfClient());
+                    children.add(ward.getIdOfClient());
+                    Org org = ward.getOrg();
+                    orgs.add(org.getIdOfOrg());
+                    Set<Org> friends = org.getFriendlyOrg();
+                    for(Org forg : friends) {
+                        orgs.add(forg.getIdOfOrg());
+                    }
+                }
+                if (orgs.size() == 0) {
+                    this.child = "";
+                    return;
+                }
+                if (contentsType == 2) {
+                    String squery = "select idOfClient from cf_enterevents where idOfOrg in (" + StringUtils.join(orgs, ",") +
+                            ") and IdOfEnterEvent = :eventId and IdOfClient in (" + StringUtils.join(children, ",") + ")";
+                    Query query = session.createSQLQuery(squery);
+                    query.setParameter("eventId", this.eventId);
+                    Long clientId = ((BigInteger) query.list().get(0)).longValue();
+                    if (clientId != null) {
+                        childFIO = ((Client)session.load(Client.class, clientId)).getPerson().getFullName();
+                    }
+                }
+            }
+            catch (Exception e) {
+                childFIO = "";
+            }
+            this.child = childFIO;
+        }
     }
 
     private List<Item> items = Collections.emptyList();
@@ -243,6 +292,7 @@ public class ClientSmsList {
                 }
             }*/
             item.setGuardian(StringUtils.join(guardians, "\n"));
+            item.setChild(session);
             items.add(item);
         }
         this.items = items;
