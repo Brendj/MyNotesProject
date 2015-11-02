@@ -58,6 +58,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private Long sumBuffet = 0L;
         private Long sumBen = 0L;
 
+        private Long sumBuffetPlusSumComplex = 0L;
+        private Long sumBuffetOwnPlusSumComplex = 0L;
+
         private final String templateFilename;
 
         public Builder(String templateFilename) {
@@ -84,6 +87,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             parameterMap.put("sumComplex", Double.parseDouble(sumComplex.toString()));
             parameterMap.put("sumBuffet", Double.parseDouble(sumBuffet.toString()));
             parameterMap.put("sumBen", Double.parseDouble(sumBen.toString()));
+            parameterMap.put("sumBuffetPlusSumComplex", Double.parseDouble(sumBuffetPlusSumComplex.toString()));
+            parameterMap.put("sumBuffetOwnPlusSumComplex", Double.parseDouble(sumBuffetOwnPlusSumComplex.toString()));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
@@ -109,7 +114,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             Map<Long, List<TotalSalesItem>> totalListMap = new HashMap<Long, List<TotalSalesItem>>();
             //Получаем список всех школ, заполняем ими списов
             List<Long> idOfOrgsList = new LinkedList<Long>();
-            retreiveAllOrgs(totalListMap, dates, idOfOrgsList);
+            retreiveAllOrgs(totalListMap, dates, idOfOrgsList, titlesComplexes);
             if(idOfOrgsList.size() == 0){
                 return new JREmptyDataSource();
             }
@@ -146,9 +151,11 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (OrderItem allOrder : allOrders) {
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
                     sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
+                    sumBuffetPlusSumComplex += sumBuffet;
                 }else if(allOrder.getSocDiscount() == 0L){//Pay
                     sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX);
-
+                    sumBuffetPlusSumComplex += sumComplex;
+                    sumBuffetOwnPlusSumComplex += sumComplex;
                 }else{ // free
                     sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
 
@@ -177,7 +184,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
-                List<Long> idOfOrgsList) {
+                List<Long> idOfOrgsList, List<String> titleComplexes) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
             if(idOfContragent != -1){
 
@@ -192,6 +199,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_COMPLEX));
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_BUFFET_PLUS_NAME_COMPLEX));
                     totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX));
+                    for (String title: titleComplexes) {
+                        totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, title));
+                    }
                 }
                 totalSalesItemMap.put(orgItem.getIdOfOrg(), totalSalesItemList);
                 idOfOrgsList.add(orgItem.getIdOfOrg());

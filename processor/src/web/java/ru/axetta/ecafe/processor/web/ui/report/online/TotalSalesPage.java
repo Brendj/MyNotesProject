@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.report.TotalSalesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -25,6 +26,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,9 +180,11 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     public Object buildReportHTML() {
         titlesComplex = new ArrayList<String>();
 
-        if (preferentialTitleComplexes.length > 0) {
-            for (Integer prefer: preferentialTitleComplexes) {
-                titlesComplex.add(contragentsSelectItems.get(prefer).getLabel());
+        if (preferentialTitleComplexes != null) {
+            if (preferentialTitleComplexes.length > 0) {
+                for (Integer prefer : preferentialTitleComplexes) {
+                    titlesComplex.add(contragentsSelectItems.get(prefer).getLabel());
+                }
             }
         }
 
