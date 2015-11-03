@@ -367,7 +367,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{eventTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{eventTime})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="728f30b7-a9ba-47a9-9842-5aa8c85c6793" positionType="Float" stretchType="RelativeToBandHeight" x="1034" y="1" width="93" height="20"/>
@@ -381,7 +381,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{serviceSendTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{serviceSendTime})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="4b345a26-987b-4f58-8c3a-c2d813227447" positionType="Float" stretchType="RelativeToBandHeight" x="1127" y="1" width="93" height="20"/>
@@ -395,7 +395,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{deliveryTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{deliveryTime})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement uuid="b4a2758e-fe90-4fd7-98db-df9f1089d979" positionType="Float" stretchType="RelativeToBandHeight" x="1220" y="1" width="69" height="20"/>
