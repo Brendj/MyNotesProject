@@ -9,8 +9,10 @@ import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
@@ -134,6 +136,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ORDER_PUBLICATION_NOT_FOUND = 350L;
     private static final Long RC_ORDER_PUBLICATION_CANT_BE_DELETED = 360L;
     private static final Long RC_ORDER_PUBLICATION_ALREADY_EXISTS = 370L;
+    private static final Long RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN = 380L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -156,6 +159,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORDER_PUBLICATION_NOT_FOUND_DESC = "Заказ не найден";
     private static final String RC_ORDER_PUBLICATION_CANT_BE_DELETED_DESC = "Заказ не может быть удален";
     private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
+    private static final String RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN_DESC = "Клиент не найден или не является опекаемым для данного опекуна";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -4336,6 +4340,61 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        return result;
+    }
+
+    @Override
+    public Result clearMobileByContractId(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "phone") String phone) {
+        authenticateRequest(contractId);
+        return processClearMobile(contractId, phone);
+    }
+
+    private Result processClearMobile(Long contractId, String phone) {
+        Result result = new Result();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            if (contractId == null) {
+                return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+            String currentMobile = client.getMobile();
+
+            if (phone.equals(currentMobile)) {
+                client.setMobile("");
+                session.persist(client);
+                logger.info(String.format("Очищен номер телефона %s у клиента с ContractId=%s", phone, client.getContractId()));
+            }
+
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            for (ClientGuardianItem item : guardians) {
+                Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
+                if (phone.equals(guardian.getMobile())) {
+                    guardian.setMobile("");
+                    session.persist(guardian);
+                    logger.info(String.format("Очищен номер телефона %s у клиента с ContractId=%s", phone, guardian.getContractId()));
+                }
+            }
+            session.flush();
+            persistenceTransaction.commit();
+            session.close();
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = e.toString();
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
         return result;
     }
 

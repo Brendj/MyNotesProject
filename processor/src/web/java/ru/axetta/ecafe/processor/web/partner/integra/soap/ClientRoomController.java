@@ -254,6 +254,9 @@ public interface ClientRoomController {
     @WebMethod CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") int state);
 
+    @WebMethod Result clearMobileByContractId(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "phone") String phone);
+
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
     @WebMethod ClassRegisterEventListByGUIDResult putClassRegisterEventListByGUID(@WebParam(name = "registerEventList")
