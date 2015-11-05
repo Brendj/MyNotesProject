@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -21,6 +25,13 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -93,6 +104,81 @@ public class ActiveClientsReportPage extends OnlineReportPage {
                 HibernateUtils.close(persistenceSession, logger);
             } catch (Exception e) {
                 logger.error("Failed to build active clients report", e);
+            }
+        }
+    }
+
+    public void exportToXLS (ActionEvent actionEvent)
+    {
+        FacesContext facesContext = FacesContext.getCurrentInstance ();
+        RuntimeContext runtimeContext;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ActiveClientsReport.Builder reportBuilder = new ActiveClientsReport.Builder();
+        Date generateTime = new Date();
+        try
+        {
+            runtimeContext = RuntimeContext.getInstance ();
+            persistenceSession = runtimeContext.createPersistenceSession ();
+            persistenceTransaction = persistenceSession.beginTransaction ();
+
+            if (idOfOrg != null) {
+                Org org = null;
+                if (idOfOrg != null && idOfOrg > -1) {
+                    org = DAOService.getInstance().findOrById(idOfOrg);
+                }
+                reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            }
+            this.report = reportBuilder.build (persistenceSession, startDate, endDate, new GregorianCalendar());
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Подготовка отчета завершена успешно", null));
+        } catch (FileNotFoundException ex) {
+            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
+                    ex.getMessage(), null));
+        }
+        catch (Exception e)
+        {
+            //logger.error("Failed to build sales report", e);
+            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчета", null));
+        }
+        finally
+        {
+            try {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            } catch (Exception e) {
+                logger.error("Failed to build active clients report", e);
+            }
+        }
+
+        if (this.report != null) {
+            try {
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                response.setHeader("Content-disposition","inline;filename=active_client.xls");
+
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+                printMessage("Отчет по активным клиентам построен");
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
             }
         }
     }

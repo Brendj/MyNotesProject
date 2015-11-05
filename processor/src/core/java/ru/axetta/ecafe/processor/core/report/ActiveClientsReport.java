@@ -104,7 +104,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 return new ActiveClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         jasperPrint, startTime, endTime, null);
             } else {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                /*ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
                 exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
                 exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
@@ -113,9 +113,9 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
                 exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                exporter.exportReport();
-                return new ActiveClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
+                exporter.exportReport();*/
+                return new ActiveClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
+                        startTime, endTime, items)/*.setHtmlReport(os.toString("UTF-8"))*/;
             }
         }
 

@@ -40,6 +40,8 @@
         <a4j:commandButton value="Генерировать отчет" action="#{activeClientsReportPage.executeReport}"
                            reRender="workspaceTogglePanel, itemsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Сохранить в Excel" actionListener="#{activeClientsReportPage.exportToXLS}"
+                           styleClass="command-button"/>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
