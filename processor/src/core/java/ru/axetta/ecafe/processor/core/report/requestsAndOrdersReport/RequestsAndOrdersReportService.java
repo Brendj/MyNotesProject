@@ -50,7 +50,7 @@ public class RequestsAndOrdersReportService {
 
     private static String getDistrict(String orgName, HashMap<Long, BasicReportJob.OrgShortItem> orgMap) {
         for (BasicReportJob.OrgShortItem orgShortItem : orgMap.values()) {
-            if (orgName.equals(orgShortItem.getOfficialName())) {
+            if (orgName.equals(orgShortItem.getShortName())) {
                 return orgShortItem.getOrgDistrict();
             }
         }
@@ -59,7 +59,7 @@ public class RequestsAndOrdersReportService {
 
     private String getAddress(String orgName, HashMap<Long,BasicReportJob.OrgShortItem> orgMap) {
         for (BasicReportJob.OrgShortItem orgShortItem : orgMap.values()) {
-            if (orgName.equals(orgShortItem.getOfficialName())) {
+            if (orgName.equals(orgShortItem.getShortName())) {
                 return orgShortItem.getAddress();
             }
         }
@@ -348,9 +348,7 @@ public class RequestsAndOrdersReportService {
     }
 
     private String getOrgName(BasicReportJob.OrgShortItem org) {
-        //return org.getShortName() != null ? org.getShortName() : org.getOfficialName();
-
-        return org.getOfficialName();
+        return org.getShortName();
     }
 
     private List getComplexList(HashMap<Long, BasicReportJob.OrgShortItem> orgMap, Date beginDate, Date endDate) {
