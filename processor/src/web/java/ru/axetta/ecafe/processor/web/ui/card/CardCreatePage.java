@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -17,8 +16,6 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import org.hibernate.Session;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.util.Date;
 
 /**
@@ -45,7 +42,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     private final CardStateMenu cardStateMenu = new CardStateMenu();
     private final CardLifeStateMenu cardLifeStateMenu = new CardLifeStateMenu();
 
-    private boolean clientHasActiveCard = false;
+    private boolean clientHasNotBlockedCard = false;
 
     public String getPageFilename() {
         return "card/create";
@@ -155,15 +152,21 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
             this.client = new ClientItem(client);
-            if (client.getCards().size() > 0) {
-                clientHasActiveCard = true;
+            clientHasNotBlockedCard = false;
+            if (client.getCards() != null) {
+                for (Card card : client.getCards()) {
+                    if (card.getState().intValue() != CardState.BLOCKED.getValue()) {
+                        clientHasNotBlockedCard = true;
+                        break;
+                    }
+                }
             }
         }
     }
 
     public void createCard(Session session) throws Exception {
-        if (isClientHasActiveCard()){
-            throw new IllegalStateException("У данного клиента уже есть активная карта.");
+        if (isClientHasNotBlockedCard()){
+            throw new IllegalStateException("Данный клиент имеет незаблокированную(ые) карту(ы).");
         }
         CardService.getInstance().resetAllCards(client.getIdOfClient());
 
@@ -176,7 +179,7 @@ public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPa
     }
 
 
-    public boolean isClientHasActiveCard() {
-        return clientHasActiveCard;
+    public boolean isClientHasNotBlockedCard() {
+        return clientHasNotBlockedCard;
     }
 }
