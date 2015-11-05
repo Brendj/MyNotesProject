@@ -127,24 +127,23 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     idOfSourceOrgSet.add(idOfSourceOrg);
                 }
             }
-            Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
-            if (supplierFilter == 1) {
-                criterion = Restrictions.not(criterion);
+            if (idOfSourceOrgSet.size() > 0) {
+                Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
+                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2) {
+                    criterion = Restrictions.not(criterion);
+                }
+                if (supplierFilter != 2) {
+                    orgCriteria.add(criterion);
+                }
             }
             if (supplierFilter == 4) {
-                criterion = Restrictions.not(criterion);
                 orgCriteria.add(Restrictions.eq("type", OrganizationType.KINDERGARTEN));
             }
             if (supplierFilter == 5) {
-                criterion = Restrictions.not(criterion);
                 orgCriteria.add(Restrictions.eq("type", OrganizationType.SCHOOL));
             }
             if (supplierFilter == 2) {
-                criterion = Restrictions.not(criterion);
                 orgCriteria.add(Restrictions.eq("type", OrganizationType.SUPPLIER));
-            }
-            if (supplierFilter != 2) {
-                orgCriteria.add(criterion);
             }
         }
 

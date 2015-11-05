@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -14,10 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -143,16 +142,45 @@ public class ContragentSelectPage extends BasicPage {
         } catch (Exception e) {
 
         }
+        Criterion byFilter = null;
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
+            //criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
+            byFilter = Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE);
         }
+        Criterion byClassType = null;
         if(StringUtils.isNotEmpty(classTypesString)) {
             String[] classTypes = classTypesString.split(",");
-            Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
+            byClassType = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
             for (int i = 1; i < classTypes.length; i++) {
-                exp = Restrictions.or(exp, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
+                byClassType = Restrictions.or(byClassType, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
             }
-            criteria.add(exp);
+            //criteria.add(exp);
+        }
+
+        Criterion finalCriterion = null;
+        if (byFilter != null && byClassType != null) {
+            finalCriterion = Restrictions.and(byFilter, byClassType);
+        }
+        else if (byFilter != null) {
+            finalCriterion = byFilter;
+        }
+        else if (byClassType != null) {
+            finalCriterion = byClassType;
+        }
+        Boolean useOperator = DAOUtils.getOptionValueBool(session, Option.OPTION_WITH_OPERATOR, false); //флаг - Включена ли схема с Оператором в настройках
+        if (useOperator) {
+            Disjunction disjunction = Restrictions.disjunction();
+            disjunction.add(Restrictions.eq("contragentName", Contragent.CLASS_NAMES[Contragent.OPERATOR]));
+            Criterion byOperator = Restrictions.disjunction().add(Restrictions.eq("contragentName", Contragent.CLASS_NAMES[Contragent.OPERATOR]));
+            if (finalCriterion != null) {
+                finalCriterion = Restrictions.or(finalCriterion, byOperator);
+            }
+            else {
+                finalCriterion = byOperator;
+            }
+        }
+        if (finalCriterion != null) {
+            criteria.add(finalCriterion);
         }
         criteria.addOrder(Order.asc("contragentName"));
         return criteria.list();
