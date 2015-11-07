@@ -310,10 +310,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 clientPaymentCriteria.add(Restrictions.in("t.org", orgList));
             clientPaymentCriteria.createAlias("transaction.client", "cl");
             clientPaymentCriteria.createAlias("transaction.client.org", "o");
-            if (!terminal.equals("")) {
+            if (terminal != null && !terminal.equals("")) {
                 clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%"));
             }
-            if (!paymentIdentifier.equals("")) {
+            if (paymentIdentifier != null && !paymentIdentifier.equals("")) {
                 clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%"));
             }
             if (orgType != null) {
@@ -334,10 +334,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.isNull("t.org"));
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client", "cl");
             clientPaymentCriteriaWithTransactionOrgIsNull.createAlias("transaction.client.org", "o");
-            if (!terminal.equals("")) {
+            if (terminal != null && !terminal.equals("")) {
                 clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%"));
             }
-            if (!paymentIdentifier.equals("")) {
+            if (paymentIdentifier != null && !paymentIdentifier.equals("")) {
                 clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%"));
             }
             if (orgType != null) {
