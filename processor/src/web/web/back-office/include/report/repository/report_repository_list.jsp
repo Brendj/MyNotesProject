@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToWorkOnlineReport())
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToShowReportsRepository())
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
