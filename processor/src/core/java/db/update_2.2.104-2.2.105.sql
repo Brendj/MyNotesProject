@@ -6,3 +6,4 @@
 
 ALTER TABLE cf_clients ADD COLUMN dontshowtoexternal integer NOT NULL DEFAULT 0;
 
+--! ФИНАЛИЗИРОВАН (Семенов, 151109) НЕ МЕНЯТЬ
