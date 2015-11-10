@@ -313,7 +313,8 @@ public class RequestsAndOrdersReportService {
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.SUBSCRIPTION_FEEDING))
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.CORRECTION_TYPE)));
         orderDetailsCriteria.add(Restrictions.between("menuType", 50, 99));
-        orderDetailsCriteria.add(Restrictions.in("org", orgMapFull.values()));
+        //orderDetailsCriteria.add(Restrictions.in("org", orgMapFull.values()));
+        orderDetailsCriteria.add(Restrictions.in("o.org.idOfOrg", orgMapFull.keySet()));
         orderDetailsCriteria.add(Restrictions.isNotNull("good"));
 
         List orderDetailsList = orderDetailsCriteria.list();
