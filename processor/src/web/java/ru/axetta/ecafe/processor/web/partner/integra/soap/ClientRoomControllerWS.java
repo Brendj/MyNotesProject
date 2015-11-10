@@ -4392,22 +4392,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 "с л/с %s и представителем с телефоном %s", contractId, guardMobile));
                     }
 
+                } else {
+                    if (client.getMobile() != null && !client.getMobile().equals(guardMobile)) {
+                        throw new IllegalArgumentException(String.format("Невозможно активировать опекунскую связь между клиентом " +
+                                "с л/с %s, телефоном %s и представителем с телефоном %s", contractId, client.getMobile(), guardMobile));
+                    }
                 }
             }
 
             session.flush();
             persistenceTransaction.commit();
             session.close();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
         }
         catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
             result.resultCode = RC_INTERNAL_ERROR;
-            result.description = e.toString();
+            result.description = e.getMessage();
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
-        result.resultCode = RC_OK;
-        result.description = RC_OK_DESC;
+
         return result;
     }
 
