@@ -937,7 +937,7 @@ public class ClientManager {
             ClientGuardian clientGuardian = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
-                guardianItems.add(new ClientGuardianItem(cl));
+                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled()));
             }
         }
         return guardianItems;
@@ -952,7 +952,7 @@ public class ClientManager {
             ClientGuardian clientWard = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
-                wardItems.add(new ClientGuardianItem(cl));
+                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled()));
             }
         }
         return wardItems;
@@ -981,6 +981,16 @@ public class ClientManager {
             clients = clientCriteria.list();
         }
         return clients;
+    }
+
+    /* Является ли опекунская связь Опекун-Клиент активной*/
+    public static Boolean isGuardianshipDisabled(Session session, Long guardianId, Long clientId) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", guardianId));
+        criteria.add(Restrictions.eq("idOfChildren", clientId));
+        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
+        if (cg == null) return false;
+        return cg.isDisabled();
     }
 
     /* Удалить список опекунов клиента */

@@ -14,6 +14,7 @@ public class ClientGuardian {
     private Long idOfChildren;
     private Long idOfGuardian;
     private Integer guardianType;
+    private Boolean disabled;
 
     protected ClientGuardian() {}
 
@@ -60,5 +61,17 @@ public class ClientGuardian {
 
     public void setGuardianType(Integer guardianType) {
         this.guardianType = guardianType;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        if (disabled == null) {
+            this.disabled = false;
+        } else {
+            this.disabled = disabled;
+        }
     }
 }

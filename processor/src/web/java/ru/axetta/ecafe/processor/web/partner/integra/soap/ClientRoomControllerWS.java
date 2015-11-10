@@ -4344,6 +4344,74 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "guardMobile") String guardMobile,
+            @WebParam(name = "value") Boolean value) {
+        authenticateRequest(contractId);
+        return processSetGuardianship(contractId, guardMobile, value);
+    }
+
+    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value) {
+        Result result = new Result();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
+            boolean guardianWithMobileFound = false;
+            for (ClientGuardianItem item : guardians) {
+                Client guardian = (Client)session.get(Client.class, item.getIdOfClient());
+                if (guardian != null && guardian.getMobile().equals(guardMobile)) {
+                    guardianWithMobileFound = true;
+                    Criteria criteria = session.createCriteria(ClientGuardian.class);
+                    criteria.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+                    criteria.add(Restrictions.eq("idOfGuardian", item.getIdOfClient()));
+                    ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
+                    cg.setDisabled(value);
+                    session.persist(cg);
+                }
+            }
+            if (value) {
+                if (client.getMobile().equals(guardMobile)) {
+                    client.setMobile("");
+                    session.persist(client);
+                }
+            } else {
+                if (!guardianWithMobileFound) {
+                    if (client.getMobile() == null || client.getMobile().isEmpty()) {
+                        client.setMobile(guardMobile);
+                        session.persist(client);
+                    } else {
+                        throw new IllegalArgumentException(String.format("Невозможно активировать опекунскую связь между клиентом " +
+                                "с л/с %s и представителем с телефоном %s", contractId, guardMobile));
+                    }
+
+                }
+            }
+
+            session.flush();
+            persistenceTransaction.commit();
+            session.close();
+        }
+        catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = e.toString();
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+        return result;
+    }
+
+    @Override
     public Result clearMobileByContractId(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "phone") String phone) {
         authenticateRequest(contractId);

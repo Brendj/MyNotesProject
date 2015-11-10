@@ -68,6 +68,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.isGuardianshipDisabled;
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
 /**
@@ -2214,9 +2215,11 @@ public class Processor implements SyncProcessor,
 
                     if (!(guardians == null || guardians.isEmpty())) {
                         for (Client destGuardian : guardians) {
-                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                            if (!isGuardianshipDisabled(persistenceSession, destGuardian.getIdOfClient(), client.getIdOfClient())) {
+                                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                     .sendNotificationAsync(destGuardian, client,
                                             EventNotificationService.MESSAGE_PAYMENT, values, payment.getOrderDate());
+                            }
                         }
                     }
                 }
@@ -3506,9 +3509,11 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
-                                        notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
+                                        if (!isGuardianshipDisabled(persistenceSession, destGuardian.getIdOfClient(), clientFromEnterEvent.getIdOfClient())) {
+                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
                                                 EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
                                                 e.getPassDirection(), null, e.getEvtDateTime());
+                                        }
                                     }
                                 }
                                 notificationService.sendNotificationAsync(clientFromEnterEvent, null,
@@ -3528,8 +3533,10 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                                     guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
+                                            if (!isGuardianshipDisabled(persistenceSession, destGuardian.getIdOfClient(), clientFromEnterEvent.getIdOfClient())) {
+                                                notificationService.sendNotificationAsync(destGuardian, clientFromEnterEvent,
                                                     EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values, e.getPassDirection(), guardianFromEnterEvent, e.getEvtDateTime());
+                                            }
                                         }
                                     } else {
                                         notificationService.sendNotificationAsync(clientFromEnterEvent, null,

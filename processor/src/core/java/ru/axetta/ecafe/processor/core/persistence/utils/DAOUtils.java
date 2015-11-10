@@ -1734,7 +1734,10 @@ public class DAOUtils {
     * Находит детей представителя или ребенка, у которого указан телефонный номер
     * */
     public static List<Long> extractIDFromGuardByGuardMobile(Session persistenceSession, String guardMobile) {
-        Query q = persistenceSession.createQuery("select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile");
+        //String query = "select client.idOfClient from Client client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
+        //        + "and not exists (select idOfClientGuardian from ClientGuardian where idOfChildren = Client.idOfClient)";
+        String query = "select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile";
+        Query q = persistenceSession.createQuery(query);
         q.setParameter("guardMobile", guardMobile);
         List<Long> clients = q.list();
 
@@ -1742,7 +1745,18 @@ public class DAOUtils {
             List<BigInteger> children = new ArrayList<BigInteger>();
             List<Long> clientsCopy = new ArrayList<Long>(clients);
             for(Long id : clientsCopy){
-                children.clear();
+                Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
+                criteria.add(Restrictions.eq("idOfGuardian", id));
+                List<ClientGuardian> list = criteria.list();
+                if (list != null && list.size() > 0) {
+                    clients.remove(id);
+                    for (ClientGuardian cg : list) {
+                        if (!cg.isDisabled()) {
+                            clients.add(cg.getIdOfChildren());
+                        }
+                    }
+                }
+                /*children.clear();
                 q = persistenceSession.createSQLQuery("select idofchildren from cf_client_guardian  where idofguardian = "+ id);
                 children = q.list();
                 if(!children.isEmpty()){
@@ -1750,7 +1764,7 @@ public class DAOUtils {
                     for(BigInteger child : children){
                         clients.add(child.longValue());
                     }
-                }
+                }*/
             }
         }
 

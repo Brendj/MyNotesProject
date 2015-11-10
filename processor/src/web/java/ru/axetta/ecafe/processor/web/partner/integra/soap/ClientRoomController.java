@@ -257,6 +257,10 @@ public interface ClientRoomController {
     @WebMethod Result clearMobileByContractId(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "phone") String phone);
 
+    @WebMethod Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "guardMobile") String guardMobile,
+            @WebParam(name = "value") Boolean value);
+
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
     @WebMethod ClassRegisterEventListByGUIDResult putClassRegisterEventListByGUID(@WebParam(name = "registerEventList")

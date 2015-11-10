@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.isGuardianshipDisabled;
 
 @Component
 @Scope("singleton")
@@ -340,7 +341,9 @@ public class FinancialOpsManager {
 
         if (!(guardians == null || guardians.isEmpty())) {
             for (Client destGuardian : guardians) {
-                eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
+                if (!isGuardianshipDisabled(session, destGuardian.getIdOfClient(), client.getIdOfClient())) {
+                    eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
+                }
             }
         }
     }
