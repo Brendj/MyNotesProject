@@ -166,6 +166,18 @@
             </f:facet>
             <h:outputText escape="true" value="#{clientGuardian.personName}" styleClass="output-text" />
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Мобильный телефон" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientGuardian.mobile}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Опекунство активировано" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{!clientGuardian.isDisabled()}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
@@ -187,6 +199,18 @@
                 <h:outputText escape="true" value="ФИО клиента" />
             </f:facet>
             <h:outputText escape="true" value="#{clientWard.personName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Мобильный телефон" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientWard.mobile}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Опекунство активировано" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{!clientWard.isDisabled()}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 
