@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -199,6 +200,18 @@ public class ContragentListSelectPage extends BasicPage {
         }
         criteria.addOrder(Order.asc("contragentName"));
         return criteria.list();
+    }
+
+    public void selectAllItems() {
+        for (Item item : getItems()) {
+            item.setSelected(true);
+        }
+    }
+
+    public void deselectAllItems() {
+        for (Item item : getItems()) {
+            item.setSelected(false);
+        }
     }
 
 }

@@ -1737,6 +1737,11 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object clearContragentListSelectedItemsList() {
+        contragentListSelectPage.deselectAllItems();
+        return null;
+    }
+
     public Object selectAllOrgListSelectedItemsList() {
         orgListSelectPage.selectAllItems();
         return null;
@@ -2156,6 +2161,11 @@ public class MainPage implements Serializable {
 
     public void setClassTypes(String classTypes) {
         this.classTypes = classTypes;
+    }
+
+    public Object selectAllContragentListSelectedItemsList() {
+        contragentListSelectPage.selectAllItems();
+        return null;
     }
 
     public Object showContragentListSelectPage() {

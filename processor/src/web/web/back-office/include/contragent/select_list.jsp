@@ -36,6 +36,14 @@
                             <f:setPropertyActionListener value="" target="#{mainPage.contragentListSelectPage.filter}" />
                         </a4j:commandLink>
                     </h:panelGrid>
+                    <h:panelGrid columns="2" styleClass="borderless-grid">
+                        <a4j:commandButton action="#{mainPage.selectAllContragentListSelectedItemsList}"
+                                           reRender="modalContragentListSelectorForm" styleClass="command-link"
+                                           value="Выбрать все" />
+                        <a4j:commandButton action="#{mainPage.clearContragentListSelectedItemsList}"
+                                           reRender="modalContragentListSelectorForm" styleClass="command-link"
+                                           value="Очистить выбор" />
+                    </h:panelGrid>
                 </td>
             </tr>
             <tr>
@@ -51,6 +59,9 @@
                         </a4j:support>--%>
                         <rich:column>
                             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.idOfContragent}" styleClass="output-text" />
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text" />
