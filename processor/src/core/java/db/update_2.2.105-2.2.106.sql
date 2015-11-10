@@ -6,3 +6,4 @@
 
 ALTER TABLE cf_client_guardian ADD COLUMN disabled integer NOT NULL DEFAULT 0;
 
+--! ФИНАЛИЗИРОВАН (Семенов, 151110) НЕ МЕНЯТЬ

@@ -4391,12 +4391,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         throw new IllegalArgumentException(String.format("Невозможно активировать опекунскую связь между клиентом " +
                                 "с л/с %s и представителем с телефоном %s", contractId, guardMobile));
                     }
-
-                } else {
-                    if (client.getMobile() != null && !client.getMobile().equals(guardMobile)) {
-                        throw new IllegalArgumentException(String.format("Невозможно активировать опекунскую связь между клиентом " +
-                                "с л/с %s, телефоном %s и представителем с телефоном %s", contractId, client.getMobile(), guardMobile));
-                    }
                 }
             }
 
