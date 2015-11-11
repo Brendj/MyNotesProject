@@ -63,8 +63,12 @@ public class ClientGuardian {
         this.guardianType = guardianType;
     }
 
-    public boolean isDisabled() {
-        return disabled;
+    public Boolean isDisabled() {
+        if (disabled == null) {
+            return false;
+        } else {
+            return disabled;
+        }
     }
 
     public void setDisabled(Boolean disabled) {
