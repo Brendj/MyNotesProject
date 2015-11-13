@@ -16,9 +16,9 @@
              styleClass="borderless-grid" columns="1">
     <h:panelGrid columns="2">
         <h:outputText escape="true" value="Название" styleClass="output-text" />
-        <h:inputText value="#{mainPage.reportRuleCreatePage.ruleName}" maxlength="64" styleClass="input-text" />
+        <h:inputText value="#{mainPage.reportRuleCreatePage.ruleName}" maxlength="64" styleClass="input-text" style="width: 600px;" />
         <h:outputText escape="true" value="Тэг" styleClass="output-text" />
-        <h:inputText value="#{mainPage.reportRuleCreatePage.tag}" maxlength="12" styleClass="input-text" />
+        <h:inputText value="#{mainPage.reportRuleCreatePage.tag}" maxlength="12" styleClass="input-text" style="width: 600px;" />
         <h:outputText escape="true" value="Включено" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.reportRuleCreatePage.enabled}" styleClass="output-text" />
         <h:outputText escape="true" value="Тип отчета" styleClass="output-text" />

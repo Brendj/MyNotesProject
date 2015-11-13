@@ -18,9 +18,9 @@
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.reportRuleEditPage.idOfReportHandleRule}" styleClass="input-text" />
     <h:outputText escape="true" value="Название" styleClass="output-text" />
-    <h:inputText value="#{mainPage.reportRuleEditPage.ruleName}" maxlength="64" styleClass="input-text" />
+    <h:inputText value="#{mainPage.reportRuleEditPage.ruleName}" maxlength="64" styleClass="input-text" style="width: 600px;" />
     <h:outputText escape="true" value="Тэг" styleClass="output-text" />
-    <h:inputText value="#{mainPage.reportRuleEditPage.tag}" maxlength="12" styleClass="input-text" />
+    <h:inputText value="#{mainPage.reportRuleEditPage.tag}" maxlength="12" styleClass="input-text" style="width: 600px;" />
     <h:outputText escape="true" value="Включено" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportRuleEditPage.enabled}" styleClass="output-text" />
     <h:outputText escape="true" value="Тип отчета" styleClass="output-text" />
