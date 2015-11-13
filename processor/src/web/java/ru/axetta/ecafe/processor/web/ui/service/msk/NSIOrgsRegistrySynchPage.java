@@ -44,6 +44,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected List<Long> revisions;
     protected List<WebItem> items;
     protected Long selectedOperationType = 0L;
+    protected Boolean hideApplied = true;
 
 
     public String getPageFilename() {
@@ -206,7 +207,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     //Применяем фильтр
     public void doUpdate() {
         try {
-            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision, selectedOperationType);
+            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision, selectedOperationType, hideApplied);
             putDbItems(dbItems);
         } catch (Exception e) {
             errorMessages = "Не удалось произвести загрузку организаций из Реестров: " + e.getMessage();
@@ -241,6 +242,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             for(WebItem i : items) {
                 if(i.isSelected()) {
                     List<Long> buildingsList = new LinkedList<Long>();
+
                     for (WebItem webItem : i.getOrgs()) {
                         if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR){
                             buildingsList.add(webItem.getIdOfOrgRegistryChange());
@@ -285,7 +287,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     }
 
     public boolean isRevisionLast() {
-        return (selectedRevision.equals(revisions.get(0)));
+        if (revisions != null && revisions.size() > 0) {
+            return (selectedRevision.equals(revisions.get(0)));
+        } else {
+            return false;
+        }
     }
 
     protected void putDbItems(List<OrgRegistryChange> dbItem) {
@@ -300,7 +306,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
         for(OrgRegistryChange i : dbItem) {
             WebItem wi = new WebItem(i);
-            items.add(wi);
+            if (!getHideApplied() || (getHideApplied() && !wi.getApplied())) {
+                items.add(wi);
+            }
         }
 
         //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
@@ -314,6 +322,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setSelectedOperationType(Long selectedOperationType) {
         this.selectedOperationType = selectedOperationType;
+    }
+
+    public Boolean getHideApplied() {
+        return hideApplied;
+    }
+
+    public void setHideApplied(Boolean hideApplied) {
+        this.hideApplied = hideApplied;
     }
 
     public class WebItem {
@@ -396,9 +412,16 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.interdistrictCouncilChief = registryChange.getInterdistrictCouncilChief();
             this.interdistrictCouncilChiefFrom = registryChange.getInterdistrictCouncilChiefFrom();
 
-            this.selected = registryChange.getApplied()?true: false;
+            this.selected = registryChange.getApplied() ? true: false;
+            boolean doAdd;
             for (OrgRegistryChangeItem orgRegistryChangeItem : registryChange.getOrgs()) {
-                orgs.add(new WebItem(orgRegistryChangeItem));
+                doAdd = true;
+                if (hideApplied && orgRegistryChangeItem.getApplied()) {
+                    doAdd = false;
+                }
+                if (doAdd) {
+                    orgs.add(new WebItem(orgRegistryChangeItem));
+                }
             }
 
         }
@@ -456,6 +479,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 return getImagedString("add", "");
             }
             else {
+                return "";
+            }
+        }
+
+        public String getAppliedItem() {
+            if (getApplied()) {
+                return getImagedString("applied", "");
+            } else {
                 return "";
             }
         }

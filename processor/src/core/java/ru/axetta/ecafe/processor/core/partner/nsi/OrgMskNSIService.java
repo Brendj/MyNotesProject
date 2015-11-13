@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
@@ -161,7 +160,9 @@ public class OrgMskNSIService extends MskNSIService {
                 item.setGuid(info.getGuid());
                 item.setInn(info.getInn());
 
-                Org fOrg = DAOService.getInstance().findOrgByRegistryIdAndGuidOrAddress(item.getUniqueAddressId(), item.getGuid(), item.getAddress());
+                //Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(), item.getAddress());
+                Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
+                        item.getInn(), item.getUnom(), item.getUnad());
                 if (fOrg != null) {
                     fillInfOWithOrg(item, fOrg);
                     item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);

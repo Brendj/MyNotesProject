@@ -117,6 +117,12 @@
     </task:scheduled-tasks>
 
 
+    <task:scheduler id="importRegisterOrgsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegisterOrgsSchedule">
+        <task:scheduled ref="importRegisterOrgsService" method="run" cron="0 0 5 ? * *"/>
+    </task:scheduled-tasks>
+
+
     <task:scheduler id="benefitsRecalculationSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
         <task:scheduled ref="benefitsRecalculationService" method="run" cron="0 15 0 ? * *"/>

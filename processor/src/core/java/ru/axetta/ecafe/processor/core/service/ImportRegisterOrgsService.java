@@ -47,11 +47,32 @@ public class ImportRegisterOrgsService {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterOrgsService.class);
 
+    public static boolean isOn() {
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
+    }
+
+    public void run() {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
+        logger.info("Start import orgs from registry");
+        StringBuffer logBuffer = new StringBuffer();
+        try {
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry("", logBuffer);
+        } catch (Exception e) {
+            logger.error("Failed to refresh orgs from registry", e);
+        }
+        logger.info("Finish import orgs from registry");
+    }
+
     @Transactional
-    public boolean applyOrgRegistryChange(long idOfOrgRegistryChange, List<Long> buildingsList) {
+    public boolean applyOrgRegistryChange(long idOfOrgRegistryChange, List<Long> buildingsList) throws Exception {
 
         Session session = (Session) em.unwrap(Session.class);
         OrgRegistryChange orgRegistryChange = DAOUtils.getOrgRegistryChange(session, idOfOrgRegistryChange);
+        if (orgRegistryChange.getOrgs() == null || orgRegistryChange.getOrgs().size() == 0) {
+            throw new Exception("У одной из выбранных организаций нет корпусов");
+        }
         if(orgRegistryChange.getApplied()) {
             return true;
         }
@@ -99,9 +120,11 @@ public class ImportRegisterOrgsService {
                 }
         }
 
-        orgRegistryChange.setApplied(true);
+        //orgRegistryChange.setApplied(true);
+        Boolean allChildrenApplied = DAOUtils.allOrgRegistryChangeItemsApplied(session, idOfOrgRegistryChange);
+        orgRegistryChange.setApplied(allChildrenApplied);
         session.persist(orgRegistryChange);
-        return true;
+        return allChildrenApplied;
     }
 
     protected void createOrg(OrgRegistryChange orgRegistryChange, Contragent defaultSupplier, Session session,
@@ -237,17 +260,19 @@ public class ImportRegisterOrgsService {
             if (orgRegistryChangeItem != null) {
                 Org org = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
                 if (org != null) {
-                    org.setAddress(orgRegistryChangeItem.getAddress());
-                    org.setCity(orgRegistryChange.getCity());
-                    org.setDistrict(orgRegistryChange.getRegion());
-
+                    //По новому алгоритму обновляем следующий набор полей оорганизации:
                     org.setBtiUnom(orgRegistryChangeItem.getUnom());
                     org.setBtiUnad(orgRegistryChangeItem.getUnad());
-                    org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
-
-                    org.setGuid(orgRegistryChange.getGuid());
-                    org.setAdditionalIdBuilding(org.getUniqueAddressId());
                     org.setINN(orgRegistryChangeItem.getInn());
+                    org.setInterdistrictCouncil(orgRegistryChangeItem.getInterdistrictCouncil());
+                    org.setInterdistrictCouncilChief(orgRegistryChange.getInterdistrictCouncilChief());
+                    org.setGuid(orgRegistryChange.getGuid());
+                    org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
+                    org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??
+                    org.setAddress(orgRegistryChangeItem.getAddress());
+                    org.setCity(orgRegistryChange.getCity());
+                    org.setOfficialName(orgRegistryChange.getOfficialName());
+
 
                     orgRegistryChangeItem.setApplied(true);
                 }

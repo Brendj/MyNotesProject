@@ -776,17 +776,34 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Org findOrgByRegistryIdAndGuidOrAddress(Long uniqueAddressId, String guid, String address) {
-        javax.persistence.Query q = entityManager
-                .createQuery("from Org where guid=:guid and (uniqueaddressid=:uniqueAddressId or address=:address)");
+    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad) {
+        //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
+        javax.persistence.Query q;
+        q = entityManager.createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
         q.setParameter("guid", guid);
         q.setParameter("uniqueAddressId", uniqueAddressId);
-        q.setParameter("address", address);
         List<Org> orgs = q.getResultList();
-        if ((orgs == null) || (orgs.size() == 0)) {
-            return null;
+        if (orgs != null && orgs.size() > 0) {
+            return orgs.get(0);
+        } else {
+            q = entityManager.createQuery("from Org where inn=:inn and uniqueaddressid=:uniqueAddressId");
+            q.setParameter("inn", inn);
+            q.setParameter("uniqueAddressId", uniqueAddressId);
+            List<Org> orgs2 = q.getResultList();
+            if (orgs2 != null && orgs2.size() > 0) {
+                return orgs2.get(0);
+            } else {
+                q = entityManager.createQuery("from Org where btiUnom=:unom and btiUnad=:unad");
+                q.setParameter("unom", unom);
+                q.setParameter("unad", unad);
+                List<Org> orgs3 = q.getResultList();
+                if (orgs3 != null && orgs3.size() > 0) {
+                    return orgs3.get(0);
+                } else {
+                    return null;
+                }
+            }
         }
-        return orgs.get(0);
     }
 
     public List<Org> findOrgsByGuidAddressINNOrNumber(String guid, String address, String inn, String number) {
@@ -1911,10 +1928,11 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
-        return getOrgRegistryChanges(nameFilter,-1L,0L);
+        return getOrgRegistryChanges(nameFilter,-1L,0L,false);
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate, long operationType) throws Exception{
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate, long operationType,
+            boolean hideApplied) throws Exception{
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
         }
@@ -1928,6 +1946,9 @@ public class DAOService {
         }
         if (operationType > 0) {
             nameStatement += " and OperationType = " + operationType + " ";
+        }
+        if (hideApplied) {
+            nameStatement += " and applied = false ";
         }
         String q = "from OrgRegistryChange where createDate=:lastUpdate" + nameStatement + " order by officialName";
         TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q, OrgRegistryChange.class);

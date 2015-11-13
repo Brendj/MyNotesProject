@@ -58,6 +58,10 @@
             <f:selectItems value="#{NSIOrgsRegistrySynchPage.operationTypes}"/>
         </h:selectOneMenu>
     </h:panelGrid>
+    <h:panelGrid columns="2" style="borderless-grid">
+        <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.hideApplied}"/>
+        <h:outputText escape="true" value="Скрывать уже примененные изменения" styleClass="output-text" />
+    </h:panelGrid>
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <a4j:commandButton value="Обновить" action="#{NSIOrgsRegistrySynchPage.doUpdate}"
                            reRender="synchTable,synchTableInfoPanel,revisionInfo,resultTitle,synchTableControl" styleClass="command-button" status="updateStatus"
@@ -156,43 +160,15 @@
                 <rich:dataTable rendered="#{e.orgsSize > 0}" var="org" value="#{e.orgs}" >
                     <rich:column>
                         <h:selectBooleanCheckbox value="#{org.selected}" styleClass="checkboxes"
-                                                 rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
+                                      rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
+                        <h:outputText value="#{org.appliedItem}" escape="false"
+                                      rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
                             <h:outputText value="Операция" />
                         </f:facet>
-                        <h:outputText value="#{org.itemType}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Адрес корпуса" />
-                        </f:facet>
-                        <h:outputText value="#{org.address}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Ид. орг." />
-                        </f:facet>
-                        <h:outputText value="#{org.idOfOrg}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Главный" />
-                        </f:facet>
-                        <h:outputText value="#{org.isMainBuilding}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Краткое наименование" />
-                        </f:facet>
-                        <h:outputText value="#{org.shortName}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="ИНН" />
-                        </f:facet>
-                        <h:outputText value="#{org.inn}" escape="false" />
+                        <h:outputText value="#{org.itemType}" escape="false"/>
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -208,6 +184,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="ИНН" />
+                        </f:facet>
+                        <h:outputText value="#{org.inn}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="УНОМ" />
                         </f:facet>
                         <h:outputText value="#{org.unom}" escape="false" />
@@ -217,6 +199,36 @@
                             <h:outputText value="УНАД" />
                         </f:facet>
                         <h:outputText value="#{org.unad}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Адрес корпуса" />
+                        </f:facet>
+                        <h:outputText value="#{org.address}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Полное наименование" />
+                        </f:facet>
+                        <h:outputText value="#{org.officialName}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Краткое наименование" />
+                        </f:facet>
+                        <h:outputText value="#{org.shortName}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Ид. орг." />
+                        </f:facet>
+                        <h:outputText value="#{org.idOfOrg}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Главный" />
+                        </f:facet>
+                        <h:outputText value="#{org.isMainBuilding}" escape="false" />
                     </rich:column>
                 </rich:dataTable>
             </rich:column>

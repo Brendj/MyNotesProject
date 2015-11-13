@@ -566,6 +566,17 @@ public class DAOUtils {
         return res;
     }
 
+    public static Boolean allOrgRegistryChangeItemsApplied(Session session, Long idOfOrgRegistryChange) {
+        Query q = session.createQuery("from OrgRegistryChangeItem where mainRegistry=:idOfOrgRegistryChange and applied=false");
+        q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
+        List res = q.list();
+        if (res != null && res.size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public static OrgRegistryChange getOrgRegistryChange(Session session, long idOfOrgRegistryChange) {
         Query q = session.createQuery("from OrgRegistryChange where idOfOrgRegistryChange=:idOfOrgRegistryChange");
         q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
