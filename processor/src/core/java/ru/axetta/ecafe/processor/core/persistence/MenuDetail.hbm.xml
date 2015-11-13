@@ -27,7 +27,7 @@
         <property name="availableNow" column="AvailableNow" type="int" not-null="true"/>
         <property name="flags" column="Flags" type="int" not-null="true"/>
         <property name="priority" column="Priority" type="int"/>
-        <property name="groupName" column="GroupName" type="string" length="60"/>
+        <property name="groupName" column="GroupName" type="string" length="60" not-null="true"/>
         <property name="price" column="Price" type="long" update="false"/>
         <property name="fat" column="Fat" type="double" update="false"/>
         <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
