@@ -267,7 +267,7 @@ public class RNIPLoadPaymentsService {
         run(null, null);
     }
     public void run(Date startDate, Date endDate) {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        if (/*!RuntimeContext.getInstance().isMainNode() || */!isOn()) {
             return;
         }
 
@@ -469,7 +469,6 @@ public class RNIPLoadPaymentsService {
 
             // Инициализация ключевого контейнера.
             String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
-            Security.insertProviderAt(new ru.CryptoPro.JCP.JCP(), 1);
             KeyStore keyStore = KeyStore.getInstance(store);
             keyStore.load(null, null);
 
