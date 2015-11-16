@@ -13,4 +13,6 @@ ON cf_orgregistrychange_item
 USING btree
 (mainregistry);
 
+--! ФИНАЛИЗИРОВАН (Семенов, 161110) НЕ МЕНЯТЬ
+
 
