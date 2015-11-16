@@ -50,9 +50,7 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -96,7 +94,7 @@ public class RNIPLoadPaymentsService {
     public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
     public static final String ERRORS_OUTPUT_FILE = "/rnip.errors";
     public static final String RNIP_DIR = "/rnip/";
-    private static final String SERVICE_NAME = "РНИП";
+    public static final String SERVICE_NAME = "РНИП";
 
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
@@ -108,6 +106,7 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("PAYMENT_TO");           // Это номер договора в нашей БД
         PAYMENT_PARAMS.add("SRV_CODE");             // Здесь содержится идентификатор контрагента
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
+        PAYMENT_PARAMS.add("ChangeStatus");         // если ChangeStatus=1 (изменение) - ищем платеж, регистрируем корректировку
     }
 
     public static RNIPLoadPaymentsService getInstance() {
@@ -268,7 +267,7 @@ public class RNIPLoadPaymentsService {
         run(null, null);
     }
     public void run(Date startDate, Date endDate) {
-        if (/*!RuntimeContext.getInstance().isMainNode() || */!isOn()) {
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             return;
         }
 
@@ -304,7 +303,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent, lastUpdateDate, startDate, endDate);
+            response = executeRequest(REQUEST_LOAD_PAYMENTS, contragent, lastUpdateDate, startDate, endDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -338,7 +337,21 @@ public class RNIPLoadPaymentsService {
         //  И записываем в БД
         addPaymentsToDb(res.getPayments());
 
-        if(res.getRnipDate() == null || updateTime.before(res.getRnipDate())) {
+        //Сохранение по новому даты-времени lastRnipUpdate для контрагента в БД
+        //Если это автоматический запуск, то меняем дату последнего получения платежей контрагента
+        //А если это ручной запуск за выбранный период времени, то дату последнего получения платежей не трогаем
+        if (startDate == null) {
+            Date edate = getEndDateByStartDate(getStartDateByLastUpdateDate(lastUpdateDate));
+            if (res.getRnipDate() != null && res.getRnipDate().before(edate)) {
+                edate = res.getRnipDate();
+            }
+            if (lastUpdateDate.before(edate)) {
+                ContragentService.getInstance().setLastRNIPUpdate(contragent, edate);
+            }
+        }
+        //Сохранили
+
+        /*if(res.getRnipDate() == null || updateTime.before(res.getRnipDate())) {
             // Вычислим МИНИМАЛЬНОЕ(lastUpdateDate + 6 часов, ТекущееВремя) и присвоим updateTime
             Date lastUpdateDatePlusDelta = CalendarUtils.addMinute(lastUpdateDate, 6*60);
             if (lastUpdateDatePlusDelta.before(updateTime)) updateTime = lastUpdateDatePlusDelta;
@@ -348,7 +361,7 @@ public class RNIPLoadPaymentsService {
 
 
         //  Обновляем дату последней загрузки платежей
-        ContragentService.getInstance().setLastRNIPUpdate(contragent,updateTime);
+        ContragentService.getInstance().setLastRNIPUpdate(contragent,updateTime);*/
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
     }
 
@@ -390,10 +403,10 @@ public class RNIPLoadPaymentsService {
 
 
     public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate) throws Exception {
-        return executeRequest(updateTime, requestType, contragent, updateDate, null, null);
+        return executeRequest(requestType, contragent, updateDate, null, null);
     }
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public SOAPMessage executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         String fileName = getTemplateFileName(requestType);
         /*if (requestType==REQUEST_MODIFY_CATALOG) {
             fileName = MODIFY_CATALOG_TEMPLATE;
@@ -406,7 +419,7 @@ public class RNIPLoadPaymentsService {
         }*/
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(
-                doMacroReplacement(updateTime, new StreamSource(is), contragent, updateDate, startDate, endDate, requestType), requestType);
+                doMacroReplacement(new StreamSource(is), contragent, updateDate, startDate, endDate, requestType), requestType);
         long timestamp = System.currentTimeMillis();
 
         File dir = new File(RNIP_DIR);
@@ -456,6 +469,7 @@ public class RNIPLoadPaymentsService {
 
             // Инициализация ключевого контейнера.
             String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
+            Security.insertProviderAt(new ru.CryptoPro.JCP.JCP(), 1);
             KeyStore keyStore = KeyStore.getInstance(store);
             keyStore.load(null, null);
 
@@ -882,8 +896,27 @@ public class RNIPLoadPaymentsService {
         return 0L;
     }
 
+    private Date getEndDateByStartDate(Date start_date) {
+        Date curtime = new Date(System.currentTimeMillis());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(start_date);
+        cal.add(Calendar.HOUR, 6);
+        Date time2 = cal.getTime();
+        if (curtime.before(time2)) {
+            return curtime;
+        }
+        else {
+            return time2;
+        }
+    }
 
-    public StreamSource doMacroReplacement(Date updateTime, StreamSource ss, Contragent contragent, Date updateDate, Date startDate, Date endDate, int requestType) throws Exception {
+    private Date getStartDateByLastUpdateDate(Date updateDate) {
+        Date lastUpdateDate = new Date(updateDate.getTime());
+        lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
+        return lastUpdateDate;
+    }
+
+    public StreamSource doMacroReplacement(StreamSource ss, Contragent contragent, Date updateDate, Date startDate, Date endDate, int requestType) throws Exception {
         InputStream is = ss.getInputStream();
         byte[] data = new byte[is.available()];
         is.read(data);
@@ -894,9 +927,10 @@ public class RNIPLoadPaymentsService {
             String str;
 
             if(startDate == null){
-                logger.warn("Auto");
-                Date lastUpdateDate = new Date(updateDate.getTime());
-                lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
+                logger.warn("Auto start time");
+                /*Date lastUpdateDate = new Date(updateDate.getTime());
+                lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);*/
+                Date lastUpdateDate = getStartDateByLastUpdateDate(updateDate);
                 str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(lastUpdateDate);
             }else {
                 logger.warn("Manual start: "+startDate);
@@ -910,9 +944,9 @@ public class RNIPLoadPaymentsService {
         if (content.indexOf("%END_DATE%") > 1) {
             String str;
             if(endDate == null){
-                logger.warn("Auto");
+                logger.warn("Auto end time");
                 if (requestType == REQUEST_LOAD_PAYMENTS) {
-                    Date curtime = new Date(System.currentTimeMillis());
+                    /*Date curtime = new Date(System.currentTimeMillis());
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(start_date);
                     cal.add(Calendar.HOUR, 6);
@@ -922,7 +956,8 @@ public class RNIPLoadPaymentsService {
                     }
                     else {
                         str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(time2);
-                    }
+                    }*/
+                    str = new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(getEndDateByStartDate(start_date));
                 }
                 else {
                     str= new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(new Date(System.currentTimeMillis()));

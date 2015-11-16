@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
@@ -356,8 +357,9 @@ public class DAOUtils {
     public static List findClientPayments(Session persistenceSession, Contragent contragent, String idOfPayment)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
-        criteria.add(Restrictions.eq("contragent", contragent));
+        //criteria.add(Restrictions.eq("contragent", contragent));   //новый алгоритм сравнения. Сравниваем по идентификатору и additionalId начинается с "РНИП"
         criteria.add(Restrictions.eq("idOfPayment", idOfPayment));
+        criteria.add(Restrictions.like("addIdOfPayment", RNIPLoadPaymentsService.SERVICE_NAME, MatchMode.START));
         return criteria.list();
     }
 
