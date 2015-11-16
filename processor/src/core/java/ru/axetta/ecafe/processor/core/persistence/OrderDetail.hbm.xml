@@ -37,8 +37,7 @@
 
         <property name="idOfRule" column="IdOfRule" type="long" update="true"/>
 
-        <property name="itemCode" column="ItemCode" type="string" length="32" not-null="true"
-                  update="false"/>
+        <property name="itemCode" column="ItemCode" type="string" length="32" update="false"/>
         <property name="idOfMenuFromSync" column="IdOfMenuFromSync" type="long"/>
 
         <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" column="IdOfGood"/>
