@@ -12,6 +12,10 @@ import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -23,6 +27,8 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
 
     private String jobName;
     private boolean enabled;
+    private boolean showRules;
+    private Integer[] preferentialComplexes;
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
@@ -45,6 +51,22 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isShowRules() {
+        return showRules;
+    }
+
+    public void setShowRules(boolean showRules) {
+        this.showRules = showRules;
+    }
+
+    public Integer[] getPreferentialComplexes() {
+        return preferentialComplexes;
+    }
+
+    public void setPreferentialComplexes(Integer[] preferentialComplexes) {
+        this.preferentialComplexes = preferentialComplexes;
     }
 
     public String getReportType() {
@@ -77,5 +99,14 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
                 AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
                 this.enabled);
         runtimeContext.getAutoReportGenerator().addJob(schedulerJob);
+    }
+
+    public List<SelectItem> getAvailableRules() {
+        List<SelectItem> list = new ArrayList<SelectItem>();
+
+        SelectItem selectItem = new SelectItem(0L, "Правило");
+        list.add(selectItem);
+
+        return list;
     }
 }

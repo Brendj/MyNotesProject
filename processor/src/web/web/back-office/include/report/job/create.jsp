@@ -32,6 +32,19 @@
             <h:outputText escape="true" value="описание" styleClass="output-text" />
         </h:outputLink>
     </h:panelGrid>
+    <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.reportJobCreatePage.showRules}" styleClass="output-text">
+        <a4j:support event="onclick" reRender="selectReportJobGroupMenu" ajaxSingle="true" />
+    </h:selectBooleanCheckbox>
+
+    <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}" />
+    <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;"
+                  rendered="#{mainPage.reportJobCreatePage.showRules}">
+        <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialComplexes}" layout="pageDirection"
+                                 styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}">
+            <f:selectItems value="#{mainPage.reportJobCreatePage.availableRules}" />
+        </h:selectManyCheckbox>
+    </h:panelGroup>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Добавить задачу" action="#{mainPage.createReportJob}"
