@@ -221,23 +221,30 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 }
                 contragentPayer = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentPayer));
             }
-           // parameterMap.put("contragentName", contragentPayer.getContragentName());
+
             String idOfContragentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID);
-            Long lIdOfContragentReceiver=null; Contragent contragentReceiver=null;
-            if (idOfContragentReceiver!=null) {
+
+            String [] idOfContragentReceiverIds =  idOfContragentReceiver.split(",");
+
+            List<Contragent> contragentReceiverList = new ArrayList<Contragent>();
+
+            Long idReceiver = null;
+            Contragent contragentReceiverItem;
+            String contragentReceiverString = "";
+            for (String contragentReceiverId: idOfContragentReceiverIds) {
                 try {
-                    lIdOfContragentReceiver=Long.parseLong(idOfContragentReceiver);
+                    idReceiver =Long.parseLong(contragentReceiverId);
                 } catch (Exception e) {
-                    throw new Exception("Ошибка парсинга идентификатора контрагента-получателя: "+idOfContragentReceiver, e);
+                    throw new Exception("Ошибка парсинга идентификатора контрагента-получателя: "+idReceiver, e);
                 }
-                contragentReceiver = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentReceiver));
-                if (contragentReceiver==null) {
-                    throw new Exception("Контрагент-получатель не найден: "+idOfContragentReceiver);
-                }
+
+                contragentReceiverItem = (Contragent)session.get(Contragent.class, idReceiver);
+                contragentReceiverString = contragentReceiverString + contragentReceiverItem.getContragentName() + ", ";
+                contragentReceiverList.add(contragentReceiverItem);
             }
 
             parameterMap.put("nameOfContragentSender", contragentPayer.getContragentName());
-            parameterMap.put("nameOfContragentReceiver", contragentReceiver.getContragentName());
+            parameterMap.put("nameOfContragentReceiver", contragentReceiverString);
 
             String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -247,7 +254,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, contragentPayer, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
+                    createDataSource(session, contragentPayer, contragentReceiverList, startTime, endTime, (Calendar) calendar.clone(),
                             parameterMap, idOfOrgList));
             Date generateEndTime = new Date();
             Long idOfContragent1 = contragentPayer == null?null:contragentPayer.getIdOfContragent();
@@ -276,7 +283,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
         private Boolean transactionsWithoutOrgIsPresented = false;
 
-        private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
+        private JRDataSource createDataSource(Session session, Contragent contragent, List<Contragent> contragentReceiverList,
                 Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
 
             // терминал
@@ -319,9 +326,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             if (orgType != null) {
                 clientPaymentCriteria.add(Restrictions.eq("o.type", orgType));
             }
-            if (contragentReceiver!=null)
-                clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
-            if (contragent !=null)
+            if (contragentReceiverList != null)
+                clientPaymentCriteria.add(Restrictions.in("contragentReceiver", contragentReceiverList));
+            if (contragent != null)
                 clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
             clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
@@ -345,9 +352,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             }
             if (!CollectionUtils.isEmpty(idOfOrgList))
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("o.idOfOrg", idOfOrgList));
-            if (contragentReceiver!=null)
-                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragentReceiver", contragentReceiver));
-            if (contragent !=null)
+            if (contragentReceiverList != null)
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("contragentReceiver",
+                        contragentReceiverList));
+            if (contragent != null)
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragent", contragent));
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));

@@ -52,17 +52,16 @@
 
         <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText
-                    value="#{mainPage.contragentPaymentReportPage.contragentReceiverFilter.contragent.contragentName}"
-                    readonly="true" styleClass="input-text" style="margin-right: 2px;" />
             <a4j:commandButton value="..."
                                action="#{mainPage.contragentPaymentReportPage.showContragentSelectPage(true)}"
-                               reRender="modalContragentSelectorPanel, orgPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                               reRender="modalContragentListSelectorPanel, orgPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.contragentReceiverIds}" target="#{mainPage.contragentListSelectPage.selectedIds}" />
             </a4j:commandButton>
+            <h:outputText value="{#{mainPage.contragentPaymentReportPage.contragentReceiverFilter}}" escape="true" styleClass="output-text" />
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />

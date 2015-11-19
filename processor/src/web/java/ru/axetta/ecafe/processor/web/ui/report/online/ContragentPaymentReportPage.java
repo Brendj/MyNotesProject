@@ -4,16 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -22,8 +18,8 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeMenu;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,16 +28,14 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -51,14 +45,18 @@ import java.util.Properties;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-public class ContragentPaymentReportPage extends OnlineReportCustomPage implements ContragentSelectPage.CompleteHandler {
+public class ContragentPaymentReportPage extends OnlineReportCustomPage implements ContragentListSelectPage.CompleteHandler,
+        ContragentSelectPage.CompleteHandler {
     private ContragentPaymentReport contragentPaymentReport;
     private String htmlReport;
-    private Org org;
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager em;
-    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
+
+    private String contragentReceiverFilter = "Не выбрано";
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
+
+    private String contragentReceiverIds;
+
+    private List<CCAccountFilter.ContragentItem > contragentReceiverItems = new ArrayList<CCAccountFilter.ContragentItem >();
+
     private boolean receiverSelection;
     private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
     // тип организации
@@ -166,23 +164,65 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         return contragentFilter;
     }
 
-    public CCAccountFilter getContragentReceiverFilter() {
+    public String getContragentReceiverFilter() {
         return contragentReceiverFilter;
+    }
+
+    public String getContragentReceiverIds() {
+        return contragentReceiverIds;
+    }
+
+    public void setContragentReceiverIds(String contragentReceiverIds) {
+        this.contragentReceiverIds = contragentReceiverIds;
     }
 
     public void showContragentSelectPage (boolean isReceiver) {
         idOfOrgList.clear();
         filter = "Не выбрано";
         receiverSelection = isReceiver;
-        MainPage.getSessionInstance().showContragentSelectPage();
+        if (isReceiver == false) {
+         MainPage.getSessionInstance().showContragentSelectPage();
+        } else {
+        MainPage.getSessionInstance().showContragentListSelectPage();
+        }
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag, String classTypes) throws Exception {
+            contragentReceiverItems.clear();
+            for (Long idOfContragent : idOfContragentList) {
+                Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+                CCAccountFilter.ContragentItem contragentItem = new CCAccountFilter.ContragentItem(currentContragent);
+                contragentReceiverItems.add(contragentItem);
+            }
+            setContragentFilterReceiverInfo(contragentReceiverItems);
+    }
+
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
         if (!receiverSelection) {
             contragentFilter.completeContragentSelection(session, idOfContragent);
-        } else {
-            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
         }
+    }
+
+    private void setContragentFilterReceiverInfo(List<CCAccountFilter.ContragentItem> contragentItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (contragentItems.isEmpty()) {
+            contragentReceiverFilter = "Не выбрано";
+        } else {
+            for (CCAccountFilter.ContragentItem it : contragentItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getContragentName());
+                ids.append(it.getIdOfContragent());
+            }
+            contragentReceiverFilter = str.toString();
+        }
+        contragentReceiverIds = ids.toString();
     }
 
     private final static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportPage.class);
@@ -197,13 +237,13 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         //Date generateTime = new Date();
         //builder.setReportProperties(fillContragentReceiver());
         if (contragentFilter.getContragent().getIdOfContragent() == null
-                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
+                || contragentReceiverFilter.equals("Не выбрано")) {
             printError("Не выбран 'Агент по приему платежей' или 'Контрагент-получатель'");
         } else {
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
                     Long.toString(contragentFilter.getContragent().getIdOfContragent()));
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
-                    Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
+                    contragentReceiverIds);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
             builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
             builder.getReportProperties().setProperty("terminal", terminal);
@@ -215,7 +255,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
                 try {
                     persistenceSession = runtimeContext.createReportPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
-                    builder.setContragent(getContragent());
+                   // builder.setContragent(getContragent());
                     report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -260,7 +300,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
     }
 
-    public void showCSVList(ActionEvent actionEvent){
+/*    public void showCSVList(ActionEvent actionEvent){
         if (validateFormData()) return;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -270,7 +310,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
             ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder(templateFilename);
-            builder.setContragent(getContragent());
+            //builder.setContragent(getContragent());
             builder.setReportProperties(fillContragentReceiver());
             Session session = RuntimeContext.getInstance().createPersistenceSession();
             contragentPaymentReport = (ContragentPaymentReport) builder.build(session,startDate, endDate, localCalendar);
@@ -308,7 +348,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(persistenceSession, getLogger());
         }
-    }
+    }*/
 
     private boolean validateFormData() {
         if(startDate==null){
@@ -333,7 +373,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
 
         if (contragentFilter.getContragent().getIdOfContragent() == null
-                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
+                || contragentReceiverFilter.equals("Не выбрано")) {
             printError("Не выбран 'Агент по приему платежей' и 'Контрагент-получатель'");
         }
         return false;
@@ -342,6 +382,10 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     public Object buildReport() {
         htmlReport="";
         if (validateFormData()) return null;
+        if (contragentFilter.equals("Не выбрано")
+                || contragentReceiverFilter.equals("Не выбрано")) {
+            printError("Не выбран 'Агент по приему платежей' или 'Контрагент-получатель'");
+        } else {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -349,9 +393,9 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         if (contragentFilter.getContragent().getIdOfContragent() == null) return null;
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
                 Long.toString(contragentFilter.getContragent().getIdOfContragent()));
-        if (contragentReceiverFilter.getContragent().getIdOfContragent() == null) return null;
+        if (contragentReceiverFilter == null) return null;
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
-                Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
+                contragentReceiverIds);
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
         builder.getReportProperties().setProperty("terminal", terminal);
@@ -360,7 +404,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            builder.setContragent(getContragent());
+           // builder.setContragent(getContragent());
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             emptyData = builder.getError();
             persistenceTransaction.commit();
@@ -399,7 +443,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
             }
-        }
+        }}
         return null;
     }
 
@@ -412,7 +456,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         htmlReport = contragentPaymentReport.getHtmlReport();
     }
 
-    private Contragent getContragent() throws Exception {
+    /*private Contragent getContragent() throws Exception {
         Contragent contragent = null;
         if (contragentFilter != null && contragentFilter.getContragent() != null &&
             contragentFilter.getContragent().getIdOfContragent() != null) {
@@ -425,17 +469,15 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             throw new Exception("Необходимо выбрать контрагента");
         }
         return contragent;
-    }
+    }*/
 
     private Properties fillContragentReceiver() {
         return fillContragentReceiver(new Properties());
     }
 
     private Properties fillContragentReceiver(Properties props) {
-        if (contragentReceiverFilter.getContragent() != null &&
-                contragentReceiverFilter.getContragent().getIdOfContragent() != null) {
-            props.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID,
-                    "" + contragentReceiverFilter.getContragent().getIdOfContragent());
+        if (contragentReceiverFilter != null) {
+            props.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, contragentReceiverFilter);
         }
         if (contragentFilter.getContragent() != null &&
                 contragentFilter.getContragent().getIdOfContragent() != null) {
@@ -446,8 +488,14 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     }
 
     public Object showOrgListSelectPage () {
-        if(contragentReceiverFilter.getContragent()!=null){
-            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(contragentReceiverFilter.getContragent().getIdOfContragent()));
+        if(contragentReceiverFilter != null || contragentReceiverItems != null){
+
+            List<Long> idOfContragentsList = new ArrayList<Long>();
+            for (CCAccountFilter.ContragentItem idOfContragent : contragentReceiverItems) {
+                idOfContragentsList.add(idOfContragent.getIdOfContragent());
+            }
+
+            MainPage.getSessionInstance().setIdOfContragentList(idOfContragentsList);
         }
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
