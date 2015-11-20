@@ -424,17 +424,13 @@ public class ImportRegisterClientsService {
                 }
             }
             if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
-                Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
-                if (newOrg == null) {
-                    continue;
-                }
                 log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " +
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " +
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
-                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg(), logBuffer);
-                addClientChange(em, ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
+                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
+                addClientChange(em, ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
                         RegistryChange.FULL_COMPARISON);
                 continue;
             }
