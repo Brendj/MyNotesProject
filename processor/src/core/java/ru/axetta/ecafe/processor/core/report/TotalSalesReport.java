@@ -58,6 +58,16 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private Long sumBuffet = 0L;
         private Long sumBen = 0L;
 
+
+        // Новые колонки
+        private Long sumProductOwn = 0L; // Собственное
+        private Long sumProductCentralize = 0L; // Централизованное
+        private Long sumProductCentralizeCook = 0L; // Централизованное с доготовкой
+        private Long sumProductPurchase = 0L;     // Закупленное
+        private Long sumProductVending = 0L;  // Вендинг
+        private Long sumProductCommercial = 0L; // Коммерческое питание
+
+
         private Long sumBuffetPlusSumComplex = 0L;
         private Long sumBuffetOwnPlusSumComplex = 0L;
 
@@ -123,7 +133,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
-            retreiveAllOrders(totalListMap, idOfOrgsList, startTime, endTime);
+            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime);
             logger.error("e2 : " + (System.currentTimeMillis() - l));
 
             //Вывод, разбивка по районам.
@@ -144,11 +154,30 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, Date startTime, Date endTime){
+                List<Long> idOfOrgsList, List<String> titleComplexes, Date startTime, Date endTime){
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
             for (OrderItem allOrder : allOrders) {
+
+                if (!titleComplexes.isEmpty()) {
+                    for (String title : titleComplexes) {
+                        if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
+                            sumProductOwn += handleOrders(totalListMap, allOrder, title);
+                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
+                            sumProductCentralize += handleOrders(totalListMap, allOrder, title);
+                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
+                            sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
+                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
+                            sumProductPurchase += handleOrders(totalListMap, allOrder, title);
+                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
+                            sumProductVending += handleOrders(totalListMap, allOrder, title);
+                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
+                            sumProductCommercial += handleOrders(totalListMap, allOrder, title);
+                        }
+                    }
+                }
+
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
                     sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
                     sumBuffetPlusSumComplex += sumBuffet;

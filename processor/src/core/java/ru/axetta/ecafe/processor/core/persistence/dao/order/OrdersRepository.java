@@ -87,7 +87,7 @@ public class OrdersRepository extends BaseJpaDao {
 
     public List<OrderItem> findAllOrders(List<Long> idOfOrgsList, Date startDate, Date endDate){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
-        Query nativeQuery = entityManager.createNativeQuery("SELECT (o.idoforg) AS name, o.createdDate, ((od.rPrice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype"
+        Query nativeQuery = entityManager.createNativeQuery("SELECT (o.idoforg) AS name, o.createdDate, ((od.rPrice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
                 + "                 FROM CF_Orders o "
                 + "                 INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                 + "                 WHERE o.idoforg in (:idoforgs) "
@@ -105,7 +105,7 @@ public class OrdersRepository extends BaseJpaDao {
                     ,((BigInteger)o[1]).longValue()
                     ,((BigInteger)o[2]).longValue()
                     ,((BigInteger)o[3]).longValue()
-                    ,(Integer)o[4]));
+                    ,(Integer)o[4], (Integer) o[5]));
         }
         return orderItemList;
     }

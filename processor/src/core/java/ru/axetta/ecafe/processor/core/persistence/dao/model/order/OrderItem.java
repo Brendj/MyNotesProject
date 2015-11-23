@@ -26,6 +26,7 @@ public class OrderItem {
 
     private long socDiscount;
     private int menutype;
+    private int menuOrigin;
 
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname, long createdDateEqualsOrderDate) {
@@ -60,12 +61,13 @@ public class OrderItem {
         this.orderDate = orderDate;
         this.sum = sum;
     }
-    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype) {
+    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin) {
         this.idOfOrg = idOfOrg;
         this.orderDate = orderDate;
         this.sum = sum;
         this.socDiscount = socDiscount;
         this.menutype = menutype;
+        this.menuOrigin = menuOrigin;
     }
 
 
@@ -212,5 +214,13 @@ public class OrderItem {
 
     public int getMenutype() {
         return menutype;
+    }
+
+    public int getMenuOrigin() {
+        return menuOrigin;
+    }
+
+    public void setMenuOrigin(int menuOrigin) {
+        this.menuOrigin = menuOrigin;
     }
 }
