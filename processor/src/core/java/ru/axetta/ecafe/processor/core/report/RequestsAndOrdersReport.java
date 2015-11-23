@@ -114,11 +114,11 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                         properties.setProperty(RequestsAndOrdersReport.P_SHOW_ONLY_DIVERGENCE, showOnlyDivergenceString);
 
                         String hideMissedColumnsString = "false";
-                        if (showOnlyDivergenceString.equals("true")) {
+                        //if (showOnlyDivergenceString.equals("true")) {
                             hideMissedColumnsString = "true";
-                        } else {
+                        //} else {
                             hideMissedColumnsString = rule.getExpressionValue(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS);
-                        }
+                        //}
                         properties.setProperty(RequestsAndOrdersReport.P_HIDE_MISSED_COLUMNS, hideMissedColumnsString);
 
                         String useColorAccentString = "true";
