@@ -63,7 +63,7 @@
     </h:panelGroup>--%>
     <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
-        <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+        <a4j:commandButton value="..." action="#{mainPage.userEditPage.showContragentListSelectPageOwn}"
                            reRender="modalContragentListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >

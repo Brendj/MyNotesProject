@@ -4,21 +4,30 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,6 +65,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
+
+    private final static Logger logger = LoggerFactory.getLogger(UserEditPage.class);
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -305,6 +316,56 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             orgFilterCanceled = str.toString();
         }
         orgIdsCanceled = ids.toString();
+    }
+
+    public Object showContragentListSelectPageOwn() {
+        BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                //contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
+                MainPage.getSessionInstance().getContragentListSelectPage().setItems(retrieveContragents(persistenceSession));
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                MainPage.getSessionInstance().getContragentListSelectPage()
+                        .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                MainPage.getSessionInstance().getModalPages().push(
+                        MainPage.getSessionInstance().getContragentListSelectPage());
+            } catch (Exception e) {
+                logger.error("Failed to fill contragents list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка контрагентов: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }
+
+    private List<ContragentListSelectPage.Item> retrieveContragents(Session session) throws HibernateException {
+        Criteria criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", 2));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("contragentName"));
+        List contragents = criteria.list();
+        List<ContragentListSelectPage.Item> items = new LinkedList<ContragentListSelectPage.Item>();
+        for (Object object : contragents) {
+            Contragent contragent = (Contragent) object;
+            ContragentListSelectPage.Item item = new ContragentListSelectPage.Item(contragent);
+            items.add(item);
+            if (contragentIds.contains(item.getIdOfContragent().toString())) {
+                item.setSelected(true);
+            }
+        }
+        return items;
     }
 
     private void fill(Session session, User user) throws Exception {

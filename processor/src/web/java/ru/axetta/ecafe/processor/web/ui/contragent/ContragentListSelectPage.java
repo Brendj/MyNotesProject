@@ -103,6 +103,10 @@ public class ContragentListSelectPage extends BasicPage {
         return items;
     }
 
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
     public String getSelectedItems () {
         StringBuilder str = new StringBuilder();
         for (Item it : items) {
