@@ -11,22 +11,21 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.report.TotalSalesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.mapping.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +40,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Онлайн отчеты / Сводный отчет по продажам
@@ -100,12 +97,11 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             i++;
         }
 
-        List<String> complexesWithPriceTitles = null;
-
         if (contragent != null) {
-            Long idOfContragent = contragent.getIdOfContragent();
+            List<String> complexesWithPriceTitles;
 
-           /* complexesWithPriceTitles = daoService.getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
+            Long idOfContragent = contragent.getIdOfContragent();
+            complexesWithPriceTitles = getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
 
             if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
 
@@ -114,7 +110,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                     list.add(selectItem);
                     i++;
                 }
-            }*/
+            }
         }
 
         contragentsSelectItems = list;
@@ -383,5 +379,54 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         if (null != idOfContragent) {
             this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
         }
+    }
+
+    public List<String> getTitlesComplexesWithPriceByContragent(Date startDate, Date endDate, Long idOfContragent) {
+        List<String> titles = new ArrayList<String>();
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            Set<Org> contragentOrgs = contragent.getOrgs();
+
+            List<Long> idOfOrgs = new ArrayList<Long>();
+
+            for (Org org : contragentOrgs) {
+                idOfOrgs.add(org.getIdOfOrg());
+            }
+
+            if (!idOfOrgs.isEmpty()) {
+                Query query = session.createSQLQuery(
+                        "SELECT od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                                + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.socdiscount > 0 AND"
+                                + "      (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99)) AND o.state = 0 AND od.state = 0"
+                                + "GROUP BY od.socdiscount ORDER BY od.socdiscount");
+
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameterList("idOfOrgs", idOfOrgs);
+
+                List resultList = query.list();
+
+                String str;
+                for (Object o : resultList) {
+                    str = "Льготный комплекс " + ((BigInteger) o).longValue() / 100 + "."
+                            + ((BigInteger) o).longValue() % 100 + " руб.";
+                    titles.add(str);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return titles;
     }
 }
