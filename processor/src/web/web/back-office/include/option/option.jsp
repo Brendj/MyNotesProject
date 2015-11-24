@@ -273,6 +273,12 @@
                     <h:outputText escape="true" value="Имя сервера с которого проводить импорт платежей"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.rnipProcessorInstance}" styleClass="input-text" size="40" />
+
+                    <h:outputText escape="true" value="Ограничение по дате платежа в днях" styleClass="output-text" />
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
+                        <h:inputText value="#{optionPage.daysRestrictionPaymentDateImport}" styleClass="input-text" size="10" />
+                        <h:outputText escape="true" value="- не импортировать платежи РНИП, старше {N} дней" styleClass="output-text" />
+                    </h:panelGrid>
                 </h:panelGrid>
             </rich:panel>
 

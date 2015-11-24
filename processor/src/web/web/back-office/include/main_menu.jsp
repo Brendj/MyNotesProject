@@ -1418,6 +1418,13 @@
 
 </rich:panelMenuGroup>
 
+<rich:panelMenuGroup id="debugGroupMenu" binding="#{mainPage.debugGroupMenu.mainMenuComponent}" label="Debug"
+                     rendered="#{mainPage.isTestMode()}">
+    <rich:panelMenuItem id="showDebugInfo" binding="#{debugInfoPage.mainMenuComponent}" label="Задачи"
+                        action="#{debugInfoPage.show}" reRender="workspaceForm" />
+
+</rich:panelMenuGroup>
+
 </rich:panelMenuGroup>
 
 </rich:panelMenu>

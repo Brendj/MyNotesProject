@@ -37,6 +37,10 @@ public class ClientPayment {
     public static final int AUTO_PAYMENT_METHOD = 12;
     public static final int CASHIER_PAYMENT_METHOD = 13;
     public static final int REGISTRY_PAYMENT_METHOD = 14;
+    public static final int CANCELLED_PAYMENT = 15;
+
+    public static final String CORRECTION_SUBSTRING = "/коррекция-";
+    public static final String CANCEL_SUBSTRING = "/отмена-";
 
 
     private Long idOfClientPayment;

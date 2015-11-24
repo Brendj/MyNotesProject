@@ -113,6 +113,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPPaymentsURL_v116;
     private String RNIPPaymentsWorkingVersion;
     private Boolean NotifyByPushNewClients;
+    private Integer DaysRestrictionPaymentDateImport;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -741,6 +742,14 @@ public class OptionPage extends BasicWorkspacePage {
         NotifyByPushNewClients = notifyByPushNewClients;
     }
 
+    public Integer getDaysRestrictionPaymentDateImport() {
+        return DaysRestrictionPaymentDateImport;
+    }
+
+    public void setDaysRestrictionPaymentDateImport(Integer daysRestrictionPaymentDateImport) {
+        DaysRestrictionPaymentDateImport = daysRestrictionPaymentDateImport;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -831,6 +840,7 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
+        DaysRestrictionPaymentDateImport = runtimeContext.getOptionValueInt((Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT));
 
         bankListPage.onShow();
 
@@ -963,6 +973,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
+            runtimeContext.setOptionValue(Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT, getDaysRestrictionPaymentDateImport());
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

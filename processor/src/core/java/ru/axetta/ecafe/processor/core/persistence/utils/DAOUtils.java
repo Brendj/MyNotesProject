@@ -357,9 +357,19 @@ public class DAOUtils {
     public static List findClientPayments(Session persistenceSession, Contragent contragent, String idOfPayment)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
-        //criteria.add(Restrictions.eq("contragent", contragent));   //новый алгоритм сравнения. Сравниваем по идентификатору и additionalId начинается с "РНИП"
         criteria.add(Restrictions.eq("idOfPayment", idOfPayment));
-        criteria.add(Restrictions.like("addIdOfPayment", RNIPLoadPaymentsService.SERVICE_NAME, MatchMode.START));
+        //criteria.add(Restrictions.like("addIdOfPayment", RNIPLoadPaymentsService.SERVICE_NAME, MatchMode.START)); - убираем сравнение строки по началу на "РНИП..."
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
+        return criteria.list();
+    }
+
+    public static List findClientPaymentsForCorrectionOperation(Session persistenceSession, Contragent contragent, String idOfPayment)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
+        criteria.add(Restrictions.like("idOfPayment", idOfPayment, MatchMode.START)); //включаем в поиск не только совпадения idOfPayment, но и корректировки
+        criteria.add(Restrictions.not(Restrictions.like("idOfPayment", idOfPayment + ClientPayment.CANCEL_SUBSTRING, MatchMode.START))); //но не включаем отмены
+        //criteria.add(Restrictions.like("addIdOfPayment", RNIPLoadPaymentsService.SERVICE_NAME, MatchMode.START)); - убираем сравнение строки по началу на "РНИП..."
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
         return criteria.list();
     }
 

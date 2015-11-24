@@ -254,6 +254,11 @@ public class FinancialOpsManager {
             throws Exception {
         ClientPayment clientPayment;
 
+        Integer payType = null;
+        if (idOfPayment.matches(".*" + ClientPayment.CANCEL_SUBSTRING + ".*")) {
+            payType = ClientPayment.CANCELLED_PAYMENT;
+        }
+
         // регистрируем транзакцию и проводим по балансу
         if(subScribeNum==null || subScribeNum.equals(0)){
             AccountTransaction accountTransaction;
@@ -267,7 +272,8 @@ public class FinancialOpsManager {
                         AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
             }
             // регистрируем платеж клиента
-            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, createTime,
+            int pType = (payType == null ? ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT : payType);
+            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerClientPayment(session, clientPayment, client);
         } else {
@@ -281,7 +287,8 @@ public class FinancialOpsManager {
                     AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
             }
             // регистрируем платеж клиента
-            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT, createTime,
+            int pType = (payType == null ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : payType);
+            clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerSubBalance1ClientPayment(session, clientPayment, client);
         }

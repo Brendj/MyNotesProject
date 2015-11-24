@@ -2030,4 +2030,19 @@ public class DAOService {
 
         return result;
     }
+
+    public List findClientPaymentsByPaymentId(Contragent contragent, String idOfPayment) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findClientPaymentsForCorrectionOperation(session, contragent, idOfPayment);
+    }
+
+    public void saveCancelPayment(ClientPayment payment) {
+        entityManager.persist(payment);
+        entityManager.flush();
+    }
+
+    public Boolean isCancelPaymentExists(String idOfPayment) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.existClientPayment(session, null, idOfPayment);
+    }
 }

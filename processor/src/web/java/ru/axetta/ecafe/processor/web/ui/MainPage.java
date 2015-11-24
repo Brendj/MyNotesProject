@@ -329,6 +329,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage reportGroupPage = new BasicWorkspacePage();
 
     private BasicWorkspacePage infoGroupMenu = new BasicWorkspacePage();
+    private BasicWorkspacePage debugGroupMenu = new BasicWorkspacePage();
 
     private final BasicWorkspacePage technologicalMapGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
@@ -8234,6 +8235,10 @@ public class MainPage implements Serializable {
         return infoGroupMenu;
     }
 
+    public BasicWorkspacePage getDebugGroupMenu() {
+        return debugGroupMenu;
+    }
+
     public String getUserContragentsList() {
         try {
             return ContextDAOServices.getInstance().getContragentsListForTooltip(getCurrentUser().getIdOfUser());
@@ -8271,5 +8276,9 @@ public class MainPage implements Serializable {
 
     public RegularPaymentsReportPage getRegularPaymentsReportPage() {
         return regularPaymentsReportPage;
+    }
+
+    public Boolean isTestMode() {
+        return RuntimeContext.getInstance().isTestMode();
     }
 }
