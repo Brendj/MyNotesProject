@@ -173,8 +173,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return htmlReport;
     }
 
-    public Object buildReportHTML() {
-        titlesComplex = new ArrayList<String>();
+    public List<String> getTitlesComplexes() {
+        List<String> titlesComplex = new ArrayList<String>();
 
         if (preferentialTitleComplexes != null) {
             if (preferentialTitleComplexes.length > 0) {
@@ -183,12 +183,21 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 }
             }
         }
+        return titlesComplex;
+    }
 
-        String titleComplexesString = "";
+    public String getStringTitleComplexes(String titleComplexesString) {
+        titlesComplex = getTitlesComplexes();
 
         for (String titleComplexItem: titlesComplex) {
             titleComplexesString = titleComplexesString.concat(titleComplexItem).concat(",");
         }
+        return titleComplexesString;
+    }
+
+    public Object buildReportHTML() {
+
+        String titleComplexesString = getStringTitleComplexes("");
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -264,6 +273,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     }
 
     public void showCSVList(ActionEvent actionEvent){
+        String titleComplexesString = getStringTitleComplexes("");
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateShortFileName = TotalSalesReport.class.getSimpleName() + ".jasper";
@@ -282,6 +293,9 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+
+            builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
+
             TotalSalesReport totalSalesReport = (TotalSalesReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
