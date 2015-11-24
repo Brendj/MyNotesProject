@@ -34,7 +34,7 @@
     </h:panelGrid>
     <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportJobCreatePage.showRules}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="selectReportJobGroupMenu" ajaxSingle="true" />
+        <a4j:support event="onclick" reRender="reportJobCreateGrid" ajaxSingle="true" />
     </h:selectBooleanCheckbox>
 
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}" />

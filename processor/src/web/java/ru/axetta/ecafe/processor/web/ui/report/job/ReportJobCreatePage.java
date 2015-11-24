@@ -102,6 +102,8 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getAvailableRules() {
+        String reportType = getReportType();
+
         List<SelectItem> list = new ArrayList<SelectItem>();
 
         SelectItem selectItem = new SelectItem(0L, "Правило");

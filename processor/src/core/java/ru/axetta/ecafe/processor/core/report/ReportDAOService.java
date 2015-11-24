@@ -1154,16 +1154,4 @@ public class ReportDAOService {
         return cl;
     }
 
-    public List<String> getTitlesComplexesWithPriceByContragent(Date startDate, Date endDate, Long idOfContragent) {
-        Contragent contragent = entityManager.find(Contragent.class, idOfContragent);
-
-        List<String> titles = new ArrayList<String>();
-
-        Set< Org> contragentOrgs = contragent.getOrgs();
-
-        List<Long> orgIdsList = new ArrayList<Long>();
-
-        return titles;
-
-    }
 }
