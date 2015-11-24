@@ -76,6 +76,7 @@
                                 <f:facet name="next">
                                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                                 </f:facet>
+                                <a4j:support event="onpagechange"/>
                             </rich:datascroller>
                         </f:facet>
                     </rich:dataTable>
