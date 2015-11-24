@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
@@ -23,20 +24,22 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -181,10 +184,57 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         filter = "Не выбрано";
         receiverSelection = isReceiver;
         if (isReceiver == false) {
-         MainPage.getSessionInstance().showContragentSelectPage();
+           showContragentSelectPageOwn();
         } else {
         MainPage.getSessionInstance().showContragentListSelectPage();
         }
+    }
+
+    public Object showContragentSelectPageOwn() {
+        BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
+        if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                MainPage.getSessionInstance().getContragentSelectPage().setItems(retrieveContragents(persistenceSession));
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler) {
+                    MainPage.getSessionInstance().getContragentSelectPage().pushCompleteHandler(
+                            (ContragentSelectPage.CompleteHandler) currentTopMostPage);
+                    MainPage.getSessionInstance().getModalPages().push(
+                            MainPage.getSessionInstance().getContragentSelectPage());
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contragent selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора контрагента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    private List<ContragentSelectPage.Item> retrieveContragents(Session session) throws HibernateException {
+        Criteria criteria = session.createCriteria(Contragent.class);
+        criteria.add(Restrictions.eq("classId", 1));
+        criteria.addOrder(Order.asc("contragentName"));
+        List contragents = criteria.list();
+        List<ContragentSelectPage.Item> items = new LinkedList<ContragentSelectPage.Item>();
+        for (Object object : contragents) {
+            Contragent contragent = (Contragent) object;
+            ContragentSelectPage.Item item = new ContragentSelectPage.Item(contragent);
+            items.add(item);
+        }
+        return items;
     }
 
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag, String classTypes) throws Exception {
@@ -225,7 +275,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         contragentReceiverIds = ids.toString();
     }
 
-    private final static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportPage.class);
+    private final static Logger logger = LoggerFactory.getLogger(ContragentPaymentReportPage.class);
 
     public void exportToXLS(ActionEvent actionEvent){
         if (validateFormData()) return;

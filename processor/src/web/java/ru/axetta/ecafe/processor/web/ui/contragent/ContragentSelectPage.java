@@ -84,6 +84,10 @@ public class ContragentSelectPage extends BasicPage {
         return items;
     }
 
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
     public Item getSelectedItem() {
         return selectedItem;
     }
