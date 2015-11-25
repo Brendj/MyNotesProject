@@ -2171,7 +2171,8 @@ public class MainPage implements Serializable {
 
     public Object showContragentListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentListSelectPage) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
@@ -2183,9 +2184,11 @@ public class MainPage implements Serializable {
                 contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                contragentListSelectPage
+                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+                    contragentListSelectPage
                         .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
-                modalPages.push(contragentListSelectPage);
+                    modalPages.push(contragentListSelectPage);
+                }
             } catch (Exception e) {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
