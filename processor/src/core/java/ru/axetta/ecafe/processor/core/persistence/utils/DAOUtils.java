@@ -1772,22 +1772,17 @@ public class DAOUtils {
                 criteria.add(Restrictions.eq("idOfGuardian", id));
                 List<ClientGuardian> list = criteria.list();
                 if (list != null && list.size() > 0) {
-                    clients.remove(id);
+                    Boolean activeGuardianshipExists = false;
                     for (ClientGuardian cg : list) {
                         if (!cg.isDisabled()) {
                             clients.add(cg.getIdOfChildren());
+                            activeGuardianshipExists = true;
                         }
                     }
-                }
-                /*children.clear();
-                q = persistenceSession.createSQLQuery("select idofchildren from cf_client_guardian  where idofguardian = "+ id);
-                children = q.list();
-                if(!children.isEmpty()){
-                    clients.remove(id);
-                    for(BigInteger child : children){
-                        clients.add(child.longValue());
+                    if (activeGuardianshipExists) {
+                        clients.remove(id);
                     }
-                }*/
+                }
             }
         }
 
