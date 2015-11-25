@@ -30,7 +30,7 @@
 
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{mainPage.totalSalesPage.contragent.contragentName}" readonly="true"
-                             styleClass="input-text" style="margin-right: 2px;" />
+                             styleClass="input-text" style="margin-right: 2px; width: 275px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
                                    reRender="modalContragentSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"

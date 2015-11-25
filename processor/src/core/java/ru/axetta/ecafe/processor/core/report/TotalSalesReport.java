@@ -38,8 +38,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     private static final String NAME_COMPLEX = "Платные комплексы";
     private static final String NAME_BUFFET = "Буфетная продукция";
     private static final String NAME_BEN = "Льготные комплексы";
-    private static final String TOTAL_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет собственное + Платные комплексы";
-    private static final String TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет все + Платные комплексы";
+    private static final String TOTAL_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет собственное + Платные комплексы"; // Буфет собственное + Платные комплексы
+    private static final String TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет все + Платные комплексы"; // Буфетная продукция + Платные комплексы
 
     final private static Logger logger = LoggerFactory.getLogger(TotalSalesReport.class);
 
@@ -163,28 +163,42 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 if (!titleComplexes.isEmpty()) {
                     for (String title : titleComplexes) {
                         if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
-                            sumProductOwn += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN) {
+                                sumProductOwn += handleOrders(totalListMap, allOrder, title);
+                                sumBuffetOwnPlusSumComplex += sumProductOwn + handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                            }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
-                            sumProductCentralize += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE) {
+                                sumProductCentralize += handleOrders(totalListMap, allOrder, title);
+                            }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
-                            sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK) {
+                                sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
+                            }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
-                            sumProductPurchase += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE) {
+                                sumProductPurchase += handleOrders(totalListMap, allOrder, title);
+                            }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
-                            sumProductVending += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING) {
+                                sumProductVending += handleOrders(totalListMap, allOrder, title);
+                            }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
-                            sumProductCommercial += handleOrders(totalListMap, allOrder, title);
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL) {
+                                sumProductCommercial += handleOrders(totalListMap, allOrder, title);
+                            }
                         }
                     }
                 }
 
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
                     sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
-                    sumBuffetPlusSumComplex += sumBuffet;
+                    sumBuffetPlusSumComplex += sumBuffet + handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
                 }else if(allOrder.getSocDiscount() == 0L){//Pay
                     sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX);
-                    sumBuffetPlusSumComplex += sumComplex;
-                    sumBuffetOwnPlusSumComplex += sumComplex;
+                    sumBuffetPlusSumComplex += sumComplex + handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
+
+                    sumBuffetOwnPlusSumComplex += sumComplex + handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
                 }else{ // free
                     sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
 
