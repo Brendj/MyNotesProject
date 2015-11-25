@@ -3725,6 +3725,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             Criteria criteria  = session.createCriteria(ClientGuardian.class);
             criteria.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+            criteria.add(Restrictions.eq("disabled", false));
             List guardiansResults = criteria.list();
 
             ClientRepresentativesList clientRepresentativesList = new ClientRepresentativesList();
