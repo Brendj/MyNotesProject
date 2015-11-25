@@ -90,7 +90,9 @@ public class RNIPLoadPaymentsService {
      */
     private String URL_ADDR = null;//"http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsService.class);
-    private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override protected DateFormat initialValue() { return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"); }
+    };
     public static final String RNIP_INPUT_FILE = "/rnip.in.signed";
     public static final String RNIP_OUTPUT_FILE = "/rnip.out.signed";
     public static final String ERRORS_OUTPUT_FILE = "/rnip.errors";
@@ -165,37 +167,6 @@ public class RNIPLoadPaymentsService {
                 .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, "" + (on ? "1" : "0"));
     }
 
-
-    private void setLastUpdateDate(Date date) {
-        RuntimeContext.getInstance()
-                .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME, dateFormat.format(date));
-    }
-
-    private Date getLastUpdateDate() {
-        try {
-            info("Получение даты последней выгрузки..");
-            String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
-            if (d == null || d.length() < 1) {
-                return new Date(0);
-            }
-            info("Последняя выгрузка состоялась %s", d);
-            return dateFormat.parse(d);
-        } catch (Exception e) {
-            logger.error("Failed to parse date from options", e);
-        }
-        return new Date(0);
-        /*Calendar cal = new GregorianCalendar();
-        cal.set(Calendar.YEAR, 2013);
-        cal.set(Calendar.MONTH, 3);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();*/
-    }
-
-
     private Date getLastUpdateDate(Contragent contragent) {
         try {
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
@@ -203,14 +174,14 @@ public class RNIPLoadPaymentsService {
             if(d == null || StringUtils.isBlank(d)) {
                 return new Date(0);
             }
-            //info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             if (d == null || d.length() < 1) {
                 info("Для контрагента %s загрузок не было, используется 0 мс.", contragent.getContragentName());
                 return new Date(0);
             }
             info("Последняя дата выгрузки для контрагента %s состоялась %s. Версия записи - %s", contragent.getContragentName(),
                     d, contragent.getContragentSync().getVersion());
-            return dateFormat.parse(d);
+            DateFormat safeDateFormat = dateFormat.get();
+            return safeDateFormat.parse(d);
         } catch (Exception e) {
             logger.error("Failed to parse date from options", e);
         }

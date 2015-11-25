@@ -28,15 +28,33 @@ public class CalendarUtils {
 
     //private final static TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
     private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-    private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    private final static SimpleDateFormat timeUnderscoreFormat = new SimpleDateFormat("HH_mm");
-    private final static SimpleDateFormat dateShortdd_mmFormat = new SimpleDateFormat("dd.MM");
-    private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
-    private final static SimpleDateFormat dateShortUnderscoreFormat = new SimpleDateFormat("yy_MM_dd");
-    private final static SimpleDateFormat dateShortFormatFullYear = new SimpleDateFormat("dd.MM.yyyy");
-    private final static SimpleDateFormat MMMMYYYY = new SimpleDateFormat("MMMM yyyy");
-    private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
+    private final static ThreadLocal<SimpleDateFormat> dateTimeFormat = new ThreadLocal<SimpleDateFormat>(){
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> timeFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH:mm"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> timeUnderscoreFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH_mm"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> dateShortdd_mmFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> dateShortFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM.yy"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> dateShortUnderscoreFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("yy_MM_dd"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> dateShortFormatFullYear = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM.yyyy"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> MMMMYYYY = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("MMMM yyyy"); }
+    };
+    private final static ThreadLocal<SimpleDateFormat> dayInWeekFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("EE", new Locale("ru")); }
+    };
     public final static Date AFTER_DATE = getAfterDate();
 
     public static XMLGregorianCalendar getXMLGregorianCalendarByDate(Date date) throws DatatypeConfigurationException {
@@ -58,11 +76,12 @@ public class CalendarUtils {
     }
 
     public static Date parseFullDateTimeWithLocalTimeZone(String s) throws Exception {
-        dateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+        SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
+        safeDateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
         if(StringUtils.isEmpty(s)){
             return null;
         } else {
-            Date date = dateTimeFormat.parse(s);
+            Date date = safeDateTimeFormat.parse(s);
             if(date.after(AFTER_DATE)) {
                 throw new Exception("Не верно введена дата");
             }
@@ -71,8 +90,9 @@ public class CalendarUtils {
     }
 
     public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
-        try {dateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));} catch (Exception ignore) {}
-        return dateTimeFormat.format(dateTime);
+        SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
+        try {safeDateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));} catch (Exception ignore) {}
+        return safeDateTimeFormat.format(dateTime);
     }
 
     public static boolean betweenDate(Date createDate, Date generateBeginTime, Date generateEndTime) {
@@ -80,8 +100,9 @@ public class CalendarUtils {
     }
 
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
-        dateTimeFormat.setTimeZone(utcTimeZone);
-        return dateTimeFormat.format(dateTime);
+        SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
+        safeDateTimeFormat.setTimeZone(utcTimeZone);
+        return safeDateTimeFormat.format(dateTime);
     }
 
     public static void truncateToMonth(Calendar calendar) {
@@ -163,7 +184,8 @@ public class CalendarUtils {
         if(StringUtils.isEmpty(s)){
             return null;
         } else {
-            Date date = dateShortFormat.parse(s);
+            SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
+            Date date = safeDateShortFormat.parse(s);
             if(date.after(AFTER_DATE)) {
                 throw new Exception("Не верно введена дата");
             }
@@ -175,7 +197,8 @@ public class CalendarUtils {
         if(StringUtils.isEmpty(s)){
             return null;
         } else {
-            Date date = timeFormat.parse(s);
+            SimpleDateFormat safeTimeFormat = timeFormat.get();
+            Date date = safeTimeFormat.parse(s);
             if(date.after(AFTER_DATE)) {
                 throw new Exception("Не верно введена дата");
             }
@@ -184,67 +207,78 @@ public class CalendarUtils {
     }
     // new SimpleDateFormat("HH:mm");
     public static String timeToString(Date date) {
-        return timeFormat.format(date);
+        SimpleDateFormat safeTimeFormat = timeFormat.get();
+        return safeTimeFormat.format(date);
     }
     /**
      *   @return  new SimpleDateFormat("HH:mm");
      * */
     public static String timeToString(Long date) {
-        return timeFormat.format(new Date(date));
+        SimpleDateFormat safeTimeFormat = timeFormat.get();
+        return safeTimeFormat.format(new Date(date));
     }
     /**
      *   @return  new SimpleDateFormat("HH_mm");
      * */
     public static String formatTimeUnderscoreToString(Long date) {
-        return timeUnderscoreFormat.format(new Date(date));
+        SimpleDateFormat safeTimeUnderscoreFormat = timeUnderscoreFormat.get();
+        return safeTimeUnderscoreFormat.format(new Date(date));
     }
 
     public static Date parseDayInWeek(String validTime) throws ParseException {
-        return timeFormat.parse(validTime);
+        SimpleDateFormat safeTimeFormat = timeFormat.get();
+        return safeTimeFormat.parse(validTime);
     }
 
     public static String dayInWeekToString(Long timeMillis) {
-        return dayInWeekFormat.format(timeMillis);
+        SimpleDateFormat safeDayInWeekFormat = dayInWeekFormat.get();
+        return safeDayInWeekFormat.format(timeMillis);
     }
 
     public static String dayInWeekToString(Date date) {
-        return dayInWeekFormat.format(date);
+        SimpleDateFormat safeDayInWeekFormat = dayInWeekFormat.get();
+        return safeDayInWeekFormat.format(date);
     }
 
     public static String dateShortToString(long date) {
-        return dateShortFormat.format(new Date(date));
+        SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
+        return safeDateShortFormat.format(new Date(date));
     }
     public static String dateShortdd_mmToString(long date) {
-        return dateShortdd_mmFormat.format(new Date(date));
+        SimpleDateFormat safeDateShortdd_mmFormat = dateShortdd_mmFormat.get();
+        return safeDateShortdd_mmFormat.format(new Date(date));
     }
     public static String dateShortToString(Date date) {
-        return dateShortFormat.format(date);
+        SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
+        return safeDateShortFormat.format(date);
     }
     /**
     * @return new SimpleDateFormat("yy_MM_dd");
     * */
     public static String formatToDateShortUnderscoreFormat(Date date) {
-        return dateShortUnderscoreFormat.format(date);
+        SimpleDateFormat safeDateShortUnderscoreFormat = dateShortUnderscoreFormat.get();
+        return safeDateShortUnderscoreFormat.format(date);
     }
 
     public static String dateShortToString(Calendar date) {
-        return dateShortFormat.format(date);
+        SimpleDateFormat safeDateShortFormat = dateShortFormat.get();
+        return safeDateShortFormat.format(date);
     }
     public static String dateShortToStringFullYear(Date date) {
-        return dateShortFormatFullYear.format(date);
+        SimpleDateFormat safeDateShortFormatFullYear = dateShortFormatFullYear.get();
+        return safeDateShortFormatFullYear.format(date);
     }
     public static String dateMMMMYYYYToString(Date date) {
-        return MMMMYYYY.format(date);
+        SimpleDateFormat safeMMMMYYYY = MMMMYYYY.get();
+        return safeMMMMYYYY.format(date);
     }
 
     /**
      * @return  dd.MM.yyyy HH:mm:ss
      */
     public static String dateTimeToString(Date date) {
-        return dateTimeFormat.format(date);
-    }
-    public static String dateTimeToString(Long date) {
-        return dateTimeFormat.format(new Date(date));
+        SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
+        return safeDateTimeFormat.format(date);
     }
 
     public static Date getFirstDayOfMonth(Date date) {
