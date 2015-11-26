@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TotalSalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="b566835e-efcd-41bb-85de-394ace3e073d">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="1587"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
 	<style name="table">
@@ -346,7 +346,7 @@
 				<text><![CDATA[ИТОГО]]></text>
 			</staticText>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="b67cfe7a-e8ba-4c43-8e93-d49308db6db6" x="2451" y="32" width="197" height="20"/>
+				<reportElement uuid="b67cfe7a-e8ba-4c43-8e93-d49308db6db6" x="2448" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -360,7 +360,7 @@
 				<textFieldExpression><![CDATA[($P{sumComplex}+$P{sumBuffet}+$P{sumBen})/100]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="73e54587-22a9-48a5-8f41-a8005f12e993" x="1663" y="32" width="197" height="20"/>
+				<reportElement uuid="73e54587-22a9-48a5-8f41-a8005f12e993" x="1660" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -374,7 +374,7 @@
 				<textFieldExpression><![CDATA[$P{sumBuffetPlusSumComplex}/100]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="ca20aef8-0ed9-4618-bbf3-bb18d8f9e3ea" x="1860" y="32" width="197" height="20"/>
+				<reportElement uuid="ca20aef8-0ed9-4618-bbf3-bb18d8f9e3ea" x="1857" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -388,7 +388,7 @@
 				<textFieldExpression><![CDATA[$P{sumBuffetOwnPlusSumComplex}/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="e69f29bf-f4f8-4857-b3de-7573cfb2b5c5" x="2254" y="32" width="197" height="20"/>
+				<reportElement uuid="e69f29bf-f4f8-4857-b3de-7573cfb2b5c5" x="2251" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -402,7 +402,7 @@
 				<textFieldExpression><![CDATA[$P{sumComplex}/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="7515ea7f-91e9-4ddd-8ae5-2e57b8d5da01" x="1466" y="32" width="197" height="20"/>
+				<reportElement uuid="7515ea7f-91e9-4ddd-8ae5-2e57b8d5da01" x="1463" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -416,7 +416,7 @@
 				<textFieldExpression><![CDATA[$P{sumBuffet}/100]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="a6ca435f-3afe-4356-8fb7-9be7d127d07b" x="2057" y="32" width="197" height="20"/>
+				<reportElement uuid="a6ca435f-3afe-4356-8fb7-9be7d127d07b" x="2054" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -430,7 +430,7 @@
 				<textFieldExpression><![CDATA[$P{sumBen}/100]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="0e778405-735a-4dbc-9a61-57af34dd1990" x="2254" y="0" width="197" height="32"/>
+				<reportElement uuid="0e778405-735a-4dbc-9a61-57af34dd1990" x="2251" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -444,7 +444,7 @@
 				<text><![CDATA[Платные комплексы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="834fbcdd-00e1-442a-847f-3622f95a8068" x="1466" y="0" width="197" height="32"/>
+				<reportElement uuid="834fbcdd-00e1-442a-847f-3622f95a8068" x="1463" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -458,7 +458,7 @@
 				<text><![CDATA[Буфетная продукция]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9b54188b-82bd-4b45-90b4-805d39ebef8e" x="2057" y="0" width="197" height="32"/>
+				<reportElement uuid="9b54188b-82bd-4b45-90b4-805d39ebef8e" x="2054" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -472,7 +472,7 @@
 				<text><![CDATA[Льготные комплексы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47a0adae-83e1-4305-a7d2-fdfb3d9e55bf" x="2451" y="0" width="197" height="32"/>
+				<reportElement uuid="47a0adae-83e1-4305-a7d2-fdfb3d9e55bf" x="2448" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -486,7 +486,7 @@
 				<text><![CDATA[Общий итог:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b0f259bd-0251-4ac5-82cc-8e1d5fe999f4" x="1663" y="0" width="197" height="32"/>
+				<reportElement uuid="b0f259bd-0251-4ac5-82cc-8e1d5fe999f4" x="1660" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -500,7 +500,7 @@
 				<text><![CDATA[Итого буфет собственное + Платные комплексы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5b809e73-fbb0-4920-b4d9-0ce7114f92e6" x="1860" y="0" width="197" height="32"/>
+				<reportElement uuid="5b809e73-fbb0-4920-b4d9-0ce7114f92e6" x="1857" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -647,7 +647,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c4dd0c92-a503-4b1c-9332-799b6568cb55" x="1266" y="0" width="200" height="32"/>
+				<reportElement uuid="c4dd0c92-a503-4b1c-9332-799b6568cb55" x="1266" y="0" width="197" height="32"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -661,7 +661,7 @@
 				<text><![CDATA[Буфет Централизованное с доготовкой]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="7e45dcb6-ff11-4f2f-941c-3ab3f5a327d3" x="1266" y="32" width="200" height="20"/>
+				<reportElement uuid="7e45dcb6-ff11-4f2f-941c-3ab3f5a327d3" x="1266" y="32" width="197" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
