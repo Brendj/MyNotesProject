@@ -100,6 +100,13 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             parameterMap.put("sumBuffetPlusSumComplex", Double.parseDouble(sumBuffetPlusSumComplex.toString()));
             parameterMap.put("sumBuffetOwnPlusSumComplex", Double.parseDouble(sumBuffetOwnPlusSumComplex.toString()));
 
+            parameterMap.put("sumProductCentralize", Double.parseDouble(sumProductCentralize.toString()));
+            parameterMap.put("sumProductCentralizeCook", Double.parseDouble(sumProductCentralizeCook.toString()));
+            parameterMap.put("sumProductPurchase", Double.parseDouble(sumProductPurchase.toString()));
+            parameterMap.put("sumProductVending", Double.parseDouble(sumProductVending.toString()));
+            parameterMap.put("sumProductCommercial", Double.parseDouble(sumProductCommercial.toString()));
+            parameterMap.put("sumProductOwn", Double.parseDouble(sumProductOwn.toString()));
+
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new TotalSalesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
