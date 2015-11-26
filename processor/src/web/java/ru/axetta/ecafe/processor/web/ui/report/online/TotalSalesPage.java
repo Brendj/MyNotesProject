@@ -65,6 +65,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private Long contragentId = -1L;
     private List<SelectItem> contragentsSelectItems;
     private List<String> titlesComplex;
+    private List<String>  titleAndSumList;
+    private HashMap<String, String> titleAndSumMap;
 
     private Integer[] preferentialTitleComplexes;
 
@@ -174,16 +176,16 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     }
 
     public List<String> getTitlesComplexes() {
-        List<String> titlesComplex = new ArrayList<String>();
+        List<String> titlesComplexList = new ArrayList<String>();
 
         if (preferentialTitleComplexes != null) {
             if (preferentialTitleComplexes.length > 0) {
                 for (Integer prefer : preferentialTitleComplexes) {
-                    titlesComplex.add(contragentsSelectItems.get(prefer).getLabel());
+                    titlesComplexList.add(contragentsSelectItems.get(prefer).getLabel());
                 }
             }
         }
-        return titlesComplex;
+        return titlesComplexList;
     }
 
     public String getStringTitleComplexes(String titleComplexesString) {
@@ -195,9 +197,35 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return titleComplexesString;
     }
 
+    private List<String> getTitleAndSums() {
+        List<String> titleAndSumList = new ArrayList<String>();
+
+        if (preferentialTitleComplexes.length > 0) {
+            if (preferentialTitleComplexes.length > 0) {
+                for (Integer prefer : preferentialTitleComplexes) {
+                    if (titleAndSumMap.get(contragentsSelectItems.get(prefer).getLabel()) != null) {
+                        titleAndSumList.add(contragentsSelectItems.get(prefer).getLabel() + "," + titleAndSumMap.get(contragentsSelectItems.get(prefer).getLabel()));
+                    }
+                }
+            }
+        }
+        return titleAndSumList;
+    }
+
+    public String getTitleAndSumByString(String titleAndSumListString) {
+        titleAndSumList = getTitleAndSums();
+
+        for (String titleAndSumItem: titleAndSumList) {
+            titleAndSumListString = titleAndSumListString.concat(titleAndSumItem).concat(";");
+        }
+        return titleAndSumListString;
+    }
+
     public Object buildReportHTML() {
 
         String titleComplexesString = getStringTitleComplexes("");
+
+        String titleAndSumString = getTitleAndSumByString("");
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -218,6 +246,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             persistenceTransaction = session.beginTransaction();
 
             builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
+            builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -275,6 +304,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     public void showCSVList(ActionEvent actionEvent){
         String titleComplexesString = getStringTitleComplexes("");
 
+        String titleAndSumString = getTitleAndSumByString("");
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateShortFileName = TotalSalesReport.class.getSimpleName() + ".jasper";
@@ -295,6 +326,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             persistenceTransaction = session.beginTransaction();
 
             builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
+            builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
 
             TotalSalesReport totalSalesReport = (TotalSalesReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -428,9 +460,11 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 List resultList = query.list();
 
                 String str;
+                titleAndSumMap = new HashMap<String, String>();
                 for (Object o : resultList) {
                     str = "Льготный комплекс " + ((BigInteger) o).longValue() / 100 + "."
                             + ((BigInteger) o).longValue() % 100 + " руб.";
+                    titleAndSumMap.put(str, o.toString());
                     titles.add(str);
                 }
             }

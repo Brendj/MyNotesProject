@@ -113,6 +113,16 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("titleComplexes"));
 
+            String titleAndSums = StringUtils.trimToEmpty(getReportProperties().getProperty("titleAndSumList"));
+
+            //Мапа с названием колонки, ценой, и суммой
+            HashMap<Long, PriceAndSum> priceAndSumHashMap = new HashMap<Long, PriceAndSum>();
+
+            for (String titleAndSum: Arrays.asList(StringUtils.split(titleAndSums, ';'))) {
+                String[] str = StringUtils.split(titleAndSum, ',');
+                priceAndSumHashMap.put(Long.parseLong(str[1]), new PriceAndSum(str[0].trim(), 0L));
+            }
+
             for (String title : Arrays.asList(StringUtils.split(titles, ','))) {
                 titlesComplexes.add(title);
             }
@@ -133,7 +143,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
-            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime);
+            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumHashMap);
             logger.error("e2 : " + (System.currentTimeMillis() - l));
 
             //Вывод, разбивка по районам.
@@ -154,7 +164,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, List<String> titleComplexes, Date startTime, Date endTime){
+                List<Long> idOfOrgsList, List<String> titleComplexes, Date startTime, Date endTime, HashMap<Long, PriceAndSum> priceAndSumHashMap){
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
@@ -187,6 +197,17 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                             if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductCommercial += handleOrders(totalListMap, allOrder, title);
                             }
+                        }
+                    }
+                }
+
+                if (!priceAndSumHashMap.isEmpty()) {
+                    if (allOrder.getMenutype() != OrderDetail.TYPE_DISH_ITEM && allOrder.getSocDiscount() != 0L) {
+                        if (priceAndSumHashMap.get(allOrder.getSum()) != null) {
+                            Long sum = priceAndSumHashMap.get(allOrder.getSum()).getSum();
+                            sum += handleOrders(totalListMap, allOrder,
+                                    priceAndSumHashMap.get(allOrder.getSum()).getTitle());
+                            priceAndSumHashMap.get(allOrder.getSum()).setSum(sum);
                         }
                     }
                 }
