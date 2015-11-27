@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -32,26 +33,22 @@ public class ContractIdGenerator {
 
     public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
-        long lastClientContractId = org.getLastClientContractId();
+        Long lastClientContractId = org.getLastClientContractId();
 
-        Long l = null;
-        String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ru.ecafe.internal.contract.maxId");
+        Long contractIdSize = null;
+        String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.client.contractIdSize");
         if(s != null &&!s.isEmpty()){
-            l = Long.parseLong(s);
+            contractIdSize = Long.parseLong(s);
+        } else {
+            contractIdSize = 10L;
         }
-        if (MIN_ORDER_ID > lastClientContractId
-                || ((l==null) && MAX_ORDER_ID < lastClientContractId)
-                || ((l!=null) && l < lastClientContractId) ) {
-            throw new IllegalArgumentException("Too large last client contractId");
+        Long divider = (contractIdSize == 10) ? 1000000000L : 100000000L;
+        lastClientContractId = DAOService.getInstance().getNextFreeLastClientContractId(divider, idOfOrg, lastClientContractId);
+        if (lastClientContractId == null) {
+            throw new IllegalArgumentException("Not available client contractId");
         }
-        lastClientContractId++;
 
-        long newClientContractId;
-        if(l == null){
-            newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
-        }else {
-            newClientContractId = addLastDigitByLuhn(org.getIdOfOrg() * l + lastClientContractId);
-        }
+        long newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
         org.setLastClientContractId(lastClientContractId);
         session.update(org);
         session.flush();
