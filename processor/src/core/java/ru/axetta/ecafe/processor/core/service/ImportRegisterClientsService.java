@@ -1096,9 +1096,9 @@ public class ImportRegisterClientsService {
     }
 
     public static boolean isPupilIgnoredFromImport(String guid, String group) {
-        if (group != null && group.toLowerCase().startsWith("дошкол")) {
+        /*if (group != null && group.toLowerCase().startsWith("дошкол")) {
             return true;
-        }
+        }*/
         if (guid == null || guid.length() == 0) {
             return true;
         }
