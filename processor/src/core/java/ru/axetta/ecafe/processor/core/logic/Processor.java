@@ -110,7 +110,7 @@ public class Processor implements SyncProcessor,
                                 PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId()), null);
             }
-            if (existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
+            if (existClientPayment(persistenceSession, contragent, payment)) {
                     logger.warn(String.format("Payment request with duplicated attributes IdOfContragent == %s, payment == %s",
                             idOfContragent,
                             payment.toString()));

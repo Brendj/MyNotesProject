@@ -2063,6 +2063,10 @@ public class DAOService {
 
     public Boolean isCancelPaymentExists(String idOfPayment) throws Exception {
         Session session = entityManager.unwrap(Session.class);
-        return DAOUtils.existClientPayment(session, null, idOfPayment);
+        Criteria criteria = session.createCriteria(ClientPayment.class);
+        criteria.add(Restrictions.eq("idOfPayment", idOfPayment));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
+        return !criteria.list().isEmpty();
+        //return DAOUtils.existClientPayment(session, null, idOfPayment);
     }
 }

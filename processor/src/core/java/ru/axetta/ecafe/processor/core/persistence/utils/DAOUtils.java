@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -354,11 +355,21 @@ public class DAOUtils {
                 .get(ContragentClientAccount.class, compositeIdOfContragentClientAccount);
     }
 
-    public static List findClientPayments(Session persistenceSession, Contragent contragent, String idOfPayment)
+    /*public static List findClientPayments(Session persistenceSession, Contragent contragent, String idOfPayment)
+        throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
+        criteria.add(Restrictions.eq("contragent", contragent));
+        criteria.add(Restrictions.eq("idOfPayment", idOfPayment));
+        return criteria.list();
+    }*/
+
+    public static List findClientPayments(Session persistenceSession, Contragent contragent, PaymentRequest.PaymentRegistry.Payment payment)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
-        criteria.add(Restrictions.eq("idOfPayment", idOfPayment));
-        //criteria.add(Restrictions.like("addIdOfPayment", RNIPLoadPaymentsService.SERVICE_NAME, MatchMode.START)); - убираем сравнение строки по началу на "РНИП..."
+        if (!payment.getAddIdOfPayment().startsWith(RNIPLoadPaymentsService.SERVICE_NAME)) {
+            criteria.add(Restrictions.eq("contragent", contragent));
+        }
+        criteria.add(Restrictions.eq("idOfPayment", payment.getIdOfPayment()));
         criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
         return criteria.list();
     }
@@ -373,9 +384,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static boolean existClientPayment(Session persistenceSession, Contragent contragent, String idOfPayment)
+    public static boolean existClientPayment(Session persistenceSession, Contragent contragent, PaymentRequest.PaymentRegistry.Payment payment)
             throws Exception {
-        return !findClientPayments(persistenceSession, contragent, idOfPayment).isEmpty();
+        return !findClientPayments(persistenceSession, contragent, payment).isEmpty();
     }
 
     public static ClientGroup findClientGroup(Session persistenceSession,
