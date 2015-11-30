@@ -87,17 +87,16 @@ public class OrdersRepository extends BaseJpaDao {
 
     public List<OrderItem> findAllOrders(List<Long> idOfOrgsList, Date startDate, Date endDate){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
-        Query nativeQuery = entityManager.createNativeQuery("SELECT (o.idoforg) AS name, o.createdDate, ((od.rPrice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
-                + "                 FROM CF_Orders o "
-                + "                 INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
-                + "                 WHERE o.idoforg in (:idoforgs) "
-                + "                  AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
-                + "                 AND (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99))"
-                + " AND o.state=0 AND od.state=0 "
-                + " ORDER BY o.idoforg")
-                .setParameter("idoforgs", idOfOrgsList)
-                .setParameter("startDate", startDate.getTime())
-                .setParameter("endDate",endDate.getTime());
+        Query nativeQuery = entityManager.createNativeQuery(
+                "SELECT (o.idoforg) AS name, o.createdDate, ((od.rPrice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
+                        + "                 FROM CF_Orders o "
+                        + "                 INNER JOIN (SELECT od2.* FROM CF_OrderDetails od2 JOIN cf_orders o2 ON o2.idOfOrder = od2.idOfOrder AND o2.idOfOrg = od2.idOfOrg WHERE o2.createdDate >= :startDate AND o2.createdDate <= :endDate AND o2.state = 0 AND o2.idOfOrg IN (:idoforgs)) AS od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                        + "                 WHERE o.idoforg IN (:idoforgs) "
+                        + "                  AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
+                        + "                 AND (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99))"
+                        + " AND o.state=0 AND od.state=0 " + " ORDER BY o.idoforg")
+                .setParameter("idoforgs", idOfOrgsList).
+                        setParameter("startDate", startDate.getTime()).setParameter("endDate", endDate.getTime());
 
         List<Object[]> temp = nativeQuery.getResultList();
         for(Object[] o : temp){
