@@ -67,6 +67,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -5296,6 +5297,10 @@ public class MainPage implements Serializable {
                             null));
         }
         return null;
+    }
+
+    public List<SelectItem> getAvailableRules() {
+        return reportJobCreatePage.getAvailableRules();
     }
 
     public BasicWorkspacePage getReportOnlineGroupPage() {

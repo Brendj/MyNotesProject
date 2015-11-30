@@ -40,9 +40,9 @@
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}" />
     <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;"
                   rendered="#{mainPage.reportJobCreatePage.showRules}">
-        <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialComplexes}" layout="pageDirection"
+        <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialRules}" layout="pageDirection"
                                  styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}">
-            <f:selectItems value="#{mainPage.reportJobCreatePage.availableRules}" />
+            <f:selectItems value="#{mainPage.availableRules}" />
         </h:selectManyCheckbox>
     </h:panelGroup>
 </h:panelGrid>

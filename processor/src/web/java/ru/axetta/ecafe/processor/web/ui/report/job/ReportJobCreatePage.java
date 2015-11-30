@@ -10,10 +10,12 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,7 +30,7 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     private String jobName;
     private boolean enabled;
     private boolean showRules;
-    private Integer[] preferentialComplexes;
+    private Integer[] preferentialRules;
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
@@ -61,12 +63,12 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
         this.showRules = showRules;
     }
 
-    public Integer[] getPreferentialComplexes() {
-        return preferentialComplexes;
+    public Integer[] getPreferentialRules() {
+        return preferentialRules;
     }
 
-    public void setPreferentialComplexes(Integer[] preferentialComplexes) {
-        this.preferentialComplexes = preferentialComplexes;
+    public void setPreferentialRules(Integer[] preferentialRules) {
+        this.preferentialRules = preferentialRules;
     }
 
     public String getReportType() {
@@ -102,12 +104,21 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getAvailableRules() {
-        String reportType = getReportType();
+        String reportType = this.reportType;
 
         List<SelectItem> list = new ArrayList<SelectItem>();
 
-        SelectItem selectItem = new SelectItem(0L, "Правило");
-        list.add(selectItem);
+        if (reportType != null) {
+
+            String [] strings =StringUtils.split(reportType, '.');
+
+            String str = strings[strings.length - 1];
+
+            Long a = 1L;
+
+
+
+        }
 
         return list;
     }
