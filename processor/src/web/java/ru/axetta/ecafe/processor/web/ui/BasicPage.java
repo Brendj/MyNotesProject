@@ -5,9 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
 import java.io.Serializable;
-import java.security.Principal;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,11 +24,5 @@ public class BasicPage implements Serializable {
 
     public void setPageComponent(UIComponent pageComponent) {
         this.pageComponent = pageComponent;
-    }
-
-    public String getCurrentUserNot(){
-        FacesContext currentInstance = FacesContext.getCurrentInstance();
-        String userName = currentInstance.getExternalContext().getRemoteUser();
-        return userName;
     }
 }
