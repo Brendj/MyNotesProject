@@ -30,6 +30,8 @@ import java.util.*;
  */
 public class ContragentListSelectPage extends BasicPage {
 
+    private final static String OPERATOR = "Оператор";
+
     public interface CompleteHandler {
 
         void completeContragentListSelection(Session session, List<Long> idOfContragent, int multiContrFlag, String classTypes) throws Exception;
@@ -203,7 +205,14 @@ public class ContragentListSelectPage extends BasicPage {
             criteria.add(exp);
         }
         criteria.addOrder(Order.asc("contragentName"));
-        return criteria.list();
+        List<Contragent> contragentsByCriteria = criteria.list();
+        Criteria criteria1 = session.createCriteria(Contragent.class);
+        criteria1.add(Restrictions.eq("contragentName", OPERATOR));
+        Contragent operator = (Contragent)criteria1.uniqueResult();
+        if (operator != null) {
+            contragentsByCriteria.add(operator);
+        }
+        return contragentsByCriteria; // criteria.list();
     }
 
     public void selectAllItems() {

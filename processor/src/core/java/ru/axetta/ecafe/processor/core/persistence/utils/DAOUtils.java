@@ -366,7 +366,7 @@ public class DAOUtils {
     public static List findClientPayments(Session persistenceSession, Contragent contragent, PaymentRequest.PaymentRegistry.Payment payment)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(ClientPayment.class);
-        if (!payment.getAddIdOfPayment().startsWith(RNIPLoadPaymentsService.SERVICE_NAME)) {
+        if (payment.getAddIdOfPayment() == null || !payment.getAddIdOfPayment().startsWith(RNIPLoadPaymentsService.SERVICE_NAME)) {
             criteria.add(Restrictions.eq("contragent", contragent));
         }
         criteria.add(Restrictions.eq("idOfPayment", payment.getIdOfPayment()));
