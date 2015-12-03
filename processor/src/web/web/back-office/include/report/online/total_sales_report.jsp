@@ -15,6 +15,13 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<script language="javascript">
+    function disableButtons(value) {
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateButton").disabled=value;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:xlsButton").disabled=value;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:clearButton").disabled=value;
+    }
+</script>
 
 <h:panelGrid id="registerStampReportPanelGrid" binding="#{mainPage.totalSalesPage.pageComponent}"
              styleClass="borderless-grid">
@@ -84,13 +91,15 @@
     </rich:simpleTogglePanel>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.totalSalesPage.buildReportHTML}"
-                           reRender="registerStampReportPanel" styleClass="command-button"
-                           status="reportGenerateStatus" />
+                           reRender="registerStampReportPanel" styleClass="command-button" onclick="disableButtons(true);"
+                           status="reportGenerateStatus" id="generateButton" oncomplete="disableButtons(false)"/>
         <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}"
-                         styleClass="command-button" />
-        <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}"
+                         action="#{mainPage.totalSalesPage.reloadPage}"
+                         styleClass="command-button" id="xlsButton" onclick="setTimeout('disableButtons(true);', 50);" >
+        </h:commandButton>
+        <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}" onclick="disableButtons(true);"
                            reRender="registerStampReportPanelGrid" styleClass="command-button"
-                           status="reportGenerateStatus" />
+                           status="reportGenerateStatus" id="clearButton" oncomplete="disableButtons(false)" />
     </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
