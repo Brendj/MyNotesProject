@@ -7,13 +7,19 @@ package ru.axetta.ecafe.processor.core.persistence.dao.order;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -85,26 +91,58 @@ public class OrdersRepository extends BaseJpaDao {
     }
 
 
-    public List<OrderItem> findAllOrders(List<Long> idOfOrgsList, Date startDate, Date endDate){
+    public List<OrderItem> findAllOrders(List<Long> idOfOrgsList, Date startDate, Date endDate) {
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
-        Query nativeQuery = entityManager.createNativeQuery(
-                "SELECT (o.idoforg) AS name, o.createdDate, ((od.rPrice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
-                        + "                 FROM CF_Orders o "
-                        + "                 INNER JOIN (SELECT od2.* FROM CF_OrderDetails od2 JOIN cf_orders o2 ON o2.idOfOrder = od2.idOfOrder AND o2.idOfOrg = od2.idOfOrg WHERE o2.createdDate >= :startDate AND o2.createdDate <= :endDate AND o2.state = 0 AND o2.idOfOrg IN (:idoforgs)) AS od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
-                        + "                 WHERE o.idoforg IN (:idoforgs) "
-                        + "                  AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
-                        + "                 AND (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99))"
-                        + " AND o.state=0 AND od.state=0 " + " ORDER BY o.idoforg")
-                .setParameter("idoforgs", idOfOrgsList).
-                        setParameter("startDate", startDate.getTime()).setParameter("endDate", endDate.getTime());
 
-        List<Object[]> temp = nativeQuery.getResultList();
-        for(Object[] o : temp){
-            orderItemList.add(new OrderItem(((BigInteger)o[0]).longValue()
-                    ,((BigInteger)o[1]).longValue()
-                    ,((BigInteger)o[2]).longValue()
-                    ,((BigInteger)o[3]).longValue()
-                    ,(Integer)o[4], (Integer) o[5]));
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO OFF").execute();
+                }
+            });
+
+            org.hibernate.Query nativeQuery = session.createSQLQuery(
+                    "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
+                            + "                 FROM CF_Orders o "
+                            + "                 INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                            + "                 WHERE o.idoforg IN (:idOfOrgs) "
+                            + "                  AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
+                            + "                 AND (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99))"
+                            + " AND o.state=0 AND od.state=0 ORDER BY o.idoforg");
+            nativeQuery.setParameterList("idOfOrgs", idOfOrgsList);
+            nativeQuery.setParameter("startDate", startDate.getTime());
+            nativeQuery.setParameter("endDate", endDate.getTime());
+
+            List temp = nativeQuery.list();
+            for (Object entry : temp) {
+                Object o[] = (Object[]) entry;
+
+                orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
+                        ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
+                        (Integer) o[5]));
+            }
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO ON").execute();
+                }
+            });
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return orderItemList;
     }

@@ -26,6 +26,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -447,6 +450,14 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             }
 
             if (!idOfOrgs.isEmpty()) {
+
+                session.doWork(new Work() {
+                    @Override
+                    public void execute(Connection connection) throws SQLException {
+                        connection.prepareStatement("SET enable_seqscan TO OFF").execute();
+                    }
+                });
+
                 Query query = session.createSQLQuery(
                         "SELECT od.socdiscount FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
                                 + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.socdiscount > 0 AND"
@@ -468,6 +479,16 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                     titles.add(str);
                 }
             }
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO ON").execute();
+                }
+            });
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());

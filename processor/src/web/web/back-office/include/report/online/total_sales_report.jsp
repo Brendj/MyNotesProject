@@ -94,7 +94,6 @@
                            reRender="registerStampReportPanel" styleClass="command-button" onclick="disableButtons(true);"
                            status="reportGenerateStatus" id="generateButton" oncomplete="disableButtons(false)"/>
         <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.totalSalesPage.showCSVList}"
-                         action="#{mainPage.totalSalesPage.reloadPage}"
                          styleClass="command-button" id="xlsButton" onclick="setTimeout('disableButtons(true);', 50);" >
         </h:commandButton>
         <a4j:commandButton value="Очистить" action="#{mainPage.totalSalesPage.clear}" onclick="disableButtons(true);"
