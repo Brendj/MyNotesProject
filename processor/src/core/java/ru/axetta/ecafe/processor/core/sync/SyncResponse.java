@@ -293,6 +293,7 @@ public class SyncResponse {
 
         public static class Item {
 
+            private final long orgOwner;
             private final long idOfClient;
             private final long version;
             private final String firstName;
@@ -321,6 +322,7 @@ public class SyncResponse {
             private int clientType;
 
             public Item(Client client, int clientType) {
+                this.orgOwner = client.getOrg().getIdOfOrg();
                 this.idOfClient = client.getIdOfClient();
                 this.version = client.getClientRegistryVersion();
                 this.firstName = client.getPerson().getFirstName();
@@ -424,6 +426,7 @@ public class SyncResponse {
 
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
+                element.setAttribute("OrgOwner", Long.toString(this.orgOwner));
                 element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
                 element.setAttribute("ContractId", Long.toString(this.contractId));
                 element.setAttribute("Version", Long.toString(this.version));
@@ -465,7 +468,7 @@ public class SyncResponse {
 
             @Override
             public String toString() {
-                return "Item{" + "idOfClient=" + idOfClient + ", version=" + version + ", firstName='" + firstName
+                return "Item{"+ "orgOwner="+ orgOwner + ", idOfClient=" + idOfClient + ", version=" + version + ", firstName='" + firstName
                         + '\'' + ", surname='" + surname + '\'' + ", secondName='" + secondName + '\''
                         + ", idDocument='" + idDocument + '\'' + ", address='" + address + '\'' + ", phone='" + phone
                         + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", contractState="
