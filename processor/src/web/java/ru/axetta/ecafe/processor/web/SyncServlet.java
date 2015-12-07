@@ -368,7 +368,9 @@ public class SyncServlet extends HttpServlet {
                 }
             }
         }
-        catch (Exception return_false) { }
+        catch (Exception e) {
+            logger.error("Error in isRestrictedFullSyncPeriod: ", e);
+        }
         return false;
     }
 }
