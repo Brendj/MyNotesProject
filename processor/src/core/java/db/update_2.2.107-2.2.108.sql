@@ -1,8 +1,29 @@
---! Пока скрипт не финализирован рекоментовано писать очистку добавляемых колонок таблиц.
+--! Пока скрипт не финализирован рекомендовано писать очистку добавляемых колонок таблиц.
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.108
+-- Пакет обновлений 2.2.107
+
+ALTER TABLE cf_categorydiscounts ADD COLUMN organizationtype integer NOT NULL DEFAULT -1;
+
+--Таблица для хранения событий, принятых от ЭЖД
+CREATE TABLE cf_enterevents_manual
+(
+  idofentereventmanual bigserial NOT NULL,
+  idoforg bigint NOT NULL,
+  entername character varying(100) NOT NULL,
+  idofclient bigint NOT NULL,
+  evtdatetime bigint NOT NULL,
+  CONSTRAINT cf_enterevents_manual_pk PRIMARY KEY (idofentereventmanual),
+  CONSTRAINT cf_enterevents_manual_clientguid_evtdatetime_key UNIQUE (idofclient, evtdatetime)
+)
+WITH (
+OIDS=FALSE
+);
+
+CREATE INDEX cf_enterevents_manual_evtdatetime_idx ON cf_enterevents_manual USING btree (evtdatetime);
+
+CREATE INDEX cf_enterevents_manual_idofclient_idx ON cf_enterevents_manual USING btree (idofclient);
 
 -- связка пользователи организации по рассылкам увидомлений по изменнным заказам
 CREATE TABLE CF_JobRules

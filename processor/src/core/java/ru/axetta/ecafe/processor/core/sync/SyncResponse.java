@@ -967,14 +967,16 @@ public class SyncResponse {
             private long idOfCategoryDiscount;
             private String categoryName;
             private Integer categoryType;
+            private Integer orgType;
 
             private String discountRules;
 
-            public DCI(long idOfCategoryDiscount, String categoryName, Integer categoryType, String discountRules) {
+            public DCI(long idOfCategoryDiscount, String categoryName, Integer categoryType, String discountRules, Integer organizationType) {
                 this.idOfCategoryDiscount = idOfCategoryDiscount;
                 this.categoryName = categoryName;
                 this.discountRules = discountRules;
                 this.categoryType = categoryType;
+                this.orgType = organizationType;
             }
 
             public long getIdOfCategoryDiscount() {
@@ -993,11 +995,16 @@ public class SyncResponse {
                 return discountRules;
             }
 
+            public Integer getOrgType() {
+                return orgType;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("DCI");
                 element.setAttribute("IdOfCategoryDiscount", Long.toString(this.idOfCategoryDiscount));
                 element.setAttribute("CategoryName", this.categoryName);
                 element.setAttribute("CategoryType", Integer.toString(this.categoryType));
+                element.setAttribute("OrgType", Integer.toString(this.orgType));
                 return element;
             }
 

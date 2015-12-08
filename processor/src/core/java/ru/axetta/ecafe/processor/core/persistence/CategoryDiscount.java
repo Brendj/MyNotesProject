@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,8 +23,12 @@ public class CategoryDiscount {
     private Date lastUpdate;
     private String discountRules;
     private CategoryDiscountEnumType categoryType;
+    private Integer orgType;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
+
+    public final static String SCHOOL_KINDERGARTEN_STRING = "ОУ + ДОУ";
+    public final static Integer SCHOOL_KINDERGARTEN_ID = -1;
 
     public CategoryDiscountEnumType getCategoryType() {
         return categoryType;
@@ -166,5 +169,20 @@ public class CategoryDiscount {
         return "CategoryDiscount{" + "idOfCategoryDiscount=" + idOfCategoryDiscount + ", categoryName='" + categoryName
                + + '\'' + ", discountRules='" + discountRules + '\'' + '\'' + ", description='" + description + '\'' + ", createdDate=" + createdDate + ", lastUpdate="
                 + lastUpdate + '}';
+    }
+
+    public Integer getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(Integer organizationType) {
+        this.orgType = organizationType;
+    }
+
+    public String getOrganizationTypeString() {
+        switch (orgType) {
+            case -1: return SCHOOL_KINDERGARTEN_STRING;
+            default: return OrganizationType.values()[orgType].toString();
+        }
     }
 }

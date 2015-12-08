@@ -22,6 +22,7 @@
                   not-null="false" />
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" />
+        <property name="orgType" column="OrganizationType" type="integer" not-null="true"/>
 
         <property name="discountRules" column="DiscountRules" type="string" length="60" not-null="true"/>
 

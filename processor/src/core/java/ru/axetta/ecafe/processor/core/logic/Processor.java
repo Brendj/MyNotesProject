@@ -3676,7 +3676,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
                 SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
                         categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
-                        categoryDiscount.getCategoryType().getValue(), categoryDiscount.getDiscountRules());
+                        categoryDiscount.getCategoryType().getValue(), categoryDiscount.getDiscountRules(),
+                        categoryDiscount.getOrgType());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }
 

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private String discountRules;
     private String description;
     private Integer categoryType;
+    private Integer organizationType;
     private Integer discountRate = 100;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
     private String filter = "-";
@@ -52,6 +55,14 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
 
     public void setCategoryType(Integer categoryType) {
         this.categoryType = categoryType;
+    }
+
+    public Integer getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(Integer organizationType) {
+        this.organizationType = organizationType;
     }
 
     public CategoryDiscountEnumTypeMenu getCategoryDiscountEnumTypeMenu() {
@@ -126,6 +137,15 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRate = discountRate;
     }
 
+    public SelectItem[] getOrganizationItems() {
+        OrganizationType[] organizationTypes = OrganizationType.values();
+        SelectItem[] items = new SelectItem[3];
+        items[0] = new SelectItem(CategoryDiscount.SCHOOL_KINDERGARTEN_ID, CategoryDiscount.SCHOOL_KINDERGARTEN_STRING);
+        items[1] = new SelectItem(0, organizationTypes[0].toString());
+        items[2] = new SelectItem(1, organizationTypes[1].toString());
+        return items;
+    }
+
     @Transactional
     public Object save() {
         if (discountRate != null && discountRate != 100) {
@@ -136,6 +156,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         categoryDiscount.setCategoryName(categoryName);
         categoryDiscount.setDescription(description);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.fromInteger(categoryType));
+        categoryDiscount.setOrgType(organizationType);
         categoryDiscount.setLastUpdate(new Date());
         entityManager.persist(categoryDiscount);
         printMessage("Данные обновлены.");
@@ -155,6 +176,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.description = categoryDiscount.getDescription();
         this.discountRuleSet = categoryDiscount.getDiscountsRules();
         this.categoryType = categoryDiscount.getCategoryType().getValue();
+        this.organizationType = categoryDiscount.getOrgType();
         if(categoryDiscount.getDiscountsRules().isEmpty()){
             this.setFilter("-");
         } else {

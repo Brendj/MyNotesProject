@@ -29,6 +29,10 @@
     <h:selectOneMenu value="#{categoryDiscountEditPage.categoryType}" styleClass="input-text">
         <f:selectItems value="#{categoryDiscountEditPage.categoryDiscountEnumTypeMenu.items}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{categoryDiscountEditPage.organizationType}" styleClass="input-text">
+        <f:selectItems value="#{categoryDiscountEditPage.organizationItems}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Используется в правилах" styleClass="output-text" />
     <h:panelGroup>
         <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{categoryDiscountEditPage.filter}}" />
