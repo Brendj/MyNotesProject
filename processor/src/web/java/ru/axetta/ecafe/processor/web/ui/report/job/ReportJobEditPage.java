@@ -5,16 +5,24 @@
 package ru.axetta.ecafe.processor.web.ui.report.job;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.faces.model.SelectItem;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +41,8 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
+    private boolean showRules;
+    private Integer[] preferentialRules;
     //private String reportTemplate;
     //
     //
@@ -84,6 +94,22 @@ public class ReportJobEditPage extends BasicWorkspacePage {
         return reportTypeMenu;
     }
 
+    public boolean isShowRules() {
+        return showRules;
+    }
+
+    public void setShowRules(boolean showRules) {
+        this.showRules = showRules;
+    }
+
+    public Integer[] getPreferentialRules() {
+        return preferentialRules;
+    }
+
+    public void setPreferentialRules(Integer[] preferentialRules) {
+        this.preferentialRules = preferentialRules;
+    }
+
     public String getPageFilename() {
         return "report/job/edit";
     }
@@ -124,5 +150,26 @@ public class ReportJobEditPage extends BasicWorkspacePage {
         this.reportType = AutoReportGenerator.getReportType(schedulerJob.getJobClass());
         this.cronExpression = schedulerJob.getCronExpression();
         this.enabled = schedulerJob.isEnabled();
+    }
+
+    public List<SelectItem> getAvailableEditRules(Session session) {
+        List<SelectItem> list = new ArrayList<SelectItem>();
+
+        String [] strings = StringUtils.split(this.reportType, '.');
+        String reportTypeString = strings[strings.length - 1];
+
+        Criteria criteria = session.createCriteria(ReportHandleRule.class);
+        criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
+        List<ReportHandleRule> result = criteria.list();
+
+        Long counter = 0L;
+
+        for (ReportHandleRule reportHandleRule: result) {
+            String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
+            list.add(new SelectItem(counter, str));
+            counter++;
+        }
+
+        return list;
     }
 }

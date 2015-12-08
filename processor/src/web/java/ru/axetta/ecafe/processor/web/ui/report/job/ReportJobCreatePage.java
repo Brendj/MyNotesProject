@@ -5,13 +5,16 @@
 package ru.axetta.ecafe.processor.web.ui.report.job;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
@@ -103,23 +106,31 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
         runtimeContext.getAutoReportGenerator().addJob(schedulerJob);
     }
 
-    public List<SelectItem> getAvailableRules() {
-        String reportType = this.reportType;
-
+    public List<SelectItem> getAvailableCreateRules(Session session) {
         List<SelectItem> list = new ArrayList<SelectItem>();
 
-        if (reportType != null) {
+        String reportTypeStr = null;
 
-            String [] strings =StringUtils.split(reportType, '.');
-
-            String str = strings[strings.length - 1];
-
-            Long a = 1L;
-
-
-
+        if (this.reportType != null) {
+            reportTypeStr = AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName();
         }
 
+        if (reportTypeStr != null) {
+            String[] strings = StringUtils.split(reportTypeStr, '.');
+            String reportTypeString = strings[strings.length - 1];
+
+            Criteria criteria = session.createCriteria(ReportHandleRule.class);
+            criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
+            List<ReportHandleRule> result = criteria.list();
+
+            Long counter = 0L;
+
+            for (ReportHandleRule reportHandleRule : result) {
+                String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
+                list.add(new SelectItem(counter, str));
+                counter++;
+            }
+        }
         return list;
     }
 }
