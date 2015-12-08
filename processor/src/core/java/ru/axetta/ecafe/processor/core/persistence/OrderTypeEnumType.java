@@ -25,7 +25,8 @@ public enum OrderTypeEnumType {
     /*6*/ REDUCED_PRICE_PLAN_RESERVE("План льготного питания, резерв"),
     /*7*/ SUBSCRIPTION_FEEDING("Абонементное питание"),
     /*8*/ CORRECTION_TYPE("Корректировочный тип"),
-    /*9*/ TEST_EMULATOR("Тестовый тип");
+    /*9*/ TEST_EMULATOR("Тестовый тип"),
+    /*10*/ WATER_ACCOUNTING("Бутилированная вода");
 
     private final String description;
     static Map<Integer,OrderTypeEnumType> map = new HashMap<Integer,OrderTypeEnumType>();
