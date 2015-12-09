@@ -95,7 +95,10 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-
+        this.jobName = null;
+        this.cronExpression = null;
+        this.enabled = false;
+        this.showRules = false;
     }
 
     public void createReportJob() throws Exception {
