@@ -259,6 +259,7 @@ public class TotalServicesReport extends BasicReport {
             return new ArrayList<OrderTypeEnumType>() {{
                 add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
                 add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
+                add(OrderTypeEnumType.WATER_ACCOUNTING);
             }};
         }
 

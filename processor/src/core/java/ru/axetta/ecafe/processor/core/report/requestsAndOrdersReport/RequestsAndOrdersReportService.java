@@ -311,7 +311,8 @@ public class RequestsAndOrdersReportService {
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.DAILY_SAMPLE))
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE))
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.SUBSCRIPTION_FEEDING))
-                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.CORRECTION_TYPE)));
+                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.CORRECTION_TYPE))
+                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.WATER_ACCOUNTING)));
         orderDetailsCriteria.add(Restrictions.between("menuType", 50, 99));
         //orderDetailsCriteria.add(Restrictions.in("org", orgMapFull.values()));
         orderDetailsCriteria.add(Restrictions.in("o.org.idOfOrg", orgMapFull.keySet()));
@@ -324,7 +325,6 @@ public class RequestsAndOrdersReportService {
             BasicReportJob.OrgShortItem org = orgMap.get(detail.getOrg().getIdOfOrg());
 
             Long totalCount = detail.getQty();
-            ;
 
             String orgName = getOrgName(org);
             FeedingPlanType feedingPlanType = getFeedingPlanType(complexOrgDictionary, detail);
