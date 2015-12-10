@@ -62,10 +62,7 @@ import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
@@ -182,6 +179,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String QUERY_PUBLICATION_LIST_COUNT = "select count(distinct pub.IdOfPublication) " +
             "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
             "where ins.OrgOwner = :org and not exists (select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
+
+    private final Set<Date> eeManualCleared = new HashSet<Date>();
 
     static class Processor {
 
@@ -3135,12 +3134,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
             Date endDate, Date startDate, boolean byGuardian) throws Exception {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        /*Запрос на получение данных из таблицы EnterEvents*/
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
         enterEventCriteria.add(byGuardian ? Restrictions.eq("guardianId", client.getIdOfClient())
                 : Restrictions.eq("client", client));
         enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
         enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
         enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        /* -- Запрос на получение данных из таблицы EnterEvents -- */
+
+        /*Запрос на получение данных из таблицы EnterEventsManual*/
+        Criteria manualEventCriteria = session.createCriteria(EnterEventManual.class);
+        manualEventCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        manualEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
+        manualEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
+        manualEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));
+        List<EnterEventManual> manualEvents = manualEventCriteria.list();
+        /* -- Запрос на получение данных из таблицы EnterEventsManual -- */
 
         Locale locale = new Locale("ru", "RU");
         Calendar calendar = Calendar.getInstance(locale);
@@ -3165,6 +3175,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
             }
+            enterEventList.getE().add(enterEventItem);
+        }
+
+        for (EnterEventManual manualEvent : manualEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            EnterEventItem enterEventItem = objectFactory.createEnterEventItem();
+            enterEventItem.setDateTime(toXmlDateTime(manualEvent.getEvtDateTime()));
+            calendar.setTime(manualEvent.getEvtDateTime());
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
+            enterEventItem.setEnterName(manualEvent.getEnterName());
+            enterEventItem.setDirection(EnterEvent.CHECKED_BY_TEACHER_EXT);
+            enterEventItem.setTemporaryCard(0);
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);
@@ -4257,27 +4281,95 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public ClassRegisterEventListByGUIDResult putClassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
         authenticateRequest(null);
 
-        return ClassRegisterEventListByGUID(registerEventList);
+        return сlassRegisterEventListByGUID(registerEventList);
 
     }
 
-    private ClassRegisterEventListByGUIDResult ClassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
+    private ClassRegisterEventListByGUIDResult сlassRegisterEventListByGUID(ClassRegisterEventListByGUID registerEventList) {
         ClassRegisterEventListByGUIDResult result = new ClassRegisterEventListByGUIDResult();
         ClassRegisterEventListByGUIDResultItem result_list = new ClassRegisterEventListByGUIDResultItem();
         result_list.classRegisterEventListByGUIDResultItem = new ArrayList<ClassRegisterEventByGUIDItem>();
 
-        for(ClassRegisterEventByGUID item : registerEventList.registerEvent) {
-            ClassRegisterEventByGUIDItem it = new ClassRegisterEventByGUIDItem();
-            it.guid = item.guid;
-            it.state = 0;
-            result_list.classRegisterEventListByGUIDResultItem.add(it);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
 
+            //удаляем события за предыдущие дни
+            Date redtime = new Date(System.currentTimeMillis());
+            redtime = CalendarUtils.calculateTodayStart(new GregorianCalendar(), redtime);
+            if (!eeManualCleared.contains(redtime)) {
+                Query query = persistenceSession.createQuery("delete from EnterEventManual where evtDateTime <= :evtDateTime");
+                query.setParameter("evtDateTime", redtime);
+                Integer cnt = query.executeUpdate();
+                eeManualCleared.add(redtime);
+            }
+
+            for(ClassRegisterEventByGUID event : registerEventList.registerEvent) {
+                ClassRegisterEventByGUIDItem it = processClassRegisterEvent(persistenceSession, event);
+                result_list.classRegisterEventListByGUIDResultItem.add(it);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            result.classRegisterEventListByGUIDResult = result_list;
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceSession.close();
         }
-        result.resultCode = RC_OK;
-        result.description = RC_OK_DESC;
-        result.classRegisterEventListByGUIDResult = result_list;
+        catch (Exception e) {
+            logger.error("Internal error in putClassRegisterEventListByGUID", e);
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
 
         return result;
+    }
+
+    private ClassRegisterEventByGUIDItem processClassRegisterEvent(Session persistenceSession, ClassRegisterEventByGUID event) {
+        ClassRegisterEventByGUIDItem item = new ClassRegisterEventByGUIDItem();
+        item.guid = event.guid;
+
+        try {
+            Criteria criteria = persistenceSession.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("clientGUID", event.guid));
+            List<Client> clientList = criteria.list();
+            persistenceSession.clear();
+            if (clientList == null || clientList.size() == 0) {
+                logger.warn(String.format("Client with guid=%s not found to save manual enter event", event.guid));
+                throw new IllegalArgumentException(String.format("Клиент с guid=%s не найден", event.guid));
+            }
+            Client client = clientList.get(0);
+            List<String> pList = new ArrayList<String>();
+            pList.add(event.guid);
+            Boolean doGenerateEvent = true;
+            try {
+                doGenerateEvent = !processEnterEventStatusList(pList).enterEventStatusList.getC().get(0).getInside();
+            }
+            catch (Exception doGenerateIsTrue) {}
+
+            if (doGenerateEvent) {
+                EnterEventManual newEvent = new EnterEventManual();
+                newEvent.setEnterName(event.evtName);
+                newEvent.setEvtDateTime(event.evtDateTime);
+                newEvent.setIdOfClient(client.getIdOfClient());
+                newEvent.setIdOfOrg(client.getOrg().getIdOfOrg());
+                persistenceSession.save(newEvent);
+            }
+
+            item.state = 0;
+
+        }
+        catch (IllegalArgumentException e) {
+            item.state = 100; //Клиент не найден
+        }
+        catch (Exception e) {
+            logger.error("Internal error in putClassRegisterEventListByGUID", e);
+            item.state = 101; //Internal Error
+        }
+        return item;
     }
 
     @Override
@@ -4315,6 +4407,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     case EnterEvent.ENTRY:
                     case EnterEvent.DETECTED_INSIDE:
                     case EnterEvent.RE_ENTRY:
+                    case EnterEvent.CHECKED_BY_TEACHER_EXT:
+                    case EnterEvent.CHECKED_BY_TEACHER_INT:
                         inside = true;
                         break;
                 }

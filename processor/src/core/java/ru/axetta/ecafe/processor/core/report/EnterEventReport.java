@@ -75,6 +75,8 @@ public class EnterEventReport extends BasicReport {
                         case EnterEvent.RE_ENTRY: passdirection="повторный вход"; color="green"; break;
                         case EnterEvent.RE_EXIT: passdirection="повторный выход"; color="red"; break;
                         case EnterEvent.DETECTED_INSIDE: passdirection="обнаружен на подносе карты внутри здания"; break;
+                        case EnterEvent.CHECKED_BY_TEACHER_EXT: passdirection="отмечен в классном журнале через внешнюю систему"; break;
+                        case EnterEvent.CHECKED_BY_TEACHER_INT: passdirection="отмечен учителем внутри здания"; break;
                         default: passdirection="Ошибка обратитесь администратору";
                         /*
                         TwicePassEnter = 6,     //повторный вход

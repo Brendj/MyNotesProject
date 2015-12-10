@@ -65,6 +65,10 @@ public class ClientPassItem {
                 return "повторный выход";
             case EnterEvent.DETECTED_INSIDE:
                 return "обнаружен на подносе карты внутри здания";
+            case EnterEvent.CHECKED_BY_TEACHER_EXT:
+                return "отмечен в классном журнале через внешнюю систему";
+            case EnterEvent.CHECKED_BY_TEACHER_INT:
+                return "отмечен учителем внутри здания";
             default:
                 return "Ошибка обратитесь администратору";
         }

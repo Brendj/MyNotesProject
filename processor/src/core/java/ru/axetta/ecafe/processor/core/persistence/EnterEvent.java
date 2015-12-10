@@ -49,7 +49,9 @@ public class EnterEvent {
     public static final int RE_EXIT = 7; // повторный выход
     public static final int DIRECTION_ENTER = 0;
     public static final int DIRECTION_EXIT = 1;
-    public static final int DETECTED_INSIDE =100; // обнаружен на подносе карты внутри здания
+    public static final int DETECTED_INSIDE = 100; // обнаружен на подносе карты внутри здания
+    public static final int CHECKED_BY_TEACHER_EXT = 101; //отмечен в классном журнале через внешнюю систему
+    public static final int CHECKED_BY_TEACHER_INT = 102; //отмечен учителем внутри здания
 
     //eventcode
    //

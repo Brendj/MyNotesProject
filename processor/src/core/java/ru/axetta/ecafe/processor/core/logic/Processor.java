@@ -3458,6 +3458,16 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         }
                     }
 
+                    //Обработка события от внешней системы
+                    if (e.getPassDirection() == EnterEvent.CHECKED_BY_TEACHER_EXT) {
+                        String qstr = "delete from EnterEventManual where idOfClient = :idOfClient and evtDateTime <= :evtDateTime";
+                        Query query = persistenceSession.createQuery(qstr);
+                        query.setParameter("idOfClient", e.getIdOfClient());
+                        query.setParameter("evtDateTime", e.getEvtDateTime());
+                        query.executeUpdate();
+                    }
+                    //Обработали событие от внешней системы
+
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));

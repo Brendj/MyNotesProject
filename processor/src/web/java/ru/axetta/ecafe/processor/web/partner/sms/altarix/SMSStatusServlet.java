@@ -197,6 +197,12 @@ public class SMSStatusServlet extends HttpServlet {
                     case EnterEvent.DETECTED_INSIDE:
                         passType = "Обнаружен на подносе карты внутри здания";
                         break;
+                    case EnterEvent.CHECKED_BY_TEACHER_EXT:
+                        passType = "отмечен в классном журнале через внешнюю систему";
+                        break;
+                    case EnterEvent.CHECKED_BY_TEACHER_INT:
+                        passType = "отмечен учителем внутри здания";
+                        break;
                 }
             }
 

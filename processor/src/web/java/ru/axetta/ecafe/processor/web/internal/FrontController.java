@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
@@ -16,8 +17,10 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +35,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -685,7 +685,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            logger.error("Ошибка при регистрации посетителя и временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -811,6 +811,37 @@ public class FrontController extends HttpServlet {
         return new ResponseItem();
     }
 
+    @WebMethod(operationName = "getEnterEventsManual")
+    public List<EnterEventManualItem> getEnterEventsManual(@WebParam(name = "orgId") long idOfOrg) throws FrontControllerException {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        List<EnterEventManualItem> listResult = new ArrayList<EnterEventManualItem>();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria criteria = persistenceSession.createCriteria(EnterEventManual.class);
+            criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+            List<EnterEventManual> list = criteria.list();
+            for (EnterEventManual event : list) {
+                EnterEventManualItem item = new EnterEventManualItem();
+                item.setIdOfOrg(event.getIdOfOrg());
+                item.setIdOfClient(event.getIdOfClient());
+                item.setEvtDateTime(event.getEvtDateTime());
+                item.setEnterName(event.getEnterName());
+                listResult.add(item);
+            }
 
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+        } catch (Exception e) {
+            logger.error("Ошибка при получении сохраненных событий Enter Event от внешней системы", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return listResult;
+    }
 
 }
