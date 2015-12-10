@@ -32,16 +32,19 @@
             <h:outputText escape="true" value="описание" styleClass="output-text" />
         </h:outputLink>
     </h:panelGrid>
+</h:panelGrid>
+<h:panelGrid id="panel" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportJobCreatePage.showRules}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="reportJobCreateGrid" ajaxSingle="true" />
+        <a4j:support event="onclick" reRender="panel"/>
     </h:selectBooleanCheckbox>
 
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}" />
-    <h:panelGroup layout="block" style="height: 100px; overflow-y: scroll;"
+    <h:panelGroup layout="block" style="height: 100px; width: 400px; overflow-y: scroll;"
                   rendered="#{mainPage.reportJobCreatePage.showRules}">
-        <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialRules}" layout="pageDirection"
-                                 styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}">
+        <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialRules}"
+                              layout="pageDirection" styleClass="output-text"
+                              rendered="#{mainPage.reportJobCreatePage.showRules}">
             <f:selectItems value="#{mainPage.availableCreateRules}" />
         </h:selectManyCheckbox>
     </h:panelGroup>

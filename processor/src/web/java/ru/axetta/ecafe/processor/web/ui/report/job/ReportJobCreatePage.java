@@ -15,7 +15,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,11 +115,7 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     public List<SelectItem> getAvailableCreateRules(Session session) {
         List<SelectItem> list = new ArrayList<SelectItem>();
 
-        String reportTypeStr = null;
-
-        if (this.reportType != null) {
-            reportTypeStr = AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName();
-        }
+        String reportTypeStr = this.reportType;
 
         if (reportTypeStr != null) {
             String[] strings = StringUtils.split(reportTypeStr, '.');

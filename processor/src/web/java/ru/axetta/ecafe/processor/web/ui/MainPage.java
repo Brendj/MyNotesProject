@@ -5260,7 +5260,7 @@ public class MainPage implements Serializable {
 
     public Object showReportJobCreatePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {

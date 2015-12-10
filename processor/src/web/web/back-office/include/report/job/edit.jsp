@@ -8,8 +8,10 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditReports())
-      { out.println("Недостаточно прав для просмотра страницы"); return; } %>
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditReports()) {
+    out.println("Недостаточно прав для просмотра страницы");
+    return;
+} %>
 
 <%-- Панель редактирования правила обработки автоматических отчетов --%>
 <h:panelGrid id="reportJobEditGrid" binding="#{mainPage.reportJobEditPage.pageComponent}" styleClass="borderless-grid"
@@ -35,9 +37,11 @@
             <h:outputText escape="true" value="описание" styleClass="output-text" />
         </h:outputLink>
     </h:panelGrid>
+</h:panelGrid>
+<h:panelGrid id="panel" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportJobEditPage.showRules}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="reportJobEditGrid" ajaxSingle="true" />
+        <a4j:support event="onclick" reRender="panel"/>
     </h:selectBooleanCheckbox>
 
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobEditPage.showRules}" />
@@ -50,10 +54,11 @@
     </h:panelGroup>
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateReportJob}" reRender="selectedReportJobGroupMenu, workspaceTogglePanel"
-                       styleClass="command-button" />
+    <a4j:commandButton value="Сохранить" action="#{mainPage.updateReportJob}"
+                       reRender="selectedReportJobGroupMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showReportJobEditPage}"
-                       reRender="selectedReportJobGroupMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       reRender="selectedReportJobGroupMenu, workspaceTogglePanel" ajaxSingle="true"
+                       styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
