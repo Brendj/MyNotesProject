@@ -40,7 +40,7 @@
     </h:selectBooleanCheckbox>
 
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobCreatePage.showRules}" />
-    <h:panelGroup layout="block" style="height: 100px; width: 400px; overflow-y: scroll;"
+    <h:panelGroup layout="block" style="height: 150px; width: 600px; overflow-y: scroll;"
                   rendered="#{mainPage.reportJobCreatePage.showRules}">
         <h:selectManyCheckbox id="rules" value="#{mainPage.reportJobCreatePage.preferentialRules}"
                               layout="pageDirection" styleClass="output-text"

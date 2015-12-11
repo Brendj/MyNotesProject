@@ -40,6 +40,8 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
+    private List<ReportHandleRule> reportHandleRuleList;
+    List<SelectItem> list;
 
     public String getPageFilename() {
         return "report/job/create";
@@ -97,6 +99,22 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
         return reportTypeMenu;
     }
 
+    public List<ReportHandleRule> getReportHandleRuleList() {
+        return reportHandleRuleList;
+    }
+
+    public void setReportHandleRuleList(List<ReportHandleRule> reportHandleRuleList) {
+        this.reportHandleRuleList = reportHandleRuleList;
+    }
+
+    public List<SelectItem> getList() {
+        return list;
+    }
+
+    public void setList(List<SelectItem> list) {
+        this.list = list;
+    }
+
     public void fill(Session session) throws Exception {
         this.jobName = null;
         this.cronExpression = null;
@@ -113,7 +131,8 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getAvailableCreateRules(Session session) {
-        List<SelectItem> list = new ArrayList<SelectItem>();
+        list = new ArrayList<SelectItem>();
+        reportHandleRuleList = new ArrayList<ReportHandleRule>();
 
         String reportTypeStr = this.reportType;
 
@@ -124,6 +143,8 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
             Criteria criteria = session.createCriteria(ReportHandleRule.class);
             criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
             List<ReportHandleRule> result = criteria.list();
+
+            reportHandleRuleList = result;
 
             Long counter = 0L;
 
