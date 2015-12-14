@@ -198,7 +198,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
             Query query = session.createSQLQuery(
                     "SELECT  ee.idofenterevent, ee.idoforg, ee.passdirection, ee.eventcode, ee.idofclient,ee.evtdatetime, "
-                            + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.officialname "
+                            + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.shortname "
                             + "    FROM cf_enterevents ee "
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
@@ -231,7 +231,7 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03()
                             .equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
                             .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event
-                            .getF05().equals((String) row.get("officialname")))) {
+                            .getF05().equals((String) row.get("shortname")))) {
                         updateEventData(event, row);
                     }
                 }
@@ -473,13 +473,13 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
 
             for (Org organization : friendlyOrgs) {
                 if (organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getOfficialName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortName(), "2"));
                 }
             }
 
             for (Org organization : friendlyOrgs) {
                 if (!organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getOfficialName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortName(), "2"));
                 }
             }
             return resultList;
