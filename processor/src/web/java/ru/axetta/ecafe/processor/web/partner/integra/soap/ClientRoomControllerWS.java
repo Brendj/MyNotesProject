@@ -50,7 +50,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseWithDetailsExt;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
@@ -88,7 +87,6 @@ import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
@@ -4346,7 +4344,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             pList.add(event.guid);
             Boolean doGenerateEvent = true;
             try {
-                doGenerateEvent = !processEnterEventStatusList(pList).enterEventStatusList.getC().get(0).getInside();
+                EnterEventStatusListResult res = processEnterEventStatusList(pList);
+                //doGenerateEvent = !processEnterEventStatusList(pList).enterEventStatusList.getC().get(0).getInside();
+                doGenerateEvent = !res.enterEventStatusList.getC().get(0).getInside();
+                if (!doGenerateEvent) {
+                    Date lastEventDate = res.enterEventStatusList.getC().get(0).getLastEnterEventDateTime().toGregorianCalendar().getTime();
+                    Date dayOfLastEventDate = CalendarUtils.calculateTodayStart(new GregorianCalendar(), lastEventDate);
+                    Date dayOfNewEventDate = CalendarUtils.calculateTodayStart(new GregorianCalendar(), event.evtDateTime);
+                    if (!dayOfLastEventDate.equals(dayOfNewEventDate) && dayOfLastEventDate.before(dayOfNewEventDate)) {
+                        doGenerateEvent = true; //Если последнее событие по клиенту было не в этот день, а ренее, то новое событие присутствия надо генерировать
+                    }
+                }
             }
             catch (Exception doGenerateIsTrue) {}
 
@@ -4412,6 +4420,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         inside = true;
                         break;
                 }
+                /*if (inside) {
+                    Date dayOfLastEventDate = CalendarUtils.calculateTodayStart(new GregorianCalendar(), evtDate);
+                    Date todayDate = CalendarUtils.calculateTodayStart(new GregorianCalendar(), new Date(System.currentTimeMillis()));
+                    if (!dayOfLastEventDate.equals(todayDate) && dayOfLastEventDate.before(todayDate)) {
+                        inside = false; //Если последнее событие по клиенту было не сегодня, то считаем, что его нет в здании
+                    }
+                }*/
                 EnterEventStatusItem result_item = new EnterEventStatusItem();
                 result_item.setGuid(guid);
                 result_item.setInside(inside);
