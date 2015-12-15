@@ -25,7 +25,7 @@ CREATE INDEX cf_enterevents_manual_evtdatetime_idx ON cf_enterevents_manual USIN
 
 CREATE INDEX cf_enterevents_manual_idofclient_idx ON cf_enterevents_manual USING btree (idofclient);
 
--- связка пользователи организации по рассылкам увидомлений по изменнным заказам
+-- связка Правил и Задач для выполнения выборочного списка одной задачи и нескольких правил
 CREATE TABLE CF_JobRules
 (
   idOfJobRule bigserial NOT NULL,
