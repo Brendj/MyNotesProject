@@ -34,3 +34,5 @@ CREATE TABLE CF_JobRules
   CONSTRAINT cf_IdOfJobRule_pk PRIMARY KEY (idOfJobRule),
   CONSTRAINT cf_JobRules_uq UNIQUE (idOfReportHandleRule, idOfSchedulerJob)
 );
+
+--! ФИНАЛИЗИРОВАН (Семенов, 151215) НЕ МЕНЯТЬ
