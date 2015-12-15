@@ -78,7 +78,9 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime );
+            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+            allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);

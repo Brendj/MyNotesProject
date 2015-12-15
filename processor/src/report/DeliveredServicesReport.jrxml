@@ -481,7 +481,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{level1}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{level1}.split("@")[1]]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabColumnHeader>

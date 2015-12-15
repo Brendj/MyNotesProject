@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.order.items;
 
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -20,6 +22,7 @@ public class GoodItem implements Comparable<GoodItem>{
     private String pathPart4;
     private String parts[];
     private String fullName;
+    private OrderTypeEnumType orderType;
 
     public GoodItem() {
         this.pathPart1 = "";
@@ -114,5 +117,13 @@ public class GoodItem implements Comparable<GoodItem>{
     @Override
     public int compareTo(GoodItem goodItem) {
         return goodItem.getFullName().compareTo(this.fullName);
+    }
+
+    public OrderTypeEnumType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(OrderTypeEnumType orderType) {
+        this.orderType = orderType;
     }
 }

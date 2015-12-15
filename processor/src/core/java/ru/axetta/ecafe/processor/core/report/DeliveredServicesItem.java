@@ -23,6 +23,7 @@ public class DeliveredServicesItem {
     private String orgnum;
     private String address;
     private long idoforg;
+    private Integer orderType;
 
     public String getLevel1() {
         return level1;
@@ -114,5 +115,13 @@ public class DeliveredServicesItem {
 
     public void setIdoforg(long idoforg) {
         this.idoforg = idoforg;
+    }
+
+    public Integer getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
     }
 }

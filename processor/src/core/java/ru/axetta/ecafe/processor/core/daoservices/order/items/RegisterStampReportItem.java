@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.daoservices.order.items;
 
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+
 import java.util.Date;
 
 /**
@@ -18,6 +20,7 @@ public class RegisterStampReportItem {
     private String date;
     private String number;
     private Date dateTime;
+    private Integer orderType;
 
     public RegisterStampReportItem(GoodItem goodItem, Long qty, String date, Date dateTime) {
         this(goodItem, qty, date, null, dateTime);
@@ -32,6 +35,7 @@ public class RegisterStampReportItem {
         this.date = date;
         this.number = number;
         this.dateTime = dateTime;
+        this.orderType = goodItem.getOrderType().ordinal();
     }
 
     public String getLevel1() {
@@ -96,5 +100,13 @@ public class RegisterStampReportItem {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public Integer getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
     }
 }

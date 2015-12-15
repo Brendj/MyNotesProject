@@ -2069,4 +2069,18 @@ public class DAOService {
         return !criteria.list().isEmpty();
         //return DAOUtils.existClientPayment(session, null, idOfPayment);
     }
+
+    public List getClientBalanceInfos(String where, Date begDate, Date endDate) {
+        String str_query = "SELECT c.idofclient, o.shortname, g.groupname, c.contractId, p.surname, p.firstname, p.secondname, c.limits, c.balance, " +
+                "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate and t.idoforg = c.idoforg), 0), " +
+                "(SELECT max(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate <= :begDate and t.idoforg = c.idoforg) " +
+                "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg LEFT OUTER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg " +
+                "JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where + ") " +
+                "ORDER BY o.shortname, g.groupname, p.surname";
+        Query q = entityManager
+                .createNativeQuery(str_query);
+        q.setParameter("begDate", begDate.getTime());
+        q.setParameter("endDate", endDate.getTime());
+        return q.getResultList();
+    }
 }

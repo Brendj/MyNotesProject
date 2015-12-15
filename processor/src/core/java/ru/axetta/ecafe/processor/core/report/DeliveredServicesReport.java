@@ -199,7 +199,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
             //String typeCondition = " cf_orders.ordertype<>8 and ";
-            String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8)) and " +
+            String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and " +
                                    " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql =
                       "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
@@ -209,7 +209,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                            + "(cf_orderdetails.rprice + cf_orderdetails.socdiscount) price, "
                            + "count(cf_orders.idoforder) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
                            + "cf_orgs.address, "
-                           + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg "
+                           + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg, "
+                           + "cf_orders.orderType "
                     + "from cf_orgs "
                     + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
@@ -217,7 +218,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
                     + typeCondition + contragentCondition + contractOrgsCondition + orgCondition
                     + " cf_orders.createddate between :start and :end  "
-                    + "group by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4, price, address "
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
             query.setParameter("start", start.getTime());
@@ -241,9 +242,10 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 String address = (String) e[8];
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
                 long idoforg = ((BigInteger) e[10]).longValue();
+                Integer orderType = (Integer) e[11];
                 DeliveredServicesItem item = new DeliveredServicesItem();
                 item.setOfficialname(officialname);
-                item.setLevel1(level1);
+                item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
                 item.setLevel2(level2);
                 item.setLevel3(level3);
                 item.setLevel4(level4);
@@ -253,6 +255,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 item.setOrgnum(orgNum);
                 item.setAddress(address);
                 item.setIdoforg(idoforg);
+                item.setOrderType(orderType);
                 result.add(item);
             }
             return result;

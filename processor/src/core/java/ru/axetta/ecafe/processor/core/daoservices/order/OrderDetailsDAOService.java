@@ -50,7 +50,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and good.fullname like '"+fullname+"' "
                 + "     and orderdetail.menutype>=:mintype "
                 + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (4,6) or (cforder.ordertype=8"
+                + "     and (cforder.ordertype in (4,6,10) or (cforder.ordertype=8"
                 + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
@@ -157,10 +157,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
-    public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime){
+    public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime, Set orderTypes){
         String sql = "select distinct good.globalId as globalId, "
                 + "     good.parts as parts, "
-                + "     good.fullName as fullName "
+                + "     good.fullName as fullName, "
+                + "     ord.orderType as orderType "
                 + " from OrderDetail details "
                 + "     left join details.good good "
                 + "     left join details.order ord "
@@ -175,7 +176,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and details.menuType <=:maxtype "
                 + " order by fullName";
         Query query = getSession().createQuery(sql);
-        query.setParameterList("orderType",getReducedPaymentOrderTypesWithDailySample());
+        query.setParameterList("orderType",orderTypes);
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
@@ -185,12 +186,18 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
-    private Set<OrderTypeEnumType> getReducedPaymentOrderTypesWithDailySample() {
+    public Set<OrderTypeEnumType> getReducedPaymentOrderTypesWithDailySample() {
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
+        //orderTypeEnumTypeSet.add(OrderTypeEnumType.WATER_ACCOUNTING);
+        return orderTypeEnumTypeSet;
+    }
+
+    public Set<OrderTypeEnumType> getWaterAccountingOrderTypesWithDailySample() {
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.WATER_ACCOUNTING);
         return orderTypeEnumTypeSet;
     }
