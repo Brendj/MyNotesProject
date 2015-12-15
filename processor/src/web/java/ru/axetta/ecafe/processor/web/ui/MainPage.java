@@ -2300,6 +2300,7 @@ public class MainPage implements Serializable {
                     modalPages.pop();
                 }
             }
+            contragentListSelectPage.setFilter("");
         } catch (Exception e) {
             logger.error("Failed to complete contragent list selection", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -2323,6 +2324,7 @@ public class MainPage implements Serializable {
                     modalPages.pop();
                 }
             }
+            contragentListSelectPage.setFilter("");
         } catch (Exception e) {
             logger.error("{}", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
