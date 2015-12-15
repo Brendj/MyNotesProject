@@ -328,7 +328,7 @@ public class SyncServlet extends HttpServlet {
     private static List<Date[]> getRestrictPeriods(String option) {
         List<Date[]> result = new ArrayList<Date[]>();
         if (option.equals("")) {
-            logger.info("Option OPTION_REQUEST_SYNC_LIMITFILTER is empty");
+            logger.error("Option OPTION_REQUEST_SYNC_LIMITFILTER is empty");
             return result;
         }
         try {
@@ -352,6 +352,8 @@ public class SyncServlet extends HttpServlet {
                 //c2.setTime(CalendarUtils.parseTime(time[1]));
                 res_period[1] = c2.getTime();
                 result.add(res_period);
+                //todo убрать дебаговое логирование после выяснения причины почему не отрабатывает на слейвах домена
+                logger.error(String.format("Debug message. option=%s; res_period[0]=%s, res_period[1]=%s", option, res_period[0], res_period[1]));
             }
         }
         catch(Exception ex) {
