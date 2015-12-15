@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.EnterEventCount;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
@@ -22,8 +21,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2070,13 +2067,22 @@ public class DAOService {
         //return DAOUtils.existClientPayment(session, null, idOfPayment);
     }
 
-    public List getClientBalanceInfos(String where, Date begDate, Date endDate) {
-        String str_query = "SELECT c.idofclient, o.shortname, g.groupname, c.contractId, p.surname, p.firstname, p.secondname, c.limits, c.balance, " +
+    public List getClientBalanceInfos(String where, String where2, Date begDate, Date endDate) {
+        String str_query = "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, " +
                 "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate and t.idoforg = c.idoforg), 0), " +
-                "(SELECT max(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate <= :begDate and t.idoforg = c.idoforg) " +
-                "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg LEFT OUTER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg " +
-                "JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where + ") " +
-                "ORDER BY o.shortname, g.groupname, p.surname";
+                "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate and t.idoforg = c.idoforg) " +
+                "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg " + where2 +
+                " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where + ") " +
+                "and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and idoforg in(" + where + ")  ) " +
+                "union " +
+                "SELECT c.idofclient, shortname as shortname, h.oldgroupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = h.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                + "(SELECT min(t.transactiondate) FROM cf_transactions t "
+                + "WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate and t.idoforg = c.idoforg) "
+                + "FROM cf_clients c INNER JOIN cf_clientmigrationhistory h ON c.idofclient = h.idofclient "
+                + "JOIN cf_persons p ON c.idofperson = p.idofperson JOIN cf_orgs o ON h.idofoldorg = o.idoforg "
+                + "WHERE h.idofoldorg in(" + where + ") and h.registrationdate between :begDate and :endDate " +
+                "ORDER BY shortname, groupname, surname";
         Query q = entityManager
                 .createNativeQuery(str_query);
         q.setParameter("begDate", begDate.getTime());

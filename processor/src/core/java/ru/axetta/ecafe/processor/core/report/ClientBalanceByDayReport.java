@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -25,6 +26,8 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -99,6 +102,10 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             private Long idOfClient;
             private Long limit;
             private String date;
+
+            ClientBalanceInfo() {
+
+            }
 
             ClientBalanceInfo(Client client, long totalBalance, String date) {
                 this.orgShortName = client.getOrg().getShortName();
@@ -256,6 +263,89 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
         public List<ClientBalanceInfo> buildReportItems(Session session, Long idOfContragent, List<Long> idOfOrgList,
                 Date endTime, Long clientGroupId, Integer clientBalanceCondition) {
+
+            List<ClientBalanceInfo> result = new ArrayList<ClientBalanceInfo>();
+
+            Criteria orgsCriteria = session.createCriteria(Org.class);
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                orgsCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+            }
+            if (idOfContragent != null) {
+                orgsCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+            }
+            String orgs_str = "";
+            orgsCriteria.addOrder(Order.asc("shortName"));
+            List<Org> orgs = orgsCriteria.list();
+            for (Org org : orgs) {
+                orgs_str += org.getIdOfOrg().toString() + ",";
+            }
+            orgs_str = orgs_str.substring(0, orgs_str.length()-1);
+
+            String groupWhere = "";
+            if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
+                if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS)) {
+                    List<Long> www = ClientGroupMenu.getNotStudent();
+                    for (Long v : www) {
+                        groupWhere += v.toString() + ",";
+                    }
+                    groupWhere = "and g.idofclientgroup not in (" + groupWhere.substring(0, groupWhere.length()-1) + ")";
+                } else {
+                    groupWhere = String.format("and g.idofclientgroup = %s", clientGroupId);
+                }
+            }
+
+            List infos = DAOService.getInstance().getClientBalanceInfos(orgs_str, groupWhere, endTime, new Date(System.currentTimeMillis()));
+            for (Object obj : infos) {
+                Object[] row = (Object[]) obj;
+                ClientBalanceInfo clientItem = new ClientBalanceInfo();
+                Long idOfClient = ((BigInteger)row[0]).longValue();
+                String orgShortName = (String)row[1];
+                String groupName = (String)row[2];
+                Long contractId = ((BigInteger)row[3]).longValue();
+                String surname = (String)row[4];
+                String firstName = (String)row[5];
+                String secondName = (String)row[6];
+                Long limit = ((BigInteger)row[7]).longValue();
+                Long totalBalance = ((BigInteger)row[8]).longValue() - ((BigDecimal)row[9]).longValue();
+                String date = row[10] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger)row[10]).longValue()));
+
+                //String date;
+                clientItem.setIdOfClient(idOfClient);
+                clientItem.setOrgShortName(orgShortName);
+                clientItem.setGroupName(groupName);
+                clientItem.setContractId(contractId);
+                clientItem.setSurname(surname);
+                clientItem.setFirstName(firstName);
+                clientItem.setSecondName(secondName);
+                clientItem.setLimit(limit);
+                clientItem.setTotalBalance(totalBalance);
+                clientItem.setDate(date);
+                switch (clientBalanceCondition) {
+                    case 0:
+                        result.add(clientItem);
+                        break;
+                    case 1:
+                        if (clientItem.getTotalBalance() < 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                    case 2:
+                        if (clientItem.getTotalBalance() == 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                    case 3:
+                        if (clientItem.getTotalBalance() > 0L) {
+                            result.add(clientItem);
+                        }
+                        break;
+                }
+            }
+            return result;
+        }
+
+        public List<ClientBalanceInfo> buildReportItems_old(Session session, Long idOfContragent, List<Long> idOfOrgList,
+                Date endTime, Long clientGroupId, Integer clientBalanceCondition) {
             List<ClientBalanceInfo> result = new ArrayList<ClientBalanceInfo>();
             DetachedCriteria idOfClientCriteria = DetachedCriteria.forClass(Client.class);
             idOfClientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
@@ -269,9 +359,6 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                 }
             }
             idOfClientCriteria.createCriteria("org", "o");
-         /*   if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                idOfClientCriteria.add(Restrictions.in("o.idOfOrg", idOfOrgList));
-            }*/
             if (idOfContragent != null) {
                 idOfClientCriteria.add(Restrictions.eq("o.defaultSupplier.idOfContragent", idOfContragent));
             }
