@@ -4,30 +4,23 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -318,7 +311,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         orgIdsCanceled = ids.toString();
     }
 
-    public Object showContragentListSelectPageOwn() {
+    /*public Object showContragentListSelectPageOwn() {
         BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
         if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -366,7 +359,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             }
         }
         return items;
-    }
+    } */
 
     private void fill(Session session, User user) throws Exception {
         this.contragentItems.clear();
