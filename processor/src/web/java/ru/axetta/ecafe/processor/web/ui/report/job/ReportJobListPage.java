@@ -96,13 +96,14 @@ public class ReportJobListPage extends BasicWorkspacePage {
     }
 
     public void removeReportJob(Long idOfReportJob) throws Exception {
-        RuntimeContext runtimeContext = null;
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
 
             runtimeContext.getAutoReportGenerator().removeJob(idOfReportJob);
+            runtimeContext.getAutoReportGenerator().removeJobRules(idOfReportJob);
 
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();

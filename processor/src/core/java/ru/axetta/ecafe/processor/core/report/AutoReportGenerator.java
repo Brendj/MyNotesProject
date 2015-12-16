@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.JobRules;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
 import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingJasperReport;
@@ -1401,6 +1402,23 @@ public class AutoReportGenerator {
         }
     }
 
+    public void addJobRule(JobRules jobRules) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = BasicReport.createTransaction(persistenceSession);
+            persistenceTransaction.begin();
+            persistenceSession.persist(jobRules);
+            persistenceSession.save(jobRules);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     public void removeJob(Long idOfSchedulerJob) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1419,6 +1437,23 @@ public class AutoReportGenerator {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    public void removeJobRules(Long idOfSchedulerJob) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = BasicReport.createTransaction(persistenceSession);
+            persistenceTransaction.begin();
+            persistenceSession.createQuery("delete from JobRules where schedulerJob = :idOfSchedulerJob").setLong("idOfSchedulerJob", idOfSchedulerJob).executeUpdate();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
     }
 
     public void triggerJob(long idOfSchedulerJob, Date startDate, Date endDate) throws Exception {

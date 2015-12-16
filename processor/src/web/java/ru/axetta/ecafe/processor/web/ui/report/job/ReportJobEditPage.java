@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.job;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.JobRules;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -22,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,6 +46,10 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
     private boolean showRules;
     private Integer[] preferentialRules;
+
+    private Map<Long, Long> rulesAndIds;
+    private List<ReportHandleRule> reportHandleRuleList;
+
     //private String reportTemplate;
     //
     //
@@ -120,11 +127,17 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     }
 
     public void updateReportJob(Long idOfReportJob) throws Exception {
-        RuntimeContext runtimeContext = null;
+        if (this.cronExpression == "") throw new Exception("Нужно заполнить поле: CRON-выражение");
+
+        List<ReportHandleRule> reportHandleRules = getReportRulesList();
+
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
+
+            runtimeContext.getAutoReportGenerator().removeJobRules(idOfReportJob);
 
             runtimeContext.getAutoReportGenerator().updateJob(idOfReportJob, this.jobName,
                     AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
@@ -134,6 +147,14 @@ public class ReportJobEditPage extends BasicWorkspacePage {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             SchedulerJob schedulerJob = (SchedulerJob) persistenceSession.load(SchedulerJob.class, idOfReportJob);
+
+            if (!reportHandleRules.isEmpty()) {
+                for (ReportHandleRule reportHandleRule: reportHandleRules) {
+                    JobRules jobRules = new JobRules(reportHandleRule, schedulerJob);
+                    runtimeContext.getAutoReportGenerator().addJobRule(jobRules);
+                }
+            }
+
             fill(persistenceSession, schedulerJob);
 
             persistenceTransaction.commit();
@@ -153,23 +174,103 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getAvailableEditRules(Session session) {
+        rulesAndIds = new HashMap<Long, Long>();
+        reportHandleRuleList = new ArrayList<ReportHandleRule>();
         List<SelectItem> list = new ArrayList<SelectItem>();
 
-        String [] strings = StringUtils.split(this.reportType, '.');
-        String reportTypeString = strings[strings.length - 1];
+        String[] stringTypeForm = StringUtils.split(this.reportType, '.');
+        String reportTypeString = stringTypeForm[stringTypeForm.length - 1];
 
-        Criteria criteria = session.createCriteria(ReportHandleRule.class);
-        criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
-        List<ReportHandleRule> result = criteria.list();
+        SchedulerJob schedulerJob = (SchedulerJob) session.load(SchedulerJob.class, this.idOfSchedulerJob);
+
+        Criteria criteriaJobRules = session.createCriteria(JobRules.class);
+        criteriaJobRules.add(Restrictions.eq("schedulerJob", schedulerJob));
+        List<JobRules> schedulerResult = criteriaJobRules.list();
+
+        String schedulerTypeString = "";
+
+        if (!schedulerResult.isEmpty()) {
+            String[] schedulerType = StringUtils
+                    .split(schedulerResult.get(0).getReportHandleRule().getTemplateFileName(), "\\|/");
+
+            String[] strArr = StringUtils.split(schedulerType[schedulerType.length - 1], ".");
+            schedulerTypeString = strArr[strArr.length - 2];
+        }
 
         Long counter = 0L;
+        Integer counterInt = 0;
 
-        for (ReportHandleRule reportHandleRule: result) {
-            String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
-            list.add(new SelectItem(counter, str));
-            counter++;
+        Integer[] someInteger = new Integer[20];
+
+        if (reportTypeString.equals(schedulerTypeString)) {
+
+            List<Long> idOfRulesList = new ArrayList<Long>();
+
+            for (JobRules jobRule : schedulerResult) {
+                idOfRulesList.add(jobRule.getReportHandleRule().getIdOfReportHandleRule());
+            }
+
+            Criteria criteria = session.createCriteria(ReportHandleRule.class);
+            criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
+            List<ReportHandleRule> result = criteria.list();
+
+            reportHandleRuleList = result;
+
+            for (ReportHandleRule reportHandleRule : result) {
+                String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
+
+                if (!idOfRulesList.isEmpty()) {
+                    for (Long id : idOfRulesList) {
+                        if (reportHandleRule.getIdOfReportHandleRule().equals(id)) {
+                            someInteger[counterInt] = counterInt;
+                            break;
+                        }
+                    }
+                    counterInt++;
+                }
+                list.add(new SelectItem(counter, str));
+                rulesAndIds.put(counter, reportHandleRule.getIdOfReportHandleRule());
+                counter++;
+            }
+            preferentialRules = someInteger;
+        } else {
+            preferentialRules = null;
+
+            Criteria criteria = session.createCriteria(ReportHandleRule.class);
+            criteria.add(Restrictions.ilike("templateFileName", "%" + reportTypeString + "%"));
+            List<ReportHandleRule> result = criteria.list();
+
+            reportHandleRuleList = result;
+
+            for (ReportHandleRule reportHandleRule : result) {
+                String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
+                rulesAndIds.put(counter, reportHandleRule.getIdOfReportHandleRule());
+                list.add(new SelectItem(counter, str));
+                counter++;
+            }
         }
 
         return list;
+    }
+
+    public List<ReportHandleRule> getReportRulesList() {
+        List<Long> reportHandleRuleIdList = new ArrayList<Long>();
+        List<ReportHandleRule> reportHandleRules = new ArrayList<ReportHandleRule>();
+        if (preferentialRules != null) {
+            for (Integer rule : preferentialRules) {
+                Long id = rule.longValue();
+                reportHandleRuleIdList.add(rulesAndIds.get(id));
+            }
+
+            for (Long id : reportHandleRuleIdList) {
+                for (ReportHandleRule reportHandleRule : reportHandleRuleList) {
+                    if (reportHandleRule.getIdOfReportHandleRule().equals(id)) {
+                        reportHandleRules.add(reportHandleRule);
+                    }
+                }
+            }
+            return reportHandleRules;
+        }
+        return reportHandleRules;
     }
 }

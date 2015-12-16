@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.job;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.JobRules;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -15,14 +16,9 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,12 +32,14 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     private String jobName;
     private boolean enabled;
     private boolean showRules;
-    private Integer[] preferentialRules;
+    private Integer[] preferentialRules = new Integer[0];
     private String reportType;
     private String cronExpression;
     private final ReportTypeMenu reportTypeMenu = new ReportTypeMenu();
     private List<ReportHandleRule> reportHandleRuleList;
-    List<SelectItem> list;
+    private List<SelectItem> list;
+
+    private Map<Long, Long> rulesAndIds;
 
     public String getPageFilename() {
         return "report/job/create";
@@ -99,14 +97,6 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
         return reportTypeMenu;
     }
 
-    public List<ReportHandleRule> getReportHandleRuleList() {
-        return reportHandleRuleList;
-    }
-
-    public void setReportHandleRuleList(List<ReportHandleRule> reportHandleRuleList) {
-        this.reportHandleRuleList = reportHandleRuleList;
-    }
-
     public List<SelectItem> getList() {
         return list;
     }
@@ -123,14 +113,27 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     }
 
     public void createReportJob() throws Exception {
+        if (this.cronExpression == "") throw new Exception("Нужно заполнить поле: CRON-выражение");
+
+        List<ReportHandleRule> reportHandleRules = getReportRulesList();
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         SchedulerJob schedulerJob = new SchedulerJob(this.jobName,
                 AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
                 this.enabled);
+
         runtimeContext.getAutoReportGenerator().addJob(schedulerJob);
+
+        if (!reportHandleRules.isEmpty()) {
+            for (ReportHandleRule reportHandleRule: reportHandleRules) {
+                JobRules jobRules = new JobRules(reportHandleRule, schedulerJob);
+                runtimeContext.getAutoReportGenerator().addJobRule(jobRules);
+            }
+        }
     }
 
     public List<SelectItem> getAvailableCreateRules(Session session) {
+        rulesAndIds = new HashMap<Long, Long>();
         list = new ArrayList<SelectItem>();
         reportHandleRuleList = new ArrayList<ReportHandleRule>();
 
@@ -151,9 +154,31 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
             for (ReportHandleRule reportHandleRule : result) {
                 String str = reportHandleRule.getIdOfReportHandleRule() + ") " + reportHandleRule.getRuleName();
                 list.add(new SelectItem(counter, str));
+                rulesAndIds.put(counter, reportHandleRule.getIdOfReportHandleRule());
                 counter++;
             }
         }
         return list;
+    }
+
+    public List<ReportHandleRule> getReportRulesList() {
+        List<Long> reportHandleRuleIdList = new ArrayList<Long>();
+        List<ReportHandleRule> reportHandleRules = new ArrayList<ReportHandleRule>();
+        if (preferentialRules != null) {
+            for (Integer rule : preferentialRules) {
+                Long id = rule.longValue();
+                reportHandleRuleIdList.add(rulesAndIds.get(id));
+            }
+
+            for (Long id : reportHandleRuleIdList) {
+                for (ReportHandleRule reportHandleRule : reportHandleRuleList) {
+                    if (reportHandleRule.getIdOfReportHandleRule().equals(id)) {
+                        reportHandleRules.add(reportHandleRule);
+                    }
+                }
+            }
+            return reportHandleRules;
+        }
+        return reportHandleRules;
     }
 }

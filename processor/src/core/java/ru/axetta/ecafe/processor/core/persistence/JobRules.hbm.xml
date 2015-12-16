@@ -12,7 +12,7 @@
         </id>
         <many-to-one name="reportHandleRule" class="ru.axetta.ecafe.processor.core.persistence.ReportHandleRule" column="idofreporthandlerule"
                      not-null="false" fetch="select" lazy="proxy"/>
-        <many-to-one name="schedulerJob" class="ru.axetta.ecafe.processor.core.persistence.SchedulerJob" column="idofshedulerjob"
+        <many-to-one name="schedulerJob" class="ru.axetta.ecafe.processor.core.persistence.SchedulerJob" column="idofschedulerjob"
                      not-null="false"/>
     </class>
 </hibernate-mapping>
