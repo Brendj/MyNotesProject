@@ -214,7 +214,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{mealSumSumByCashTotal}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="0.00">
 				<reportElement uuid="e6b21d56-d99c-49b7-896a-d07472a322ea" x="580" y="20" width="100" height="20" isRemoveLineWhenBlank="true">
 					<printWhenExpression><![CDATA[$F{mealCountSumByCardTotal}!=null]]></printWhenExpression>
 				</reportElement>
