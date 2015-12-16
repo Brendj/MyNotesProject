@@ -106,7 +106,14 @@ public class OrgMskNSIService extends MskNSIService {
                                 info.setUnom(Long.valueOf(attribute.getValue().get(0).getValue()));
                             }
                             if ("unique_address_id".equals(attribute.getName())){
-                                info.setUniqueAddressId(Long.valueOf(attribute.getValue().get(0).getValue()));
+                                Long value = null;
+                                try {
+                                    value = Long.valueOf(attribute.getValue().get(0).getValue());
+                                }
+                                catch (Exception e) {
+                                    logger.error("Empty value of unique_address_id. Use null value");
+                                }
+                                info.setUniqueAddressId(value);
                             }
                         }
                     }
@@ -284,7 +291,15 @@ public class OrgMskNSIService extends MskNSIService {
                         info.setAddress(attribute.getValue().get(0).getValue());
                     }
                     if("unique_address_id".equals(attribute.getName())){
-                        info.setAdditionalId(Long.valueOf(attribute.getValue().get(0).getValue()));
+                        Long value = null;
+                        try {
+                            value = Long.valueOf(attribute.getValue().get(0).getValue());
+                        }
+                        catch (Exception e) {
+                            logger.error("Empty value of unique_address_id. Use null value");
+                        }
+                        info.setAdditionalId(value);
+                        info.setUniqueAddressId(value); //todo почему 2 одинаковых значения?
                     }
                     if("is_main_building".equals(attribute.getName())){
                         if (attribute.getValue()!= null
@@ -303,9 +318,9 @@ public class OrgMskNSIService extends MskNSIService {
                     if("БТИ.unad".equals(attribute.getName())){
                         info.setUnad(Long.valueOf(attribute.getValue().get(0).getValue()));
                     }
-                    if("unique_address_id".equals(attribute.getName())){
+                    /*if("unique_address_id".equals(attribute.getName())){
                         info.setUniqueAddressId(Long.valueOf(attribute.getValue().get(0).getValue()));
-                    }
+                    }*/
                     //====end of сюда добавляю заполнение полей для __Item
                 }
                 result.add(info);

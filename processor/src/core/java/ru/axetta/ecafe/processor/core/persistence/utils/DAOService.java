@@ -796,30 +796,31 @@ public class DAOService {
     public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad) {
         //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
         javax.persistence.Query q;
-        q = entityManager.createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
-        q.setParameter("guid", guid);
-        q.setParameter("uniqueAddressId", uniqueAddressId);
-        List<Org> orgs = q.getResultList();
-        if (orgs != null && orgs.size() > 0) {
-            return orgs.get(0);
-        } else {
-            q = entityManager.createQuery("from Org where inn=:inn and uniqueaddressid=:uniqueAddressId");
-            q.setParameter("inn", inn);
+        if (uniqueAddressId != null) {
+            q = entityManager.createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
+            q.setParameter("guid", guid);
             q.setParameter("uniqueAddressId", uniqueAddressId);
-            List<Org> orgs2 = q.getResultList();
-            if (orgs2 != null && orgs2.size() > 0) {
-                return orgs2.get(0);
+            List<Org> orgs = q.getResultList();   //1 этап
+            if (orgs != null && orgs.size() > 0) {
+                return orgs.get(0);
             } else {
-                q = entityManager.createQuery("from Org where btiUnom=:unom and btiUnad=:unad");
-                q.setParameter("unom", unom);
-                q.setParameter("unad", unad);
-                List<Org> orgs3 = q.getResultList();
-                if (orgs3 != null && orgs3.size() > 0) {
-                    return orgs3.get(0);
-                } else {
-                    return null;
+                q = entityManager.createQuery("from Org where inn=:inn and uniqueaddressid=:uniqueAddressId");
+                q.setParameter("inn", inn);
+                q.setParameter("uniqueAddressId", uniqueAddressId);
+                List<Org> orgs2 = q.getResultList();  //2 этап
+                if (orgs2 != null && orgs2.size() > 0) {
+                    return orgs2.get(0);
                 }
             }
+        }
+        q = entityManager.createQuery("from Org where btiUnom=:unom and btiUnad=:unad");
+        q.setParameter("unom", unom);
+        q.setParameter("unad", unad);
+        List<Org> orgs3 = q.getResultList();   //3 этап
+        if (orgs3 != null && orgs3.size() > 0) {
+            return orgs3.get(0);
+        } else {
+            return null;
         }
     }
 
