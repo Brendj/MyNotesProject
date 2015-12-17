@@ -258,8 +258,10 @@ public class ReportJobEditPage extends BasicWorkspacePage {
         List<ReportHandleRule> reportHandleRules = new ArrayList<ReportHandleRule>();
         if (preferentialRules != null) {
             for (Integer rule : preferentialRules) {
+                if (rule != null) {
                 Long id = rule.longValue();
                 reportHandleRuleIdList.add(rulesAndIds.get(id));
+                }
             }
 
             for (Long id : reportHandleRuleIdList) {
