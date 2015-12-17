@@ -161,7 +161,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         String sql = "select distinct good.globalId as globalId, "
                 + "     good.parts as parts, "
                 + "     good.fullName as fullName, "
-                + "     ord.orderType as orderType "
+                + "     case ord.orderType when 10 then 1 else 0 end as orderType "
                 + " from OrderDetail details "
                 + "     left join details.good good "
                 + "     left join details.order ord "
