@@ -4393,6 +4393,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             reportRuleListPage.removeReportRule(persistenceSession, removedIdOfReportRule);
+            removeJobRules(persistenceSession, removedIdOfReportRule);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (removedIdOfReportRule.equals(selectedIdOfReportRule)) {
@@ -4409,6 +4410,10 @@ public class MainPage implements Serializable {
 
         }
         return null;
+    }
+
+    public void removeJobRules(Session session, Long idOfReportHandleRule) throws Exception {
+        session.createQuery("delete from JobRules where reportHandleRule = :idOfReportHandleRule").setLong("idOfReportHandleRule", idOfReportHandleRule).executeUpdate();
     }
 
     public Long getSelectedIdOfReportRule() {

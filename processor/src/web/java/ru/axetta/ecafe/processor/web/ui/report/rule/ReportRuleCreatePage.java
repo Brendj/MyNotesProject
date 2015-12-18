@@ -225,6 +225,9 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
     public void fill(Session session, User currentUser) throws Exception {
         this.documentFormat = 0;
+        this.ruleName = null;
+        this.tag = null;
+        this.enabled = false;
         parseExecParams();
     }
 
