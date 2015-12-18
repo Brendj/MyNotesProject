@@ -510,13 +510,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 long rPrice = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                 long sum = vals[4] == null ? 0 : Long.parseLong(vals[4].toString());
 
-                String xyu = (String)vals[5];
-                long countCash = xyu.equals("cash") ? count : 0;
-                long countCard = xyu.equals("card") ? count : 0;
-                long sumCash = xyu.equals("cash") ? sum : 0;
-                long sumCard = xyu.equals("card") ? sum : 0;
-                long countMixed = xyu.equals("mixed") ? count : 0;
-                long sumMixed = xyu.equals("mixed") ? sum : 0;
+                String payType = (String)vals[5];
+                long countCash = payType.equals("cash") ? count : 0;
+                long countCard = payType.equals("card") ? count : 0;
+                long sumCash = payType.equals("cash") ? sum : 0;
+                long sumCard = payType.equals("card") ? sum : 0;
+                long countMixed = payType.equals("mixed") ? count : 0;
+                long sumMixed = payType.equals("mixed") ? sum : 0;
 
                 if (groupByMenuOrigin) {
                     subReportMealRow = new SubReportMealRow(menuName, count, rPrice, sum, countCash, countCard, sumCash, sumCard, countMixed, sumMixed);
@@ -626,13 +626,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     if (tradeDiscount > 0) {
                         menuNamePay = String.format("%s (скидка %d%%)", menuNamePay, tradeDiscount);
                     }
-                    String xyu = (String)vals[8];
-                    long countCash = xyu.equals("cash") ? count : 0;
-                    long countCard = xyu.equals("card") ? count : 0;
-                    long sumCash = xyu.equals("cash") ? sum : 0;
-                    long sumCard = xyu.equals("card") ? sum : 0;
-                    long countMixed = xyu.equals("mixed") ? count : 0;
-                    long sumMixed = xyu.equals("mixed") ? sum : 0;
+                    String payType = (String)vals[8];
+                    long countCash = payType.equals("cash") ? count : 0;
+                    long countCard = payType.equals("card") ? count : 0;
+                    long sumCash = payType.equals("cash") ? sum : 0;
+                    long sumCard = payType.equals("card") ? sum : 0;
+                    long countMixed = payType.equals("mixed") ? count : 0;
+                    long sumMixed = payType.equals("mixed") ? sum : 0;
 
                     totalCount += count;
                     totalPayCount += count;
