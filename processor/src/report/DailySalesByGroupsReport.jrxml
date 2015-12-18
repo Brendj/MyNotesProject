@@ -198,7 +198,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{mealCountSumByCashTotal}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="0.00">
 				<reportElement uuid="b50876ae-869f-4f49-9595-a7f48c9ae9af" x="580" y="0" width="100" height="20" isRemoveLineWhenBlank="true">
 					<printWhenExpression><![CDATA[$F{mealCountSumByCashTotal}!=null]]></printWhenExpression>
 				</reportElement>
@@ -300,7 +300,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[ИТОГО НАЛИЧНАЯ И БЕЗНАЛИЧНАЯ ОПЛАТА:
+				<text><![CDATA[ИТОГО СМЕШАННАЯ ОПЛАТА:
 ]]></text>
 			</staticText>
 			<staticText>
@@ -317,7 +317,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
-			<textField>
+			<textField pattern="0.00">
 				<reportElement uuid="021d9905-dbd4-4d43-b329-d9be6c658ad2" x="580" y="40" width="100" height="20" isRemoveLineWhenBlank="true">
 					<printWhenExpression><![CDATA[$F{mealCountSumByCashAndSumByCardTotal}!=null]]></printWhenExpression>
 				</reportElement>

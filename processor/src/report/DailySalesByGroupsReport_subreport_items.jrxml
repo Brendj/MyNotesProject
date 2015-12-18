@@ -6,8 +6,14 @@
 	<field name="originName" class="java.lang.String"/>
 	<field name="count" class="java.lang.Long"/>
 	<field name="sum" class="java.lang.Long"/>
+	<field name="countCash" class="java.lang.Long"/>
+	<field name="countCard" class="java.lang.Long"/>
+	<field name="sumCash" class="java.lang.Long"/>
+	<field name="sumCard" class="java.lang.Long"/>
+	<field name="countCashAndCard" class="java.lang.Long"/>
+	<field name="sumCashAndCard" class="java.lang.Long"/>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="82" splitType="Stretch">
 			<textField>
 				<reportElement uuid="8a374269-ec0a-4668-82bc-08b650072393" stretchType="RelativeToBandHeight" x="0" y="0" width="501" height="20"/>
 				<box>
@@ -44,6 +50,151 @@
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement uuid="17a2d7fe-5677-49ee-aa77-a6be60e7af2a" mode="Opaque" x="501" y="61" width="79" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{countCashAndCard}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="37c82974-d36c-4f4b-bbc8-c3e6257dd53d" mode="Opaque" x="0" y="41" width="501" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[ИТОГО БЕЗНАЛИЧНАЯ ОПЛАТА:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="3549223d-073d-40d7-af9e-fedd1af36a04" mode="Opaque" x="501" y="41" width="79" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{countCard}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.00">
+				<reportElement uuid="3e39dbe4-4d79-4d5b-b18e-11ff5865d96e" mode="Opaque" x="580" y="41" width="100" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sumCard}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="82b96153-bd3c-450a-9e14-cce8c2c7168a" mode="Opaque" x="501" y="21" width="79" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{countCash}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.00">
+				<reportElement uuid="24c01e6c-caf0-483d-873f-264936f8b621" mode="Opaque" x="580" y="61" width="100" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sumCashAndCard}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.00">
+				<reportElement uuid="21bc5151-fbc0-4a63-8da6-8b17a5559f6c" mode="Opaque" x="580" y="21" width="100" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sumCash}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="513de7cb-d3f5-4d7f-afc4-c966d921b5bf" mode="Opaque" x="0" y="61" width="501" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[ИТОГО СМЕШАННАЯ ОПЛАТА:
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1cf1c995-659b-4b2c-b97c-833647dc0a3e" mode="Opaque" x="0" y="21" width="501" height="20" isRemoveLineWhenBlank="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[!$F{originName}.contains("Бесплатное")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[ИТОГО НАЛИЧНАЯ ОПЛАТА:]]></text>
+			</staticText>
 		</band>
 	</detail>
 </jasperReport>

@@ -173,12 +173,25 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             private String name;
             private long count, price, sum;
+            private Long countCash;
+            private Long countCard;
+            private Long sumCash;
+            private Long sumCard;
+            private Long countCashAndCard;
+            private Long sumCashAndCard;
 
-            public SubReportMealRow(String name, long count, long price, long sum) {
+            public SubReportMealRow(String name, long count, long price, long sum,
+                    Long countCash, Long countCard, Long sumCash, Long sumCard, Long countCashAndCard, Long sumCashAndCard) {
                 this.name = name;
                 this.count = count;
                 this.price = price;
                 this.sum = sum;
+                this.setCountCash(countCash);
+                this.setCountCard(countCard);
+                this.setSumCash(sumCash);
+                this.setSumCard(sumCard);
+                this.setCountCashAndCard(countCashAndCard);
+                this.setSumCashAndCard(sumCashAndCard);
             }
 
             public String getName() {
@@ -200,6 +213,54 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             @Override
             public int compareTo(SubReportMealRow mealRow) {
                 return this.getName().compareTo(mealRow.getName());
+            }
+
+            public long getCountCash() {
+                return countCash;
+            }
+
+            public void setCountCash(Long countCash) {
+                this.countCash = countCash;
+            }
+
+            public Long getCountCard() {
+                return countCard;
+            }
+
+            public void setCountCard(Long countCard) {
+                this.countCard = countCard;
+            }
+
+            public Long getSumCash() {
+                return sumCash;
+            }
+
+            public void setSumCash(Long sumCash) {
+                this.sumCash = sumCash;
+            }
+
+            public Long getSumCard() {
+                return sumCard;
+            }
+
+            public void setSumCard(Long sumCard) {
+                this.sumCard = sumCard;
+            }
+
+            public Long getCountCashAndCard() {
+                return countCashAndCard;
+            }
+
+            public void setCountCashAndCard(Long countCashAndCard) {
+                this.countCashAndCard = countCashAndCard;
+            }
+
+            public Long getSumCashAndCard() {
+                return sumCashAndCard;
+            }
+
+            public void setSumCashAndCard(Long sumCashAndCard) {
+                this.sumCashAndCard = sumCashAndCard;
             }
         }
 
@@ -331,9 +392,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             SubReportMealRow subReportMealRow;
 
             long totalCount, totalSum;
+            long totalCountCash, totalCountCard, totalSumCash, totalSumCard, totalCountMixed, totalSumMixed;
             long totalBuffetCount = 0, totalBuffetSum = 0;
 
             long mealCountGroupTotal, mealSumGroupTotal, mealCountSumByCashTotal, mealSumSumByCashTotal, mealCountSumByCardTotal, mealSumSumByCardTotal, mealCountSumByCashAndSumByCardTotal, mealSumSumByCardAndSumByCashTotal;
+            long mealCountGroupTotalCash, mealCountGroupTotalCard, mealSumGroupTotalCash, mealSumGroupTotalCard, mealCountGroupMixed, mealSumGroupMixed;
 
             // буфет
 
@@ -409,10 +472,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             }
 
             Query mealsQuery = session.createSQLQuery(String.format(
-                    "SELECT od.%s, od.MenuDetailName, SUM(od.qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice)" +
+                    "SELECT od.%s, od.MenuDetailName, SUM(od.qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), " +
+                            "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
+                            + "ELSE 'other' END AS flag " +
                             " FROM CF_ORDERS o,CF_ORDERDETAILS od "
                             + "WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
-                            + "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice "
+                            + "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice, flag "
                             + "ORDER BY od.%s, od.MenuDetailName", groupByField,
                     menuGroupsCondition == null ? "" : "AND od.MenuGroup IN (" + menuGroupsCondition + ") ",
                     groupByField, groupByField));
@@ -443,12 +510,20 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 long rPrice = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                 long sum = vals[4] == null ? 0 : Long.parseLong(vals[4].toString());
 
+                String xyu = (String)vals[5];
+                long countCash = xyu.equals("cash") ? count : 0;
+                long countCard = xyu.equals("card") ? count : 0;
+                long sumCash = xyu.equals("cash") ? sum : 0;
+                long sumCard = xyu.equals("card") ? sum : 0;
+                long countMixed = xyu.equals("mixed") ? count : 0;
+                long sumMixed = xyu.equals("mixed") ? sum : 0;
+
                 if (groupByMenuOrigin) {
-                    subReportMealRow = new SubReportMealRow(menuName, count, rPrice, sum);
+                    subReportMealRow = new SubReportMealRow(menuName, count, rPrice, sum, countCash, countCard, sumCash, sumCard, countMixed, sumMixed);
                     mealRowHashMap.get(OrderDetail.getMenuOriginAsString(menuOrigin)).getSubReportMealRowList()
                             .add(subReportMealRow);
                 } else {
-                    subReportMealRow = new SubReportMealRow(menuName, count, rPrice, sum);
+                    subReportMealRow = new SubReportMealRow(menuName, count, rPrice, sum, countCash, countCard, sumCash, sumCard, countMixed, sumMixed);
                     mealRowHashMap.get(menuGroup).getSubReportMealRowList().add(subReportMealRow);
                 }
             }
@@ -461,10 +536,22 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
                 mealCountGroupTotal = 0;
                 mealSumGroupTotal = 0;
+                mealCountGroupTotalCash = 0;
+                mealCountGroupTotalCard = 0;
+                mealSumGroupTotalCash = 0;
+                mealSumGroupTotalCard = 0;
+                mealCountGroupMixed = 0;
+                mealSumGroupMixed = 0;
 
                 for (SubReportMealRow item : subReportDataRowList) {
                     mealCountGroupTotal += item.getCount();
                     mealSumGroupTotal += item.getSum();
+                    mealCountGroupTotalCash += item.getCountCash();
+                    mealCountGroupTotalCard += item.getCountCard();
+                    mealSumGroupTotalCash += item.getSumCash();
+                    mealSumGroupTotalCard += item.getSumCard();
+                    mealCountGroupMixed += item.getCountCashAndCard();
+                    mealSumGroupMixed += item.getSumCashAndCard();
                 }
 
                 totalBuffetCount += mealCountGroupTotal;
@@ -474,7 +561,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 mealRowHashMap.get(mealRowKey).setMealSumGroupTotal(mealSumGroupTotal);
 
                 subReportDataRowsBuffet
-                        .add(new SubReportDataRow("   Буфет: " + mealRowKey, mealCountGroupTotal, mealSumGroupTotal));
+                        .add(new SubReportDataRow("   Буфет: " + mealRowKey, mealCountGroupTotal, mealSumGroupTotal,
+                                mealCountGroupTotalCash, mealCountGroupTotalCard, mealSumGroupTotalCash, mealSumGroupTotalCard,
+                                mealCountGroupMixed, mealSumGroupMixed));
             }
             totalDataRows
                     .add(new TotalDataRow("Буфет ВСЕГО: ", totalBuffetCount, totalBuffetSum, subReportDataRowsBuffet));
@@ -484,14 +573,24 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             totalCount = 0;
             totalSum = 0;
+            totalCountCash = 0;
+            totalCountCard = 0;
+            totalSumCash = 0;
+            totalSumCard = 0;
+            totalCountMixed = 0;
+            totalSumMixed = 0;
 
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery(
-                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum"
+                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum, " +
+                        "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
+                                + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
+                                + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
+                                + "ELSE 'other' END AS flag "
                                 + " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND"
                                 + " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND "
                                 + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 "
-                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
+                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, flag");
 
                 complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
                 complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
@@ -527,20 +626,35 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     if (tradeDiscount > 0) {
                         menuNamePay = String.format("%s (скидка %d%%)", menuNamePay, tradeDiscount);
                     }
+                    String xyu = (String)vals[8];
+                    long countCash = xyu.equals("cash") ? count : 0;
+                    long countCard = xyu.equals("card") ? count : 0;
+                    long sumCash = xyu.equals("cash") ? sum : 0;
+                    long sumCard = xyu.equals("card") ? sum : 0;
+                    long countMixed = xyu.equals("mixed") ? count : 0;
+                    long sumMixed = xyu.equals("mixed") ? sum : 0;
 
                     totalCount += count;
                     totalPayCount += count;
                     totalSum += sum;
                     totalPaySum += sum;
+                    totalCountCash += countCash;
+                    totalCountCard += countCard;
+                    totalSumCash += sumCash;
+                    totalSumCard += sumCard;
+                    totalCountMixed += countMixed;
+                    totalSumMixed += sumMixed;
 
-                    subReportMealRow = new SubReportMealRow(menuNamePay, count, rPrice, sum);
+                    subReportMealRow = new SubReportMealRow(menuNamePay, count, rPrice, sum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
+                            totalCountMixed, totalSumMixed);
                     mealRowHashMap.get(menuGroupPay).getSubReportMealRowList().add(subReportMealRow);
                 }
 
                 mealRowHashMap.get(menuGroupPay).setMealCountGroupTotal(totalPayCount);
                 mealRowHashMap.get(menuGroupPay).setMealSumGroupTotal(totalPaySum);
 
-                subReportDataRowsPay.add(new SubReportDataRow(menuGroupPay, totalCount, totalSum));
+                subReportDataRowsPay.add(new SubReportDataRow(menuGroupPay, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
+                        totalCountMixed, totalSumMixed));
 
                 long totalPayAndBuffetCount = totalBuffetCount + totalPayCount;
                 long totalPayAndBuffetSum = totalBuffetSum + totalPaySum;
@@ -588,14 +702,15 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     totalSum += sum;
                     totalUnPaidSum += sum;
 
-                    subReportMealRow = new SubReportMealRow(menuNameUnPaid, count, rPrice + socdiscount, sum);
+                    subReportMealRow = new SubReportMealRow(menuNameUnPaid, count, rPrice + socdiscount, sum, null, null, null, null, null, null);
                     mealRowHashMap.get(menuGroupUnPaid).getSubReportMealRowList().add(subReportMealRow);
                 }
 
                 mealRowHashMap.get(menuGroupUnPaid).setMealCountGroupTotal(totalUnPaidCount);
                 mealRowHashMap.get(menuGroupUnPaid).setMealSumGroupTotal(totalUnPaidSum);
 
-                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaid, totalCount, totalSum));
+                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaid, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
+                        totalCountMixed, totalSumMixed));
 
                 long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount;
                 long totalByAllSum = totalBuffetSum + totalPaySum + totalUnPaidSum;
@@ -660,62 +775,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             mealRowHashMap.get("Платное комплексное питание")
                     .setMealSumSumByCardAndSumByCashTotal(mealSumSumByCardAndSumByCashTotal);
 
-            // Сбор итоговых данных "Бесплатное комплексное питание"
-            /*List mealsUnpaidTotals;
-
-            Query freeComplexQueryTotal = session.createSQLQuery(
-                    "SELECT SUM(od.Qty) AS qtySum, SUM(od.Qty * (od.RPrice + od.socdiscount)),"
-                            + " CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash'"
-                            + " WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card'"
-                            + " WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                            + " ELSE 'other' END AS flag FROM CF_ORDERS o, CF_ORDERDETAILS od "
-                            + " WHERE (o.idOfOrg = :idOfOrg AND od.idOfOrg = :idOfOrg) AND (o.IdOfOrder = od.IdOfOrder) AND "
-                            + " (od.MenuType >= :typeComplexMin OR od.MenuType <= :typeComplexMax) AND (od.RPrice = 0 AND od.Discount > 0) AND "
-                            + " (o.CreatedDate >= :startTime AND o.CreatedDate <= :endTime) AND o.state = 0 AND od.state = 0 "
-                            + " GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount, o.sumbycash, o.sumbycard");
-
-            freeComplexQueryTotal.setParameter("idOfOrg", org.getIdOfOrg());
-            freeComplexQueryTotal.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
-            freeComplexQueryTotal.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-            freeComplexQueryTotal.setParameter("startTime", startTime.getTime());
-            freeComplexQueryTotal.setParameter("endTime", endTime.getTime());
-
-            mealsUnpaidTotals = freeComplexQueryTotal.list();
-
-            mealCountSumByCashTotal = 0;
-            mealSumSumByCashTotal = 0;
-
-            mealCountSumByCardTotal = 0;
-            mealSumSumByCardTotal = 0;
-
-            mealCountSumByCashAndSumByCardTotal = 0;
-            mealSumSumByCardAndSumByCashTotal = 0;
-
-            for (Object mealsTot : mealsUnpaidTotals) {
-                vals = (Object[]) mealsTot;
-
-                if (vals[2].toString().equals("cash")) {
-                    mealCountSumByCashTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
-                    mealSumSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
-                } else if (vals[2].toString().equals("card")) {
-                    mealCountSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
-                    mealSumSumByCardTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
-                } else if (vals[2].toString().equals("mixed")) {
-                    mealCountSumByCashAndSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
-                    mealSumSumByCardAndSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
-                }
-            }*/
-
-            /*mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCardTotal(mealCountSumByCardTotal);
-            mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCardTotal(mealSumSumByCardTotal);
-
-            mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCashTotal(mealCountSumByCashTotal);
-            mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCashTotal(mealSumSumByCashTotal);
-
-            mealRowHashMap.get("Бесплатное комплексное питание")
-                    .setMealCountSumByCashAndSumByCardTotal(mealCountSumByCashAndSumByCardTotal);
-            mealRowHashMap.get("Бесплатное комплексное питание")
-                    .setMealSumSumByCardAndSumByCashTotal(mealSumSumByCardAndSumByCashTotal);*/
 
             mealRowHashMap.get("Бесплатное комплексное питание").setMealCountSumByCardTotal(null);
             mealRowHashMap.get("Бесплатное комплексное питание").setMealSumSumByCardTotal(null);
@@ -886,11 +945,25 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         String originName;
         Long count;
         Long sum;
+        private Long countCash;
+        private Long countCard;
+        private Long sumCash;
+        private Long sumCard;
+        private Long countCashAndCard;
+        private Long sumCashAndCard;
 
-        public SubReportDataRow(String originName, Long count, Long sum) {
+        public SubReportDataRow(String originName, Long count, Long sum,
+                Long countCash, Long countCard, Long sumCash,
+                Long sumCard, Long countCashAndCard, Long sumCashAndCard) {
             this.originName = originName;
             this.count = count;
             this.sum = sum;
+            this.setCountCash(countCash);
+            this.setCountCard(countCard);
+            this.setSumCash(sumCash);
+            this.setSumCard(sumCard);
+            this.setCountCashAndCard(countCashAndCard);
+            this.setSumCashAndCard(sumCashAndCard);
         }
 
         public String getOriginName() {
@@ -915,6 +988,54 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         public void setSum(Long sum) {
             this.sum = sum;
+        }
+
+        public Long getCountCash() {
+            return countCash;
+        }
+
+        public void setCountCash(Long countCash) {
+            this.countCash = countCash;
+        }
+
+        public Long getCountCard() {
+            return countCard;
+        }
+
+        public void setCountCard(Long countCard) {
+            this.countCard = countCard;
+        }
+
+        public Long getSumCash() {
+            return sumCash;
+        }
+
+        public void setSumCash(Long sumCash) {
+            this.sumCash = sumCash;
+        }
+
+        public Long getSumCard() {
+            return sumCard;
+        }
+
+        public void setSumCard(Long sumCard) {
+            this.sumCard = sumCard;
+        }
+
+        public Long getCountCashAndCard() {
+            return countCashAndCard;
+        }
+
+        public void setCountCashAndCard(Long countCashAndCard) {
+            this.countCashAndCard = countCashAndCard;
+        }
+
+        public Long getSumCashAndCard() {
+            return sumCashAndCard;
+        }
+
+        public void setSumCashAndCard(Long sumCashAndCard) {
+            this.sumCashAndCard = sumCashAndCard;
         }
     }
 
