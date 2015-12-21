@@ -254,6 +254,9 @@
 				<measure name="measureSumm1" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[Double.valueOf($F{sum})/100]]></measureExpression>
 				</measure>
+				<measure name="LogicMeasure" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы")? Double.valueOf($F{sum})/100 : 0 ]]></measureExpression>
+				</measure>
 				<crosstabCell width="197" height="25">
 					<cellContents>
 						<box>
@@ -286,7 +289,7 @@
 						<textField pattern="#,##0.00">
 							<reportElement uuid="440d2eb3-9d71-4658-906b-e34dfa096e21" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
 							<textElement/>
-							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measureSumm1} - $V{LogicMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -298,7 +301,7 @@
 						<textField pattern="#,##0.00">
 							<reportElement uuid="f1773956-2f08-4126-9d19-40032d474e8b" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
 							<textElement/>
-							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measureSumm1}-$V{LogicMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -322,7 +325,7 @@
 						<textField pattern="#,##0.00">
 							<reportElement uuid="74deed95-c672-4047-b561-2ea85fd8ce8e" style="Crosstab Data Text" x="0" y="0" width="127" height="25"/>
 							<textElement/>
-							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measureSumm1}-$V{LogicMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
