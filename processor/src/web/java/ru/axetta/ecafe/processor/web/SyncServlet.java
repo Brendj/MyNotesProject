@@ -54,7 +54,7 @@ public class SyncServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SyncServlet.class);
     private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
-    private static final List<Date[]> restrictedFullSyncPeriods =
+    private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
 
     static class RequestData {
@@ -325,35 +325,17 @@ public class SyncServlet extends HttpServlet {
         }
     }
 
-    private static List<Date[]> getRestrictPeriods(String option) {
-        List<Date[]> result = new ArrayList<Date[]>();
+    private static List<String[]> getRestrictPeriods(String option) {
+        List<String[]> result = new ArrayList<String[]>();
         if (option.equals("")) {
             logger.error("Option OPTION_REQUEST_SYNC_LIMITFILTER is empty");
             return result;
         }
         try {
-            String[] arr = option.split(";");
+            String[] arr = option.trim().split(";");
             for (String period : arr) {
-                Date[] res_period = new Date[2];
-                String[] time = period.split("-");
-
-                Calendar c1 = new GregorianCalendar();
-                Date d1 = CalendarUtils.parseTime(time[0]);
-                c1.set(Calendar.HOUR_OF_DAY, d1.getHours());
-                c1.set(Calendar.MINUTE, d1.getMinutes());
-                c1.set(Calendar.SECOND,0);
-                res_period[0] = c1.getTime();
-
-                Calendar c2 = Calendar.getInstance();
-                Date d2 = CalendarUtils.parseTime(time[1]);
-                c2.set(Calendar.HOUR_OF_DAY, d2.getHours());
-                c2.set(Calendar.MINUTE, d2.getMinutes());
-                c2.set(Calendar.SECOND,0);
-                //c2.setTime(CalendarUtils.parseTime(time[1]));
-                res_period[1] = c2.getTime();
-                result.add(res_period);
-                //todo убрать дебаговое логирование после выяснения причины почему не отрабатывает на слейвах домена
-                logger.error(String.format("Debug message. option=%s; res_period[0]=%s, res_period[1]=%s", option, res_period[0], res_period[1]));
+                String[] time = period.trim().split("-");
+                result.add(time);
             }
         }
         catch(Exception ex) {
@@ -364,8 +346,20 @@ public class SyncServlet extends HttpServlet {
 
     private boolean isRestrictedFullSyncPeriod() {
         try {
-            for (Date[] period : restrictedFullSyncPeriods) {
-                if (CalendarUtils.betweenDate(new Date(), period[0], period[1])) {
+            for (String[] period : restrictedFullSyncPeriods) {
+                String[] bPeriod = period[0].trim().split(":");
+                Calendar c1 = new GregorianCalendar();
+                c1.set(Calendar.HOUR_OF_DAY, Integer.parseInt(bPeriod[0].trim()));
+                c1.set(Calendar.MINUTE, Integer.parseInt(bPeriod[1].trim()));
+                c1.set(Calendar.SECOND,0);
+
+                String[] ePeriod = period[1].trim().split(":");
+                Calendar c2 = new GregorianCalendar();
+                c2.set(Calendar.HOUR_OF_DAY, Integer.parseInt(ePeriod[0].trim()));
+                c2.set(Calendar.MINUTE, Integer.parseInt(ePeriod[1].trim()));
+                c2.set(Calendar.SECOND,0);
+
+                if (CalendarUtils.betweenDate(new Date(), c1.getTime(), c2.getTime())) {
                     return true;
                 }
             }
@@ -375,4 +369,5 @@ public class SyncServlet extends HttpServlet {
         }
         return false;
     }
+
 }
