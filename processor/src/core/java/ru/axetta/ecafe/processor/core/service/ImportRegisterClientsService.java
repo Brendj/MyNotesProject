@@ -949,7 +949,9 @@ public class ImportRegisterClientsService {
                 dbClient.setOrg(newOrg);
             case MODIFY_OPERATION:
                 Org newOrg1 = em.find(Org.class, change.getIdOfOrg());
-                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
+                if (dbClient.getOrg().getIdOfOrg() == change.getIdOfOrg()) {
+                    addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                }
                 String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                 FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                 modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
@@ -957,9 +959,14 @@ public class ImportRegisterClientsService {
                 modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                 modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
+                    addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
+                    dbClient.setOrg(newOrg1);
+                }
                 ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
                         newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
                         dbClient, session, true);
+
                 break;
             default:
                 logger.error("Unknown update registry change operation " + change.getOperation());
