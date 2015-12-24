@@ -205,6 +205,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderCategoryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new OrgOrderCategoryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -226,7 +227,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + SalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new SalesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -247,7 +249,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MscSalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new MscSalesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -267,7 +270,8 @@ public class AutoReportGenerator {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + RegisterReport.class.getSimpleName() + ".jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new RegisterReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -288,7 +292,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new ClientsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -309,7 +314,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrgOrderByDaysReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new OrgOrderByDaysReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -331,7 +337,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new AutoEnterEventReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -353,7 +360,8 @@ public class AutoReportGenerator {
                         String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
 
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                                jobName, 
+                                jobId,
+                                jobName,
                                 new AutoEnterEventByDaysReport(),
                                 autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                                 autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -375,6 +383,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ReportOnNutritionByWeekReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ReportOnNutritionByWeekReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -397,7 +406,8 @@ public class AutoReportGenerator {
                         String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
 
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                                jobName, 
+                                jobId,
+                                jobName,
                                 new DailySalesByGroupsReport(),
                                 autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                                 autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -419,6 +429,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + SubscriptionFeedingJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new SubscriptionFeedingJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -441,6 +452,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + QuestionaryResultByOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new QuestionaryResultByOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -463,6 +475,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientMigrationHistoryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ClientMigrationHistoryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -485,6 +498,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientSelectedAnswerResultByOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ClientSelectedAnswerResultByOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -507,7 +521,8 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + MenuDetailsGroupByMenuOriginReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
-                        jobName, 
+                        jobId,
+                        jobName,
                         new MenuDetailsGroupByMenuOriginReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
@@ -529,6 +544,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientOrderDetailsByAllOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ClientOrderDetailsByAllOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -551,6 +567,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DashboardByAllOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new DashboardByAllOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -573,6 +590,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + OrderDetailsGroupByMenuOriginReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new OrderDetailsGroupByMenuOriginReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -595,6 +613,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ClientOrderDetailsByOneOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ClientOrderDetailsByOneOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -617,6 +636,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new RegisterStampReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -639,6 +659,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new DeliveredServicesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -661,6 +682,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ActiveClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ActiveClientsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -683,6 +705,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ActiveDiscountClientsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ActiveDiscountClientsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -705,6 +728,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ComplaintCountByGoodReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ComplaintCountByGoodReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -727,6 +751,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ComplaintCausesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ComplaintCausesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -749,6 +774,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ComplaintIterationsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ComplaintIterationsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -771,6 +797,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ProductPopularityReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ProductPopularityReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -793,6 +820,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ContragentPaymentReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -817,6 +845,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ContragentCompletionReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new ContragentCompletionReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -841,6 +870,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + HalfYearSummaryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new HalfYearSummaryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -866,6 +896,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + BeneficiarySummaryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new BeneficiarySummaryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -889,6 +920,7 @@ public class AutoReportGenerator {
                         Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                         String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "CWOACReport.jasper";
                         BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                                jobId,
                                 jobName, new CWOACReport(), autoReportGenerator.getExecutorService(),
                                 autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
                                 autoReportGenerator.getReportPath(), reportTemplate,
@@ -908,6 +940,7 @@ public class AutoReportGenerator {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "SSTSReport.jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName, new SSTSReport(), autoReportGenerator.getExecutorService(),
                         autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
                         autoReportGenerator.getReportPath(), reportTemplate,
@@ -926,6 +959,7 @@ public class AutoReportGenerator {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "ClientBalanceByDayReport.jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName, new ClientBalanceByDayReport(), autoReportGenerator.getExecutorService(),
                         autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
                         autoReportGenerator.getReportPath(), reportTemplate,
@@ -945,6 +979,7 @@ public class AutoReportGenerator {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "BudgetMealsShippingReport.jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName, new BudgetMealsShippingReport(), autoReportGenerator.getExecutorService(),
                         autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
                         autoReportGenerator.getReportPath(), reportTemplate,
@@ -964,6 +999,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + StatisticsPaymentPreferentialSupplyJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new StatisticsPaymentPreferentialSupplyJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -988,6 +1024,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + TelephoneNumberCountJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new TelephoneNumberCountJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1009,6 +1046,7 @@ public class AutoReportGenerator {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "DiscrepanciesDataOnOrdersAndPaymentJasperReport.jasper";
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName, new DiscrepanciesDataOnOrdersAndPaymentJasperReport(), autoReportGenerator.getExecutorService(),
                         autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
                         autoReportGenerator.getReportPath(), reportTemplate,
@@ -1030,6 +1068,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + TransactionsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new TransactionsReport.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new TransactionsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1052,6 +1091,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventV2Report.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new AutoEnterEventV2Report(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1074,6 +1114,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + TotalSalesReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new TotalSalesReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1096,6 +1137,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + FeedingAndVisitReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new FeedingAndVisitReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1117,6 +1159,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + FeedingAndVisitSReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new FeedingAndVisitSReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1139,6 +1182,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new DetailedDeviationsPaymentOrReducedPriceMealsJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1161,6 +1205,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1183,6 +1228,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new SMSDeliveryReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1205,6 +1251,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + RequestsAndOrdersReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new RequestsAndOrdersReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1227,6 +1274,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + PaymentTotalsReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new PaymentTotalsReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
@@ -1249,6 +1297,7 @@ public class AutoReportGenerator {
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + BeneficiaryByAllOrgReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
                         jobName,
                         new BeneficiaryByAllOrgReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),

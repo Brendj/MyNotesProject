@@ -478,7 +478,11 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                     session = autoReportBuildTask.sessionFactory.openSession();
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
-                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
+
+                    String jobId = autoReportBuildTask.jobId;
+                    Long idOfSchedulerJob = Long.valueOf(jobId);
+
+                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
 
                     for (Object object: thisReportRulesList){
                         RuleProcessor.Rule rule = (RuleProcessor.Rule) object;

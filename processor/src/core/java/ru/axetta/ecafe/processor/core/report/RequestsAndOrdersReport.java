@@ -101,7 +101,10 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
 
-                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
+                    String jobId = autoReportBuildTask.jobId;
+                    Long idOfSchedulerJob = Long.valueOf(jobId);
+
+                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         Properties properties = new Properties();
                         ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);

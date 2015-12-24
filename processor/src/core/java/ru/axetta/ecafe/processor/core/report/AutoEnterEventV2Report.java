@@ -59,7 +59,11 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                     session = autoReportBuildTask.sessionFactory.openSession();
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
-                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session);
+
+                    String jobId = autoReportBuildTask.jobId;
+                    Long idOfSchedulerJob = Long.valueOf(jobId);
+
+                    List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
 
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         String pre_orgs = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);

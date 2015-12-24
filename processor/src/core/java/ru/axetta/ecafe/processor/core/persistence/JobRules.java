@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+
 /**
  * Created with IntelliJ IDEA.
  * User: T800
@@ -47,5 +51,9 @@ public class JobRules {
 
     public void setSchedulerJob(SchedulerJob schedulerJob) {
         this.schedulerJob = schedulerJob;
+    }
+
+    public static Criteria createReportJobRulesCriteria(Session session, SchedulerJob schedulerJob ) throws Exception {
+        return session.createCriteria(JobRules.class).add(Restrictions.eq("schedulerJob", schedulerJob));
     }
 }

@@ -7,9 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 
@@ -61,17 +59,29 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
     public Class getMyClass() { return getClass(); }
 
-    protected List<RuleProcessor.Rule> getThisReportRulesList(Session session) throws Exception {
+    protected List<RuleProcessor.Rule> getThisReportRulesList(Session session, Long idOfSchedulerJob) throws Exception {
+        List<JobRules> loadJobRules = new ArrayList<JobRules>();
+        SchedulerJob schedulerJob = (SchedulerJob) session.load(SchedulerJob.class, idOfSchedulerJob);
+        Criteria reportJobRules = JobRules.createReportJobRulesCriteria(session, schedulerJob);
+        loadJobRules = reportJobRules.list();
+
         List<RuleProcessor.Rule> newRules = new LinkedList<RuleProcessor.Rule>();
-        Criteria reportRulesCriteria = ReportHandleRule.createEnabledReportRulesCriteria(session);
-        List rules = reportRulesCriteria.list();
-        for (Object currObject : rules) {
-            ReportHandleRule currRule = (ReportHandleRule) currObject;
-            if (currRule.isEnabled()) {
-                for (RuleCondition ruleCondition : currRule.getRuleConditions()) {
-                    if (ruleCondition.getConditionConstant().equals(getMyClass().getCanonicalName())) {
-                        newRules.add(new RuleProcessor.Rule(currRule));
-                        break;
+
+        if (!loadJobRules.isEmpty()) {
+            for (JobRules jobRule: loadJobRules) {
+                newRules.add(new RuleProcessor.Rule(jobRule.getReportHandleRule()));
+            }
+        } else {
+            Criteria reportRulesCriteria = ReportHandleRule.createEnabledReportRulesCriteria(session);
+            List rules = reportRulesCriteria.list();
+            for (Object currObject : rules) {
+                ReportHandleRule currRule = (ReportHandleRule) currObject;
+                if (currRule.isEnabled()) {
+                    for (RuleCondition ruleCondition : currRule.getRuleConditions()) {
+                        if (ruleCondition.getConditionConstant().equals(getMyClass().getCanonicalName())) {
+                            newRules.add(new RuleProcessor.Rule(currRule));
+                            break;
+                        }
                     }
                 }
             }
@@ -232,8 +242,9 @@ public abstract class BasicReportJob extends BasicJasperReport {
             private final BasicReportJob reportJob;
             private Date startDate, endDate;
             private final String jobName;
+            private final String jobId;
 
-            public ExecuteEnvironment(String jobName, BasicReportJob reportJob, ExecutorService executorService, SessionFactory sessionFactory,
+            public ExecuteEnvironment(String jobId, String jobName, BasicReportJob reportJob, ExecutorService executorService, SessionFactory sessionFactory,
                     AutoReportProcessor autoReportProcessor, String reportPath, String templateFileName,
                     Calendar calendar, DateFormat dateFormat, DateFormat timeFormat) {
                 this.executorService = executorService;
@@ -246,6 +257,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
                 this.timeFormat = timeFormat;
                 this.reportJob = reportJob;
                 this.jobName = jobName;
+                this.jobId = jobId;
             }
 
             public ExecutorService getExecutorService() {
@@ -330,7 +342,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
                 startTime = dates[0];
                 endTime = dates[1];
             }
-            return new AutoReportBuildTask(executeEnvironment.jobName, datesSpecifiedByUser,
+            return new AutoReportBuildTask(executeEnvironment.jobId, executeEnvironment.jobName, datesSpecifiedByUser,
                     executeEnvironment.reportJob.getAutoReportRunner(), executeEnvironment.getExecutorService(),
                     executeEnvironment.getAutoReportProcessor(), executeEnvironment.getSessionFactory(),
                     executeEnvironment.getTemplateFileName(), calendar, startTime, endTime, executeEnvironment.reportJob
@@ -349,6 +361,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         public final SessionFactory sessionFactory;
         public final String templateFileName;
         public final String jobName;
+        public final String jobId;
         public final boolean datesSpecifiedByUser;
         public final Calendar startCalendar;
         public final Date startTime;
@@ -356,10 +369,11 @@ public abstract class BasicReportJob extends BasicJasperReport {
         public final Map<Integer, ReportDocumentBuilder> documentBuilders;
         private final AutoReportRunner reportRunner;
 
-        public AutoReportBuildTask(String jobName, boolean datesSpecifiedByUser, AutoReportRunner reportRunner, ExecutorService executorService,
+        public AutoReportBuildTask(String jobId, String jobName, boolean datesSpecifiedByUser, AutoReportRunner reportRunner, ExecutorService executorService,
                 AutoReportProcessor autoReportProcessor, SessionFactory sessionFactory, String templateFileName,
                 Calendar startCalendar, Date startTime, Date endTime,
                 Map<Integer, ReportDocumentBuilder> documentBuilders) {
+            this.jobId = jobId;
             this.jobName = jobName;
             this.datesSpecifiedByUser = datesSpecifiedByUser;
             this.executorService = executorService;
