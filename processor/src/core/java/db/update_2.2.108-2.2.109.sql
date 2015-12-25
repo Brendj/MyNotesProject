@@ -20,10 +20,12 @@ ALTER TABLE cf_contracts ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
   ADD COLUMN sendall integer DEFAULT 0,
   ADD COLUMN globalversiononcreate bigint;
 
-UPDATE cf_contracts set guid = md5(random()::text || clock_timestamp()::text)::uuid,
+UPDATE cf_contracts set guid = cast(md5(cast(random() as text) || cast(clock_timestamp() as text)) as uuid),
   createddate = extract(epoch from now()) * 1000,
   globalversion = 1,
   globalversiononcreate = 1;
 
 ALTER TABLE cf_contracts ALTER COLUMN guid SET NOT NULL,
   ALTER COLUMN createddate SET NOT NULL;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 151225) НЕ МЕНЯТЬ
