@@ -4,15 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.ContragentClientAccount;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.Collections;
 import java.util.List;

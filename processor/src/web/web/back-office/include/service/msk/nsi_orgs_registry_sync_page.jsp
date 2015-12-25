@@ -214,7 +214,7 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Краткое наименование" />
+                            <h:outputText value="Наименование ОО для поставщика" />
                         </f:facet>
                         <h:outputText value="#{org.shortName}" escape="false" />
                     </rich:column>

@@ -30,6 +30,7 @@ import java.util.List;
 public class OrgCreatePage extends BasicWorkspacePage
     implements OrgSelectPage.CompleteHandler, ContragentSelectPage.CompleteHandler {
     private String shortName;
+    private String shortNameInfoService;
     private String officialName;
     private String address;
     private String phone;
@@ -208,6 +209,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 
     public String getOfficialName() {
@@ -441,7 +450,7 @@ public class OrgCreatePage extends BasicWorkspacePage
             }
         }
 
-        Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
+        Org org = new Org(this.shortName, this.shortNameInfoService, this.officialName, this.address, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.uniqueAddressId,

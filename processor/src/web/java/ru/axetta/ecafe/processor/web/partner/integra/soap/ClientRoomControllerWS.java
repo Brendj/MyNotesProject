@@ -1710,14 +1710,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setLastEnterEventCode(ee.getPassDirection());
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
-        /* Группа к которой относится клиент (Наименование класса учиника) */
+        /* Группа к которой относится клиент (Наименование класса ученика) */
         if (client.getClientGroup() == null) {
             clientSummaryExt.setGrade(null);
         } else {
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
         }
-        /* Официальное наименование Учебного учереждения */
-        clientSummaryExt.setOfficialName(client.getOrg().getOfficialName());
+        /* Краткое наименование Учебного учреждения для сервиса информирования*/
+        clientSummaryExt.setOfficialName(client.getOrg().getShortNameInfoService());
         // Новые параметры:
         String phone = client.getPhone();
         if (phone != null) {
@@ -5914,12 +5914,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (list == null || list.isEmpty()) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description =
-                        "Отсутствуют настройки абонементного питания для организации " + clientOrg.getShortName();
+                        "Отсутствуют настройки абонементного питания для организации " + clientOrg.getShortNameInfoService();
                 return result;
             }
             if (list.size() > 1) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
-                result.description = "Организация имеет более одной настройки " + clientOrg.getShortName();
+                result.description = "Организация имеет более одной настройки " + clientOrg.getShortNameInfoService();
                 return result;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
@@ -5977,13 +5977,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
                         .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                                client.getOrg().getShortName(), idOfOrg);
+                                client.getOrg().getShortNameInfoService(), idOfOrg);
                 return result;
             }
             if (list.size() > 1) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String.format("Организация имеет более одной настройки %s (IdOfOrg = %s)",
-                        client.getOrg().getShortName(), idOfOrg);
+                        client.getOrg().getShortNameInfoService(), idOfOrg);
                 return result;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
@@ -6273,7 +6273,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
                         .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                                client.getOrg().getShortNameInfoService(), client.getOrg().getIdOfOrg());
                 return result;
             }
             Date dateActivateSubs = CalendarUtils.truncateToDayOfMonth(dateActivateSubscription);
@@ -6512,7 +6512,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
                       .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                            client.getOrg().getShortName(), subscriptionFeeding.getOrgOwner());
+                            client.getOrg().getShortNameInfoService(), subscriptionFeeding.getOrgOwner());
                 return result;
             }
             ECafeSettings cafeSettings = settings.get(0);
@@ -6580,7 +6580,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
                       .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                            client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                            client.getOrg().getShortNameInfoService(), client.getOrg().getIdOfOrg());
                 return result;
             }
             ECafeSettings cafeSettings = settings.get(0);
@@ -6737,13 +6737,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
                         .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                                clientOrg.getShortName(), idOfOrg);
+                                clientOrg.getShortNameInfoService(), idOfOrg);
                 return result;
             }
             if (settingsList.size() > 1) {
                 result.resultCode = RC_SETTINGS_NOT_FOUND;
                 result.description = String
-                        .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortName(),
+                        .format("Организация имеет более одной настройки %s (IdOfOrg = %s)", clientOrg.getShortNameInfoService(),
                                 idOfOrg);
                 return result;
             }

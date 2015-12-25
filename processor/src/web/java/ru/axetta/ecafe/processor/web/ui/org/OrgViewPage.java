@@ -24,6 +24,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Long idOfOrg;
     private String shortName;
+    private String shortNameInfoService;
     private String officialName;
     private String tag;
     private String address;
@@ -128,6 +129,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         Org org = (Org) session.load(Org.class, idOfOrg);
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
+        this.shortNameInfoService = org.getShortNameInfoService();
         this.officialName = org.getOfficialName();
         this.tag = org.getTag();
         this.city = org.getCity();
@@ -553,5 +555,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public String getInterdistrictCouncilChief() {
         return interdistrictCouncilChief;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 }

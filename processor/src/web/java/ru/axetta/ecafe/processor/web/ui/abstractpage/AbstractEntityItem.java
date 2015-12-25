@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
-
 import javax.persistence.EntityManager;
 
 public abstract class AbstractEntityItem<E> {

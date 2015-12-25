@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -16,8 +18,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -125,11 +129,51 @@ public class ContractItem extends AbstractEntityItem<Contract> {
         contract.setDateOfClosing(getDateOfClosing());
         contract.setDateOfConclusion(getDateOfConclusion());
         contract.setContragent(getContragent());
+        saveGlobalVersion(entityManager, contract);
         if(!getIdOfOrgList().isEmpty()){
             for (Org org : DAOUtils.findOrgs(entityManager, getIdOfOrgList())){
                 org.setContract(contract);
             }
         }
+    }
+
+    public void saveGlobalVersion(EntityManager entityManager, Contract contract) {
+        TypedQuery<DOVersion> query = entityManager
+                .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
+                        DOVersion.class);
+        query.setParameter("distributedObjectClassName", "Contract".toUpperCase());
+        List<DOVersion> doVersionList = query.getResultList();
+        DOVersion doVersion = null;
+        Long version = null;
+        if (doVersionList.size() == 0) {
+            doVersion = new DOVersion();
+            doVersion.setCurrentVersion(0L);
+            version = 0L;
+        } else {
+            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
+            version = doVersion.getCurrentVersion() + 1;
+            doVersion.setCurrentVersion(version);
+        }
+        doVersion.setDistributedObjectClassName("Contract");
+        if(contract.getGlobalId()==null){
+            contract.setGlobalVersion(version);
+            entityManager.persist(doVersion);
+            //entityManager.persist(contract);
+        } else {
+            contract.setGlobalVersion(version);
+            entityManager.persist(doVersion);
+            //contract=entityManager.merge(contract);
+        }
+    }
+
+    @Override
+    public void removeEntity(EntityManager entityManager) throws Exception {
+        Contract contract = getEntity(entityManager);
+        if (contract==null) throw new Exception("Объект не найден");
+        prepareForEntityRemove(entityManager, contract);
+        contract.setDeletedState(true);
+        saveGlobalVersion(entityManager, contract);
+        entityManager.persist(contract);
     }
 
     @Override
@@ -143,7 +187,12 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     }
     @Override
     public Contract createEmptyEntity() {
-        return new Contract();
+        Contract contract = new Contract();
+        contract.setDeletedState(false);
+        contract.setCreatedDate(new Date(System.currentTimeMillis()));
+        contract.setGlobalVersion(-1L);
+        contract.setGlobalVersionOnCreate(-1L);
+        return contract;
     }
 
     public long getIdOfContract() {
@@ -218,6 +267,10 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     }
 
     public void setIdOfOrgList(List<Long> idOfOrgList) {
+        /*this.idOfOrgList.removeAll(idOfOrgList);
+        for (Long id : this.idOfOrgList) {
+            DAOService.getInstance().createDOConfirmForContract("Contract", this.idOfContract, id);
+        }*/
         this.idOfOrgList = idOfOrgList;
     }
 

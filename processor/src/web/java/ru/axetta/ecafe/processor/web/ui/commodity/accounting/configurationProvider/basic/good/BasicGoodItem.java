@@ -4,23 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
-import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.EntityManager;
 import java.util.*;

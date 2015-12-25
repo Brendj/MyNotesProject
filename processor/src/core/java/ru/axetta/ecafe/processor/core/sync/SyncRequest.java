@@ -2117,6 +2117,7 @@ public class SyncRequest {
         private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder;
         private final ClientGuardianBuilder clientGuardianBuilder;
         private final ProhibitionMenuRequestBuilder prohibitionMenuRequestBuilder;
+        private final OrganizationStructureRequestBuilder organizationStructureRequestBuilder;
         private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
 
         public Builder() {
@@ -2144,6 +2145,7 @@ public class SyncRequest {
             this.accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
             this.clientGuardianBuilder = new ClientGuardianBuilder();
             this.prohibitionMenuRequestBuilder = new ProhibitionMenuRequestBuilder();
+            this.organizationStructureRequestBuilder = new OrganizationStructureRequestBuilder();
             this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
         }
 
@@ -2287,6 +2289,9 @@ public class SyncRequest {
             prohibitionMenuRequestBuilder.createMainNode(envelopeNode);
             ProhibitionMenuRequest prohibitionMenuRequest = prohibitionMenuRequestBuilder.build();
 
+            organizationStructureRequestBuilder.createMainNode(envelopeNode);
+            OrganizationStructureRequest organizationStructureRequest = organizationStructureRequestBuilder.build();
+
             accountsRegistryRequestBuilder.createMainNode(envelopeNode);
             AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
 
@@ -2315,7 +2320,7 @@ public class SyncRequest {
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest);
         }
 
 
@@ -2350,6 +2355,7 @@ public class SyncRequest {
     private final AccRegistryUpdateRequest accRegistryUpdateRequest;
     private final ClientGuardianRequest clientGuardianRequest;
     private final ProhibitionMenuRequest prohibitionMenuRequest;
+    private final OrganizationStructureRequest organizationStructureRequest;
     private final CardsOperationsRegistry cardsOperationsRegistry;
     private final AccountsRegistryRequest accountsRegistryRequest;
 
@@ -2359,7 +2365,7 @@ public class SyncRequest {
             EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
-            AccountsRegistryRequest accountsRegistryRequest) {
+            AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2370,6 +2376,7 @@ public class SyncRequest {
         this.accRegistryUpdateRequest = accRegistryUpdateRequest;
         this.clientGuardianRequest = clientGuardianRequest;
         this.prohibitionMenuRequest = prohibitionMenuRequest;
+        this.organizationStructureRequest = organizationStructureRequest;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -2479,6 +2486,10 @@ public class SyncRequest {
 
     public ProhibitionMenuRequest getProhibitionMenuRequest() {
         return prohibitionMenuRequest;
+    }
+
+    public OrganizationStructureRequest getOrganizationStructureRequest() {
+        return organizationStructureRequest;
     }
 
     public CardsOperationsRegistry getCardsOperationsRegistry() {

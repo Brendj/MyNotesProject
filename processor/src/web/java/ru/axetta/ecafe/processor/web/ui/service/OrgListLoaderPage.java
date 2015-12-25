@@ -55,7 +55,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
 
     protected static final String [][] COLUMN_NAMES = new String [][] {
             { "guid",              "GUID" },
-            { "shortName",         "Краткое наименование" },
+            { "shortName",         "Наименование ОО для поставщика" },
             { "officialName",      "Официальное наименование" },
             { "tags",              "Тэги" },
             { "city",              "Город" },
@@ -265,7 +265,8 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     return new OrgEntry(lineNo, 0, "Org has been modified", currentOrg.getIdOfOrg());
                 }
 
-                Org org = new Org(shortName, officialName, address, officialPerson, "",
+                //todo правильно заполнять второй параметр shortNameInfoService
+                Org org = new Org(shortName, shortName, officialName, address, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
                         "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/");

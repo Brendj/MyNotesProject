@@ -17,8 +17,10 @@
     <h:inputText readonly="true" value="#{mainPage.orgEditPage.idOfOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.guid}" styleClass="input-text" />
-    <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
+    <h:outputText escape="true" value="Наименование ОО для поставщика" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.shortName}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.shortNameInfoService}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Тэги" styleClass="output-text" />

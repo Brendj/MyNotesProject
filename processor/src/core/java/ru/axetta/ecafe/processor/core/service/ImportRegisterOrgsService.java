@@ -200,7 +200,8 @@ public class ImportRegisterOrgsService {
                 Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
                 String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
                 Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing)*/
-        Org org = new Org(orgShortName, orgRegistryChange.getOfficialName(), address, officialPerson, "",
+        //todo правильно заполнять второй параметр shortNameInfoService
+        Org org = new Org(orgShortName, orgShortName, orgRegistryChange.getOfficialName(), address, officialPerson, "",
                 "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
                 0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
                 "", "", "",

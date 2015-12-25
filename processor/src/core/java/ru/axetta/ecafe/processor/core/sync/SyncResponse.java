@@ -1238,6 +1238,7 @@ public class SyncResponse {
     private final ProhibitionsMenu prohibitionsMenu;
     private final ResCardsOperationsRegistry resCardsOperationsRegistry;
     private final AccountsRegistry accountsRegistry;
+    private final OrganizationStructure organizationStructure;
 
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1250,7 +1251,7 @@ public class SyncResponse {
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
-            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry) {
+            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1286,6 +1287,7 @@ public class SyncResponse {
         this.prohibitionsMenu = prohibitionsMenu;
         this.accountsRegistry = accountsRegistry;
         this.resCardsOperationsRegistry = resCardsOperationsRegistry;
+        this.organizationStructure = organizationStructure;
     }
 
     public Document toDocument() throws Exception {
@@ -1373,6 +1375,11 @@ public class SyncResponse {
         // ProhibitionsMenu
         if (null != prohibitionsMenu) {
             ecafeEnvelopeElement.appendChild(prohibitionsMenu.toElement(document));
+        }
+
+        //OrganizationStructure
+        if (null != organizationStructure) {
+            ecafeEnvelopeElement.appendChild(organizationStructure.toElement(document));
         }
 
         if (resDiary != null) {

@@ -5,12 +5,13 @@
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
-import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -56,6 +57,7 @@ public class ContractListPage extends AbstractListPage<Contract, ContractItem> {
         try {
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
             ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, "contragent.idOfContragent", criteria);
+            criteria.add(Restrictions.eq("deletedState", false));
         } catch (Exception e) {
 
         }

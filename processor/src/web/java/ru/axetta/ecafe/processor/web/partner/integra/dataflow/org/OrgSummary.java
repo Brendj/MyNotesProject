@@ -17,7 +17,7 @@ public class OrgSummary {
 
     public OrgSummary(Org org) {
         this.id = org.getIdOfOrg();
-        this.name = org.getOfficialName();
+        this.name = org.getShortNameInfoService();
         this.setOrgType(org.getType());
     }
 

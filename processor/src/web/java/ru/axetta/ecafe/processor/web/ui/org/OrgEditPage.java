@@ -34,6 +34,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private Long idOfOrg;
     private String shortName;
+    private String shortNameInfoService;
     private String officialName;
     private String tag;
     private String address;
@@ -144,6 +145,7 @@ public class OrgEditPage extends BasicWorkspacePage
         Org org = (Org) session.load(Org.class, idOfOrg);
         org.setRefectoryType(refectoryType);
         org.setShortName(shortName);
+        org.setShortNameInfoService(shortNameInfoService);
         org.setOfficialName(officialName);
         org.setTag(tag);
         org.setCity(city);
@@ -292,6 +294,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private void fill(Org org) throws Exception {
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
+        this.shortNameInfoService = org.getShortNameInfoService();
         this.officialName = org.getOfficialName();
         this.tag = org.getTag();
         this.city = org.getCity();
@@ -879,6 +882,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
         this.usePaydableSubscriptionFeeding = usePaydableSubscriptionFeeding;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 
     public static class ContragentItem {

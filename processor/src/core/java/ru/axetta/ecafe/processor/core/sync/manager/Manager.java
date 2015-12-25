@@ -203,6 +203,7 @@ public class Manager {
             elementRO.appendChild(doClassElement);
             if (distributedObjects != null && !distributedObjects.isEmpty()) {
                 for (DistributedObject distributedObject : distributedObjects) {
+                    distributedObject.setIdOfSyncOrg(idOfOrg);
                     Element element = document.createElement("O");
                     doClassElement.appendChild(distributedObject.toElement(element));
                 }

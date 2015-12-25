@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
@@ -2090,4 +2091,47 @@ public class DAOService {
         q.setParameter("endDate", endDate.getTime());
         return q.getResultList();
     }
+
+    public String getMenuSourceOrgName(Long idOfOrg) {
+        Session session = (Session) entityManager.unwrap(Session.class);
+        Long id = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
+        if (id != null) {
+            Org org = (Org)session.load(Org.class, id);
+            return org.getOfficialName();
+        }
+        return null;
+    }
+
+    public String getDefaultSupplierNameByOrg(Long idOfOrg) {
+        Contragent cc = getOrg(idOfOrg).getDefaultSupplier();
+        if (cc != null) {
+            return cc.getContragentName();
+        } else {
+            return null;
+        }
+    }
+
+    public String getConfigurationProviderNameByOrg(Long idOfOrg) {
+        ConfigurationProvider prov = getOrg(idOfOrg).getConfigurationProvider();
+        if (prov != null) {
+            return prov.getName();
+        }
+        return null;
+    }
+
+    /*public void createDOConfirmForContract(String className, Long idOfContract, Long idOfOrg) {
+        Session session = (Session) entityManager.unwrap(Session.class);
+        Contract contract = (Contract)session.load(Contract.class, idOfContract);
+        Query del = entityManager.createNativeQuery("delete from cf_do_confirms where distributedObjectClassName = :className and guid = :guid and orgOwner = :org");
+        del.setParameter("className", className);
+        del.setParameter("guid", contract.getGuid());
+        del.setParameter("org", idOfOrg);
+        del.executeUpdate();
+
+        Query ins = entityManager.createNativeQuery("insert into cf_do_confirms(distributedObjectClassName, guid, orgOwner) values (:className, :guid, :org) ");
+        ins.setParameter("className", className);
+        ins.setParameter("guid", contract.getGuid());
+        ins.setParameter("org", idOfOrg);
+        ins.executeUpdate();
+    }*/
 }

@@ -804,6 +804,7 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
 
@@ -934,6 +935,21 @@ public class Processor implements SyncProcessor,
             String message = String.format("Failed to build prohibitions menu, IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             prohibitionsMenu = new ProhibitionsMenu(100, String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
+
+        //Process organization structure
+        try {
+            final OrganizationStructureRequest organizationStructureRequest = request.getOrganizationStructureRequest();
+            if(organizationStructureRequest !=null){
+                organizationStructure = getOrganizationStructureData(request.getOrg(),
+                        organizationStructureRequest.getMaxVersion());
+            }
+        }
+        catch (Exception e) {
+            String message = String.format("Failed to build organization structure, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            organizationStructure = new OrganizationStructure(100, String.format("Internal error: %s", e.getMessage()));
             logger.error(message, e);
         }
 
@@ -1107,7 +1123,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
     }
     /*
     * Запуск авто пополнения
@@ -1156,6 +1172,7 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
 
@@ -1199,7 +1216,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1233,6 +1250,7 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
 
@@ -1345,7 +1363,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1379,6 +1397,7 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
 
@@ -1478,7 +1497,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1509,6 +1528,7 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         AccRegistryUpdate accRegistryUpdate = null;
         ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
 
@@ -1630,7 +1650,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -2942,6 +2962,25 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return clientRegistry;
+    }
+
+    private OrganizationStructure getOrganizationStructureData(Org org, long version) throws Exception{
+        OrganizationStructure organizationStructure = new OrganizationStructure();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            for (Org fOrg : org.getFriendlyOrg()) {
+                organizationStructure.addOrganizationStructureInfo(persistenceSession, fOrg.getIdOfOrg());
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return organizationStructure;
     }
 
     private ProhibitionsMenu getProhibitionsMenuData(Org org, long version) throws Exception{

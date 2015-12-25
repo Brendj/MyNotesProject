@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -14,12 +14,12 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.util.StringUtil;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -97,15 +97,18 @@ public class ContractEditPage extends AbstractEditPage<ContractItem> implements 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if (orgMap != null) {
-            currentItem.setIdOfOrgList(new ArrayList<Long>(0));
+            //currentItem.setIdOfOrgList(new ArrayList<Long>(0));
             if (orgMap.isEmpty())
                 currentItem.setOrgNames("Не выбрано");
             else {
+                List newOrgs = new ArrayList<Long>();
                 String filter = "";
                 for(Long idOfOrg : orgMap.keySet()) {
-                    currentItem.getIdOfOrgList().add(idOfOrg);
+                    //currentItem.getIdOfOrgList().add(idOfOrg);
                     filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+                    newOrgs.add(idOfOrg);
                 }
+                currentItem.setIdOfOrgList(newOrgs);
                 filter = filter.substring(0, filter.length() - 1);
                 currentItem.setOrgNames(filter);
             }

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
@@ -1413,6 +1414,20 @@ public class DAOUtils {
     }
 
     public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
+        try {
+            javax.persistence.Query del = entityManager.createQuery("delete from DOConfirm where distributedObjectClassName = 'Contract' " +
+            "and guid = '" + entity.getGuid() + "' and orgOwner in (select idOfOrg from Org where contract=:contract)");
+            del.setParameter("contract", entity);
+            del.executeUpdate();
+
+            javax.persistence.Query ins = entityManager.createQuery("insert into DOConfirm (distributedObjectClassName, guid, orgOwner) " +
+            "select 'Contract', '" + entity.getGuid() + "', idOfOrg from Org where contract=:contract");
+            ins.setParameter("contract", entity);
+            ins.executeUpdate();
+        } catch (Exception e) {
+            logger.error("Error creating confirm DO for contract", e);
+        }
+
         javax.persistence.Query q = entityManager.createQuery("update Org set contract=null where contract=:contract");
         q.setParameter("contract", entity);
         q.executeUpdate();

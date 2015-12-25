@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.doGroups;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.*;
@@ -34,5 +35,6 @@ public class DocumentGroup extends AbstractGroup {
         doClassMap.put("WayBill", new DOSyncClass(WayBill.class, 1));
         doClassMap.put("WayBillPosition", new DOSyncClass(WayBillPosition.class, 3));
         doClassMap.put("Staff", new DOSyncClass(Staff.class, 0));
+        doClassMap.put("Contract", new DOSyncClass(Contract.class, 5));
     }
 }

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import org.apache.commons.codec.binary.Base64;
@@ -44,6 +45,7 @@ public class Org implements Serializable {
     private Long idOfOrg;
     private long version;
     private String shortName;
+    private String shortNameInfoService;
     private String officialName;
     private String address;
     private String phone;
@@ -124,12 +126,13 @@ public class Org implements Serializable {
 
 
 
-    public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
+    public Org(String shortName, String shortNameInfoService, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
             Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing) throws Exception {
         this.shortName = shortName;
+        this.shortNameInfoService = shortNameInfoService;
         this.officialName = officialName;
         this.address = address;
         this.officialPerson = officialPerson;
@@ -384,6 +387,14 @@ public class Org implements Serializable {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 
     public String getOfficialName() {
@@ -913,6 +924,7 @@ public class Org implements Serializable {
     @Override
     public String toString() {
         return "Org{" + "idOfOrg=" + idOfOrg + ", version=" + version + ", shortName='" + shortName + '\''
+                + ", shortNameInfoService='" + shortNameInfoService + '\''
                 + ", officialName='" + officialName + '\'' + ", address='" + address + '\'' + ", phone='" + phone + '\''
                 + ", officialPerson=" + officialPerson + ", officialPosition='" + officialPosition + '\''
                 + ", contractId='" + contractId + '\'' + ", contractTime=" + contractTime + ", state=" + state
