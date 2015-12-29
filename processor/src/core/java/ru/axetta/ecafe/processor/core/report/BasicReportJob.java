@@ -60,7 +60,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public Class getMyClass() { return getClass(); }
 
     protected List<RuleProcessor.Rule> getThisReportRulesList(Session session, Long idOfSchedulerJob) throws Exception {
-        List<JobRules> loadJobRules = new ArrayList<JobRules>();
+        List<JobRules> loadJobRules;
         SchedulerJob schedulerJob = (SchedulerJob) session.load(SchedulerJob.class, idOfSchedulerJob);
         Criteria reportJobRules = JobRules.createReportJobRulesCriteria(session, schedulerJob);
         loadJobRules = reportJobRules.list();
@@ -87,6 +87,23 @@ public abstract class BasicReportJob extends BasicJasperReport {
             }
         }
         return newRules;
+    }
+
+    //Метод который возвращает правила по таблице cf_jobrules
+    public List<Long> getRulesIdsByJobRules(Session session, Long idOfSchedulerJob) throws Exception {
+        List<Long> reportHandleRules = new ArrayList<Long>();
+
+        SchedulerJob schedulerJob = (SchedulerJob) session.load(SchedulerJob.class, idOfSchedulerJob);
+        Criteria reportJobRules = JobRules.createReportJobRulesCriteria(session, schedulerJob);
+        List<JobRules> loadJobRules = reportJobRules.list();
+
+        if (!loadJobRules.isEmpty()) {
+            for (JobRules jobRule : loadJobRules) {
+                reportHandleRules.add(jobRule.getReportHandleRule().getIdOfReportHandleRule());
+            }
+        }
+
+        return reportHandleRules;
     }
 
     public interface AutoReportRunner {

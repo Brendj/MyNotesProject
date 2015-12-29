@@ -26,7 +26,7 @@ public interface AutoReportProcessor {
      * @param reportDocumentBuilders
      * @throws Exception
      */
-    void processAutoReports(List<AutoReport> reports, Map<Integer, ReportDocumentBuilder> reportDocumentBuilders)
+    void processAutoReports(List<AutoReport> reports, Map<Integer, ReportDocumentBuilder> reportDocumentBuilders, List<Long> reportHandleRuleIdsList)
             throws Exception;
 
     /**
@@ -49,6 +49,7 @@ public interface AutoReportProcessor {
         private final AutoReportProcessor autoReportProcessor;
         private final List<AutoReport> reports;
         private final Map<Integer, ReportDocumentBuilder> reportDocumentBuilders;
+        private List<Long> reportHandleRuleIdsList;
 
         public ProcessTask(AutoReportProcessor autoReportProcessor, List<AutoReport> reports,
                 Map<Integer, ReportDocumentBuilder> reportDocumentBuilders) {
@@ -57,9 +58,17 @@ public interface AutoReportProcessor {
             this.reportDocumentBuilders = reportDocumentBuilders;
         }
 
+        public ProcessTask(AutoReportProcessor autoReportProcessor, List<AutoReport> reports,
+                Map<Integer, ReportDocumentBuilder> reportDocumentBuilders, List<Long> reportHandleRuleIdsList) {
+            this.autoReportProcessor = autoReportProcessor;
+            this.reports = reports;
+            this.reportDocumentBuilders = reportDocumentBuilders;
+            this.reportHandleRuleIdsList = reportHandleRuleIdsList;
+        }
+
         public void run() {
             try {
-                autoReportProcessor.processAutoReports(reports, reportDocumentBuilders);
+                autoReportProcessor.processAutoReports(reports, reportDocumentBuilders, reportHandleRuleIdsList);
             } catch (Exception e) {
                 logger.error("Failed to handle reports", e);
             }

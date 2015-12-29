@@ -516,11 +516,14 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                                 autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
                         autoReports.add(new AutoReport(report, properties));
                     }
+
+                    List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

@@ -91,11 +91,14 @@ public class AutoEnterEventV2Report extends BasicReportForOrgJob {
                             autoReports.add(new AutoReport(report, properties));
                         }
                     }
+
+                    List<Long> reportHandleRuleList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

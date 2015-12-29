@@ -12,7 +12,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -367,6 +366,10 @@ public class HalfYearSummaryReport extends BasicReportJob
             @Override
             public void run (AutoReportBuildTask autoReportBuildTask)
             {
+
+                String jobId = autoReportBuildTask.jobId;
+                Long idOfSchedulerJob = Long.valueOf(jobId);
+
                 if (logger.isDebugEnabled ()){
                     logger.debug (String.format ("Building auto reports \"%s\"", getMyClass ().getCanonicalName ()));
                 }
@@ -389,11 +392,14 @@ public class HalfYearSummaryReport extends BasicReportJob
                                                             autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
                                                             autoReportBuildTask.startCalendar);*/
                     autoReports.add (new AutoReport (report, properties));
+
+                    List<Long> reportHandleRuleList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit ();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask (autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleList));
                 }
                 catch (Exception e){
                     logger.error (String.format ("Failed at building auto reports \"%s\"", classPropertyValue), e);

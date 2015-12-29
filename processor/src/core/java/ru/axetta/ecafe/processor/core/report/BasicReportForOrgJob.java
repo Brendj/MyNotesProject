@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -42,6 +42,10 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
 
         return new AutoReportRunner() {
             public void run(AutoReportBuildTask autoReportBuildTask) {
+
+                String jobId = autoReportBuildTask.jobId;
+                Long idOfSchedulerJob = Long.valueOf(jobId);
+
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(String.format("Building auto reports \"%s\"",
                             getMyClass().getCanonicalName()));
@@ -74,11 +78,14 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                                 autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
                         autoReports.add(new AutoReport(report, properties));
                     }
+
+                    List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {
@@ -89,7 +96,6 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
             }
         };
     }
-
 
     private Long idOfOrg;
 

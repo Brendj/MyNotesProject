@@ -166,6 +166,10 @@ public class BeneficiarySummaryReport extends BasicReportJob
         return new BasicReportJob.AutoReportRunner (){
             @Override
             public void run (BasicReportJob.AutoReportBuildTask autoReportBuildTask){
+
+                String jobId = autoReportBuildTask.jobId;
+                Long idOfSchedulerJob = Long.valueOf(jobId);
+
                 if (logger.isDebugEnabled ()){
                     logger.debug (String.format ("Building auto reports \"%s\"", getMyClass ().getCanonicalName ()));
                 }
@@ -188,11 +192,14 @@ public class BeneficiarySummaryReport extends BasicReportJob
                     autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
                     autoReportBuildTask.startCalendar);*/
                     autoReports.add (new AutoReport (report, properties));
+
+                    List<Long> reportHandleRuleList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit ();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask (autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleList));
                 }
                 catch (Exception e){
                     logger.error (String.format ("Failed at building auto reports \"%s\"", classPropertyValue), e);

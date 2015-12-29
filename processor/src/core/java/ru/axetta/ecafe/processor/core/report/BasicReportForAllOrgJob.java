@@ -7,9 +7,12 @@ package ru.axetta.ecafe.processor.core.report;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.JobRules;
+import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -34,6 +37,9 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
 
         return new AutoReportRunner() {
             public void run(AutoReportBuildTask autoReportBuildTask) {
+                String jobId = autoReportBuildTask.jobId;
+                Long idOfSchedulerJob = Long.valueOf(jobId);
+
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(String.format("Building auto reports \"%s\"",
                             getMyClass().getCanonicalName()));
@@ -53,11 +59,14 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
                     report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime, autoReportBuildTask.templateFileName,
                             autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
                     autoReports.add(new AutoReport(report, properties));
+
+                    List<Long> reportHandleRuleIdList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {
@@ -69,6 +78,22 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
         };
     }
 
+    //Метод который возвращает правила по таблице cf_jobrules
+    public List<Long> getRulesIdsByJobRules(Session session, Long idOfSchedulerJob) throws Exception {
+        List<Long> reportHandleRules = new ArrayList<Long>();
+
+        SchedulerJob schedulerJob = (SchedulerJob) session.load(SchedulerJob.class, idOfSchedulerJob);
+        Criteria reportJobRules = JobRules.createReportJobRulesCriteria(session, schedulerJob);
+        List<JobRules> loadJobRules = reportJobRules.list();
+
+        if (!loadJobRules.isEmpty()) {
+            for (JobRules jobRule: loadJobRules) {
+                reportHandleRules.add(jobRule.getReportHandleRule().getIdOfReportHandleRule());
+            }
+        }
+
+        return reportHandleRules;
+    }
 
     public BasicReportForAllOrgJob(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {

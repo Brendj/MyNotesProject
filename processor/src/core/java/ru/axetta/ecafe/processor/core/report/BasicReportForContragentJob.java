@@ -45,6 +45,10 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
         return new AutoReportRunner(){
             @Override
             public void run(AutoReportBuildTask autoReportBuildTask) {
+
+                String jobId = autoReportBuildTask.jobId;
+                Long idOfSchedulerJob = Long.valueOf(jobId);
+
                 if (getLogger().isDebugEnabled()) {
                     getLogger().debug(String.format("Building auto reports \"%s\"",
                             getMyClass().getCanonicalName()));
@@ -79,11 +83,14 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                                 autoReportBuildTask.sessionFactory, autoReportBuildTask.startCalendar);
                         autoReports.add(new AutoReport(report, properties));
                     }
+
+                    List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+
                     transaction.commit();
                     transaction = null;
                     autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

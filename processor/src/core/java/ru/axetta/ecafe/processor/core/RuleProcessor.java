@@ -202,7 +202,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
      * @param reportDocumentBuilders
      * @throws Exception
      */
-    public void processAutoReports(List<AutoReport> reports, Map<Integer, ReportDocumentBuilder> reportDocumentBuilders)
+    public void processAutoReports(List<AutoReport> reports, Map<Integer, ReportDocumentBuilder> reportDocumentBuilders, List<Long> reportHandleRuleIdsList)
             throws Exception {
         if (!reports.isEmpty()) {
             if (logger.isDebugEnabled()) {
@@ -221,7 +221,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 for (Rule currRule : rulesCopy) {
                     Properties reportProperties = copyProperties(report.getProperties());
                     ////
-                    if (currRule.applicatable(reportProperties)) {
+
+                    boolean existFlag = getFlag(Long.valueOf(currRule.getRuleId()), reportHandleRuleIdsList);
+
+                    if (currRule.applicatable(reportProperties) && existFlag) {
                         if (currRule.getExpressionValue(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE) != null &&
                                 !(reportProperties.getProperty(ReportPropertiesUtils.P_DATES_SPECIFIED_BY_USER) + "")
                                         .equals("true") && basicReport instanceof BasicReportJob) {
@@ -489,6 +492,16 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             HibernateUtils.close(session, logger);
         }
         return mailListMap;
+    }
+
+    private boolean getFlag(Long idOfRule, List<Long> reportHandleRuleIdsList) {
+        boolean flag = false;
+        if (!reportHandleRuleIdsList.isEmpty()) {
+            if (reportHandleRuleIdsList.contains(idOfRule)) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 
     public void loadAutoReportRules() throws Exception {
