@@ -5098,16 +5098,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         r.description = RC_OK_DESC;
         RuntimeContext runtimeContext = null;
 
+        Session persistenceSession = null;
+        org.hibernate.Transaction persistenceTransaction = null;
+
         runtimeContext = RuntimeContext.getInstance();
         ClientPaymentOrderProcessor clientPaymentOrderProcessor = runtimeContext.getClientPaymentOrderProcessor();
         try {
-            clientPaymentOrderProcessor.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder,
-                  ClientPaymentOrder.ORDER_STATUS_CANCELLED);
-
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if (orderStatus < ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED) {
+                clientPaymentOrderProcessor.changePaymentOrderStatus(idOfClient, idOfClientPaymentOrder, orderStatus);
+            } else {
+                ClientPaymentOrder clientPaymentOrder = DAOUtils.getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
+                clientPaymentOrderProcessor.changePaymentOrderStatus(clientPaymentOrder.getContragent().getIdOfContragent(), idOfClientPaymentOrder, orderStatus,
+                        clientPaymentOrder.getContragentSum(), idOfClientPaymentOrder.toString(), "changePaymentOrderStatus/".concat(idOfClientPaymentOrder.toString()));
+            }
+            persistenceSession.clear();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             r.resultCode = RC_INTERNAL_ERROR;
             r.description = RC_INTERNAL_ERROR_DESC;
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return r;
 

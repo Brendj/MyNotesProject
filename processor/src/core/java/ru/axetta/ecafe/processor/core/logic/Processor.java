@@ -245,7 +245,7 @@ public class Processor implements SyncProcessor,
         }
         if (!(ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED == orderStatus
                 || ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus)) {
-            throw new IllegalArgumentException(String.format("Anacceptable OrderStatus: %d", orderStatus));
+            throw new IllegalArgumentException(String.format("Unacceptable OrderStatus: %d", orderStatus));
         }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
