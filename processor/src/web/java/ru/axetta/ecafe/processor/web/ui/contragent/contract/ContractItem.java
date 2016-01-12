@@ -4,11 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent.contract;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
@@ -19,7 +18,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -195,9 +193,9 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     public void removeEntity(EntityManager entityManager) throws Exception {
         Contract contract = getEntity(entityManager);
         if (contract==null) throw new Exception("Объект не найден");
+        saveGlobalVersion(entityManager, contract);
         prepareForEntityRemove(entityManager, contract);
         contract.setDeletedState(true);
-        saveGlobalVersion(entityManager, contract);
         entityManager.persist(contract);
     }
 
