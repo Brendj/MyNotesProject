@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TotalServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -28,11 +29,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,7 +52,6 @@ public class ActiveClientsReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(ActiveClientsReportPage.class);
     private ru.axetta.ecafe.processor.core.report.ActiveClientsReport report;
 
-
     public String getPageFilename ()
     {
         return "report/online/active_clients_report";
@@ -63,47 +66,61 @@ public class ActiveClientsReportPage extends OnlineReportPage {
     {
         this.report = new ActiveClientsReport ();
         ActiveClientsReport.Builder reportBuilder = new ActiveClientsReport.Builder();
-        if (idOfOrg != null) {
-            Org org = null;
-            if (idOfOrg != null && idOfOrg > -1) {
+        if (!idOfOrgList.isEmpty()) {
+            Org org;
+            List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
+
+            for (Long idOfOrg : idOfOrgList) {
                 org = DAOService.getInstance().findOrById(idOfOrg);
+                orgShortItemList.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
+                        org.getOfficialName()));
             }
-            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            reportBuilder.setOrgShortItemList(orgShortItemList);
         }
-        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+        this.report = reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
     }
 
-
-    public void executeReport ()
-    {
-        FacesContext facesContext = FacesContext.getCurrentInstance ();
-        RuntimeContext runtimeContext = null;
+    public void executeReport() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        try
-        {
-            runtimeContext = RuntimeContext.getInstance ();
-            persistenceSession = runtimeContext.createPersistenceSession ();
-            persistenceTransaction = persistenceSession.beginTransaction ();
-            buildReport (persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Подготовка отчета завершена успешно", null));
-        }
-        catch (Exception e)
-        {
-            //logger.error("Failed to build sales report", e);
-            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке отчета", null));
-        }
-        finally
-        {
-            try {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            } catch (Exception e) {
-                logger.error("Failed to build active clients report", e);
+
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "ActiveClientsReport.jasper";
+
+        if (!(new File(templateFilename)).exists()) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    String.format("Не найден файл шаблона '%s'", templateFilename), null));
+        } else {
+
+
+
+            if (!idOfOrgList.isEmpty()) {
+                try {
+                    runtimeContext = RuntimeContext.getInstance();
+                    persistenceSession = runtimeContext.createPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    buildReport(persistenceSession);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+                } catch (Exception e) {
+                    //logger.error("Failed to build sales report", e);
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                } finally {
+                    try {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                        HibernateUtils.close(persistenceSession, logger);
+                    } catch (Exception e) {
+                        logger.error("Failed to build active clients report", e);
+                    }
+                }
+            } else {
+                facesContext
+                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Выберите организацию или список организаций", null));
             }
         }
     }

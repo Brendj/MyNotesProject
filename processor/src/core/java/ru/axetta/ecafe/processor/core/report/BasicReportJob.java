@@ -113,6 +113,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public static abstract class Builder {
         protected Contragent contragent;
         protected OrgShortItem org;
+        protected List<OrgShortItem> orgShortItemList;
         protected long userId;
         
         Properties reportProperties = new Properties();
@@ -147,6 +148,14 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
         public void setOrg(OrgShortItem org) {
             this.org = org;
+        }
+
+        public List<OrgShortItem> getOrgShortItemList() {
+            return orgShortItemList;
+        }
+
+        public void setOrgShortItemList(List<OrgShortItem> orgShortItemList) {
+            this.orgShortItemList = orgShortItemList;
         }
 
         public abstract BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)

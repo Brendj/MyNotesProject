@@ -136,11 +136,16 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
             endCal.set(Calendar.SECOND, 0);
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String orgRestriction = "";
-            if (org != null && org.getIdOfOrg() != null) {
-                orgRestriction = " and cf_orgs.idoforg=" + org.getIdOfOrg() + " ";
+
+            if (!orgShortItemList.isEmpty()) {
+                orgRestriction = " and cf_orgs.idoforg in (";
+                for (int i = 0; i < orgShortItemList.size() - 1; i++) {
+                    orgRestriction = orgRestriction + orgShortItemList.get(i).getIdOfOrg() + ", ";
+                }
+                orgRestriction = orgRestriction + orgShortItemList.get(orgShortItemList.size() - 1).getIdOfOrg();
+                orgRestriction = orgRestriction + ") ";
             }
 
-            
             List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
             String sql =
                 /* Все */
