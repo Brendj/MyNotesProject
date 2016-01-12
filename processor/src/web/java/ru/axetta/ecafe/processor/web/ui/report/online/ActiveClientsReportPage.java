@@ -94,8 +94,6 @@ public class ActiveClientsReportPage extends OnlineReportPage {
                     String.format("Не найден файл шаблона '%s'", templateFilename), null));
         } else {
 
-
-
             if (!idOfOrgList.isEmpty()) {
                 try {
                     runtimeContext = RuntimeContext.getInstance();
