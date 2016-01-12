@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.TotalServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -31,8 +30,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -123,77 +120,91 @@ public class ActiveClientsReportPage extends OnlineReportPage {
         }
     }
 
-    public void exportToXLS (ActionEvent actionEvent)
-    {
-        FacesContext facesContext = FacesContext.getCurrentInstance ();
+    public void exportToXLS(ActionEvent actionEvent) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ActiveClientsReport.Builder reportBuilder = new ActiveClientsReport.Builder();
         Date generateTime = new Date();
-        try
-        {
-            runtimeContext = RuntimeContext.getInstance ();
-            persistenceSession = runtimeContext.createPersistenceSession ();
-            persistenceTransaction = persistenceSession.beginTransaction ();
 
-            if (idOfOrg != null) {
-                Org org = null;
-                if (idOfOrg != null && idOfOrg > -1) {
-                    org = DAOService.getInstance().findOrById(idOfOrg);
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "ActiveClientsReport.jasper";
+
+        if (!(new File(templateFilename)).exists()) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    String.format("Не найден файл шаблона '%s'", templateFilename), null));
+        } else {
+
+            if (!idOfOrgList.isEmpty()) {
+                try {
+                    runtimeContext = RuntimeContext.getInstance();
+                    persistenceSession = runtimeContext.createPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
+                    if (!idOfOrgList.isEmpty()) {
+                        Org org;
+                        List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
+
+                        for (Long idOfOrg : idOfOrgList) {
+                            org = DAOService.getInstance().findOrById(idOfOrg);
+                            orgShortItemList.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
+                                    org.getOfficialName()));
+                        }
+                        reportBuilder.setOrgShortItemList(orgShortItemList);
+                    }
+                    this.report = reportBuilder.build(persistenceSession, startDate, endDate, new GregorianCalendar());
+
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+                } catch (FileNotFoundException ex) {
+                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), null));
+                } catch (Exception e) {
+                    //logger.error("Failed to build sales report", e);
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                } finally {
+                    try {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                        HibernateUtils.close(persistenceSession, logger);
+                    } catch (Exception e) {
+                        logger.error("Failed to build active clients report", e);
+                    }
                 }
-                reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
-            }
-            this.report = reportBuilder.build (persistenceSession, startDate, endDate, new GregorianCalendar());
 
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Подготовка отчета завершена успешно", null));
-        } catch (FileNotFoundException ex) {
-            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
-                    ex.getMessage(), null));
-        }
-        catch (Exception e)
-        {
-            //logger.error("Failed to build sales report", e);
-            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке отчета", null));
-        }
-        finally
-        {
-            try {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            } catch (Exception e) {
-                logger.error("Failed to build active clients report", e);
-            }
-        }
+                if (this.report != null) {
+                    try {
+                        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                                .getResponse();
 
-        if (this.report != null) {
-            try {
-                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+                        ServletOutputStream servletOutputStream = response.getOutputStream();
 
-                ServletOutputStream servletOutputStream = response.getOutputStream();
+                        facesContext.responseComplete();
+                        response.setContentType("application/xls");
+                        response.setHeader("Content-disposition", "inline;filename=active_client.xls");
 
-                facesContext.responseComplete();
-                response.setContentType("application/xls");
-                response.setHeader("Content-disposition","inline;filename=active_client.xls");
-
-                JRXlsExporter xlsExport = new JRXlsExporter();
-                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                xlsExport.exportReport();
-                servletOutputStream.flush();
-                servletOutputStream.close();
-                printMessage("Отчет по активным клиентам построен");
-            } catch (Exception e) {
-                logger.error("Failed export report : ", e);
-                printError("Ошибка при подготовке отчета: " + e.getMessage());
+                        JRXlsExporter xlsExport = new JRXlsExporter();
+                        xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                        xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                        xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                        xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                        xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                        xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                        xlsExport.exportReport();
+                        servletOutputStream.flush();
+                        servletOutputStream.close();
+                        printMessage("Отчет по активным клиентам построен");
+                    } catch (Exception e) {
+                        logger.error("Failed export report : ", e);
+                        printError("Ошибка при подготовке отчета: " + e.getMessage());
+                    }
+                }
+            } else {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Выберите организацию или список организаций",
+                                null));
             }
         }
     }
