@@ -19,7 +19,11 @@ public abstract class ContractDistributedObject extends DistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         setContract(session, idOfOrg);
+        if (this.getDeletedState()) {
+            setContractOrgHistory(session, idOfOrg);
+        }
     }
 
     protected abstract void setContract(Session session, Long idOfOrg);
+    protected abstract void setContractOrgHistory(Session session, Long idofOrg);
 }

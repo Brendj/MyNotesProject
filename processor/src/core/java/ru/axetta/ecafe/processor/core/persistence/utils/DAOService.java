@@ -2119,6 +2119,15 @@ public class DAOService {
         return null;
     }
 
+    public boolean isContractFromHistory(Long idOfOrg, Long idOfContract) {
+        Session session = (Session) entityManager.unwrap(Session.class);
+        Org org = (Org)session.load(Org.class, idOfOrg);
+        if (org.getContract() == null) {
+            return true;
+        }
+        return (org.getContract().getIdOfContract() != idOfContract);
+    }
+
     /*public void createDOConfirmForContract(String className, Long idOfContract, Long idOfOrg) {
         Session session = (Session) entityManager.unwrap(Session.class);
         Contract contract = (Contract)session.load(Contract.class, idOfContract);

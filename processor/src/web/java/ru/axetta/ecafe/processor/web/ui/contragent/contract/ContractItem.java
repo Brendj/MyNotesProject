@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,10 +131,34 @@ public class ContractItem extends AbstractEntityItem<Contract> {
         contract.setDateOfConclusion(getDateOfConclusion());
         contract.setContragent(getContragent());
         saveGlobalVersion(entityManager, contract);
+
+        List<Long> deletedOrgs = getOrgsDisjunction(entityManager, contract); //организации в контракте до редактирования
+        deletedOrgs.removeAll(getIdOfOrgList()); //исключенные из контракта организации при редактировании
+        for (Long orgId : deletedOrgs) {
+            DAOUtils.removeContractLinkFromOrg(entityManager, contract, orgId);
+        }
+
         if(!getIdOfOrgList().isEmpty()){
             for (Org org : DAOUtils.findOrgs(entityManager, getIdOfOrgList())){
                 org.setContract(contract);
             }
+        }
+    }
+
+    private List getOrgsDisjunction(EntityManager entityManager, Contract contract) {
+        try {
+            List result = new ArrayList<Long>();
+            Session session = entityManager.unwrap(Session.class);
+            Criteria  criteria = session.createCriteria(Org.class);
+            criteria.add(Restrictions.eq("contract", contract));
+            List<Org> list = criteria.list();
+            for (Org org : list) {
+                result.add(org.getIdOfOrg());
+            }
+            return result;
+        }
+        catch (Exception e) {
+            return new ArrayList<Long>();
         }
     }
 

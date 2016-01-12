@@ -34,6 +34,7 @@
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/*</value>
+                <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/org/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/questionary/*</value>

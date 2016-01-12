@@ -1413,19 +1413,22 @@ public class DAOUtils {
         return query.getResultList();
     }
 
-    public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
-        try {
-            javax.persistence.Query del = entityManager.createQuery("delete from DOConfirm where distributedObjectClassName = 'Contract' " +
-            "and guid = '" + entity.getGuid() + "' and orgOwner in (select idOfOrg from Org where contract=:contract)");
-            del.setParameter("contract", entity);
-            del.executeUpdate();
+    public static void removeContractLinkFromOrg(EntityManager entityManager, Contract contract, Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        contract.setContractOrgHistory(session, idOfOrg);
+        javax.persistence.Query q = entityManager.createQuery("update Org set contract=null where idOfOrg=:idOfOrg and contract=:contract");
+        q.setParameter("idOfOrg", idOfOrg);
+        q.setParameter("contract", contract);
+        q.executeUpdate();
+    }
 
-            javax.persistence.Query ins = entityManager.createQuery("insert into DOConfirm (distributedObjectClassName, guid, orgOwner) " +
-            "select 'Contract', '" + entity.getGuid() + "', idOfOrg from Org where contract=:contract");
-            ins.setParameter("contract", entity);
-            ins.executeUpdate();
-        } catch (Exception e) {
-            logger.error("Error creating confirm DO for contract", e);
+    public static void removeContractLinkFromOrgs(EntityManager entityManager, Contract entity) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria  criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("contract", entity));
+        List<Org> list = criteria.list();
+        for (Org org : list) {
+            entity.setContractOrgHistory(session, org.getIdOfOrg());
         }
 
         javax.persistence.Query q = entityManager.createQuery("update Org set contract=null where contract=:contract");

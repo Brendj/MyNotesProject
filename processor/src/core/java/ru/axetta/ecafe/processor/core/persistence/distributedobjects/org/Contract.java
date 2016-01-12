@@ -17,10 +17,7 @@ import ru.axetta.ecafe.processor.core.utils.*;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,25 +66,30 @@ public class Contract extends ContractDistributedObject {
         Criteria criteria = session.createCriteria(Contract.class);
         buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         createProjections(criteria);
-        Criterion crByOwner = Restrictions.eq("orgOwner", idOfOrg);
+        //Criterion crByOwner = Restrictions.eq("orgOwner", idOfOrg);
         //Добавим в возвращаемый список контракты, созданные на процессинге
-
         Query query = session.createQuery("select o.contract.globalId from Org o where o.idOfOrg = :id");
         query.setParameter("id", idOfOrg);
-        //query.setResultTransformer(Transformers.aliasToBean(Contract.class));
         List<Long> list = query.list();
+        //Criterion crByIds = Restrictions.in("globalId", list);
 
+        //и добавим контракты из истории (удаленные контракты или исключенные из контракта организации)
+        Query queryHistory = session.createQuery("select h.contract.globalId from ContractOrgHistory h where h.org.idOfOrg = :id and h.lastVersionOfContract > :version");
+        queryHistory.setParameter("id", idOfOrg);
+        queryHistory.setParameter("version", currentMaxVersion);
+        List<Long> listHistory = queryHistory.list();
+        //Criterion crByHistory = Restrictions.in("globalId", listHistory);
 
-        /*Criteria criteriaByOrg = session.createCriteria(Org.class);
-        criteriaByOrg.add(Restrictions.eq("contract.idOfContract", this));
-        List<Org> list = criteriaByOrg.list();
-        Set<Long> set = new HashSet<Long>();
-        for (Org o : list) {
-            set.add(o.getContract().getIdOfContract());
-        }*/
-        Criterion crByIds = Restrictions.in("globalId", list);
-
-        criteria.add(Restrictions.or(crByOwner, crByIds));
+        //criteria.add(Restrictions.or(crByOwner, crByIds));
+        Junction junction = Restrictions.disjunction();
+        junction.add(Restrictions.eq("orgOwner", idOfOrg));
+        if (!list.isEmpty()) {
+            junction.add(Restrictions.in("globalId", list));
+        }
+        if (!listHistory.isEmpty()) {
+            junction.add(Restrictions.in("globalId", listHistory));
+        }
+        criteria.add(junction);
 
         criteria.setCacheable(false);
         criteria.setReadOnly(true);
@@ -116,6 +118,13 @@ public class Contract extends ContractDistributedObject {
         }
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", owner);
         XMLUtils.setAttributeIfNotNull(element, "State", state);
+        if (!element.hasAttribute("D")) {
+            //проверяем, не пришел ли этот контракт из истории контрактов (из истории - это когда организация исключена из контракта, но сам контракт остался)
+            //проверка такая: поле idofcontract у организации не равен ид. текущего контракта. Достаточно?
+            if ((org.getContract() == null) || DAOService.getInstance().isContractFromHistory(getIdOfSyncOrg(), getGlobalId())) {
+                element.setAttribute("D", "1");
+            }
+        }
     }
 
     @Override
@@ -124,7 +133,6 @@ public class Contract extends ContractDistributedObject {
         if (longOrgOwner != null) {
             setOrgOwner(longOrgOwner);
             setContragent(DAOService.getInstance().getOrg(getOrgOwner()).getDefaultSupplier());
-
         }
         setContractNumber(XMLUtils.getStringAttributeValue(node, "Id", 255));
         setCustomer(XMLUtils.getStringAttributeValue(node, "Customer", 255));
@@ -142,7 +150,19 @@ public class Contract extends ContractDistributedObject {
     protected void setContract(Session session, Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
         org.setContract(this);
-        session.merge(org);
+        session.update(org);
+    }
+
+    @Override
+    public void setContractOrgHistory(Session session, Long idOfOrg) {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+
+        ContractOrgHistory history = new ContractOrgHistory();
+        history.setContract(this);
+        history.setOrg(org);
+        history.setCreatedDate(new Date());
+        history.setLastVersionOfContract(this.globalVersion);
+        session.persist(history);
     }
 
     @Override
