@@ -17,6 +17,10 @@
                 <h:outputText escape="true" value="Тест приема платежей РНИП. Путь к файлу на сервере: /home/jbosser/processor/Debugs/rnip.txt" styleClass="output-text" />
                 <h:commandButton value="Запуск" action="#{debugInfoPage.runTestRNIP()}" />
         </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Test2" styleClass="output-text" />
+            <h:commandButton value="Запуск" action="#{debugInfoPage.runTest2()}" />
+        </h:panelGrid>
     </rich:simpleTogglePanel>
 </h:panelGrid>
 

@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
@@ -36,9 +35,6 @@ public class CardService {
     private static final Logger logger = LoggerFactory.getLogger(CardService.class);
     @Autowired
     private CardWritableRepository cardWritableRepository;
-
-    @Autowired
-    private CardReadOnlyRepository cardReadOnlyRepository;
 
     @Autowired
     private OrgRepository orgRepository;
@@ -71,7 +67,7 @@ public class CardService {
 
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
-        Card card = cardReadOnlyRepository.findByCardNo(o.getCardNo());
+        Card card = cardWritableRepository.findByCardNoWithoutClient(o.getCardNo());
         if(card != null){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
         }else {

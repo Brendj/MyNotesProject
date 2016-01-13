@@ -2128,19 +2128,11 @@ public class DAOService {
         return (org.getContract().getIdOfContract() != idOfContract);
     }
 
-    /*public void createDOConfirmForContract(String className, Long idOfContract, Long idOfOrg) {
-        Session session = (Session) entityManager.unwrap(Session.class);
-        Contract contract = (Contract)session.load(Contract.class, idOfContract);
-        Query del = entityManager.createNativeQuery("delete from cf_do_confirms where distributedObjectClassName = :className and guid = :guid and orgOwner = :org");
-        del.setParameter("className", className);
-        del.setParameter("guid", contract.getGuid());
-        del.setParameter("org", idOfOrg);
-        del.executeUpdate();
-
-        Query ins = entityManager.createNativeQuery("insert into cf_do_confirms(distributedObjectClassName, guid, orgOwner) values (:className, :guid, :org) ");
-        ins.setParameter("className", className);
-        ins.setParameter("guid", contract.getGuid());
-        ins.setParameter("org", idOfOrg);
-        ins.executeUpdate();
-    }*/
+    public int runDebugTest2() {
+        //разные тестовые плюшки
+        return 0;
+        /*return entityManager.createQuery("update Card set  state = 0 where cardNo = :cardNo")
+                .setParameter("cardNo", 1666500521L)
+                .executeUpdate();*/
+    }
 }

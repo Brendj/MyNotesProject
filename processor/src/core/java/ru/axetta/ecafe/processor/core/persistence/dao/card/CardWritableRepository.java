@@ -43,6 +43,14 @@ public class CardWritableRepository extends WritableJpaDao {
             return query.getResultList().get(0);
         }else return null;
     }
+    public Card findByCardNoWithoutClient( Long cardno ){
+        TypedQuery<Card> query = entityManager.createQuery("from Card c where c.cardNo=:cardno", Card.class);
+        query.setParameter("cardno",cardno);
+        List<Card> resultList = query.getResultList();
+        if(resultList.size()> 0){
+            return query.getResultList().get(0);
+        }else return null;
+    }
 
     public void saveEntity(Card card) {
         entityManager.merge(card);

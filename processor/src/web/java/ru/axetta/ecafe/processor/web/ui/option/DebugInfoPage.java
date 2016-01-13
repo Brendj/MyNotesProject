@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.option;
 
-import ru.CryptoPro.JCP.JCP;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -69,6 +69,11 @@ public class DebugInfoPage extends BasicWorkspacePage {
             RNIPLoadPaymentsService rnip = RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
             rnip.addPaymentsToDb(mapList, true);
         }
+    }
+
+    public void runTest2() {
+        CardService cardService = CardService.getInstance();
+        System.out.println(DAOService.getInstance().runDebugTest2());
     }
 
 }
