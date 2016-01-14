@@ -567,13 +567,13 @@ public class Processor implements SyncProcessor,
         if (isReplaceOrg) {
             Set<Card> cards = client.getCards();
             for (Card card : cards) {
-                if (card.getState().equals(CardState.TEMPBLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
+                if (card.getState().equals(CardState.BLOCKED.getValue())) {     //если карта уже заблокирована, ее пропускаем
                     continue;
                 }
                 updateCard(client.getIdOfClient(),
                         card.getIdOfCard(),
                         card.getCardType(),
-                        CardState.TEMPBLOCKED.getValue(), //статус = Заблокировано
+                        CardState.BLOCKED.getValue(), //статус = Заблокировано
                         card.getValidTime(),
                         card.getLifeState(),
                         card.getLockReason(),
@@ -3897,7 +3897,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     private static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {
-                card.setState(CardState.TEMPBLOCKED.getValue());
+                card.setState(CardState.BLOCKED.getValue());
                 card.setLockReason("Выпуск новой карты");
                 persistenceSession.update(card);
             }
