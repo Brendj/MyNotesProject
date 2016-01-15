@@ -891,7 +891,7 @@
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
-                            label="Отчет по оказанным услугам"
+                            label="Сводный отчет по услугам"
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"

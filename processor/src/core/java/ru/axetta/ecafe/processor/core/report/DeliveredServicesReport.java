@@ -13,8 +13,9 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -72,6 +74,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
         private final String templateFilename;
         private boolean exportToHTML = false;
+        private String region;
+        private Boolean otherRegions = false;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -99,25 +103,51 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 idOfContragent = contragent.getIdOfContragent();
             }
 
-            return build(session, startTime, endTime, calendar, idOfContragent, idOfContract);
+            return build(session, startTime, endTime, calendar, idOfContragent, idOfContract, region, getOtherRegions());
         }
 
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long contragent, Long contract) throws Exception {
+                Long contragent, Long contract, String region, Boolean otherRegions) throws Exception {
             Date generateTime = new Date();
-
+            this.otherRegions = otherRegions;
+            this.region = region;
 
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
+            String nameOrg = "";
+            if (org == null) {
+                nameOrg = "                                                                   ";
+            } else  {
+                nameOrg = ((Org)session.load(Org.class, org.getIdOfOrg())).getOfficialName();
+                if ((nameOrg == null) || nameOrg.isEmpty()) {
+                    nameOrg = "                                                                   ";
+                }
+            }
+            String contractNumber = "";
+            String contractDate = "";
+            if (contract == null) {
+                contractNumber = "______";
+                contractDate = "________";
+            } else {
+                Contract cc = (Contract)session.load(Contract.class, contract);
+                contractNumber = cc.getContractNumber();
+                if (cc.getDateOfConclusion() != null) {
+                    contractDate = new SimpleDateFormat("dd.MM.yyyy").format(cc.getDateOfConclusion());
+                } else {
+                    contractDate = "________";
+                }
+            }
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
-
+            parameterMap.put("nameOrg", nameOrg);
+            parameterMap.put("contractNumber", contractNumber);
+            parameterMap.put("contractDate", contractDate);
 
             Date generateEndTime = new Date();
             List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
@@ -173,7 +203,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 //  Берем даты начала и окончания контракта, если они выходят за рамки выбранных пользователем дат, то
                 //  ограничиваем временные рамки
                 Criteria contractCriteria = session.createCriteria(Contract.class);
-                contractCriteria.add(Restrictions.eq("idOfContract", contract));
+                contractCriteria.add(Restrictions.eq("globalId", contract));
                 Contract c = (Contract) contractCriteria.uniqueResult();
                 if (c.getDateOfConclusion().getTime() > start.getTime()) {
                     start.setTime(c.getDateOfConclusion().getTime());
@@ -187,9 +217,29 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             }
             String orgCondition = "";
             if (org != null) {
-                orgCondition = " cf_orgs.idoforg=" + org.getIdOfOrg() + " and ";
+                Org o = (Org)session.load(Org.class, org.getIdOfOrg());
+                String in_str = "";
+                for (Org fo : o.getFriendlyOrg()) {
+                    in_str += fo.getIdOfOrg().toString() + ",";
+                }
+                if (in_str.length() > 0) {
+                    in_str = in_str.substring(0, in_str.length()-1);
+                    orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
+                }
             }
 
+            String districtCondition = "";
+            if ((region != null) && !region.isEmpty()) {
+                //если выбран регион - надо анализировать флаг otherRegions
+                if (otherRegions) {
+                    districtCondition = String.format(" cf_orgs.idoforg in (select distinct friendlyorg from cf_friendly_organization f " +
+                            "join cf_orgs o on f.currentorg = o.idoforg where o.district = '%s') and ", region);
+                } else {
+                    districtCondition = String.format(" cf_orgs.idoforg in (select distinct friendlyorg from cf_friendly_organization f " +
+                            "join cf_orgs o on f.currentorg = o.idoforg where o.district = '%s') and cf_orgs.district = '%s' and ", region, region);
+                }
+                //districtCondition = String.format(" district = '%s' and ", region);
+            }
 
             //String typeCondition = " cf_orders.ordertype<>8 and ";
             String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and " +
@@ -209,7 +259,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
-                    + typeCondition + contragentCondition + contractOrgsCondition + orgCondition
+                    + typeCondition + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + " cf_orders.createddate between :start and :end  "
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
@@ -252,6 +302,22 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 result.add(item);
             }
             return result;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public Boolean getOtherRegions() {
+            return otherRegions;
+        }
+
+        public void setOtherRegions(Boolean otherRegions) {
+            this.otherRegions = otherRegions;
         }
     }
 

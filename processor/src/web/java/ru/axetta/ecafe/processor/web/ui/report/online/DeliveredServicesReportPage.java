@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -28,8 +29,11 @@ import org.hibernate.Transaction;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,7 +43,7 @@ import javax.servlet.http.HttpServletResponse;
  * Отчет по предоставленным услугам
  */
 public class DeliveredServicesReportPage extends OnlineReportPage
-        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
+        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler, OrgSelectPage.CompleteHandler {
     private DeliveredServicesReport deliveredServices;
     private String goodName;
     private Boolean hideMissedColumns;
@@ -47,6 +51,28 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final ContractFilter contractFilter= new ContractFilter();
     protected static final int MILLIS_IN_DAY = 86400000;
+    private String region;
+    private Boolean otherRegions;
+    private final String FILTER_INIT = "Не выбрано. Отчет будет построен по всем образовательным организациям города";
+    protected String filter = FILTER_INIT;
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.idOfOrg = idOfOrg;
+        if (this.idOfOrg == null) {
+            filter = FILTER_INIT;
+        } else {
+            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            filter = org.getShortName();
+        }
+    }
 
     public String getPageFilename() {
         return "report/online/delivered_services_report";
@@ -90,10 +116,12 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         contragentFilter.completeContragentSelection(session, idOfContragent);
+        resetOrg();
     }
 
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
+        resetOrg();
     }
 
     public void showCSVList(ActionEvent actionEvent){
@@ -114,7 +142,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
             DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
-                    contractFilter.getContract().getIdOfContract());
+                    contractFilter.getContract().getIdOfContract(), region, otherRegions);
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -163,13 +191,58 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         fixDates();
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
                                                     contragentFilter.getContragent().getIdOfContragent(),
-                                                    contractFilter.getContract().getIdOfContract());
+                                                    contractFilter.getContract().getIdOfContract(), region, otherRegions);
         htmlReport = deliveredServices.getHtmlReport();
     }
 
     protected void fixDates() {
         if(startDate.after(endDate)) {
             startDate.setTime(endDate.getTime() - MILLIS_IN_DAY);
+        }
+    }
+
+    public List<SelectItem> getRegions() {
+        List<String> regions = DAOService.getInstance().getRegions();
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(""));
+        for(String reg : regions) {
+            items.add(new SelectItem(reg));
+        }
+        return items;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public boolean emptyRegion() {
+        return ((region == null) || (region.isEmpty())) ? true : false;
+    }
+
+    public boolean emptyContragent() {
+        return (contragentFilter.getContragent().getIdOfContragent() == null) ? true : false;
+    }
+
+    public boolean emptyContract() {
+        return (contractFilter.getContract().getIdOfContract() == null) ? true : false;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public Boolean getOtherRegions() {
+        return otherRegions;
+    }
+
+    public void setOtherRegions(Boolean otherRegions) {
+        this.otherRegions = otherRegions;
+    }
+
+    public void resetOrg() {
+        if (!emptyRegion() || !emptyContract() || !emptyContragent()) {
+            idOfOrg = null;
+            setFilter(FILTER_INIT);
         }
     }
 }

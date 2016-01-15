@@ -23,7 +23,7 @@
             <h:inputText value="#{mainPage.deliveredServicesReportPage.contragentFilter.contragent.contragentName}" readonly="true"
                          styleClass="input-text long-field" style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                               reRender="modalContragentSelectorPanel"
+                               reRender="modalContragentSelectorPanel,orgDeliveredServicesSelectButton,orgDeliveredServicesOrgText"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0"
@@ -38,7 +38,7 @@
             <h:inputText value="#{mainPage.deliveredServicesReportPage.contractFilter.contract.contractName}" readonly="true"
                          styleClass="input-text long-field" style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showContractSelectPage}"
-                               reRender="modalContractSelectorPanel"
+                               reRender="modalContractSelectorPanel,orgDeliveredServicesSelectButton,orgDeliveredServicesOrgText"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContractSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0"
@@ -48,12 +48,30 @@
             </a4j:commandButton>
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:selectOneMenu id="regionsList" value="#{mainPage.deliveredServicesReportPage.region}" style="width:325px;" >
+                <a4j:support event="onchange" reRender="districtOtherCheckBox,orgDeliveredServicesSelectButton,orgDeliveredServicesOrgText" ajaxSingle="true"
+                             actionListener="#{mainPage.deliveredServicesReportPage.resetOrg()}"/>
+                <f:selectItems value="#{mainPage.deliveredServicesReportPage.regions}"/>
+            </h:selectOneMenu>
+        </h:panelGroup>
+        <h:outputText escape="true" value="Учитывать корпуса других округов" styleClass="output-text" />
+        <h:selectBooleanCheckbox id="districtOtherCheckBox" value="#{mainPage.deliveredServicesReportPage.otherRegions}"
+            disabled="#{mainPage.deliveredServicesReportPage.emptyRegion()}" title="Учитывать корпуса других округов">
+            <a4j:support event="onchange" ajaxSingle="true" />
+        </h:selectBooleanCheckbox>
+
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.filter}}" />
+                               styleClass="command-link" style="width: 25px;"
+                               disabled="#{!mainPage.deliveredServicesReportPage.emptyRegion() || !mainPage.deliveredServicesReportPage.emptyContract()
+                               || !mainPage.deliveredServicesReportPage.emptyContragent()}"
+                               id="orgDeliveredServicesSelectButton"/>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.filter}}"
+                          id="orgDeliveredServicesOrgText"/>
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
