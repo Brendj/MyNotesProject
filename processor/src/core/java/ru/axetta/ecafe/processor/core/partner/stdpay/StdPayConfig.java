@@ -24,6 +24,7 @@ public class StdPayConfig {
     private static final String PARAM_PARTNER_PUBLIC_KEY = ".partnerPubKey";
     private static final String PARAM_OUR_PRIVATE_KEY = ".ourPrivKey";
     private static final String PARAM_CHECK_SIGN = ".checkSignature";
+    private static final String PARAM_SCREENING = ".screening";
     private static final String PARAM_ALLOWED_CLIENT_ORGS = ".allowedClientOrgs";
     private static final String PARAM_AUTH_TYPE = ".authType";
     private static final String PARAM_ADAPTER = ".adapter";
@@ -41,6 +42,7 @@ public class StdPayConfig {
         public PublicKey partnerPublicKey;
         public int authType;
         public boolean checkSignature;
+        public boolean screening;
         public String adapter;
         public String[] blockedTerminals;
         //public boolean checkOnly;
@@ -56,6 +58,8 @@ public class StdPayConfig {
             String remoteAddressParam = paramBaseName + n + PARAM_REMOTE_ADDRESS;
             String idOfContragentParam = paramBaseName + n + PARAM_ID_OF_CONGRAGENT;
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
+            String screeningParam = paramBaseName + n + PARAM_SCREENING;
+
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
             String authTypeParam = paramBaseName + n + PARAM_AUTH_TYPE;
             //String checkOnlyParam = paramBaseName + n + PARAM_CHECK_ONLY;
@@ -68,6 +72,9 @@ public class StdPayConfig {
             linkConfig.remoteAddressMask = getRequiredParam(remoteAddressParam, properties);
             if (properties.containsKey(checkSignatureParam)) {
                 linkConfig.checkSignature = Boolean.parseBoolean(getRequiredParam(checkSignatureParam, properties));
+            }
+            if (properties.containsKey(screeningParam)) {
+                linkConfig.screening = Boolean.parseBoolean(getRequiredParam(screeningParam, properties));
             }
             /*if (properties.containsKey(checkOnlyParam)) {
                 linkConfig.checkOnly = Boolean.parseBoolean(getRequiredParam(checkOnlyParam, properties));

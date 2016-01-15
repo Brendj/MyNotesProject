@@ -230,6 +230,27 @@ public class OnlinePaymentProcessor {
             return clientSurname +" "+clientFirstName+" "+ clientSecondName;
         }
 
+        public String getClientBlurName() {
+            if (clientSecondName == null) {
+                return null;
+            }
+            return blurString(clientSurname) + " " + blurString(clientFirstName) + " " + blurString(clientSecondName);
+        }
+
+        public String blurString(String toBlurString) {
+            char[] splitString = toBlurString.toCharArray();
+            int lengthOfSplitString = splitString.length;
+
+            String result;
+
+            for (int i = 1; i < lengthOfSplitString - 1; i++) {
+                splitString[i] = '*';
+            }
+
+            result = String.valueOf(splitString);
+            return result;
+        }
+
         public String getClientFirstName() {
             return clientFirstName;
         }

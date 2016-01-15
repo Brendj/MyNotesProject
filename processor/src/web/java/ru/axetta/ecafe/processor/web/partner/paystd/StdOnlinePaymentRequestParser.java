@@ -106,10 +106,19 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
             vals.addLast("BAL");
             vals.addLast(response.getBalance());
         }
-        if (response.getClientFullName()!=null) {
-            vals.addLast("CLIENTFIO");
-            vals.addLast(response.getClientFullName());
+
+        if (linkConfig.screening) {
+            if (response.getClientBlurName() != null) {
+                vals.addLast("CLIENTFIO");
+                vals.addLast(response.getClientBlurName());
+            }
+        } else {
+            if (response.getClientFullName() != null) {
+                vals.addLast("CLIENTFIO");
+                vals.addLast(response.getClientFullName());
+            }
         }
+
         if (response.getProtoVersion()>0 && response.getTspContragentId()!=null) {
             vals.addLast("TSPID");
             vals.addLast(response.getTspContragentId());
