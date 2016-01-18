@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
@@ -28,6 +29,11 @@ import java.io.*;
 public class PaymentControllerWS extends HttpServlet implements PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentControllerWS.class);
     private static final int STD_PAYMENT = 1;
+
+    StdPayConfig.LinkConfig linkConfig;
+    public void setLinkConfig(StdPayConfig.LinkConfig linkConfig) {
+        this.linkConfig = linkConfig;
+    }
 
     @Override
     public PaymentResult process(String request) throws Exception {
@@ -68,7 +74,11 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             paymentResult.res = payResponse.getResultCode();
             paymentResult.desc = payResponse.getResultDescription();
             paymentResult.bal = payResponse.getBalance();
-            paymentResult.clientFIO = payResponse.getClientFullName();
+            if (paymentResult.response.contains("*")) {
+                paymentResult.clientFIO = payResponse.getClientBlurName();
+            } else {
+                paymentResult.clientFIO = payResponse.getClientFullName();
+            }
             paymentResult.tspContragentId = payResponse.getTspContragentId();
             paymentResult.addInfo = payResponse.getAddInfo()==null?null:ParameterStringUtils.toString(payResponse.getAddInfo());
             payResponse.getTspContragentId();
