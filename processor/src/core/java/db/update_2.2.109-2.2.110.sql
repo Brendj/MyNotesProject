@@ -24,3 +24,14 @@ WITH (
 OIDS=FALSE
 );
 
+--Таблица для клиентов, отражающая факт перехода баланса клиента в минус или большой плюс.
+CREATE TABLE cf_balance_leaving
+  (
+  idofbalanceleaving bigserial not null,
+  idofclient bigint not null,
+  datepacketprocessing bigint not null,
+  beforereducebalance bigint,
+  finalbalance bigint,
+  CONSTRAINT cf_idofbalanceleaving PRIMARY KEY (idofbalanceleaving)
+);
+
