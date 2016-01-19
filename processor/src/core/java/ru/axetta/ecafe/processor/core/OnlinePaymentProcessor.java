@@ -238,16 +238,64 @@ public class OnlinePaymentProcessor {
         }
 
         public String blurString(String toBlurString) {
-            char[] splitString = toBlurString.toCharArray();
-            int lengthOfSplitString = splitString.length;
+            String result = "";
 
-            String result;
+            String[] splitBar;
 
-            for (int i = 2; i < lengthOfSplitString - 2; i++) {
-                splitString[i] = '*';
+            if (toBlurString.contains("-")) {
+                splitBar = toBlurString.split("-");
+            } else {
+                splitBar = toBlurString.split(" ");
             }
 
-            result = String.valueOf(splitString);
+            if (splitBar.length >= 2) {
+                String preResult = "";
+
+                for (String str : splitBar) {
+                    int length = str.length();
+
+                    if (length > 3) {
+                        char[] split = str.toCharArray();
+                        preResult = String.valueOf(split[0]).concat(String.valueOf(split[1])).concat("***")
+                                .concat(String.valueOf(split[length - 2])).concat(String.valueOf(split[length - 1]));
+                    } else {
+                        if (length <= 2) {
+                            preResult = str.concat("***").concat(str.toLowerCase());
+                        }
+
+                        if (length == 3) {
+                            char[] split = str.toCharArray();
+                            preResult = String.valueOf(split[0]).concat(String.valueOf(split[1])).concat("***")
+                                    .concat(String.valueOf(split[1])).concat(String.valueOf(split[2]));
+                        }
+                    }
+                    if (toBlurString.contains("-")) {
+                        result = result.concat(preResult).concat("-");
+                    } else {
+                        result = result.concat(preResult).concat(" ");
+                    }
+                }
+                result = result.substring(0, result.length() - 1);
+            } else {
+                int length = toBlurString.length();
+
+                if (length > 3) {
+                    char[] split = toBlurString.toCharArray();
+                    result = String.valueOf(split[0]).concat(String.valueOf(split[1])).concat("***")
+                            .concat(String.valueOf(split[length - 2])).concat(String.valueOf(split[length - 1]));
+                } else {
+                    if (length <= 2) {
+                        result = toBlurString.concat("***").concat(toBlurString.toLowerCase());
+                    }
+
+                    if (length == 3) {
+                        char[] split = toBlurString.toCharArray();
+                        result = String.valueOf(split[0]).concat(String.valueOf(split[1])).concat("***")
+                                .concat(String.valueOf(split[1])).concat(String.valueOf(split[2]));
+                    }
+                }
+            }
+
             return result;
         }
 
