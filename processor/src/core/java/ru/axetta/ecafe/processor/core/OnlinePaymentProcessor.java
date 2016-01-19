@@ -243,7 +243,7 @@ public class OnlinePaymentProcessor {
 
             String result;
 
-            for (int i = 1; i < lengthOfSplitString - 1; i++) {
+            for (int i = 2; i < lengthOfSplitString - 2; i++) {
                 splitString[i] = '*';
             }
 
