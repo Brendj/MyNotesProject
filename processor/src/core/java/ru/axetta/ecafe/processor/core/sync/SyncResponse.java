@@ -1319,6 +1319,7 @@ public class SyncResponse {
         ecafeEnvelopeElement.setAttribute("Options", this.options);
         ecafeEnvelopeElement.setAttribute("Type",syncType.toString());
         ecafeEnvelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
+        ecafeEnvelopeElement.setAttribute("ReportService", (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.report.service"));
 
         if (directorName != null) {
             ecafeEnvelopeElement.setAttribute("DirectorName", this.directorName);
