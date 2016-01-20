@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BalanceLeaving" language="groovy" pageWidth="620" pageHeight="842" columnWidth="580" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7ab631b4-7dde-4abc-a0cc-1be46a7db70f">
-	<property name="ireport.zoom" value="1.4641000000000008"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BalanceLeaving" language="groovy" pageWidth="840" pageHeight="842" columnWidth="800" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7ab631b4-7dde-4abc-a0cc-1be46a7db70f">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
 	<field name="idOfClient" class="java.lang.Long"/>
-	<field name="datePacketProcessing" class="java.lang.String"/>
-	<field name="beforeReduceBalance" class="java.lang.Long"/>
-	<field name="finalBalance" class="java.lang.Long"/>
+	<field name="idOfTransaction" class="java.lang.Long"/>
+	<field name="transactionSum" class="java.lang.Long"/>
+	<field name="balanceBeforeTransaction" class="java.lang.Long"/>
+	<field name="balanceAfterTransaction" class="java.lang.Long"/>
+	<field name="transactionTime" class="java.lang.String"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="f2cb0097-d4a2-4fcb-9f2b-3cb055e4ab08" x="0" y="0" width="580" height="79"/>
+				<reportElement uuid="f2cb0097-d4a2-4fcb-9f2b-3cb055e4ab08" x="0" y="0" width="800" height="79"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + $P{startDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + " c " + $P{startDate} + " по " + "$P{endDate}"  ]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<pageHeader>
 		<band height="50">
 			<staticText>
-				<reportElement uuid="e3d808a0-65a8-496d-8eca-61c44521bdaf" x="0" y="0" width="70" height="50"/>
+				<reportElement uuid="e3d808a0-65a8-496d-8eca-61c44521bdaf" x="100" y="0" width="100" height="50"/>
 				<box>
+					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
 					<bottomPen lineWidth="0.5"/>
@@ -35,7 +39,7 @@
 				<text><![CDATA[Идентификатор клиента]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1a1295c4-b6e5-48b8-9497-0f7d6bf91521" x="70" y="0" width="170" height="50"/>
+				<reportElement uuid="170a3343-84b1-4efc-8277-9fff3765775e" x="0" y="0" width="100" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -44,12 +48,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Дата время обработки пакета (текущее)]]></text>
+				<text><![CDATA[Идентификатор транзакции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1d8933e2-65cd-45f8-a051-c9c103a96c0a" x="410" y="0" width="170" height="50"/>
+				<reportElement uuid="bdd987e0-ba85-4e2b-bf7f-9f5b87be7ce5" x="200" y="0" width="150" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -58,12 +62,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сумма до уменьшения (до)]]></text>
+				<text><![CDATA[Сумма операции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b696fdda-daf6-4725-a2fd-08c6109424b0" x="240" y="0" width="170" height="50"/>
+				<reportElement uuid="1f115ca0-199f-4b5a-90f1-5f9d4144be1b" x="350" y="0" width="150" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -72,16 +76,44 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сумма баланса финальная (после)]]></text>
+				<text><![CDATA[Баланс до операции]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0a6a225f-46ad-427f-bb7c-0ec5d13b57ca" x="500" y="0" width="150" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Баланс после операции]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="89d33e37-0b35-4f5b-86c5-7b73ae9532c5" x="650" y="0" width="150" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Время операции]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
 		<band height="21" splitType="Stretch">
 			<textField>
-				<reportElement uuid="9f64770a-a2ad-462b-ba69-90e8c68e1c50" x="0" y="0" width="70" height="20"/>
+				<reportElement uuid="9f64770a-a2ad-462b-ba69-90e8c68e1c50" x="100" y="0" width="100" height="21"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -95,7 +127,7 @@
 				<textFieldExpression><![CDATA[$F{idOfClient}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="4b1d9ee6-e692-46d0-b11f-4bce14005132" x="410" y="0" width="170" height="20"/>
+				<reportElement uuid="93220506-cb2d-4d9a-aa2d-739da4bf01eb" x="0" y="0" width="100" height="21"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -104,12 +136,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="false"/>
+					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{finalBalance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{idOfTransaction}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="42d84606-9ebe-4df8-a9c5-9fae81c6352a" x="240" y="0" width="170" height="20"/>
+				<reportElement uuid="3d115528-0f61-436f-97d6-dd52541553fe" x="200" y="0" width="150" height="21"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -118,12 +150,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="false"/>
+					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{beforeReduceBalance}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{transactionSum}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="961d4100-66e9-4727-91ca-6c0fd8624455" x="70" y="0" width="170" height="20"/>
+				<reportElement uuid="9a478b8a-4088-4912-ad35-d61c64ef9bd9" x="350" y="0" width="150" height="21"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -132,9 +164,37 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="false"/>
+					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{datePacketProcessing}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{balanceBeforeTransaction}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5c3731cd-b122-4d78-bff8-2e82ffe97c70" x="500" y="0" width="150" height="21"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{balanceAfterTransaction}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d7b960d1-6a39-4649-a873-98802119dec2" x="650" y="0" width="150" height="21"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{transactionTime}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

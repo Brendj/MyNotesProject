@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.*;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsIntervalJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsJasperReport;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1175,16 +1177,16 @@ public class AutoReportGenerator {
             }
         }));
 
-        REPORT_DEFS.add(new ReportDef(DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.class, DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(DetailedDeviationsWithoutCorpsJasperReport.class, DetailedDeviationsWithoutCorpsJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsWithoutCorpsJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         jobId,
                         jobName,
-                        new DetailedDeviationsPaymentOrReducedPriceMealsJasperReport(),
+                        new DetailedDeviationsWithoutCorpsJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
                         reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
@@ -1193,21 +1195,21 @@ public class AutoReportGenerator {
 
                 JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
-                        .put(DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        .put(DetailedDeviationsWithoutCorpsJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));
 
-        REPORT_DEFS.add(new ReportDef(DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.class, DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
+        REPORT_DEFS.add(new ReportDef(DetailedDeviationsWithoutCorpsIntervalJasperReport.class, DetailedDeviationsWithoutCorpsIntervalJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
-                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.class.getSimpleName() + ".jasper";
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedDeviationsWithoutCorpsIntervalJasperReport.class.getSimpleName() + ".jasper";
 
                 BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
                         jobId,
                         jobName,
-                        new DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport(),
+                        new DetailedDeviationsWithoutCorpsIntervalJasperReport(),
                         autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
                         autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
                         reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
@@ -1216,7 +1218,7 @@ public class AutoReportGenerator {
 
                 JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
-                        .put(DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        .put(DetailedDeviationsWithoutCorpsIntervalJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));
@@ -1309,6 +1311,29 @@ public class AutoReportGenerator {
                 JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(BeneficiaryByAllOrgReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(BalanceLeavingReport.class, BalanceLeavingReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + BalanceLeavingReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
+                        jobName,
+                        new BalanceLeavingReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(BalanceLeavingReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));

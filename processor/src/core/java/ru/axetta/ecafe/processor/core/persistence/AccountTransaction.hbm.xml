@@ -24,6 +24,7 @@
         <property name="transactionSum" column="TransactionSum" type="long" not-null="true" update="false"/>
         <property name="transactionSubBalance1Sum" column="TransactionSubBalance1Sum" type="long" update="false"/>
         <property name="balanceBeforeTransaction" column="BalanceBefore" type="long" update="false"/>
+        <property name="balanceAfterTransaction" column="BalanceAfter" type="long"/>
         <property name="subBalance1BeforeTransaction" column="SubBalance1BeforeTransaction" type="long" update="false"/>
         <property name="source" column="Source" type="string" length="30" not-null="true" update="false"/>
         <property name="sourceType" column="SourceType" type="integer" not-null="true" update="false"/>

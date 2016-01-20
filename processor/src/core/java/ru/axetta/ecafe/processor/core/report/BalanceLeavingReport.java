@@ -9,12 +9,12 @@ import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: anvarov
  * Date: 18.01.16
  * Time: 13:22
  * To change this template use File | Settings | File Templates.
  */
-public class BalanceLeavingReport extends BasicReportForContragentJob {
+public class BalanceLeavingReport extends BasicReportForAllOrgJob {
 
     /* Логгер для отчета BalanceLeavingReport */
     private static final Logger Logger = LoggerFactory.getLogger(BalanceLeavingReport.class);
@@ -23,10 +23,9 @@ public class BalanceLeavingReport extends BasicReportForContragentJob {
 
     }
 
-    public BalanceLeavingReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime, Long idOfContragent) {
-        super(generateTime, generateDuration, print, startTime, endTime,
-                idOfContragent);
+    public BalanceLeavingReport(Date generateTime, long generateDuration, JasperPrint print,
+            Date startTime, Date endTime) {
+        super(generateTime, generateDuration, print, startTime, endTime);
     }
 
     public BalanceLeavingReport() {

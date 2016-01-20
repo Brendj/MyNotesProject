@@ -47,6 +47,7 @@ public class AccountTransaction {
     private Long transactionSum;
     private Long transactionSubBalance1Sum;
     private Long balanceBeforeTransaction;
+    private Long balanceAfterTransaction;
     private Long subBalance1BeforeTransaction;
     // Номер счета по умолчаню основной
     private Long sourceBalanceNumber;
@@ -138,6 +139,14 @@ public class AccountTransaction {
 
     public void setBalanceBeforeTransaction(Long balanceBeforeTransaction) {
         this.balanceBeforeTransaction = balanceBeforeTransaction;
+    }
+
+    public Long getBalanceAfterTransaction() {
+        return balanceAfterTransaction;
+    }
+
+    public void setBalanceAfterTransaction(Long balanceAfterTransaction) {
+        this.balanceAfterTransaction = balanceAfterTransaction;
     }
 
     public Long getTransactionSubBalance1Sum() {
