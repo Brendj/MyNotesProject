@@ -5,6 +5,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -34,7 +35,12 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
 
     @Override
     public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-        if (!(new File(this.templateFilename)).exists()) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
+                + "BalanceLeavingReport.jasper";
+
+        if (!(new File(templateFilename)).exists()) {
             throw new Exception(String.format("Не найден файл шаблона '%s'", templateFilename));
         }
 
@@ -42,8 +48,8 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
 
         /* Параметры для передачи в jasper */
         Map<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put("endDate", endTime);
-        parameterMap.put("startDate", startTime);
+        parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+        parameterMap.put("startDate", CalendarUtils.dateToString(startTime));
 
         JRDataSource dataSource = buildDataSource(session, startTime, endTime);
 
@@ -62,7 +68,7 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
 
         Query query = session.createSQLQuery(
                 "select idOfTransaction, idOfClient, transactionSum, balanceBefore, balanceAfter, transactionDate "
-                        + "from cf_transactions where transactionDate between :startTime and :endTime");
+                        + "from cf_transactions where balanceAfter < 0 and transactionDate between :startTime and :endTime");
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
 

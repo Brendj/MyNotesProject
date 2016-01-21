@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.*;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsNewJasperReport;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -275,7 +276,9 @@ public class ReportRuleConstants {
             new ReportHint(SMSDeliveryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(RequestsAndOrdersReport.class.getCanonicalName(), new int[]{3, 32, 40, 41, 42, 43, 44}),
             new ReportHint(PaymentTotalsReport.class.getCanonicalName(), new int[]{20, 3, 35}),
-            new ReportHint(BeneficiaryByAllOrgReport.class.getCanonicalName(), new int[]{})
+            new ReportHint(BeneficiaryByAllOrgReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(DetailedDeviationsWithoutCorpsNewJasperReport.class.getCanonicalName(), new int[]{0,3}),
+            new ReportHint(BalanceLeavingReport.class.getCanonicalName(), new int[]{0})
     };
 
     private ReportRuleConstants() {

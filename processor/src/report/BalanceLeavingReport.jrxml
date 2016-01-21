@@ -3,14 +3,15 @@
 	<property name="ireport.zoom" value="1.2100000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="startDate" class="java.util.Date"/>
-	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
 	<field name="idOfClient" class="java.lang.Long"/>
 	<field name="idOfTransaction" class="java.lang.Long"/>
 	<field name="transactionSum" class="java.lang.Long"/>
 	<field name="balanceBeforeTransaction" class="java.lang.Long"/>
 	<field name="balanceAfterTransaction" class="java.lang.Long"/>
 	<field name="transactionTime" class="java.lang.String"/>
+	<field name="transactionTimeShortFormat" class="java.lang.String"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
@@ -18,7 +19,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + " c " + $P{startDate} + " по " + "$P{endDate}"  ]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + " c " + $P{startDate} + " по " +  " $P{endDate}" ]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -152,7 +153,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{transactionSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((double)(Long.valueOf($F{transactionSum}.toString())))/((double) 100)]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="9a478b8a-4088-4912-ad35-d61c64ef9bd9" x="350" y="0" width="150" height="21"/>
@@ -166,7 +167,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{balanceBeforeTransaction}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((double)(Long.valueOf($F{balanceBeforeTransaction}.toString())))/((double) 100)]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="5c3731cd-b122-4d78-bff8-2e82ffe97c70" x="500" y="0" width="150" height="21"/>
@@ -180,7 +181,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{balanceAfterTransaction}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((double)(Long.valueOf($F{balanceAfterTransaction}.toString())))/((double) 100)]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="d7b960d1-6a39-4649-a873-98802119dec2" x="650" y="0" width="150" height="21"/>
@@ -194,7 +195,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{transactionTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{transactionTimeShortFormat}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
