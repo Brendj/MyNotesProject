@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.210000000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="31"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -76,6 +76,9 @@
 	<parameter name="endTime" class="java.lang.Long"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="nameOrg" class="java.lang.String"/>
+	<parameter name="contractNumber" class="java.lang.String"/>
+	<parameter name="contractDate" class="java.lang.String"/>
 	<field name="level1" class="java.lang.String"/>
 	<field name="level2" class="java.lang.String"/>
 	<field name="price" class="java.lang.Long"/>
@@ -100,21 +103,43 @@
 		<band splitType="Immediate"/>
 	</background>
 	<title>
-		<band height="100" splitType="Stretch">
+		<band height="120" splitType="Stretch">
 			<elementGroup/>
 			<staticText>
-				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="802" height="20"/>
+				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="802" height="44"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Оказанные услуги]]></text>
+				<text><![CDATA[Сводный отчет
+ по услугам по организации питания и обеспечения питьевого режима обучающихся]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="1" y="32" width="390" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="1" y="100" width="613" height="20"/>
 				<textElement>
-					<font size="12" isBold="true"/>
+					<font size="12" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Период: "+$V{startDateStr}+" - "+$V{endDateStr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Период оказания услуг: с "+$V{startDateStr}+" по "+$V{endDateStr}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="5317ead8-9ba1-42b2-b8a8-6e6ddf5e27e0" x="1" y="59" width="801" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="8" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[(наименование образовательной организации)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="7d5afef2-d27d-4e60-b3b3-8b46bcedc8a0" x="1" y="44" width="801" height="15"/>
+				<textElement textAlignment="Center">
+					<font isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nameOrg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a0fd84c5-2ea7-4dff-9c08-ed242a5e78fb" x="0" y="80" width="614" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Контракт №"+$P{contractNumber}+" от "+$P{contractDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -127,28 +152,25 @@
 	<lastPageFooter>
 		<band height="92">
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="1" y="0" width="390" height="31"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="-1" y="42" width="390" height="31"/>
 				<textElement verticalAlignment="Bottom">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Составил_________________( Исполнитель)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="391" y="0" width="411" height="31"/>
+				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="390" y="42" width="277" height="31"/>
 				<textElement verticalAlignment="Bottom">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Проверил ________________ (Получатель услуг)]]></text>
+				<text><![CDATA[Проверил ________________ (Заказчик)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="55" y="31" width="137" height="20"/>
-				<textElement/>
-				<text><![CDATA[      М.П.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="451" y="31" width="88" height="20"/>
-				<textElement/>
-				<text><![CDATA[      М.П.]]></text>
+				<reportElement uuid="dc2da192-13ea-4858-9c44-904ef128040c" x="0" y="22" width="524" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Приложение: Реестры талонов по каждому объекту Заказчика.]]></text>
 			</staticText>
 		</band>
 	</lastPageFooter>
@@ -187,7 +209,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement verticalAlignment="Middle"/>
-							<text><![CDATA[Образовательной организации (Получатель услуг)Наименование ]]></text>
+							<text><![CDATA[Наименование объекта Заказчика]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="46ee7237-4f20-4bf6-902c-43f748713003" style="Crosstab Data Text" x="342" y="0" width="151" height="200"/>
@@ -199,7 +221,8 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement verticalAlignment="Middle"/>
-							<text><![CDATA[Фактический адрес пищеблока организации ]]></text>
+							<text><![CDATA[Адрес объекта образовательной организации
+(место оказания услуг)]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -306,7 +329,7 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="c697688d-36f0-44f3-be57-5924ce8a227e" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="284" height="39"/>
 								<box>
 									<pen lineWidth="0.5"/>
@@ -418,7 +441,7 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textField isStretchWithOverflow="true">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement uuid="aad9e225-5c15-4a16-95c1-65ebc6fd721a" style="Crosstab Data Text" positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="0" y="0" width="356" height="30"/>
 								<box>
 									<pen lineWidth="0.5"/>
@@ -430,7 +453,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{level1}.split("@")[1]]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{level1}.endsWith("@") ? "_" : $V{level1}.split("@")[1]]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabColumnHeader>
@@ -459,7 +482,7 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement uuid="f3e06a87-12d0-4c32-b4ea-723540e6de75" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="207" height="30"/>
 								<box>
 									<pen lineWidth="0.5"/>
@@ -528,7 +551,7 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement uuid="530ffe55-9682-4887-8687-2a9d49925b01" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="140" height="30"/>
 								<box>
 									<pen lineWidth="0.5"/>
@@ -554,7 +577,7 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Кол-во, шт]]></text>
+								<text><![CDATA[Количество РП, шт.]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="b0998b7d-f650-40a7-8709-42bd73d34a4b" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="30" width="40" height="110"/>
@@ -568,7 +591,7 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Цена по контракту]]></text>
+								<text><![CDATA[Цена РП по ГК, руб.]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="7b1a6658-40fa-4802-a5c2-32c7f92a103e" style="Crosstab Data Text" stretchType="RelativeToBandHeight" mode="Transparent" x="76" y="30" width="64" height="110" backcolor="#FFCCCC"/>
@@ -582,7 +605,7 @@
 								<textElement verticalAlignment="Middle" rotation="Left">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Стоимость, руб.]]></text>
+								<text><![CDATA[Стоимость РП, руб.]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabColumnHeader>
@@ -1003,7 +1026,7 @@
 							<bottomPen lineWidth="0.5"/>
 							<rightPen lineWidth="0.5"/>
 						</box>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" pattern="0.00">
 							<reportElement uuid="54a8b761-8ae7-483e-a5a3-79c32b6fade4" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1016,9 +1039,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="">
 							<reportElement uuid="d707c545-f7af-4309-8ebe-c1023b523f8f" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="36" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1031,7 +1054,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00">
 							<reportElement uuid="5f925592-758e-4be4-9a06-ae681a555ea0" style="Crosstab Data Text" mode="Transparent" x="76" y="0" width="64" height="39" backcolor="#CCFFFF"/>
