@@ -25,3 +25,5 @@ OIDS=FALSE
 );
 
 ALTER TABLE cf_transactions ADD COLUMN balanceafter bigint;
+
+ALTER TABLE cf_complexinfo ADD COLUMN modevisible integer;

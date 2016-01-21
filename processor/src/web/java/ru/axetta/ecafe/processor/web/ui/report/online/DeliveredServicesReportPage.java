@@ -141,7 +141,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
-            DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
+            DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar, idOfOrg, contragentFilter.getContragent().getIdOfContragent(),
                     contractFilter.getContract().getIdOfContract(), region, otherRegions);
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -189,7 +189,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             }
         }
         fixDates();
-        this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
+        this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar, idOfOrg,
                                                     contragentFilter.getContragent().getIdOfContragent(),
                                                     contractFilter.getContract().getIdOfContract(), region, otherRegions);
         htmlReport = deliveredServices.getHtmlReport();

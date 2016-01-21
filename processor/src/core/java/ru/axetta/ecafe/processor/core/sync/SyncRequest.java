@@ -747,6 +747,11 @@ public class SyncRequest {
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
+                        Integer modeVisible = null;
+                        Node modeVisibleNode = namedNodeMap.getNamedItem("cv");
+                        if (modeVisibleNode != null) {
+                            modeVisible = Integer.parseInt(namedNodeMap.getNamedItem("cv").getTextContent());
+                        }
                         Node useTrDiscountNode = namedNodeMap.getNamedItem("UseTrDiscount");
                         Integer useTrDiscount = null;
                         if (useTrDiscountNode != null) {
@@ -775,7 +780,8 @@ public class SyncRequest {
                             childNode = childNode.getNextSibling();
                         }
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                usedSubscriptionFeeding, reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice, goodsGuid);
+                                usedSubscriptionFeeding, reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail,
+                                reqComplexInfoDiscountDetail, currentPrice, goodsGuid, modeVisible);
                     }
 
                 }
@@ -792,10 +798,11 @@ public class SyncRequest {
                 private final ReqComplexInfoDiscountDetail complexInfoDiscountDetail;
                 private final Long currentPrice;
                 private final String goodsGuid;
+                private final Integer modeVisible;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         int usedSubscriptionFeeding, List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
-                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid) {
+                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid, Integer modeVisible) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -808,6 +815,7 @@ public class SyncRequest {
                     this.reqMenuDetail = reqMenuDetail;
                     this.currentPrice = currentPrice;
                     this.goodsGuid = goodsGuid;
+                    this.modeVisible = modeVisible;
                 }
 
                 public int getComplexId() {
@@ -856,6 +864,10 @@ public class SyncRequest {
 
                 public int getUsedSubscriptionFeeding() {
                     return usedSubscriptionFeeding;
+                }
+
+                public Integer getModeVisible() {
+                    return modeVisible;
                 }
 
                 @Override
@@ -910,6 +922,10 @@ public class SyncRequest {
                             : that.useTrDiscount != null) {
                         return false;
                     }
+                    if (modeVisible != null ? !modeVisible.equals(that.modeVisible)
+                            : that.modeVisible != null) {
+                        return false;
+                    }
 
                     return true;
                 }
@@ -928,6 +944,7 @@ public class SyncRequest {
                     builder.append(goodsGuid);
                     builder.append(reqMenuDetail);
                     builder.append(complexInfoDiscountDetail);
+                    builder.append(modeVisible);
                     if(complexInfoDetails != null){
                         for (ReqComplexInfoDetail obj : complexInfoDetails) {
                             builder.append(obj);

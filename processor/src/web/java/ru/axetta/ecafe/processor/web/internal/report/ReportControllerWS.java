@@ -8,11 +8,12 @@ package ru.axetta.ecafe.processor.web.internal.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportInfoItem;
+import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportParameter;
+import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportRepository;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.report.dataflow.*;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -21,18 +22,31 @@ import org.slf4j.LoggerFactory;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
+import javax.xml.bind.annotation.XmlMimeType;
+import javax.xml.ws.soap.MTOM;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
+@MTOM
 @WebService()
 public class ReportControllerWS extends HttpServlet implements ReportController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportControllerWS.class);
 
-    private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
+    private static final Long RC_OK = 0L;
+    private static final Long RC_INTERNAL_ERROR = 100L;
+    private static final Long RC_PARAMETERS_ERROR = 101L;
+    private static final Long RC_UNKNOWN_REPORT_ERROR = 102L;
+    private static final Long RC_FILE_NOT_FOUND_ERROR = 103L;
     private static final String RC_OK_DESC = "OK";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
+    private static final String RC_PARAMETERS_ERROR_DESC = "Ошибочные входные данные или нет данных за запрашиваемый период";
+    private static final String RC_UNKNOWN_REPORT_ERROR_DESC = "Генерация этого отчета не поддерживается";
+    private static final String RC_FILE_NOT_FOUND_ERROR_DESC = "Запрашиваемый файл не найден в репозитории";
+
+    public final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
+    public final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
 
     @Override
     public ReportTradeMaterialGoodDataInfo generateReportTradeMaterialGood(@WebParam(name = "idOfOrg") Long idOfOrg,
@@ -47,7 +61,7 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            service.setSession(persistenceSession);
+            //service.setSession(persistenceSession);
             List<TradeMaterialGoodItem> tradeMaterialGoodItemList = service.findReportDataInfo(idOfOrg, startDate, endDate);
             TradeMaterialGoodList tradeMaterialGoodList = new TradeMaterialGoodList();
             tradeMaterialGoodList.setT(tradeMaterialGoodItemList);
@@ -93,6 +107,100 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public @XmlMimeType("application/octet-stream") GenerateReportResult generateReport(@WebParam(name = "reportType") String reportType,
+            @WebParam(name = "parameters") List<ReportParameter> parameters) throws Exception {
+        /*Параметры метода в структуре parameters
+        Обязательные:
+          startDate
+          endDate
+          idOfOrg
+        Необязательные:
+          idOfContragent
+          idOfContract
+          region
+        */
+        GenerateReportResult result = new GenerateReportResult();
+        result.setReport(null);
+        //result.setCode(RC_UNKNOWN_REPORT_ERROR);
+        //result.setResult(RC_UNKNOWN_REPORT_ERROR_DESC);
+        try {
+            if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
+                byte[] jasper_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getDeliveredServicesReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
+                if (jasper_content == null) {
+                    result.setCode(RC_PARAMETERS_ERROR);
+                    result.setResult(RC_PARAMETERS_ERROR_DESC);
+                } else {
+                    result.setReport(jasper_content);
+                    result.setCode(RC_OK);
+                    result.setResult(RC_OK_DESC);
+                }
+            }
+        } catch (Exception e) {
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+            logger.error("Error in generateReport", e);
+        }
+        return result;
+    }
+
+    @Override
+    public RepositoryReportListResult getRepositoryReportsList(@WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate) throws Exception {
+        RepositoryReportListResult result = new RepositoryReportListResult();
+        try {
+            List<ReportInfoItem> reportInfos = RuntimeContext.getAppContext().getBean(ReportRepository.class).getReportInfos(idOfOrg, startDate, endDate);
+            RepositoryReportItems resultItems = new RepositoryReportItems();
+            List<RepositoryReportItem> list = new ArrayList<RepositoryReportItem>();
+            for(ReportInfoItem info : reportInfos) {
+                RepositoryReportItem item = new RepositoryReportItem();
+                item.setReportName(info.getReportName());
+                item.setCreatedDate(info.getCreatedDate());
+                item.setStartDate(info.getStartDate());
+                item.setEndDate(info.getEndDate());
+                item.setOrgAddress(info.getOrgAddress());
+                item.setOrgShortName(info.getOrgShortName());
+                item.setReportFile(info.getReportFile());
+                list.add(item);
+            }
+            resultItems.setRepositoryReportItem(list);
+            result.setRepositoryReportItems(resultItems);
+            result.setCode(RC_OK);
+            result.setResult(RC_OK_DESC);
+        } catch (Exception e) {
+            result.setRepositoryReportItems(null);
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+            logger.error("Error in getRepositoryReportsList", e);
+        }
+
+        return result;
+    }
+
+    @Override
+    public GenerateReportResult getRepositoryReport(@WebParam(name = "idOfReport") Long idOfReport) throws Exception {
+        GenerateReportResult result = new GenerateReportResult();
+        result.setReport(null);
+        result.setCode(RC_UNKNOWN_REPORT_ERROR);
+        result.setResult(RC_UNKNOWN_REPORT_ERROR_DESC);
+        try {
+            byte[] report_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getRepositoryReportById(idOfReport);
+            if (report_content == null) {
+                result.setCode(RC_FILE_NOT_FOUND_ERROR);
+                result.setResult(RC_FILE_NOT_FOUND_ERROR_DESC);
+            } else {
+                result.setReport(report_content);
+                result.setCode(RC_OK);
+                result.setResult(RC_OK_DESC);
+            }
+        } catch (Exception e) {
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+            logger.error("Error in generateReport", e);
         }
         return result;
     }

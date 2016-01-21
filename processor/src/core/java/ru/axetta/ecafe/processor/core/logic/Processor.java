@@ -3109,12 +3109,16 @@ public class Processor implements SyncProcessor,
                     reqComplexInfo.getComplexMenuName());
             Integer useTrDiscount = reqComplexInfo.getUseTrDiscount();
             Long currentPrice = reqComplexInfo.getCurrentPrice();
+            Integer modeVisible = reqComplexInfo.getModeVisible();
             String goodsGuid = reqComplexInfo.getGoodsGuid();
             if (useTrDiscount != null) {
                 complexInfo.setUseTrDiscount(useTrDiscount);
             }
             if (currentPrice != null) {
                 complexInfo.setCurrentPrice(currentPrice);
+            }
+            if (modeVisible != null) {
+                complexInfo.setModeVisible(modeVisible);
             }
             if (goodsGuid != null) {
                 Good good = findGoodByGuid(persistenceSession, goodsGuid);

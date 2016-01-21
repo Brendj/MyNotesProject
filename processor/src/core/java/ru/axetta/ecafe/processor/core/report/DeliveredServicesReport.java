@@ -39,7 +39,7 @@ import java.util.*;
  * Time: 13:37
  * Онлайн отчеты -> Льготное питание -> Отчет по предоставленным услугам
  */
-public class DeliveredServicesReport extends BasicReportForAllOrgJob {
+public class DeliveredServicesReport extends BasicReportForOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(DeliveredServicesReport.class);
 
@@ -86,6 +86,10 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             exportToHTML = true;
         }
 
+        public void setOrg(Long idOfOrg) {
+            org = new OrgShortItem(idOfOrg);
+        }
+
         @Override
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
@@ -103,11 +107,11 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 idOfContragent = contragent.getIdOfContragent();
             }
 
-            return build(session, startTime, endTime, calendar, idOfContragent, idOfContract, region, getOtherRegions());
+            return build(session, startTime, endTime, calendar, org.getIdOfOrg(), idOfContragent, idOfContract, region, getOtherRegions());
         }
 
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long contragent, Long contract, String region, Boolean otherRegions) throws Exception {
+                Long orgId, Long contragent, Long contract, String region, Boolean otherRegions) throws Exception {
             Date generateTime = new Date();
             this.otherRegions = otherRegions;
             this.region = region;
@@ -156,7 +160,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, null);
+                        jasperPrint, startTime, endTime, null, org.getIdOfOrg());
             } else {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -327,8 +331,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
     public DeliveredServicesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime, List<DeliveredServicesItem> items) {
-        super(generateTime, generateDuration, print, startTime, endTime);
+            Date endTime, List<DeliveredServicesItem> items, Long idOfOrg) {
+        super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
         this.items = items;
     }
 
@@ -348,7 +352,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
     @Override
-    public BasicReportForAllOrgJob createInstance() {
+    public BasicReportForOrgJob createInstance() {
         return new DeliveredServicesReport();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
