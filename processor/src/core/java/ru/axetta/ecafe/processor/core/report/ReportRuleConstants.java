@@ -254,7 +254,7 @@ public class ReportRuleConstants {
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{20, 21}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(DeliveredServicesReport.class.getCanonicalName(),  new int[]{3}),
+            new ReportHint(DeliveredServicesReport.class.getCanonicalName(),  new int[]{3, 32}),
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(ClientBalanceByDayReport.class.getCanonicalName(), new int[]{20, 3, 45}),

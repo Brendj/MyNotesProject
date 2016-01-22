@@ -39,7 +39,7 @@ import java.util.*;
  * Time: 13:37
  * Онлайн отчеты -> Льготное питание -> Отчет по предоставленным услугам
  */
-public class DeliveredServicesReport extends BasicReportForOrgJob {
+public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(DeliveredServicesReport.class);
 
