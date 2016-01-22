@@ -44,7 +44,7 @@ public class ClientAccountManager {
             // остальное списываем с основоного
             accountTransaction.setSubBalance1BeforeTransaction(sum);
             accountTransaction.setTransactionSubBalance1Sum(transactionSum-diff);
-            accountTransaction.setBalanceAfterTransaction(transactionSum);
+            accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
             DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
             client.addBalanceNotForSave(transactionSum);
@@ -54,7 +54,7 @@ public class ClientAccountManager {
             // на субсчете хватает средства списываем с АП
             accountTransaction.setSubBalance1BeforeTransaction(sum);
             accountTransaction.setTransactionSubBalance1Sum(transactionSum);
-            accountTransaction.setBalanceAfterTransaction(transactionSum);
+            accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
             DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
             client.addBalanceNotForSave(transactionSum);
@@ -69,7 +69,7 @@ public class ClientAccountManager {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
                 sourceType, transactionTime);
         accountTransaction.setOrg(client.getOrg());
-        accountTransaction.setBalanceAfterTransaction(transactionSum);
+        accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
         client.addBalanceNotForSave(transactionSum);
@@ -88,7 +88,7 @@ public class ClientAccountManager {
             accountTransaction.setSubBalance1BeforeTransaction(sum);
             accountTransaction.setTransactionSubBalance1Sum(transactionSum);
         }
-        accountTransaction.setBalanceAfterTransaction(transactionSum);
+        accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
         client.addBalanceNotForSave(transactionSum);
@@ -110,7 +110,7 @@ public class ClientAccountManager {
             cancelTransaction.setSubBalance1BeforeTransaction(client.getSubBalance(1));
             cancelTransaction.setTransactionSubBalance1Sum(-transaction.getTransactionSubBalance1Sum());
         }
-        cancelTransaction.setBalanceAfterTransaction(-transaction.getTransactionSum());
+        cancelTransaction.setBalanceAfterTransaction(client.getBalance() + (-transaction.getTransactionSum()));
         session.save(cancelTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum());
         if(transaction.getTransactionSubBalance1Sum()!=null){
@@ -128,7 +128,7 @@ public class ClientAccountManager {
         AccountTransaction cancelTransaction = new AccountTransaction(client, null, subBalanceNum, -transactionSum, source,
                     AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, transactionTime);
         cancelTransaction.setOrg(transaction.getOrg());
-        cancelTransaction.setBalanceAfterTransaction(-transactionSum);
+        cancelTransaction.setBalanceAfterTransaction(client.getBalance() + (-transactionSum));
         session.save(cancelTransaction);
 
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transactionSum);
