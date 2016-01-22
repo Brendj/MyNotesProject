@@ -160,7 +160,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, null, org.getIdOfOrg());
+                        jasperPrint, startTime, endTime, null, (org == null ? null : org.getIdOfOrg()));
             } else {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();

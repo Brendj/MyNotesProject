@@ -28,6 +28,10 @@
     <h:selectOneMenu value="#{categoryDiscountCreatePage.categoryType}" styleClass="input-text">
         <f:selectItems value="#{categoryDiscountCreatePage.categoryDiscountEnumTypeMenu.items}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{categoryDiscountCreatePage.organizationType}" styleClass="input-text">
+        <f:selectItems value="#{categoryDiscountCreatePage.organizationItems}" />
+    </h:selectOneMenu>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryDiscountCreatePage.onSave}"

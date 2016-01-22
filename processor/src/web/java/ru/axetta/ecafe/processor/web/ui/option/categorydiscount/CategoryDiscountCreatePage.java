@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -17,6 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
@@ -37,6 +39,7 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     private String categoryName;
     private String description;
     private Integer categoryType;
+    private Integer organizationType;
     private Integer discountRate = 100;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
 
@@ -58,6 +61,23 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
 
     public void setCategoryType(Integer categoryType) {
         this.categoryType = categoryType;
+    }
+
+    public Integer getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(Integer organizationType) {
+        this.organizationType = organizationType;
+    }
+
+    public SelectItem[] getOrganizationItems() {
+        OrganizationType[] organizationTypes = OrganizationType.values();
+        SelectItem[] items = new SelectItem[3];
+        items[0] = new SelectItem(CategoryDiscount.SCHOOL_KINDERGARTEN_ID, CategoryDiscount.SCHOOL_KINDERGARTEN_STRING);
+        items[1] = new SelectItem(0, organizationTypes[0].toString());
+        items[2] = new SelectItem(1, organizationTypes[1].toString());
+        return items;
     }
 
     //private Set<DiscountRule> discountRuleSet;
@@ -132,6 +152,7 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
             CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, "", description,
                     createdDate, createdDate);
             categoryDiscount.setCategoryType(CategoryDiscountEnumType.fromInteger(categoryType));
+            categoryDiscount.setOrgType(organizationType);
             entityManager.persist(categoryDiscount);
             transactionManager.commit(status);
             categoryName = "";
