@@ -402,7 +402,7 @@ public class ClientManager {
                 if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
                     ClientGroup clientGroup = DAOUtils
-                            .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(),
+                            .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession, client.getOrg().getIdOfOrg(),
                                     clientGroupName);
                     if (clientGroup == null) {
                         clientGroup = DAOUtils

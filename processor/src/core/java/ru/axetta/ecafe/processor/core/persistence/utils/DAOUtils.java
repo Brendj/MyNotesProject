@@ -416,6 +416,18 @@ public class DAOUtils {
         return null;
     }
 
+    public static ClientGroup findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(Session persistenceSession,Long idOfOrg, String groupName) throws Exception{
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        List l = clientGroupCriteria.add(
+                Restrictions.and(
+                        Restrictions.eq("groupName", groupName),
+                        Restrictions.eq("org.idOfOrg",idOfOrg)
+                )
+        ).list();
+        if (l.size()>0) return (ClientGroup)l.get(0);
+        return null;
+    }
+
     /**
      * производит выборку Группы клиента по номеру организации и имени группы
      * игнорируя регистр имени группы
