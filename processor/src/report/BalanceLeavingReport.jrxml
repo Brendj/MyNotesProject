@@ -19,7 +19,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + " c " + $P{startDate} + " по " +  " $P{endDate}" ]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Отчет ухода баланса в минус/большой плюс на дату" + " c " + $P{startDate} + " по " +   $P{endDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
