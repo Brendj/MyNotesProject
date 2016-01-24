@@ -160,7 +160,7 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
         }
 
         public String getTransactionTimeShortFormat() {
-            return CalendarUtils.dateShortToStringFullYear(transactionTime);
+            return CalendarUtils.dateTimeToString(transactionTime);
         }
     }
 }
