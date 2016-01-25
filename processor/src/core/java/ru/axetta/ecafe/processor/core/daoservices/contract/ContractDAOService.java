@@ -54,7 +54,7 @@ public class ContractDAOService {
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("idOfOrg"), "idOfOrg")
                 .add(Projections.property("shortName"), "shortName")
-                .add(Projections.property("contr.idOfContract"), "idOfContract")
+                .add(Projections.property("contr.globalId"), "idOfContract")
                 .add(Projections.property("contr.contractNumber"), "contractNumber")
                 .add(Projections.property("agent.idOfContragent"), "idOfContragent")
                 .add(Projections.property("agent.contragentName"), "contragentName")
