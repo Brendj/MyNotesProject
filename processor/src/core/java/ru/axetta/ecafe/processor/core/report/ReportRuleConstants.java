@@ -277,7 +277,7 @@ public class ReportRuleConstants {
             new ReportHint(PaymentTotalsReport.class.getCanonicalName(), new int[]{20, 3, 35}),
             new ReportHint(BeneficiaryByAllOrgReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DetailedDeviationsWithoutCorpsNewJasperReport.class.getCanonicalName(), new int[]{0,3}),
-            new ReportHint(BalanceLeavingReport.class.getCanonicalName(), new int[]{0})
+            new ReportHint(BalanceLeavingReport.class.getCanonicalName(), new int[]{})
     };
 
     private ReportRuleConstants() {
