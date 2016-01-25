@@ -131,8 +131,11 @@ public class ReportRepository extends BaseJpaDao {
         byte[] arr = stream.toByteArray();
 
         if (email != null && !email.isEmpty()) {
+            String[] emails = email.split(";");
             DateFormat df = dateFormatLetter.get();
-            postReport(email, subject + String.format(" (%s - %s)", df.format(startDate), df.format(endDate)), arr);
+            for (String em : emails) {
+                postReport(em, subject + String.format(" (%s - %s)", df.format(startDate), df.format(endDate)), arr);
+            }
         }
         return arr;
     }
