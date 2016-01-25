@@ -82,7 +82,7 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
                     ((BigInteger) object[2]).longValue(),
                     ((BigInteger) object[3]).longValue(),
                     ((BigInteger) object[4]).longValue(),
-                    CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) object[5]).longValue())));
+                    new Date(((BigInteger) object[5]).longValue()));
             balanceLeavingItemList.add(balanceLeavingItem);
         }
 
