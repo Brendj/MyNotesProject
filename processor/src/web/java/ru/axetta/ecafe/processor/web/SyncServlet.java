@@ -106,6 +106,7 @@ public class SyncServlet extends HttpServlet {
             if (syncType==SyncType.TYPE_FULL && isRestrictedFullSyncPeriod()) {
                 String message = String.format("Full sync not allowed in this time, idOfOrg=%d", idOfOrg);
                 logger.error(message);
+                response.addHeader("Retry-After", String.valueOf(LimitFilter.RETRY_AFTER));
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }

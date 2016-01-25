@@ -23,7 +23,7 @@ public class LimitFilter implements Filter {
 
     private final int limit = RuntimeContext.getInstance()
             .getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);//150; // FILTER LIMIT -> OPTION_REQUEST_SYNC_LIMITS moved to SyncServlet
-    private final int RETRY_AFTER = RuntimeContext.getInstance()
+    public static int RETRY_AFTER = RuntimeContext.getInstance()
             .getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
     public static final int SC_TOO_MANY_REQUESTS = 429;
     private final String SC_TOO_MANY_REQUESTS_MESSAGE = "Too Many Requests";
