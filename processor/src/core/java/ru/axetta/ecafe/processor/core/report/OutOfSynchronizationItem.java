@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
@@ -19,7 +23,7 @@ public class OutOfSynchronizationItem {
 
     private String condition;
     private Long idOfOrg;
-    private String orgShortName;
+    private String officialName;
     private String address;
 
     private String tags;
@@ -27,11 +31,11 @@ public class OutOfSynchronizationItem {
     private String version;
     private String remoteAddr;
 
-    public OutOfSynchronizationItem(String condition, Long idOfOrg, String orgShortName, String address, String tags,
+    public OutOfSynchronizationItem(String condition, Long idOfOrg, String officialName, String address, String tags,
             Date lastSuccessfulBalanceSync, String version, String remoteAddr) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
-        this.orgShortName = orgShortName;
+        this.officialName = officialName;
         this.address = address;
         this.tags = tags;
         this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
@@ -58,12 +62,12 @@ public class OutOfSynchronizationItem {
         this.idOfOrg = idOfOrg;
     }
 
-    public String getOrgShortName() {
-        return orgShortName;
+    public String getOfficialName() {
+        return officialName;
     }
 
-    public void setOrgShortName(String orgShortName) {
-        this.orgShortName = orgShortName;
+    public void setOfficialName(String officialName) {
+        this.officialName = officialName;
     }
 
     public String getAddress() {
