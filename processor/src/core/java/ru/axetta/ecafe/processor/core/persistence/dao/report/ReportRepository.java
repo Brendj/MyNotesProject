@@ -140,6 +140,33 @@ public class ReportRepository extends BaseJpaDao {
         return arr;
     }
 
+    public boolean areParametersBad(List<ReportParameter> parameters) {
+        Date startDate = null;
+        Date endDate = null;
+        Long idOfOrg = null;
+        DateFormat safeDateFormat = dateFormat.get();
+        try {
+            for (ReportParameter parameter : parameters) {
+                if (parameter.getParameterName().equals("startDate")) {
+                    startDate = safeDateFormat.parse(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("endDate")) {
+                    endDate = safeDateFormat.parse(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("idOfOrg")) {
+                    idOfOrg = Long.parseLong(parameter.getParameterValue());
+                }
+            }
+        } catch (Exception e) {
+            return true;
+        }
+        if (idOfOrg == null || startDate == null || endDate == null || startDate.after(endDate)) {
+            return true; //не переданы или заполнены с ошибкой обязательные параметры
+        } else {
+            return false;
+        }
+    }
+
     private void postReport(String address, String subject, byte[] report) {
         ReportPoster poster = new ReportPoster(RuntimeContext.getInstance().getPostman(), address, subject, report);
         new Thread(poster).start();

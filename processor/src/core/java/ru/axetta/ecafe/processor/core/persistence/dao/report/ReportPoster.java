@@ -43,7 +43,6 @@ public class ReportPoster implements Runnable {
             FileUtils.writeByteArrayToFile(temp, document);
             ReportDocument reportDocument = new ReportDocument(temp);
             postman.postReport(address, subject, reportDocument);
-            logger.info("Temp file: " + temp.getAbsolutePath());
         }
         catch (Exception e) {
             logger.error("Error sending report by email", e);

@@ -39,11 +39,13 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
     private static final Long RC_PARAMETERS_ERROR = 101L;
     private static final Long RC_UNKNOWN_REPORT_ERROR = 102L;
     private static final Long RC_FILE_NOT_FOUND_ERROR = 103L;
+    private static final Long RC_NO_DATA_ERROR = 104L;
     private static final String RC_OK_DESC = "OK";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
-    private static final String RC_PARAMETERS_ERROR_DESC = "Ошибочные входные данные или нет данных за запрашиваемый период";
+    private static final String RC_PARAMETERS_ERROR_DESC = "Ошибочные входные данные";
     private static final String RC_UNKNOWN_REPORT_ERROR_DESC = "Генерация этого отчета не поддерживается";
     private static final String RC_FILE_NOT_FOUND_ERROR_DESC = "Запрашиваемый файл не найден в репозитории";
+    private static final String RC_NO_DATA_ERROR_DESC = "Нет данных по запрошенным параметрам";
 
     public final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
     public final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
@@ -126,14 +128,17 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         */
         GenerateReportResult result = new GenerateReportResult();
         result.setReport(null);
-        //result.setCode(RC_UNKNOWN_REPORT_ERROR);
-        //result.setResult(RC_UNKNOWN_REPORT_ERROR_DESC);
+        if (RuntimeContext.getAppContext().getBean(ReportRepository.class).areParametersBad(parameters)) {
+            result.setCode(RC_PARAMETERS_ERROR);
+            result.setResult(RC_PARAMETERS_ERROR_DESC);
+            return result;
+        }
         try {
             if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
                 byte[] jasper_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getDeliveredServicesReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
                 if (jasper_content == null) {
-                    result.setCode(RC_PARAMETERS_ERROR);
-                    result.setResult(RC_PARAMETERS_ERROR_DESC);
+                    result.setCode(RC_NO_DATA_ERROR);
+                    result.setResult(RC_NO_DATA_ERROR_DESC);
                 } else {
                     result.setReport(jasper_content);
                     result.setCode(RC_OK);
