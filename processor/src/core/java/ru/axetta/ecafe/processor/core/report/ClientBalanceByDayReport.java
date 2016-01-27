@@ -44,6 +44,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
     public static final int LT_ZERO = 1;
     public static final int EQ_ZERO = 2;
     public static final int GT_ZERO = 3;
+    public static final int NE_ZERO = 4;
 
     final public static String P_CLIENT_BALANCE_CONDITION_TYPE = "clientBalanceCondition";
 
@@ -338,6 +339,10 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                         if (clientItem.getTotalBalance() > 0L) {
                             result.add(clientItem);
                         }
+                    case 4:
+                        if (clientItem.getTotalBalance() != 0L) {
+                            result.add(clientItem);
+                        }
                         break;
                 }
             }
@@ -448,7 +453,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientBalanceByDayReport.class);
 
-    private static Integer getClientBalanceCondiotion(String s) {
+    private static Integer getClientBalanceCondition(String s) {
         if (s.equals("Не задано")) {
             return NO_CONDITION;
         } else if (s.equals("Меньше 0")) {
@@ -457,6 +462,8 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
             return EQ_ZERO;
         } else if (s.equals("Больше 0")) {
             return GT_ZERO;
+        } else if (s.equals("Кроме 0")) {
+            return NE_ZERO;
         }
         return null;
     }

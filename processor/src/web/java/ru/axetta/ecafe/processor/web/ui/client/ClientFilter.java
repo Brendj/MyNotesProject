@@ -327,6 +327,9 @@ public class ClientFilter {
                 case ClientBalanceFilter.GT_ZERO:
                     criteria.add(Restrictions.gt("balance",0L));
                     break;
+                case ClientBalanceFilter.NE_ZERO:
+                    criteria.add(Restrictions.ne("balance", 0L));
+                    break;
             }
         }
 

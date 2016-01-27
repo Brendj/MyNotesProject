@@ -18,8 +18,9 @@ public class ClientBalanceFilter {
     public static final int LT_ZERO = 1;
     public static final int EQ_ZERO = 2;
     public static final int GT_ZERO = 3;
+    public static final int NE_ZERO = 4;
 
-    private static final String[] ITEM_TEXT = {"Не задано", "Меньше 0", "Равен 0", "Больше 0"};
+    private static final String[] ITEM_TEXT = {"Не задано", "Меньше 0", "Равен 0", "Больше 0", "Кроме 0"};
 
     private SelectItem[] items = readAllItems();
 
