@@ -27,3 +27,5 @@ OIDS=FALSE
 ALTER TABLE cf_transactions ADD COLUMN balanceafter bigint;
 
 ALTER TABLE cf_complexinfo ADD COLUMN modevisible integer;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 160127) НЕ МЕНЯТЬ
