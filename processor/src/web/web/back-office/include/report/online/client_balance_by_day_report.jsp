@@ -130,7 +130,7 @@
                 <h:outputText styleClass="output-text" value="#{complex.secondName}" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
-                <h:outputText styleClass="output-text" value="#{complex.limit}" />
+                <h:outputText styleClass="output-text" value="#{complex.limit}" converter="copeckSumConverter" />
             </rich:column>
             <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.totalBalance}" converter="copeckSumConverter" />
