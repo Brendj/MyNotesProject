@@ -153,7 +153,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 List list = query.list();
                 if (list != null && list.size() == 1) {
                     Contract contr = (Contract)list.get(0);
-                    contractNumber = contr.getContractNumber();
+                    contractNumber = " ".concat(contr.getContractNumber());
                     if (contr.getDateOfConclusion() != null) {
                         contractDate = new SimpleDateFormat("dd.MM.yyyy").format(contr.getDateOfConclusion());
                     } else {
