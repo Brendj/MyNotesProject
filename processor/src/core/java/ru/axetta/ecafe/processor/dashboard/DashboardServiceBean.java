@@ -151,7 +151,7 @@ public class DashboardServiceBean {
         for (Object object : queryResult) {
             Object[] result = (Object[]) object;
             String name = ((String) result[0]).trim();
-            long value  = ((BigInteger) result[1]).longValue();
+            long value  = (result[1] == null) ? 0 : ((BigInteger) result[1]).longValue();
             String type = ((String) result[2]).trim();
             if (type.equals("long")) {
                 params.add(new DashboardResponse.NamedParams(name, value));
