@@ -129,20 +129,6 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                     nameOrg = "                                                                   ";
                 }
             }
-            String contractNumber = "";
-            String contractDate = "";
-            if (contract == null) {
-                contractNumber = "______";
-                contractDate = "________";
-            } else {
-                Contract cc = (Contract)session.load(Contract.class, contract);
-                contractNumber = cc.getContractNumber();
-                if (cc.getDateOfConclusion() != null) {
-                    contractDate = new SimpleDateFormat("dd.MM.yyyy").format(cc.getDateOfConclusion());
-                } else {
-                    contractDate = "________";
-                }
-            }
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
@@ -150,12 +136,33 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             parameterMap.put("nameOrg", nameOrg);
-            parameterMap.put("contractNumber", contractNumber);
-            parameterMap.put("contractDate", contractDate);
 
             Date generateEndTime = new Date();
             List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
                     contract);
+            ///Пробегаемся по items и смотрим - если у них всех один и тот же контракт - заполняем параметр contract
+            String contractNumber = "______";
+            String contractDate = "________";
+            Set<Long> orgs = new HashSet<Long>();
+            for (DeliveredServicesItem item : items) {
+                orgs.add(item.getIdoforg());
+            }
+            if (orgs.size() > 0) {
+                Query query = session.createQuery("select distinct contract from Org where idOfOrg in :orgs");
+                query.setParameterList("orgs", orgs);
+                List list = query.list();
+                if (list != null && list.size() == 1) {
+                    Contract contr = (Contract)list.get(0);
+                    contractNumber = contr.getContractNumber();
+                    if (contr.getDateOfConclusion() != null) {
+                        contractDate = new SimpleDateFormat("dd.MM.yyyy").format(contr.getDateOfConclusion());
+                    } else {
+                        contractDate = "________";
+                    }
+                }
+            }
+            parameterMap.put("contractNumber", contractNumber);
+            parameterMap.put("contractDate", contractDate);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
