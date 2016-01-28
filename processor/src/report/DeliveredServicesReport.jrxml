@@ -504,7 +504,7 @@
 								<textElement verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Общая стоимость за отчетный период]]></text>
+								<text><![CDATA[Стоимость услуг за отчетный период, руб.]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
