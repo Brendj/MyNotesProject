@@ -256,7 +256,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and " +
                                    " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql =
-                      "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
+                      "select cf_orgs.shortnameinfoservice, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
                            + "split_part(cf_goods.fullname, '/', 2) as level2, "
                            + "split_part(cf_goods.fullname, '/', 3) as level3, "
                            + "split_part(cf_goods.fullname, '/', 4) as level4, " + "sum(cf_orderdetails.qty) as cnt, "
