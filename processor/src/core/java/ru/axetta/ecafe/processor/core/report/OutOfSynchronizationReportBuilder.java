@@ -102,7 +102,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + " max(to_timestamp(syncdate / 1000)) AS lastsynctime FROM cf_synchistory_daily GROUP BY idoforg UNION SELECT idoforg, null FROM (SELECT idoforg FROM cf_orgs WHERE state = 0"
                         + " AND idoforg in (:idOfOrgList) "
                         + " EXCEPT (SELECT idoforg FROM cf_synchistory_daily)) AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg "
-                        + " INNER JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg");
+                        + " INNER JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg where cfor.state = 0");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         List result = query.list();
