@@ -339,6 +339,7 @@ public class ClientBalanceByDayReport extends BasicReportForContragentJob {
                         if (clientItem.getTotalBalance() > 0L) {
                             result.add(clientItem);
                         }
+                        break;
                     case 4:
                         if (clientItem.getTotalBalance() != 0L) {
                             result.add(clientItem);
