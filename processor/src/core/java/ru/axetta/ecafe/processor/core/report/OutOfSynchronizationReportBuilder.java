@@ -83,8 +83,8 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
 
         Query query = session.createSQLQuery(
                 "SELECT CASE WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '10 minutes')AND (current_timestamp - lastsynctime <= INTERVAL '30 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more10Minutes' "
-                        + " WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minute' "
-                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minute' "
+                        + " WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minutes' "
+                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minutes' "
                         + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more3Hours' "
                         + " ELSE 'other' END AS condition,"
                         + " cfsh.idoforg,"
@@ -133,7 +133,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
             return "Синхронизация отсутствует более 30 минут";
         }
 
-        if (condition.equals("more1Hours")) {
+        if (condition.equals("more60Minutes")) {
             return "Синхронизация отсутствует более 60 минут";
         }
         if (condition.equals("more3Hours")) {
