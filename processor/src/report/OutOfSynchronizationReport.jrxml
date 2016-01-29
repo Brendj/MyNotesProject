@@ -9,8 +9,7 @@
 	<field name="officialName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
 	<field name="tags" class="java.lang.String"/>
-	<field name="lastSuccessfulBalanceSync" class="java.util.Date"/>
-	<field name="lastSuccessfulBalanceSyncShortName" class="java.lang.String"/>
+	<field name="lastSuccessfulBalanceSync" class="java.lang.String"/>
 	<field name="version" class="java.lang.String"/>
 	<field name="remoteAddr" class="java.lang.String"/>
 	<title>
@@ -202,7 +201,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{lastSuccessfulBalanceSyncShortName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{lastSuccessfulBalanceSync}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="a8df2b02-e483-43ab-9c95-c6b501dead9b" x="700" y="0" width="100" height="45"/>

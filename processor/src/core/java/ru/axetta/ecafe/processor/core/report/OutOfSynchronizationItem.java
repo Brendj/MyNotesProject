@@ -27,12 +27,12 @@ public class OutOfSynchronizationItem {
     private String address;
 
     private String tags;
-    private Date lastSuccessfulBalanceSync;
+    private String lastSuccessfulBalanceSync;
     private String version;
     private String remoteAddr;
 
     public OutOfSynchronizationItem(String condition, Long idOfOrg, String officialName, String address, String tags,
-            Date lastSuccessfulBalanceSync, String version, String remoteAddr) {
+            String lastSuccessfulBalanceSync, String version, String remoteAddr) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
         this.officialName = officialName;
@@ -86,11 +86,11 @@ public class OutOfSynchronizationItem {
         this.tags = tags;
     }
 
-    public Date getLastSuccessfulBalanceSync() {
+    public String getLastSuccessfulBalanceSync() {
         return lastSuccessfulBalanceSync;
     }
 
-    public void setLastSuccessfulBalanceSync(Date lastSuccessfulBalanceSync) {
+    public void setLastSuccessfulBalanceSync(String lastSuccessfulBalanceSync) {
         this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
     }
 
@@ -108,9 +108,5 @@ public class OutOfSynchronizationItem {
 
     public void setRemoteAddr(String remoteAddr) {
         this.remoteAddr = remoteAddr;
-    }
-
-    public String getLastSuccessfulBalanceSyncShortName() {
-        return CalendarUtils.dateTimeToString(lastSuccessfulBalanceSync);
     }
 }

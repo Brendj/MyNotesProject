@@ -83,26 +83,22 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
 
         Query query = session.createSQLQuery(
                 "SELECT CASE WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '10 minutes')AND (current_timestamp - lastsynctime <= INTERVAL '30 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more10Minutes' "
-                        + " WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minutes' "
-                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minutes' "
-                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more3Hours' "
-                        + " ELSE 'other' END AS condition,"
-                        + " cfsh.idoforg,"
-                        + " cfor.officialname,"
-                        + " cfor.address,"
-                        + " cfor.tag,"
-                        + " cfos.lastsucbalancesync,"
-                        + " cfos.clientversion,"
-                        + " cfos.remoteaddress,"
-                        + " to_timestamp(syncendtime / 1000) AS fullsyncendtime,"
-                        + " lastsynctime"
-                        + " FROM cf_synchistory cfsh INNER JOIN (SELECT idoforg, max(syncstarttime) AS lastfullsynctime"
-                        + " FROM cf_synchistory cfs   WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date)"
-                        + " GROUP BY idoforg) AS lastsyncbyorg  ON cfsh.idoforg = lastsyncbyorg.idoforg AND lastfullsynctime = cfsh.syncstarttime INNER JOIN (SELECT  idoforg,"
-                        + " max(to_timestamp(syncdate / 1000)) AS lastsynctime FROM cf_synchistory_daily GROUP BY idoforg UNION SELECT idoforg, null FROM (SELECT idoforg FROM cf_orgs WHERE state = 1"
-                        + " AND idoforg in (:idOfOrgList) "
-                        + " EXCEPT (SELECT idoforg FROM cf_synchistory_daily)) AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg "
-                        + " INNER JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg where cfor.state = 1 AND cfor.idoforg in (:idOfOrgList)");
+                        + "WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minute' "
+                        + "WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minute' "
+                        + "WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS null)) THEN 'more3Hours' "
+                        + "ELSE 'other' END AS condition, nosynch.idoforg, cfor.officialname, cfor.address, cfor.tag, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, "
+                        + "to_timestamp(syncendtime / 1000) AS fullsyncendtime, lastsynctime "
+                        + "FROM cf_synchistory cfsh INNER JOIN (SELECT idoforg, max(syncstarttime) AS lastfullsynctime "
+                        + "FROM cf_synchistory cfs   WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date) "
+                        + "GROUP BY idoforg) AS lastsyncbyorg  ON cfsh.idoforg = lastsyncbyorg.idoforg AND lastfullsynctime = cfsh.syncstarttime RIGHT JOIN (SELECT  idoforg, "
+                        + "max(to_timestamp(syncdate / 1000)) AS lastsynctime FROM cf_synchistory_daily WHERE to_timestamp(syncdate / 1000) > DATE_TRUNC('hour', current_date) "
+                        + "AND idoforg in (:idOfOrgList) "
+                        + "GROUP BY idoforg UNION SELECT idoforg, null AS lastsynctime FROM (SELECT idoforg FROM cf_orgs WHERE state = 1 "
+                        + "AND idoforg in (:idOfOrgList)  "
+                        + "EXCEPT (SELECT idoforg FROM cf_synchistory_daily WHERE to_timestamp(syncdate / 1000) > DATE_TRUNC('hour', current_date) "
+                        + "AND idoforg in (:idOfOrgList))) "
+                        + "AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = nosynch.idoforg "
+                        + "INNER JOIN cf_orgs cfor ON cfor.idoforg = nosynch.idoforg where cfor.state = 1 AND cfor.idoforg in (:idOfOrgList)");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         List result = query.list();
@@ -110,18 +106,18 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         for (Object resultItem : result) {
             Object[] object = (Object[]) resultItem;
 
-            if (object.length == 10) {
-
                 if (parseCondition((String) object[0]) != null) {
 
                     OutOfSynchronizationItem outOfSynchronizationItem = new OutOfSynchronizationItem(
-                            parseCondition((String) object[0]), ((BigInteger) object[1]).longValue(),
-                            (String) object[2], (String) object[3], parseTags((String) object[4]),
-                            new Date(((BigInteger) object[5]).longValue()), (String) object[6], (String) object[7]);
+                            parseCondition((String) object[0]),
+                            ((BigInteger) object[1]).longValue(),
+                            (String) object[2],
+                            (String) object[3],
+                            parseTags((String) object[4]),
+                            object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())), object[6] == null ? "" : (String) object[6] , object[7] == null ? "" : (String) object[7]);
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
             }
-        }
         return new JRBeanCollectionDataSource(outOfSynchronizationReportList);
     }
 
