@@ -52,7 +52,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
 
         /* Параметры для передачи в jasper */
         Map<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(new Date()));
+        parameterMap.put("startDate", CalendarUtils.dateTimeToString(new Date()));
 
         JRDataSource dataSource = buildDataSource(session);
 
@@ -82,10 +82,10 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         Query query = session.createSQLQuery(
-                "SELECT CASE WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime <= INTERVAL '10 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more10Minutes' "
-                        + " WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime <= INTERVAL '30 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minute' "
-                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minute' "
-                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more3Hours' "
+                "SELECT CASE WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '10 minutes')AND (current_timestamp - lastsynctime <= INTERVAL '30 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more10Minutes' "
+                        + " WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minute' "
+                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minute' "
+                        + " WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more3Hours' "
                         + " ELSE 'other' END AS condition,"
                         + " cfsh.idoforg,"
                         + " cfor.officialname,"
@@ -102,7 +102,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + " max(to_timestamp(syncdate / 1000)) AS lastsynctime FROM cf_synchistory_daily GROUP BY idoforg UNION SELECT idoforg, null FROM (SELECT idoforg FROM cf_orgs WHERE state = 1"
                         + " AND idoforg in (:idOfOrgList) "
                         + " EXCEPT (SELECT idoforg FROM cf_synchistory_daily)) AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg "
-                        + " INNER JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg where cfor.state = 1");
+                        + " INNER JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg where cfor.state = 1 AND cfor.idoforg in (:idOfOrgList)");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         List result = query.list();
