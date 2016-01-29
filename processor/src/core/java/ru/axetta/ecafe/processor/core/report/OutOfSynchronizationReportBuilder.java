@@ -118,6 +118,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
             }
+        Collections.sort(outOfSynchronizationReportList);
         return new JRBeanCollectionDataSource(outOfSynchronizationReportList);
     }
 

@@ -19,7 +19,7 @@ import java.util.Date;
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
-public class OutOfSynchronizationItem {
+public class OutOfSynchronizationItem implements Comparable<OutOfSynchronizationItem>{
 
     private String condition;
     private Long idOfOrg;
@@ -108,5 +108,11 @@ public class OutOfSynchronizationItem {
 
     public void setRemoteAddr(String remoteAddr) {
         this.remoteAddr = remoteAddr;
+    }
+
+    @Override
+    public int compareTo(OutOfSynchronizationItem o) {
+        int retCode = this.condition.compareTo(o.getCondition());
+        return retCode;
     }
 }
