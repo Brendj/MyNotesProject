@@ -23,7 +23,7 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
 
     private String condition;
     private Long idOfOrg;
-    private String officialName;
+    private String shortName;
     private String address;
 
     private String tags;
@@ -31,11 +31,11 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
     private String version;
     private String remoteAddr;
 
-    public OutOfSynchronizationItem(String condition, Long idOfOrg, String officialName, String address, String tags,
+    public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, String tags,
             String lastSuccessfulBalanceSync, String version, String remoteAddr) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
-        this.officialName = officialName;
+        this.shortName = shortName;
         this.address = address;
         this.tags = tags;
         this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
@@ -62,12 +62,12 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.idOfOrg = idOfOrg;
     }
 
-    public String getOfficialName() {
-        return officialName;
+    public String getShortName() {
+        return shortName;
     }
 
-    public void setOfficialName(String officialName) {
-        this.officialName = officialName;
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public String getAddress() {

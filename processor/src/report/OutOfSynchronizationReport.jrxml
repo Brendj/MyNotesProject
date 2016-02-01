@@ -6,7 +6,7 @@
 	<parameter name="startDate" class="java.lang.String"/>
 	<field name="condition" class="java.lang.String"/>
 	<field name="idOfOrg" class="java.lang.Long"/>
-	<field name="officialName" class="java.lang.String"/>
+	<field name="shortName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
 	<field name="tags" class="java.lang.String"/>
 	<field name="lastSuccessfulBalanceSync" class="java.lang.String"/>
@@ -183,7 +183,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{officialName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="cc85f423-4960-4648-a250-ef07570905cf" x="145" y="0" width="200" height="45"/>
