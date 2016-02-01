@@ -23,6 +23,10 @@ public class OutOfSynchronizationReport extends BasicReportForAllOrgJob {
     /* Логгер для отчета  DetailedDeviationsWithoutCorpsNewJasperReport*/
     private static final Logger logger = LoggerFactory.getLogger(OutOfSynchronizationReport.class);
 
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
+    }
+
     public OutOfSynchronizationReport(Date generateTime, long generateDuration, JasperPrint jasperPrint,
             Date startTime, Date endTime) {
         super(generateTime, generateDuration, jasperPrint, startTime, endTime);
