@@ -6,24 +6,27 @@ package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JasperPrint;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.hibernate.Session;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * User: anvarov
- * Date: 21.01.16
- * Time: 16:30
+ * Created by IntelliJ IDEA.
+ * User: kolpakov
+ * Date: 14.03.11
+ * Time: 16:05
  * To change this template use File | Settings | File Templates.
  */
-public class OutOfSynchronizationReport extends BasicReportForListOrgsJob {
+public abstract class BasicReportForListOrgsJob extends BasicReportForAllOrgJob {
 
-    /* Логгер для отчета  DetailedDeviationsWithoutCorpsNewJasperReport*/
-    private static final Logger logger = LoggerFactory.getLogger(OutOfSynchronizationReport.class);
-
-   /* public AutoReportRunner getAutoReportRunner() {
+    public AutoReportRunner getAutoReportRunner() {
 
         return new AutoReportRunner() {
             public void run(AutoReportBuildTask autoReportBuildTask) {
@@ -47,17 +50,17 @@ public class OutOfSynchronizationReport extends BasicReportForListOrgsJob {
                     List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         String pre_orgs = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
-                            Properties properties = new Properties();
-                            ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
-                            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, pre_orgs);
+                        Properties properties = new Properties();
+                        ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);
+                        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, pre_orgs != null ? pre_orgs : "0"); //0  -организация не предусмотрена параметром
 
-                            BasicReportForAllOrgJob report = createInstance();
-                            report.setReportProperties(properties);
-                            report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
-                                    autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
-                                    autoReportBuildTask.startCalendar);
+                        BasicReportForAllOrgJob report = createInstance();
+                        report.setReportProperties(properties);
+                        report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime,
+                                autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
+                                autoReportBuildTask.startCalendar);
 
-                            autoReports.add(new AutoReport(report, properties));
+                        autoReports.add(new AutoReport(report, properties));
                     }
 
                     List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
@@ -76,32 +79,16 @@ public class OutOfSynchronizationReport extends BasicReportForListOrgsJob {
 
             }
         };
-    }  */
-
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-
     }
 
-    public OutOfSynchronizationReport(Date generateTime, long generateDuration, JasperPrint jasperPrint,
-            Date startTime, Date endTime) {
-        super(generateTime, generateDuration, jasperPrint, startTime, endTime);
+    // call initialize after this constructor
+    protected BasicReportForListOrgsJob() {
     }
 
-    public OutOfSynchronizationReport() {
+    public BasicReportForListOrgsJob(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime) {
+        super(generateTime, generateDuration, print, startTime, endTime);
     }
 
-    @Override
-    public OutOfSynchronizationReport createInstance() {
-        return new OutOfSynchronizationReport();
-    }
-
-    @Override
-    public OutOfSynchronizationReport.Builder createBuilder(String templateFilename) {
-        return new OutOfSynchronizationReportBuilder(templateFilename);
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
-    }
 }
+

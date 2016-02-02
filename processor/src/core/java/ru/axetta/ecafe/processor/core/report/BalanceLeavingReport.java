@@ -14,7 +14,7 @@ import java.util.Date;
  * Time: 13:22
  * To change this template use File | Settings | File Templates.
  */
-public class BalanceLeavingReport extends BasicReportForAllOrgJob {
+public class BalanceLeavingReport extends BasicReportForListOrgsJob {
 
     /* Логгер для отчета BalanceLeavingReport */
     private static final Logger Logger = LoggerFactory.getLogger(BalanceLeavingReport.class);
