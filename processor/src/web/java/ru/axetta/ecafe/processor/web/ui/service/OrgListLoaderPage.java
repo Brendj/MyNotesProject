@@ -54,17 +54,19 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     private EntityManager entityManager;
 
     protected static final String [][] COLUMN_NAMES = new String [][] {
-            { "guid",              "GUID" },
-            { "shortName",         "Наименование ОО для поставщика" },
-            { "officialName",      "Официальное наименование" },
-            { "tags",              "Тэги" },
-            { "city",              "Город" },
-            { "region",            "Район ( Округ)" },
-            { "address",           "Адрес" },
-            { "btiUnom",           "БТИ УНОМ" },
-            { "btiUnad",           "БТИ УНАД" },
-            { "introductionQueue", "Очередь внедрения" },
-            { "additionalId",      "Доп. ид. здания" },
+            { "guid",                   "GUID" },
+            { "shortName",              "Наименование ОО для поставщика" },
+            { "officialName",           "Официальное наименование" },
+            { "tags",                   "Тэги" },
+            { "city",                   "Город" },
+            { "region",                 "Район ( Округ)" },
+            { "address",                "Адрес" },
+            { "btiUnom",                "БТИ УНОМ" },
+            { "btiUnad",                "БТИ УНАД" },
+            { "introductionQueue",      "Очередь внедрения" },
+            { "additionalId",           "Доп. ид. здания" },
+            { "shortNameInfoService",   "Краткое наименование" },
+
     };
 
     public int getSuccessLineNumber() {
@@ -228,6 +230,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         Long uniqueAddressId = toLong(getFromColumn(tokens, columns, "uniqueAddressId"));
         String introductionQueue = toStr(getFromColumn(tokens, columns, "introductionQueue"));
         Long additionalId = toLong(getFromColumn(tokens, columns, "additionalId"));
+        String shortNameInfoService = toStr(getFromColumn(tokens, columns, "shortNameInfoService"));
 
 
         if(introductionQueue.toLowerCase().indexOf("не планируется") < 0) {
@@ -261,12 +264,12 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     currentOrg.setBtiUnad(btiUnad);
                     currentOrg.setIntroductionQueue(introductionQueue);
                     currentOrg.setAdditionalIdBuilding(additionalId);
+                    //currentOrg.setShortNameInfoService(shortNameInfoService);
                     session.update(currentOrg);
                     return new OrgEntry(lineNo, 0, "Org has been modified", currentOrg.getIdOfOrg());
                 }
 
-                //todo правильно заполнять второй параметр shortNameInfoService
-                Org org = new Org(shortName, shortName, officialName, address, officialPerson, "",
+                Org org = new Org(shortName, shortNameInfoService, officialName, address, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
                         "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/");
@@ -310,13 +313,14 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 if(exists) {
                     sql = "UPDATE cf_not_planned_orgs SET  "
                             + "guid=:guid, officialName=:officialName, tag=:tags, city=:city, district=:region, "
-                            + "address=:address, btiUnom=:btiUnom, btiUnad=:btiUnad, introductionQueue=:introductionQueue "
+                            + "address=:address, btiUnom=:btiUnom, btiUnad=:btiUnad, introductionQueue=:introductionQueue, "
+                            + "shortNameInfoService=:shortNameInfoService "
                         + "WHERE shortName=:shortName AND additionalIdBuilding=:additionalId";
                 } else {
                     sql = "INSERT INTO cf_not_planned_orgs "
-                            + "(guid, shortName, officialName, tag, city, district, address, btiUnom, btiUnad, introductionQueue, additionalIdBuilding) "
+                            + "(guid, shortName, officialName, tag, city, district, address, btiUnom, btiUnad, introductionQueue, additionalIdBuilding, shortNameInfoService) "
                             + "VALUES "
-                            + "(:guid, :shortName, :officialName, :tags, :city, :region, :address, :btiUnom, :btiUnad, :introductionQueue, :additionalId)";
+                            + "(:guid, :shortName, :officialName, :tags, :city, :region, :address, :btiUnom, :btiUnad, :introductionQueue, :additionalId, :shortNameInfoService)";
                 }
 
                 Query q = session.createSQLQuery(sql);
@@ -331,6 +335,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 q.setParameter("btiUnad", btiUnad);
                 q.setParameter("introductionQueue", introductionQueue);
                 q.setParameter("additionalId", additionalId);
+                q.setParameter("shortNameInfoService", shortNameInfoService);
                 q.executeUpdate();
                 if(exists) {
                     return new OrgEntry(lineNo, 0, "Not planned org has been modified", additionalId);
