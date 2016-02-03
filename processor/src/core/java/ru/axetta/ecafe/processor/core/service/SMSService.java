@@ -232,8 +232,9 @@ public class SMSService {
             boolean result = false;
 
             if (sendResponse != null) {
+                Long idOfSourceOrg = EventNotificationService.getSourceOrgIdFromValues(values);
                 result = registerClientSMSCharge(sendResponse.isSuccess(), client, sendResponse.getMessageId(),
-                        phoneNumber, messageTargetId, messageType, textMessage, eventTime);
+                        phoneNumber, messageTargetId, messageType, textMessage, eventTime, idOfSourceOrg);
             }
 
             //  Добавление в список не отправленных sms
@@ -263,15 +264,15 @@ public class SMSService {
             return true;
         }
 
-        protected boolean registerClientSMSCharge(boolean success, Client client, String messageId,
-                                                  String phoneNumber, Long messageTargetId, int messageType, String text, Date eventTime) throws Exception {
+        protected boolean registerClientSMSCharge(boolean success, Client client, String messageId, String phoneNumber, Long messageTargetId,
+                int messageType, String text, Date eventTime, Long idOfSourceOrg) throws Exception {
             ClientSms clientSms = null;
             boolean result = false;
             if (success) {
                 boolean delivered =  RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
                 clientSms = RuntimeContext.getFinancialOpsManager()
                         .createClientSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
-                                new Date(), eventTime, delivered);
+                                new Date(), eventTime, delivered, idOfSourceOrg);
                 createdClientSms.set(clientSms);
                 result = true;
             }

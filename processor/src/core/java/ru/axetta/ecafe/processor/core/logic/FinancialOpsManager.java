@@ -70,12 +70,12 @@ public class FinancialOpsManager {
     @Transactional
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
             String textContents, Date serviceSendTime, Date eventTime) throws Exception {
-        return createClientSmsCharge(client, idOfSms, phone, contentsId, contentsType, textContents, serviceSendTime, eventTime, false);
+        return createClientSmsCharge(client, idOfSms, phone, contentsId, contentsType, textContents, serviceSendTime, eventTime, false, null);
     }
 
     @Transactional
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Long contentsId,Integer contentsType,
-            String textContents, Date serviceSendTime, Date eventTime, boolean isDelivered) throws Exception {
+            String textContents, Date serviceSendTime, Date eventTime, boolean isDelivered, Long idOfSourceOrg) throws Exception {
 
         Session session = em.unwrap(Session.class);
         long priceOfSms = client.getOrg().getPriceOfSms();
@@ -90,7 +90,7 @@ public class FinancialOpsManager {
             //        AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, currTime);
             //session.save(accountTransaction);
             accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, -priceOfSms, "",
-                    AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, currTime);
+                    AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, null, currTime);
 
             Contragent operatorContragent = DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
             Contragent clientContragent = DAOUtils.findContragentByClass(session, Contragent.CLIENT);
@@ -100,8 +100,9 @@ public class FinancialOpsManager {
         }
 
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
+        Long orgId = idOfSourceOrg == null ? client.getOrg().getIdOfOrg() : idOfSourceOrg;
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
-                serviceSendTime, priceOfSms, eventTime, client.getOrg().getIdOfOrg());
+                serviceSendTime, priceOfSms, eventTime, orgId);
         clientSms.setSendTime(serviceSendTime);
         clientSms.setContentsId(contentsId);
         if(isDelivered) {
@@ -118,7 +119,7 @@ public class FinancialOpsManager {
         Date currentTime = new Date();
         AccountTransaction accountTransaction = ClientAccountManager
                 .processAccountTransaction(session, client, null, -subscriptionPrice, "",
-                        AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, currentTime);
+                        AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, null, currentTime);
 
         SubscriptionFee subscriptionFee = new SubscriptionFee(subscriptionYear, periodNo, accountTransaction,
                 subscriptionPrice, currentTime, type);
@@ -142,17 +143,17 @@ public class FinancialOpsManager {
                 // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
                       -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-                      AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                      AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, idOfOrg, new Date());
             } else {
                 if(payment.getOrderType()==OrderTypeEnumType.PAY_PLAN ||
                       payment.getOrderType()==OrderTypeEnumType.SUBSCRIPTION_FEEDING ){
                     orderTransaction = ClientAccountManager.checkBalanceAndProcessAccountTransaction(session,
                           client, card, -payment.getSumByCard(), "" + idOfOrg + "/" + payment.getIdOfOrder(),
-                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date(), idOfOrg);
                 } else {
                     orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
                           -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+                          AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, idOfOrg, new Date());
                 }
             }
         }
@@ -265,11 +266,11 @@ public class FinancialOpsManager {
             if(paymentMethod != null && paymentMethod == ClientPayment.CASHIER_PAYMENT_METHOD){
                 accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                         null, paySum, idOfPayment,
-                        AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, new Date());
+                        AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, null, new Date());
             }else {
                 accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                         null, paySum, idOfPayment,
-                        AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+                        AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, null, new Date());
             }
             // регистрируем платеж клиента
             int pType = (payType == null ? ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT : payType);
@@ -311,7 +312,7 @@ public class FinancialOpsManager {
         // регистрируем транзакцию и проводим по балансу
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                 null, clientPaymentOrder.getPaySum(), clientPaymentOrder.getIdOfPayment(),
-                AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+                AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, null, new Date());
 
         // регистрируем платеж клиента
         ClientPayment clientPayment = new ClientPayment(accountTransaction, clientPaymentOrder,
@@ -440,11 +441,11 @@ public class FinancialOpsManager {
         // регистрируем транзакцию на плательщике
         AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, benefactor,
                 null, -sum, "",
-                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt);
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, null, dt);
         // регистрируем транзакцию на получателе
         AccountTransaction accountTransactionOnBeneficiary = ClientAccountManager.processAccountTransaction(session, beneficiary,
                 null, sum, "",
-                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt);
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, null, dt);
         AccountTransfer accountTransfer = new AccountTransfer(dt, benefactor,  beneficiary, reason, createdBy, 
                 accountTransactionOnBenefactor, accountTransactionOnBeneficiary, sum);
         session.save(accountTransactionOnBenefactor);
@@ -479,7 +480,7 @@ public class FinancialOpsManager {
         // регистрируем транзакцию
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                 null, -sum, "",
-                AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE, dt);
+                AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE, null, dt);
         AccountRefund accountRefund = new AccountRefund(dt, client, reason, createdBy, accountTransaction, sum);
         session.save(accountTransaction);
         session.save(accountRefund);

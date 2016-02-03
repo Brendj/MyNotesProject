@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
@@ -32,10 +33,12 @@ public class ClientAccountManager {
      */
 
     public static AccountTransaction checkBalanceAndProcessAccountTransaction(Session session, Client client, Card card,
-          long transactionSum, String source, int sourceType, Date transactionTime) throws Exception {
+          long transactionSum, String source, int sourceType, Date transactionTime, Long idOfSourceOrg) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
               sourceType, transactionTime);
-        accountTransaction.setOrg(client.getOrg());
+        //accountTransaction.setOrg(client.getOrg());
+        Org o = (Org)session.load(Org.class, idOfSourceOrg);
+        accountTransaction.setOrg(o);
         final Long sum = client.getSubBalance(1);
         // смотрм будущий остаток на счете
         final long diff = sum+transactionSum;
@@ -65,10 +68,15 @@ public class ClientAccountManager {
     }
 
     public static AccountTransaction processAccountTransaction(Session session, Client client, Card card, long transactionSum,
-            String source, int sourceType, Date transactionTime) throws Exception {
+            String source, int sourceType, Long idOfSourceOrg, Date transactionTime) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
                 sourceType, transactionTime);
-        accountTransaction.setOrg(client.getOrg());
+        if (sourceType == AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE && idOfSourceOrg != null) {
+            Org o = (Org)session.load(Org.class, idOfSourceOrg);
+            accountTransaction.setOrg(o);
+        } else {
+            accountTransaction.setOrg(client.getOrg());
+        }
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);

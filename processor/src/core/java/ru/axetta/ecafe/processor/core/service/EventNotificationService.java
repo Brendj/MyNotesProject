@@ -56,6 +56,7 @@ public class EventNotificationService {
 
     public static final String GUARDIAN_VALUES_KEY = "guardianId";
     public static final String TARGET_VALUES_KEY   = "targetId";
+    public static final String SOURCE_ORG_VALUES_KEY   = "sourceOrgId";
     public static final String DIRECTION_VALUES_KEY   = "direction";
 
 
@@ -473,6 +474,13 @@ public class EventNotificationService {
         return newValues;
     }
 
+    public static final String[] attachSourceOrgIdToValues(Long orgId, String[] values) {
+        if(orgId == null) {
+            return values;
+        }
+        return attachToValues(SOURCE_ORG_VALUES_KEY, "" + orgId, values);
+    }
+
     public static final String[] attachTargetIdToValues(Long targetId, String[] values) {
         if(targetId == null) {
             return values;
@@ -496,6 +504,14 @@ public class EventNotificationService {
 
     public static Long getTargetIdFromValues(String[] values) {
         String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
+        if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
+            return null;
+        }
+        return Long.parseLong(id);
+    }
+
+    public static Long getSourceOrgIdFromValues(String[] values) {
+        String id = findValueInParams(new String [] {SOURCE_ORG_VALUES_KEY}, values);
         if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
             return null;
         }

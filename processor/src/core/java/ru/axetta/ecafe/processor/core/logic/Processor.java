@@ -2223,6 +2223,7 @@ public class Processor implements SyncProcessor,
                 if(client!=null && payment.isNotify()){
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
+                    values = EventNotificationService.attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     values = EventNotificationService
                             .attachToValues("amountPrice", Long.toString(totalBuffetRSum/100) + ',' + Long.toString(totalBuffetRSum%100), values);
@@ -3552,6 +3553,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         //        e.getPassDirection(), e.getEvtDateTime(), guardianId);
                         String[] values = generateNotificationParams(persistenceSession, clientFromEnterEvent, e);
                         values = EventNotificationService.attachTargetIdToValues(e.getIdOfEnterEvent(), values);
+                        values = EventNotificationService.attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                         switch (org.getType()){
                             case PROFESSIONAL:
                             case SCHOOL: {
