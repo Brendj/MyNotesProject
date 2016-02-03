@@ -9,11 +9,10 @@ import generated.nsiws2.com.rstyle.nsi.beans.GroupValue;
 import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: shamil
@@ -36,7 +36,54 @@ import java.util.List;
 public class OrgMskNSIService extends MskNSIService {
     private static final Logger logger = LoggerFactory.getLogger(OrgMskNSIService.class);
 
+    public List<String> getBadGuids(Set<String> orgGuids) throws Exception {
+        List<String> result = new ArrayList<String>();
+        SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
 
+        SearchPredicate searchByStatus = new SearchPredicate();
+        searchByStatus.setAttributeName("Статус записи");
+        searchByStatus.setAttributeType(TYPE_STRING);
+        searchByStatus.setAttributeValue("Удаленный");
+        searchByStatus.setAttributeOp("not like");
+        searchPredicateInfo.addSearchPredicate(searchByStatus);
+
+        Boolean guidOK;
+        for (String guid : orgGuids) {
+            guidOK = false;
+            if (searchPredicateInfo.getSearchPredicates().size() > 1) {
+                searchPredicateInfo.getSearchPredicates().remove(1);
+            }
+
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("GUID Образовательного учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(guid);
+            search.setAttributeOp("in");
+            searchPredicateInfo.addSearchPredicate(search);
+
+            List<Item> queryResults = executeQuery(searchPredicateInfo, -1);
+            ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class);
+            for (Item i : queryResults) {
+                for(Attribute attr : i.getAttribute()) {
+                    if (attr.getName().equals("GUID Образовательного учреждения")) {
+                        String guidFrom = attr.getValue().get(0).getValue();
+                        if (guid.equals(guidFrom)) {
+                            guidOK = true;
+                            service.setOrgSyncErrorCode(guid, OrgSync.ERROR_STATE_OK_CODE);
+                            break;
+                        }
+                    }
+                }
+                if (guidOK) break;
+            }
+            if (!guidOK) {
+                service.setOrgSyncErrorCode(guid, OrgSync.ERROR_STATE_BAD_GUID_CODE);
+                result.add(guid);
+            }
+        }
+        return result;
+    }
     public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, int importIteration) throws Exception {
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");

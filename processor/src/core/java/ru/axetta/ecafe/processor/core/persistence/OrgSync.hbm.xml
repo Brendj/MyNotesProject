@@ -32,6 +32,8 @@
         <property name="lastAccRegistrySync" column="lastaccregistrysync"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
+        <property name="errorState" column="ErrorState" type="integer" not-null="false"/>
+
     </class>
 </hibernate-mapping>
 

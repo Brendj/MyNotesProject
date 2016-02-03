@@ -21,6 +21,10 @@
             <h:outputText escape="true" value="Test2" styleClass="output-text" />
             <h:commandButton value="Запуск" action="#{debugInfoPage.runTest2()}" />
         </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Тест обращения к АИС Реестр" styleClass="output-text" />
+            <h:commandButton value="Запуск" action="#{debugInfoPage.runTestAISReestr()}" />
+        </h:panelGrid>
     </rich:simpleTogglePanel>
 </h:panelGrid>
 

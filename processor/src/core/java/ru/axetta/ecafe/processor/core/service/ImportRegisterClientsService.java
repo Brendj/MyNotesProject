@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -1022,6 +1024,17 @@ public class ImportRegisterClientsService {
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
                 + "]", logBuffer);
 
+        //Проверка на устаревшие гуиды организаций
+        OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
+        List<String> list = service.getBadGuids(orgGuids.orgGuids);
+        if (list != null && !list.isEmpty()) {
+            String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
+            for (String g : list) {
+                badGuids += g;
+            }
+            throw new UnsupportedOperationException(badGuids);
+        }
+
         //  Итеративно загружаем клиентов, используя ограничения
         List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
         log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
@@ -1032,6 +1045,18 @@ public class ImportRegisterClientsService {
         //  !!!!!!!!!!
         saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
         return logBuffer;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void setOrgSyncErrorCode(String orgGuid, Integer code) throws Exception {
+        Session session = (Session) em.getDelegate();
+        Query query = session.createQuery("from OrgSync os where os.org.guid = :guid");
+        query.setParameter("guid", orgGuid);
+        List<OrgSync> list = query.list();
+        for (OrgSync os : list) {
+            os.setErrorState(code);
+            session.save(os);
+        }
     }
 
     public static boolean doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, String reesterValue,

@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientAlreadyExistException;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -20,9 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.jws.WebParam;
-import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -94,7 +93,10 @@ public class FrontControllerProcessor {
         try {
             RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (Exception e) {
+        } catch (UnsupportedOperationException uoe) {
+            logger.error(uoe.getMessage());
+        }
+        catch (Exception e) {
             logger.error("Failed to refresh registry change items", e);
         }
         return Collections.EMPTY_LIST;

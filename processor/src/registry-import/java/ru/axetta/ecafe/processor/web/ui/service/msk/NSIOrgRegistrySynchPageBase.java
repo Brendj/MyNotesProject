@@ -17,7 +17,6 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,7 +26,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -334,6 +332,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                                                                       actionFilter, nameFilter);
         } else {
             changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
+            if (changedItems == null || changedItems.isEmpty()) {
+                errorMessages = "Не получено разногласий либо устарел GUID организации";
+            }
         }
         items = new ArrayList<WebRegistryChangeItem>();
         for (RegistryChangeItem i : changedItems) {

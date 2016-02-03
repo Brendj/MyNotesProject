@@ -15,6 +15,9 @@ import java.util.Date;
  */
 public class OrgSync implements Serializable {
 
+    public static Integer ERROR_STATE_OK_CODE = 0;
+    public static Integer ERROR_STATE_BAD_GUID_CODE = 100;
+
     private Long idOfOrg;
     private long version;
 
@@ -26,7 +29,7 @@ public class OrgSync implements Serializable {
     private String clientVersion;
     private String remoteAddress;
     private Date lastAccRegistrySync;
-
+    private Integer errorState;
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -111,5 +114,13 @@ public class OrgSync implements Serializable {
                 ", clientVersion='" + clientVersion + '\'' +
                 ", remoteAddress='" + remoteAddress + '\'' +
                 '}';
+    }
+
+    public Integer getErrorState() {
+        return errorState;
+    }
+
+    public void setErrorState(Integer errorState) {
+        this.errorState = errorState;
     }
 }

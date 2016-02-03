@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -19,10 +20,7 @@ import org.springframework.stereotype.Component;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -74,6 +72,22 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runTest2() {
         CardService cardService = CardService.getInstance();
         System.out.println(DAOService.getInstance().runDebugTest2());
+    }
+
+    public void runTestAISReestr() throws Exception {
+        OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
+        Set<String> guids = new HashSet<String>();
+        guids.add("AD1CA6A0-7390-4270-8F76-ED31C1E52A2D");
+        guids.add("9290FB1E-5512-41D3-A447-8A865D0E8215");
+        guids.add("D88D3D17-16C6-497E-93CB-68DD209C937C");
+        guids.add("D88D3D17-16C6-497E-93CB-68DD209C927C");
+        guids.add("980D134B-0F61-418F-B09F-2502A532CC12");
+        List<String> list = service.getBadGuids(guids);
+        if (list != null) {
+            for (String s : list) {
+                System.out.println(String.format("Гуид %s не найден в АИС Реестр", s));
+            }
+        }
     }
 
 }
