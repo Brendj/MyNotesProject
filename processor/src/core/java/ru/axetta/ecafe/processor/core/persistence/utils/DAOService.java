@@ -450,6 +450,15 @@ public class DAOService {
         return entityManager.find(Client.class, idOfClient);
     }
 
+    public String getClientFullNameById(Long idOfClient) {
+        Client client = findClientById(idOfClient);
+        if (client != null) {
+            return client.getPerson().getFullName();
+        } else {
+            return null;
+        }
+    }
+
     public <T> T saveEntity(T entity) {
         return entityManager.merge(entity);
     }

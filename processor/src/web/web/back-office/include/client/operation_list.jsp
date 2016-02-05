@@ -537,6 +537,12 @@
         </f:facet>
         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />
     </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Кто отметил" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pass.checker}" styleClass="output-text" />
+    </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="clientPassesTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">

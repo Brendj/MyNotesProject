@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import java.util.Date;
 
@@ -21,12 +22,17 @@ public class ClientPassItem {
     private Date enterTime;
     private String enterName;
     private String direction;
+    private String checker;
 
     public ClientPassItem(EnterEvent event) {
         this.orgName = event.getOrg().getShortName();
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
         this.direction = getDirection(event.getPassDirection());
+        Long checkerId = event.getChildPassCheckerId();
+        if (checkerId != null) {
+            this.checker = DAOService.getInstance().getClientFullNameById(checkerId);
+        }
     }
 
     public String getOrgName() {
@@ -43,6 +49,10 @@ public class ClientPassItem {
 
     public String getDirection() {
         return direction;
+    }
+
+    public String getChecker() {
+        return checker;
     }
 
     private String getDirection(int direction) {
