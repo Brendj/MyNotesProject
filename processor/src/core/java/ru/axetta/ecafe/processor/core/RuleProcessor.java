@@ -495,8 +495,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     }
 
     private boolean getFlag(Long idOfRule, List<Long> reportHandleRuleIdsList) {
-        boolean flag = false;
+        boolean flag = true;
         if (!reportHandleRuleIdsList.isEmpty()) {
+            flag = false;
             if (reportHandleRuleIdsList.contains(idOfRule)) {
                 flag = true;
             }
