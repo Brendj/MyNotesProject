@@ -95,6 +95,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean notifyViaSMS;
     private Boolean notifyViaPUSH;
     private Boolean dontShowToExternal;
+    private Boolean useLastEEModeForPlan;
     private String remarks;
     private Date updateTime;
     private Long contractId;
@@ -243,6 +244,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         return dontShowToExternal;
     }
 
+    public Boolean getUseLastEEModeForPlan() {
+        return useLastEEModeForPlan;
+    }
+
     public String getRemarks() {
         return remarks;
     }
@@ -345,6 +350,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
         this.externalId = client.getExternalId();
+        this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
 
         // опекуны
         // (Kadyrov D) 23.12.2011

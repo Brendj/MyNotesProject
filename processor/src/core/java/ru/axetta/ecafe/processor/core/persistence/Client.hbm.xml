@@ -45,6 +45,8 @@
                   not-null="true"/>
         <property name="dontShowToExternal" column="DontShowToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="useLastEEModeForPlan" column="UseLastEEModeForPlan" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="false"/>
         <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
         <!--property name="image" column="Image" type="blob"/-->

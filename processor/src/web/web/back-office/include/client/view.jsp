@@ -218,6 +218,10 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.dontShowToExternal}" disabled="true" readonly="true"
                              styleClass="output-text" />
 
+    <h:outputText escape="true" value="Учет последнего события входа в планах питания" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.useLastEEModeForPlan}" disabled="true" readonly="true"
+                             styleClass="output-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

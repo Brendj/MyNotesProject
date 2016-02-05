@@ -320,6 +320,7 @@ public class SyncResponse {
             private final String guid;
             private boolean tempClient;
             private int clientType;
+            private final boolean isUseLastEEModeForPlan;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -349,6 +350,7 @@ public class SyncResponse {
                 this.guid = client.getClientGUID();
                 this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
+                this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -463,6 +465,7 @@ public class SyncResponse {
 			        element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 }
                 element.setAttribute("ClientType", Integer.toString(this.clientType));
+                element.setAttribute("IsUseLastEEModeForPlan", this.isUseLastEEModeForPlan?"1":"0");
                 return element;
             }
 

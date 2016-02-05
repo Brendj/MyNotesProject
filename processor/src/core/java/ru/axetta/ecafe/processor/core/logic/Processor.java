@@ -2523,6 +2523,10 @@ public class Processor implements SyncProcessor,
                 client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
 
+            if (clientParamItem.getIsUseLastEEModeForPlan() != null) {
+                client.setUseLastEEModeForPlan(clientParamItem.getIsUseLastEEModeForPlan());
+            }
+
             client.setClientRegistryVersion(version);
 
             persistenceSession.update(client);

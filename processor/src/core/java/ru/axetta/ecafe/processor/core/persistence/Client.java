@@ -66,6 +66,7 @@ public class Client {
     private boolean notifyViaSMS;
     private boolean notifyViaPUSH;
     private boolean dontShowToExternal;
+    private Boolean useLastEEModeForPlan;
     //private Blob image = Hibernate.createBlob(new byte[]{});
     private String remarks;
     private Date updateTime;
@@ -499,6 +500,14 @@ public class Client {
 
     public void setDontShowToExternal(boolean dontShowToExternal) {
         this.dontShowToExternal = dontShowToExternal;
+    }
+
+    public Boolean isUseLastEEModeForPlan() {
+        return useLastEEModeForPlan;
+    }
+
+    public void setUseLastEEModeForPlan(Boolean useLastEEModeForPlan) {
+        this.useLastEEModeForPlan = useLastEEModeForPlan;
     }
 
     /*public Blob getImage() {

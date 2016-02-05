@@ -214,6 +214,10 @@
     <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам	" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.dontShowToExternal}" styleClass="output-text" />
 
+    <h:outputText escape="true" value="Учет последнего события входа в планах питания" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.useLastEEModeForPlan}"
+                             styleClass="output-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

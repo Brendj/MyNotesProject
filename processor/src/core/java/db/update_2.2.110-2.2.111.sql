@@ -12,3 +12,6 @@ ALTER TABLE cf_not_planned_orgs ADD COLUMN shortnameinfoservice character varyin
 
 --Дополнительный статус организации (например, устарел гуид относительно АИС Реестр)
 ALTER TABLE cf_orgs_sync ADD COLUMN errorstate integer;
+
+--Сохранение флага Учет последнего события входа в планах питания
+ALTER TABLE cf_clients ADD COLUMN uselasteemodeforplan integer;

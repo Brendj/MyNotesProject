@@ -209,6 +209,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean notifyViaSMS;
     private Boolean notifyViaPUSH;
     private Boolean dontShowToExternal;
+    private Boolean useLastEEModeForPlan;
     private String remarks;
     private boolean changePassword;
     private String plainPassword;
@@ -417,6 +418,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setDontShowToExternal(Boolean dontShowToExternal) {
         this.dontShowToExternal = dontShowToExternal;
+    }
+
+    public Boolean getUseLastEEModeForPlan() {
+        return useLastEEModeForPlan;
+    }
+
+    public void setUseLastEEModeForPlan(Boolean useLastEEModeForPlan) {
+        this.useLastEEModeForPlan = useLastEEModeForPlan;
     }
 
     public String getRemarks() {
@@ -729,7 +738,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setNotifyViaEmail(this.notifyViaEmail);
         client.setNotifyViaSMS(this.notifyViaSMS);
         client.setNotifyViaPUSH(this.notifyViaPUSH);
-        client.setDontShowToExternal((this.dontShowToExternal));
+        client.setDontShowToExternal(this.dontShowToExternal);
+        client.setUseLastEEModeForPlan(this.useLastEEModeForPlan);
         client.setRemarks(this.remarks);
         client.setUpdateTime(new Date());
         client.setContractTime(this.contractTime);
@@ -954,7 +964,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             categoriesFilter.append("Не выбрано");
         }
-
+        this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
     }
 
     public String getIdOfCategoryListString() {

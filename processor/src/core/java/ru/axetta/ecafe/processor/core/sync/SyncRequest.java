@@ -89,6 +89,7 @@ public class SyncRequest {
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap,"CanConfirmGroupPayment");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
+                    String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
                     //return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                     //        categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                     //        fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -101,7 +102,7 @@ public class SyncRequest {
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
                             notifyViaSMS == null ? null : notifyViaSMS.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
-                            expenditureLimit);
+                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));
                 }
 
             }
@@ -118,6 +119,7 @@ public class SyncRequest {
             private final Boolean canConfirmGroupPayment;
             private final String guid;
             private final Long expenditureLimit;
+            private final Boolean isUseLastEEModeForPlan;
 
             //public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
             //        int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
@@ -128,7 +130,7 @@ public class SyncRequest {
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
                     Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit) {
+                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -152,6 +154,7 @@ public class SyncRequest {
                 this.canConfirmGroupPayment = canConfirmGroupPayment;
                 this.guid = guid;
                 this.expenditureLimit = expenditureLimit;
+                this.isUseLastEEModeForPlan = isUseLastEEModeForPlan;
             }
 
             public long getIdOfClient() {
@@ -244,6 +247,10 @@ public class SyncRequest {
 
             public Long getExpenditureLimit() {
                 return expenditureLimit;
+            }
+
+            public Boolean getIsUseLastEEModeForPlan() {
+                return isUseLastEEModeForPlan;
             }
 
             @Override
