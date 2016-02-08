@@ -20,7 +20,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -123,11 +126,11 @@ public class Postman implements AutoReportPostman {
     }
 
     public void postReport(String address, String subject, ReportDocument reportDocument) throws Exception {
-        postFiles(reportMailSettings, address, subject, reportDocument.getFiles());
+        postFiles(reportMailSettings, address, subject, reportDocument.getFiles(), "REPORT");
     }
 
     public void postEvent(String address, String subject, ReportDocument eventDocument) throws Exception {
-        postFiles(reportMailSettings, address, subject, eventDocument.getFiles());
+        postFiles(reportMailSettings, address, subject, eventDocument.getFiles(), "EVENT");
     }
 
     public void postNotificationEmail(String address, String subject, String text) throws Exception {
@@ -162,8 +165,24 @@ public class Postman implements AutoReportPostman {
         return Session.getInstance(properties, smtpAauthenticator);
     }
 
-    private static void postFiles(MailSettings mailSettings, String address, String subject, List<File> files)
-            throws Exception {
+    private static String readFile(File file) throws IOException {
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(
+                        new java.io.FileInputStream(file), "Cp1251"));
+
+        String str = "";
+        String line;
+
+        while ((line = in.readLine()) != null) {
+            str += line;
+        }
+
+        in.close();
+        return str;
+    }
+
+    private static void postFiles(MailSettings mailSettings, String address, String subject, List<File> files,
+            String mode) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Posting file with subject \"%s\" to \"%s\"", subject, address));
         }
@@ -183,8 +202,13 @@ public class Postman implements AutoReportPostman {
             String extension = FilenameUtils.getExtension(file.getAbsolutePath());
             if (StringUtils.equalsIgnoreCase(extension, "htm") || StringUtils.equalsIgnoreCase(extension, "html")) {
                 singleContentBody = true;
-                FileDataSource fileDataSource = new FileDataSource(file);
-                mailMessage.setDataHandler(new DataHandler(fileDataSource));
+                if (mode.equals("EVENT")) {
+                    FileDataSource fileDataSource = new FileDataSource(file);
+                    mailMessage.setDataHandler(new DataHandler(fileDataSource));
+                } else if (mode.equals("REPORT")) {
+                    String s = readFile(file);
+                    mailMessage.setContent(s, "text/html; charset=windows-1251");
+                }
             }
         }
         if (!singleContentBody) {
