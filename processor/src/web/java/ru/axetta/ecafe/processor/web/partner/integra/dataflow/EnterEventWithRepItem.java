@@ -45,7 +45,10 @@ public class EnterEventWithRepItem {
     protected Long repId;
     @XmlAttribute(name = "RepName")
     protected String repName;
-
+    @XmlAttribute(name = "ChildPassChecker")
+    protected String childPassChecker;
+    @XmlAttribute(name = "ChildPassCheckerContractId")
+    protected Long childPassCheckerContractId;
 
     /**
      * Gets the value of the dateTime property.
@@ -189,5 +192,21 @@ public class EnterEventWithRepItem {
 
     public void setRepName(String repName) {
         this.repName = repName;
+    }
+
+    public String getChildPassChecker() {
+        return childPassChecker;
+    }
+
+    public void setChildPassChecker(String childPassChecker) {
+        this.childPassChecker = childPassChecker;
+    }
+
+    public Long getChildPassCheckerContractId() {
+        return childPassCheckerContractId;
+    }
+
+    public void setChildPassCheckerContractId(Long childPassCheckerContractId) {
+        this.childPassCheckerContractId = childPassCheckerContractId;
     }
 }

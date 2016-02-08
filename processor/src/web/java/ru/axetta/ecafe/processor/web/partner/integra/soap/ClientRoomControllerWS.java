@@ -3124,6 +3124,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 //enterEventItem.setGuardianSan(guardian.getSan());
                 enterEventWithRepItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
             }
+            final Long checkerId = enterEvent.getChildPassCheckerId();
+            if (checkerId != null) {
+                Client checker = DAOUtils.findClient(session, checkerId);
+                enterEventWithRepItem.setChildPassCheckerContractId(checker.getContractId());
+                enterEventWithRepItem.setChildPassChecker(checker.getPerson().getFullName());
+            }
             enterEventWithRepList.getE().add(enterEventWithRepItem);
         }
         data.setEnterEventWithRepList(enterEventWithRepList);
