@@ -46,6 +46,8 @@ public class OrderPublicationItem {
     protected Long orderId;
     @XmlAttribute(name = "OrderStatus")
     protected String orderStatus;
+    @XmlAttribute(name = "OrgHolder")
+    protected String orgHolder;
 
     /**
      * Gets the value of the publication property.
@@ -114,5 +116,13 @@ public class OrderPublicationItem {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getOrgHolder() {
+        return orgHolder;
+    }
+
+    public void setOrgHolder(String orgHolder) {
+        this.orgHolder = orgHolder;
     }
 }

@@ -55,13 +55,17 @@
     var req;
     var isIE;
 
-    function init(prefix, Id) {
+    function initOrderRemoving(prefix, Id) {
         completeField = document.getElementById(prefix+Id);
     }
 
-    function doOrder(pubId) {
-        init("pub", pubId);
-        var url = "pages/order-publication.jsp?publication_id="+pubId;
+    function initOrderPublication(pubPrefix, pubId, holderPrefix, holderId) {
+        completeField = document.getElementById(pubPrefix+pubId+holderPrefix+holderId);
+    }
+
+    function doOrder(pubId, holderId) {
+        initOrderPublication("pub", pubId, "holder", holderId);
+        var url = "pages/order-publication.jsp?publication_id="+pubId+"&org_holder_id="+holderId;
         req = initRequest();
         req.open("get", url, "true");
         req.onreadystatechange = callback;
@@ -69,7 +73,7 @@
     }
 
     function deleteOrder(orderId) {
-        init("order", orderId);
+        initOrderRemoving("order", orderId);
         var url = "pages/delete-order-publication.jsp?order_id="+orderId;
         req = initRequest();
         req.open("get", url, "true");
@@ -180,6 +184,9 @@
             <div class="output-text">Доступно к выдаче</div>
         </td>
         <td>
+            <div class="output-text">Организация - держатель экземпляра</div>
+        </td>
+        <td>
             <div class="output-text">Заказ</div>
         </td>
     </tr>
@@ -210,8 +217,11 @@
             <%=publicationIns.getInstancesAvailable().toString()%>
         </td>
         <td>
-            <div id="pub<%=publicationIns.getPublication().getPublicationId().toString()%>">
-                <a href="#" onclick="doOrder(<%=publicationIns.getPublication().getPublicationId()%>);">Забронировать</a>
+            <%=publicationIns.getOrgHolder()%>
+        </td>
+        <td>
+            <div id="pub<%=publicationIns.getPublication().getPublicationId().toString()+ "holder" + publicationIns.getOrgHolderId().toString()%>">
+                <a href="#" onclick="doOrder(<%=publicationIns.getPublication().getPublicationId()%>, <%=publicationIns.getOrgHolderId()%>)">Забронировать</a>
             </div>
         </td>
     </tr>

@@ -592,6 +592,8 @@
         </xs:sequence>
         <xs:attribute name="InstancesAmount" type="xs:int"/>
         <xs:attribute name="InstancesAvailable" type="xs:int"/>
+        <xs:attribute name="OrgHolderId" type="xs:long"/>
+        <xs:attribute name="OrgHolder" type="xs:string"/>
     </xs:complexType>
 <xs:complexType name="getCirculationList">
     <xs:sequence>

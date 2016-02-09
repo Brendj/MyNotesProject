@@ -19,6 +19,10 @@ public class PublicationInstancesItem {
     protected Integer instancesAmount;
     @XmlAttribute(name = "InstancesAvailable")
     protected Integer instancesAvailable;
+    @XmlAttribute(name = "OrgHolderId")
+    protected Long orgHolderId;
+    @XmlAttribute(name = "OrgHolder")
+    protected  String orgHolder;
 
     /**
      * Gets the value of the publication property.
@@ -92,4 +96,19 @@ public class PublicationInstancesItem {
         this.instancesAvailable = value;
     }
 
+    public Long getOrgHolderId() {
+        return orgHolderId;
+    }
+
+    public void setOrgHolderId(Long orgHolderId) {
+        this.orgHolderId = orgHolderId;
+    }
+
+    public String getOrgHolder() {
+        return orgHolder;
+    }
+
+    public void setOrgHolder(String orgHolder) {
+        this.orgHolder = orgHolder;
+    }
 }

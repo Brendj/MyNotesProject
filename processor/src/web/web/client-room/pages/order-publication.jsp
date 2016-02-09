@@ -11,15 +11,19 @@
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-menu_jsp");
     final String PUBLICATION_ID = "publication_id";
+    final String ORG_HOLDER_ID = "org_holder_id";
 
     try {
         ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
         Long publicationId = 0L;
         Long orderId = 0L;
+        Long orgHolderId = 0L;
         logger.debug(request.getParameter(PUBLICATION_ID));
+        logger.debug(request.getParameter(ORG_HOLDER_ID));
         publicationId = Long.parseLong(StringUtils.defaultString(request.getParameter(PUBLICATION_ID)));
+        orgHolderId = Long.parseLong(StringUtils.defaultString(request.getParameter(ORG_HOLDER_ID)));
         ClientRoomController port = clientAuthToken.getPort();
-        OrderPublicationResult orderResult=port.orderPublication(clientAuthToken.getContractId(), publicationId);
+        OrderPublicationResult orderResult=port.orderPublication(clientAuthToken.getContractId(), publicationId, orgHolderId);
         orderId = orderResult.id;
         long resultCode = orderResult.resultCode;
         if (resultCode == 0L) {

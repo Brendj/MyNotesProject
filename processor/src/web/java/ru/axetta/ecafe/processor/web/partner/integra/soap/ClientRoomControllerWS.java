@@ -132,6 +132,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ORDER_PUBLICATION_CANT_BE_DELETED = 360L;
     private static final Long RC_ORDER_PUBLICATION_ALREADY_EXISTS = 370L;
     private static final Long RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN = 380L;
+    private static final Long RC_ORG_HOLDER_NOT_FOUND = 390L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -155,28 +156,33 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORDER_PUBLICATION_CANT_BE_DELETED_DESC = "Заказ не может быть удален";
     private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
     private static final String RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN_DESC = "Клиент не найден или не является опекаемым для данного опекуна";
+    private static final String RC_ORG_HOLDER_NOT_FOUND_DESC = "Не найдена организация - держатель экземпляра";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
 
-
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
 
     private static final String QUERY_PUBLICATION_LIST =
-            "select fq.*, count(ins.IdOfInstance) as instancesAvailable from (select pub.IdOfPublication, pub.Author, pub.Title, pub.Title2, pub.PublicationDate, pub.Publisher, " +
-            "count(ins.IdOfInstance) as instancesAmount " +
-            "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication " +
-            "where ins.OrgOwner = :org " +
-            "CONDITION " +
-            "group by pub.IdOfPublication order by Author limit :limit offset :offset) fq inner join " +
-            "cf_instances ins on fq.IdOfPublication = ins.IdOfPublication " +
-            "where ins.OrgOwner = :org and not exists (select IdOfCirculation from cf_circulations cir inner join cf_issuable iss on cir.IdOfIssuable = iss.IdOfIssuable " +
-            "where iss.IdOfInstance = ins.IdOfInstance and cir.RealRefundDate is null) " +
-            "group by fq.IdOfPublication, fq.Author, fq.Title, fq.Title2, fq.PublicationDate, fq.Publisher, fq.instancesAmount " +
-            "order by fq.Author";
-    private static final String QUERY_PUBLICATION_LIST_COUNT = "select count(distinct pub.IdOfPublication) " +
+            "select result.*, org.shortname from " +
+            "(select fq.IdOfPublication, fq.Author, fq.Title, fq.Title2, fq.PublicationDate, fq.Publisher, fq.instancesAmount, count(ins.IdOfInstance) as instancesAvailable, fq.owner " +
+                    "from (select pub.IdOfPublication, pub.Author, pub.Title, pub.Title2, pub.PublicationDate, pub.Publisher, " +
+                    "count(ins.IdOfInstance) as instancesAmount, ins.OrgOwner as owner " +
+                    "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication " +
+                    "where ins.OrgOwner in (select friendlyorg from cf_friendly_organization where currentorg = :org) " +
+                    "CONDITION " +
+                    "group by pub.IdOfPublication, ins.OrgOwner order by Author limit :limit offset :offset) fq inner join " +
+                    "cf_instances ins on fq.IdOfPublication = ins.IdOfPublication " +
+                    "where ins.OrgOwner = fq.owner and not exists (select IdOfCirculation from cf_circulations cir inner join cf_issuable iss on cir.IdOfIssuable = iss.IdOfIssuable " +
+                    "where iss.IdOfInstance = ins.IdOfInstance and cir.RealRefundDate is null) " +
+                    "group by fq.IdOfPublication, fq.Author, fq.Title, fq.Title2, fq.PublicationDate, fq.Publisher, fq.instancesAmount, fq.owner " +
+                    "order by fq.Author) result inner join cf_orgs org on result.owner=org.IdOfOrg";
+
+    private static final String QUERY_PUBLICATION_LIST_COUNT = "select count(*) from (select distinct pub.IdOfPublication, ins.orgOwner " +
             "from cf_publications pub inner join cf_instances ins on pub.IdOfPublication = ins.IdOfPublication inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
-            "where ins.OrgOwner = :org and not exists (select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
+            "where ins.OrgOwner in (select friendlyorg from cf_friendly_organization where currentorg = :org) and not exists (select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
+
+    private static final String QUERY_PUBLICATION_LIST_COUNT_TAIL = ") result";//alias for inner select
 
     private final Set<Date> eeManualCleared = new HashSet<Date>();
 
@@ -3941,6 +3947,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         bquery.setLength(0);
         bquery.append(QUERY_PUBLICATION_LIST_COUNT);
         bquery.append(str_condition);
+        bquery.append(QUERY_PUBLICATION_LIST_COUNT_TAIL);
         query = session.createSQLQuery(bquery.toString());
         query.setParameter("org", org);
         query.setParameter("condition_like", "%" + searchCondition.toUpperCase() + "%");
@@ -4010,6 +4017,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         bquery.setLength(0);
         bquery.append(QUERY_PUBLICATION_LIST_COUNT);
         bquery.append(str_condition);
+        bquery.append(QUERY_PUBLICATION_LIST_COUNT_TAIL);
 
         query = session.createSQLQuery(bquery.toString());
         query.setParameter("org", org);
@@ -4074,6 +4082,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             pu.setInstancesAmount(((BigInteger)objs[6]).intValue());
             pu.setInstancesAvailable(((BigInteger)objs[7]).intValue());
+            pu.setOrgHolder(objs[9].toString());
+            pu.setOrgHolderId(((BigInteger)objs[8]).longValue());
             PublicationItem pi = new PublicationItem();
             pi.setAuthor(objs[1].toString());
             pi.setPublisher(objs[5].toString());
@@ -4090,7 +4100,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public OrderPublicationResult orderPublication(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "publicationId") Long publicationId) {
+            @WebParam(name = "publicationId") Long publicationId, @WebParam(name = "orgHolderId") Long orgHolderId) {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
@@ -4114,10 +4124,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
 
+                Org orgHolder = DAOUtils.findOrg(session, orgHolderId);
+                if (orgHolder == null) {
+                    result.resultCode = RC_ORG_HOLDER_NOT_FOUND;
+                    result.description = RC_ORG_HOLDER_NOT_FOUND_DESC;
+                    return result;
+                }
+
                 Criteria orderCriteria = session.createCriteria(OrderPublication.class);
                 orderCriteria.add(Restrictions.eq("client", client));
                 orderCriteria.add(Restrictions.eq("publication", publication));
                 orderCriteria.add(Restrictions.eq("deletedState", false));
+                orderCriteria.add(Restrictions.eq("orgOwner", orgHolderId));
+
                 if (!orderCriteria.list().isEmpty()) {
                     result.resultCode = RC_ORDER_PUBLICATION_ALREADY_EXISTS;
                     result.description = RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC;
@@ -4129,9 +4148,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         "from cf_instances ins inner join cf_issuable iss on ins.IdOfInstance = iss.IdOfInstance " +
                         "where ins.OrgOwner = :org and ins.IdOfPublication = :pub and not exists " +
                         "(select IdOfCirculation from cf_circulations cir where cir.IdOfIssuable = iss.IdOfIssuable and cir.RealRefundDate is null) ";
-                Long org = client.getOrg().getIdOfOrg();
                 SQLQuery query = session.createSQLQuery(bquery.toString());
-                query.setParameter("org", org);
+                query.setParameter("org", orgHolderId);
                 query.setParameter("pub", publicationId);
                 Long insCount = ((BigInteger)query.uniqueResult()).longValue();
                 if (insCount > 0) {
@@ -4142,7 +4160,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     orderPublication.setCreatedDate(new Date());
                     orderPublication.setDeletedState(false);
                     orderPublication.setIdOfClient(client.getIdOfClient());
-                    orderPublication.setOrgOwner(client.getOrg().getIdOfOrg());
+                    orderPublication.setOrgOwner(orgHolderId);
                     orderPublication.setSendAll(SendToAssociatedOrgs.DontSend);
 
                     orderPublication.setPublication(publication);
@@ -4170,7 +4188,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_INTERNAL_ERROR_DESC;
         }
         return result;
-
     }
 
     private Publication findPublicationByPublicationId(Session session, long publicationId) {
@@ -4207,12 +4224,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         List<OrderPublication> orderList = orderCriteria.list();
 
+        HashMap<Long, String> friendlyOrgNames = getFriendlyOrgNames(client);
+
         OrderPublicationItemList orList = objectFactory.createOrderPublicationItemList();
         for (OrderPublication c : orderList) {
             OrderPublicationItem oi = new OrderPublicationItem();
             oi.setOrderDate(toXmlDateTime(c.getCreatedDate()));
             oi.setOrderId(c.getGlobalId());
             oi.setOrderStatus(c.getStatus());
+            oi.setOrgHolder(StringUtils.defaultString(friendlyOrgNames.get(c.getOrgOwner())));
             Publication p = c.getPublication();
             if (p != null) {
                 PublicationItem pi = new PublicationItem();
@@ -4227,6 +4247,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             orList.getC().add(oi);
         }
         data.setOrderPublicationItemList(orList);
+    }
+
+    private HashMap<Long, String> getFriendlyOrgNames(Client client) {
+        Set<Org> frienlyOrgs = client.getOrg().getFriendlyOrg();
+        HashMap<Long, String> frienlyOrgNames = new HashMap<Long, String>();
+        for(Org org : frienlyOrgs) {
+            frienlyOrgNames.put(org.getIdOfOrg(), org.getShortName());
+        }
+        return frienlyOrgNames;
     }
 
     @Override

@@ -99,6 +99,9 @@
             <div class="output-text">Статус</div>
         </td>
         <td>
+            <div class="output-text">Организация - держатель экземпляра</div>
+        </td>
+        <td>
             <div class="output-text">Действия</div>
         </td>
     </tr>
@@ -127,6 +130,9 @@
         </td>
         <td>
             <%=orderPub.getOrderStatus()%>
+        </td>
+        <td>
+            <%=orderPub.getOrgHolder()%>
         </td>
         <td>
             <% if ((orderPub.getOrderStatus() == null) || (orderPub.getOrderStatus().isEmpty())) { %>
