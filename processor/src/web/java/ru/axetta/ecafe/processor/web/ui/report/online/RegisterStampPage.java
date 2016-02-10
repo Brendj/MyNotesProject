@@ -207,7 +207,7 @@ public class RegisterStampPage extends OnlineReportPage{
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             Org org = (Org) session.load(Org.class, idOfOrg);
-            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getShortNameInfoService(), org.getAddress()));
             RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;

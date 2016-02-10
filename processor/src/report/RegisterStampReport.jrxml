@@ -27,6 +27,7 @@
 	<parameter name="endTime" class="java.lang.Long"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="orgAddress" class="java.lang.String"/>
 	<field name="level1" class="java.lang.String"/>
 	<field name="level2" class="java.lang.String"/>
 	<field name="level3" class="java.lang.String"/>
@@ -36,7 +37,7 @@
 	<field name="dateTime" class="java.util.Date"/>
 	<field name="number" class="java.lang.String"/>
 	<title>
-		<band height="117" splitType="Stretch">
+		<band height="145" splitType="Stretch">
 			<textField>
 				<reportElement uuid="dd2fb70b-13e5-41cc-86e6-ecc00c220968" x="0" y="20" width="496" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
@@ -52,6 +53,13 @@
 				<text><![CDATA[(наименование Получателя услуг)]]></text>
 			</staticText>
 			<staticText>
+				<reportElement uuid="adb60d7a-1ada-4926-a0ea-b93fe7dc1e4c" positionType="FixRelativeToBottom" x="0" y="111" width="496" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[(адрес Получателя услуг)]]></text>
+			</staticText>
+			<staticText>
 				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="496" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="14" isBold="true"/>
@@ -59,33 +67,40 @@
 				<text><![CDATA[Реестр талонов по льготному  питанию]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="70" y="96" width="70" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="FixRelativeToBottom" x="70" y="125" width="70" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="96" width="70" height="20"/>
+				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" positionType="FixRelativeToBottom" x="0" y="125" width="70" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Период c]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="210" y="96" width="70" height="20"/>
+				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" positionType="FixRelativeToBottom" x="210" y="125" width="70" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="140" y="96" width="70" height="20"/>
+				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" positionType="FixRelativeToBottom" x="140" y="125" width="70" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[по]]></text>
 			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" x="0" y="96" width="496" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%s", $P{orgAddress})]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

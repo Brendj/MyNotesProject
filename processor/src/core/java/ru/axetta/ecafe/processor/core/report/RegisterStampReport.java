@@ -49,6 +49,7 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
             parameterMap.put("orgName", org.getOfficialName());
+            parameterMap.put("orgAddress", org.getAddress());
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
