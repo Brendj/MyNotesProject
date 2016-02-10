@@ -981,11 +981,12 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по клиентам" rendered="#{mainPage.eligibleToViewClientsReports}">
+                         label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientsReports}">
         <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
                             label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="сlientBalanceByOrgReportMenuItem" binding="#{mainPage.clientBalanceByOrgReportPage.mainMenuComponent}"
+                            label="Остаток денежных средств по организациям на дату" action="#{mainPage.showClientBalanceByOrgReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
-
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}">

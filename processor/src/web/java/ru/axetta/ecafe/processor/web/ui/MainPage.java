@@ -240,6 +240,7 @@ public class MainPage implements Serializable {
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
     private final ClientReportPage clientReportPage = new ClientReportPage();
     private final ClientBalanceByDayReportPage clientBalanceByDayReportPage = new ClientBalanceByDayReportPage();
+    private final ClientBalanceByOrgReportPage clientBalanceByOrgReportPage = new ClientBalanceByOrgReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -6295,6 +6296,23 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientBalanceByDayReportPage;
         } catch (Exception e) {
             logger.error("Failed to set ClientBalanceByDayreport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public ClientBalanceByOrgReportPage getClientBalanceByOrgReportPage() {
+        return clientBalanceByOrgReportPage;
+    }
+
+    public Object showClientBalanceByOrgReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = clientBalanceByOrgReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ClientBalanceByOrgReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }
