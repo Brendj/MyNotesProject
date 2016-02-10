@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,6 +54,19 @@ public class ClientBalanceByOrgReportPage extends OnlineReportPage implements Co
     private String htmlReport;
 
     private final ClientFilter clientFilter = new ClientFilter();
+
+    public ClientBalanceByOrgReportPage() {
+        super();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+
+        localCalendar.setTime(new Date());
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.DATE).getTime();
+        //startDate = new Date(System.currentTimeMillis());
+    }
 
     public String getPageFilename() {
         return "report/online/client_balance_by_org_report";
@@ -135,9 +150,6 @@ public class ClientBalanceByOrgReportPage extends OnlineReportPage implements Co
     }
 
     private BasicReportJob makeReport() {
-        if (validateFormData()) {
-            return null;
-        }
         Properties properties = new Properties();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
@@ -183,11 +195,17 @@ public class ClientBalanceByOrgReportPage extends OnlineReportPage implements Co
     }
 
     public void exportToHtml() {
+        if (validateFormData()) {
+            return;
+        }
         this.clientBalanceByOrg = (ClientBalanceByOrgReport)makeReport();
         htmlReport = clientBalanceByOrg.getHtmlReport();
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
+        if (validateFormData()) {
+            return;
+        }
         BasicReportJob report = makeReport();
         if (report != null) {
             try {
