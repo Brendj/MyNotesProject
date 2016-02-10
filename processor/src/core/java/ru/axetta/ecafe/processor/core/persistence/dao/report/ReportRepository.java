@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Criteria;
@@ -75,9 +76,11 @@ public class ReportRepository extends BaseJpaDao {
         for (ReportParameter parameter : parameters) {
             if (parameter.getParameterName().equals("startDate")) {
                 startDate = safeDateFormat.parse(parameter.getParameterValue());
+                startDate = CalendarUtils.truncateToDayOfMonth(startDate);
             }
             if (parameter.getParameterName().equals("endDate")) {
                 endDate = safeDateFormat.parse(parameter.getParameterValue());
+                endDate = CalendarUtils.endOfDay(endDate);
             }
             if (parameter.getParameterName().equals("idOfOrg")) {
                 idOfOrg = Long.parseLong(parameter.getParameterValue());
@@ -182,6 +185,9 @@ public class ReportRepository extends BaseJpaDao {
             org_ids.add(fOrg.getIdOfOrg());
             orgMap.put(fOrg.getIdOfOrg(), (Org)session.load(Org.class, fOrg.getIdOfOrg()));
         }
+
+        startDate = CalendarUtils.truncateToDayOfMonth(startDate);
+        endDate = CalendarUtils.endOfDay(endDate);
 
         Criteria criteria = session.createCriteria(ReportInfo.class);
         criteria.add(Restrictions.in("idOfOrg", org_ids));
