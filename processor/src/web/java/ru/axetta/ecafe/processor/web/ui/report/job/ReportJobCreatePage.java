@@ -18,7 +18,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.model.SelectItem;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -115,9 +118,14 @@ public class ReportJobCreatePage extends BasicWorkspacePage {
     public void createReportJob() throws Exception {
         if (this.cronExpression == "") throw new Exception("Нужно заполнить поле: CRON-выражение");
 
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        if (!runtimeContext.isMainNode()) {
+            throw new Exception("Создавать расписания можно только на сервере с ролью = main");
+        }
+
         List<ReportHandleRule> reportHandleRules = getReportRulesList();
 
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         SchedulerJob schedulerJob = new SchedulerJob(this.jobName,
                 AutoReportGenerator.getReportJobClass(this.reportType).getCanonicalName(), this.cronExpression,
                 this.enabled);

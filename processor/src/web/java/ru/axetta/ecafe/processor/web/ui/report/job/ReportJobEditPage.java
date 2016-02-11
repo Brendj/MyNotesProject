@@ -15,8 +15,8 @@ import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,14 +129,17 @@ public class ReportJobEditPage extends BasicWorkspacePage {
     public void updateReportJob(Long idOfReportJob) throws Exception {
         if (this.cronExpression == "") throw new Exception("Нужно заполнить поле: CRON-выражение");
 
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        if (!runtimeContext.isMainNode()) {
+            throw new Exception("Редактировать расписания можно только на сервере с ролью = main");
+        }
+
         List<ReportHandleRule> reportHandleRules = getReportRulesList();
 
-        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            runtimeContext = RuntimeContext.getInstance();
-
             runtimeContext.getAutoReportGenerator().removeJobRules(idOfReportJob);
 
             runtimeContext.getAutoReportGenerator().updateJob(idOfReportJob, this.jobName,
