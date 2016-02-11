@@ -284,6 +284,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
 
+        org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);
         fill(org);
         /////

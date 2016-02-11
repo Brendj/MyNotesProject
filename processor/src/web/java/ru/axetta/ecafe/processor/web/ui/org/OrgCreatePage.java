@@ -471,7 +471,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setOneActiveCard(oneActiveCard);
 
 
-
+        org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());

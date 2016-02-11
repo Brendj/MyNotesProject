@@ -120,6 +120,7 @@ public class Org implements Serializable {
     private Boolean payByCashier;
     private Boolean oneActiveCard;
     private Set<Card> cards = new HashSet<Card>();
+    private Date updateTime;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -169,6 +170,7 @@ public class Org implements Serializable {
         this.orgSync = new OrgSync();
         this.orgSync.setIdOfPacket(0L);
         this.orgSync.setOrg(this);
+        updateTime = new Date();
 
     }
 
@@ -904,6 +906,14 @@ public class Org implements Serializable {
         this.interdistrictCouncilChief = interdistrictCouncilChief;
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -931,7 +941,7 @@ public class Org implements Serializable {
                 + ", cardLimit=" + cardLimit + ", publicKey='" + publicKey + '\''// + ", idOfPacket=" + idOfPacket
                 + ", lastClientContractId=" + lastClientContractId + ", cypheredSsoPassword='" + cypheredSsoPassword
                 + '\'' + ", smsSender='" + smsSender + '\'' + ", priceOfSms=" + priceOfSms + ", subscriptionPrice="
-                + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +'}';
+                + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +", updateTime=" + updateTime+'}';
     }
 
 }

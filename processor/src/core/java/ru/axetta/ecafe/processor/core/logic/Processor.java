@@ -3963,6 +3963,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             Long result = organization.getOrgSync().getIdOfPacket();
             organization.getOrgSync().setIdOfPacket(++result);
             //organization.setIdOfPacket(result + 1);
+            organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             persistenceSession.update(organization);
             persistenceSession.flush();
             persistenceTransaction.commit();

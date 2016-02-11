@@ -150,6 +150,7 @@ public class Contract extends ContractDistributedObject {
     protected void setContract(Session session, Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
         org.setContract(this);
+        org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);
     }
 

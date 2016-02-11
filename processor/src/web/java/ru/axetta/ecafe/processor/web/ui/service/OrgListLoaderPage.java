@@ -292,6 +292,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     org.setFriendlyOrg(new HashSet<Org>());
                 }
                 org.getFriendlyOrg().add(org);*/
+                org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
                 session.save(org);
 
                 org.setRefectoryType(null);
@@ -299,6 +300,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     org.setFriendlyOrg(new HashSet<Org>());
                 }
                 org.getFriendlyOrg().add(org);
+                org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
                 session.save(org);
 
                 return new OrgEntry(lineNo, 0, "Ok", org.getIdOfOrg());

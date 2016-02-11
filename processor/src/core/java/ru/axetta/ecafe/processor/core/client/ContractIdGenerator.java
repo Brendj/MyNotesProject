@@ -50,6 +50,7 @@ public class ContractIdGenerator {
 
         long newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
         org.setLastClientContractId(lastClientContractId);
+        org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);
         session.flush();
         return newClientContractId;

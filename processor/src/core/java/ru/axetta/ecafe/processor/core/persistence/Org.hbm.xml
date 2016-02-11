@@ -206,6 +206,7 @@
 
         <property name="interdistrictCouncil" column="interdistrictCouncil" type="string" length="256"/>
         <property name="interdistrictCouncilChief" column="interdistrictCouncilChief" type="string" length="256"/>
+        <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
     </class>
 </hibernate-mapping>
