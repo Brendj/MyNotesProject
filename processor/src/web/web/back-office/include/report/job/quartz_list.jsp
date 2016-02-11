@@ -15,7 +15,7 @@
 <h:outputText escape="true" value="Запланированные задачи менеджера расписаний Quartz Scheduler" styleClass="output-text" />
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Обновить" action="#{mainPage.quartzJobsListPage.reload}"
-                       reRender="workspaceTogglePanel" styleClass="command-button" status="repositoryStatus" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" status="quartzJobsListStatus" />
     <a4j:status id="quartzJobsListStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
