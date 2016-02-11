@@ -1379,6 +1379,10 @@
                             label="Добавить задачу" action="#{mainPage.showReportJobCreatePage}"
                             reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="reportQuartzJobsListMenuItem" binding="#{mainPage.quartzJobsListPage.mainMenuComponent}"
+                            label="Quartz jobs" action="#{mainPage.showQuartzJobsListPage}"
+                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
 

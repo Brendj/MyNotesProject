@@ -216,6 +216,7 @@ public class MainPage implements Serializable {
     private final ReportJobViewPage reportJobViewPage = new ReportJobViewPage();
     private final ReportJobEditPage reportJobEditPage = new ReportJobEditPage();
     private final ReportJobCreatePage reportJobCreatePage = new ReportJobCreatePage();
+    private final QuartzJobsListPage quartzJobsListPage = new QuartzJobsListPage();
 
     // Report discountrule manipulation
     private final BasicWorkspacePage reportRuleGroupPage = new BasicWorkspacePage();
@@ -5293,6 +5294,31 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showQuartzJobsListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            quartzJobsListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = quartzJobsListPage;
+        } catch (Exception e) {
+            logger.error("Failed to show quartz jobs list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы создания задачи: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object createReportJob() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -8359,5 +8385,9 @@ public class MainPage implements Serializable {
 
     public Boolean isTestMode() {
         return RuntimeContext.getInstance().isTestMode();
+    }
+
+    public QuartzJobsListPage getQuartzJobsListPage() {
+        return quartzJobsListPage;
     }
 }

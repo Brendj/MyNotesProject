@@ -6,12 +6,12 @@ package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -69,9 +69,26 @@ public class DebugInfoPage extends BasicWorkspacePage {
         }
     }
 
-    public void runTest2() {
-        CardService cardService = CardService.getInstance();
-        System.out.println(DAOService.getInstance().runDebugTest2());
+    public void runTest2() throws Exception {
+        //CardService cardService = CardService.getInstance();
+        //System.out.println(DAOService.getInstance().runDebugTest2());
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        Scheduler scheduler = runtimeContext.getAutoReportGenerator().getScheduler();
+        for (String groupName : scheduler.getJobGroupNames()) {
+
+            //loop all jobs by groupname
+            for (String jobName : scheduler.getJobNames(groupName)) {
+
+                //get job's trigger
+                Trigger[] triggers = scheduler.getTriggersOfJob(jobName,groupName);
+                Date nextFireTime = triggers[0].getNextFireTime();
+
+                System.out.println("[jobName] : " + jobName + " [groupName] : "
+                        + groupName + " - " + nextFireTime);
+
+            }
+        }
     }
 
     public void runTestAISReestr() throws Exception {
