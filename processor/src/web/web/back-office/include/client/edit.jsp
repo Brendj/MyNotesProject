@@ -36,11 +36,11 @@
     </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Пароль" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.changePassword}" />
-    <h:inputSecret value="#{mainPage.clientEditPage.plainPassword}" maxlength="64"
+    <h:inputSecret value="#{mainPage.clientEditPage.plainPassword}" maxlength="64" redisplay="true"
                    rendered="#{mainPage.clientEditPage.changePassword}" styleClass="input-text" />
     <h:outputText escape="true" value="Повторите пароль" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.changePassword}" />
-    <h:inputSecret value="#{mainPage.clientEditPage.plainPasswordConfirmation}" maxlength="64"
+    <h:inputSecret value="#{mainPage.clientEditPage.plainPasswordConfirmation}" maxlength="64" redisplay="true"
                    rendered="#{mainPage.clientEditPage.changePassword}" styleClass="input-text" />
     <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.contractId}" converter="contractIdConverter"
