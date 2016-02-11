@@ -46,6 +46,12 @@
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="totalsData" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="totalReportCountCash" class="java.lang.Long" isForPrompting="false"/>
+	<parameter name="totalReportCountCard" class="java.lang.Long" isForPrompting="false"/>
+	<parameter name="totalReportCountCashAndCard" class="java.lang.Long" isForPrompting="false"/>
+	<parameter name="totalReportSumCash" class="java.lang.Long" isForPrompting="false"/>
+	<parameter name="totalReportSumCard" class="java.lang.Long" isForPrompting="false"/>
+	<parameter name="totalReportSumCashAndCard" class="java.lang.Long" isForPrompting="false"/>
 	<field name="originName" class="java.lang.String"/>
 	<field name="mealSumGroupTotal" class="java.lang.Long"/>
 	<field name="mealCountGroupTotal" class="java.lang.Long"/>
@@ -339,6 +345,24 @@
 		<band height="30">
 			<subreport>
 				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="0" width="680" height="30"/>
+				<subreportParameter name="totalReportSumCard">
+					<subreportParameterExpression><![CDATA[$P{totalReportSumCard}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalReportCountCash">
+					<subreportParameterExpression><![CDATA[$P{totalReportCountCash}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalReportSumCash">
+					<subreportParameterExpression><![CDATA[$P{totalReportSumCash}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalReportSumCashAndCard">
+					<subreportParameterExpression><![CDATA[$P{totalReportSumCashAndCard}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalReportCountCard">
+					<subreportParameterExpression><![CDATA[$P{totalReportCountCard}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="totalReportCountCashAndCard">
+					<subreportParameterExpression><![CDATA[$P{totalReportCountCashAndCard}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[$P{totalsData}]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DailySalesByGroupsReport_subreport_totals.jasper"]]></subreportExpression>
 			</subreport>

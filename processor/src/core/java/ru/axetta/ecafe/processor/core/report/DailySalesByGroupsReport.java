@@ -877,8 +877,40 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             parameterMap.put("totalsData", new JRBeanCollectionDataSource(totalDataRows));
             parameterMap.put("SUBREPORT_DIR",
                     RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
+            addPaymentTypeTotalValuesToReportParameters(parameterMap, totalDataRows);
 
             return new JRBeanCollectionDataSource(mealRowHashMap.values());
+        }
+
+        private void addPaymentTypeTotalValuesToReportParameters(Map<String, Object> parameters,  LinkedList<TotalDataRow> totalDataRows) {
+            List<SubReportDataRow> allSubReportDataRows = new LinkedList<SubReportDataRow>();
+            for(TotalDataRow totalDataRow : totalDataRows) {
+                allSubReportDataRows.addAll(totalDataRow.getSubReportDataRows());
+            }
+
+            Long totalReportCountCash = 0L, totalReportCountCard = 0L, totalReportCountCashAndCard = 0L;
+            Long totalReportSumCash = 0L, totalReportSumCard = 0L, totalReportSumCashAndCard = 0L;
+
+            for(SubReportDataRow subReportDataRow : allSubReportDataRows) {
+                if(!subReportDataRow.getOriginName().contains("Бесплатное")) {
+                    totalReportCountCash += subReportDataRow.countCash;
+                    totalReportCountCard += subReportDataRow.countCard;
+                    totalReportCountCashAndCard += subReportDataRow.countCashAndCard;
+                    totalReportSumCash += subReportDataRow.sumCash;
+                    totalReportSumCard += subReportDataRow.sumCard;
+                    totalReportSumCashAndCard += subReportDataRow.sumCashAndCard;
+                } else {
+                    totalReportCountCard += subReportDataRow.count;
+                    totalReportSumCard += subReportDataRow.sum;
+                }
+            }
+
+            parameters.put("totalReportCountCash", totalReportCountCash);
+            parameters.put("totalReportCountCard", totalReportCountCard);
+            parameters.put("totalReportCountCashAndCard", totalReportCountCashAndCard);
+            parameters.put("totalReportSumCash", totalReportSumCash);
+            parameters.put("totalReportSumCard", totalReportSumCard);
+            parameters.put("totalReportSumCashAndCard", totalReportSumCashAndCard);
         }
 
     }
