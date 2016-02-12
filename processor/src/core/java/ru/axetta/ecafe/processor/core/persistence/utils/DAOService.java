@@ -2080,8 +2080,8 @@ public class DAOService {
 
     public List getClientBalanceInfos(String where, String where2, Date begDate, Date endDate) {
         String str_query = "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, " +
-                "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate and t.idoforg = c.idoforg), 0), " +
-                "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate and t.idoforg = c.idoforg), " +
+                "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), " +
+                "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), " +
                 "o.idoforg as idoforg " +
                 "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg " + where2 +
                 " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where + ") " +
@@ -2090,7 +2090,7 @@ public class DAOService {
                 "SELECT c.idofclient, shortname as shortname, h.oldgroupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
                 + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = h.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
                 + "(SELECT min(t.transactiondate) FROM cf_transactions t "
-                + "WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate and t.idoforg = c.idoforg), "
+                + "WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
                 + "h.idofoldorg as idoforg "
                 + "FROM cf_clients c INNER JOIN cf_clientmigrationhistory h ON c.idofclient = h.idofclient "
                 + "JOIN cf_persons p ON c.idofperson = p.idofperson JOIN cf_orgs o ON h.idofoldorg = o.idoforg "
