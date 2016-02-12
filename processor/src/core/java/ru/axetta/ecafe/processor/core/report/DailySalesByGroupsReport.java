@@ -899,9 +899,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     totalReportSumCash += subReportDataRow.sumCash;
                     totalReportSumCard += subReportDataRow.sumCard;
                     totalReportSumCashAndCard += subReportDataRow.sumCashAndCard;
-                } else {
-                    totalReportCountCard += subReportDataRow.count;
-                    totalReportSumCard += subReportDataRow.sum;
                 }
             }
 
