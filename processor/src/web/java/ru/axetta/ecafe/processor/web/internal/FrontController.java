@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
@@ -112,7 +111,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "refreshRegistryChangeItems")
-    public List<RegistryChangeItem> refreshRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg) {
+    public List<RegistryChangeItem> refreshRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
         try {
             checkRequestValidity(idOfOrg);
         } catch(FrontControllerException fce) {
@@ -125,7 +124,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "refreshRegistryChangeItemsInternal")
-    public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+    public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {

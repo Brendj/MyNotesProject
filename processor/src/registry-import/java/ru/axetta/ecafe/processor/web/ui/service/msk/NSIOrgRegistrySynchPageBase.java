@@ -26,6 +26,8 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.xml.namespace.QName;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.lang.Exception;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -331,9 +333,17 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             changedItems = controller.loadRegistryChangeItemsInternal(getIdOfOrg(), revisionCreateDate,
                                                                       actionFilter, nameFilter);
         } else {
-            changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
+            try {
+                changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
+            } catch(Exception e) {
+                if (e instanceof SOAPFaultException) {
+                    errorMessages = e.getMessage();
+                    return;
+                }
+            }
             if (changedItems == null || changedItems.isEmpty()) {
                 errorMessages = "Не получено разногласий либо устарел GUID организации";
+                return;
             }
         }
         items = new ArrayList<WebRegistryChangeItem>();

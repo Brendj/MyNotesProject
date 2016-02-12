@@ -79,7 +79,12 @@ public class OrgMskNSIService extends MskNSIService {
             }
             if (!guidOK) {
                 service.setOrgSyncErrorCode(guid, OrgSync.ERROR_STATE_BAD_GUID_CODE);
-                result.add(guid);
+                String badGuidString = "";
+                List<Org> orgs = DAOService.getInstance().findOrgsByGuidAddressINNOrNumber(guid, "", "", "");
+                for (Org o : orgs) {
+                    badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
+                }
+                result.add(badGuidString);
             }
         }
         return result;

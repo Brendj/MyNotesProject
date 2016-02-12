@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
@@ -89,12 +90,12 @@ public class FrontControllerProcessor {
         return Collections.EMPTY_LIST;
     }
 
-    public List<RegistryChangeItem> refreshRegistryChangeItems(long idOfOrg) {
+    public List<RegistryChangeItem> refreshRegistryChangeItems(long idOfOrg) throws Exception {
         try {
             RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (UnsupportedOperationException uoe) {
-            logger.error(uoe.getMessage());
+        } catch (BadOrgGuidsException eGuid) {
+            throw eGuid;
         }
         catch (Exception e) {
             logger.error("Failed to refresh registry change items", e);

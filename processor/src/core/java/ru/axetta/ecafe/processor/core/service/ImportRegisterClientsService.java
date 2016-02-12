@@ -1032,7 +1032,7 @@ public class ImportRegisterClientsService {
             for (String g : list) {
                 badGuids += g;
             }
-            throw new UnsupportedOperationException(badGuids);
+            throw new BadOrgGuidsException(badGuids); // UnsupportedOperationException(badGuids);
         }
 
         //  Итеративно загружаем клиентов, используя ограничения
