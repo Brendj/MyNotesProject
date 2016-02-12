@@ -79,17 +79,22 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
                                     autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
                                     autoReportBuildTask.startCalendar);
 
-                            autoReports.add(new AutoReport(report, properties));
+                            //autoReports.add(new AutoReport(report, properties));
+                            List<Long> ids = Arrays.asList(rule.getRuleId());
+                            List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
+                            autoReportBuildTask.executorService.execute(
+                                    new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, reps,
+                                            autoReportBuildTask.documentBuilders, ids));
                         }
                     }
 
-                    List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+                    //List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
 
                     transaction.commit();
                     transaction = null;
-                    autoReportBuildTask.executorService.execute(
+                    /*autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));*/
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

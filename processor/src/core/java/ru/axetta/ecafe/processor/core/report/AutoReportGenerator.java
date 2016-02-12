@@ -14,8 +14,6 @@ import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.*;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsIntervalJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsJasperReport;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
@@ -1592,6 +1590,7 @@ public class AutoReportGenerator {
             persistenceSession.update(schedulerJob);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            persistenceSession.clear();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
