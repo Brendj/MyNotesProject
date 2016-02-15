@@ -279,7 +279,7 @@
 				<textFieldExpression><![CDATA[(double) $F{sumProductVending} / 100]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="7a2f5b13-7364-4bec-a3da-c39b01967098" x="42" y="0" width="35" height="23"/>
+				<reportElement uuid="7a2f5b13-7364-4bec-a3da-c39b01967098" stretchType="RelativeToBandHeight" x="42" y="0" width="35" height="23"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
