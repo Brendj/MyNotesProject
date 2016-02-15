@@ -34,6 +34,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -252,7 +253,7 @@ public class RegisterStampPage extends OnlineReportPage{
     private void addContractProperties(Properties properties, Org org) {
         Contract orgContract = org.getContract();
         properties.setProperty("contractNumber", orgContract != null ? orgContract.getContractNumber() : EMPTY_FILLING);
-        DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.");
+        DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.", new Locale("ru"));
         properties.setProperty("contractDate", orgContract != null ? replaceMonthNameByGenitive(
                 formatter.format(CalendarUtils.addOneDay(org.getContract().getDateOfConclusion()))) : EMPTY_DATE_FILLING);
     }

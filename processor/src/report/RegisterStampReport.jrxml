@@ -55,7 +55,7 @@
 				<text><![CDATA[(наименование образовательной организации)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="adb60d7a-1ada-4926-a0ea-b93fe7dc1e4c" positionType="FixRelativeToBottom" x="0" y="130" width="496" height="14"/>
+				<reportElement uuid="adb60d7a-1ada-4926-a0ea-b93fe7dc1e4c" positionType="FixRelativeToBottom" x="0" y="150" width="496" height="14"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
@@ -70,14 +70,14 @@
 услуг по организации питания и обеспечения питьевого режима обучающихся]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="FixRelativeToBottom" x="0" y="144" width="496" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="FixRelativeToBottom" x="0" y="115" width="496" height="20"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("Период оказания услуг с %s по %s", new SimpleDateFormat("dd.MM.yyyy").format($P{startDate}),new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" positionType="FixRelativeToBottom" x="0" y="115" width="496" height="15"/>
+				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" positionType="FixRelativeToBottom" x="0" y="135" width="496" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="10" isBold="false" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -88,7 +88,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="10" isBold="false" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[String.format("Контракт №%s от %s", $P{contractNumber}, $P{contractDate})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.format("Контракт № %s от %s", $P{contractNumber}, $P{contractDate})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
