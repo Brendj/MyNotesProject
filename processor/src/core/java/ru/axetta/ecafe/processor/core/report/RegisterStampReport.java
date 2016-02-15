@@ -58,6 +58,8 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("contractNumber", getReportProperties().getProperty("contractNumber"));
+            parameterMap.put("contractDate", getReportProperties().getProperty("contractDate"));
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,

@@ -6,6 +6,7 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
@@ -48,6 +49,8 @@ public class RegisterStampPage extends OnlineReportPage{
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampPage.class);
 
+    private static final String EMPTY_FILLING = "           ";
+    private static final String EMPTY_DATE_FILLING = "           г.";
     @Autowired
     private ReportDAOService daoService;
     private String htmlReport = null;
@@ -200,13 +203,14 @@ public class RegisterStampPage extends OnlineReportPage{
         RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
         Properties properties = new Properties();
         properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
-        builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             Org org = (Org) session.load(Org.class, idOfOrg);
+            addContractProperties(properties, org);
+            builder.setReportProperties(properties);
             builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getShortNameInfoService(), org.getAddress()));
             RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -243,6 +247,30 @@ public class RegisterStampPage extends OnlineReportPage{
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private void addContractProperties(Properties properties, Org org) {
+        Contract orgContract = org.getContract();
+        properties.setProperty("contractNumber", orgContract != null ? orgContract.getContractNumber() : EMPTY_FILLING);
+        DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.");
+        properties.setProperty("contractDate", orgContract != null ? replaceMonthNameByGenitive(
+                formatter.format(CalendarUtils.addOneDay(org.getContract().getDateOfConclusion()))) : EMPTY_DATE_FILLING);
+    }
+
+    private String replaceMonthNameByGenitive(String date) {
+        if (date.contains("Январь")) return date.replace("Январь", "Января");
+        if (date.contains("Февраль")) return date.replace("Февраль", "Февраля");
+        if (date.contains("Март")) return date.replace("Март", "Марта");
+        if (date.contains("Апрель")) return date.replace("Апрель", "Апреля");
+        if (date.contains("Май")) return date.replace("Май", "Мая");
+        if (date.contains("Июнь")) return date.replace("Июнь", "Июня");
+        if (date.contains("Июль")) return date.replace("Июль", "Июля");
+        if (date.contains("Август")) return date.replace("Август", "Августа");
+        if (date.contains("Сентябрь")) return date.replace("Сентябрь", "Сентября");
+        if (date.contains("Октябрь")) return date.replace("Октябрь", "Октября");
+        if (date.contains("Ноябрь")) return date.replace("Ноябрь", "Ноября");
+        if (date.contains("Декабрь")) return date.replace("Декабрь", "Декабря");
+        return date;
     }
 
     private String buildFileName(Date generateTime, RegisterStampReport registerStampReport) {
