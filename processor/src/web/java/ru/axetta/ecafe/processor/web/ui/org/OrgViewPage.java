@@ -28,6 +28,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String officialName;
     private String tag;
     private String address;
+    private String shortAddress;
     private String phone;
     private String officialPersonFirstName;
     private String officialPersonSurname;
@@ -138,6 +139,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.longitude = org.getLongitude();
         this.latitude = org.getLatitude();
         this.address = org.getAddress();
+        this.shortAddress = org.getShortAddress();
         this.phone = org.getPhone();
         Person officialPerson = org.getOfficialPerson();
         this.officialPersonFirstName = officialPerson.getFirstName();
@@ -330,6 +332,10 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public String getAddress() {
         return address;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
     }
 
     public String getPhone() {

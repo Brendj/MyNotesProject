@@ -38,6 +38,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String officialName;
     private String tag;
     private String address;
+    private String shortAddress;
     private String phone;
     private String officialPersonFirstName;
     private String officialPersonSurname;
@@ -154,6 +155,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setLongitude(longitude);
         org.setLatitude(latitude);
         org.setAddress(address);
+        org.setShortAddress(shortAddress);
         org.setPhone(phone);
         Person officialPerson = org.getOfficialPerson();
         officialPerson.setFirstName(officialPersonFirstName);
@@ -304,6 +306,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.longitude = org.getLongitude();
         this.latitude = org.getLatitude();
         this.address = org.getAddress();
+        this.shortAddress = org.getShortAddress();
         this.phone = org.getPhone();
         Person officialPerson = org.getOfficialPerson();
         this.officialPersonFirstName = officialPerson.getFirstName();
@@ -647,6 +650,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     public String getPhone() {

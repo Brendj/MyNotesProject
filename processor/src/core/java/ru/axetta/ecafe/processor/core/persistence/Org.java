@@ -48,6 +48,7 @@ public class Org implements Serializable {
     private String shortNameInfoService;
     private String officialName;
     private String address;
+    private String shortAddress;
     private String phone;
     private Person officialPerson;
     private String officialPosition;
@@ -127,7 +128,7 @@ public class Org implements Serializable {
 
 
 
-    public Org(String shortName, String shortNameInfoService, String officialName, String address, Person officialPerson, String officialPosition,
+    public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
@@ -136,6 +137,7 @@ public class Org implements Serializable {
         this.shortNameInfoService = shortNameInfoService;
         this.officialName = officialName;
         this.address = address;
+        this.shortAddress = shortAddress;
         this.officialPerson = officialPerson;
         this.officialPosition = officialPosition;
         this.contractId = contractId;
@@ -413,6 +415,14 @@ public class Org implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     public String getPhone() {
@@ -935,7 +945,7 @@ public class Org implements Serializable {
     public String toString() {
         return "Org{" + "idOfOrg=" + idOfOrg + ", version=" + version + ", shortName='" + shortName + '\''
                 + ", shortNameInfoService='" + shortNameInfoService + '\''
-                + ", officialName='" + officialName + '\'' + ", address='" + address + '\'' + ", phone='" + phone + '\''
+                + ", officialName='" + officialName + '\'' + ", address='" + address + '\'' + ", shortAddress='" + shortAddress + '\'' + ", phone='" + phone + '\''
                 + ", officialPerson=" + officialPerson + ", officialPosition='" + officialPosition + '\''
                 + ", contractId='" + contractId + '\'' + ", contractTime=" + contractTime + ", state=" + state
                 + ", cardLimit=" + cardLimit + ", publicKey='" + publicKey + '\''// + ", idOfPacket=" + idOfPacket

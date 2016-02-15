@@ -33,6 +33,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String shortNameInfoService;
     private String officialName;
     private String address;
+    private String shortAddress;
     private String phone;
     private String officialPersonFirstName;
     private String officialPersonSurname;
@@ -307,6 +308,14 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.address = address;
     }
 
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -450,7 +459,7 @@ public class OrgCreatePage extends BasicWorkspacePage
             }
         }
 
-        Org org = new Org(this.shortName, this.shortNameInfoService, this.officialName, this.address, officialPerson, this.officialPosition,
+        Org org = new Org(this.shortName, this.shortNameInfoService, this.officialName, this.address, this.shortAddress, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.uniqueAddressId,

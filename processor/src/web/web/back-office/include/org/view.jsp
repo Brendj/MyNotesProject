@@ -35,6 +35,8 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.longitude}" maxlength="12" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.address}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Короткий адрес" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortAddress}" styleClass="input-text long-field" />
 
 
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />

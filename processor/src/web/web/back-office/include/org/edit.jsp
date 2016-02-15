@@ -37,6 +37,8 @@
     <h:inputText value="#{mainPage.orgEditPage.longitude}" maxlength="12" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Короткий адрес" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.shortAddress}" maxlength="128" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.INN}" maxlength="32" styleClass="input-text" />

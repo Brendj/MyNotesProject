@@ -187,8 +187,13 @@ public class ImportRegisterOrgsService {
     private Org createOrg(OrgRegistryChange orgRegistryChange, Person officialPerson, Date createDate,
             Contragent defaultSupplier, OrgRegistryChangeItem orgRegistryChangeItem, String orgShortName) throws Exception {
         String address = orgRegistryChangeItem.getAddress();
+        String shortAddress = "";
         if (address == null){
             address = orgRegistryChange.getAddress();
+        } else {
+            String[] splitterAddress = address.split("/");
+            int len = splitterAddress.length;
+            shortAddress = splitterAddress[len - 2] + " /" + (splitterAddress[len - 1]);
         }
         Long additionalId = orgRegistryChangeItem.getAdditionalId();
         if (additionalId == null){
@@ -201,7 +206,7 @@ public class ImportRegisterOrgsService {
                 String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
                 Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing)*/
         //todo правильно заполнять второй параметр shortNameInfoService
-        Org org = new Org(orgShortName, orgShortName, orgRegistryChange.getOfficialName(), address, officialPerson, "",
+        Org org = new Org(orgShortName, orgShortName, orgRegistryChange.getOfficialName(), address, shortAddress, officialPerson, "",
                 "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
                 0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
                 "", "", "",
