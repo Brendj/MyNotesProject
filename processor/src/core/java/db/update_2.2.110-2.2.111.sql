@@ -31,3 +31,5 @@ SET shortaddress = i.shortaddress FROM (SELECT
                                           trim(FROM substring(address FROM '%/%/#"%/%#"' FOR '#')) AS shortaddress
                                         FROM cf_orgs) i
 WHERE i.idoforg = o.idoforg;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 160215) НЕ МЕНЯТЬ
