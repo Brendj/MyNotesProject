@@ -30,9 +30,10 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
     private String lastSuccessfulBalanceSync;
     private String version;
     private String remoteAddr;
+    private Long number;
 
     public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, String tags,
-            String lastSuccessfulBalanceSync, String version, String remoteAddr) {
+            String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
@@ -41,6 +42,7 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
         this.version = version;
         this.remoteAddr = remoteAddr;
+        this.number = number;
     }
 
     public OutOfSynchronizationItem() {
@@ -110,9 +112,17 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.remoteAddr = remoteAddr;
     }
 
+    public Long getNumber() {
+        return number;
+    }
+
+    public void setNumber(Long number) {
+        this.number = number;
+    }
+
     @Override
     public int compareTo(OutOfSynchronizationItem o) {
-        int retCode = this.condition.compareTo(o.getCondition());
+        int retCode = this.number.compareTo(o.getNumber());
         return retCode;
     }
 }

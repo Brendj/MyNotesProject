@@ -114,11 +114,11 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                             (String) object[2],
                             (String) object[3],
                             parseTags((String) object[4]),
-                            object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())), object[6] == null ? "" : (String) object[6] , object[7] == null ? "" : (String) object[7]);
+                            object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())), object[6] == null ? "" : (String) object[6] , object[7] == null ? "" : (String) object[7], rowName((String) object[0]));
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
             }
-        Collections.sort(outOfSynchronizationReportList, Collections.reverseOrder());
+        Collections.sort(outOfSynchronizationReportList);
         return new JRBeanCollectionDataSource(outOfSynchronizationReportList);
     }
 
@@ -129,7 +129,6 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         if (condition.equals("more30Minutes")) {
             return "Синхронизация отсутствует более 30 минут";
         }
-
         if (condition.equals("more60Minutes")) {
             return "Синхронизация отсутствует более 60 минут";
         }
@@ -141,6 +140,25 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         return null;
+    }
+
+    public Long rowName(String condition) {
+        if (condition.equals("more10Minutes")) {
+            return 1L;
+        }
+        if (condition.equals("more30Minutes")) {
+            return 2L;
+        }
+        if (condition.equals("more60Minutes")) {
+            return 3L;
+        }
+        if (condition.equals("more3Hours")) {
+            return 4L;
+        }
+        if (condition.equals("other")) {
+            return 0L;
+        }
+        return 0L;
     }
 
 
