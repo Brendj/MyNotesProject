@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OutOfSynchronizationReport" language="groovy" pageWidth="1155" pageHeight="20000" columnWidth="1115" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7c728f0a-9775-4526-acc5-8387f1fd9d83">
 	<property name="ireport.zoom" value="1.464100000000001"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="4"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<field name="condition" class="java.lang.String"/>
@@ -101,7 +101,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Последняя успешная синхра. балансов]]></text>
+				<text><![CDATA[Последняя быстрая синхронизация]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="87adb0cb-b3bd-4c43-8d87-e6255bab20d2" x="750" y="0" width="100" height="35"/>
