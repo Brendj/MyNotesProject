@@ -8,9 +8,12 @@ package ru.axetta.ecafe.processor.web.internal.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportInfoItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportParameter;
 import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.report.mailing.MailingListReportsTypes;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.report.dataflow.*;
 
@@ -40,13 +43,14 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
     private static final Long RC_UNKNOWN_REPORT_ERROR = 102L;
     private static final Long RC_FILE_NOT_FOUND_ERROR = 103L;
     private static final Long RC_NO_DATA_ERROR = 104L;
+    private static final Long RC_ORG_NOT_FOUND_ERROR = 105L;
     private static final String RC_OK_DESC = "OK";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_PARAMETERS_ERROR_DESC = "Ошибочные входные данные";
     private static final String RC_UNKNOWN_REPORT_ERROR_DESC = "Генерация этого отчета не поддерживается";
     private static final String RC_FILE_NOT_FOUND_ERROR_DESC = "Запрашиваемый файл не найден в репозитории";
     private static final String RC_NO_DATA_ERROR_DESC = "Нет данных по запрошенным параметрам";
-
+    private static final String RC_ORG_NOT_FOUND_ERROR_DESC = "Не удалось найти главную организацию";
     public final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
     public final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
 
@@ -209,4 +213,70 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         }
         return result;
     }
+
+    @Override
+    public OrgMailingListResult getMailingListReports(@WebParam(name="idOfOrg")Long idOfOrg,
+            @WebParam(name = "mailingListType")Integer mailingListType) throws Exception{
+        OrgMailingListResult result = new OrgMailingListResult();
+        if (isBadParametersForMailingList(mailingListType)){
+            result.setCode(RC_PARAMETERS_ERROR);
+            result.setResult(RC_PARAMETERS_ERROR_DESC);
+            return result;
+        }
+        try {
+            OrgService orgService = OrgService.getInstance();
+            MailingListReportsTypes type = MailingListReportsTypes.getByCode(mailingListType.intValue());
+            Org mainBulding = orgService.getMainBulding(idOfOrg);
+            if (mainBulding != null) {
+                result.setMailingList(orgService.getMailingList(mainBulding, type));
+                result.setCode(RC_OK);
+                result.setResult(RC_OK_DESC);
+            } else {
+                result.setCode(RC_ORG_NOT_FOUND_ERROR);
+                result.setResult(RC_ORG_NOT_FOUND_ERROR_DESC);
+            }
+        } catch (Exception e) {
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+            logger.error("Error in getMailingListReports", e);
+        }
+        return result;
+    }
+
+    private boolean isBadParametersForMailingList(Integer code) {
+        return code == null
+                || MailingListReportsTypes.getByCode(code.intValue()).equals(MailingListReportsTypes.UNKNOWN);
+    }
+
+    @Override
+    public OrgMailingListResult updateMailingListReports(@WebParam(name="idOfOrg")Long idOfOrg,@WebParam(name="mailingList")String mailingList,
+            @WebParam(name = "mailingListType")Integer mailingListType) throws Exception {
+        OrgMailingListResult result = new OrgMailingListResult();
+        if (isBadParametersForMailingList(mailingListType)) {
+            result.setCode(RC_PARAMETERS_ERROR);
+            result.setResult(RC_PARAMETERS_ERROR_DESC);
+            return result;
+        }
+        try {
+            OrgService orgService = OrgService.getInstance();
+            Org mainBulding = orgService.getMainBulding(idOfOrg);
+            if (mainBulding != null) {
+                MailingListReportsTypes type = MailingListReportsTypes.getByCode(mailingListType.intValue());
+                orgService.setMailingList(mainBulding,mailingList,type);
+                result.setMailingList(orgService.getMailingList(mainBulding,type));
+                result.setCode(RC_OK);
+                result.setResult(RC_OK_DESC);
+            }
+            else {
+                result.setCode(RC_ORG_NOT_FOUND_ERROR);
+                result.setResult(RC_ORG_NOT_FOUND_ERROR_DESC);
+            }
+        } catch (Exception e) {
+            result.setCode(RC_INTERNAL_ERROR);
+            result.setResult(RC_INTERNAL_ERROR_DESC);
+            logger.error("Error in updateMailingListReports", e);
+        }
+        return result;
+    }
+
 }

@@ -31,6 +31,15 @@ public class OrgWritableRepository extends WritableJpaDao {
         return entityManager.find(Org.class, id);
     }
 
+    public boolean saveOrg(Org org) {
+        if (org != null) {
+            entityManager.merge(org);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /*public Org findByAdditionalId(long additionalIdBuildingId){
         List<Org> additionalIdBuildingList = entityManager.createQuery("from Org where additionalIdBuilding =:additionalIdBuildingId", Org.class)
                 .setParameter("additionalIdBuildingId", additionalIdBuildingId).getResultList();

@@ -2,10 +2,7 @@
 package ru.axetta.ecafe.processor.web.internal.report;
 
 import ru.axetta.ecafe.processor.core.persistence.dao.report.ReportParameter;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.GenerateReportResult;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportClientOrderDetailsByAllOrgDataInfo;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportTradeMaterialGoodDataInfo;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.RepositoryReportListResult;
+import ru.axetta.ecafe.processor.web.internal.report.dataflow.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -33,6 +30,15 @@ public interface ReportController {
 
     @WebMethod(operationName = "getRepositoryReport")
     GenerateReportResult getRepositoryReport(@WebParam(name = "idOfReport") Long idOfReport) throws Exception;
+
+    @WebMethod(operationName = "getMailingListReports")
+    OrgMailingListResult getMailingListReports(@WebParam(name = "idOfOrg") Long idOfOrg,
+            @WebParam(name = "mailingListType") Integer mailingListType) throws Exception;
+
+    @WebMethod(operationName = "updateMailingListReports")
+    OrgMailingListResult updateMailingListReports(@WebParam(name = "idOfOrg") Long idOfOrg,
+            @WebParam(name = "mailingList") String mailingList,
+            @WebParam(name = "mailingListType") Integer mailingListType) throws Exception;
 
     //@WebMethod(operationName = "generateReportOrders")
     //ReportDataInfoOld generateReportOrders(@WebParam(name = "idOfOrg") Long idOfOrg, @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
