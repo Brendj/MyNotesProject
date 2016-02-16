@@ -10,6 +10,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class RegisterStampReportItem {
+    private String caption = "Сведения о реализованных Рационах питания, шт.";
     private String level1;
     private String level2;
     private String level3;
@@ -106,5 +107,9 @@ public class RegisterStampReportItem {
 
     public void setOrderType(Integer orderType) {
         this.orderType = orderType;
+    }
+
+    public String getCaption() {
+        return caption;
     }
 }

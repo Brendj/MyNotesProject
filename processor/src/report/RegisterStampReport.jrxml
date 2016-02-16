@@ -30,6 +30,7 @@
 	<parameter name="orgAddress" class="java.lang.String"/>
 	<parameter name="contractNumber" class="java.lang.String"/>
 	<parameter name="contractDate" class="java.lang.String"/>
+	<field name="caption" class="java.lang.String"/>
 	<field name="level1" class="java.lang.String"/>
 	<field name="level2" class="java.lang.String"/>
 	<field name="level3" class="java.lang.String"/>
@@ -39,30 +40,23 @@
 	<field name="dateTime" class="java.util.Date"/>
 	<field name="number" class="java.lang.String"/>
 	<title>
-		<band height="168" splitType="Stretch">
+		<band height="179" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="dd2fb70b-13e5-41cc-86e6-ecc00c220968" positionType="FixRelativeToBottom" x="0" y="56" width="496" height="19"/>
+				<reportElement uuid="dd2fb70b-13e5-41cc-86e6-ecc00c220968" positionType="Float" x="0" y="56" width="496" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("%s", $P{orgName})]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="6c7e9d4a-32bd-4db8-82e3-053ee62188ec" positionType="FixRelativeToBottom" x="0" y="75" width="496" height="20"/>
+				<reportElement uuid="6c7e9d4a-32bd-4db8-82e3-053ee62188ec" positionType="Float" x="0" y="75" width="496" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<text><![CDATA[(наименование образовательной организации)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="adb60d7a-1ada-4926-a0ea-b93fe7dc1e4c" positionType="FixRelativeToBottom" x="0" y="150" width="496" height="14"/>
-				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
-				</textElement>
-				<text><![CDATA[Место оказания услуг (адрес объекта образовательной организации)]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" positionType="FixRelativeToBottom" x="0" y="0" width="496" height="56"/>
+				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" positionType="Float" x="0" y="0" width="496" height="56"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="14" isBold="true"/>
 				</textElement>
@@ -70,26 +64,34 @@
 услуг по организации питания и обеспечения питьевого режима обучающихся]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="FixRelativeToBottom" x="0" y="115" width="496" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="Float" x="0" y="115" width="496" height="20"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
+					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("Период оказания услуг с %s по %s", new SimpleDateFormat("dd.MM.yyyy").format($P{startDate}),new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" positionType="FixRelativeToBottom" x="0" y="135" width="496" height="15"/>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="10" isBold="false" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" positionType="Float" x="0" y="155" width="496" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("%s", $P{orgAddress})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="740c35aa-f164-461e-b2da-7df88a1685d2" positionType="FixRelativeToBottom" x="0" y="95" width="496" height="20"/>
+				<reportElement uuid="740c35aa-f164-461e-b2da-7df88a1685d2" positionType="Float" x="0" y="95" width="496" height="20"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="SansSerif" size="10" isBold="false" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("Контракт № %s от %s", $P{contractNumber}, $P{contractDate})]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement uuid="35423792-5e5c-4560-9704-88958d4ab749" positionType="Float" mode="Transparent" x="0" y="135" width="496" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Место оказания услуг (адрес объекта образовательной организации):]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -147,12 +149,12 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="df4bb767-00bb-470b-b14b-4b271f422067" style="table" x="0" y="0" width="88" height="55"/>
+							<reportElement uuid="df4bb767-00bb-470b-b14b-4b271f422067" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="88" height="69"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<text><![CDATA[Дата]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="7b449804-5cd1-4dcb-b5b0-076b323c9454" style="table" x="88" y="0" width="100" height="55"/>
+							<reportElement uuid="7b449804-5cd1-4dcb-b5b0-076b323c9454" style="table" stretchType="RelativeToBandHeight" x="88" y="0" width="100" height="69"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<text><![CDATA[Номер талона Абонементной книжки]]></text>
 						</staticText>
@@ -207,14 +209,33 @@
 						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<columnGroup name="level1" height="13" headerPosition="Stretch">
+				<columnGroup name="caption" height="14" headerPosition="Stretch">
 					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{caption}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Transparent" style="Crosstab Data Text">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="110f1244-8b1a-43c6-aea4-12997a8fec3b" style="table" positionType="Float" x="0" y="0" width="70" height="14"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{caption}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents style="Crosstab Data Text"/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="level1" height="13" headerPosition="Stretch">
+					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents mode="Transparent" style="Crosstab Data Text">
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="110f8844-8b1a-43c6-aea4-11997a8fec3b" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="110f8844-8b1a-43c6-aea4-11997a8fec3b" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="70" height="13"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
