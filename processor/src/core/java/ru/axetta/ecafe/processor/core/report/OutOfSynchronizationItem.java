@@ -4,14 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
-
 /**
  * Created with IntelliJ IDEA.
  * User: T800
@@ -19,7 +11,7 @@ import java.util.Date;
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
-public class OutOfSynchronizationItem implements Comparable<OutOfSynchronizationItem>{
+public class OutOfSynchronizationItem implements Comparable<OutOfSynchronizationItem> {
 
     private String condition;
     private Long idOfOrg;
@@ -32,8 +24,11 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
     private Long number;
     private String statusDetailing;
     private String introductionQueue;
+    private String district;
 
-    public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number, String statusDetailing, String introductionQueue) {
+    public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address,
+            String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number, String statusDetailing,
+            String introductionQueue, String district) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
@@ -44,6 +39,7 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.number = number;
         this.statusDetailing = statusDetailing;
         this.introductionQueue = introductionQueue;
+        this.district = district;
     }
 
     public OutOfSynchronizationItem() {
@@ -127,6 +123,14 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
 
     public void setIntroductionQueue(String introductionQueue) {
         this.introductionQueue = introductionQueue;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     @Override
