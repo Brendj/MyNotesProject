@@ -26,23 +26,24 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
     private String shortName;
     private String address;
 
-    private String tags;
     private String lastSuccessfulBalanceSync;
     private String version;
     private String remoteAddr;
     private Long number;
+    private String statusDetailing;
+    private String introductionQueue;
 
-    public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, String tags,
-            String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number) {
+    public OutOfSynchronizationItem(String condition, Long idOfOrg, String shortName, String address, String lastSuccessfulBalanceSync, String version, String remoteAddr, Long number, String statusDetailing, String introductionQueue) {
         this.condition = condition;
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
         this.address = address;
-        this.tags = tags;
         this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
         this.version = version;
         this.remoteAddr = remoteAddr;
         this.number = number;
+        this.statusDetailing = statusDetailing;
+        this.introductionQueue = introductionQueue;
     }
 
     public OutOfSynchronizationItem() {
@@ -80,14 +81,6 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
         this.address = address;
     }
 
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
     public String getLastSuccessfulBalanceSync() {
         return lastSuccessfulBalanceSync;
     }
@@ -118,6 +111,22 @@ public class OutOfSynchronizationItem implements Comparable<OutOfSynchronization
 
     public void setNumber(Long number) {
         this.number = number;
+    }
+
+    public String getStatusDetailing() {
+        return statusDetailing;
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
     }
 
     @Override
