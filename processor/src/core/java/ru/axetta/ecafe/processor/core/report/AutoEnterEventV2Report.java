@@ -55,7 +55,8 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
-            parameterMap.put("orgName", org.getOfficialName());
+            Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
+            parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
             parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
@@ -110,16 +111,15 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             Query query = session.createSQLQuery(
                     "SELECT  ee.idofenterevent, ee.idoforg, ee.passdirection, ee.eventcode, ee.idofclient,ee.evtdatetime, "
-                            + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.shortname "
+                            + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.shortaddress "
                             + "    FROM cf_enterevents ee "
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
                             + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
-                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg " + " WHERE ee.idoforg IN ("
+                            + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
-                            + "     AND ee.idofclient IS NOT null " + " AND ee.PassDirection in (0, 1, 6, 7) "
-
+                            + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
                             + "     AND cs.idofclientgroup != 1100000060 "
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
 
@@ -143,7 +143,7 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                     if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03()
                             .equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
                             .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event
-                            .getF05().equals((String) row.get("shortname")))) {
+                            .getF05().equals((String) row.get("shortaddress")))) {
                         updateEventData(event, row);
                     }
                 }
@@ -190,7 +190,8 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
         public boolean uniqueMapKeyModel(List<MapKeyModel> mapKeyModels, MapKeyModel mapKeyModel) {
             for (MapKeyModel model : mapKeyModels) {
-                if (model.getDate().equals(mapKeyModel.getDate()) && model.getClientID().equals(mapKeyModel.getClientID())) {
+                if (model.getDate().equals(mapKeyModel.getDate()) && model.getClientID()
+                        .equals(mapKeyModel.getClientID())) {
                     return false;
                 }
             }
@@ -385,13 +386,13 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             for (Org organization : friendlyOrgs) {
                 if (organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortAddress(), "2"));
                 }
             }
 
             for (Org organization : friendlyOrgs) {
                 if (!organization.isMainBuilding()) {
-                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortName(), "2"));
+                    resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortAddress(), "2"));
                 }
             }
             return resultList;

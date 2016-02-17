@@ -41,7 +41,7 @@
 		</field>
 		<field name="f10" class="java.lang.String"/>
 	</subDataset>
-	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="shortNameInfoService" class="java.lang.String"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<queryString>
@@ -80,7 +80,7 @@
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{shortNameInfoService}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
