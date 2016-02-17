@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="2.3579476910000703"/>
+	<property name="ireport.zoom" value="0.6209213230591734"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="181"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -20,6 +20,8 @@
 	<parameter name="orgName" class="java.lang.String"/>
 	<parameter name="days" class="java.util.List"/>
 	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="shortNameInfoService" class="java.lang.String"/>
+	<parameter name="shortAddress" class="java.lang.String"/>
 	<field name="timeList" class="java.util.List"/>
 	<field name="groupName" class="java.lang.String"/>
 	<field name="fio" class="java.lang.String"/>
@@ -298,14 +300,14 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="92" splitType="Stretch">
+		<band height="142" splitType="Stretch">
 			<textField>
 				<reportElement uuid="3bce0c11-2401-42a2-85f2-420c245ad964" x="0" y="42" width="2400" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Сводный отчет по посещению"+'\n'
-+$P{orgName}]]></textFieldExpression>
++$P{shortNameInfoService}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="241a6066-1158-4f1c-85c3-ccd4aedc5787" x="0" y="0" width="802" height="42"/>
@@ -314,6 +316,13 @@
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
+			<textField>
+				<reportElement uuid="eb276f87-f0db-4bf0-b09b-26e851928ea7" x="0" y="92" width="2400" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{shortAddress}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

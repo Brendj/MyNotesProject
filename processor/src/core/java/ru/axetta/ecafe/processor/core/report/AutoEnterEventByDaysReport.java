@@ -10,10 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.map.MultiValueMap;
@@ -160,7 +157,9 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
-            parameterMap.put("orgName", org.getOfficialName());
+            Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
+            parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
+            parameterMap.put("shortAddress", orgLoad.getShortAddress());
             calendar.setTime(startTime);
 //            Calendar c = Calendar.getInstance();
 //            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
