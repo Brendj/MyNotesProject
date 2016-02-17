@@ -16,6 +16,7 @@ public class RegisterStampPaidReportItem {
     private Long price;
     private Long total;
 
+    private String caption = "Сведения о реализованных Рационах питания, шт.";
     private String level1;
     private String level2;
     private String level3;
@@ -122,5 +123,9 @@ public class RegisterStampPaidReportItem {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getCaption() {
+        return caption;
     }
 }

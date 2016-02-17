@@ -50,6 +50,7 @@ public class RegisterStampSubscriptionFeedingReport extends BasicReportForOrgJob
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
             parameterMap.put("orgName", org.getOfficialName());
+            parameterMap.put("orgAddress", org.getAddress());
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -58,6 +59,8 @@ public class RegisterStampSubscriptionFeedingReport extends BasicReportForOrgJob
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
+            parameterMap.put("contractNumber", getReportProperties().getProperty("contractNumber"));
+            parameterMap.put("contractDate", getReportProperties().getProperty("contractDate"));
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,

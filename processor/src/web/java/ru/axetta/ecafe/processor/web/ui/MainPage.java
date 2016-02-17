@@ -242,6 +242,8 @@ public class MainPage implements Serializable {
     private final ClientReportPage clientReportPage = new ClientReportPage();
     private final ClientBalanceByDayReportPage clientBalanceByDayReportPage = new ClientBalanceByDayReportPage();
     private final ClientBalanceByOrgReportPage clientBalanceByOrgReportPage = new ClientBalanceByOrgReportPage();
+    private final BalanceLeavingReportPage balanceLeavingReportPage = new BalanceLeavingReportPage();
+
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -5541,6 +5543,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showInformReportsGroupMenu() {
+        currentWorkspacePage = informReportsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showRepositoryUtilityGroupMenu() {
         currentWorkspacePage = repositoryUtilityGroupMenu;
         updateSelectedMainMenu();
@@ -6339,6 +6347,23 @@ public class MainPage implements Serializable {
             currentWorkspacePage = clientBalanceByOrgReportPage;
         } catch (Exception e) {
             logger.error("Failed to set ClientBalanceByOrgReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BalanceLeavingReportPage getBalanceLeavingReportPage() {
+        return balanceLeavingReportPage;
+    }
+
+    public Object showBalanceLeavingReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = balanceLeavingReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set BalanceLeavingReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }

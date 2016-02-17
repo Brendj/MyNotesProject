@@ -254,24 +254,8 @@ public class RegisterStampPage extends OnlineReportPage{
         Contract orgContract = org.getContract();
         properties.setProperty("contractNumber", orgContract != null ? orgContract.getContractNumber() : EMPTY_FILLING);
         DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.", new Locale("ru"));
-        properties.setProperty("contractDate", orgContract != null ? replaceMonthNameByGenitive(
+        properties.setProperty("contractDate", orgContract != null ? CalendarUtils.replaceMonthNameByGenitive(
                 formatter.format(CalendarUtils.addOneDay(org.getContract().getDateOfConclusion()))) : EMPTY_DATE_FILLING);
-    }
-
-    private String replaceMonthNameByGenitive(String date) {
-        if (date.contains("Январь")) return date.replace("Январь", "Января");
-        if (date.contains("Февраль")) return date.replace("Февраль", "Февраля");
-        if (date.contains("Март")) return date.replace("Март", "Марта");
-        if (date.contains("Апрель")) return date.replace("Апрель", "Апреля");
-        if (date.contains("Май")) return date.replace("Май", "Мая");
-        if (date.contains("Июнь")) return date.replace("Июнь", "Июня");
-        if (date.contains("Июль")) return date.replace("Июль", "Июля");
-        if (date.contains("Август")) return date.replace("Август", "Августа");
-        if (date.contains("Сентябрь")) return date.replace("Сентябрь", "Сентября");
-        if (date.contains("Октябрь")) return date.replace("Октябрь", "Октября");
-        if (date.contains("Ноябрь")) return date.replace("Ноябрь", "Ноября");
-        if (date.contains("Декабрь")) return date.replace("Декабрь", "Декабря");
-        return date;
     }
 
     private String buildFileName(Date generateTime, RegisterStampReport registerStampReport) {

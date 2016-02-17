@@ -42,6 +42,11 @@ public class BalanceLeavingReport extends BasicReportForListOrgsJob {
     }
 
     @Override
+    public int getDefaultReportPeriod() {
+        return REPORT_PERIOD_PREV_DAY;
+    }
+
+    @Override
     public Logger getLogger() {
         return Logger;
     }

@@ -68,7 +68,7 @@ public class BalanceLeavingReportBuilder extends BasicReportForAllOrgJob.Builder
 
         Query query = session.createSQLQuery(
                 "select idOfTransaction, idOfClient, transactionSum, balanceBefore, balanceAfter, transactionDate "
-                        + "from cf_transactions where transactionDate between :startTime and :endTime and balanceAfter < 0 or balanceAfter > 3000000 ");
+                        + "from cf_transactions where (transactionDate between :startTime and :endTime) and (balanceAfter < 0 or balanceAfter > 3000000) ");
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
 

@@ -560,4 +560,20 @@ public class CalendarUtils {
         calendar.add(Calendar.MINUTE, i);
         return calendar.getTime();
     }
+
+    public static String replaceMonthNameByGenitive(String date) {
+        if (date.contains("Январь")) return date.replace("Январь", "Января");
+        if (date.contains("Февраль")) return date.replace("Февраль", "Февраля");
+        if (date.contains("Март")) return date.replace("Март", "Марта");
+        if (date.contains("Апрель")) return date.replace("Апрель", "Апреля");
+        if (date.contains("Май")) return date.replace("Май", "Мая");
+        if (date.contains("Июнь")) return date.replace("Июнь", "Июня");
+        if (date.contains("Июль")) return date.replace("Июль", "Июля");
+        if (date.contains("Август")) return date.replace("Август", "Августа");
+        if (date.contains("Сентябрь")) return date.replace("Сентябрь", "Сентября");
+        if (date.contains("Октябрь")) return date.replace("Октябрь", "Октября");
+        if (date.contains("Ноябрь")) return date.replace("Ноябрь", "Ноября");
+        if (date.contains("Декабрь")) return date.replace("Декабрь", "Декабря");
+        return date;
+    }
 }

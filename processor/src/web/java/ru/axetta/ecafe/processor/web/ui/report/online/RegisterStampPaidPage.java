@@ -6,6 +6,7 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampPaidReport;
@@ -33,6 +34,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -44,6 +46,8 @@ import java.util.Properties;
 public class RegisterStampPaidPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampPaidPage.class);
+    private static final String EMPTY_FILLING = "           ";
+    private static final String EMPTY_DATE_FILLING = "           г.";
 
     @Autowired
     private ReportDAOService daoService;
@@ -199,15 +203,16 @@ public class RegisterStampPaidPage extends OnlineReportPage {
         RegisterStampPaidReport.Builder builder = new RegisterStampPaidReport.Builder(templateFilename);
         Properties properties = new Properties();
         // properties.setProperty(RegisterStampPaidReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
-        builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             Org org = (Org) session.load(Org.class, idOfOrg);
+            addContractProperties(properties, org);
+            builder.setReportProperties(properties);
             builder.setOrg(
-                    new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+                    new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getShortNameInfoService(), org.getAddress()));
             RegisterStampPaidReport registerPaidReport = (RegisterStampPaidReport) builder
                     .build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -244,6 +249,14 @@ public class RegisterStampPaidPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private void addContractProperties(Properties properties, Org org) {
+        Contract orgContract = org.getContract();
+        properties.setProperty("contractNumber", orgContract != null ? orgContract.getContractNumber() : EMPTY_FILLING);
+        DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.", new Locale("ru"));
+        properties.setProperty("contractDate", orgContract != null ? CalendarUtils.replaceMonthNameByGenitive(
+                formatter.format(CalendarUtils.addOneDay(org.getContract().getDateOfConclusion()))) : EMPTY_DATE_FILLING);
     }
 
     private String buildFileName(Date generateTime, RegisterStampPaidReport registerPaidReport) {

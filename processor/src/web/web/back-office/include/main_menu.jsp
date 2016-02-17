@@ -982,14 +982,19 @@
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientsReports}">
+        <a4j:support event="onclick" action="#{mainPage.showClientReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
                             label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="сlientBalanceByOrgReportMenuItem" binding="#{mainPage.clientBalanceByOrgReportPage.mainMenuComponent}"
                             label="Остаток денежных средств по организациям на дату" action="#{mainPage.showClientBalanceByOrgReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="balanceLeavingReportMenuItem" binding="#{mainPage.balanceLeavingReportPage.mainMenuComponent}"
+                            label="Отчет ухода баланса в минус/большой плюс"
+                            action="#{mainPage.showBalanceLeavingReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}">
+        <a4j:support event="onclick" action="#{mainPage.showInformReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="SentSmsReportPageMenuItem"
                             binding="#{sentSmsReportPage.mainMenuComponent}"
                             label="Статистика отправки СМС по дням"
