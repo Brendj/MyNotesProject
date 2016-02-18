@@ -80,7 +80,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private String previousRuleName;
     private String infoMessage;
     private String errorMessage;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
 
     private List<Hint> hints = new ArrayList<Hint>();
 
