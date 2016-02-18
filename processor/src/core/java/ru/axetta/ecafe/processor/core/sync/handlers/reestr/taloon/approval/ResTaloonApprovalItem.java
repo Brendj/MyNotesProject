@@ -53,7 +53,7 @@ public class ResTaloonApprovalItem {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "OrgId", orgId);
         if (date != null) {
-            XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToString(date));
+            XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
         }
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
