@@ -17,7 +17,7 @@ public class DetailedGoodRequestReportPage extends OnlineReportWithContragentPag
     private static final Logger logger = LoggerFactory.getLogger(DetailedGoodRequestReportPage.class);
     private List<DetailedGoodRequestReportItem> detailedGoodRequestReportItems = new ArrayList<DetailedGoodRequestReportItem>();
     private final DocumentStateFilterMenu documentStateFilterMenu = new DocumentStateFilterMenu();
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
