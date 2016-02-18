@@ -1551,6 +1551,17 @@ public class DAOService {
         return org.getFriendlyOrg();
     }
 
+    public Boolean isOrgFriendly(Long targetOrgId, Long testOrgId) {
+        Org testOrg = entityManager.find(Org.class, testOrgId);
+        Set<Org> set = testOrg.getFriendlyOrg();
+        for (Org o : set) {
+            if (targetOrgId.equals(o.getIdOfOrg())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate) throws Exception {
         return getLastRegistryChanges(idOfOrg, revisionDate, null, null);
     }

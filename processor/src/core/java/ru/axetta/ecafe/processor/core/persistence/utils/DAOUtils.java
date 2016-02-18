@@ -300,6 +300,10 @@ public class DAOUtils {
         return (Order) persistenceSession.get(Order.class, compositeIdOfOrder);
     }
 
+    public static TaloonApproval findTaloonApproval(Session persistenceSession, CompositeIdOfTaloonApproval compositeIdOfTaloonApproval) throws Exception {
+        return (TaloonApproval) persistenceSession.get(TaloonApproval.class, compositeIdOfTaloonApproval);
+    }
+
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
@@ -2044,6 +2048,25 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByTaloonApproval(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select max(t.version) from cf_taloon_approval as t");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        //Org org = (Org)session.load(Org.class, idOfOrg);
+        List<Org> orgs = findFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(TaloonApproval.class);
+        criteria.add(Restrictions.in("org", orgs));
+        criteria.add(Restrictions.gt("version", version));
+        criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
 
     public static List enterEventsSummary(){
                  return null;

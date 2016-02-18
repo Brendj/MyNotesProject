@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
@@ -1242,6 +1244,8 @@ public class SyncResponse {
     private final ResCardsOperationsRegistry resCardsOperationsRegistry;
     private final AccountsRegistry accountsRegistry;
     private final OrganizationStructure organizationStructure;
+    private final ResReestrTaloonApproval resReestrTaloonApproval;
+    private final ReestrTaloonApprovalData reestrTaloonApprovalData;
 
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1254,7 +1258,8 @@ public class SyncResponse {
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
-            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure) {
+            AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
+            ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1291,6 +1296,8 @@ public class SyncResponse {
         this.accountsRegistry = accountsRegistry;
         this.resCardsOperationsRegistry = resCardsOperationsRegistry;
         this.organizationStructure = organizationStructure;
+        this.resReestrTaloonApproval = resReestrTaloonApproval;
+        this.reestrTaloonApprovalData = reestrTaloonApprovalData;
     }
 
     public Document toDocument() throws Exception {
@@ -1454,6 +1461,13 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(directiveElement.toElement(document));
         }
 
+        if (resReestrTaloonApproval != null) {
+            ecafeEnvelopeElement.appendChild(resReestrTaloonApproval.toElement(document));
+        }
+
+        if (reestrTaloonApprovalData != null) {
+            ecafeEnvelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);

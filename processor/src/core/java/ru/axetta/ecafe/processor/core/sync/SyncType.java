@@ -20,7 +20,8 @@ public enum SyncType {
     TYPE_GET_ACC_INC(1,"GetAccInc"),
     TYPE_GET_CLIENTS_PARAMS(2,"GetClientParams"),
     TYPE_GET_GET_ACC_REGISGTRY_UPDATE(3,"GetAccRegisgtryUpdate"),
-    TYPE_COMMODITY_ACCOUNTING(4,"CommodityAccounting");
+    TYPE_COMMODITY_ACCOUNTING(4,"CommodityAccounting"),
+    TYPE_REESTR_TALOONS_APPROVAL(6,"ReestrTaloonsApproval");
 
     private static Map<String,SyncType> map = new HashMap<String,SyncType>();
     static {

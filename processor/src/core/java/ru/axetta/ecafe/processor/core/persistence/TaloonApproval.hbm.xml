@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.TaloonApproval" table="CF_Taloon_Approval">
+        <composite-id name="compositeIdOfTaloonApproval" class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfTaloonApproval">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="taloonDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="taloonDate"/>
+            <key-property name="taloonName" type="string" column="taloonName"/>
+        </composite-id>
+
+        <property name="qty" column="Qty" type="integer" not-null="true"/>
+        <property name="price" column="Price" type="long" not-null="true"/>
+
+        <property name="createdType" column="CreatedType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="version" column="Version" type="long" not-null="true"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <many-to-one name="orgOwner" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgOwner" not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+

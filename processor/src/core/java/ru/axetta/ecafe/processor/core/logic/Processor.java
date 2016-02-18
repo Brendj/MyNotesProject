@@ -34,6 +34,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
@@ -326,6 +330,11 @@ public class Processor implements SyncProcessor,
                 case TYPE_COMMODITY_ACCOUNTING:{
                     // обработка синхронизации параметров клиента
                     response = buildCommodityAccountingSyncResponse(request);
+                    break;
+                }
+                case TYPE_REESTR_TALOONS_APPROVAL:{
+                    //обработка синхронизации ручного реестра талонов
+                    response = buildReestrTaloonsApprovalSyncResponse(request);
                     break;
                 }
             }
@@ -807,6 +816,8 @@ public class Processor implements SyncProcessor,
         OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
 
         boolean bError = false;
 
@@ -1114,7 +1125,16 @@ public class Processor implements SyncProcessor,
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
         }
 
-
+        try {
+            if(request.getReestrTaloonApproval() != null) {
+                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
+                resReestrTaloonApproval = processReestrTaloonApproval(request.getReestrTaloonApproval());
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
 
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -1123,7 +1143,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
     }
     /*
     * Запуск авто пополнения
@@ -1175,6 +1195,8 @@ public class Processor implements SyncProcessor,
         OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
 
         boolean bError = false;
 
@@ -1216,7 +1238,62 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
+    }
+
+    private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
+        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        ComplexRoles complexRoles = null;
+        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+
+        boolean bError = false;
+
+        try {
+            if(request.getReestrTaloonApproval() != null) {
+                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
+                resReestrTaloonApproval = processReestrTaloonApproval(request.getReestrTaloonApproval());
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1253,6 +1330,8 @@ public class Processor implements SyncProcessor,
         OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
 
         boolean bError = false;
 
@@ -1363,7 +1442,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1400,6 +1479,8 @@ public class Processor implements SyncProcessor,
         OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
 
         //Process AccountOperationsRegistry
         try {
@@ -1497,7 +1578,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1531,6 +1612,8 @@ public class Processor implements SyncProcessor,
         OrganizationStructure organizationStructure = null;
         ResCardsOperationsRegistry resCardsOperationsRegistry = null;
         AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
 
         boolean bError = false;
 
@@ -1650,7 +1733,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -1845,6 +1928,42 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private ResReestrTaloonApproval processReestrTaloonApproval(ReestrTaloonApproval reestrTaloonApproval) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ReestrTaloonApprovalProcessor(persistenceSession, reestrTaloonApproval);
+            resReestrTaloonApproval = (ResReestrTaloonApproval) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resReestrTaloonApproval;
+    }
+
+    private ReestrTaloonApprovalData processReestrTaloonApprovalData(ReestrTaloonApproval reestrTaloonApproval) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ReestrTaloonApprovalProcessor processor = new ReestrTaloonApprovalProcessor(persistenceSession, reestrTaloonApproval);
+            reestrTaloonApprovalData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return reestrTaloonApprovalData;
     }
 
     private TempCardOperationData processClientRequestsOperations(Long idOfOrg) throws Exception {

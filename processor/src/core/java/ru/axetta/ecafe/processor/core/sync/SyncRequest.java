@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
@@ -2143,6 +2145,7 @@ public class SyncRequest {
         private final ProhibitionMenuRequestBuilder prohibitionMenuRequestBuilder;
         private final OrganizationStructureRequestBuilder organizationStructureRequestBuilder;
         private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
+        private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2171,6 +2174,7 @@ public class SyncRequest {
             this.prohibitionMenuRequestBuilder = new ProhibitionMenuRequestBuilder();
             this.organizationStructureRequestBuilder = new OrganizationStructureRequestBuilder();
             this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
+            this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2319,6 +2323,14 @@ public class SyncRequest {
             accountsRegistryRequestBuilder.createMainNode(envelopeNode);
             AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
 
+            Node reestrTaloonApprovalNode = findFirstChildElement(envelopeNode, "ReestrTaloonApproval");
+            ReestrTaloonApproval reestrTaloonApprovalRequest = null;
+            if (reestrTaloonApprovalNode != null) {
+                reestrTaloonApprovalRequest = reestrTaloonApprovalBuilder.build(reestrTaloonApprovalNode, org.getIdOfOrg());
+            }
+            //        reestrTaloonApprovalBuilder.build();
+
+
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
             if (roNode != null){
@@ -2344,7 +2356,7 @@ public class SyncRequest {
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest);
         }
 
 
@@ -2382,6 +2394,7 @@ public class SyncRequest {
     private final OrganizationStructureRequest organizationStructureRequest;
     private final CardsOperationsRegistry cardsOperationsRegistry;
     private final AccountsRegistryRequest accountsRegistryRequest;
+    private final ReestrTaloonApproval reestrTaloonApprovalRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
             AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
@@ -2389,7 +2402,8 @@ public class SyncRequest {
             EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
-            AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest) {
+            AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
+            ReestrTaloonApproval reestrTaloonApprovalRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2418,6 +2432,7 @@ public class SyncRequest {
         this.enterEvents = enterEvents;
         this.cardsOperationsRegistry = cardsOperationsRegistry;
         this.accountsRegistryRequest = accountsRegistryRequest;
+        this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
     }
 
     public String getClientVersion() {
@@ -2522,6 +2537,10 @@ public class SyncRequest {
 
     public AccountsRegistryRequest getAccountsRegistryRequest() {
         return accountsRegistryRequest;
+    }
+
+    public ReestrTaloonApproval getReestrTaloonApproval() {
+        return reestrTaloonApprovalRequest;
     }
 
     @Override
