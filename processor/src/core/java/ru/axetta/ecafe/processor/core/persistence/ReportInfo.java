@@ -24,7 +24,7 @@ public class ReportInfo {
     private String contragentReceiver;
     private Long idOfContragentPayer;
     private String contragentPayer;
-    private Integer createStatus;
+    private Integer createState;
     
     protected ReportInfo() {
 
@@ -179,12 +179,12 @@ public class ReportInfo {
         this.contragentPayer = contragentPayer;
     }
 
-    public Integer getCreateStatus() {
-        return createStatus;
+    public Integer getCreateState() {
+        return createState;
     }
 
-    public void setCreateStatus(Integer createStatus) {
-        this.createStatus = createStatus;
+    public void setCreateState(Integer createState) {
+        this.createState = createState;
     }
 
     @Override
