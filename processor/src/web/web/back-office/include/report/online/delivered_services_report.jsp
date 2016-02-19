@@ -86,7 +86,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.deliveredServicesReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesReportPage.deliveredServicesReport.htmlReport}" >
-            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
+            <h:outputText escape="true" value="Отчет по оказанным услугам (предварительный)" styleClass="output-text" />
 
             <f:verbatim>
                 <style type="text/css">

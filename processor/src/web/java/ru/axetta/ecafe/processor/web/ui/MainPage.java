@@ -348,6 +348,7 @@ public class MainPage implements Serializable {
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage();
+    private final DeliveredServicesElectronicCollationReportPage deliveredServicesElectronicCollationReportPage = new DeliveredServicesElectronicCollationReportPage();
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage();
     private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage = new StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage();
     private final DetailedGoodRequestReportPage detailedGoodRequestReportPage = new DetailedGoodRequestReportPage();
@@ -5671,6 +5672,10 @@ public class MainPage implements Serializable {
         return deliveredServicesReportPage;
     }
 
+    public DeliveredServicesElectronicCollationReportPage getDeliveredServicesElectronicCollationReportPage() {
+        return deliveredServicesElectronicCollationReportPage;
+    }
+
     public ClientsBenefitsReportPage getClientsBenefitsReportPage() {
         return clientsBenefitsReportPage;
     }
@@ -5721,7 +5726,20 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to set delivered report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по предоставленным услугам: " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы отчета по предоставленным услугам (предварительный): " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showDeliveredServicesElectronicCollationReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = deliveredServicesElectronicCollationReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set delivered report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по предоставленным услугам (электронная сверка): " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5737,6 +5755,37 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             deliveredServicesReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (JRException fnfe) {
+            logger.error("Failed to build Delivered report", fnfe);
+            String message = (fnfe.getCause() == null ? fnfe.getMessage() : fnfe.getCause().getMessage());
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message), null));
+        } catch (Exception e) {
+            logger.error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object buildDeliveredServicesElectronicCollationReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            deliveredServicesElectronicCollationReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
