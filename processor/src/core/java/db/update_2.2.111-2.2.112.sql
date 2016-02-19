@@ -31,3 +31,6 @@ CREATE INDEX cf_taloons_approval_version_idx ON cf_taloon_approval USING btree (
 
 --Увеличение размерности поля для условия выборки в отчетах по расписанию
 ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (25000);
+
+--добавление поля статуса создания отчета в таблицу Репозиторий отчетов
+ALTER TABLE cf_reportinfo ADD COLUMN createstate integer;

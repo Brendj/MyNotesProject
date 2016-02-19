@@ -25,6 +25,7 @@
         <property name="contragentReceiver" column="ContragentReceiver" type="string" length="128" not-null="false"/>
         <property name="idOfContragentPayer" column="IdOfContragentPayer" type="long" not-null="false"/>
         <property name="contragentPayer" column="ContragentPayer" type="string" length="128" not-null="false"/>
+        <property name="createStatus" column="CreateStatus" type="integer" not-null="false"/>
 
 
     </class>
