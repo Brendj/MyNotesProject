@@ -27,6 +27,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrgJob {
+    private final static Object runExecutorLock = new Object();
 
     @Override
     public AutoReportRunner getAutoReportRunner() {
@@ -42,7 +43,6 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
                             getMyClass().getCanonicalName()));
                 }
                 String classPropertyValue = getMyClass().getCanonicalName();
-                List<AutoReport> autoReports = new ArrayList<AutoReport>();
                 Session session = null;
                 org.hibernate.Transaction transaction = null;
                 try {
@@ -53,16 +53,16 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
                     allOrgCriteria.addOrder(Order.asc("idOfOrg"));
                     allOrgCriteria.setCacheMode(CacheMode.GET);
                     allOrgCriteria.setCacheable(true);
-                    //List allOrgs = allOrgCriteria.list();
 
                     List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
-                    Set<Long> map_ids = new HashSet<Long>();
+
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         String pre_orgs = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
                         if (pre_orgs == null) {
                             pre_orgs = getAllOrgs(session);
                         }
                         String[] idOfOrgs = pre_orgs.split(",");
+                        List<AutoReport> autoReports = new ArrayList<AutoReport>();
                         for (String id : idOfOrgs) {
                             Org org = (Org)session.load(Org.class, Long.parseLong(id));
                             if (!doReportByOrgCondition(session, org)) {
@@ -81,24 +81,17 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
                                     autoReportBuildTask.startCalendar);
 
                             autoReports.add(new AutoReport(report, properties));
-                            //List<Long> ids = Arrays.asList(rule.getRuleId());
-                            map_ids.add(rule.getRuleId());
-                            /*List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
+                        }
+                        List<Long> ids = Arrays.asList(rule.getRuleId());
+                        synchronized (runExecutorLock) {
                             autoReportBuildTask.executorService.execute(
-                                    new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, reps,
-                                            autoReportBuildTask.documentBuilders, ids));*/
+                                new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
+                                    autoReportBuildTask.documentBuilders, ids));
                         }
                     }
 
-                    //List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
-                    List<Long> reportHandleRuleIdsList = new ArrayList<Long>();
-                    reportHandleRuleIdsList.addAll(map_ids);
-
                     transaction.commit();
                     transaction = null;
-                    autoReportBuildTask.executorService.execute(
-                            new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

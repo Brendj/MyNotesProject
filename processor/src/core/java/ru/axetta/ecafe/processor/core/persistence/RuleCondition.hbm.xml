@@ -18,7 +18,7 @@
                      column="IdOfReportHandleRule" not-null="true" update="false"/>
         <property name="conditionOperation" column="ConditionOperation" type="int" not-null="true"/>
         <property name="conditionArgument" column="ConditionArgument" type="string" length="128"/>
-        <property name="conditionConstant" column="ConditionConstant" type="string" length="128"/>
+        <property name="conditionConstant" column="ConditionConstant" type="string" length="25000"/>
     </class>
 </hibernate-mapping>
 
