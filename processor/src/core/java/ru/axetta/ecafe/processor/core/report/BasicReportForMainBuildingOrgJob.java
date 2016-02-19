@@ -53,9 +53,10 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
                     allOrgCriteria.addOrder(Order.asc("idOfOrg"));
                     allOrgCriteria.setCacheMode(CacheMode.GET);
                     allOrgCriteria.setCacheable(true);
-                    List allOrgs = allOrgCriteria.list();
+                    //List allOrgs = allOrgCriteria.list();
 
                     List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
+                    Set<Long> map_ids = new HashSet<Long>();
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         String pre_orgs = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
                         if (pre_orgs == null) {
@@ -74,27 +75,30 @@ public abstract class BasicReportForMainBuildingOrgJob extends BasicReportForOrg
 
                             BasicReportForOrgJob report = createInstance();
                             report.setReportProperties(properties);
-                            //report.setIdOfOrg(Long.parseLong(id));
+
                             report.initialize(autoReportBuildTask.startTime, autoReportBuildTask.endTime, Long.parseLong(id),
                                     autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
                                     autoReportBuildTask.startCalendar);
 
-                            //autoReports.add(new AutoReport(report, properties));
-                            List<Long> ids = Arrays.asList(rule.getRuleId());
-                            List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
+                            autoReports.add(new AutoReport(report, properties));
+                            //List<Long> ids = Arrays.asList(rule.getRuleId());
+                            map_ids.add(rule.getRuleId());
+                            /*List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
                             autoReportBuildTask.executorService.execute(
                                     new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, reps,
-                                            autoReportBuildTask.documentBuilders, ids));
+                                            autoReportBuildTask.documentBuilders, ids));*/
                         }
                     }
 
                     //List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
+                    List<Long> reportHandleRuleIdsList = new ArrayList<Long>();
+                    reportHandleRuleIdsList.addAll(map_ids);
 
                     transaction.commit();
                     transaction = null;
-                    /*autoReportBuildTask.executorService.execute(
+                    autoReportBuildTask.executorService.execute(
                             new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
-                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));*/
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 } finally {

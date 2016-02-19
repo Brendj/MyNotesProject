@@ -12,10 +12,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.hibernate.Session;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,7 +37,7 @@ public abstract class BasicReportForListOrgsJob extends BasicReportForAllOrgJob 
                             getMyClass().getCanonicalName()));
                 }
                 String classPropertyValue = getMyClass().getCanonicalName();
-                //List<AutoReport> autoReports = new ArrayList<AutoReport>();
+                List<AutoReport> autoReports = new ArrayList<AutoReport>();
                 Session session = null;
                 org.hibernate.Transaction transaction = null;
                 try {
@@ -49,6 +46,7 @@ public abstract class BasicReportForListOrgsJob extends BasicReportForAllOrgJob 
                     transaction.begin();
 
                     List<RuleProcessor.Rule> thisReportRulesList = getThisReportRulesList(session, idOfSchedulerJob);
+                    Set<Long> map_ids = new HashSet<Long>();
                     for (RuleProcessor.Rule rule : thisReportRulesList) {
                         String pre_orgs = rule.getExpressionValue(ReportPropertiesUtils.P_ID_OF_ORG);
                         Properties properties = new Properties();
@@ -61,18 +59,25 @@ public abstract class BasicReportForListOrgsJob extends BasicReportForAllOrgJob 
                                 autoReportBuildTask.templateFileName, autoReportBuildTask.sessionFactory,
                                 autoReportBuildTask.startCalendar);
 
-                        List<Long> ids = Arrays.asList(rule.getRuleId());
-                        List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
-                        //autoReports.add(new AutoReport(report, properties));
-                        autoReportBuildTask.executorService.execute(
+                        //List<Long> ids = Arrays.asList(rule.getRuleId());
+                        //List<AutoReport> reps = Arrays.asList(new AutoReport(report, properties));
+                        autoReports.add(new AutoReport(report, properties));
+                        map_ids.add(rule.getRuleId());
+                        /*autoReportBuildTask.executorService.execute(
                                 new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, reps,
-                                        autoReportBuildTask.documentBuilders, ids));
+                                        autoReportBuildTask.documentBuilders, ids));*/
                     }
 
                     //List<Long> reportHandleRuleIdsList = getRulesIdsByJobRules(session, idOfSchedulerJob);
 
+                    List<Long> reportHandleRuleIdsList = new ArrayList<Long>();
+                    reportHandleRuleIdsList.addAll(map_ids);
+
                     transaction.commit();
                     transaction = null;
+                    autoReportBuildTask.executorService.execute(
+                            new AutoReportProcessor.ProcessTask(autoReportBuildTask.autoReportProcessor, autoReports,
+                                    autoReportBuildTask.documentBuilders, reportHandleRuleIdsList));
 
                 } catch (Exception e) {
                     getLogger().error(String.format("Failed at building auto reports \"%s\"", classPropertyValue), e);
