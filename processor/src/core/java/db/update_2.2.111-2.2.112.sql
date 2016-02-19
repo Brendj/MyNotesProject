@@ -4,6 +4,7 @@
 
 -- Пакет обновлений 2.2.111
 
+--Новый реестр ручных талонов
 CREATE TABLE cf_taloon_approval
 (
   idoforg bigint NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE cf_taloon_approval
   qty integer NOT NULL,
   price bigint NOT NULL,
   createdtype integer NOT NULL,
+  taloonnumber bigint,
   idoforgowner bigint NOT NULL,
   version bigint NOT NULL,
   deletedstate boolean NOT NULL DEFAULT false,
@@ -26,3 +28,6 @@ OIDS=FALSE
 );
 
 CREATE INDEX cf_taloons_approval_version_idx ON cf_taloon_approval USING btree (version);
+
+--Увеличение размерности поля для условия выборки в отчетах по расписанию
+ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (25000);

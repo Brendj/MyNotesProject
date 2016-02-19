@@ -22,6 +22,7 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+        <property name="taloonNumber" column="TaloonNumber" type="long" not-null="false"/>
         <property name="version" column="Version" type="long" not-null="true"/>
         <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
 

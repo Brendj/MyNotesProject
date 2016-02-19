@@ -34,6 +34,7 @@ public class TaloonApprovalItem {
     private Integer qty;
     private Long price;
     private TaloonCreatedTypeEnum createdType;
+    private Long taloonNumber;
     private Long orgOwnerId;
     private Boolean deletedState;
     private String errorMessage;
@@ -47,6 +48,7 @@ public class TaloonApprovalItem {
         Long price = null;
         Integer createdType = null;
         Boolean deletedState = false;
+        Long taloonNumber = null;
 
         String errorMessageComposite = "";
         //Три обязательных поля (orgId, date, name)- первичный ключ
@@ -129,17 +131,28 @@ public class TaloonApprovalItem {
                 errorMessageComposite += "NumberFormatException incorrect format DeletedState";
             }
         }
-        return new TaloonApprovalItem(orgId, date, name, qty, price, TaloonCreatedTypeEnum.fromInteger(createdType), orgOwner, deletedState, errorMessageComposite);
+
+        String strTaloonNumber = XMLUtils.getAttributeValue(itemNode, "TaloonNumber");
+        if (StringUtils.isNotEmpty(strTaloonNumber)) {
+            try {
+                taloonNumber = Long.parseLong(strTaloonNumber);
+            } catch (NumberFormatException e) {
+                errorMessageComposite += "NumberFormatException incorrect format TaloonNumber";
+            }
+        }
+
+        return new TaloonApprovalItem(orgId, date, name, qty, price, TaloonCreatedTypeEnum.fromInteger(createdType), taloonNumber, orgOwner, deletedState, errorMessageComposite);
     }
 
     private TaloonApprovalItem(Long orgId, Date date, String name, Integer qty, Long price, TaloonCreatedTypeEnum createdType,
-            Long orgOwnerId, Boolean deletedState, String errorMessage) {
+            Long taloonNumber, Long orgOwnerId, Boolean deletedState, String errorMessage) {
         this.setOrgId(orgId);
         this.setDate(date);
         this.setName(name);
         this.setQty(qty);
         this.setPrice(price);
         this.setCreatedType(createdType);
+        this.setTaloonNumber(taloonNumber);
         this.orgOwnerId = orgOwnerId;
         this.deletedState = deletedState;
         this.setErrorMessage(errorMessage);
@@ -228,5 +241,13 @@ public class TaloonApprovalItem {
 
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
+    }
+
+    public Long getTaloonNumber() {
+        return taloonNumber;
+    }
+
+    public void setTaloonNumber(Long taloonNumber) {
+        this.taloonNumber = taloonNumber;
     }
 }

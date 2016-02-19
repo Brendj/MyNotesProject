@@ -33,6 +33,7 @@ public class ResTaloonApprovalItem {
     private Boolean deletedState;
     private Integer resultCode;
     private String errorMessage;
+    private Long taloonNumber;
 
     public ResTaloonApprovalItem() {
 
@@ -45,6 +46,7 @@ public class ResTaloonApprovalItem {
         this.qty = taloon.getQty();
         this.price = taloon.getPrice();
         this.createdType = taloon.getCreatedType();
+        this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
     }
@@ -61,6 +63,7 @@ public class ResTaloonApprovalItem {
         XMLUtils.setAttributeIfNotNull(element, "Name", name);
         XMLUtils.setAttributeIfNotNull(element, "Qty", qty);
         XMLUtils.setAttributeIfNotNull(element, "Price", price);
+        XMLUtils.setAttributeIfNotNull(element, "TaloonNumber", taloonNumber);
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
@@ -148,5 +151,13 @@ public class ResTaloonApprovalItem {
 
     public void setResultCode(Integer resultCode) {
         this.resultCode = resultCode;
+    }
+
+    public Long getTaloonNumber() {
+        return taloonNumber;
+    }
+
+    public void setTaloonNumber(Long taloonNumber) {
+        this.taloonNumber = taloonNumber;
     }
 }

@@ -18,7 +18,7 @@ public class TaloonApproval {
     private Integer qty;
     private Long price;
     private TaloonCreatedTypeEnum createdType;
-    //todo не позволять сохранять запись, если она создана ранее от другой OrgOwner.
+    private Long taloonNumber;
     private Org orgOwner; //От какой организации создана запись.
     private Long version;
     private Boolean deletedState;
@@ -89,7 +89,7 @@ public class TaloonApproval {
     @Override
     public String toString() {
         return "TaloonApproval{" + "compositeIdOfTaloonApproval=" + compositeIdOfTaloonApproval + ", org=" + org + ", qty=" + qty + ", price="
-                + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner + '}';
+                + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner + ", taloonNumber=" + taloonNumber + '}';
     }
 
     public Org getOrgOwner() {
@@ -114,5 +114,13 @@ public class TaloonApproval {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public Long getTaloonNumber() {
+        return taloonNumber;
+    }
+
+    public void setTaloonNumber(Long taloonNumber) {
+        this.taloonNumber = taloonNumber;
     }
 }

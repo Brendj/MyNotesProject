@@ -54,6 +54,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
+                    Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
                         taloon = new TaloonApproval(compositeId, qty, price, createdType);
@@ -64,6 +65,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     taloon.setOrgOwner(orgOwner);
                     taloon.setVersion(nextVersion);
                     taloon.setDeletedState(deletedState);
+                    taloon.setTaloonNumber(taloonNumber);
 
                     session.saveOrUpdate(taloon);
 
@@ -77,6 +79,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     resItem.setQty(item.getQty());
                     resItem.setPrice(item.getPrice());
                     resItem.setCreatedType(item.getCreatedType());
+                    resItem.setTaloonNumber(item.getTaloonNumber());
                     resItem.setResultCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
                 }
