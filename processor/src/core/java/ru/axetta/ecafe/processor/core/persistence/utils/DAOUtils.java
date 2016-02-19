@@ -2064,7 +2064,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(TaloonApproval.class);
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
-        criteria.add(Restrictions.eq("deletedState", false));
+        //criteria.add(Restrictions.eq("deletedState", false));
         return criteria.list();
     }
 
