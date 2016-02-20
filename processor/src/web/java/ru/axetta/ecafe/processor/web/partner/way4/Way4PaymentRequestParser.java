@@ -59,7 +59,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
             Contragent c = RuntimeContext.getAppContext().getBean(DAOService.class).findContragentByClient(clientId);
             if (c != null && !bmId.equals(c.getBMID())) {
                 throw new Exception(
-                        String.format("Некорректный код поставщика, необходимо использовать %s", c.getBMID()));
+                        String.format("Некорректный код поставщика (BMID), необходимо использовать %s", c.getBMID()));
             }
         }
         long sum=CurrencyStringUtils.rublesToCopecks(parseResult.getReqParam("AMOUNT"));
