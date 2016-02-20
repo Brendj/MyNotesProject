@@ -1,10 +1,10 @@
 .output-text {
-    font-size: 8pt;
+    font-size: 12pt;
 }
 
 .menu-date {
     font-size: 8pt;
-    font-weight: bold; 
+    font-weight: bold;
     color: #003399;
 }
 
@@ -27,6 +27,7 @@
     font-size: 8pt;
     color: gray;
 }
+
 .active-command-link {
     font-size: 8pt;
     color: green;
@@ -40,19 +41,19 @@
     font-size: 8pt;
 }
 
-.login-panel-body {    
+.login-panel-body {
 }
 
 .borderless-form-login {
     border-style: none;
-  /*  margin: 0 auto;*/
-   /* width: 20%;*/
+    /*  margin: 0 auto;*/
+    /* width: 20%;*/
     padding: 0 0 0 0;
     /*text-align: center;*/
 }
 
 .borderless-form {
-    border-style: none;    
+    border-style: none;
     margin: 0 0 0 0;
     padding: 0 0 0 0;
 }
@@ -116,8 +117,8 @@
     color: #003399;
 }
 
-.tab{
-   text-align: center !important;
+.tab {
+    text-align: center !important;
 }
 
 .borderless-form-login {
@@ -135,9 +136,10 @@
 .login-form-button-tr {
     text-align: center !important;
 }
+
 .login-form-button-tr td {
     background-color: #ffeeaa !important;
-    text-align:center !important;
+    text-align: center !important;
 }
 
 .login-form-input-tr {
