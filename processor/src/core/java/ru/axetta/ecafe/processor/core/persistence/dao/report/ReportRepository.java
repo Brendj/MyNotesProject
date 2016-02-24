@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.dao.report;
 
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
@@ -13,6 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
+import ru.axetta.ecafe.processor.core.report.DeliveredServicesElectronicCollationReport;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -33,6 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -105,7 +109,7 @@ public class ReportRepository extends BaseJpaDao {
 
         Calendar localCalendar = new GregorianCalendar();
 
-        DeliveredServicesReport deliveredServicesReport = null;
+        BasicJasperReport deliveredServicesReport = null;
         try {
             deliveredServicesReport = builder.build(session, startDate, endDate, localCalendar, idOfOrg,
                 idOfContragent, idOfContract, region, false);
@@ -120,6 +124,72 @@ public class ReportRepository extends BaseJpaDao {
             return null;
         }
 
+        ByteArrayOutputStream stream = exportReportToJRXls(deliveredServicesReport);
+        byte[] arr = stream.toByteArray();
+
+        postReportToEmails(subject, startDate, endDate, email, arr);
+        return arr;
+    }
+
+    public byte[] getDeliveredServicesElectronicCollationReport(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+
+        DeliveredServicesReportParameters reportParameters = new DeliveredServicesReportParameters(
+                parameters).invoke();
+
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+
+        BasicJasperReport deliveredServicesReport = buildDeliveredServicesElectronicCollationReport(session,
+                reportParameters);
+
+        if (deliveredServicesReport == null) {
+            return null;
+        }
+        if (deliveredServicesReport.getPrint().getPages() != null
+                && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0) {
+            return null;
+        }
+
+        ByteArrayOutputStream stream = exportReportToJRXls(deliveredServicesReport);
+        byte[] arr = stream.toByteArray();
+        postReportToEmails(subject,reportParameters.getStartDate(),reportParameters.getEndDate(),reportParameters.getEmail(), arr);
+        return arr;
+    }
+
+    private void postReportToEmails(String subject, Date startDate, Date endDate, String email, byte[] arr) {
+        if (email != null && !email.isEmpty()) {
+            String[] emails = email.split(";");
+            DateFormat df = dateFormatLetter.get();
+            for (String em : emails) {
+                postReport(em, subject + String.format(" (%s - %s)", df.format(startDate), df.format(endDate)), arr);
+            }
+        }
+    }
+
+    private BasicJasperReport buildDeliveredServicesElectronicCollationReport(Session session, DeliveredServicesReportParameters reportParameters) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class.getSimpleName() + ".jasper";
+        DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(
+                templateFilename);
+        builder.setOrg(reportParameters.getIdOfOrg());
+        Calendar localCalendar = new GregorianCalendar();
+        BasicJasperReport deliveredServicesReport = null;
+        try {
+            deliveredServicesReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), localCalendar,
+                            reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
+                            reportParameters.getRegion(), false);
+            return deliveredServicesReport;
+        } catch (Exception e) {
+            logger.error("Error in generate report", e);
+            return null;
+        }
+    }
+
+    private ByteArrayOutputStream exportReportToJRXls(BasicJasperReport deliveredServicesReport) throws JRException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         JRXlsExporter xlsExport = new JRXlsExporter();
         xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesReport.getPrint());
@@ -130,18 +200,9 @@ public class ReportRepository extends BaseJpaDao {
         xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
         xlsExport.exportReport();
         xlsExport.reset();
-
-        byte[] arr = stream.toByteArray();
-
-        if (email != null && !email.isEmpty()) {
-            String[] emails = email.split(";");
-            DateFormat df = dateFormatLetter.get();
-            for (String em : emails) {
-                postReport(em, subject + String.format(" (%s - %s)", df.format(startDate), df.format(endDate)), arr);
-            }
-        }
-        return arr;
+        return stream;
     }
+
 
     public boolean areParametersBad(List<ReportParameter> parameters) {
         Date startDate = null;
@@ -225,4 +286,90 @@ public class ReportRepository extends BaseJpaDao {
         return result;
     }
 
+    private class DeliveredServicesReportParameters {
+
+        private List<ReportParameter> parameters;
+        private Date startDate;
+        private Date endDate;
+        private Long idOfOrg;
+        private Long idOfContragent;
+        private Long idOfContract;
+        private String region;
+        private String email;
+
+        public DeliveredServicesReportParameters(List<ReportParameter> parameters) {
+            this.parameters = parameters;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public Long getIdOfContract() {
+            return idOfContract;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public DeliveredServicesReportParameters invoke() throws ParseException {
+            startDate = null;
+            endDate = null;
+            idOfOrg = null;
+            idOfContragent = null;
+            idOfContract = null;
+            region = null;
+            email = null;
+            DateFormat safeDateFormat = dateFormat.get();
+            for (ReportParameter parameter : parameters) {
+                if (parameter.getParameterName().equals("startDate")) {
+                    startDate = safeDateFormat.parse(parameter.getParameterValue());
+                    startDate = CalendarUtils.truncateToDayOfMonth(startDate);
+                }
+                if (parameter.getParameterName().equals("endDate")) {
+                    endDate = safeDateFormat.parse(parameter.getParameterValue());
+                    endDate = CalendarUtils.endOfDay(endDate);
+                }
+                if (parameter.getParameterName().equals("idOfOrg")) {
+                    idOfOrg = Long.parseLong(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("idOfContragent")) {
+                    idOfContragent = Long.parseLong(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("idOfContract")) {
+                    idOfContract = Long.parseLong(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("region")) {
+                    region = parameter.getParameterValue();
+                }
+                if (parameter.getParameterName().equals("email")) {
+                    email = parameter.getParameterValue();
+                }
+            }
+            return this;
+        }
+
+        public boolean checkRequiredParameters() {
+          return   idOfOrg != null && startDate != null
+                    && endDate != null;
+        }
+
+    }
 }

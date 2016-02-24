@@ -139,7 +139,7 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         }
         try {
             if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
-                byte[] jasper_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getDeliveredServicesReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
+                byte[] jasper_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getDeliveredServicesElectronicCollationReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
                 if (jasper_content == null) {
                     result.setCode(RC_NO_DATA_ERROR);
                     result.setResult(RC_NO_DATA_ERROR_DESC);
