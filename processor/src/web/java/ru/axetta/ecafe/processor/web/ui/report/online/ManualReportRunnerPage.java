@@ -754,7 +754,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                             contragentReceiver == null ? null : contragentReceiver.getIdOfContragent(),
                             contragentReceiver == null ? null : contragentReceiver.getContragentName(),
                             contragentPayer == null ? null : contragentPayer.getIdOfContragent(),
-                            contragentPayer == null ? null : contragentPayer.getContragentName());
+                            contragentPayer == null ? null : contragentPayer.getContragentName(), ReportInfo.MANUAL_REPORT_GENERATION);
             infoMessage = "Отчеты успешно созданы и помещены в репозиторий";
         } else if (documentFormat == ReportHandleRule.HTML_FORMAT) {
             //  Если выбран html, то необходимо выполнить отчет в строку и отобразить его на странице, а так же, добавить

@@ -20,10 +20,9 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.component.UIOutput;
 import javax.persistence.EntityManager;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     public static class Filter extends AbstractFilter {
@@ -175,12 +174,14 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private Date endDate;
     private String reportFile;
     private String orgNum;
-    private String tag;
+    private Long idOfOrg;
     private Long idOfContragentReceiver;
-    private String contragentReceiver;
     private Long idOfContragentPayer;
-    private String contragentPayer;
     private List<Long> idOfOrgList;
+    private String createState;
+    private String errorString;
+    private String createStateStyle;
+    private boolean isErrorButtonRendered;
 
     @Override
     public void fillForList(EntityManager entityManager, ReportInfo entity) {
@@ -192,13 +193,15 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         generationTime = entity.getGenerationTime();
         startDate = entity.getStartDate();
         endDate = entity.getEndDate();
-        reportFile = entity.getReportFile();
+        reportFile = StringUtils.trimToEmpty(entity.getReportFile());
         orgNum = entity.getOrgNum();
-        tag = entity.getTag();
+        idOfOrg = entity.getIdOfOrg();
         idOfContragentReceiver = entity.getIdOfContragentReceiver();
-        contragentReceiver = entity.getContragentReceiver();
         idOfContragentPayer = entity.getIdOfContragentPayer();
-        contragentPayer = entity.getContragentPayer();
+        createState = fillCreateState(entity.getCreateState());
+        createStateStyle = fillCreateStateStyle(entity.getCreateState());
+        errorString = entity.getErrorString();
+        isErrorButtonRendered = setErrorButtonEnabled(entity.getCreateState());
     }
 
     @Override
@@ -264,8 +267,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         return orgNum;
     }
 
-    public String getTag() {
-        return tag;
+    public Long getIdOfOrg() {
+        return idOfOrg;
     }
 
     public Long getIdOfContragentReceiver() {
@@ -276,16 +279,52 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         this.idOfContragentReceiver = idOfContragentReceiver;
     }
 
-    public String getContragentReceiver() {
-        return contragentReceiver;
+    public String getCreateStateStyle() {
+        return createStateStyle;
     }
 
-    public String getContragentPayer() {
-        return contragentPayer;
+    public void setCreateStateStyle(String createStateStyle) {
+        this.createStateStyle = createStateStyle;
     }
 
-    public void setContragentReceiver(String contragentReceiver) {
-        this.contragentReceiver = contragentReceiver;
+    public String getCreateState() {
+        return createState;
+    }
+
+    public void setCreateState(String createState) {
+        this.createState = createState;
+    }
+
+    public String getErrorString() {
+        return errorString;
+    }
+
+    public void setErrorString(String errorString) {
+        this.errorString = errorString;
+    }
+
+    public boolean isErrorButtonRendered() {
+        return isErrorButtonRendered;
+    }
+
+    public void setErrorButtonRendered(boolean errorButtonRendered) {
+        isErrorButtonRendered = errorButtonRendered;
+    }
+
+    private String fillCreateState(Integer status) {
+        if (status == null) status = ReportInfo.UNDEFINED;
+        return ReportInfo.REPORT_INFO_STATUS.get(status);
+    }
+
+    private String fillCreateStateStyle(Integer status) {
+        if(status == null) return "output-text";
+        if(status.equals(ReportInfo.ERROR_DURING_REPORT_GENERATION)) return "report-error-output-text";
+        if(status.equals(ReportInfo.ERROR_DURING_MAILING)) return "mailing-error-output-text";
+        return "output-text";
+    }
+
+    private boolean setErrorButtonEnabled(Integer value) {
+        return ((value != null)&&((value.equals(ReportInfo.ERROR_DURING_REPORT_GENERATION))||(value.equals(ReportInfo.ERROR_DURING_MAILING))));
     }
 
     @Override

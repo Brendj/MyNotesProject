@@ -114,10 +114,26 @@ function checkReporitoryDate () {
             </a4j:status>
         </h:panelGrid>
     </rich:simpleTogglePanel>
-
+        <rich:modalPanel id="errorPanel" width="600" height="600" style="overflow: scroll;">
+            <f:facet name="header">
+                <h:outputText value="Текст ошибки" />
+            </f:facet>
+            <f:facet name="controls">
+                <a4j:commandLink onclick="Richfaces.hideModalPanel('errorPanel')" reRender="this" style="color: white;">
+                    <h:outputText value="Закрыть" />
+                </a4j:commandLink>
+            </f:facet>
+            <h:outputText value="#{reportRepositoryListPage.displayedError}" />
+        </rich:modalPanel>
     <rich:dataTable id="contractListTable" value="#{reportRepositoryListPage.itemList}" var="item" rows="50"
                     footerClass="data-table-footer"
-                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column">
+                    columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Ид. организации" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
+        </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Правило" />
@@ -132,27 +148,9 @@ function checkReporitoryDate () {
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Тэг" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.tag}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
                 <h:outputText escape="true" value="Номер организации" />
             </f:facet>
             <h:outputText escape="true" value="#{item.orgNum}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Платежный агент" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.contragentPayer}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Поставщик" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.contragentReceiver}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -165,7 +163,7 @@ function checkReporitoryDate () {
                 <h:outputText escape="true" value="Дата создания" />
             </f:facet>
             <h:outputText escape="true" value="#{item.createdDate}" styleClass="output-text">
-                <f:convertDateTime pattern="dd.MM.yyyy" />
+                <f:convertDateTime pattern="dd.MM.yyyy HH:mm:ss" />
             </h:outputText>
         </rich:column>
         <rich:column headerClass="column-header">
@@ -200,7 +198,25 @@ function checkReporitoryDate () {
             </a4j:commandLink>
         </rich:column>
 
-        <rich:column style="text-align:center" rendered="#{reportRepositoryListPage.canDelete}">
+        <rich:column headerClass="column-header" styleClass="#{item.createStateStyle}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.createState}" styleClass="#{item.createStateStyle}" />
+        </rich:column>
+
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Ошибка" />
+            </f:facet>
+            <a4j:commandLink value="Текст ошибки" rendered="#{item.errorButtonRendered}" ajaxSingle="true" oncomplete="Richfaces.showModalPanel('errorPanel');"
+                    reRender="errorPanel" styleClass="command-link">
+                <f:setPropertyActionListener value="#{item.errorString}" target="#{reportRepositoryListPage.displayedError}" />
+            </a4j:commandLink>
+            <%--<h:outputText escape="true" value="#{item.errorString}" styleClass="output-text"  />--%>
+        </rich:column>
+
+        <rich:column headerClass="column-header" rendered="#{reportRepositoryListPage.canDelete}">
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true"/>
             </f:facet>

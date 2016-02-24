@@ -26,8 +26,7 @@
         <property name="idOfContragentPayer" column="IdOfContragentPayer" type="long" not-null="false"/>
         <property name="contragentPayer" column="ContragentPayer" type="string" length="128" not-null="false"/>
         <property name="createState" column="CreateState" type="integer" not-null="false"/>
-
-
+        <property name="errorString" column="ErrorString" type="string" not-null="false"/>
     </class>
 </hibernate-mapping>
 

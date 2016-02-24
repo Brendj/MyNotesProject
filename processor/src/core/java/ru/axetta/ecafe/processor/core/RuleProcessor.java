@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -19,6 +20,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.core.utils.RuleExpressionUtil;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -220,7 +222,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 BasicReport basicReport = report.getBasicReport();
                 for (Rule currRule : rulesCopy) {
                     Properties reportProperties = copyProperties(report.getProperties());
-                    ////
+                    ReportInfo reportInfo = null;
 
                     boolean existFlag = getFlag(Long.valueOf(currRule.getRuleId()), reportHandleRuleIdsList);
 
@@ -270,8 +272,15 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         } else {
                             subject = fillTemplate(currRule.getSubject(), reportProperties);
                             basicReport.setReportProperties(reportProperties);
-                            reportDocument = documentBuilder.buildDocument(currRule.getRuleId() + "", basicReport);
-
+                            reportInfo = registerQuartzJobTriggeredStage(subject, idOfOrg, currRule);
+                            try {
+                                    reportDocument = documentBuilder.buildDocument(currRule.getRuleId() + "", basicReport);
+                            }catch(Exception ex) {
+                                String fullStackTrace = ExceptionUtils.getFullStackTrace(ex);
+                                registerErrorDuringReportGeneration(reportInfo, fullStackTrace);
+                                logger.error(String.format("Error during report generation with report info id=%d. Error is %s", reportInfo.getIdOfReportInfo(), ExceptionUtils.getFullStackTrace(ex)));
+                                continue;
+                            }
                             if (basicReport instanceof BasicReportJob) {
                                 BasicReportJob basicReportJob = (BasicReportJob) basicReport;
                                 File f = new File(
@@ -297,14 +306,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 .getContragentById(idOfContragentReceiver).getContragentName();
                                     }
                                 }
-                                DAOService.getInstance()
-                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(), subject,
-                                                basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
-                                                basicReportJob.getStartTime(), basicReportJob.getEndTime(),
-                                                relativeReportFilePath, report.getProperties()
-                                                .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
-                                                currRule.getTag(), idOfContragentReceiver, contragentReceiver,
-                                                idOfContragent, contragent);
+                                reportInfo = registerReportGeneratedStage(reportInfo, currRule.getRuleName(),
+                                        currRule.getDocumentFormat(), subject,
+                                        basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
+                                        basicReportJob.getStartTime(), basicReportJob.getEndTime(),
+                                        relativeReportFilePath, report.getProperties()
+                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
+                                        currRule.getTag(), idOfContragentReceiver, contragentReceiver,
+                                        idOfContragent, contragent, ReportInfo.REPORT_GENERATED);
                             }
 
                             if (basicReport instanceof OrgBalanceReport) {
@@ -313,13 +322,13 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                         RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
                                 String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                                         .substring(f.getAbsolutePath().length());
-                                DAOService.getInstance()
-                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(), subject,
-                                                basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
-                                                basicReportJob.getBaseTime(), basicReportJob.getBaseTime(),
-                                                relativeReportFilePath, report.getProperties()
-                                                .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
-                                                currRule.getTag(), null, null, null, null);
+                                reportInfo = registerReportGeneratedStage(reportInfo, currRule.getRuleName(),
+                                        currRule.getDocumentFormat(), subject,
+                                        basicReport.getGenerateTime(), basicReport.getGenerateDuration(),
+                                        basicReportJob.getBaseTime(), basicReportJob.getBaseTime(),
+                                        relativeReportFilePath, report.getProperties()
+                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME), idOfOrg,
+                                        currRule.getTag(), null, null, null, null, ReportInfo.REPORT_GENERATED);
                             }
 
                         }
@@ -341,46 +350,35 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                             if (StringUtils.isNotEmpty(addressList)) {
                                                 // обходим все адреса в рассылке
                                                 String addresses[] = addressList.split(";");
+                                                List<String> errorMailingList = new ArrayList<String>();
                                                 for (String addrFromList : addresses) {
                                                     try {
                                                         autoReportPostman
                                                                 .postReport(addrFromList, subject, reportDocument);
                                                     } catch (Exception e) {
                                                         logger.error("Failed to post report", e);
+                                                        String fullStackTrace = ExceptionUtils.getFullStackTrace(e);
+                                                        errorMailingList.add(String.format("address: %s, error: %s", addrFromList, fullStackTrace));
                                                     }
                                                 }
+                                                registerMailingResults(reportInfo, errorMailingList);
+                                                if (!errorMailingList.isEmpty()) continue;
                                             } else {
                                                 logger.error(String.format(
                                                         "Failed to post report. Не определен список рассылки %s для организации с идентификатором %d",
                                                         address, idOfOrg));
                                             }
                                         } else {
+                                            List<String> errorMailingList = new ArrayList<String>();
                                             try {
                                                 autoReportPostman.postReport(address, subject, reportDocument);
                                             } catch (Exception e) {
                                                 logger.error("Failed to post report", e);
+                                                String fullStackTrace = ExceptionUtils.getFullStackTrace(e);
+                                                errorMailingList.add(String.format("address: %s, error: %s", address, fullStackTrace));
                                             }
-                                            //List<String> addresses1 = new ArrayList<String>(Arrays.asList(StringUtils.split(address, ";")));
-                                            //for (String addrFromList : addresses1) {
-                                            //    try {
-                                            //        if(!StringUtils.trim(address).equalsIgnoreCase(StringUtils.trim(addrFromList))){
-                                            //            autoReportPostman
-                                            //                    .postReport(addrFromList, subject, reportDocument);
-                                            //        }
-                                            //    } catch (Exception e) {
-                                            //        logger.error("Failed to post report", e);
-                                            //    }
-                                            //}
-                                            //List<String> addresses2 = new ArrayList<String>(Arrays.asList(StringUtils.split(address, ",")));
-                                            //for (String addrFromList : addresses2) {
-                                            //    try {
-                                            //        if(!StringUtils.trim(address).equalsIgnoreCase(StringUtils.trim(addrFromList))){
-                                            //            autoReportPostman.postReport(addrFromList, subject, reportDocument);
-                                            //        }
-                                            //    } catch (Exception e) {
-                                            //        logger.error("Failed to post report", e);
-                                            //    }
-                                            //}
+                                            registerMailingResults(reportInfo, errorMailingList);
+                                            if (!errorMailingList.isEmpty()) continue;
                                         }
                                     }
                                 }
@@ -399,6 +397,43 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                 }
             }
         }
+    }
+
+    private ReportInfo registerQuartzJobTriggeredStage(String subject, Long idOfOrg, Rule currRule) {
+        Date generateDate = new Date();
+        Long zeroGenerationTime = 0L;
+        ReportInfo reportInfo = new ReportInfo(currRule.getRuleName(), currRule.getDocumentFormat(), subject,
+                generateDate, zeroGenerationTime, generateDate, generateDate, StringUtils.EMPTY, idOfOrg, ReportInfo.QUARTZ_JOB_TRIGGERED);
+        return DAOService.getInstance().saveReportInfo(reportInfo);
+    }
+
+    private ReportInfo registerReportGeneratedStage(ReportInfo reportInfo, String ruleName, int documentFormat, String reportName, Date createdDate,
+            Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
+            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
+            String contragent, Integer createState) {
+
+        ReportInfo.Updater updater = new ReportInfo.Updater();
+        ReportInfo updatedReportInfo = updater.update(reportInfo, ruleName, documentFormat, reportName, createdDate,generationTime, startDate,
+                endDate, reportFile, orgNum, idOfOrg, tag, idOfContragentReceiver, contragentReceiver, idOfContragent,
+                contragent, createState);
+
+        return DAOService.getInstance().updateReportInfo(updatedReportInfo);
+    }
+
+    private void registerErrorDuringReportGeneration(ReportInfo reportInfo, String error) {
+        reportInfo.setErrorString(error);
+        reportInfo.setCreateState(ReportInfo.ERROR_DURING_REPORT_GENERATION);
+        DAOService.getInstance().updateReportInfo(reportInfo);
+    }
+
+    private void registerMailingResults(ReportInfo reportInfo, List<String> errorList) {
+        if (errorList.isEmpty()) {
+            reportInfo.setCreateState(ReportInfo.MAIL_SENT);
+        }else {
+            reportInfo.setCreateState(ReportInfo.ERROR_DURING_MAILING);
+            reportInfo.setErrorString(StringUtils.join(errorList, '\n'));
+        }
+        DAOService.getInstance().updateReportInfo(reportInfo);
     }
 
     private Properties copyProperties(Properties properties) {

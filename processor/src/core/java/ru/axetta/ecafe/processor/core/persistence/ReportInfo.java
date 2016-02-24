@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
+import java.util.HashMap;
 
 public class ReportInfo {
 
@@ -25,14 +28,40 @@ public class ReportInfo {
     private Long idOfContragentPayer;
     private String contragentPayer;
     private Integer createState;
-    
+    private String errorString;
+
+    //статусы записей в репозитории отчетов
+    public static final Integer QUARTZ_JOB_TRIGGERED = 100; // запущена org.quartz.Job (записывается до генерации отчета)
+    public static final Integer REPORT_GENERATED = 200; // отчет успешно сгенерирован (записывается после генерации отчета)
+    public static final Integer MANUAL_REPORT_GENERATION = 300; // отчет сгенерирован вручную (вне org.quartz.Job)
+    public static final Integer ERROR_DURING_REPORT_GENERATION = 400; //ошибка при генерации отчета
+    public static final Integer ERROR_DURING_MAILING = 500; //ошибка при отправке отчета по почте
+    public static final Integer MAIL_SENT = 600; //почтовая рассылка прошла успешно
+    public static final Integer UNDEFINED = 0;
+
+    public static final HashMap<Integer, String> REPORT_INFO_STATUS = new HashMap<Integer, String>();
+    static {
+        REPORT_INFO_STATUS.put(QUARTZ_JOB_TRIGGERED, "Задача стартовала");
+        REPORT_INFO_STATUS.put(REPORT_GENERATED, "Отчет сгенерирован");
+        REPORT_INFO_STATUS.put(MANUAL_REPORT_GENERATION, "Ручной запуск");
+        REPORT_INFO_STATUS.put(ERROR_DURING_REPORT_GENERATION, "Ошибка генерации отчета");
+        REPORT_INFO_STATUS.put(ERROR_DURING_MAILING, "Ошибка отправки почты");
+        REPORT_INFO_STATUS.put(MAIL_SENT, "Почта отправлена");
+        REPORT_INFO_STATUS.put(UNDEFINED, "Статус не определен");
+    }
+
+    public static String getStatusDescription(Integer statusCode) {
+        String description = REPORT_INFO_STATUS.get(statusCode);
+        return StringUtils.trimToEmpty(description);
+    }
+
     protected ReportInfo() {
 
     }
 
     public ReportInfo(String ruleName, Integer documentFormat, String reportName, Date createdDate, Long generationTime,
             Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag, Long idOfContragentReceiver,
-            String contragentReceiver, Long idOfContragentPayer, String contragentPayer) {
+            String contragentReceiver, Long idOfContragentPayer, String contragentPayer, Integer createState) {
         this.ruleName = ruleName;
         this.documentFormat = documentFormat;
         this.reportName = reportName;
@@ -49,6 +78,21 @@ public class ReportInfo {
         this.contragentReceiver = contragentReceiver;
         this.idOfContragentPayer = idOfContragentPayer;
         this.contragentPayer = contragentPayer;
+        this.createState = createState;
+    }
+
+    public ReportInfo(String ruleName, Integer documentFormat, String reportName, Date createdDate, Long generationTime,
+            Date startDate, Date endDate, String reportFile, Long idOfOrg, Integer createState) {
+        this.ruleName = ruleName;
+        this.documentFormat = documentFormat;
+        this.reportName = reportName;
+        this.createdDate = createdDate;
+        this.generationTime = generationTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reportFile = reportFile;
+        this.idOfOrg = idOfOrg;
+        this.createState = createState;
     }
 
     public String getReportFile() {
@@ -187,6 +231,14 @@ public class ReportInfo {
         this.createState = createState;
     }
 
+    public String getErrorString() {
+        return errorString;
+    }
+
+    public void setErrorString(String errorString) {
+        this.errorString = errorString;
+    }
+
     @Override
     public String toString() {
         return "ReportInfo{" +
@@ -199,10 +251,42 @@ public class ReportInfo {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", reportFile='" + reportFile + '\'' +
-                ", idOfContragentReceiver='" + idOfContragentReceiver + '\'' +
+                ", orgNum='" + orgNum + '\'' +
+                ", idOfOrg=" + idOfOrg +
+                ", tag='" + tag + '\'' +
+                ", idOfContragentReceiver=" + idOfContragentReceiver +
                 ", contragentReceiver='" + contragentReceiver + '\'' +
-                ", idOfContragent='" + idOfContragentPayer + '\'' +
-                ", contragent='" + contragentPayer + '\'' +
+                ", idOfContragentPayer=" + idOfContragentPayer +
+                ", contragentPayer='" + contragentPayer + '\'' +
+                ", createState=" + createState +
+                ", errorString='" + errorString + '\'' +
                 '}';
+    }
+
+    public static class Updater {
+        public ReportInfo update(ReportInfo reportInfo, String ruleName, int documentFormat,
+                String reportName, Date createdDate, Long generationTime,
+                Date startDate, Date endDate, String reportFile,
+                String orgNum, Long idOfOrg, String tag,
+                Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
+                String contragent, Integer createState) {
+            reportInfo.setRuleName(ruleName);
+            reportInfo.setDocumentFormat(documentFormat);
+            reportInfo.setReportName(reportName);
+            reportInfo.setCreatedDate(createdDate);
+            reportInfo.setGenerationTime(generationTime);
+            reportInfo.setStartDate(startDate);
+            reportInfo.setEndDate(endDate);
+            reportInfo.setReportFile(reportFile);
+            reportInfo.setOrgNum(orgNum);
+            reportInfo.setIdOfOrg(idOfOrg);
+            reportInfo.setTag(tag);
+            reportInfo.setIdOfContragentReceiver(idOfContragentReceiver);
+            reportInfo.setContragentReceiver(contragentReceiver);
+            reportInfo.setIdOfContragentPayer(idOfContragent);
+            reportInfo.setContragentPayer(contragent);
+            reportInfo.setCreateState(createState);
+            return reportInfo;
+        }
     }
 }

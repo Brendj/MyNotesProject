@@ -36,6 +36,7 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
     
     File fileToDownload;
     private ReportRepositoryItem selectedItem;
+    private String displayedError;
 
     @Override
     protected String getPageFileName() {
@@ -157,5 +158,13 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
 
     public String getGetStringIdOfOrgList() {
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getDisplayedError() {
+        return displayedError;
+    }
+
+    public void setDisplayedError(String displayedError) {
+        this.displayedError = displayedError;
     }
 }

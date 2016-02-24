@@ -1740,12 +1740,21 @@ public class DAOService {
     public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
             String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
-            String contragent) {
+            String contragent, Integer createState) {
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
                 endDate, reportFile, orgNum, idOfOrg, tag, idOfContragent, contragent, idOfContragentReceiver,
-                contragentReceiver);
-        entityManager.persist(ri);
+                contragentReceiver, createState);
+        entityManager.merge(ri);
         return ri;
+    }
+
+    public ReportInfo saveReportInfo(ReportInfo reportInfo) {
+        entityManager.persist(reportInfo);
+        return reportInfo;
+    }
+
+    public ReportInfo updateReportInfo(ReportInfo reportInfo) {
+        return entityManager.merge(reportInfo);
     }
 
     public Map<Long, String> getUserOrgses(Long userId, UserNotificationType type) {
