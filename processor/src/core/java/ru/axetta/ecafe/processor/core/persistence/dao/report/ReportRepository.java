@@ -63,129 +63,94 @@ public class ReportRepository extends BaseJpaDao {
     }
 
     public byte[] getDeliveredServicesReport(List<ReportParameter> parameters, String subject) throws Exception {
-        Date startDate = null;
-        Date endDate = null;
-        Long idOfOrg = null;
-        Long idOfContragent = null;
-        Long idOfContract = null;
-        String region = null;
-        String email = null;
-
         Session session = entityManager.unwrap(Session.class);
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
-        DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
-        DateFormat safeDateFormat = dateFormat.get();
-
-        for (ReportParameter parameter : parameters) {
-            if (parameter.getParameterName().equals("startDate")) {
-                startDate = safeDateFormat.parse(parameter.getParameterValue());
-                startDate = CalendarUtils.truncateToDayOfMonth(startDate);
-            }
-            if (parameter.getParameterName().equals("endDate")) {
-                endDate = safeDateFormat.parse(parameter.getParameterValue());
-                endDate = CalendarUtils.endOfDay(endDate);
-            }
-            if (parameter.getParameterName().equals("idOfOrg")) {
-                idOfOrg = Long.parseLong(parameter.getParameterValue());
-            }
-            if (parameter.getParameterName().equals("idOfContragent")) {
-                idOfContragent = Long.parseLong(parameter.getParameterValue());
-            }
-            if (parameter.getParameterName().equals("idOfContract")) {
-                idOfContract = Long.parseLong(parameter.getParameterValue());
-            }
-            if (parameter.getParameterName().equals("region")) {
-                region = parameter.getParameterValue();
-            }
-            if (parameter.getParameterName().equals("email")) {
-                email = parameter.getParameterValue();
-            }
-        }
-        if (idOfOrg == null || startDate == null || endDate == null) {
+        DeliveredServicesReportParameters reportParameters = new DeliveredServicesReportParameters(
+                parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
-        builder.setOrg(idOfOrg);
-
-        Calendar localCalendar = new GregorianCalendar();
-
-        BasicJasperReport deliveredServicesReport = null;
-        try {
-            deliveredServicesReport = builder.build(session, startDate, endDate, localCalendar, idOfOrg,
-                idOfContragent, idOfContract, region, false);
-        } catch (EntityNotFoundException e) {
-            logger.error("Not found organization to generate report");
-            return null;  //не найдена организация
-        }
-        if (deliveredServicesReport == null) {
+        BasicJasperReport jasperReport = buildDelivererdServicesReport(session,reportParameters);
+        if (jasperReport == null
+                || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
-        if (deliveredServicesReport.getPrint().getPages() != null && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0) {
-            return null;
-        }
-
-        ByteArrayOutputStream stream = exportReportToJRXls(deliveredServicesReport);
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
         byte[] arr = stream.toByteArray();
-
-        postReportToEmails(subject, startDate, endDate, email, arr);
+        postReportToEmails(subject, reportParameters, arr);
         return arr;
     }
 
     public byte[] getDeliveredServicesElectronicCollationReport(List<ReportParameter> parameters, String subject) throws Exception {
         Session session = entityManager.unwrap(Session.class);
-
         DeliveredServicesReportParameters reportParameters = new DeliveredServicesReportParameters(
-                parameters).invoke();
-
+                parameters).parse();
         if (!reportParameters.checkRequiredParameters()) {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
-
-        BasicJasperReport deliveredServicesReport = buildDeliveredServicesElectronicCollationReport(session,
+        BasicJasperReport jasperReport = buildDeliveredServicesElectronicCollationReport(session,
                 reportParameters);
-
-        if (deliveredServicesReport == null) {
+        if (jasperReport == null
+                || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
-        if (deliveredServicesReport.getPrint().getPages() != null
-                && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0) {
-            return null;
-        }
-
-        ByteArrayOutputStream stream = exportReportToJRXls(deliveredServicesReport);
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
         byte[] arr = stream.toByteArray();
-        postReportToEmails(subject,reportParameters.getStartDate(),reportParameters.getEndDate(),reportParameters.getEmail(), arr);
+        postReportToEmails(subject,reportParameters, arr);
         return arr;
     }
 
-    private void postReportToEmails(String subject, Date startDate, Date endDate, String email, byte[] arr) {
+    private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
+        return deliveredServicesReport.getPrint().getPages() != null
+                && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
+    }
+
+    private void postReportToEmails(String subject, DeliveredServicesReportParameters reportParameters, byte[] arr) {
+        String email = reportParameters.getEmail();
         if (email != null && !email.isEmpty()) {
             String[] emails = email.split(";");
             DateFormat df = dateFormatLetter.get();
             for (String em : emails) {
-                postReport(em, subject + String.format(" (%s - %s)", df.format(startDate), df.format(endDate)), arr);
+                postReport(em, subject + String.format(" (%s - %s)", df.format(reportParameters.getStartDate()), df.format(reportParameters.getEndDate())), arr);
             }
         }
     }
 
-    private BasicJasperReport buildDeliveredServicesElectronicCollationReport(Session session, DeliveredServicesReportParameters reportParameters) {
+    private BasicJasperReport buildDelivererdServicesReport(Session session,DeliveredServicesReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
+        DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
+        builder.setOrg(reportParameters.getIdOfOrg());
+        try {
+            BasicJasperReport deliveredServicesReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar(),
+                            reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
+                            reportParameters.getRegion(), false);
+            return deliveredServicesReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;  //не найдена организация
+        }
+    }
+
+    private BasicJasperReport buildDeliveredServicesElectronicCollationReport(Session session, DeliveredServicesReportParameters reportParameters)
+            throws Exception {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class.getSimpleName() + ".jasper";
         DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(
                 templateFilename);
         builder.setOrg(reportParameters.getIdOfOrg());
-        Calendar localCalendar = new GregorianCalendar();
-        BasicJasperReport deliveredServicesReport = null;
         try {
-            deliveredServicesReport = builder
-                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), localCalendar,
-                            reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
+            BasicJasperReport deliveredServicesReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar(), reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
                             reportParameters.getRegion(), false);
             return deliveredServicesReport;
-        } catch (Exception e) {
-            logger.error("Error in generate report", e);
-            return null;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;  //не найдена организация
         }
     }
 
@@ -287,7 +252,6 @@ public class ReportRepository extends BaseJpaDao {
     }
 
     private class DeliveredServicesReportParameters {
-
         private List<ReportParameter> parameters;
         private Date startDate;
         private Date endDate;
@@ -329,7 +293,7 @@ public class ReportRepository extends BaseJpaDao {
             return email;
         }
 
-        public DeliveredServicesReportParameters invoke() throws ParseException {
+        public DeliveredServicesReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
             idOfOrg = null;
