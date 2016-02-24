@@ -9,25 +9,25 @@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <f:view>
     <h:outputText value="Ид.;" escape="false"/>
     <h:outputText value="Номер;" escape="false"/>
-    <h:outputText value="Наименование;" escape="false"/>
-    <h:outputText value="После. синхр. бал.;" escape="false"/>
+    <%--<h:outputText value="Наименование;" escape="false"/>
+    <h:outputText value="После. синхр. бал.;" escape="false"/>--%>
     <h:outputText value="Дети;" escape="false"/>
     <h:outputText value="Родители;" escape="false"/>
     <h:outputText value="Сотруд. и др.;" escape="false"/>
     <h:outputText value="Без карт;" escape="false"/>
     <h:outputText value="Событий проходов;" escape="false"/>
-    <h:outputText value="Первый проход;" escape="false" />
+    <%--<h:outputText value="Первый проход;" escape="false" />--%>
     <h:outputText value="%У;" escape="false"/>
     <h:outputText value="%С;" escape="false"/>
     <h:outputText value="Льготных заказов;" escape="false"/>
-    <h:outputText value="Первая транз. льготн. питания;" escape="false" />
+    <%--<h:outputText value="Первая транз. льготн. питания;" escape="false" />
     <h:outputText value="%У;" escape="false"/>
-    <h:outputText value="%С;" escape="false"/>
+    <h:outputText value="%С;" escape="false"/>--%>
     <h:outputText value="Платных заказов;" escape="false"/>
-    <h:outputText value="Первая транз. платн. питания;" escape="false" />
+    <%--<h:outputText value="Первая транз. платн. питания;" escape="false" />
     <h:outputText value="%У;" escape="false"/>
     <h:outputText value="%С;" escape="false"/>
-    <h:outputText value="Продажи вендинг;" escape="false"/>
+    <h:outputText value="Продажи вендинг;" escape="false"/>--%>
     <h:outputText value="Район;" escape="false"/>
     <h:outputText value="Локация;" escape="false"/>
     <h:outputText value="Тэги;" escape="false"/>
@@ -35,14 +35,14 @@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
     <a4j:repeat value="#{dashboardPage.orgBasicStats.orgBasicStatItems}" var="item">
         <h:outputText value="#{item.idOfOrg};" escape="false"/>
         <h:outputText value="#{item.orgNameNumber};" escape="false"/>
-        <h:outputText value="#{item.orgName};" escape="false"/>
-        <h:outputText value="#{item.lastSuccessfulBalanceSyncTime};" escape="false"/>
+        <%--<h:outputText value="#{item.orgName};" escape="false"/>
+        <h:outputText value="#{item.lastSuccessfulBalanceSyncTime};" escape="false"/>--%>
         <h:outputText value="#{item.numberOfChildrenClients};" escape="false"/>
         <h:outputText value="#{item.numberOfParentsClients};" escape="false"/>
         <h:outputText value="#{item.numberOfNonStudentClients};" escape="false"/>
         <h:outputText value="#{item.numberOfClientsWithoutCard};" escape="false"/>
         <h:outputText value="#{item.numberOfEnterEvents};" escape="false"/>
-        <h:outputText value="#{item.lastEnterEvent};" escape="false"/>
+        <%--<h:outputText value="#{item.lastEnterEvent};" escape="false"/>--%>
         <h:outputText value="#{item.numberOfStudentsWithEnterEventsPercent};" escape="false">
             <f:convertNumber type="percent"/>
         </h:outputText>
@@ -50,22 +50,22 @@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
             <f:convertNumber type="percent"/>
         </h:outputText>
         <h:outputText value="#{item.numberOfDiscountOrders};" escape="false"/>
-        <h:outputText value="#{item.firstDiscountOrderDate};" escape="false"/>
+        <%--<h:outputText value="#{item.firstDiscountOrderDate};" escape="false"/>
         <h:outputText value="#{item.numberOfStudentsWithDiscountOrdersPercent};" escape="false">
             <f:convertNumber type="percent"/>
         </h:outputText>
         <h:outputText value="#{item.numberOfEmployeesWithDiscountOrdersPercent};" escape="false">
             <f:convertNumber type="percent"/>
-        </h:outputText>
+        </h:outputText>--%>
         <h:outputText value="#{item.numberOfPayOrders};" escape="false"/>
-        <h:outputText value="#{item.firstPayOrderDate};" escape="false"/>
+        <%--<h:outputText value="#{item.firstPayOrderDate};" escape="false"/>
         <h:outputText value="#{item.numberOfStudentsWithPayedOrdersPercent};" escape="false">
             <f:convertNumber type="percent"/>
         </h:outputText>
         <h:outputText value="#{item.numberOfEmployeesWithPayedOrdersPercent};" escape="false">
             <f:convertNumber type="percent"/>
         </h:outputText>
-        <h:outputText value="#{item.numberOfVendingOrders};" escape="false"/>
+        <h:outputText value="#{item.numberOfVendingOrders};" escape="false"/>--%>
         <h:outputText value="#{item.orgDistrict};" escape="false"/>
         <h:outputText value="#{item.orgLocation};" escape="false"/>
         <h:outputText value="#{item.orgTag};" escape="false"/>

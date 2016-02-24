@@ -83,25 +83,25 @@ public class DashboardResponse {
         String orgTag;
         String orgDistrict;
         String orgLocation;
-        Date lastSuccessfulBalanceSyncTime;
+        //Date lastSuccessfulBalanceSyncTime;
         long numberOfEnterEvents;
-        private Date lastEnterEvent;
+        //private Date lastEnterEvent;
         long numberOfDiscountOrders;
-        private Date firstDiscountOrderDate;
+        //private Date firstDiscountOrderDate;
         long numberOfPayOrders;
-        private Date firstPayOrderDate;
+        //private Date firstPayOrderDate;
         //long numberOfStudentClients;
         long numberOfChildrenClients;
         long numberOfParentsClients;
         long numberOfNonStudentClients;
         double numberOfStudentsWithEnterEventsPercent;
         double numberOfEmployeesWithEnterEventsPercent;
-        double numberOfStudentsWithDiscountOrdersPercent;
-        double numberOfEmployeesWithDiscountOrdersPercent;
-        double numberOfStudentsWithPayedOrdersPercent;
-        double numberOfEmployeesWithPayedOrdersPercent;
+        //double numberOfStudentsWithDiscountOrdersPercent;
+        //double numberOfEmployeesWithDiscountOrdersPercent;
+        //double numberOfStudentsWithPayedOrdersPercent;
+        //double numberOfEmployeesWithPayedOrdersPercent;
         private Long numberOfClientsWithoutCard;
-        Long numberOfVendingOrders;
+        //Long numberOfVendingOrders;
 
         public long getIdOfOrg() {
             return idOfOrg;
@@ -135,13 +135,13 @@ public class DashboardResponse {
             this.orgNameNumber = orgNameNumber;
         }
 
-        public Date getLastSuccessfulBalanceSyncTime() {
+        /*public Date getLastSuccessfulBalanceSyncTime() {
             return lastSuccessfulBalanceSyncTime;
         }
 
         public void setLastSuccessfulBalanceSyncTime(Date lastSuccessfulBalanceSyncTime) {
             this.lastSuccessfulBalanceSyncTime = lastSuccessfulBalanceSyncTime;
-        }
+        }*/
 
         public long getNumberOfEnterEvents() {
             return numberOfEnterEvents;
@@ -151,13 +151,13 @@ public class DashboardResponse {
             this.numberOfEnterEvents = numberOfEnterEvents;
         }
 
-        public Date getLastEnterEvent() {
+        /*public Date getLastEnterEvent() {
             return lastEnterEvent;
         }
 
         public void setLastEnterEvent(Date lastEnterEvent) {
             this.lastEnterEvent = lastEnterEvent;
-        }
+        }*/
 
         public long getNumberOfDiscountOrders() {
             return numberOfDiscountOrders;
@@ -167,13 +167,13 @@ public class DashboardResponse {
             this.numberOfDiscountOrders = numberOfDiscountOrders;
         }
 
-        public Date getFirstDiscountOrderDate() {
+        /*public Date getFirstDiscountOrderDate() {
             return firstDiscountOrderDate;
         }
 
         public void setFirstDiscountOrderDate(Date firstDiscountOrderDate) {
             this.firstDiscountOrderDate = firstDiscountOrderDate;
-        }
+        }*/
 
         public long getNumberOfPayOrders() {
             return numberOfPayOrders;
@@ -183,13 +183,13 @@ public class DashboardResponse {
             this.numberOfPayOrders = numberOfPayOrders;
         }
 
-        public Date getFirstPayOrderDate() {
+        /*public Date getFirstPayOrderDate() {
             return firstPayOrderDate;
         }
 
         public void setFirstPayOrderDate(Date firstPayOrderDate) {
             this.firstPayOrderDate = firstPayOrderDate;
-        }
+        }*/
 
         //public long getNumberOfStudentClients() {
         //    return numberOfStudentClients;
@@ -264,7 +264,7 @@ public class DashboardResponse {
             this.numberOfEmployeesWithEnterEventsPercent = numberOfEmployeesWithEnterEventsPercent;
         }
 
-        public double getNumberOfStudentsWithPayedOrdersPercent() {
+        /*public double getNumberOfStudentsWithPayedOrdersPercent() {
             return numberOfStudentsWithPayedOrdersPercent;
         }
 
@@ -278,9 +278,9 @@ public class DashboardResponse {
 
         public void setNumberOfEmployeesWithPayedOrdersPercent(double numberOfEmployeesWithPayedOrdersPercent) {
             this.numberOfEmployeesWithPayedOrdersPercent = numberOfEmployeesWithPayedOrdersPercent;
-        }
+        }*/
 
-        public double getNumberOfStudentsWithDiscountOrdersPercent() {
+        /*public double getNumberOfStudentsWithDiscountOrdersPercent() {
             return numberOfStudentsWithDiscountOrdersPercent;
         }
 
@@ -294,15 +294,15 @@ public class DashboardResponse {
 
         public void setNumberOfEmployeesWithDiscountOrdersPercent(double numberOfEmployeesWithDiscountOrdersPercent) {
             this.numberOfEmployeesWithDiscountOrdersPercent = numberOfEmployeesWithDiscountOrdersPercent;
-        }
+        }*/
 
-        public Long getNumberOfVendingOrders() {
+        /*public Long getNumberOfVendingOrders() {
             return numberOfVendingOrders;
         }
 
         public void setNumberOfVendingOrders(Long numberOfVendingOrders) {
             this.numberOfVendingOrders = numberOfVendingOrders;
-        }
+        }*/
     }
 
     public static class OrgBasicStats {

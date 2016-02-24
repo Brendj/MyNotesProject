@@ -220,7 +220,7 @@ public class DashboardServiceBean {
                 statItem.setOrgLocation((String) result[n++]);
                 statItem.setOrgTag((String) result[n++]);
                 statItem.setOrgNameNumber(Org.extractOrgNumberFromName(statItem.getOrgName()));
-                statItem.setLastSuccessfulBalanceSyncTime((Date) result[n++]);
+                //statItem.setLastSuccessfulBalanceSyncTime((Date) result[n++]);
             }
             ////
             queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup <:studentsMaxValue GROUP BY cl.org.idOfOrg";
@@ -296,7 +296,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfClientsWithoutCard(Long.parseLong("" + result[1]));
             }
             ////
-            queryText = "SELECT eev.org.idOfOrg, count(distinct eev.client.idOfClient), min(eev.evtDateTime) FROM EnterEvent eev WHERE  (eev.idOfCard!=null or eev.idOfTempCard!=null) and eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
+            queryText = "SELECT eev.org.idOfOrg, count(distinct eev.client.idOfClient), min(eev.evtDateTime) FROM EnterEvent eev WHERE  (eev.idOfCard is not null or eev.idOfTempCard is not null) and eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -309,10 +309,11 @@ public class DashboardServiceBean {
                     continue;
                 }
                 statItem.setNumberOfEnterEvents((Long) result[1]);
-                statItem.setLastEnterEvent((Date) result[2]);
+                //statItem.setLastEnterEvent((Date) result[2]);
             }
             //// Дата первой транзакции платного питания, Дата первой транзакции льготного питания.
-            queryText = "SELECT org.idOfOrg, min(case when o.socDiscount = 0 then a.transactionTime else null end), "
+            //Это самый медленный запрос в отчете
+            /*queryText = "SELECT org.idOfOrg, min(case when o.socDiscount = 0 then a.transactionTime else null end), "
                     + " min(case when o.socDiscount > 0 then a.transactionTime else null end) \n"
                     + " FROM AccountTransaction a join a.ordersInternal o join o.org org \n"
                     + "WHERE a.transactionTime BETWEEN :dayStart AND :dayEnd GROUP BY org.idOfOrg";
@@ -329,7 +330,7 @@ public class DashboardServiceBean {
                 }
                 statItem.setFirstPayOrderDate((Date) result[1]);
                 statItem.setFirstDiscountOrderDate((Date) result[2]);
-            }
+            }*/
             ////
             queryText = "SELECT ord.org.idOfOrg, count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.socDiscount > 0 AND ord.createTime BETWEEN :dayStart AND :dayEnd GROUP BY ord.org.idOfOrg";
             query = entityManager.createQuery(queryText);
@@ -361,7 +362,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfPayOrders((Long) result[1]);
             }
             ////
-            queryText = " select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders "
+            /*queryText = " select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders "
                     + " left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + " where lower(cf_orderdetails.menugroup)=:groupName and cf_orders.state=0 and cf_orderdetails.state=0 "
                     + " AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
@@ -385,7 +386,7 @@ public class DashboardServiceBean {
                 {
                     statItem.setNumberOfVendingOrders(0L);
                 }
-            }
+            }*/
 
 
 
@@ -588,10 +589,10 @@ public class DashboardServiceBean {
                 }
                 statItem.setNumberOfStudentsWithEnterEventsPercent(beautifyPercent (per1));
                 statItem.setNumberOfEmployeesWithEnterEventsPercent(beautifyPercent (per2));
-                statItem.setNumberOfStudentsWithPayedOrdersPercent(beautifyPercent (per3));
-                statItem.setNumberOfEmployeesWithPayedOrdersPercent(beautifyPercent (per4));
-                statItem.setNumberOfStudentsWithDiscountOrdersPercent(beautifyPercent (per5));
-                statItem.setNumberOfEmployeesWithDiscountOrdersPercent(beautifyPercent (per6));
+                //statItem.setNumberOfStudentsWithPayedOrdersPercent(beautifyPercent (per3));
+                //statItem.setNumberOfEmployeesWithPayedOrdersPercent(beautifyPercent (per4));
+                //statItem.setNumberOfStudentsWithDiscountOrdersPercent(beautifyPercent (per5));
+                //statItem.setNumberOfEmployeesWithDiscountOrdersPercent(beautifyPercent (per6));
             }
             ////
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {

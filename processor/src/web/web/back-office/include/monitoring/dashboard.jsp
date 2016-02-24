@@ -59,7 +59,8 @@
                      </f:facet>
                      <h:outputText value="#{item.orgNameNumber}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgNameNumber}"  width="200px" filterBy="#{item.orgNameNumber}" filterEvent="onkeyup">
+
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgNameNumber}"  width="200px" filterBy="#{item.orgNameNumber}" filterEvent="onkeyup">
                      <f:facet name="header">
                          <h:outputText value="Наименование" styleClass="output-text" escape="true"/>
                      </f:facet>
@@ -70,7 +71,8 @@
                          <h:outputText value="После. синхр. бал." styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.lastSuccessfulBalanceSyncTime}" converter="timeMinuteConverter"/>
-                 </rich:column>
+                 </rich:column> --%>
+
                  <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfStudentClients}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Учащихся" styleClass="output-text" escape="true"/>
@@ -107,12 +109,12 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfEnterEvents}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.lastEnterEvent}" width="120px">
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.lastEnterEvent}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Первый проход" styleClass="output-text" escape="true" />
                      </f:facet>
                      <h:outputText value="#{item.lastEnterEvent}" converter="timeMinuteConverter" escape="true" />
-                 </rich:column>
+                 </rich:column>--%>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfEnterEvents}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
@@ -131,15 +133,15 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfDiscountOrders}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstDiscountOrderDate}"
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstDiscountOrderDate}"
                               width="210px">
                      <f:facet name="header">
                          <h:outputText value="Первая транз. льготн. питания" styleClass="output-text" escape="true" />
                      </f:facet>
                      <h:outputText value="#{item.firstDiscountOrderDate}" converter="timeMinuteConverter"
                                    escape="true" />
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="70px">
+                 </rich:column>--%>
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
                      </f:facet>
@@ -150,21 +152,21 @@
                          <h:outputText value="%С" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfEmployeesWithDiscountOrdersPercent}"><f:convertNumber type="percent"/></h:outputText>
-                 </rich:column>
+                 </rich:column>--%>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfPayOrders}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstPayOrderDate}"
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstPayOrderDate}"
                               width="210px">
                      <f:facet name="header">
                          <h:outputText value="Первая транз. платн. питания" styleClass="output-text" escape="true" />
                      </f:facet>
                      <h:outputText value="#{item.firstPayOrderDate}" converter="timeMinuteConverter" escape="true" />
-                 </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
+                 </rich:column>--%>
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
                      </f:facet>
@@ -184,7 +186,7 @@
                          <h:outputText value="Продажи вендинг" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfVendingOrders}"/>
-                 </rich:column>
+                 </rich:column>--%>
 
 
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgDistrict}" width="70px">
