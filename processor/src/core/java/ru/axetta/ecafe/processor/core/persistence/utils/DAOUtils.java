@@ -2060,7 +2060,7 @@ public class DAOUtils {
 
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
-        List<Org> orgs = findFriendlyOrgs(session, idOfOrg);
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(TaloonApproval.class);
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));

@@ -2348,6 +2348,10 @@ public class Processor implements SyncProcessor,
                             .attachToValues("amountPrice", Long.toString(totalBuffetRSum/100) + ',' + Long.toString(totalBuffetRSum%100), values);
                     values = EventNotificationService
                             .attachToValues("amountLunch", Long.toString(totalLunchRSum/100) + ',' + Long.toString(totalLunchRSum%100), values);
+                    if (client.getBalance() != null) {
+                        values = EventNotificationService
+                            .attachToValues("balance", Long.toString(client.getBalance()/100) + ',' + Long.toString(Math.abs(client.getBalance())%100), values);
+                    }
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT,values, payment.getOrderDate());
 

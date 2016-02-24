@@ -204,6 +204,7 @@
                     <h:outputText value="[contractId] - дата оповещения" styleClass="output-text" />
                     <h:outputText value="[others] - суммы оплаты не комплексного питания" styleClass="output-text" />
                     <h:outputText value="[complexes] - суммы оплаты комплексного питания" styleClass="output-text" />
+                    <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
