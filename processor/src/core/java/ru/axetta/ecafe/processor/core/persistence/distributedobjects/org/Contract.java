@@ -4,21 +4,21 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.org;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ContractDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
+import org.infinispan.atomic.AtomicHashMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -33,7 +33,6 @@ import java.util.*;
  */
 public class Contract extends ContractDistributedObject {
 
-    //private long idOfContract;
     private String contractNumber;
     private String performer;
     private String customer;
@@ -45,57 +44,99 @@ public class Contract extends ContractDistributedObject {
     private final Integer CONTRACT_ACTIVE = 1;
     private final Integer CONTRACT_INACTIVE = 0;
 
+    private static final AtomicHashMap<Long, HashMap<Long, List<Long>>> cashInludedOrgsForContracts = new AtomicHashMap<Long, HashMap<Long, List<Long>>>();
+
+
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
-
         projectionList.add(Projections.property("contractNumber"), "contractNumber");
         projectionList.add(Projections.property("performer"), "performer");
         projectionList.add(Projections.property("customer"), "customer");
         projectionList.add(Projections.property("dateOfConclusion"), "dateOfConclusion");
         projectionList.add(Projections.property("dateOfClosing"), "dateOfClosing");
         projectionList.add(Projections.property("contractState"), "contractState");
-
         criteria.setProjection(projectionList);
     }
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
+        List resultContracts = loadProcessedContracts(session, idOfOrg, currentMaxVersion, currentLastGuid,
+                currentLimit);
+        updateCashInludedOrgsForContracts(resultContracts, session, idOfOrg);
+        return resultContracts;
+    }
+
+    private List loadProcessedContracts(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
+            Integer currentLimit) {
         Criteria criteria = session.createCriteria(Contract.class);
         buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         createProjections(criteria);
-        //Criterion crByOwner = Restrictions.eq("orgOwner", idOfOrg);
-        //Добавим в возвращаемый список контракты, созданные на процессинге
-        Query query = session.createQuery("select o.contract.globalId from Org o where o.idOfOrg = :id");
-        query.setParameter("id", idOfOrg);
-        List<Long> list = query.list();
-        //Criterion crByIds = Restrictions.in("globalId", list);
 
-        //и добавим контракты из истории (удаленные контракты или исключенные из контракта организации)
-        Query queryHistory = session.createQuery("select h.contract.globalId from ContractOrgHistory h where h.org.idOfOrg = :id and h.lastVersionOfContract > :version");
-        queryHistory.setParameter("id", idOfOrg);
-        queryHistory.setParameter("version", currentMaxVersion);
-        List<Long> listHistory = queryHistory.list();
-        //Criterion crByHistory = Restrictions.in("globalId", listHistory);
-
-        //criteria.add(Restrictions.or(crByOwner, crByIds));
+        List<Long> allFriendlyOrgs = getFriendlyOrgs(session, idOfOrg);
         Junction junction = Restrictions.disjunction();
-        junction.add(Restrictions.eq("orgOwner", idOfOrg));
-        if (!list.isEmpty()) {
-            junction.add(Restrictions.in("globalId", list));
+        List<Long> listContractsIds = loadCurrentContractIdsForOrgs(session, allFriendlyOrgs);
+        List<Long> listHistoryContractsIds = loadContractIdsFromHistoryForOrgs(session, currentMaxVersion,
+                allFriendlyOrgs);
+        if (!listContractsIds.isEmpty()) {
+            junction.add(Restrictions.in("globalId", listContractsIds));
         }
-        if (!listHistory.isEmpty()) {
-            junction.add(Restrictions.in("globalId", listHistory));
+        if (!listHistoryContractsIds.isEmpty()) {
+            junction.add(Restrictions.in("globalId", listHistoryContractsIds));
         }
         criteria.add(junction);
-
         criteria.setCacheable(false);
         criteria.setReadOnly(true);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
-
         return criteria.list();
+    }
+
+    private List<Long> loadCurrentContractIdsForOrgs(Session session, List<Long> allFriendlyOrgs) {
+        //Добавим в возвращаемый список контракты, созданные на процессинге
+        Query queryContractsIds = session.createQuery("select distinct o.contract.globalId from Org o where o.idOfOrg in (:orgs)");
+        queryContractsIds.setParameterList("orgs", allFriendlyOrgs);
+        return queryContractsIds.list();
+    }
+
+    private List<Long> loadContractIdsFromHistoryForOrgs(Session session, Long currentMaxVersion,
+            List<Long> allFriendlyOrgs) {
+        //и добавим контракты из истории (удаленные контракты или исключенные из контракта организации)
+        Query queryHistoryContractsIds = session.createQuery(
+                "select distinct h.contract.globalId from ContractOrgHistory h where h.org.idOfOrg in (:orgs) and h.lastVersionOfContract > :version");
+        queryHistoryContractsIds.setParameterList("orgs", allFriendlyOrgs);
+        queryHistoryContractsIds.setParameter("version", currentMaxVersion);
+        return queryHistoryContractsIds.list();
+    }
+
+    private void updateCashInludedOrgsForContracts(List resultContracts, Session session, Long currentOrg) {
+        if (cashInludedOrgsForContracts.containsKey(currentOrg)) {
+            cashInludedOrgsForContracts.get(currentOrg).clear();
+        } else {
+            cashInludedOrgsForContracts.put(currentOrg, new HashMap<Long, List<Long>>());
+        }
+        if (resultContracts == null)
+            return;
+        List<Contract> contracts = (List<Contract>) resultContracts;
+        for (Contract contract : contracts) {
+            List<Long> includedOrgsInContract = loadIncludedOrgsInContract(session, contract);
+            cashInludedOrgsForContracts.get(currentOrg).put(contract.getIdOfContract(), includedOrgsInContract);
+        }
+    }
+
+    private List<Long> getFriendlyOrgs(Session session, Long idOfOrg) {
+        ArrayList<Long> result = new ArrayList<Long>();
+        Query query = session.createQuery("select o.friendlyOrg from Org o where o.idOfOrg=:id");
+        query.setParameter("id", idOfOrg);
+        List<Org> list = query.list();
+        for (Org org : list) {
+            result.add(org.getIdOfOrg());
+        }
+        if (!result.contains(idOfOrg)) {
+            result.add(idOfOrg);
+        }
+        return result;
     }
 
     @Override
@@ -118,13 +159,39 @@ public class Contract extends ContractDistributedObject {
         }
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", owner);
         XMLUtils.setAttributeIfNotNull(element, "State", state);
+
+        XMLUtils.setAttributeIfNotNull(element, "IncludedOrgs", StringUtils.join(loadFromCashIncludedOrgsInContract(), ","));
+        /*
         if (!element.hasAttribute("D")) {
             //проверяем, не пришел ли этот контракт из истории контрактов (из истории - это когда организация исключена из контракта, но сам контракт остался)
             //проверка такая: поле idofcontract у организации не равен ид. текущего контракта. Достаточно?
-            if ((org.getContract() == null) || DAOService.getInstance().isContractFromHistory(getIdOfSyncOrg(), getGlobalId())) {
+            if ((org.getContract() == null) || DAOService.getInstance()
+                    .isContractFromHistory(getIdOfSyncOrg(), getGlobalId())) {
                 element.setAttribute("D", "1");
             }
         }
+        */
+    }
+
+    private List<Long> loadFromCashIncludedOrgsInContract() {
+        if (!cashInludedOrgsForContracts.containsKey(getIdOfSyncOrg()))
+            return Collections.emptyList();
+        HashMap<Long, List<Long>> contractsWithOrgs = cashInludedOrgsForContracts.get(getIdOfSyncOrg());
+        if (contractsWithOrgs == null) {
+            return Collections.emptyList();
+        }
+        for (Long idOfContract : contractsWithOrgs.keySet()) {
+            if (idOfContract == this.getIdOfContract()) {
+                return contractsWithOrgs.get(idOfContract);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private List<Long> loadIncludedOrgsInContract(Session session, Contract contract) {
+        Query query = session.createQuery("select o.idOfOrg from Org o where o.contract.globalId=:id");
+        query.setParameter("id", contract.globalId);
+        return query.list();
     }
 
     @Override
@@ -169,7 +236,7 @@ public class Contract extends ContractDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
-        setContractState(((Contract)distributedObject).getContractState());
+        setContractState(((Contract) distributedObject).getContractState());
         setDateOfClosing(((Contract) distributedObject).getDateOfClosing());
         setDateOfConclusion(((Contract) distributedObject).getDateOfConclusion());
         setCustomer(((Contract) distributedObject).getCustomer());
@@ -241,4 +308,6 @@ public class Contract extends ContractDistributedObject {
     public void setContragent(Contragent contragent) {
         this.contragent = contragent;
     }
+
+
 }
