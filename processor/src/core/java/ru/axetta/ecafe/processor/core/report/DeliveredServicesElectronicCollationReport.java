@@ -314,6 +314,54 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 item.setOrderType(orderType);
                 result.add(item);
             }
+
+            //Дополнительная инфа из таблицы cf_taloon_approval
+            String sqlTaloon = "SELECT cf_orgs.shortnameinfoservice, split_part(cft.taloonname, '/', 1) AS level1, "
+                    + "split_part(cft.taloonname, '/', 2) AS level2, "
+                    + "split_part(cft.taloonname, '/', 3) AS level3, "
+                    + "split_part(cft.taloonname, '/', 4) AS level4, sum(cft.qty) AS cnt, "
+                    + "cft.price AS price, sum(cft.qty) * cft.price AS sum, cf_orgs.address, "
+                    + "substring(cf_orgs.officialname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                    + "cf_orgs.idoforg, CASE WHEN cft.taloonname LIKE '%вода%' THEN 1 ELSE 0 END AS orderType "
+                    + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg WHERE cft.deletedstate = FALSE  AND "
+                    + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
+                    + "cft.taloondate BETWEEN :start AND :end"
+                    + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, address, cft.qty, level1, level2, level3, level4, price, address, cft.taloonname";
+            Query queryTaloon = session.createSQLQuery(sqlTaloon);
+            queryTaloon.setParameter("start", start.getTime());
+            queryTaloon.setParameter("end", end.getTime());
+
+            List resTaloon = queryTaloon.list();
+            for (Object entryTaloon : resTaloon) {
+                Object e[] = (Object[]) entryTaloon;
+                String officialname = (String) e[0];
+                String level1 = (String) e[1];
+                String level2 = (String) e[2];
+                String level3 = (String) e[3];
+                String level4 = (String) e[4];
+                int count = ((BigInteger) e[5]).intValue();
+                long price = ((BigInteger) e[6]).longValue();
+                long summary = ((BigInteger) e[7]).longValue();
+                String address = (String) e[8];
+                String orgNum = (e[9] == null ? "" : (String) e[9]);
+                long idoforg = ((BigInteger) e[10]).longValue();
+                Integer orderType = (Integer) e[11];
+                DeliveredServicesItem item = new DeliveredServicesItem();
+                item.setOfficialname(officialname);
+                item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
+                item.setLevel2(level2);
+                item.setLevel3(level3);
+                item.setLevel4(level4);
+                item.setCount(count);
+                item.setPrice(price);
+                item.setSummary(summary);
+                item.setOrgnum(orgNum);
+                item.setAddress(address);
+                item.setIdoforg(idoforg);
+                item.setOrderType(orderType);
+                result.add(item);
+            }
+
             return result;
         }
 
