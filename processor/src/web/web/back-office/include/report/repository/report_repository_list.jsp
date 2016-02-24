@@ -40,8 +40,6 @@ function checkReporitoryDate () {
                 </rich:comboBox>--%>
             </h:panelGrid>
             <h:panelGrid columns="2">
-                <h:outputText escape="true" value="Тэг" styleClass="output-text" />
-                <h:inputText value="#{reportRepositoryListPage.filter.tag}" styleClass="input-text" />
                 <h:outputText escape="true" value="Название отчета" styleClass="output-text" />
                 <h:inputText value="#{reportRepositoryListPage.filter.reportName}" styleClass="input-text" />
                 <h:outputText escape="true" value="Организации" styleClass="output-text" />
@@ -52,40 +50,6 @@ function checkReporitoryDate () {
                         <f:setPropertyActionListener value="#{reportRepositoryListPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                     </a4j:commandButton>
                     <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
-                </h:panelGroup>
-
-                <h:outputText escape="true" value="Платежный агент" styleClass="output-text" />
-                <h:panelGroup styleClass="borderless-div">
-                    <h:inputText value="#{reportRepositoryListPage.contragentPayerFilter.contragent.contragentName}" readonly="true"
-                                 styleClass="input-text" style="margin-right: 2px;" />
-                    <a4j:commandButton value="..." action="#{contragentPaymentReportPage.showContragentSelectPage(true)}"
-                                       reRender="modalContragentSelectorPanel"
-                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                                       styleClass="command-link" style="width: 25px;">
-                        <f:setPropertyActionListener value="#{false}"
-                                                     target="#{reportRepositoryListPage.selectReceiver}" />
-                        <f:setPropertyActionListener value="0"
-                                                     target="#{mainPage.multiContrFlag}" />
-                        <f:setPropertyActionListener value="1"
-                                                     target="#{mainPage.classTypes}" />
-                    </a4j:commandButton>
-                </h:panelGroup>
-
-                <h:outputText escape="true" value="Поставщик" styleClass="output-text" />
-                <h:panelGroup styleClass="borderless-div">
-                    <h:inputText value="#{reportRepositoryListPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
-                                 styleClass="input-text" style="margin-right: 2px;" />
-                    <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
-                                       reRender="modalContragentSelectorPanel"
-                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                                       styleClass="command-link" style="width: 25px;">
-                        <f:setPropertyActionListener value="#{true}"
-                                                     target="#{reportRepositoryListPage.selectReceiver}" />
-                        <f:setPropertyActionListener value="0"
-                                                     target="#{mainPage.multiContrFlag}" />
-                        <f:setPropertyActionListener value="2"
-                                                     target="#{mainPage.classTypes}" />
-                    </a4j:commandButton>
                 </h:panelGroup>
 
                 <h:outputText escape="true" value="Дата создания" styleClass="output-text" />

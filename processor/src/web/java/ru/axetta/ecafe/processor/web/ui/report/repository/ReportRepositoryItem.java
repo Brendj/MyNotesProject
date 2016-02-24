@@ -26,21 +26,19 @@ import java.util.*;
 
 public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     public static class Filter extends AbstractFilter {
-        String ruleName, reportName, orgNum, tag;
+        String ruleName, reportName, orgNum;
         Date createdDate, startDate, endDate;
         List<Long> idOfOrgList;
-        private Long idOfContragentReceiver;
-        private Long idOfContragentPayer;
         private static Logger logger = LoggerFactory.getLogger(Filter.class);
 
         @Override
         public boolean isEmpty() {
-            return (StringUtils.isEmpty(ruleName) && StringUtils.isEmpty(tag) && StringUtils.isEmpty(reportName)&& StringUtils.isEmpty(orgNum) && createdDate==null && startDate==null && endDate==null);
+            return (StringUtils.isEmpty(ruleName) && StringUtils.isEmpty(reportName)&& StringUtils.isEmpty(orgNum) && createdDate==null && startDate==null && endDate==null);
         }
 
         @Override
         public void clear() {
-            ruleName =  reportName = orgNum = tag = "";
+            ruleName =  reportName = orgNum = "";
             createdDate = startDate = endDate = null;
         }
 
@@ -58,7 +56,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
                 crit.add(Restrictions.in("idOfOrg", idOfOrgList));
             }
             if (!StringUtils.isEmpty(ruleName)) crit.add(Restrictions.like("ruleName", ruleName, MatchMode.ANYWHERE).ignoreCase());
-            if (!StringUtils.isEmpty(tag)) crit.add(Restrictions.like("tag", tag, MatchMode.ANYWHERE).ignoreCase());
             if (!StringUtils.isEmpty(reportName)) crit.add(Restrictions.like("reportName", reportName, MatchMode.ANYWHERE).ignoreCase());
             if (!StringUtils.isEmpty(orgNum)) crit.add(Restrictions.eq("orgNum", orgNum));
             if (createdDate!=null) crit.add(Restrictions.and(
@@ -67,12 +64,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
             if (startDate!=null) {
                 crit.add(Restrictions.ge("startDate", CalendarUtils.truncateToDayOfMonth(startDate)));
                 if (endDate==null) endDate = CalendarUtils.addOneDay(startDate);
-            }
-            if (idOfContragentReceiver != null) {
-                crit.add(Restrictions.eq(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, idOfContragentReceiver));
-            }
-            if (idOfContragentPayer != null) {
-                crit.add(Restrictions.eq(ContragentPaymentReport.PARAM_CONTRAGENT_PAYER_ID, idOfContragentPayer));
             }
             if (endDate!=null) {
                 Calendar localCalendar = Calendar.getInstance();
@@ -88,14 +79,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
 
         public void setRuleName(String ruleName) {
             this.ruleName = ruleName;
-        }
-
-        public String getTag() {
-            return tag;
-        }
-
-        public void setTag(String tag) {
-            this.tag = tag;
         }
 
         public String getReportName() {
@@ -145,22 +128,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         public void setIdOfOrgList(List<Long> idOfOrgList) {
             this.idOfOrgList = idOfOrgList;
         }
-
-        public Long getIdOfContragentReceiver() {
-            return idOfContragentReceiver;
-        }
-
-        public void setIdOfContragentReceiver(Long idOfContragentReceiver) {
-            this.idOfContragentReceiver = idOfContragentReceiver;
-        }
-
-        public Long getIdOfContragentPayer() {
-            return idOfContragentPayer;
-        }
-
-        public void setIdOfContragentPayer(Long idOfContragentPayer) {
-            this.idOfContragentPayer = idOfContragentPayer;
-        }
     }
 
 
@@ -175,8 +142,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private String reportFile;
     private String orgNum;
     private String idOfOrg;
-    private Long idOfContragentReceiver;
-    private Long idOfContragentPayer;
     private List<Long> idOfOrgList;
     private String createState;
     private String errorString;
@@ -196,8 +161,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         reportFile = StringUtils.trimToEmpty(entity.getReportFile());
         orgNum = entity.getOrgNum();
         idOfOrg = ((entity.getIdOfOrg() == null) || (entity.getIdOfOrg() == 0L)) ? "" : entity.getIdOfOrg().toString();
-        idOfContragentReceiver = entity.getIdOfContragentReceiver();
-        idOfContragentPayer = entity.getIdOfContragentPayer();
         createState = fillCreateState(entity.getCreateState());
         createStateStyle = fillCreateStateStyle(entity.getCreateState());
         errorString = entity.getErrorString();
@@ -269,14 +232,6 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
 
     public String getIdOfOrg() {
         return idOfOrg;
-    }
-
-    public Long getIdOfContragentReceiver() {
-        return idOfContragentReceiver;
-    }
-
-    public void setIdOfContragentReceiver(Long idOfContragentReceiver) {
-        this.idOfContragentReceiver = idOfContragentReceiver;
     }
 
     public String getCreateStateStyle() {

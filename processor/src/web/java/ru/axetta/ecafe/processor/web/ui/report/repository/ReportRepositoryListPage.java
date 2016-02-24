@@ -27,12 +27,9 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, ReportRepositoryItem> implements OrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
-    private boolean selectReceiver;
+public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, ReportRepositoryItem> implements OrgListSelectPage.CompleteHandlerList  {
     BasicWorkspacePage groupPage = new BasicWorkspacePage();
     ReportRepositoryItem.Filter filter = new ReportRepositoryItem.Filter();
-    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
-    private final CCAccountFilter contragentPayerFilter = new CCAccountFilter();
     
     File fileToDownload;
     private ReportRepositoryItem selectedItem;
@@ -78,22 +75,6 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
         return items;
     }
 
-    public boolean isSelectReceiver() {
-        return selectReceiver;
-    }
-
-    public void setSelectReceiver(boolean selectReceiver) {
-        this.selectReceiver = selectReceiver;
-    }
-
-    public CCAccountFilter getContragentPayerFilter() {
-        return contragentPayerFilter;
-    }
-
-    public CCAccountFilter getContragentReceiverFilter() {
-        return contragentReceiverFilter;
-    }
-    
     public Object downloadReportFile() {
         return "downloadReportFile";
     }
@@ -126,16 +107,6 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
 
     public String getOrgsFilter() {
         return orgsFilter;
-    }
-
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-        if (selectReceiver) {
-            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
-            filter.setIdOfContragentReceiver(idOfContragent);
-        } else {
-            contragentPayerFilter.completeContragentSelection(session, idOfContragent);
-            filter.setIdOfContragentPayer(idOfContragent);
-        }
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
