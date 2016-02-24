@@ -137,7 +137,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             String templateFilename =
                     autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class
                             .getSimpleName() + ".jasper";
-            DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
+            DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(templateFilename);
             if (idOfOrg != null) {
                 Org org = null;
                 if (idOfOrg > -1) {
@@ -148,7 +148,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
-            DeliveredServicesReport deliveredServicesReport = builder
+            DeliveredServicesElectronicCollationReport deliveredServicesElectronicCollationReport = builder
                     .build(session, startDate, endDate, localCalendar, idOfOrg,
                             contragentFilter.getContragent().getIdOfContragent(),
                             contractFilter.getContract().getIdOfContract(), region, otherRegions);
@@ -162,7 +162,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             response.setHeader("Content-disposition", "inline;filename=deliveredElectronicCollation.xls");
 
             JRXlsExporter xlsExport = new JRXlsExporter();
-            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesReport.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesElectronicCollationReport.getPrint());
             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
             xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
