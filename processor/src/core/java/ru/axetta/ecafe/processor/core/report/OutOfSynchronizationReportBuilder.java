@@ -99,7 +99,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "AND idoforg in (:idOfOrgList))) "
                         + "AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = nosynch.idoforg "
                         + "INNER JOIN cf_orgs cfor ON cfor.idoforg = nosynch.idoforg where cfor.state = 1 AND cfor.idoforg in (:idOfOrgList) "
-                        + "ORDER BY cfos.lastsucbalancesync DESC");
+                        + "ORDER BY cfos.lastsucbalancesync DESC NULLS LAST, cfor.statusdetailing DESC");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         List result = query.list();
