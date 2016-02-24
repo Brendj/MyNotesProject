@@ -174,7 +174,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private Date endDate;
     private String reportFile;
     private String orgNum;
-    private Long idOfOrg;
+    private String idOfOrg;
     private Long idOfContragentReceiver;
     private Long idOfContragentPayer;
     private List<Long> idOfOrgList;
@@ -195,7 +195,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         endDate = entity.getEndDate();
         reportFile = StringUtils.trimToEmpty(entity.getReportFile());
         orgNum = entity.getOrgNum();
-        idOfOrg = entity.getIdOfOrg();
+        idOfOrg = ((entity.getIdOfOrg() == null) || (entity.getIdOfOrg() == 0L)) ? "" : entity.getIdOfOrg().toString();
         idOfContragentReceiver = entity.getIdOfContragentReceiver();
         idOfContragentPayer = entity.getIdOfContragentPayer();
         createState = fillCreateState(entity.getCreateState());
@@ -267,7 +267,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         return orgNum;
     }
 
-    public Long getIdOfOrg() {
+    public String getIdOfOrg() {
         return idOfOrg;
     }
 

@@ -127,7 +127,7 @@ function checkReporitoryDate () {
         </rich:modalPanel>
     <rich:dataTable id="contractListTable" value="#{reportRepositoryListPage.itemList}" var="item" rows="50"
                     footerClass="data-table-footer"
-                    columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+                    columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Ид. организации" />
@@ -151,6 +151,12 @@ function checkReporitoryDate () {
                 <h:outputText escape="true" value="Номер организации" />
             </f:facet>
             <h:outputText escape="true" value="#{item.orgNum}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" styleClass="#{item.createStateStyle}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.createState}" styleClass="#{item.createStateStyle}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -196,13 +202,6 @@ function checkReporitoryDate () {
                              styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <f:setPropertyActionListener value="#{item}" target="#{reportRepositoryListPage.selectedItem}" />
             </a4j:commandLink>
-        </rich:column>
-
-        <rich:column headerClass="column-header" styleClass="#{item.createStateStyle}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Статус" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.createState}" styleClass="#{item.createStateStyle}" />
         </rich:column>
 
         <rich:column headerClass="column-header">
