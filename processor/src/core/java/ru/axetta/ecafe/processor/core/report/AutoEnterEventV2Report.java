@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
@@ -56,7 +58,18 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
             Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
-            parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
+
+            Set<Org> orgs = orgLoad.getFriendlyOrg();
+
+            for (Org orgM : orgs) {
+                if (orgM.isMainBuilding()) {
+                    parameterMap.put("shortNameInfoService", orgM.getShortNameInfoService());
+                    break;
+                } else {
+                    parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
+                }
+            }
+
             parameterMap.put("beginDate", CalendarUtils.dateShortToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToString(endTime));
 
