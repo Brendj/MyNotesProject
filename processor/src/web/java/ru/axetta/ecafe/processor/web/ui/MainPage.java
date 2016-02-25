@@ -236,6 +236,8 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage autorechargePage = new BasicWorkspacePage();
     private final BasicWorkspacePage benefitPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage nsiGroupContingentPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage nsiGroupOrgPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -5415,6 +5417,14 @@ public class MainPage implements Serializable {
         return nsiGroupPage;
     }
 
+    public BasicWorkspacePage getNsiGroupContingentPage() {
+        return nsiGroupContingentPage;
+    }
+
+    public BasicWorkspacePage getNsiGroupOrgPage() {
+        return nsiGroupOrgPage;
+    }
+
     public BasicWorkspacePage getUosGroupPage() {
         return uosGroupPage;
     }
@@ -5435,6 +5445,18 @@ public class MainPage implements Serializable {
 
     public Object showNSIGroupPage() {
         currentWorkspacePage = nsiGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showNSIGroupContingentPage() {
+        currentWorkspacePage = nsiGroupContingentPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showNSIGroupOrgPage() {
+        currentWorkspacePage = nsiGroupOrgPage;
         updateSelectedMainMenu();
         return null;
     }

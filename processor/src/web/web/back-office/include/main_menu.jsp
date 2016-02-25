@@ -728,22 +728,38 @@
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="nsiOrgCatalogFind" binding="#{orgCatalogFindPage.mainMenuComponent}"
-                            label="Поиск организаций" action="#{orgCatalogFindPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
-                            label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
-        <%--<rich:panelMenuItem id="nsiRegistrySync" binding="#{NSIRegistrySyncPage.mainMenuComponent}"
-                            label="Ручная синхронизация" action="#{NSIRegistrySyncPage.show}"
-                            reRender="workspaceForm" />--%>
-        <rich:panelMenuItem id="nsiOrgRegistrySync" binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}"
-                            label="Интерактивная сверка" action="#{NSIOrgRegistrySynchPage.show}"
-                            reRender="workspaceForm" />
-        <rich:panelMenuItem id="nsiOrgRegistrySyncOverview" binding="#{NSIOrgRegistrySynchOverviewPage.mainMenuComponent}"
-                            label="Статистика сверки" action="#{NSIOrgRegistrySynchOverviewPage.show}"
-                            reRender="workspaceForm" />
-        <rich:panelMenuItem id="nsiOrgsRegistrySync" binding="#{NSIOrgsRegistrySynchPage.mainMenuComponent}"
-                            label="Сверка организаций" action="#{NSIOrgsRegistrySynchPage.show}"
-                            reRender="workspaceForm" />
+        <rich:panelMenuGroup id="nsiGroupContingent" binding="#{mainPage.nsiGroupContingentPage.mainMenuComponent}" label="Сверка контингента"
+                             rendered="#{mainPage.eligibleToServiceAdmin}">
+            <a4j:support event="onclick" action="#{mainPage.showNSIGroupContingentPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
+                                label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="nsiOrgRegistrySync" binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}"
+                                label="Интерактивная сверка" action="#{NSIOrgRegistrySynchPage.show}"
+                                reRender="workspaceForm" />
+            <rich:panelMenuItem id="nsiOrgRegistrySyncOverview" binding="#{NSIOrgRegistrySynchOverviewPage.mainMenuComponent}"
+                                label="Статистика сверки" action="#{NSIOrgRegistrySynchOverviewPage.show}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuGroup id="nsiGroupOrg" binding="#{mainPage.nsiGroupOrgPage.mainMenuComponent}" label="Сверка организаций"
+                             rendered="#{mainPage.eligibleToServiceAdmin}">
+            <a4j:support event="onclick" action="#{mainPage.showNSIGroupOrgPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="nsiOrgCatalogFind" binding="#{orgCatalogFindPage.mainMenuComponent}"
+                                label="Поиск организаций" action="#{orgCatalogFindPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="nsiOrgsRegistrySync" binding="#{NSIOrgsRegistrySynchPage.mainMenuComponent}"
+                                label="Сверка организаций" action="#{NSIOrgsRegistrySynchPage.show}"
+                                reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="nsiOrgsRegistryStat" binding="#{NSIOrgsRegistryStatPage.mainMenuComponent}"
+                                label="Статистика сверки" action="#{NSIOrgsRegistryStatPage.show}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
