@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -87,7 +86,20 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         if(items == null) {
             return 0;
         }
-        return items.size();
+        //return items.size();
+        int count = 0;
+        for (WebItem i : items) {
+            if (i.getOperation() == OrgRegistryChange.DELETE_OPERATION) {
+                count++;
+                continue;
+            }
+            for (WebItem j : i.orgs) {
+                if (j.getOperation() != OrgRegistryChange.SIMILAR) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private int getCountOfOperation(int operation) {
@@ -95,9 +107,19 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return 0;
         }
         int count = 0;
-        for (WebItem i : items) {
-            if (!i.isApplied() && i.getOperation() == operation) {
-                count++;
+        if (operation == OrgRegistryChange.DELETE_OPERATION) {
+            for (WebItem i : items) {
+                if (!i.isApplied() && i.getOperation() == operation) {
+                    count++;
+                }
+            }
+        } else {
+            for (WebItem i : items) {
+                for (WebItem j : i.orgs) {
+                    if (!j.isApplied() && j.getOperation() == operation) {
+                        count++;
+                    }
+                }
             }
         }
         return count;

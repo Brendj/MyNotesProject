@@ -1979,9 +1979,9 @@ public class DAOService {
         return getOrgRegistryChanges(nameFilter,-1L,0L,false);
     }
 
-    public List<OrgRegistryChangeItem> getOrgRegistryChangeItemsByDate(long revisionDate) throws Exception {
-        String q = "from OrgRegistryChangeItem where createDate=:lastUpdate order by officialName";
-        TypedQuery<OrgRegistryChangeItem> query = entityManager.createQuery(q, OrgRegistryChangeItem.class);
+    public List<OrgRegistryChange> getOrgRegistryChangeByDate(long revisionDate) throws Exception {
+        String q = "from OrgRegistryChange where createDate=:lastUpdate order by officialName";
+        TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q, OrgRegistryChange.class);
         query.setParameter("lastUpdate", revisionDate);
         return query.getResultList();
     }

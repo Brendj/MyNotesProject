@@ -38,48 +38,71 @@ public class NSIRegistryStatReport {
 
     public void buildReport(Session session, Long selectedRevision) throws Exception {
         items.clear();
-        List<OrgRegistryChangeItem> dbItems = DAOService.getInstance().getOrgRegistryChangeItemsByDate(selectedRevision);
+        List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChangeByDate(selectedRevision);
         if (dbItems.size() == 0) {
             return;
         }
         Set<String> regions = new HashSet<String>();
         Map<String, Stat> stats = new TreeMap<String, Stat>();
-        for (OrgRegistryChangeItem item : dbItems) {
-            String district;
-            if (item.getIdOfOrg() == null) {
-                district = item.getRegion();
-            } else {
-                Org org = (Org)session.load(Org.class, item.getIdOfOrg());
-                district = org.getDistrict();
-            }
-            if (district != null && !district.isEmpty()) {
-                regions.add(district);
-            } else {
-                district = "=Регион не определен=";
-                regions.add(district);
-            }
-            Stat stat;
-            if (stats.containsKey(district)) {
-                stat = stats.get(district);
-            } else {
-                stat = new Stat(district, 0, 0, 0);
-            }
+        for (OrgRegistryChange item : dbItems) {
+            String district = "";
             Integer operationType = item.getOperationType();
-            switch (operationType) {
-                case OrgRegistryChange.CREATE_OPERATION :
-                    stat.setCreateOperation(stat.getCreateOperation() + 1);
-                    break;
-                case OrgRegistryChange.DELETE_OPERATION :
-                    stat.setRemoveOperation(stat.getRemoveOperation() + 1);
-                    break;
-                case OrgRegistryChange.MODIFY_OPERATION :
-                    stat.setChangeOperation(stat.getChangeOperation() + 1);
-                    break;
+            if (operationType == OrgRegistryChange.DELETE_OPERATION) {
+                if (item.getIdOfOrg() != null) {
+                    Org org = (Org)session.load(Org.class, item.getIdOfOrg());
+                    district = org.getDistrict();
+                }
+                if (district != null && !district.isEmpty()) {
+                    regions.add(district);
+                } else {
+                    district = "=Регион не определен=";
+                    regions.add(district);
+                }
+                Stat stat;
+                if (stats.containsKey(district)) {
+                    stat = stats.get(district);
+                } else {
+                    stat = new Stat(district, 0, 0, 0);
+                }
+                stat.setRemoveOperation(stat.getRemoveOperation() + 1);
+                stats.put(district, stat);
+                continue;
+            } else {
+                for (OrgRegistryChangeItem subitem : item.getOrgs()) {
+                    if (subitem.getIdOfOrg() == null) {
+                        district = subitem.getRegion();
+                    } else {
+                        //Org org = (Org)session.load(Org.class, subitem.getIdOfOrg());
+                        //district = org.getDistrict();
+                        district = subitem.getRegionFrom();
+                    }
+                    if (district != null && !district.isEmpty()) {
+                        regions.add(district);
+                    } else {
+                        district = "=Регион не определен=";
+                        regions.add(district);
+                    }
+                    Stat stat;
+                    if (stats.containsKey(district)) {
+                        stat = stats.get(district);
+                    } else {
+                        stat = new Stat(district, 0, 0, 0);
+                    }
+                    operationType = subitem.getOperationType();
+                    switch (operationType) {
+                        case OrgRegistryChange.CREATE_OPERATION :
+                            stat.setCreateOperation(stat.getCreateOperation() + 1);
+                            break;
+                        case OrgRegistryChange.MODIFY_OPERATION :
+                            stat.setChangeOperation(stat.getChangeOperation() + 1);
+                            break;
+                    }
+                    if (operationType != OrgRegistryChange.SIMILAR) {
+                        stat.setTotalOperation(stat.getTotalOperation() + 1);
+                    }
+                    stats.put(district, stat);
+                }
             }
-            if (operationType != OrgRegistryChange.SIMILAR) {
-                stat.setTotalOperation(stat.getTotalOperation() + 1);
-            }
-            stats.put(district, stat);
         }
         Integer tCreate = 0;
         Integer tRemove = 0;
