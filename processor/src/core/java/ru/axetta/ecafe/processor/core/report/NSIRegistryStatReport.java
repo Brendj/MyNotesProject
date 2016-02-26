@@ -47,6 +47,9 @@ public class NSIRegistryStatReport {
         for (OrgRegistryChange item : dbItems) {
             String district = "";
             Integer operationType = item.getOperationType();
+            if (operationType == OrgRegistryChange.SIMILAR) {
+                continue;
+            }
             if (operationType == OrgRegistryChange.DELETE_OPERATION) {
                 if (item.getIdOfOrg() != null) {
                     Org org = (Org)session.load(Org.class, item.getIdOfOrg());
@@ -55,7 +58,7 @@ public class NSIRegistryStatReport {
                 if (district != null && !district.isEmpty()) {
                     regions.add(district);
                 } else {
-                    district = "=Регион не определен=";
+                    district = ".Регион не определен";
                     regions.add(district);
                 }
                 Stat stat;
@@ -69,6 +72,9 @@ public class NSIRegistryStatReport {
                 continue;
             } else {
                 for (OrgRegistryChangeItem subitem : item.getOrgs()) {
+                    if (subitem.getOperationType() == OrgRegistryChange.SIMILAR) {
+                        continue;
+                    }
                     if (subitem.getIdOfOrg() == null) {
                         district = subitem.getRegion();
                     } else {
@@ -79,7 +85,7 @@ public class NSIRegistryStatReport {
                     if (district != null && !district.isEmpty()) {
                         regions.add(district);
                     } else {
-                        district = "=Регион не определен=";
+                        district = ".Регион не определен";
                         regions.add(district);
                     }
                     Stat stat;
@@ -97,9 +103,7 @@ public class NSIRegistryStatReport {
                             stat.setChangeOperation(stat.getChangeOperation() + 1);
                             break;
                     }
-                    if (operationType != OrgRegistryChange.SIMILAR) {
-                        stat.setTotalOperation(stat.getTotalOperation() + 1);
-                    }
+                    stat.setTotalOperation(stat.getTotalOperation() + 1);
                     stats.put(district, stat);
                 }
             }
