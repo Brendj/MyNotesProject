@@ -394,7 +394,7 @@ public class DashboardServiceBean {
             Map<Long, Integer> studentEnters = new HashMap<Long, Integer>();
             String sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
-                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    "LEFT JOIN cf_clients ON cf_enterevents.idofclient=cf_clients.idofclient "
                     +
                     "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
                     +
@@ -413,7 +413,7 @@ public class DashboardServiceBean {
             Map<Long, Integer> employeeEnters = new HashMap<Long, Integer>();
             sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
-                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    "LEFT JOIN cf_clients ON cf_enterevents.idofclient=cf_clients.idofclient "
                     +
                     "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
                     +
