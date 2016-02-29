@@ -48,7 +48,7 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Повторная отправка не доставленных СМС" action="#{otherActionsPage.runTest}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-    <a4j:commandButton value="Запустить пересчет позказателей СМС" action="#{otherActionsPage.runSmsDeliveryRecalculation}"
+    <a4j:commandButton value="Запустить пересчет показателей СМС" action="#{otherActionsPage.runSmsDeliveryRecalculation}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
 

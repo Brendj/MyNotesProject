@@ -5,13 +5,13 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
 import ru.axetta.ecafe.processor.core.report.SMSDeliveryReportItem;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,12 +48,28 @@ public class SmsDeliveryCalculationService {
     private EntityManager entityManager;
 
     public void run() {
+        if (!isOn()) {
+            return;
+        }
         RuntimeContext.getAppContext().getBean(SmsDeliveryCalculationService.class).doRun();
+    }
+
+    //автозапуск по расписанию только на той же ноде, где разрешен импорт платежей
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
+                reqInstance.trim())) {
+            return false;
+        }
+        return true;
     }
 
     @Transactional
     public void doRun() {
         Session session = null;
+        logger.info("Start sms delivery calculation");
         try {
             session = entityManager.unwrap(Session.class);
 
@@ -63,6 +82,7 @@ public class SmsDeliveryCalculationService {
 
             List<SMSDeliveryReportItem> items = SMSDeliveryReport.Builder.findSmsSyncItem(session, start, end, null);
             saveData(session, items, cal.getTime());
+            logger.info("End sms delivery calculation");
         } catch (Exception e) {
             logger.error("Failed to consolidate sms delivery info", e);
         }

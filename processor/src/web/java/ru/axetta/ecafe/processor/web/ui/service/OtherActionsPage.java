@@ -155,7 +155,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runSmsDeliveryRecalculation() throws Exception {
-        RuntimeContext.getAppContext().getBean(SmsDeliveryCalculationService.class).run(); //DEF
+        RuntimeContext.getAppContext().getBean(SmsDeliveryCalculationService.class).doRun(); //DEF
         printMessage("Пересчет показателей по СМС завершен");
     }
 
