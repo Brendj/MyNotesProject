@@ -36,3 +36,5 @@ ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (2
 ALTER TABLE cf_reportinfo ADD COLUMN createstate integer;
 --добавление поля описания ошибки при автоматической генерации и отправке отчета
 ALTER TABLE cf_reportinfo ADD COLUMN errorstring character varying (3000);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 290216) НЕ МЕНЯТЬ

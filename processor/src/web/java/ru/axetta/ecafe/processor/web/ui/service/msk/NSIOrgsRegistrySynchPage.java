@@ -317,14 +317,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     }
 
     protected void putDbItems(List<OrgRegistryChange> dbItem) {
-        if(dbItem == null || dbItem.size() < 1) {
-            items.clear();
-            return;
-        }
-        if(items != null) {
-            items.clear();
-        } else {
+        if (items == null) {
             items = new ArrayList<WebItem>();
+        }
+        items.clear();
+        if(dbItem == null || dbItem.size() < 1) {
+            return;
         }
         for(OrgRegistryChange i : dbItem) {
             WebItem wi = new WebItem(i);
