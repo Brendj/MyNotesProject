@@ -576,4 +576,13 @@ public class CalendarUtils {
         if (date.contains("Декабрь")) return date.replace("Декабрь", "Декабря");
         return date;
     }
+
+    public static Calendar setHoursAndMinutes(Calendar calendar, int hours, int minutes) {
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
+
 }

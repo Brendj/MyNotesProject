@@ -42,7 +42,13 @@ public class SmsDeliveryCalculationService {
                                                       "0_sumDelayMiddayTs",
                                                       "0_maxDelayNightTs",
                                                       "0_sumDelayNightTs",
-                                                      "0_lastSyncTs"};
+                                                      "0_lastSyncTs",
+                                                      "0_maxDelayMorningTs",
+                                                      "0_sumDelayMorningTs"};
+
+    public static final int SUM_MIDDAY = 1;
+    public static final int SUM_NIGHT = 3;
+    public static final int SUM_MORNING = 6;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -80,12 +86,23 @@ public class SmsDeliveryCalculationService {
             cal.setTimeInMillis(cal.getTimeInMillis() - DAY_MILLISECONDS);
             Date start = cal.getTime();
 
-            List<SMSDeliveryReportItem> items = SMSDeliveryReport.Builder.findSmsSyncItem(session, start, end, null);
-            saveData(session, items, cal.getTime());
+            //предыдущие сутки полностью
+            findSyncItemByDay(session, start, end);
+
+            //текущие сутки - от начала до настоящего момента
+            start = end;
+            cal.setTimeInMillis(start.getTime() + DAY_MILLISECONDS);
+            end = cal.getTime();
+            findSyncItemByDay(session, start, end);
             logger.info("End sms delivery calculation");
         } catch (Exception e) {
             logger.error("Failed to consolidate sms delivery info", e);
         }
+    }
+
+    private void findSyncItemByDay(Session session, Date begin, Date end) {
+        List<SMSDeliveryReportItem> items = SMSDeliveryReport.Builder.findSmsSyncItem(session, begin, end, null);
+        saveData(session, items, begin);
     }
 
     protected void saveData(Session session, List<SMSDeliveryReportItem> items, Date syncDate) {
@@ -115,7 +132,7 @@ public class SmsDeliveryCalculationService {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
         return calendar;
     }
 
@@ -134,5 +151,9 @@ public class SmsDeliveryCalculationService {
             return null;
         }
         return DATA_TYPES[id];
+    }
+
+    public static boolean isSumType(int type) {
+        return ((type == SUM_MORNING) || (type == SUM_MIDDAY) || (type == SUM_NIGHT));
     }
 }

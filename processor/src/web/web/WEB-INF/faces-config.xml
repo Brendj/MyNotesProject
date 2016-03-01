@@ -68,6 +68,12 @@
     </converter>
 
     <converter>
+        <description>Date to time converter</description>
+        <converter-id>dateConverterWithoutTZ</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateConverterWithoutTZ</converter-class>
+    </converter>
+
+    <converter>
         <description>Phone converter</description>
         <converter-id>phoneConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PhoneConverter</converter-class>

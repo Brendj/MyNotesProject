@@ -12,10 +12,13 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.IPrintWarn;import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
+import ru.axetta.ecafe.processor.core.service.SmsDeliveryCalculationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -31,6 +34,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
@@ -48,6 +54,18 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     public EntityManager entityManager;
     private final static Logger logger = LoggerFactory.getLogger(SmsDeliveryReportPage.class);
     private SMSDeliveryReport report;
+
+    public SmsDeliveryReportPage() throws RuntimeContext.NotInitializedException {
+        super();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        CalendarUtils.truncateToDayOfMonth(calendar);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        this.startDate = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MILLISECOND, -1);
+        this.endDate = calendar.getTime();
+    }
 
     public String getPageFilename() {
         return "report/online/sms_delivery_report";
@@ -97,11 +115,6 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
 
     protected void addOrgFilter(SMSDeliveryReport.Builder builder) {
         if (idOfOrgList != null && idOfOrgList.size() > 0) {
-            /*Org org = null;
-            if (idOfOrg != null && idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
-            }
-            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));*/
             Properties properties = builder.getReportProperties();
             String idOfOrgString = "";
             if(idOfOrgList != null) {
@@ -115,6 +128,11 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
 
     public void showXLS(ActionEvent actionEvent){
         RuntimeContext.getAppContext().getBean(SmsDeliveryReportPage.class).doBuidXLS();
+    }
+
+    public void recalculateSyncData(ActionEvent actionEvent){
+        RuntimeContext.getAppContext().getBean(SmsDeliveryCalculationService.class).doRun();
+        printMessage("Пересчет закончен.");
     }
 
     @Transactional

@@ -11,13 +11,15 @@
 
 <%--@elvariable id="smsDeliveryReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SmsDeliveryReportPage"--%>
 <h:panelGrid id="smsDeliveryReportPanelGrid" binding="#{smsDeliveryReportPage.pageComponent}" styleClass="borderless-grid">
+    <h:outputText styleClass="output-text" escape="true" value="Отчет содержит актуальные данные по синхронизациям, выполненным до сегодняшнего дня." />
+    <h:outputText styleClass="output-text" escape="true" value="Для включения в отчет сегодняшних синхронизаций нажмите кнопку \"Пересчитать\"" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{smsDeliveryReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverterWithoutTZ" inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{smsDeliveryReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverterWithoutTZ" inputClass="input-text" showWeeksBar="false" />
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <%--<h:panelGroup>
@@ -69,6 +71,7 @@
         </c:if>
     </h:panelGrid>
     <h:commandButton value="Выгрузить в Excel" actionListener="#{smsDeliveryReportPage.showXLS}" styleClass="command-button" />
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+    <a4j:commandButton value="Пересчитать" actionListener="#{smsDeliveryReportPage.recalculateSyncData}" styleClass="command-button" reRender="msgs"/>
+    <rich:messages id="msgs" styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

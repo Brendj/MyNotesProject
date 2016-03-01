@@ -21,6 +21,10 @@ public class SMSDeliveryReportItem implements Serializable {
     private long orgId;
     private String orgName;
     private int columnId;
+    private String shortNameInfoService;
+    private String shortAddress;
+    private String introductionQueue;
+    private String orgStatus;
     public Map<String, String> values;
 
     public SMSDeliveryReportItem() {
@@ -65,6 +69,38 @@ public class SMSDeliveryReportItem implements Serializable {
         this.columnId = columnId;
     }
 
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public String getOrgStatus() {
+        return orgStatus;
+    }
+
+    public void setOrgStatus(String orgStatus) {
+        this.orgStatus = orgStatus;
+    }
+
     public Map<String, String> getValues() {
         if(values == null) {
             return Collections.EMPTY_MAP;
@@ -74,7 +110,7 @@ public class SMSDeliveryReportItem implements Serializable {
     }
 
     public void addValue(String k, String v) {
-        if(values == null) {
+        if (values == null) {
             values = new HashMap<String, String>();
         }
         values.put(k, v);
