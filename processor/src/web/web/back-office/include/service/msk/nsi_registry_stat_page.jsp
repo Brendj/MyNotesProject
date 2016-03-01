@@ -43,7 +43,7 @@
             </rich:column>
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="Создание (кол-во зданий" />
+                    <h:outputText value="Создание (кол-во зданий)" />
                 </f:facet>
                 <h:outputText value="#{item.createOperation}" styleClass="output-text" />
             </rich:column>
@@ -55,13 +55,13 @@
             </rich:column>
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="Отключение (кол-во зданий" />
+                    <h:outputText value="Отключение (кол-во зданий)" />
                 </f:facet>
                 <h:outputText value="#{item.removeOperation}" styleClass="output-text" />
             </rich:column>
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="Итого (общее кол-во изменений" />
+                    <h:outputText value="Итого (общее кол-во изменений)" />
                 </f:facet>
                 <h:outputText value="#{item.totalOperation}" styleClass="output-text" />
             </rich:column>
