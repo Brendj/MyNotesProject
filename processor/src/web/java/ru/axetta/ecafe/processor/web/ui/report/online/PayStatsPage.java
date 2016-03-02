@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -48,6 +49,12 @@ public class PayStatsPage extends BasicWorkspacePage implements ContragentSelect
         FacesContext facesContext = FacesContext.getCurrentInstance();
         localCalendar = runtimeContext
                 .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+        this.fromDate = DateUtils.truncate(localCalendar, Calendar.DAY_OF_MONTH).getTime();
+        localCalendar.setTime(this.fromDate);
+
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.toDate = localCalendar.getTime();
     }
 
     public String getFromDateAsString() {
@@ -154,7 +161,10 @@ public class PayStatsPage extends BasicWorkspacePage implements ContragentSelect
     }
 
     public void setToDate(Date toDate) {
-        this.toDate = toDate;
+        localCalendar.setTime(toDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.toDate = localCalendar.getTime();
     }
 
     public Contragent getContragent() {
