@@ -17,77 +17,58 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<h:panelGrid id="orgDiscountReportPanelGrid" binding="#{mainPage.orgDiscountsReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="orgDiscountReportPanelGrid" binding="#{mainPage.orgDiscountsReportPage.pageComponent}"
+             styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;" />
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.orgDiscountsReportPage.filter}}" />
         </h:panelGroup>
-    </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:panelGroup>
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgDiscountsReport}"
-                           reRender="orgDiscountsReportTable"
-                           styleClass="commandButton" status="sReportGeneratorStatus" />
-        <a4j:status id="sReportGenerateStatus">
+
+        <h:outputText escape="true" value="Данные по комплексу" styleClass="output-text" />
+        <h:selectOneMenu id="regionsList" value="#{mainPage.orgDiscountsReportPage.orgFilter}" style="width:120px;">
+            <f:selectItems value="#{mainPage.orgDiscountsReportPage.orgFilters}" />
+        </h:selectOneMenu>
+
+        <h:outputText escape="false" value="Показывать резервников" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgDiscountsReportPage.showReserve}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать платное питание" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgDiscountsReportPage.showPayComplex}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.orgDiscountsReportPage.buildReportHTML}"
+                               reRender="workspaceTogglePanel" styleClass="command-button"
+                               status="reportGenerateStatus" />
+        </h:panelGrid>
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.orgDiscountsReportPage.generateXLS}"
+                         styleClass="command-button" />
+        <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
-        </h:panelGroup>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Отчет по учреждению " styleClass="output-text" />
-        <rich:dataTable id="orgDiscountsReportTable" value="#{mainPage.orgDiscountsReportPage.orgDiscountsReport.itemList}"
-                        var="item" rowKeyVar="row" rows="15" footerClass="data-table-footer">
-
-                <f:facet name="header">
-                    <rich:columnGroup>
-                        <rich:column headerClass="center-aligned-column" colspan="2">
-                            <h:outputText escape="true" value="Класс" styleClass="column-header" />
-                        </rich:column>
-                    </rich:columnGroup>
-                </f:facet>
-
-                <rich:column  colspan="2">
-                    <h:outputText value="Класс #{item.name}"/>
-                    <rich:subTable value="#{item.subItemList}" var="subItem">
-                        <rich:column>
-                            <f:facet name="header">
-                                <h:outputText value="ФИО"/>
-                            </f:facet>
-                            <h:outputText escape="true" value="#{subItem.fio}"/>
-                            <f:facet name="footer">
-                                <h:outputText value="Итого: #{item.size}" styleClass="output-text"/>
-                            </f:facet>
-                        </rich:column>
-                        <rich:column>
-                            <f:facet name="header">
-                                <h:outputText value="Категории льгот"/>
-                            </f:facet>
-                            <h:outputText escape="true" value="#{subItem.categories}" styleClass="output-text"/>
-                        </rich:column>
-                    </rich:subTable>
-                </rich:column>
-                <%--<rich:column  colspan="2">--%>
-                    <%--<h:outputText value="Итого: #{item.size}"/>--%>
-                <%--</rich:column>--%>
-
-            <f:facet name="footer">
-                <h:outputText value="Итого по ОУ: #{mainPage.orgDiscountsReportPage.orgDiscountsReport.count}"/>
-                <rich:datascroller for="orgDiscountsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
-                    <f:facet name="previous">
-                        <h:graphicImage value="/images/16x16/left-arrow.png" />
-                    </f:facet>
-                    <f:facet name="next">
-                        <h:graphicImage value="/images/16x16/right-arrow.png" />
-                    </f:facet>
-                </rich:datascroller>
-            </f:facet>
-        </rich:dataTable>
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty mainPage.orgDiscountsReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по количеству льготников в организации" styleClass="output-text" />
+            <f:verbatim>
+                <%--<style type="text/css">--%>
+                <%--div.htmlReportContent :empty {--%>
+                <%--display: none;--%>
+                <%--}--%>
+                <%--</style>--%>
+                <div class="htmlReportContent"> ${mainPage.orgDiscountsReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
     </h:panelGrid>
 </h:panelGrid>

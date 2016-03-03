@@ -490,7 +490,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            orgDiscountsReportPage.buildReport(persistenceSession);
+            orgDiscountsReportPage.buildReport();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
@@ -2195,7 +2195,7 @@ public class MainPage implements Serializable {
                 persistenceTransaction = null;
                 if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
                     contragentListSelectPage
-                        .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                            .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
                     modalPages.push(contragentListSelectPage);
                 }
             } catch (Exception e) {
@@ -3010,30 +3010,30 @@ public class MainPage implements Serializable {
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
         BasicPage currentTopMostPage = getTopMostPage();
         //if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                clientSelectListPage.fill(persistenceSession, clientList);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
-                    clientSelectListPage.pushCompleteHandler((ClientSelectListPage.CompleteHandler) currentTopMostPage);
-                    modalPages.push(clientSelectListPage);
-                }
-
-            } catch (Exception e) {
-                logger.error("Failed to fill client selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientSelectListPage.fill(persistenceSession, clientList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
+                clientSelectListPage.pushCompleteHandler((ClientSelectListPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(clientSelectListPage);
             }
+
+        } catch (Exception e) {
+            logger.error("Failed to fill client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
         //}
         return null;
     }
@@ -4421,7 +4421,8 @@ public class MainPage implements Serializable {
     }
 
     public void removeJobRules(Session session, Long idOfReportHandleRule) throws Exception {
-        session.createQuery("delete from JobRules where reportHandleRule = :idOfReportHandleRule").setLong("idOfReportHandleRule", idOfReportHandleRule).executeUpdate();
+        session.createQuery("delete from JobRules where reportHandleRule = :idOfReportHandleRule")
+                .setLong("idOfReportHandleRule", idOfReportHandleRule).executeUpdate();
     }
 
     public Long getSelectedIdOfReportRule() {
@@ -5749,7 +5750,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to set delivered report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по предоставленным услугам (предварительный): " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы отчета по предоставленным услугам (предварительный): " + e
+                            .getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5762,7 +5764,8 @@ public class MainPage implements Serializable {
         } catch (Exception e) {
             logger.error("Failed to set delivered report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по предоставленным услугам (электронная сверка): " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы отчета по предоставленным услугам (электронная сверка): " + e
+                            .getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
