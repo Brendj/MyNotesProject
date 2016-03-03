@@ -44,7 +44,18 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected List<WebItem> items;
     protected Long selectedOperationType = 0L;
     protected Boolean hideApplied = true;
+    private WebItem orgForEdit;
 
+    private Boolean checkGuid = true;
+    private Boolean checkUniqueAddressId = true;
+    private Boolean checkAddress = true;
+    private Boolean checkShortName = true;
+    private Boolean checkOfficialName = true;
+    private Boolean checkUnom = true;
+    private Boolean checkUnad = true;
+    private Boolean checkINN = true;
+    private Boolean checkInterDistrictCouncil = true;
+    private Boolean checkInterDistrictCouncilChief = true;
 
     public String getPageFilename() {
         return "service/msk/nsi_orgs_registry_sync_page";
@@ -352,6 +363,94 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         this.hideApplied = hideApplied;
     }
 
+    public WebItem getOrgForEdit() {
+        return orgForEdit;
+    }
+
+    public void setOrgForEdit(WebItem orgForEdit) {
+        this.orgForEdit = orgForEdit;
+    }
+
+    public Boolean getCheckAddress() {
+        return checkAddress;
+    }
+
+    public void setCheckAddress(Boolean checkAddress) {
+        this.checkAddress = checkAddress;
+    }
+
+    public Boolean getCheckShortName() {
+        return checkShortName;
+    }
+
+    public void setCheckShortName(Boolean checkShortName) {
+        this.checkShortName = checkShortName;
+    }
+
+    public Boolean getCheckOfficialName() {
+        return checkOfficialName;
+    }
+
+    public void setCheckOfficialName(Boolean checkOfficialName) {
+        this.checkOfficialName = checkOfficialName;
+    }
+
+    public Boolean getCheckUnom() {
+        return checkUnom;
+    }
+
+    public void setCheckUnom(Boolean checkUnom) {
+        this.checkUnom = checkUnom;
+    }
+
+    public Boolean getCheckUnad() {
+        return checkUnad;
+    }
+
+    public void setCheckUnad(Boolean checkUnad) {
+        this.checkUnad = checkUnad;
+    }
+
+    public Boolean getCheckINN() {
+        return checkINN;
+    }
+
+    public void setCheckINN(Boolean checkINN) {
+        this.checkINN = checkINN;
+    }
+
+    public Boolean getCheckInterDistrictCouncil() {
+        return checkInterDistrictCouncil;
+    }
+
+    public void setCheckInterDistrictCouncil(Boolean checkInterDistrictCouncil) {
+        this.checkInterDistrictCouncil = checkInterDistrictCouncil;
+    }
+
+    public Boolean getCheckInterDistrictCouncilChief() {
+        return checkInterDistrictCouncilChief;
+    }
+
+    public void setCheckInterDistrictCouncilChief(Boolean checkInterDistrictCouncilChief) {
+        this.checkInterDistrictCouncilChief = checkInterDistrictCouncilChief;
+    }
+
+    public Boolean getCheckGuid() {
+        return checkGuid;
+    }
+
+    public void setCheckGuid(Boolean checkGuid) {
+        this.checkGuid = checkGuid;
+    }
+
+    public Boolean getCheckUniqueAddressId() {
+        return checkUniqueAddressId;
+    }
+
+    public void setCheckUniqueAddressId(Boolean checkUniqueAddressId) {
+        this.checkUniqueAddressId = checkUniqueAddressId;
+    }
+
     public class WebItem {
         protected Long idOfOrgRegistryChange;
         protected Long idOfOrg;
@@ -364,6 +463,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String shortNameFrom;
         protected String officialName;
         protected String officialNameFrom;
+        protected String shortNameSupplier;
 
         protected String address;
         protected String addressFrom;
@@ -454,6 +554,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.applied = registryChangeItem.getApplied();
             this.shortName = registryChangeItem.getShortName();
             this.shortNameFrom = registryChangeItem.getShortNameFrom();
+            this.shortNameSupplier = registryChangeItem.getShortNameSupplierFrom();
             this.officialName = registryChangeItem.getOfficialName();
             this.officialNameFrom = registryChangeItem.getOfficialNameFrom();
             this.address = registryChangeItem.getAddress();
@@ -617,6 +718,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(shortName, shortNameFrom);
         }
 
+        public String getShortNameSupplier() {
+            return shortNameSupplier;
+        }
+
         public String getOrgNumber() {
             String str = (shortName == null) ? "" : shortName;
             String strFrom = (shortNameFrom == null) ? "" : shortNameFrom;
@@ -625,6 +730,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public boolean getIsSimilar() {
             return operationType == OrgRegistryChange.SIMILAR;
+        }
+
+        public boolean getIsModify() {
+            return operationType == OrgRegistryChange.MODIFY_OPERATION;
         }
 
         public String getShortNameFrom() {
@@ -644,7 +753,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         }
 
         public String getIsMainBuilding() {
-            return getResultString(getIsMainString(isMain), getIsMainString(isMainFrom));
+            if (operationType == OrgRegistryChange.CREATE_OPERATION) {
+                return getIsMainString(isMain);
+            } else {
+                return getResultString(getIsMainString(isMain), getIsMainString(isMainFrom));
+            }
         }
 
         private String getIsMainString(boolean isMain) {

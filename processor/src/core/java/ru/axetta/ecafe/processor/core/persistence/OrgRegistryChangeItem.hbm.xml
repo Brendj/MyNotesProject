@@ -28,6 +28,7 @@
         </property>
         <property name="shortName" column="shortname" type="string" length="255"/>
         <property name="shortNameFrom" column="shortnamefrom" type="string" length="255"/>
+        <property name="shortNameSupplierFrom" column="shortnamesupplierfrom" type="string" length="128"/>
         <property name="officialName" column="officialname" type="string" length="255"/>
         <property name="officialNameFrom" column="officialnamefrom" type="string" length="255"/>
 

@@ -76,20 +76,12 @@ public class ImportRegisterOrgsService {
         if(orgRegistryChange.getApplied()) {
             return true;
         }
-        Org org = null;
+
         Contragent defaultSupplier = null;
         try {
             defaultSupplier = DAOService.getInstance().getContragentById(DEFAULT_SUPPLIER_ID);
         } catch (Exception e) { }
-        if(orgRegistryChange.getIdOfOrg() != null) {
-            org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
-        }
-        if (org == null && orgRegistryChange.getAdditionalId() != -1){
-            org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());
-        }
-        if (org == null && orgRegistryChange.getUnom() != -1){
-            org = DAOUtils.findByBtiUnom(session,orgRegistryChange.getUnom());
-        }
+
         switch(orgRegistryChange.getOperationType()) {
             case OrgRegistryChange.CREATE_OPERATION:
                 try {
@@ -97,22 +89,33 @@ public class ImportRegisterOrgsService {
                     modifyOrg(orgRegistryChange, session, buildingsList);
                     break;
                 } catch (Exception e) {
-                    logger.error("Failed to create org", org);
+                    logger.error("Failed to create org", orgRegistryChange);
                     return false;
                 }
             case OrgRegistryChange.MODIFY_OPERATION:
                 try {
-                    //modifyOrg(orgRegistryChange, org, session, buildingsList);
                     modifyOrg(orgRegistryChange, session, buildingsList);
                     createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
                     break;
                 } catch (Exception e) {
-                    logger.error("Failed to modify org", org);
+                    logger.error("Failed to modify org", orgRegistryChange);
                     return false;
                 }
             case OrgRegistryChange.DELETE_OPERATION:
+                Org org = null;
                 try {
-                    deleteOrg(orgRegistryChange, org, session, buildingsList);
+                    if(orgRegistryChange.getIdOfOrg() != null) {
+                        org = DAOService.getInstance().getOrg(orgRegistryChange.getIdOfOrg());
+                    }
+                    if (org == null && orgRegistryChange.getAdditionalId() != null && orgRegistryChange.getAdditionalId() != -1){
+                        org = DAOUtils.findByAdditionalId(session,orgRegistryChange.getUniqueAddressId());
+                    }
+                    if (org == null && orgRegistryChange.getUnom() != -1){
+                        org = DAOUtils.findByBtiUnom(session,orgRegistryChange.getUnom());
+                    }
+                    if (org != null) {
+                        deleteOrg(org, session, buildingsList);
+                    }
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to delete org", org);
@@ -193,19 +196,17 @@ public class ImportRegisterOrgsService {
         } else {
             String[] splitterAddress = address.split("/");
             int len = splitterAddress.length;
-            shortAddress = splitterAddress[len - 2] + " /" + (splitterAddress[len - 1]);
+            try {
+                shortAddress = splitterAddress[len - 2] + " /" + (splitterAddress[len - 1]);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                shortAddress = address;
+            }
         }
         Long additionalId = orgRegistryChangeItem.getAdditionalId();
         if (additionalId == null){
             additionalId = orgRegistryChange.getAdditionalId();
         }
-        /* Создание организациииии
-        Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
-                String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
-                Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
-                String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
-                Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing)*/
-        //todo правильно заполнять второй параметр shortNameInfoService
+
         Org org = new Org(orgShortName, orgShortName, orgRegistryChange.getOfficialName(), address, shortAddress, officialPerson, "",
                 "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
                 0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
@@ -226,35 +227,6 @@ public class ImportRegisterOrgsService {
 
         return org;
     }
-
-    /*private Org createOrg(OrgRegistryChange orgRegistryChange, Person officialPerson, Date createDate,
-            Contragent defaultSupplier, String address, Long additionalId) throws Exception {
-        if (address == null){
-            address = orgRegistryChange.getAddress();
-        }
-        if (additionalId == null){
-            additionalId = orgRegistryChange.getAdditionalId();
-        }
-        Org org = new Org(orgRegistryChange.getShortName(), orgRegistryChange.getOfficialName(),
-                address, officialPerson, "",
-                "", createDate, orgRegistryChange.getOrganizationType(), 0, 0L, "", 0L,
-                0L, defaultSupplier, "", "", "",
-                "", "", "", orgRegistryChange.getUnom(), orgRegistryChange.getUnad(),
-                orgRegistryChange.getUniqueAddressId(), "", additionalId, "/");
-        org.setCity(orgRegistryChange.getCity());
-        org.setDistrict(orgRegistryChange.getRegion());
-        org.setLocation("");
-        org.setLongitude("");
-        org.setLatitude("");
-        org.setGuid(orgRegistryChange.getGuid());
-        org.setPhone("");
-        org.setSmsSender("");
-        org.setTag("");
-        org.setStatus(OrganizationStatus.PLANNED);
-        org.setState(0);
-
-        return org;
-    }*/
 
     protected void modifyOrg(OrgRegistryChange orgRegistryChange, Session session, List<Long> buildingsList)
             throws Exception {
@@ -278,7 +250,7 @@ public class ImportRegisterOrgsService {
                     org.setAddress(orgRegistryChangeItem.getAddress());
                     org.setCity(orgRegistryChange.getCity());
                     org.setOfficialName(orgRegistryChange.getOfficialName());
-
+                    org.setShortNameInfoService(orgRegistryChange.getShortName());//Краткое наименование для инфосервиса
 
                     orgRegistryChangeItem.setApplied(true);
                 }
@@ -287,61 +259,7 @@ public class ImportRegisterOrgsService {
         }
     }
 
-    /*protected void modifyOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
-            throws Exception {
-        org.setShortName(orgRegistryChange.getShortName());
-        org.setOfficialName(orgRegistryChange.getOfficialName());
-
-        org.setAddress(orgRegistryChange.getAddress());
-        org.setCity(orgRegistryChange.getCity());
-        org.setDistrict(orgRegistryChange.getRegion());
-
-        org.setBtiUnom(orgRegistryChange.getUnom());
-        org.setBtiUnad(orgRegistryChange.getUnad());
-        org.setUniqueAddressId(orgRegistryChange.getUniqueAddressId());
-
-        org.setGuid(orgRegistryChange.getGuid());
-        org.setAdditionalIdBuilding(orgRegistryChange.getAdditionalId());
-
-        for (Long aLong : buildingsList) {
-            OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
-            if (orgRegistryChangeItem != null){
-                Org byAdditionalId = DAOUtils.findByAdditionalId(session, aLong);
-                if (byAdditionalId == null){
-                    Person officialPerson = new Person("", "", "");
-                    session.save(officialPerson);
-
-                    Date createDate = new Date();
-
-                    Contragent defaultSupplier = null;
-                    try {
-                        defaultSupplier = DAOService.getInstance().getContragentById(DEFAULT_SUPPLIER_ID);
-                    } catch (Exception e) { }
-                    byAdditionalId = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier,orgRegistryChangeItem);
-                }else{
-                    byAdditionalId.setShortName(orgRegistryChange.getShortName());
-                    byAdditionalId.setOfficialName(orgRegistryChange.getOfficialName());
-
-                    byAdditionalId.setAddress(orgRegistryChangeItem.getAddress());
-                    byAdditionalId.setCity(orgRegistryChange.getCity());
-                    byAdditionalId.setDistrict(orgRegistryChange.getRegion());
-
-                    byAdditionalId.setBtiUnom(orgRegistryChangeItem.getUnom());
-                    byAdditionalId.setBtiUnad(orgRegistryChange.getUnad());
-                    byAdditionalId.setUniqueAddressId(orgRegistryChange.getUniqueAddressId());
-
-                    byAdditionalId.setGuid(orgRegistryChange.getGuid());
-                    byAdditionalId.setAdditionalIdBuilding(aLong);
-                }
-                session.persist(byAdditionalId);
-            }
-
-
-        }
-        session.persist(org);
-    }*/
-
-    protected void deleteOrg(OrgRegistryChange orgRegistryChange, Org org, Session session, List<Long> buildingsList)
+    protected void deleteOrg(Org org, Session session, List<Long> buildingsList)
             throws Exception {
         org.setState(0);
         for (Long aLong : buildingsList) {
@@ -376,19 +294,56 @@ public class ImportRegisterOrgsService {
         log(synchDate + "Сохранение организаций", logBuffer);
         long createDate = System.currentTimeMillis();
         OrgRegistryChangeItem orgRegistryChangeItem = null;
+        boolean addChange = true;
         for(OrgInfo oi : orgs) {
             OrgRegistryChange orgRegistryChange = fillOrgRegistryChange(oi, createDate);
             if (orgRegistryChange == null){
                 continue;
             }
             for (OrgInfo orgInfo : oi.getOrgInfos()) {
-                if(orgRegistryChange.getOrgs() == null){
-                    orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
+                //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
+                if (safeCompare(oi.interdistrictCouncil, oi.interdistrictCouncilFrom) && safeCompare(oi.interdistrictCouncilChief, oi.interdistrictCouncilChiefFrom) &&
+                        safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
+                        safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
+                        safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom)) {
+                    addChange = false;
+                } else {
+                    if(orgRegistryChange.getOrgs() == null){
+                        orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
+                    }
+                    orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
+                    orgRegistryChange.getOrgs().add(orgRegistryChangeItem);
+                    addChange = true;
                 }
-                orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
-                orgRegistryChange.getOrgs().add(orgRegistryChangeItem);
+                /*if(orgRegistryChange.getOrgs() == null){
+                    orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
+                }*/
+                /*if (addChange) {
+                    orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
+                    orgRegistryChange.getOrgs().add(orgRegistryChangeItem);
+                }*/
             }
-            em.persist(orgRegistryChange);
+            if (addChange) {
+                em.persist(orgRegistryChange);
+            }
+        }
+    }
+
+    private boolean safeCompare(String byOrg, String byReestrOrgInfo) {
+        boolean result = false;
+        String compareByOrg = (byOrg == null ? "" : byOrg);
+        String compareByReestrOrgInfo = (byReestrOrgInfo == null ? "" : byReestrOrgInfo);
+        if (compareByOrg.equals(compareByReestrOrgInfo)) {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean safeCompare(Long byOrg, Long byRestrOrgInfo) {
+        if (byOrg == null || byRestrOrgInfo == null) {
+            return false;
+        } else {
+            return safeCompare(byOrg.toString(), byRestrOrgInfo.toString());
         }
     }
 
@@ -447,13 +402,17 @@ public class ImportRegisterOrgsService {
                         oi.getInterdistrictCouncilFrom(),
                         oi.getInterdistrictCouncilChief(),
                         oi.getInterdistrictCouncilChiefFrom(),
-                        orgRegistryChange, oi.getMainBuilding()
+                        orgRegistryChange, solveBoolean(oi.getMainBuilding()), oi.getShortNameSupplierFrom()
 
                 );
     }
 
     protected String solveString(String v) {
         return v == null || StringUtils.isBlank(v) ? "" : v;
+    }
+
+    protected Boolean solveBoolean(Boolean v) {
+        return (v == null) ? false : v;
     }
 
     public static void log(String str, StringBuffer logBuffer) {
@@ -479,6 +438,7 @@ public class ImportRegisterOrgsService {
         protected OrganizationType organizationTypeFrom;
         protected String shortName;
         protected String shortNameFrom;
+        protected String shortNameSupplierFrom;
         protected String officialName;
         protected String officialNameFrom;
 
@@ -577,6 +537,14 @@ public class ImportRegisterOrgsService {
 
         public void setShortNameFrom(String shortNameFrom) {
             this.shortNameFrom = shortNameFrom == null ? null : shortNameFrom;
+        }
+
+        public String getShortNameSupplierFrom() {
+            return shortNameSupplierFrom;
+        }
+
+        public void setShortNameSupplierFrom(String shortNameSupplierFrom) {
+            this.shortNameSupplierFrom = shortNameSupplierFrom;
         }
 
         public String getOfficialName() {

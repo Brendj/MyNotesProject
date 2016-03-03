@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * User: Shamil
  * Date: 27.07.15
@@ -22,6 +19,7 @@ public class OrgRegistryChangeItem {
     protected OrganizationType organizationTypeFrom;
     protected String shortName;
     protected String shortNameFrom;
+    protected String shortNameSupplierFrom;
     protected String officialName;
     protected String officialNameFrom;
 
@@ -73,7 +71,7 @@ public class OrgRegistryChangeItem {
 
             String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
             String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
-            OrgRegistryChange orgRegistryChange, boolean mainBuilding) {
+            OrgRegistryChange orgRegistryChange, boolean mainBuilding, String shortNameSupplierFrom) {
         this.idOfOrg = idOfOrg;
 
         this.organizationType = organizationType;
@@ -113,6 +111,7 @@ public class OrgRegistryChangeItem {
         this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
         this.orgRegistryChange = orgRegistryChange;
         this.mainBuilding = mainBuilding;
+        this.shortNameSupplierFrom = shortNameSupplierFrom;
     }
 
     public Long getAdditionalId() {
@@ -185,6 +184,14 @@ public class OrgRegistryChangeItem {
 
     public void setShortNameFrom(String shortNameFrom) {
         this.shortNameFrom = shortNameFrom;
+    }
+
+    public String getShortNameSupplierFrom() {
+        return shortNameSupplierFrom;
+    }
+
+    public void setShortNameSupplierFrom(String shortNameSupplierFrom) {
+        this.shortNameSupplierFrom = shortNameSupplierFrom;
     }
 
     public String getOfficialName() {
