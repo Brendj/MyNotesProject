@@ -78,10 +78,14 @@
 		</band>
 	</title>
 	<detail>
-		<band height="75" splitType="Stretch">
+		<band height="55" splitType="Stretch">
 			<textField>
 				<reportElement uuid="fa85721c-83c4-4e9e-8265-92136fd9727b" style="table" x="0" y="0" width="600" height="35" isPrintWhenDetailOverflows="true"/>
-				<box leftPadding="15"/>
+				<box leftPadding="15">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<leftPen lineColor="#FFFFFF"/>
+					<rightPen lineColor="#FFFFFF"/>
+				</box>
 				<textElement verticalAlignment="Bottom">
 					<font size="14" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
@@ -89,7 +93,7 @@
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="a977c04c-9c46-4017-83f4-ebc234c06d19" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="35" width="600" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="a977c04c-9c46-4017-83f4-ebc234c06d19" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="35" width="600" height="20" isPrintWhenDetailOverflows="true"/>
 				<subreportParameter name="SUBREPORT_DIR"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{groupItemList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "OrgDiscountsReport_subreport.jasper"]]></subreportExpression>

@@ -38,8 +38,8 @@ import static ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage.CompleteHandler
 public class OrgDiscountsReportPage extends OnlineReportPage implements CompleteHandler {
 
     private String htmlReport;
-    private Boolean showReserve = true;
-    private Boolean showPayComplex = true;
+    private Boolean showReserve = false;
+    private Boolean showPayComplex = false;
     private String orgFilter;
 
     public String getHtmlReport() {

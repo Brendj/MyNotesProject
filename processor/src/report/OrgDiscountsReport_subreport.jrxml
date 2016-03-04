@@ -64,6 +64,26 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e" x="0" y="0" width="600" height="20">
+					<printWhenExpression><![CDATA[new Boolean($F{groupName}==null) ]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="15">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
 	<detail>
 		<band height="25" splitType="Stretch">
 			<textField isStretchWithOverflow="true">

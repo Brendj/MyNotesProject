@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report.statistics.discounts.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,6 +39,14 @@ public class OrgItem {
                     categoryItemOrg.add(newCategoryItem);
                 }
             }
+        }
+    }
+
+    public void removeEmptyGroups(){
+        Iterator<GroupItem> it = getGroupItemList().iterator();
+        while (it.hasNext()) {
+            GroupItem group = it.next();
+            if(group.getClientItemList().size() == 0) it.remove();
         }
     }
 

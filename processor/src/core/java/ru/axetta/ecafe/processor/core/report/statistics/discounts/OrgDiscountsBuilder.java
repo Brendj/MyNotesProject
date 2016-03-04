@@ -96,6 +96,7 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
             currentOrg.setShortName(orgPersistence.getShortName());
             currentOrg.setGroupItemList(getGroupItemsByOrgId(session, currentIdOfOrg, showReserve, showPayComplex));
             currentOrg.countCategory();
+            currentOrg.removeEmptyGroups();
             Collections.sort(currentOrg.getCategoryItemOrg());
             Collections.sort(currentOrg.getGroupItemList());
             orgItemList.add(currentOrg);
