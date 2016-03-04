@@ -246,7 +246,7 @@ public class OrgMskNSIService extends MskNSIService {
             }
             //теперь добавим в таблицу _items организации, не найденные по точным критериям (гуид и уник_аддресс_ид).
             // Совпадение м.б. по номеру организации, адресу, гуиду или ИНН по отдельности
-            addSimilarOrgs(info);
+            //addSimilarOrgs(info);
 
             if (modify) {
                 info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);

@@ -58,12 +58,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     private Boolean checkInterDistrictCouncil = true;
     private Boolean checkInterDistrictCouncilChief = true;
 
-
-
-    private static final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
+    private final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
 
     public NSIOrgsRegistrySynchPage() {
         super();
+        orgModifyChangeItems.clear();
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INN, "", ""));
