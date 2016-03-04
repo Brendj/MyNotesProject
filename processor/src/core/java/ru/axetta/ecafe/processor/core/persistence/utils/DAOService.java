@@ -1644,6 +1644,17 @@ public class DAOService {
         session.save(e);
     }
 
+    public Long getMainRegistryByItemId(Long idOfItem) {
+        Session session = (Session) entityManager.getDelegate();
+        try {
+            OrgRegistryChangeItem item = (OrgRegistryChangeItem)session.load(OrgRegistryChangeItem.class, idOfItem);
+            return item.getOrgRegistryChange().getIdOfOrgRegistryChange();
+        } catch(Exception e) {
+            logger.error("Error retrieving MainRegistryChange by OrgRegistryChangeItem ID", e);
+            return null;
+        }
+    }
+
     public List<String> getCurrentRepositoryReportNames() {
         TypedQuery<String> query = entityManager
                 .createQuery("select distinct ruleName from ReportInfo order by ruleName", String.class);

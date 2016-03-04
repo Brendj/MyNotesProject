@@ -7,4 +7,5 @@
 --Увеличение размерности поля для условия выборки в отчетах по расписанию
 ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (50000);
 
+--Новое поле для краткого наименование организации для поставщика в сверке организаций
 ALTER TABLE cf_orgregistrychange_item ADD COLUMN shortnamesupplierfrom character varying(128);

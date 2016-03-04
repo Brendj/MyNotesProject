@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.service.OrgModifyChangeItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
@@ -56,6 +57,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     private Boolean checkINN = true;
     private Boolean checkInterDistrictCouncil = true;
     private Boolean checkInterDistrictCouncilChief = true;
+
+
+
+    private static final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
+
+    public NSIOrgsRegistrySynchPage() {
+        super();
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INN, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNOM, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNAD, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
+    }
 
     public String getPageFilename() {
         return "service/msk/nsi_orgs_registry_sync_page";
@@ -282,7 +299,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                         }
                     }
                     boolean success = RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
-                            applyOrgRegistryChange(i.getIdOfOrgRegistryChange(), buildingsList);
+                            applyOrgRegistryChange(i.getIdOfOrgRegistryChange(), buildingsList, null);
 
                     i.setApplied(success);
                     i.setSelected(false);
@@ -292,6 +309,43 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         catch (Exception e) {
             errorMessages = String.format("Не удается применить операцию к выбранным организациям. Текст ошибки: %s", e.getMessage());
             getLogger().error("Failed to apply changes from registry. Error " + e.getMessage(), e);
+        }
+    }
+
+    public void doApplyOneOrg() {
+        try {
+            List<Long> buildingsList = new LinkedList<Long>();
+            Long itemId = orgForEdit.getIdOfOrgRegistryChange();
+            buildingsList.add(itemId);
+            Long mainRegistryId = DAOService.getInstance().getMainRegistryByItemId(itemId);
+            if (mainRegistryId == null) {
+                errorMessages = "Не удается применить операцию к выбранной организации.";
+                return;
+            }
+            Set<String> flags = new HashSet<String>();
+            for (OrgModifyChangeItem item : orgModifyChangeItems) {
+                if (item.getSelected()) {
+                    flags.add(item.getValueName());
+                }
+            }
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
+                    applyOrgRegistryChange(mainRegistryId, buildingsList, flags);
+            doUpdate();
+        } catch (Exception e) {
+            errorMessages = String.format("Не удается применить операцию к выбранным организациям. Текст ошибки: %s", e.getMessage());
+            getLogger().error("Failed to apply changes from registry. Error " + e.getMessage(), e);
+        }
+    }
+
+    public void doCheckAllSverkaPanel() {
+        for (OrgModifyChangeItem item : orgModifyChangeItems) {
+            item.setSelected(true);
+        }
+    }
+
+    public void doUncheckAllSverkaPanel() {
+        for (OrgModifyChangeItem item : orgModifyChangeItems) {
+            item.setSelected(false);
         }
     }
 
@@ -449,6 +503,47 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setCheckUniqueAddressId(Boolean checkUniqueAddressId) {
         this.checkUniqueAddressId = checkUniqueAddressId;
+    }
+
+    public List<OrgModifyChangeItem> getOrgModifyChangeItems() {
+        if (orgForEdit == null) {
+            return orgModifyChangeItems;
+        }
+        for (OrgModifyChangeItem item : orgModifyChangeItems) {
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_GUID)) {
+                item.setOldValue(orgForEdit.getGuidFrom());
+                item.setNewValue(orgForEdit.getGuidReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID)) {
+                item.setOldValue(orgForEdit.getUniqueAddressIdFromNullSafe());
+                item.setNewValue(orgForEdit.getUniqueAddressIdReestrNullSafe());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_INN)) {
+                item.setOldValue(orgForEdit.getInnFrom());
+                item.setNewValue(orgForEdit.getInnReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_UNOM)) {
+                item.setOldValue(orgForEdit.getUnomFromNullSafe());
+                item.setNewValue(orgForEdit.getUnomReestrNullSafe());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_UNAD)) {
+                item.setOldValue(orgForEdit.getUnadFromNullSafe());
+                item.setNewValue(orgForEdit.getUnadReestrNullSafe());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_ADDRESS)) {
+                item.setOldValue(orgForEdit.getAddressFrom());
+                item.setNewValue(orgForEdit.getAddressReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME)) {
+                item.setOldValue(orgForEdit.getOfficialNameFrom());
+                item.setNewValue(orgForEdit.getOfficialNameReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_SHORT_NAME)) {
+                item.setOldValue(orgForEdit.getShortNameFrom());
+                item.setNewValue(orgForEdit.getShortNameReestr());
+            }
+        }
+        return orgModifyChangeItems;
     }
 
     public class WebItem {
@@ -718,6 +813,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(shortName, shortNameFrom);
         }
 
+        public String getShortNameReestr() {
+            return shortName;
+        }
+
         public String getShortNameSupplier() {
             return shortNameSupplier;
         }
@@ -744,12 +843,20 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(officialName, officialNameFrom);
         }
 
+        public String getOfficialNameReestr() {
+            return officialName;
+        }
+
         public String getOfficialNameFrom() {
             return officialNameFrom;
         }
 
         public String getAddress() {
             return getResultString(address, addressFrom);
+        }
+
+        public String getAddressReestr() {
+            return address;
         }
 
         public String getIsMainBuilding() {
@@ -796,20 +903,40 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(unom, unomFrom);
         }
 
+        public String getUnomReestrNullSafe() {
+            return unom == null ? "" : unom.toString();
+        }
+
         public Long getUnomFrom() {
             return unomFrom;
+        }
+
+        public String getUnomFromNullSafe() {
+            return unomFrom == null ? "" : unomFrom.toString();
         }
 
         public String getUnad() {
             return getResultString(unad, unadFrom);
         }
 
+        public String getUnadReestrNullSafe() {
+            return unad == null ? "" : unad.toString();
+        }
+
         public Long getUnadFrom() {
             return unadFrom;
         }
 
+        public String getUnadFromNullSafe() {
+            return unadFrom == null ? "" : unadFrom.toString();
+        }
+
         public String getGuid() {
             return getResultString(guid, guidFrom);
+        }
+
+        public String getGuidReestr() {
+            return guid;
         }
 
         public String getGuidFrom() {
@@ -881,6 +1008,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(uniqueAddressId, uniqueAddressIdFrom);
         }
 
+        public Long getUniqueAddressIdReestr() {
+            return uniqueAddressId;
+        }
+
+        public String getUniqueAddressIdReestrNullSafe() {
+            return uniqueAddressId == null ? "" : uniqueAddressId.toString();
+        }
+
         public void setUniqueAddressId(Long uniqueAddressId) {
             this.uniqueAddressId = uniqueAddressId;
         }
@@ -889,12 +1024,20 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return uniqueAddressIdFrom;
         }
 
+        public String getUniqueAddressIdFromNullSafe() {
+            return uniqueAddressIdFrom == null ? "" : uniqueAddressIdFrom.toString();
+        }
+
         public void setUniqueAddressIdFrom(Long uniqueAddressIdFrom) {
             this.uniqueAddressIdFrom = uniqueAddressIdFrom;
         }
 
         public String getInn() {
             return getResultString(inn, innFrom);
+        }
+
+        public String getInnReestr() {
+            return inn;
         }
 
         public void setInn(String inn) {

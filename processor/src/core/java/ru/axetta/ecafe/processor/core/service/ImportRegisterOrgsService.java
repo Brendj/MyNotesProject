@@ -45,6 +45,15 @@ public class ImportRegisterOrgsService {
     public static final int MODIFY_OPERATION = 3;
     public static final int MOVE_OPERATION = 4;
 
+    public static final String VALUE_GUID = "Guid";
+    public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
+    public static final String VALUE_ADDRESS = "Адрес корпуса";
+    public static final String VALUE_SHORT_NAME = "Краткое наименование";
+    public static final String VALUE_OFFICIAL_NAME = "Полное наименование";
+    public static final String VALUE_UNOM = "УНОМ";
+    public static final String VALUE_UNAD = "УНАД";
+    public static final String VALUE_INN = "ИНН";
+
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterOrgsService.class);
 
     public static boolean isOn() {
@@ -66,7 +75,7 @@ public class ImportRegisterOrgsService {
     }
 
     @Transactional
-    public boolean applyOrgRegistryChange(long idOfOrgRegistryChange, List<Long> buildingsList) throws Exception {
+    public boolean applyOrgRegistryChange(long idOfOrgRegistryChange, List<Long> buildingsList, Set<String> fieldFlags) throws Exception {
 
         Session session = (Session) em.unwrap(Session.class);
         OrgRegistryChange orgRegistryChange = DAOUtils.getOrgRegistryChange(session, idOfOrgRegistryChange);
@@ -86,7 +95,7 @@ public class ImportRegisterOrgsService {
             case OrgRegistryChange.CREATE_OPERATION:
                 try {
                     createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
-                    modifyOrg(orgRegistryChange, session, buildingsList);
+                    modifyOrg(orgRegistryChange, session, buildingsList, fieldFlags);
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to create org", orgRegistryChange);
@@ -94,7 +103,7 @@ public class ImportRegisterOrgsService {
                 }
             case OrgRegistryChange.MODIFY_OPERATION:
                 try {
-                    modifyOrg(orgRegistryChange, session, buildingsList);
+                    modifyOrg(orgRegistryChange, session, buildingsList, fieldFlags);
                     createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
                     break;
                 } catch (Exception e) {
@@ -228,7 +237,7 @@ public class ImportRegisterOrgsService {
         return org;
     }
 
-    protected void modifyOrg(OrgRegistryChange orgRegistryChange, Session session, List<Long> buildingsList)
+    protected void modifyOrg(OrgRegistryChange orgRegistryChange, Session session, List<Long> buildingsList, Set<String> fieldFlags)
             throws Exception {
         for (Long aLong : buildingsList) {
             OrgRegistryChangeItem orgRegistryChangeItem = DAOUtils.getOrgRegistryChangeItem(session, aLong);
@@ -239,18 +248,28 @@ public class ImportRegisterOrgsService {
                 Org org = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
                 if (org != null) {
                     //По новому алгоритму обновляем следующий набор полей оорганизации:
-                    org.setBtiUnom(orgRegistryChangeItem.getUnom());
-                    org.setBtiUnad(orgRegistryChangeItem.getUnad());
-                    org.setINN(orgRegistryChangeItem.getInn());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNOM)))
+                        org.setBtiUnom(orgRegistryChangeItem.getUnom());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNAD)))
+                        org.setBtiUnad(orgRegistryChangeItem.getUnad());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INN)))
+                        org.setINN(orgRegistryChangeItem.getInn());
                     org.setInterdistrictCouncil(orgRegistryChangeItem.getInterdistrictCouncil());
                     org.setInterdistrictCouncilChief(orgRegistryChange.getInterdistrictCouncilChief());
-                    org.setGuid(orgRegistryChange.getGuid());
-                    org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
-                    org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??
-                    org.setAddress(orgRegistryChangeItem.getAddress());
-                    org.setCity(orgRegistryChange.getCity());
-                    org.setOfficialName(orgRegistryChange.getOfficialName());
-                    org.setShortNameInfoService(orgRegistryChange.getShortName());//Краткое наименование для инфосервиса
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
+                        org.setGuid(orgRegistryChange.getGuid());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
+                        org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
+                        org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??
+                    }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_ADDRESS))) {
+                        org.setAddress(orgRegistryChangeItem.getAddress());
+                        org.setCity(orgRegistryChange.getCity());
+                    }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_OFFICIAL_NAME)))
+                        org.setOfficialName(orgRegistryChange.getOfficialName());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
+                        org.setShortNameInfoService(orgRegistryChange.getShortName());//Краткое наименование для инфосервиса
 
                     orgRegistryChangeItem.setApplied(true);
                 }

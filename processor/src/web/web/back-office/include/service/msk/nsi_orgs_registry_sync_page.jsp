@@ -121,33 +121,42 @@
             <h:outputText value=" - Данные ИС ПП)" styleClass="output-text" />
         </h:panelGrid>
 
-        <rich:modalPanel id="editSverkaPanel" width="600" height="600" style="overflow: scroll;">
+        <rich:modalPanel id="editSverkaPanel" autosized="true" minWidth="600">
             <f:facet name="header">
                 <h:outputText value="Принятие сверки по зданию" />
             </f:facet>
-            <f:facet name="controls">
-                <a4j:commandLink onclick="Richfaces.hideModalPanel('editSverkaPanel')" style="color: white;">
-                    <h:outputText value="Закрыть" />
-                </a4j:commandLink>
-            </f:facet>
-            <h:outputText value="Принять к изменению значения в отмеченных полях:" styleClass="output-text"/>
-            <h:panelGrid style="text-align: left" columns="2">
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkGuid}" styleClass="checkboxes"/><h:outputText value="Guid" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkUniqueAddressId}" styleClass="checkboxes"/><h:outputText value="№ здания" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkINN}" styleClass="checkboxes"/><h:outputText value="ИНН" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkUnom}" styleClass="checkboxes"/><h:outputText value="УНОМ" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkUnad}" styleClass="checkboxes"/><h:outputText value="УНАД" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkAddress}" styleClass="checkboxes"/><h:outputText value="Адрес" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkOfficialName}" styleClass="checkboxes"/><h:outputText value="Полное наименование" styleClass="output-text"/>
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.checkShortName}" styleClass="checkboxes"/><h:outputText value="Краткое наименование" styleClass="output-text"/>
-            </h:panelGrid>
-            <a4j:commandButton value="Применить" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" status="updateStatus"
-                               oncomplete="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;"/>
-            <h:outputText value="#{NSIOrgsRegistrySynchPage.orgForEdit.guid}" />
+            <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAllSverkaPanel}" reRender="editSverkaPanelTable"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;" ajaxSingle="true" />
+            <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAllSverkaPanel}" reRender="editSverkaPanelTable"
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;" ajaxSingle="true" />
+            <rich:spacer height="20px" />
+            <rich:dataTable value="#{NSIOrgsRegistrySynchPage.orgModifyChangeItems}" id="editSverkaPanelTable" var="orgModifyItems" width="100%" columns="4">
+                <rich:column>
+                    <h:selectBooleanCheckbox value="#{orgModifyItems.selected}" styleClass="checkboxes"/>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header"><h:outputText styleClass="headerText" value="Изменяемое поле" /></f:facet>
+                    <h:outputText value="#{orgModifyItems.valueName}" />
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header"><h:outputText styleClass="headerText" value="Данные ИС ПП" /></f:facet>
+                    <h:outputText value="#{orgModifyItems.oldValue}" />
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header"><h:outputText styleClass="headerText" value="Данные АИС Реестр" /></f:facet>
+                    <h:outputText value="#{orgModifyItems.newValue}" rendered="#{orgModifyItems.isEqual()}"/>
+                    <h:outputText value="#{orgModifyItems.newValue}" styleClass="error-output-text" rendered="#{!orgModifyItems.isEqual()}"/>
+                </rich:column>
+            </rich:dataTable>
+            <rich:spacer height="20px" />
+            <a4j:commandButton value="Применить" action="#{NSIOrgsRegistrySynchPage.doApplyOneOrg}" status="updateStatus"
+                               oncomplete="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;"
+                    reRender="synchTable,synchTableInfoPanel,resultTitle,synchTableControl"/>
+            <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;"/>
         </rich:modalPanel>
 
         <rich:dataTable value="#{NSIOrgsRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
-                        width="100%" rows="20" columns="4" id="table" rowKeyVar="row" >
+                        width="100%" rows="20" columns="4" id="tableSverka" rowKeyVar="row" >
 
             <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="2" colspan="1">
                 <f:facet name="header">
@@ -190,7 +199,7 @@
                                       rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
                         <rich:spacer height="10" />
                         <a4j:commandButton value="..." style="width: 25px; height:25px; text-align: right" title="Редактировать запись сверки"
-                                           reRender="editSverkaPanel" styleClass="command-button" status="updateStatus"
+                                           reRender="editSverkaPanel,tableSverka" styleClass="command-button" status="updateStatus"
                                            oncomplete="Richfaces.showModalPanel('editSverkaPanel');" ajaxSingle="true"
                                            rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && org.isModify}">
                         <f:setPropertyActionListener value="#{org}" target="#{NSIOrgsRegistrySynchPage.orgForEdit}" />
@@ -272,7 +281,7 @@
             </rich:column>
 
             <f:facet name="footer">
-                <rich:datascroller for="table" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                <rich:datascroller for="tableSverka" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                    stepControls="auto">
                     <f:facet name="first">
                         <h:graphicImage value="/images/16x16/first.png" />
