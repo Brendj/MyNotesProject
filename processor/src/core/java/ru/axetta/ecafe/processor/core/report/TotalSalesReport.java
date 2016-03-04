@@ -48,11 +48,14 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     }
 
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
+
     }
 
     public static class Builder extends BasicReportForContragentJob.Builder {
 
-        private Long idOfContragent= -1L;
+        private List<String> titlesComplexes;
+
+        private Long idOfContragent = -1L;
 
         private Long sumComplex = 0L;
         private Long sumBuffet = 0L;
@@ -71,6 +74,16 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private Long sumBuffetPlusSumComplex = 0L;
         private Long sumBuffetOwnPlusSumComplex = 0L;
 
+        private List<TotalSalesReportItem> totalSalesReportItemList;
+
+        public List<TotalSalesReportItem> getTotalSalesReportItemList() {
+            return totalSalesReportItemList;
+        }
+
+        public void setTotalSalesReportItemList(List<TotalSalesReportItem> totalSalesReportItemList) {
+            this.totalSalesReportItemList = totalSalesReportItemList;
+        }
+
         private final String templateFilename;
 
         public Builder(String templateFilename) {
@@ -86,8 +99,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             if (contragent != null) {
                 parameterMap.put("contragentName", contragent.getContragentName());
                 idOfContragent = contragent.getIdOfContragent();
-            }else {
-                throw new Exception("Контрагент не указан.");
+            } else {
+                throw new Exception("Поставщик не указан.");
             }
             JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(),
                     parameterMap);
@@ -113,10 +126,78 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     startTime, endTime, idOfContragent);
         }
 
+        private  List<TotalSalesReportItem> summaries() {
+            totalSalesReportItemList = new ArrayList<TotalSalesReportItem>();
+
+            if (!titlesComplexes.isEmpty()) {
+                for (String title : titlesComplexes) {
+
+                    if (title.equals("Буфет Вендинг")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductVending = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
+                                Double.parseDouble(sumProductVending.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
+                    }
+                    if (title.equals("Буфет Закупленное")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
+                                Double.parseDouble(sumProductPurchase.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
+                    }
+                    if (title.equals("Буфет Коммерческое питание")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
+                                Double.parseDouble(sumProductCommercial.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
+                    }
+                    if (title.equals("Буфет Собственное")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
+                                Double.parseDouble(sumProductOwn.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
+                    }
+                    if (title.equals("Буфет Централизованное")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
+                                Double.parseDouble(sumProductCentralize.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
+                    }
+                    if (title.equals("Буфет Централизованное с доготовкой")) {
+                        TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
+                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
+                                Double.parseDouble(sumProductCentralizeCook.toString()));
+                        totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
+                    }
+                }
+            }
+
+            TotalSalesReportItem totalSalesReportItemSumBuffet = new TotalSalesReportItem(NAME_BUFFET,
+                    Double.parseDouble(sumBuffet.toString()));
+            totalSalesReportItemList.add(totalSalesReportItemSumBuffet);
+
+            TotalSalesReportItem totalSalesReportItemSumBuffetOwnPlusSumComplex = new TotalSalesReportItem(
+                    TOTAL_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetOwnPlusSumComplex.toString()));
+            totalSalesReportItemList.add(totalSalesReportItemSumBuffetOwnPlusSumComplex);
+
+            TotalSalesReportItem totalSalesReportItemSumBuffetPlusSumComplex = new TotalSalesReportItem(
+                    TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetPlusSumComplex.toString()));
+            totalSalesReportItemList.add(totalSalesReportItemSumBuffetPlusSumComplex);
+
+            TotalSalesReportItem totalSalesReportItemSumBen = new TotalSalesReportItem(NAME_BEN,
+                    Double.parseDouble(sumBen.toString()));
+            totalSalesReportItemList.add(totalSalesReportItemSumBen);
+
+            TotalSalesReportItem totalSalesReportItemSubComplex = new TotalSalesReportItem(NAME_COMPLEX,
+                    Double.parseDouble(sumComplex.toString()));
+            totalSalesReportItemList.add(totalSalesReportItemSubComplex);
+
+            return totalSalesReportItemList;
+        }
+
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
                 Map<String, Object> parameterMap) throws Exception {
 
-            List<String> titlesComplexes = new ArrayList<String>();
+            titlesComplexes = new ArrayList<String>();
 
             String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("titleComplexes"));
 
@@ -125,7 +206,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             //Мапа с названием колонки, ценой, и суммой
             HashMap<Long, PriceAndSum> priceAndSumHashMap = new HashMap<Long, PriceAndSum>();
 
-            for (String titleAndSum: Arrays.asList(StringUtils.split(titleAndSums, ';'))) {
+            for (String titleAndSum : Arrays.asList(StringUtils.split(titleAndSums, ';'))) {
                 String[] str = StringUtils.split(titleAndSum, ',');
                 priceAndSumHashMap.put(Long.parseLong(str[1]), new PriceAndSum(str[0].trim(), 0L));
             }
@@ -142,7 +223,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             //Получаем список всех школ, заполняем ими списов
             List<Long> idOfOrgsList = new LinkedList<Long>();
             retreiveAllOrgs(totalListMap, dates, idOfOrgsList, titlesComplexes);
-            if(idOfOrgsList.size() == 0){
+            if (idOfOrgsList.size() == 0) {
                 return new JREmptyDataSource();
             }
             logger.error("e1 : " + (System.currentTimeMillis() - l));
@@ -154,11 +235,13 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             logger.error("e2 : " + (System.currentTimeMillis() - l));
 
             //Вывод, разбивка по районам.
-            Map<String,TotalSalesData> totalSalesResult = new HashMap<String, TotalSalesData>();
+            Map<String, TotalSalesData> totalSalesResult = new HashMap<String, TotalSalesData>();
+
+            List<TotalSalesReportItem> tot = summaries();
 
             for (TotalSalesItem o : totalSalesTMP.getItemList()) {
-                if(!totalSalesResult.containsKey(o.getDisctrict())){
-                    totalSalesResult.put(o.getDisctrict(),new TotalSalesData(o.getDisctrict()));
+                if (!totalSalesResult.containsKey(o.getDisctrict())) {
+                    totalSalesResult.put(o.getDisctrict(), new TotalSalesData(o.getDisctrict(), tot));
                 }
                 List<TotalSalesItem> itemList = totalSalesResult.get(o.getDisctrict()).getItemList();
                 if(itemList == null) {
@@ -170,8 +253,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             return new JRBeanCollectionDataSource(totalSalesResult.values());
         }
 
-        private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap,
-                List<Long> idOfOrgsList, List<String> titleComplexes, Date startTime, Date endTime, HashMap<Long, PriceAndSum> priceAndSumHashMap){
+        private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap, List<Long> idOfOrgsList,
+                List<String> titleComplexes, Date startTime, Date endTime,
+                HashMap<Long, PriceAndSum> priceAndSumHashMap) {
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
@@ -180,28 +264,35 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 if (!titleComplexes.isEmpty()) {
                     for (String title : titleComplexes) {
                         if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductOwn += handleOrders(totalListMap, allOrder, title);
-                                sumBuffetOwnPlusSumComplex += sumProductOwn + handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                                sumBuffetOwnPlusSumComplex += sumProductOwn + handleOrders(totalListMap, allOrder,
+                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductCentralize += handleOrders(totalListMap, allOrder, title);
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductPurchase += handleOrders(totalListMap, allOrder, title);
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductVending += handleOrders(totalListMap, allOrder, title);
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL
+                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductCommercial += handleOrders(totalListMap, allOrder, title);
                             }
                         }
@@ -257,7 +348,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
                 List<Long> idOfOrgsList, List<String> titleComplexes) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
-            if(idOfContragent != -1){
+            if (idOfContragent != -1) {
 
             }
             List<OrgItem> allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
@@ -265,13 +356,22 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (OrgItem orgItem : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();
                 for (String date : dates) {
-                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BUFFET));
-                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BEN));
-                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_COMPLEX));
-                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_BUFFET_PLUS_NAME_COMPLEX));
-                    totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX));
+                    totalSalesItemList.add(
+                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BUFFET));
+                    totalSalesItemList.add(
+                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BEN));
+                    totalSalesItemList.add(
+                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                    NAME_COMPLEX));
+                    totalSalesItemList.add(
+                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                    TOTAL_BUFFET_PLUS_NAME_COMPLEX));
+                    totalSalesItemList.add(
+                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                    TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX));
                     for (String title: titleComplexes) {
-                        totalSalesItemList.add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, title));
+                        totalSalesItemList.add(
+                                new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, title));
                     }
                 }
                 totalSalesItemMap.put(orgItem.getIdOfOrg(), totalSalesItemList);
@@ -287,7 +387,6 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
     public TotalSalesReport() {
     }
-
 
 
     @Override

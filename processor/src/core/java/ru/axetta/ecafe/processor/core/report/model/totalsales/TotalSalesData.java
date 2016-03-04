@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.model.totalsales;
 
+import ru.axetta.ecafe.processor.core.report.TotalSalesReportItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +19,16 @@ import java.util.List;
 public class TotalSalesData {
     private String name;
     private List<TotalSalesItem> itemList;
+    private List<TotalSalesReportItem> totalSalesReportItemList;
 
     public TotalSalesData() {
         itemList = new ArrayList<TotalSalesItem>();
     }
 
-    public TotalSalesData(String name) {
+    public TotalSalesData(String name, List<TotalSalesReportItem> totalSalesReportItemList) {
         this.name = name;
         itemList = new ArrayList<TotalSalesItem>();
+        this.totalSalesReportItemList = totalSalesReportItemList;
     }
 
     public List<TotalSalesItem> getItemList() {
@@ -33,6 +37,14 @@ public class TotalSalesData {
 
     public void setItemList(List<TotalSalesItem> itemList) {
         this.itemList = itemList;
+    }
+
+    public List<TotalSalesReportItem> getTotalSalesReportItemList() {
+        return totalSalesReportItemList;
+    }
+
+    public void setTotalSalesReportItemList(List<TotalSalesReportItem> totalSalesReportItemList) {
+        this.totalSalesReportItemList = totalSalesReportItemList;
     }
 
     public String getName() {
