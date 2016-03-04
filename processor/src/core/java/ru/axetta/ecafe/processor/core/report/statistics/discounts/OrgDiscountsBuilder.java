@@ -14,7 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
-import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportForOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.CategoryItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.ClientItem;
@@ -35,7 +35,7 @@ import java.util.*;
  * Date: 24.02.16
  * Time: 17:58
  */
-public class OrgDiscountsBuilder extends BasicReportForAllOrgJob.Builder {
+public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
 
     private final String templateFilename;
     private final String subReportDir;
