@@ -1246,6 +1246,7 @@ public class SyncResponse {
     private final OrganizationStructure organizationStructure;
     private final ResReestrTaloonApproval resReestrTaloonApproval;
     private final ReestrTaloonApprovalData reestrTaloonApprovalData;
+    private final OrganizationComplexesStructure organizationComplexesStructure;
 
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1259,7 +1260,8 @@ public class SyncResponse {
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData, DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
-            ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData) {
+            ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
+            OrganizationComplexesStructure organizationComplexesStructure) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1298,6 +1300,7 @@ public class SyncResponse {
         this.organizationStructure = organizationStructure;
         this.resReestrTaloonApproval = resReestrTaloonApproval;
         this.reestrTaloonApprovalData = reestrTaloonApprovalData;
+        this.organizationComplexesStructure = organizationComplexesStructure;
     }
 
     public Document toDocument() throws Exception {
@@ -1467,6 +1470,9 @@ public class SyncResponse {
 
         if (reestrTaloonApprovalData != null) {
             ecafeEnvelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
+        if (organizationComplexesStructure != null) {
+            ecafeEnvelopeElement.appendChild(organizationComplexesStructure.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
