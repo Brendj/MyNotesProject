@@ -79,7 +79,7 @@ public class ImportRegisterOrgsService {
 
         Session session = (Session) em.unwrap(Session.class);
         OrgRegistryChange orgRegistryChange = DAOUtils.getOrgRegistryChange(session, idOfOrgRegistryChange);
-        if (orgRegistryChange.getOrgs() == null || orgRegistryChange.getOrgs().size() == 0) {
+        if ((orgRegistryChange.getOrgs() == null || orgRegistryChange.getOrgs().size() == 0) && (!orgRegistryChange.getOperationType().equals(OrgRegistryChange.DELETE_OPERATION))) {
             throw new Exception("У одной из выбранных организаций нет корпусов");
         }
         if(orgRegistryChange.getApplied()) {
