@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: anvarov
  * Date: 22.01.16
  * Time: 16:40
  * To change this template use File | Settings | File Templates.

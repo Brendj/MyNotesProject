@@ -10,7 +10,7 @@ import org.hibernate.criterion.Restrictions;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: anvarov
  * Date: 08.12.15
  * Time: 16:34
  * To change this template use File | Settings | File Templates.

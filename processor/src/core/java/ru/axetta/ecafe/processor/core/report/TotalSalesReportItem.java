@@ -2,7 +2,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: anvarov
  * Date: 01.03.16
  * Time: 15:01
  * To change this template use File | Settings | File Templates.
