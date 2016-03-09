@@ -130,29 +130,31 @@
             <a4j:commandButton value="Очистить все" action="#{NSIOrgsRegistrySynchPage.doUncheckAllSverkaPanel}" reRender="editSverkaPanelTable"
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;" ajaxSingle="true" />
             <rich:spacer height="20px" />
-            <rich:dataTable value="#{NSIOrgsRegistrySynchPage.orgModifyChangeItems}" id="editSverkaPanelTable" var="orgModifyItems" width="100%" columns="4">
+            <rich:dataTable value="#{NSIOrgsRegistrySynchPage.orgModifyChangeItems}" id="editSverkaPanelTable" var="orgModifyItem" width="100%" columns="4">
                 <rich:column>
-                    <h:selectBooleanCheckbox value="#{orgModifyItems.selected}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgModifyItem.selected}" styleClass="checkboxes">
+                        <a4j:support event="onchange" ajaxSingle="true"/>
+                    </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column>
                     <f:facet name="header"><h:outputText styleClass="headerText" value="Изменяемое поле" /></f:facet>
-                    <h:outputText value="#{orgModifyItems.valueName}" />
+                    <h:outputText value="#{orgModifyItem.valueName}" />
                 </rich:column>
                 <rich:column>
                     <f:facet name="header"><h:outputText styleClass="headerText" value="Данные ИС ПП" /></f:facet>
-                    <h:outputText value="#{orgModifyItems.oldValue}" />
+                    <h:outputText value="#{orgModifyItem.oldValue}" />
                 </rich:column>
                 <rich:column>
                     <f:facet name="header"><h:outputText styleClass="headerText" value="Данные АИС Реестр" /></f:facet>
-                    <h:outputText value="#{orgModifyItems.newValue}" rendered="#{orgModifyItems.isEqual()}"/>
-                    <h:outputText value="#{orgModifyItems.newValue}" styleClass="error-output-text" rendered="#{!orgModifyItems.isEqual()}"/>
+                    <h:outputText value="#{orgModifyItem.newValue}" rendered="#{orgModifyItem.isEqual()}"/>
+                    <h:outputText value="#{orgModifyItem.newValue}" styleClass="error-output-text" rendered="#{!orgModifyItem.isEqual()}"/>
                 </rich:column>
             </rich:dataTable>
             <rich:spacer height="20px" />
-            <a4j:commandButton value="Применить" action="#{NSIOrgsRegistrySynchPage.doApplyOneOrg}" status="updateStatus"
-                               oncomplete="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;"
-                    reRender="synchTable,synchTableInfoPanel,resultTitle,synchTableControl"/>
-            <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;"/>
+            <a4j:commandButton value="Применить" action="#{NSIOrgsRegistrySynchPage.doApplyOneOrg}" status="updateStatus" ajaxSingle="true"
+                               onclick="this.disabled = true;" oncomplete="Richfaces.hideModalPanel('editSverkaPanel');this.disabled = false;"
+                               style="width: 180px;" reRender="synchTable,synchTableInfoPanel,resultTitle,synchTableControl"/>
+            <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('editSverkaPanel')" style="width: 180px;" ajaxSingle="true" />
         </rich:modalPanel>
 
         <rich:dataTable value="#{NSIOrgsRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
@@ -199,8 +201,8 @@
                                       rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
                         <rich:spacer height="10" />
                         <a4j:commandButton value="..." style="width: 25px; height:25px; text-align: right" title="Редактировать запись сверки"
-                                           reRender="editSverkaPanel,tableSverka" styleClass="command-button" status="updateStatus"
-                                           oncomplete="Richfaces.showModalPanel('editSverkaPanel');" ajaxSingle="true"
+                                           reRender="editSverkaPanel" styleClass="command-button" status="updateStatus" ajaxSingle="true"
+                                           oncomplete="Richfaces.showModalPanel('editSverkaPanel');"
                                            rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && org.isModify}">
                         <f:setPropertyActionListener value="#{org}" target="#{NSIOrgsRegistrySynchPage.orgForEdit}" />
                         </a4j:commandButton>

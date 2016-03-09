@@ -1997,6 +1997,13 @@ public class DAOService {
         return query.getResultList();
     }
 
+    public OrgRegistryChange getOrgRegistryChange(Long idOfOrgRegistryChange) throws Exception {
+        String q = "from OrgRegistryChange where idOfOrgRegistryChange=:id";
+        TypedQuery<OrgRegistryChange> query = entityManager.createQuery(q, OrgRegistryChange.class);
+        query.setParameter("id", idOfOrgRegistryChange);
+        return query.getSingleResult();
+    }
+
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate, long operationType,
             boolean hideApplied) throws Exception{
         if (revisionDate < 1L) {

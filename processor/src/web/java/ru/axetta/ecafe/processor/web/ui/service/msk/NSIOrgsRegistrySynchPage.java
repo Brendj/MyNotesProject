@@ -47,17 +47,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected Boolean hideApplied = true;
     private WebItem orgForEdit;
 
-    private Boolean checkGuid = true;
-    private Boolean checkUniqueAddressId = true;
-    private Boolean checkAddress = true;
-    private Boolean checkShortName = true;
-    private Boolean checkOfficialName = true;
-    private Boolean checkUnom = true;
-    private Boolean checkUnad = true;
-    private Boolean checkINN = true;
-    private Boolean checkInterDistrictCouncil = true;
-    private Boolean checkInterDistrictCouncilChief = true;
-
     private final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
 
     public NSIOrgsRegistrySynchPage() {
@@ -71,6 +60,15 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
+
+        /*checked.put(ImportRegisterOrgsService.VALUE_GUID, true);
+        checked.put(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, true);
+        checked.put(ImportRegisterOrgsService.VALUE_INN, true);
+        checked.put(ImportRegisterOrgsService.VALUE_UNOM, true);
+        checked.put(ImportRegisterOrgsService.VALUE_UNAD, true);
+        checked.put(ImportRegisterOrgsService.VALUE_ADDRESS, true);
+        checked.put(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, true);
+        checked.put(ImportRegisterOrgsService.VALUE_SHORT_NAME, true);*/
     }
 
     public String getPageFilename() {
@@ -329,10 +327,25 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             }
             RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).
                     applyOrgRegistryChange(mainRegistryId, buildingsList, flags);
-            doUpdate();
+            doUpdateOne(mainRegistryId);
         } catch (Exception e) {
             errorMessages = String.format("Не удается применить операцию к выбранным организациям. Текст ошибки: %s", e.getMessage());
             getLogger().error("Failed to apply changes from registry. Error " + e.getMessage(), e);
+        }
+    }
+
+    private void doUpdateOne(Long idOfRegistryChange) {
+        try {
+            OrgRegistryChange dbItem = DAOService.getInstance().getOrgRegistryChange(idOfRegistryChange);
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getIdOfOrgRegistryChange().equals(idOfRegistryChange)) {
+                    items.set(i, new WebItem(dbItem));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            errorMessages = "Не удалось произвести загрузку организаций из Реестров: " + e.getMessage();
+            getLogger().error("Failed to load orgs from registry", e);
         }
     }
 
@@ -422,86 +435,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setOrgForEdit(WebItem orgForEdit) {
         this.orgForEdit = orgForEdit;
-    }
-
-    public Boolean getCheckAddress() {
-        return checkAddress;
-    }
-
-    public void setCheckAddress(Boolean checkAddress) {
-        this.checkAddress = checkAddress;
-    }
-
-    public Boolean getCheckShortName() {
-        return checkShortName;
-    }
-
-    public void setCheckShortName(Boolean checkShortName) {
-        this.checkShortName = checkShortName;
-    }
-
-    public Boolean getCheckOfficialName() {
-        return checkOfficialName;
-    }
-
-    public void setCheckOfficialName(Boolean checkOfficialName) {
-        this.checkOfficialName = checkOfficialName;
-    }
-
-    public Boolean getCheckUnom() {
-        return checkUnom;
-    }
-
-    public void setCheckUnom(Boolean checkUnom) {
-        this.checkUnom = checkUnom;
-    }
-
-    public Boolean getCheckUnad() {
-        return checkUnad;
-    }
-
-    public void setCheckUnad(Boolean checkUnad) {
-        this.checkUnad = checkUnad;
-    }
-
-    public Boolean getCheckINN() {
-        return checkINN;
-    }
-
-    public void setCheckINN(Boolean checkINN) {
-        this.checkINN = checkINN;
-    }
-
-    public Boolean getCheckInterDistrictCouncil() {
-        return checkInterDistrictCouncil;
-    }
-
-    public void setCheckInterDistrictCouncil(Boolean checkInterDistrictCouncil) {
-        this.checkInterDistrictCouncil = checkInterDistrictCouncil;
-    }
-
-    public Boolean getCheckInterDistrictCouncilChief() {
-        return checkInterDistrictCouncilChief;
-    }
-
-    public void setCheckInterDistrictCouncilChief(Boolean checkInterDistrictCouncilChief) {
-        this.checkInterDistrictCouncilChief = checkInterDistrictCouncilChief;
-    }
-
-    public Boolean getCheckGuid() {
-        return checkGuid;
-    }
-
-    public void setCheckGuid(Boolean checkGuid) {
-        this.checkGuid = checkGuid;
-    }
-
-    public Boolean getCheckUniqueAddressId() {
-        return checkUniqueAddressId;
-    }
-
-    public void setCheckUniqueAddressId(Boolean checkUniqueAddressId) {
-        this.checkUniqueAddressId = checkUniqueAddressId;
     }
 
     public List<OrgModifyChangeItem> getOrgModifyChangeItems() {

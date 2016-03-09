@@ -15,7 +15,7 @@ public class OrgModifyChangeItem {
     private String oldValue;
     private String newValue;
     private String valueName;
-    private Boolean selected;
+    private boolean selected;
 
     public OrgModifyChangeItem(String valueName, String oldValue, String newValue) {
         this.valueName = valueName;
@@ -48,11 +48,11 @@ public class OrgModifyChangeItem {
         this.valueName = valueName;
     }
 
-    public Boolean getSelected() {
+    public boolean getSelected() {
         return selected;
     }
 
-    public void setSelected(Boolean selected) {
+    public void setSelected(boolean selected) {
         this.selected = selected;
     }
 
