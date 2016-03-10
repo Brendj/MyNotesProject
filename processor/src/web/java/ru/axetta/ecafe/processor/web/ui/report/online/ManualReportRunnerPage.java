@@ -258,8 +258,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
         filter = "";
         idOfOrgList = Collections.EMPTY_LIST;
         ruleId = null;
-        /*generateStartDate = getDefaultStartDate();
-        generateEndDate = getDefaultEndDate();*/
         reportType = null;
         documentFormat = ReportHandleRule.HTML_FORMAT;
         errorMessage = "";
@@ -359,7 +357,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
             this.hints.add(new Hint(h));
         }
         List<RuleCondition> actualRules = proxy.getReportHandlerRules(ruleId);
-
 
         //TODO: refactor with ReportRuleEditPage
         for (Hint hint : this.hints) {
@@ -635,7 +632,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 }
             }
         } else {
-            //  Если орги вообще не присутствывали, то просто единаждый выполняем отчет
+            //  Если орги вообще не присутствывали, то просто единожды выполняем отчет
             try {
                 buildReport(values, null);
             } catch (Exception e) {
@@ -644,7 +641,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 return;
             }
         }
-
     }
 
 
@@ -686,7 +682,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
         Calendar cal = new GregorianCalendar();
         //  и запускаем
         BasicReportJob report = builder.build((Session) em.getDelegate(), startDate, endDate, cal);
-
 
         //  Получаем принтер и в зависимости от выбранного типа отчета, выполняем его
         String rootPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportPath();

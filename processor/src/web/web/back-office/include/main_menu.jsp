@@ -1101,19 +1101,33 @@
                             reRender="workspaceForm"/>
 
     </rich:panelMenuGroup>
+    <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
+    <rich:panelMenuGroup id="salesReportGroupMenu" binding="#{salesReportGroupPage.mainMenuComponent}"
+                         label="Отчеты по продажам"
+                         rendered="#{salesReportGroupPage.eligibleToWorkCommodityAccounting}">
+        <a4j:support event="onclick" action="#{salesReportGroupPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
-                        label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
+                            label="Дневные продажи по категориям" action="#{dailySalesByGroupsReportPage.show}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
+                            label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
+        <rich:panelMenuItem id="aggregateCostsAndSalesReportMenuItem"
+                            binding="#{aggregateCostsAndSalesReportPage.mainMenuComponent}"
+                            label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
+                            reRender="workspaceForm" />
+        <%--@elvariable id="totalSalesPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalSalesPage"--%>
+        <rich:panelMenuItem id="totalSalesReportMenuItem" binding="#{mainPage.totalSalesPage.mainMenuComponent}"
+                            label="Сводный отчет по продажам" action="#{mainPage.showTotalSalesPage}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" />
 
-    <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
-    <rich:panelMenuItem id="aggregateCostsAndSalesReportMenuItem"
-                        binding="#{aggregateCostsAndSalesReportPage.mainMenuComponent}"
-                        label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
-                        reRender="workspaceForm" />
+
 
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
@@ -1127,10 +1141,6 @@
     <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                         reRender="workspaceForm" />
-
-    <%--@elvariable id="totalSalesPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalSalesPage"--%>
-    <rich:panelMenuItem id="totalSalesReportMenuItem" binding="#{mainPage.totalSalesPage.mainMenuComponent}"
-                        label="Сводный отчет по продажам" action="#{mainPage.showTotalSalesPage}" reRender="workspaceForm" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"

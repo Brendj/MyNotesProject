@@ -12,9 +12,11 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -30,7 +32,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,9 +49,22 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     private Org org;
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager em;
-    private String includeComplex;
-    private String groupByMenuGroup;
-    private String menuGroups;
+    private String includeComplex = "";
+    private String groupByMenuGroup = "";
+    private String menuGroups = "";
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
+    private boolean includeFriendlyOrgs = false;
+
+    public DailySalesByGroupsReportPage() throws RuntimeContext.NotInitializedException {
+        super();
+        localCalendar.setTime(new Date());
+        CalendarUtils.truncateToDayOfMonth(localCalendar);
+        localCalendar.add(Calendar.DAY_OF_MONTH, -1);
+        this.startDate = localCalendar.getTime();
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+    }
 
     public String getPageFilename() {
         return "report/online/daily_sales_by_groups_report";
@@ -87,16 +102,37 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         this.menuGroups = menuGroups;
     }
 
+    public boolean isIncludeFriendlyOrgs() {
+        return includeFriendlyOrgs;
+    }
+
+    public void setIncludeFriendlyOrgs(boolean includeFriendlyOrgs) {
+        this.includeFriendlyOrgs = includeFriendlyOrgs;
+    }
+
     public void showCSVList(ActionEvent actionEvent){
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
+        Session persistenceSession = (Session)em.getDelegate();
         Transaction persistenceTransaction = null;
         try {
+            List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
+            if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+                List<Long> orgIdsList;
+                if(includeFriendlyOrgs) {
+                    orgIdsList = getFriendlyOrgsIds(persistenceSession);
+                }else {
+                    orgIdsList = idOfOrgList;
+                }
+                orgShortItemList = getOrgShortItemList(orgIdsList);
+            } else {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
+                return;
+            }
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
             DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
-            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            builder.setOrgShortItemList(orgShortItemList);
             Session session = RuntimeContext.getInstance().createPersistenceSession();
             dailySalesReport = (DailySalesByGroupsReport) builder.build(session,startDate, endDate, localCalendar);
 
@@ -109,19 +145,16 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             response.setHeader("Content-disposition", "inline;filename=daily_sales.xls");
 
             JRXlsExporter xlsExport = new JRXlsExporter();
-            //JRCsvExporter csvExporter = new JRCsvExporter();
             xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, dailySalesReport.getPrint());
             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
             xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-            //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
             xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
             xlsExport.exportReport();
 
             servletOutputStream.flush();
             servletOutputStream.close();
-
         } catch (JRException fnfe) {
             String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
             logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
@@ -138,29 +171,33 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     @Transactional
     public void buildReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if (idOfOrg != null && idOfOrg > -1) {
-            org = DAOService.getInstance().findOrById(idOfOrg);
-        }
-        if (org == null) {
+        Session persistenceSession = (Session) em.getDelegate();
+        List<BasicReportJob.OrgShortItem> orgShortItemList;
+
+        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
+            List<Long> orgIdsList;
+            if(includeFriendlyOrgs) {
+                orgIdsList = getFriendlyOrgsIds(persistenceSession);
+            }else {
+                orgIdsList = idOfOrgList;
+            }
+            orgShortItemList = getOrgShortItemList(orgIdsList);
+        } else {
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Необходимо выбрать организацию", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
             return;
         }
 
-        Session persistenceSession = null;
         try {
-            persistenceSession = (Session) em.getDelegate();
-            buildReport(persistenceSession);
+            buildReport(persistenceSession, orgShortItemList);
         } catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
-        }/* finally {
-            HibernateUtils.close(persistenceSession, getLogger());
-        }*/
+        }
     }
 
-    public void buildReport(Session session) throws Exception {
+    public void buildReport(Session session, List<BasicReportJob.OrgShortItem> orgShortItems) throws Exception {
         DailySalesByGroupsReport.Builder reportBuilder = new DailySalesByGroupsReport.Builder();
-        reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        reportBuilder.setOrgShortItemList(orgShortItems);
         Properties reportProperties = new Properties();
         reportProperties.setProperty(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, includeComplex);
         reportProperties.setProperty(DailySalesByGroupsReport.PARAM_GROUP_BY_MENU_GROUP, groupByMenuGroup);
@@ -168,5 +205,65 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         reportBuilder.setReportProperties(reportProperties);
         dailySalesReport = (DailySalesByGroupsReport) reportBuilder.build(session, startDate, endDate, localCalendar);
         htmlReport = dailySalesReport.getHtmlReport();
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noofdays=(int)(diff/(24*60*60*1000));
+            switch (noofdays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+        }
+    }
+
+    private List<Long> getFriendlyOrgsIds(Session session) {
+        List<Long> tempIds = new ArrayList<Long>();
+        for(Long orgId : idOfOrgList) {
+            tempIds.addAll(DAOUtils.findFriendlyOrgIds(session, orgId));
+        }
+        Set<Long> distinctIds = new HashSet<Long>(tempIds); //remove doubles
+        return new ArrayList<Long>(distinctIds);
+    }
+
+    private List<BasicReportJob.OrgShortItem> getOrgShortItemList(List<Long> orgIds) {
+        Org org;
+        List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
+        for (Long idOfOrg : orgIds) {
+            org = DAOService.getInstance().findOrById(idOfOrg);
+            list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(),
+                    org.getOfficialName()));
+        }
+        return list;
     }
 }

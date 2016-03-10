@@ -14,27 +14,49 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{dailySalesByGroupsReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" >
+            <a4j:support event="onchanged" reRender="endDateCalendar"
+                         actionListener="#{dailySalesByGroupsReportPage.onReportPeriodChanged}" />
+                       </rich:calendar>
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{dailySalesByGroupsReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 190px;">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{dailySalesByGroupsReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar"
+                         actionListener="#{dailySalesByGroupsReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{dailySalesByGroupsReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <rich:calendar id="endDateCalendar" value="#{dailySalesByGroupsReportPage.endDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" >
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                         actionListener="#{dailySalesByGroupsReportPage.onEndDateSpecified}" />
+                       </rich:calendar>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
+                               </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{dailySalesByGroupsReportPage.filter}}" />
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Включать комплексы" styleClass="output-text" />
-        <h:inputText value="#{dailySalesByGroupsReportPage.includeComplex}" styleClass="output-text"/>
+        <h:outputText escape="true" value="Включать комплексы" styleClass="output-text" rendered="false"/>
+        <h:inputText value="#{dailySalesByGroupsReportPage.includeComplex}" styleClass="output-text" rendered="false"/>
 
-        <h:outputText escape="true" value="Группировать по группам меню" styleClass="output-text" />
-        <h:inputText value="#{dailySalesByGroupsReportPage.groupByMenuGroup}" styleClass="output-text"/>
+        <h:outputText escape="true" value="Группировать по группам меню" styleClass="output-text" rendered="false"/>
+        <h:inputText value="#{dailySalesByGroupsReportPage.groupByMenuGroup}" styleClass="output-text" rendered="false"/>
 
-        <h:outputText escape="true" value="Группы меню" styleClass="output-text" />
-        <h:inputText value="#{dailySalesByGroupsReportPage.menuGroups}" styleClass="output-text"/>
+        <h:outputText escape="true" value="Группы меню" styleClass="output-text" rendered="false"/>
+        <h:inputText value="#{dailySalesByGroupsReportPage.menuGroups}" styleClass="output-text" rendered="false"/>
+
+        <h:outputText escape="true" value="Включать дружественные организации" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{dailySalesByGroupsReportPage.includeFriendlyOrgs}"
+                                     styleClass="output-text" />
 
         <a4j:commandButton value="Генерировать отчет" action="#{dailySalesByGroupsReportPage.buildReport}"
                            reRender="workspaceTogglePanel"

@@ -336,10 +336,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            if(orgShortItemList == null) {
+                orgShortItemList = new ArrayList<OrgShortItem>();
+                orgShortItemList.add(new OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            }
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("idOfOrg", org.getIdOfOrg());
-            parameterMap.put("orgName", org.getShortName());
+            fillOrgNameParameter(parameterMap);
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -354,7 +357,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             Date generateEndTime = new Date();
             if (!exportToHTML) {
                 return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, org.getIdOfOrg());
+                        jasperPrint, startTime, endTime, orgShortItemList.get(0).getIdOfOrg());
             } else {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -367,8 +370,17 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, org.getIdOfOrg()).setHtmlReport(os.toString("UTF-8"));
+                        jasperPrint, startTime, endTime, orgShortItemList.get(0).getIdOfOrg()).setHtmlReport(os.toString("UTF-8"));
             }
+        }
+
+        private void fillOrgNameParameter(Map<String, Object> params) {
+            StringBuilder paramValue = new StringBuilder();
+            paramValue.append(orgShortItemList.size() == 1 ? "Учреждение: " : "Учреждения: ");
+            for(OrgShortItem org : orgShortItemList) {
+                paramValue.append(String.format("%s, ", org.getShortName()));
+            }
+            params.put("orgName", paramValue.substring(0, paramValue.length() - 2));//without last ", "
         }
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
@@ -379,7 +391,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             String includeComplexParam = (String) getReportProperties().get(PARAM_INCLUDE_COMPLEX);
             boolean includeComplex = true;
-            if (includeComplexParam != null) {
+            if ((includeComplexParam != null)&&(!includeComplexParam.isEmpty())) {
                 includeComplex = includeComplexParam.trim().equalsIgnoreCase("true");
             }
 
@@ -432,18 +444,23 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             int menuOrigin1 = 0;
             String menuGroup1 = null;
 
+
+
             Query menuOriginQuery = session
-                    .createSQLQuery(String.format("SELECT od.%s FROM CF_ORDERS o,CF_ORDERDETAILS od " +
+                    .createSQLQuery(String.format("SELECT DISTINCT od.%s FROM CF_ORDERS o,CF_ORDERDETAILS od " +
                             " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
                             +
-                            "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) ", groupByField, groupByField));
+                            "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) ", groupByField));
 
-            menuOriginQuery.setParameter("idOfOrg", org.getIdOfOrg());
             menuOriginQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
             menuOriginQuery.setParameter("startTime", startTime.getTime());
             menuOriginQuery.setParameter("endTime", endTime.getTime());
 
-            menuOriginList = menuOriginQuery.list();
+            menuOriginList = new ArrayList();
+            for(OrgShortItem orgItem : orgShortItemList) {
+                menuOriginQuery.setParameter("idOfOrg", orgItem.getIdOfOrg());
+                menuOriginList.addAll(menuOriginQuery.list());
+            }
 
             Object val;
 
@@ -471,6 +488,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 }
             }
 
+            String orgAdditionalCondition = createOrgAdditionalConditionByOrgList(orgShortItemList);
+
             Query mealsQuery = session.createSQLQuery(String.format(
                     "SELECT od.%s, od.MenuDetailName, SUM(od.qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), " +
                             "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
@@ -478,13 +497,12 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                             + "ELSE 'other' END AS flag " +
                             " FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                            + "WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
+                            + "WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
                             + "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice, flag "
-                            + "ORDER BY od.%s, od.MenuDetailName", groupByField,
+                            + "ORDER BY od.%s, od.MenuDetailName", groupByField, orgAdditionalCondition,
                     menuGroupsCondition == null ? "" : "AND od.MenuGroup IN (" + menuGroupsCondition + ") ",
                     groupByField, groupByField));
 
-            mealsQuery.setParameter("idOfOrg", org.getIdOfOrg());
             mealsQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
             mealsQuery.setParameter("startTime", startTime.getTime());
             mealsQuery.setParameter("endTime", endTime.getTime());
@@ -587,19 +605,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                                 + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
                                 + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                                 + "ELSE 'other' END AS flag "
-                                + " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND"
+                                + String.format("FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND", orgAdditionalCondition)
                                 + " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND "
                                 + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 "
                                 + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, flag");
 
-                complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
                 complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
                 complexQuery_1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
-                //complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
-                //complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
-                //complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
-                //complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
-                //complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбор
                 complexQuery_1.setParameter("startTime", startTime.getTime());
                 complexQuery_1.setParameter("endTime", endTime.getTime());
 
@@ -670,10 +682,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 Query freeComplexQuery1 = session.createSQLQuery(
                         "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
                                 + "FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                                + "WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 "
+                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
                                 + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
 
-                freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
                 freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
                 freeComplexQuery1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
                 freeComplexQuery1.setParameter("startTime", startTime.getTime());
@@ -727,12 +738,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                             + "ELSE 'other' END AS flag FROM CF_ORDERS o, CF_ORDERDETAILS od "
-                            + "WHERE (o.idOfOrg = :idOfOrg AND od.idOfOrg = :idOfOrg) AND (o.IdOfOrder = od.IdOfOrder) "
+                            + String.format("WHERE %s AND (o.IdOfOrder = od.IdOfOrder) ", orgAdditionalCondition)
                             + "AND (od.MenuType >= :typeComplexMin AND od.MenuType <= :typeComplexMax) "
                             + "AND (od.rPrice > 0) AND (o.CreatedDate >= :startTime AND o.CreatedDate <= :endTime) "
                             + "AND o.state = 0 AND od.state = 0 "
                             + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, o.sumbycard, o.sumbycash");
-            payComplexQueryTotal.setParameter("idOfOrg", org.getIdOfOrg());
             payComplexQueryTotal.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             payComplexQueryTotal.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
             payComplexQueryTotal.setParameter("startTime", startTime.getTime());
@@ -798,14 +808,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + " WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
                             + " WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                             + " ELSE 'other' END AS flag "
-                            + " FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                            + " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
+                            + " FROM CF_ORDERS o, CF_ORDERDETAILS od "
+                            + " WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
                             + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s GROUP BY od.%s, od.MenuDetailName, od.RPrice, o.sumbycash, o.sumbycard "
-                            + " ORDER BY od.%s, od.MenuDetailName", groupByField,
+                            + " ORDER BY od.%s, od.MenuDetailName", groupByField, orgAdditionalCondition,
                     menuGroupsCondition == null ? "" : "AND od.MenuGroup IN (" + menuGroupsCondition + ") ",
                     groupByField, groupByField));
 
-            mealsBuffQuery.setParameter("idOfOrg", org.getIdOfOrg());
             mealsBuffQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
             mealsBuffQuery.setParameter("startTime", startTime.getTime());
             mealsBuffQuery.setParameter("endTime", endTime.getTime());
@@ -882,6 +891,15 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             return new JRBeanCollectionDataSource(mealRowHashMap.values());
         }
 
+        private String createOrgAdditionalConditionByOrgList(List<OrgShortItem> orgShortItems) {
+            StringBuilder orgCondition = new StringBuilder("(");
+            for(OrgShortItem orgItem : orgShortItems) {
+                orgCondition.append(String.format("(o.idOfOrg=%d AND od.idOfOrg=%<d) OR ", orgItem.getIdOfOrg()));
+            }
+            //return without last "OR " and add ")"
+            return String.format("%s%s", orgCondition.substring(0, orgCondition.length() - 4), ")");
+        }
+
         private void addPaymentTypeTotalValuesToReportParameters(Map<String, Object> parameters,  LinkedList<TotalDataRow> totalDataRows) {
             List<SubReportDataRow> allSubReportDataRows = new LinkedList<SubReportDataRow>();
             for(TotalDataRow totalDataRow : totalDataRows) {
@@ -909,7 +927,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             parameters.put("totalReportSumCard", totalReportSumCard);
             parameters.put("totalReportSumCashAndCard", totalReportSumCashAndCard);
         }
-
     }
 
     public static class TotalDataRow {

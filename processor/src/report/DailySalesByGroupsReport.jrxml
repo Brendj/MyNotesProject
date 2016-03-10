@@ -17,7 +17,6 @@
 		</box>
 	</style>
 	<style name="Crosstab Data Text" hAlign="Center"/>
-	<parameter name="idOfOrg" class="java.lang.Long"/>
 	<parameter name="orgName" class="java.lang.String"/>
 	<parameter name="monthName" class="java.lang.String"/>
 	<parameter name="month" class="java.lang.Integer"/>
@@ -73,12 +72,12 @@
 	</background>
 	<title>
 		<band height="104" splitType="Stretch">
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement uuid="b8e43dc2-2988-4a07-b18e-f711ae62dcfc" x="0" y="30" width="680" height="24"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Учреждение: "+$P{orgName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="df99d7d5-eb36-453d-88ec-eb89178a3987" x="0" y="0" width="680" height="20"/>
@@ -90,7 +89,7 @@
 			</textField>
 			<elementGroup/>
 			<staticText>
-				<reportElement uuid="dcdc0da8-4ad0-496b-b000-592ca1d39e11" x="0" y="54" width="680" height="20"/>
+				<reportElement uuid="dcdc0da8-4ad0-496b-b000-592ca1d39e11" positionType="Float" x="0" y="54" width="680" height="20"/>
 				<textElement/>
 				<text><![CDATA[ ]]></text>
 			</staticText>

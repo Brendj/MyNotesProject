@@ -366,6 +366,7 @@ public class MainPage implements Serializable {
     private final LatePaymentReportPage latePaymentReportPage = new LatePaymentReportPage();
     private final LatePaymentDetailedReportPage latePaymentDetailedReportPage = new LatePaymentDetailedReportPage();
     private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
+    private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5887,6 +5888,10 @@ public class MainPage implements Serializable {
 
     public DetailedDeviationsWithoutCorpsNewReportPage getDetailedDeviationsWithoutCorpsNewReportPage() {
         return detailedDeviationsWithoutCorpsNewReportPage;
+    }
+
+    public SalesReportGroupPage getSalesReportGroupPage() {
+        return salesReportGroupPage;
     }
 
     public Object showGoodRequestNewReportPage() {

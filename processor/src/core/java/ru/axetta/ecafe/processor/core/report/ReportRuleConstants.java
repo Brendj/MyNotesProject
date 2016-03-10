@@ -355,5 +355,4 @@ public class ReportRuleConstants {
             return new ReportParamHint(hint).getParamHints();
         }
     }
-
 }
