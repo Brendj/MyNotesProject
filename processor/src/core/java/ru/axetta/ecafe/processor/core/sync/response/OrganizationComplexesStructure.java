@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.cxf.common.i18n.Exception;
 import org.hibernate.Query;
@@ -75,7 +76,7 @@ public class OrganizationComplexesStructure {
         Set<Org> orgsWithConfiguration = selectOrgsWithConfiguration(configurationProvider, friendlyOrgs);
         Set<ComplexInfo> complexes = findUniqueComplexes(session, orgsWithConfiguration,searchDate);
         complexesMap.put(searchDate,complexes);
-        return new ProviderComplexesItem(configurationProvider,complexesMap);
+        return new ProviderComplexesItem(configurationProvider,complexesMap,orgsWithConfiguration);
     }
 
     private Set<ConfigurationProvider> selectProviders(Session session, Set<Org> friendlyOrgs) {
@@ -162,23 +163,27 @@ public class OrganizationComplexesStructure {
         private static final String PROVIDER_ELEMENT_NAME ="CFP";
         private static final String PROVIDER_ATTR_NAME="name";
         private static final String PROVIDER_ATTR_ID="id";
+        private static final String PROVIDER_ATTR_ORGS="orgs";
         private static final String DATE_ELEMENT="Date";
         private static final String DATE_ATTR_VALUE="value";
 
         private final ConfigurationProvider configurationProvider;
         private final Map<Date,Set<ComplexInfo>> complexesMap;
+        private final Set<Org> workedOrgs;
 
-        public ProviderComplexesItem(ConfigurationProvider configurationProvider, Map<Date, Set<ComplexInfo>> complexesMap) {
+        public ProviderComplexesItem(ConfigurationProvider configurationProvider,
+                Map<Date, Set<ComplexInfo>> complexesMap, Set<Org> workedOrgs) {
 
             this.configurationProvider = configurationProvider;
             this.complexesMap = complexesMap;
+            this.workedOrgs = workedOrgs;
         }
 
         public Element toElement(Document document) {
             Element element = document.createElement(PROVIDER_ELEMENT_NAME);
             element.setAttribute(PROVIDER_ATTR_NAME,configurationProvider.getName());
             element.setAttribute(PROVIDER_ATTR_ID,Long.toString(configurationProvider.getIdOfConfigurationProvider()));
-
+            element.setAttribute(PROVIDER_ATTR_ORGS, StringUtils.join(getOrgIds(),','));
             for (Date date : complexesMap.keySet()) {
                 Element elementDate = document.createElement(DATE_ELEMENT);
                 elementDate.setAttribute(DATE_ATTR_VALUE,CalendarUtils.getDateFormatLocal().format(date));
@@ -189,6 +194,15 @@ public class OrganizationComplexesStructure {
             }
             return element;
         }
+
+        private Set<Long> getOrgIds() {
+            Set<Long> result = new HashSet<Long>();
+            for (Org org : workedOrgs) {
+                result.add(org.getIdOfOrg());
+            }
+            return result;
+        }
+
     }
 
 
