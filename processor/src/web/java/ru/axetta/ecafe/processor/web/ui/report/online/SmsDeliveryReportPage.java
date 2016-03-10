@@ -97,7 +97,11 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
                 printWarn(message);
             }
         };
-
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if(startDate.after(endDate)) {
+            complainWrongPeriod(facesContext);
+            return;
+        }
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder(printer);
         addOrgFilter(reportBuilder);
@@ -150,6 +154,10 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        if(startDate.after(endDate)) {
+            complainWrongPeriod(facesContext);
+            return;
+        }
         try {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
@@ -193,5 +201,10 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(persistenceSession, getLogger());
         }
+    }
+
+    private void complainWrongPeriod(FacesContext facesContext) {
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Начальная дата больше конечной.", null));
     }
 }

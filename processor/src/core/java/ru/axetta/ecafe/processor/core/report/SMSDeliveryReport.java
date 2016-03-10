@@ -56,6 +56,10 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
     private static final String GOOD_NAME = "Товар";
     private static final List<String> DEFAULT_COLUMNS = new ArrayList<String>();
 
+    public static final long MILLIS_IN_HOUR = 3600000L;
+    public static final long MILLIS_IN_MINUTE = 60000L;
+    public static final long MILLIS_IN_SECOND = 1000L;
+
     static {
         DEFAULT_COLUMNS.add(ORG_NUM);
         DEFAULT_COLUMNS.add(ORG_NAME);
@@ -576,20 +580,13 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         }
 
         protected static String calcTimeout(long time) {
-            /*DateFormat df;
-            if(time / (60*60*24) >= 1) {
-                df = new SimpleDateFormat(String.format("'%s' '%s' H '%s' m '%s'", time / 86400000L, "дн.", "час.", "мин."));
-            } else if(time / (60*60) >= 1) {
-                df = new SimpleDateFormat(String.format("H '%s' m '%s'", "час.", "мин."));
-            } else if(time / (60) >= 1) {
-                df = new SimpleDateFormat(String.format("m '%s'", "мин."));
-            } else {
-                df = new SimpleDateFormat(String.format("s '%s'", "сек."));
-            }*/
-            //DateFormat df = new SimpleDateFormat(String.format("HH:mm:ss"));
-            DateFormat df = new SimpleDateFormat(String.format("'%s':mm:ss", time / 3600000L));
-            Date d = new Date(time);
-            return df.format(d);
+
+            final boolean lessThenZero = time < 0L;
+            if(lessThenZero) time = Math.abs(time);
+            long hourAmount = time / MILLIS_IN_HOUR;
+            long minuteAmount = (time - (hourAmount * MILLIS_IN_HOUR)) / MILLIS_IN_MINUTE;
+            long secondAmount = (time - (hourAmount * MILLIS_IN_HOUR) - (minuteAmount * MILLIS_IN_MINUTE)) / MILLIS_IN_SECOND;
+            return String.format("%s%d:%02d:%02d", lessThenZero ? "-" : "", hourAmount, minuteAmount, secondAmount);
         }
 
         protected static String calcDate(long time){
