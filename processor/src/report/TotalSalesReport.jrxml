@@ -70,6 +70,15 @@
 			<fieldDescription><![CDATA[type]]></fieldDescription>
 		</field>
 	</subDataset>
+	<subDataset name="Table Dataset 2" uuid="27dbee13-bb62-40e7-836e-4173a60421e1">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="productTitle" class="java.lang.String">
+			<fieldDescription><![CDATA[productTitle]]></fieldDescription>
+		</field>
+		<field name="sumTotals" class="java.lang.Double"/>
+	</subDataset>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="sumComplex" class="java.lang.Double"/>
@@ -91,6 +100,9 @@
 	</field>
 	<field name="name" class="java.lang.String">
 		<fieldDescription><![CDATA[name]]></fieldDescription>
+	</field>
+	<field name="totalSalesReportItemList" class="java.util.List">
+		<fieldDescription><![CDATA[totalSalesReportItemList]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -125,9 +137,16 @@
 		<band height="35" splitType="Stretch"/>
 	</pageHeader>
 	<detail>
-		<band height="269" splitType="Stretch">
+		<band height="153" splitType="Stretch">
+			<textField>
+				<reportElement uuid="f263b515-37e2-4f48-a86a-38e74e37aa47" x="20" y="18" width="174" height="20"/>
+				<textElement>
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
 			<crosstab>
-				<reportElement uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce" x="0" y="38" width="802" height="231"/>
+				<reportElement uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce" x="0" y="38" width="802" height="111"/>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="122f20f9-c69c-45b3-8977-e31e8d50953a">
@@ -255,7 +274,7 @@
 					<measureExpression><![CDATA[Double.valueOf($F{sum})/100]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasure" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы")? Double.valueOf($F{sum})/100 : 0 ]]></measureExpression>
+					<measureExpression><![CDATA[($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы")? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<crosstabCell width="197" height="25">
 					<cellContents>
@@ -269,7 +288,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="25" rowTotalGroup="name">
+				<crosstabCell width="197" height="26" rowTotalGroup="name">
 					<cellContents backcolor="#FF0000" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -293,7 +312,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="127" height="25" rowTotalGroup="name" columnTotalGroup="type">
+				<crosstabCell width="127" height="26" rowTotalGroup="name" columnTotalGroup="type">
 					<cellContents backcolor="#FF0000" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -330,351 +349,106 @@
 					</cellContents>
 				</crosstabCell>
 			</crosstab>
-			<textField>
-				<reportElement uuid="f263b515-37e2-4f48-a86a-38e74e37aa47" x="20" y="18" width="174" height="20"/>
-				<textElement>
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
-			</textField>
 		</band>
 	</detail>
-	<lastPageFooter>
-		<band height="64">
-			<staticText>
-				<reportElement uuid="e6104f6c-f6fc-45cf-a489-5256bb19c0e3" x="116" y="32" width="165" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<text><![CDATA[ИТОГО]]></text>
-			</staticText>
-			<textField pattern="#,##0.00">
-				<reportElement uuid="b67cfe7a-e8ba-4c43-8e93-d49308db6db6" x="2448" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[($P{sumComplex}+$P{sumBuffet}+$P{sumBen})/100]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="73e54587-22a9-48a5-8f41-a8005f12e993" x="1660" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{sumBuffetPlusSumComplex}/100]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="ca20aef8-0ed9-4618-bbf3-bb18d8f9e3ea" x="1857" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{sumBuffetOwnPlusSumComplex}/100]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement uuid="e69f29bf-f4f8-4857-b3de-7573cfb2b5c5" x="2251" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{sumComplex}/100]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement uuid="7515ea7f-91e9-4ddd-8ae5-2e57b8d5da01" x="1463" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{sumBuffet}/100]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement uuid="a6ca435f-3afe-4356-8fb7-9be7d127d07b" x="2054" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true" isUnderline="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{sumBen}/100]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="0e778405-735a-4dbc-9a61-57af34dd1990" x="2251" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платные комплексы]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="834fbcdd-00e1-442a-847f-3622f95a8068" x="1463" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфетная продукция]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9b54188b-82bd-4b45-90b4-805d39ebef8e" x="2054" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Льготные комплексы]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="47a0adae-83e1-4305-a7d2-fdfb3d9e55bf" x="2448" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общий итог:]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b0f259bd-0251-4ac5-82cc-8e1d5fe999f4" x="1660" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Итого буфет собственное + Платные комплексы]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5b809e73-fbb0-4920-b4d9-0ce7114f92e6" x="1857" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Итого буфет все + Платные комплексы]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f63a2e86-9f1c-4f92-9810-47b999eb725c" x="281" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Вендинг]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="db306b61-0879-4b76-9165-6db9fa267cf6" x="281" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductVending}/100]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="63319d1d-f3c4-476d-acce-60de992273c9" x="478" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductPurchase}/100]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="cbe61817-080c-4170-a56e-4eff866f13d3" x="478" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Закупленное
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f5659b97-f414-4ac0-8288-b7c9dbb28f34" x="675" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Коммерческое питание
-]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="a7852d75-6799-4d19-9ea7-ba5876381e5b" x="675" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductCommercial}/100]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="7150a13a-6be7-4b82-953e-e74cbfaf9549" x="872" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Собственное]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="78b42746-72d6-4428-b490-9465510bb423" x="872" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductOwn}/100]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="925a7c18-501f-4538-b70f-e60a3296c847" x="1069" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductCentralize}/100]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement uuid="52c20030-cb2e-4e1b-a587-8575e9bcec9d" x="1069" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Централизованное
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c4dd0c92-a503-4b1c-9332-799b6568cb55" x="1266" y="0" width="197" height="32"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет Централизованное с доготовкой]]></text>
-			</staticText>
-			<textField>
-				<reportElement uuid="7e45dcb6-ff11-4f2f-941c-3ab3f5a327d3" x="1266" y="32" width="197" height="20"/>
-				<box>
-					<pen lineWidth="0.25"/>
-					<topPen lineWidth="0.25"/>
-					<leftPen lineWidth="0.25"/>
-					<bottomPen lineWidth="0.25"/>
-					<rightPen lineWidth="0.25"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{sumProductCentralizeCook}/100]]></textFieldExpression>
-			</textField>
+	<summary>
+		<band height="94">
+			<crosstab>
+				<reportElement uuid="fdfec54e-0b36-410d-acea-ee63c6f7ad02" x="0" y="0" width="478" height="94"/>
+				<crosstabDataset>
+					<dataset>
+						<datasetRun subDataset="Table Dataset 2" uuid="0ce35fde-01bd-43e8-916e-dc6a68394a1f">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{totalSalesReportItemList})]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+				</crosstabDataset>
+				<rowGroup name="sumTotals" width="281" totalPosition="End">
+					<bucket class="java.lang.Double">
+						<bucketExpression><![CDATA[$F{sumTotals}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement uuid="a1f69cf1-2514-4c65-8c50-8e714a47a9e4" x="0" y="1" width="281" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ИТОГО]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="productTitle" height="30" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{productTitle}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement uuid="36270d1b-1356-4446-bc50-5483c1478c5a" style="Crosstab Data Text" x="0" y="0" width="197" height="30"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{productTitle}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="sumTotalsMeasure" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{sumTotals}]]></measureExpression>
+				</measure>
+				<crosstabCell width="197" height="0">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="197" height="26" rowTotalGroup="sumTotals">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="dd6b6a69-3fe3-490d-9e18-b932ff63def9" style="Crosstab Data Text" x="0" y="0" width="197" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{sumTotalsMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" columnTotalGroup="productTitle">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="26" rowTotalGroup="sumTotals" columnTotalGroup="productTitle">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
 		</band>
-	</lastPageFooter>
+	</summary>
 </jasperReport>

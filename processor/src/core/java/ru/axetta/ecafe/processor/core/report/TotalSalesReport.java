@@ -135,60 +135,60 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     if (title.equals("Буфет Вендинг")) {
                         TotalSalesReportItem totalSalesReportItemSumProductVending = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
-                                Double.parseDouble(sumProductVending.toString()));
+                                Double.parseDouble(sumProductVending.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
                     }
                     if (title.equals("Буфет Закупленное")) {
                         TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
-                                Double.parseDouble(sumProductPurchase.toString()));
+                                Double.parseDouble(sumProductPurchase.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
                     }
                     if (title.equals("Буфет Коммерческое питание")) {
                         TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
-                                Double.parseDouble(sumProductCommercial.toString()));
+                                Double.parseDouble(sumProductCommercial.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
                     }
                     if (title.equals("Буфет Собственное")) {
                         TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
-                                Double.parseDouble(sumProductOwn.toString()));
+                                Double.parseDouble(sumProductOwn.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
                     }
                     if (title.equals("Буфет Централизованное")) {
                         TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
-                                Double.parseDouble(sumProductCentralize.toString()));
+                                Double.parseDouble(sumProductCentralize.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
                     }
                     if (title.equals("Буфет Централизованное с доготовкой")) {
                         TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
                                 "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
-                                Double.parseDouble(sumProductCentralizeCook.toString()));
+                                Double.parseDouble(sumProductCentralizeCook.toString())/100);
                         totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
                     }
                 }
             }
 
             TotalSalesReportItem totalSalesReportItemSumBuffet = new TotalSalesReportItem(NAME_BUFFET,
-                    Double.parseDouble(sumBuffet.toString()));
+                    Double.parseDouble(sumBuffet.toString())/100);
             totalSalesReportItemList.add(totalSalesReportItemSumBuffet);
 
             TotalSalesReportItem totalSalesReportItemSumBuffetOwnPlusSumComplex = new TotalSalesReportItem(
-                    TOTAL_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetOwnPlusSumComplex.toString()));
+                    TOTAL_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetOwnPlusSumComplex.toString())/100);
             totalSalesReportItemList.add(totalSalesReportItemSumBuffetOwnPlusSumComplex);
 
             TotalSalesReportItem totalSalesReportItemSumBuffetPlusSumComplex = new TotalSalesReportItem(
-                    TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetPlusSumComplex.toString()));
+                    TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, Double.parseDouble(sumBuffetPlusSumComplex.toString())/100);
             totalSalesReportItemList.add(totalSalesReportItemSumBuffetPlusSumComplex);
 
             TotalSalesReportItem totalSalesReportItemSumBen = new TotalSalesReportItem(NAME_BEN,
-                    Double.parseDouble(sumBen.toString()));
+                    Double.parseDouble(sumBen.toString())/100);
             totalSalesReportItemList.add(totalSalesReportItemSumBen);
 
             TotalSalesReportItem totalSalesReportItemSubComplex = new TotalSalesReportItem(NAME_COMPLEX,
-                    Double.parseDouble(sumComplex.toString()));
+                    Double.parseDouble(sumComplex.toString())/100);
             totalSalesReportItemList.add(totalSalesReportItemSubComplex);
 
             return totalSalesReportItemList;
