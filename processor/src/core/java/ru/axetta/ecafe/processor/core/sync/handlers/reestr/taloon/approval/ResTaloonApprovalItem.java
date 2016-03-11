@@ -72,19 +72,15 @@ public class ResTaloonApprovalItem {
         XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
         XMLUtils.setAttributeIfNotNull(element, "Name", name);
         XMLUtils.setAttributeIfNotNull(element, "SoldedQty", soldedQty);
-        XMLUtils.setAttributeIfNotNull(element, "RequestedQty", requestedQty);
-        XMLUtils.setAttributeIfNotNull(element, "ShippedQty", shippedQty);
+        XMLUtils.setAttributeIfNotNull(element, "RequestedQty", requestedQty == null ? 0 : requestedQty);
+        XMLUtils.setAttributeIfNotNull(element, "ShippedQty", shippedQty == null ? 0 : shippedQty);
         XMLUtils.setAttributeIfNotNull(element, "Price", price);
         XMLUtils.setAttributeIfNotNull(element, "TaloonNumber", taloonNumber);
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
-        if (isppState != null) {
-            XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
-        }
-        if (ppState != null) {
-            XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
-        }
+        XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState == null ? TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal() : isppState.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState == null ? TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal() : ppState.ordinal());
         if (resultCode != null && resultCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
         }
