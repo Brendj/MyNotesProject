@@ -16,6 +16,10 @@ import java.util.Set;
  */
 public class OrgUtils {
 
+    public static Set<Long> getFriendlyOrgIds(Org org) {
+        return new HashSet<Long>(extractIds(new ArrayList<Org>(org.getFriendlyOrg())));
+    }
+
     public static List<Long> extractIds(List<Org> orgList) {
         List<Long> result = new ArrayList<Long>();
         for (Org org : orgList) {

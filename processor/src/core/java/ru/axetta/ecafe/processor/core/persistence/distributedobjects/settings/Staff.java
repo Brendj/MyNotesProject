@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
@@ -11,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.In
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -24,9 +26,7 @@ import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,6 +54,26 @@ public class Staff extends DistributedObject {
     private Set<StateChange> stateChangeInternal;
     private Set<InternalDisposingDocument> internalDisposingDocumentInternal;
     private Set<GoodRequest> goodRequestInternal;
+
+    public enum Roles {
+        ADMIN(0),
+        CASHIER(1),
+        SECURITY(2),
+        LIBRARY_ADMIN(3),
+        SELF_SERVICE(4),
+        ADMIN_SECURITY(5),
+        AUDITOR(6);
+
+        private long idOfRole;
+
+        Roles(long idOfRole) {
+            this.idOfRole = idOfRole;
+        }
+
+        public long getIdOfRole() {
+            return idOfRole;
+        }
+    }
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -83,27 +103,70 @@ public class Staff extends DistributedObject {
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
-        List<Long> orgOwners = new ArrayList<Long>();
-        if(isSupplier){
-            /* Собираем всех потребителей Организации источника меню */
-            Query query = session.createQuery("select rule.idOfDestOrg from MenuExchangeRule rule where rule.idOfSourceOrg=:idOfOrg");
-            query.setParameter("idOfOrg", idOfOrg);
-            orgOwners = query.list();
+        if (isSupplier) {
+            return toSupplierOrgProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         } else {
-            /* Собираем всех потребителей Организации источника меню */
-            Query query = session.createQuery("select rule.idOfSourceOrg from MenuExchangeRule rule where rule.idOfDestOrg=:idOfOrg");
-            query.setParameter("idOfOrg", idOfOrg);
-            Long orgOwner = (Long) query.uniqueResult();
-            orgOwners.add(orgOwner);
+            return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         }
-        orgOwners.add(idOfOrg);
+    }
+
+    private List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
+            Integer currentLimit) {
+        Org currentOrg = (Org) session.load(Org.class,idOfOrg);
+        List<DistributedObject> result = new ArrayList<DistributedObject>();
+        Set<Long> friendlyOrgIds = OrgUtils.getFriendlyOrgIds(currentOrg);
+        Long supplierOrg = getSourceOrgId(session, idOfOrg);
+        friendlyOrgIds.add(supplierOrg);
+        List<DistributedObject> adminStaffs = loadAdminStaffsForOrgs(session, friendlyOrgIds);
+        List<DistributedObject> currentOrgStaffs = loadAllStaffsForOrg(session, idOfOrg);
+        result.addAll(adminStaffs);
+        result.addAll(currentOrgStaffs);
+        return result;
+    }
+
+    private List<DistributedObject> toSupplierOrgProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
+            Integer currentLimit) {
+        List<DistributedObject> result = new ArrayList<DistributedObject>();
+        List<Long> orgOwners = getDestOrgsForSupplier(session, idOfOrg);
+        List<DistributedObject> adminStaffs = loadAdminStaffsForOrgs(session, orgOwners);
+        List<DistributedObject> currentOrgStaffs = loadAllStaffsForOrg(session, idOfOrg);
+        result.addAll(adminStaffs);
+        result.addAll(currentOrgStaffs);
+        return result;
+    }
+
+    private List<Long> getDestOrgsForSupplier(Session session, Long idOfSourceOrg) {
+        /* Собираем всех потребителей Организации источника меню */
+        Query query = session.createQuery("select rule.idOfDestOrg from MenuExchangeRule rule where rule.idOfSourceOrg=:idOfOrg");
+        query.setParameter("idOfOrg", idOfSourceOrg);
+        return query.list();
+    }
+
+    private Long getSourceOrgId(Session session, Long idOfOrg) {
+    /* Получаю идентификатор организации источника меню */
+        Query query = session.createQuery("select rule.idOfSourceOrg from MenuExchangeRule rule where rule.idOfDestOrg=:idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        return (Long) query.uniqueResult();
+    }
+
+    private List<DistributedObject> loadAllStaffsForOrg(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(getClass());
-        criteria.add(Restrictions.in("orgOwner", orgOwners));
-        //criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();
     }
+
+    private List<DistributedObject> loadAdminStaffsForOrgs(Session session, Collection<Long> orgIds) {
+        Criteria criteria = session.createCriteria(getClass());
+        criteria.add(Restrictions.in("orgOwner", orgIds));
+        criteria.add(Restrictions.in("idOfRole", Arrays.asList(Roles.ADMIN.getIdOfRole(), Roles.LIBRARY_ADMIN.getIdOfRole())));
+        createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
+    }
+
+
 
 
     @Override
