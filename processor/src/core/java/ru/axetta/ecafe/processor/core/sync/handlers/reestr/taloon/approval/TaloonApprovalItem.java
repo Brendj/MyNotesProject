@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -31,9 +33,13 @@ public class TaloonApprovalItem {
     private Long orgId;
     private Date date;
     private String name;
-    private Integer qty;
+    private Integer soldedQty;
+    private Integer requestedQty;
+    private Integer shippedQty;
     private Long price;
     private TaloonCreatedTypeEnum createdType;
+    private TaloonISPPStatesEnum isppState;
+    private TaloonPPStatesEnum ppState;
     private Long taloonNumber;
     private Long orgOwnerId;
     private Boolean deletedState;
@@ -44,9 +50,13 @@ public class TaloonApprovalItem {
         Long orgId = null;
         Date date = null;
         String name = null;
-        Integer qty = null;
+        Integer soldedQty = null;
+        Integer requestedQty = null;
+        Integer shippedQty = null;
         Long price = null;
         Integer createdType = null;
+        Integer isppState = null;
+        Integer ppState = null;
         Boolean deletedState = false;
         Long taloonNumber = null;
 
@@ -87,19 +97,41 @@ public class TaloonApprovalItem {
             errorMessageComposite += "Attribute Name not found\n";
         }
 
-        String strQty = XMLUtils.getAttributeValue(itemNode, "Qty");
-        if (StringUtils.isNotEmpty(strQty)) {
+        String strSoldedQty = XMLUtils.getAttributeValue(itemNode, "SoldedQty");
+        if (StringUtils.isNotEmpty(strSoldedQty)) {
             try {
-                qty = Integer.parseInt(strQty);
+                soldedQty = Integer.parseInt(strSoldedQty);
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format Qty\n";
+                errorMessageComposite += "NumberFormatException incorrect format SoldedQty\n";
             }
         } else {
-            errorMessageComposite += "Attribute Qty not found\n";
+            errorMessageComposite += "Attribute SoldedQty not found\n";
+        }
+
+        String strRequestedQty = XMLUtils.getAttributeValue(itemNode, "RequestedQty");
+        if (StringUtils.isNotEmpty(strRequestedQty)) {
+            try {
+                requestedQty = Integer.parseInt(strRequestedQty);
+            } catch (NumberFormatException e) {
+                errorMessageComposite += "NumberFormatException incorrect format RequestedQty\n";
+            }
+        } else {
+            errorMessageComposite += "Attribute RequestedQty not found\n";
+        }
+
+        String strShippedQty = XMLUtils.getAttributeValue(itemNode, "ShippedQty");
+        if (StringUtils.isNotEmpty(strShippedQty)) {
+            try {
+                shippedQty = Integer.parseInt(strShippedQty);
+            } catch (NumberFormatException e) {
+                errorMessageComposite += "NumberFormatException incorrect format ShippedQty\n";
+            }
+        } else {
+            errorMessageComposite += "Attribute ShippedQty not found\n";
         }
 
         String strPrice = XMLUtils.getAttributeValue(itemNode, "Price");
-        if (StringUtils.isNotEmpty(strQty)) {
+        if (StringUtils.isNotEmpty(strPrice)) {
             try {
                 price = Long.parseLong(strPrice);
             } catch (NumberFormatException e) {
@@ -123,6 +155,36 @@ public class TaloonApprovalItem {
             errorMessageComposite += "Attribute CreatedType not found\n";
         }
 
+        String strIsppState = XMLUtils.getAttributeValue(itemNode, "ISPP_State");
+        if (StringUtils.isNotEmpty(strIsppState)) {
+            try {
+                isppState = Integer.parseInt(strIsppState);
+                if (!isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal()) && !isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED.ordinal())) {
+                    errorMessageComposite += "Attribute ISPP_State not valid\n";
+                }
+            } catch (NumberFormatException e) {
+                errorMessageComposite += "NumberFormatException incorrect format ISPP_State\n";
+            }
+        } else {
+            errorMessageComposite += "Attribute ISPP_State not found\n";
+        }
+
+        String strPpState = XMLUtils.getAttributeValue(itemNode, "PP_State");
+        if (StringUtils.isNotEmpty(strPpState)) {
+            try {
+                ppState = Integer.parseInt(strPpState);
+                if (!ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal())
+                        && !ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED.ordinal())
+                        && !ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED.ordinal())) {
+                    errorMessageComposite += "Attribute PP_State not valid\n";
+                }
+            } catch (NumberFormatException e) {
+                errorMessageComposite += "NumberFormatException incorrect format PP_State\n";
+            }
+        } else {
+            errorMessageComposite += "Attribute PP_State not found\n";
+        }
+
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
         if (StringUtils.isNotEmpty(strDeletedState)) {
             try {
@@ -141,17 +203,24 @@ public class TaloonApprovalItem {
             }
         }
 
-        return new TaloonApprovalItem(orgId, date, name, qty, price, TaloonCreatedTypeEnum.fromInteger(createdType), taloonNumber, orgOwner, deletedState, errorMessageComposite);
+        return new TaloonApprovalItem(orgId, date, name, soldedQty, requestedQty, shippedQty, price,
+                TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
+                taloonNumber, orgOwner, deletedState, errorMessageComposite);
     }
 
-    private TaloonApprovalItem(Long orgId, Date date, String name, Integer qty, Long price, TaloonCreatedTypeEnum createdType,
+    private TaloonApprovalItem(Long orgId, Date date, String name, Integer soldedQty, Integer requestedQty, Integer shippedQty,
+            Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
             Long taloonNumber, Long orgOwnerId, Boolean deletedState, String errorMessage) {
         this.setOrgId(orgId);
         this.setDate(date);
         this.setName(name);
-        this.setQty(qty);
+        this.setSoldedQty(soldedQty);
+        this.setRequestedQty(requestedQty);
+        this.setShippedQty(shippedQty);
         this.setPrice(price);
         this.setCreatedType(createdType);
+        this.setIsppState(isppState);
+        this.setPpState(ppState);
         this.setTaloonNumber(taloonNumber);
         this.orgOwnerId = orgOwnerId;
         this.deletedState = deletedState;
@@ -187,12 +256,12 @@ public class TaloonApprovalItem {
         this.name = name;
     }
 
-    public Integer getQty() {
-        return qty;
+    public Integer getSoldedQty() {
+        return soldedQty;
     }
 
-    public void setQty(Integer qty) {
-        this.qty = qty;
+    public void setSoldedQty(Integer soldedQty) {
+        this.soldedQty = soldedQty;
     }
 
     public Long getPrice() {
@@ -249,5 +318,37 @@ public class TaloonApprovalItem {
 
     public void setTaloonNumber(Long taloonNumber) {
         this.taloonNumber = taloonNumber;
+    }
+
+    public Integer getRequestedQty() {
+        return requestedQty;
+    }
+
+    public void setRequestedQty(Integer requestedQty) {
+        this.requestedQty = requestedQty;
+    }
+
+    public Integer getShippedQty() {
+        return shippedQty;
+    }
+
+    public void setShippedQty(Integer shippedQty) {
+        this.shippedQty = shippedQty;
+    }
+
+    public TaloonISPPStatesEnum getIsppState() {
+        return isppState;
+    }
+
+    public void setIsppState(TaloonISPPStatesEnum isppState) {
+        this.isppState = isppState;
+    }
+
+    public TaloonPPStatesEnum getPpState() {
+        return ppState;
+    }
+
+    public void setPpState(TaloonPPStatesEnum ppState) {
+        this.ppState = ppState;
     }
 }

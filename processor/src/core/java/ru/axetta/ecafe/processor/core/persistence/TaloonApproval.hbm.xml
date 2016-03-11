@@ -13,12 +13,26 @@
             <key-property name="taloonName" type="string" column="taloonName"/>
         </composite-id>
 
-        <property name="qty" column="Qty" type="integer" not-null="true"/>
+        <property name="soldedQty" column="SoldedQty" type="integer" not-null="true"/>
+        <property name="requestedQty" column="RequestedQty" type="integer" not-null="false"/>
+        <property name="shippedQty" column="ShippedQty" type="integer" not-null="false"/>
         <property name="price" column="Price" type="long" not-null="true"/>
 
         <property name="createdType" column="CreatedType">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="isppState" column="ISPP_State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="ppState" column="PP_State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>

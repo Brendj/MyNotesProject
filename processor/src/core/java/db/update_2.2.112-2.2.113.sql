@@ -9,3 +9,7 @@ ALTER TABLE cf_ruleconditions ALTER  conditionconstant TYPE character varying (5
 
 --Новое поле для краткого наименование организации для поставщика в сверке организаций
 ALTER TABLE cf_orgregistrychange_item ADD COLUMN shortnamesupplierfrom character varying(128);
+
+--Новые поля ручного реестра талонов
+ALTER TABLE cf_taloon_approval RENAME COLUMN qty to soldedqty, ADD COLUMN requestedqty integer,
+  ADD COLUMN shippedqty integer, ADD COLUMN ispp_state integer NOT NULL DEFAULT 0, ADD COLUMN pp_state integer NOT NULL DEFAULT 0;

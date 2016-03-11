@@ -15,9 +15,13 @@ public class TaloonApproval {
     private CompositeIdOfTaloonApproval compositeIdOfTaloonApproval;
 
     private Org org;
-    private Integer qty;
+    private Integer soldedQty;
+    private Integer requestedQty;
+    private Integer shippedQty;
     private Long price;
     private TaloonCreatedTypeEnum createdType;
+    private TaloonISPPStatesEnum isppState;
+    private TaloonPPStatesEnum ppState;
     private Long taloonNumber;
     private Org orgOwner; //От какой организации создана запись.
     private Long version;
@@ -27,11 +31,17 @@ public class TaloonApproval {
         //for Hibernate only
     }
 
-    public TaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval, Integer qty, Long price, TaloonCreatedTypeEnum createdType) {
+    public TaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval, Integer soldedQty, Long price,
+            TaloonCreatedTypeEnum createdType, Integer requestedQty, Integer shippedQty,
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState) {
         this.compositeIdOfTaloonApproval = compositeIdOfTaloonApproval;
-        this.qty = qty;
+        this.soldedQty = soldedQty;
         this.price = price;
         this.createdType = createdType;
+        this.requestedQty = requestedQty;
+        this.shippedQty = shippedQty;
+        this.isppState = isppState;
+        this.ppState = ppState;
     }
 
     public CompositeIdOfTaloonApproval getCompositeIdOfTaloonApproval() {
@@ -50,12 +60,12 @@ public class TaloonApproval {
         this.org = org;
     }
 
-    public Integer getQty() {
-        return qty;
+    public Integer getSoldedQty() {
+        return soldedQty;
     }
 
-    public void setQty(Integer qty) {
-        this.qty = qty;
+    public void setSoldedQty(Integer soldedQty) {
+        this.soldedQty = soldedQty;
     }
 
     public Long getPrice() {
@@ -88,8 +98,9 @@ public class TaloonApproval {
 
     @Override
     public String toString() {
-        return "TaloonApproval{" + "compositeIdOfTaloonApproval=" + compositeIdOfTaloonApproval + ", org=" + org + ", qty=" + qty + ", price="
-                + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner + ", taloonNumber=" + taloonNumber + '}';
+        return "TaloonApproval{" + "compositeIdOfTaloonApproval=" + compositeIdOfTaloonApproval + ", org=" + org + ", soldedQty=" + soldedQty
+                + ", requestedQty=" + requestedQty + ", shippedQty=" + shippedQty + ", ispp_state=" + isppState + ", pp_state=" + ppState
+                + ", price=" + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner + ", taloonNumber=" + taloonNumber + '}';
     }
 
     public Org getOrgOwner() {
@@ -122,5 +133,37 @@ public class TaloonApproval {
 
     public void setTaloonNumber(Long taloonNumber) {
         this.taloonNumber = taloonNumber;
+    }
+
+    public Integer getRequestedQty() {
+        return requestedQty;
+    }
+
+    public void setRequestedQty(Integer requestedQty) {
+        this.requestedQty = requestedQty;
+    }
+
+    public Integer getShippedQty() {
+        return shippedQty;
+    }
+
+    public void setShippedQty(Integer shippedQty) {
+        this.shippedQty = shippedQty;
+    }
+
+    public TaloonISPPStatesEnum getIsppState() {
+        return isppState;
+    }
+
+    public void setIsppState(TaloonISPPStatesEnum isppState) {
+        this.isppState = isppState;
+    }
+
+    public TaloonPPStatesEnum getPpState() {
+        return ppState;
+    }
+
+    public void setPpState(TaloonPPStatesEnum ppState) {
+        this.ppState = ppState;
     }
 }

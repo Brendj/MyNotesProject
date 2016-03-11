@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfTaloonApproval;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
-import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
@@ -49,19 +46,27 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                 if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
                     CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName());
                     TaloonApproval taloon = DAOUtils.findTaloonApproval(session, compositeId);
-                    Integer qty = item.getQty();
+                    Integer soldedQty = item.getSoldedQty();
                     Long price = item.getPrice();
+                    Integer requestedQty = item.getRequestedQty();
+                    Integer shippedQty = item.getShippedQty();
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();
+                    TaloonISPPStatesEnum isppState = item.getIsppState();
+                    TaloonPPStatesEnum ppState = item.getPpState();
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(compositeId, qty, price, createdType);
+                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState);
                     }
-                    taloon.setQty(qty);
+                    taloon.setSoldedQty(soldedQty);
+                    taloon.setRequestedQty(requestedQty);
+                    taloon.setShippedQty(shippedQty);
                     taloon.setPrice(price);
                     taloon.setCreatedType(createdType);
+                    taloon.setIsppState(isppState);
+                    taloon.setPpState(ppState);
                     taloon.setOrgOwner(orgOwner);
                     taloon.setVersion(nextVersion);
                     taloon.setDeletedState(deletedState);
@@ -76,9 +81,13 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     resItem.setOrgId(item.getOrgId());
                     resItem.setDate(item.getDate());
                     resItem.setName(item.getName());
-                    resItem.setQty(item.getQty());
+                    resItem.setSoldedQty(item.getSoldedQty());
+                    resItem.setRequestedQty(item.getRequestedQty());
+                    resItem.setShippedQty(item.getShippedQty());
                     resItem.setPrice(item.getPrice());
                     resItem.setCreatedType(item.getCreatedType());
+                    resItem.setIsppState(item.getIsppState());
+                    resItem.setPpState(item.getPpState());
                     resItem.setTaloonNumber(item.getTaloonNumber());
                     resItem.setResultCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());

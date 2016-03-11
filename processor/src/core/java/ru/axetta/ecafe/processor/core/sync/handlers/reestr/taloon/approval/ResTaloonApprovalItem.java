@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
 import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
 import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -26,9 +28,13 @@ public class ResTaloonApprovalItem {
     private Long orgId;
     private Date date;
     private String name;
-    private Integer qty;
+    private Integer soldedQty;
+    private Integer requestedQty;
+    private Integer shippedQty;
     private Long price;
     private TaloonCreatedTypeEnum createdType;
+    private TaloonISPPStatesEnum isppState;
+    private TaloonPPStatesEnum ppState;
     private Long version;
     private Boolean deletedState;
     private Integer resultCode;
@@ -43,9 +49,13 @@ public class ResTaloonApprovalItem {
         this.orgId = taloon.getCompositeIdOfTaloonApproval().getIdOfOrg();
         this.date = taloon.getCompositeIdOfTaloonApproval().getTaloonDate();
         this.name = taloon.getCompositeIdOfTaloonApproval().getTaloonName();
-        this.qty = taloon.getQty();
+        this.soldedQty = taloon.getSoldedQty();
+        this.setRequestedQty(taloon.getRequestedQty());
+        this.setShippedQty(taloon.getShippedQty());
         this.price = taloon.getPrice();
         this.createdType = taloon.getCreatedType();
+        this.isppState = taloon.getIsppState();
+        this.ppState = taloon.getPpState();
         this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
@@ -61,11 +71,19 @@ public class ResTaloonApprovalItem {
         XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
         XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
         XMLUtils.setAttributeIfNotNull(element, "Name", name);
-        XMLUtils.setAttributeIfNotNull(element, "Qty", qty);
+        XMLUtils.setAttributeIfNotNull(element, "SoldedQty", soldedQty);
+        XMLUtils.setAttributeIfNotNull(element, "RequestedQty", requestedQty);
+        XMLUtils.setAttributeIfNotNull(element, "ShippedQty", shippedQty);
         XMLUtils.setAttributeIfNotNull(element, "Price", price);
         XMLUtils.setAttributeIfNotNull(element, "TaloonNumber", taloonNumber);
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
+        }
+        if (isppState != null) {
+            XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
+        }
+        if (ppState != null) {
+            XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
         }
         if (resultCode != null && resultCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
@@ -97,12 +115,12 @@ public class ResTaloonApprovalItem {
         this.name = name;
     }
 
-    public Integer getQty() {
-        return qty;
+    public Integer getSoldedQty() {
+        return soldedQty;
     }
 
-    public void setQty(Integer qty) {
-        this.qty = qty;
+    public void setSoldedQty(Integer soldedQty) {
+        this.soldedQty = soldedQty;
     }
 
     public Long getPrice() {
@@ -159,5 +177,37 @@ public class ResTaloonApprovalItem {
 
     public void setTaloonNumber(Long taloonNumber) {
         this.taloonNumber = taloonNumber;
+    }
+
+    public Integer getRequestedQty() {
+        return requestedQty;
+    }
+
+    public void setRequestedQty(Integer requestedQty) {
+        this.requestedQty = requestedQty;
+    }
+
+    public Integer getShippedQty() {
+        return shippedQty;
+    }
+
+    public void setShippedQty(Integer shippedQty) {
+        this.shippedQty = shippedQty;
+    }
+
+    public TaloonISPPStatesEnum getIsppState() {
+        return isppState;
+    }
+
+    public void setIsppState(TaloonISPPStatesEnum isppState) {
+        this.isppState = isppState;
+    }
+
+    public TaloonPPStatesEnum getPpState() {
+        return ppState;
+    }
+
+    public void setPpState(TaloonPPStatesEnum ppState) {
+        this.ppState = ppState;
     }
 }
