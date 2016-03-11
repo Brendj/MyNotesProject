@@ -110,12 +110,14 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         this.includeFriendlyOrgs = includeFriendlyOrgs;
     }
 
+
     public void showCSVList(ActionEvent actionEvent){
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Session persistenceSession = (Session)em.getDelegate();
+        Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<BasicReportJob.OrgShortItem>();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            List<BasicReportJob.OrgShortItem> orgShortItemList;
             if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
                 List<Long> orgIdsList;
                 if(includeFriendlyOrgs) {
@@ -133,8 +135,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
             DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
             builder.setOrgShortItemList(orgShortItemList);
-            Session session = RuntimeContext.getInstance().createPersistenceSession();
-            dailySalesReport = (DailySalesByGroupsReport) builder.build(session,startDate, endDate, localCalendar);
+            dailySalesReport = (DailySalesByGroupsReport) builder.build(persistenceSession,startDate, endDate, localCalendar);
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
