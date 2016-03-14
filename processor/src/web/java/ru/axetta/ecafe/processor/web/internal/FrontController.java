@@ -654,7 +654,7 @@ public class FrontController extends HttpServlet {
                 String mobilePhone = getClientParamDescValueByName("mobilePhone", cd.getClientDescParams().getParam());
                 String email = getClientParamDescValueByName("email", cd.getClientDescParams().getParam());
                 String notifyBySms = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
-                String notifyByEmail = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
+                String notifyByEmail = getClientParamDescValueByName("notifyByEmail", cd.getClientDescParams().getParam());
                 String comments = getClientParamDescValueByName("comments", cd.getClientDescParams().getParam());
                 String cardNo = getClientParamDescValueByName("cardNo", cd.getClientDescParams().getParam());
                 String cardPrintedNo = getClientParamDescValueByName("cardPrintedNo", cd.getClientDescParams().getParam());
@@ -665,24 +665,30 @@ public class FrontController extends HttpServlet {
 
                 fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, contractSurname == null ? " " : contractSurname);
                 if (contractName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_NAME, contractName);
-                if (contractSecondName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME, contractSecondName);
+                fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME, contractSecondName == null ? "" : contractSecondName);
                 if (contractDoc!=null) fc.setValue(ClientManager.FieldId.CONTRACT_DOC, contractDoc);
                 if (surname!=null) fc.setValue(ClientManager.FieldId.SURNAME, surname);
                 if (name!=null) fc.setValue(ClientManager.FieldId.NAME, name);
-                if (secondName!=null) fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName == null ? "" : secondName);
                 if (doc!=null) fc.setValue(ClientManager.FieldId.DOC, doc);
                 if (address!=null) fc.setValue(ClientManager.FieldId.ADDRESS, address);
                 if (phone!=null) fc.setValue(ClientManager.FieldId.PHONE, phone);
                 if (mobilePhone!=null) fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
                 if (email!=null) fc.setValue(ClientManager.FieldId.EMAIL, email);
                 if (group!=null) fc.setValue(ClientManager.FieldId.GROUP, group);
-                fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, notifyBySms);
-                fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
-                fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+                if (notifyBySms!=null) fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, notifyBySms);
+                if (notifyByEmail!=null) fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
+                if (notifyByPush!=null) fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                 if (comments!=null) fc.setValue(ClientManager.FieldId.COMMENTS, comments);
                 if (cardNo!=null) fc.setValue(ClientManager.FieldId.CARD_ID, cardNo);
                 if (cardPrintedNo!=null) fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cardPrintedNo);
-                if (cardType!=null) fc.setValue(ClientManager.FieldId.CARD_TYPE, Integer.parseInt(cardType));
+                try {
+                    if (cardType!=null) fc.setValue(ClientManager.FieldId.CARD_TYPE, Integer.parseInt(cardType));
+                } catch (Exception e) {
+                    if (!cardType.equals("")) {
+                        throw new FrontControllerException("Неправильный формат поля cardType");
+                    }
+                }
                 if (cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, CalendarUtils.parseDate(cardExpiry));
                 if (cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, CalendarUtils.parseDate(cardIssued));
                 if (snils!=null) fc.setValue(ClientManager.FieldId.SAN, snils);
