@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -602,6 +603,108 @@ public class FrontController extends HttpServlet {
         }
     }
 
+    @WebMethod(operationName = "registerClientsV2")
+    public List<RegisterClientResult> registerClientsV2(@WebParam(name = "orgId")Long orgId,
+            @WebParam(name = "clientDescList") List<ClientDescV2> clientDescList, @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
+            throws FrontControllerException {
+        logger.debug("checkRequestValidity");
+        checkRequestValidity(orgId);
+
+        boolean isExistsOrgByIdAndTags; // = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
+        String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+
+        ArrayList<RegisterClientResult> results = new ArrayList<RegisterClientResult>();
+        String recIdStr = null;
+        Integer recId = null;
+        for (ClientDescV2 cd : clientDescList) {
+            try {
+                logger.debug("create FieldConfig v2");
+                recIdStr = getClientParamDescValueByName("recId", cd.getClientDescParams().getParam());
+                if (recIdStr == null) {
+                    throw new FrontControllerException("Не найден обязательный параметр recId");
+                }
+                String group = getClientParamDescValueByName("group", cd.getClientDescParams().getParam());
+                recId = Integer.parseInt(recIdStr);
+                if (group == null) {
+                    throw new FrontControllerException("Не найден обязательный параметр group");
+                }
+
+                String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
+                if (orgIdForClient == null) {
+                    throw new FrontControllerException("Не найден обязательный параметр orgId");
+                }
+                isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(Long.parseLong(orgIdForClient), "БЛОК_РЕГ_УЧ");
+                if(isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(group)){
+                    throw new FrontControllerException("Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
+                }
+
+                ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+                logger.debug("check client params v2");
+
+                String contractSurname = getClientParamDescValueByName("contractSurname", cd.getClientDescParams().getParam());
+                String contractName = getClientParamDescValueByName("contractName", cd.getClientDescParams().getParam());
+                String contractSecondName = getClientParamDescValueByName("contractSecondName", cd.getClientDescParams().getParam());
+                String contractDoc = getClientParamDescValueByName("contractDoc", cd.getClientDescParams().getParam());
+                String surname = getClientParamDescValueByName("surname", cd.getClientDescParams().getParam());
+                String name = getClientParamDescValueByName("name", cd.getClientDescParams().getParam());
+                String secondName = getClientParamDescValueByName("secondName", cd.getClientDescParams().getParam());
+                String doc = getClientParamDescValueByName("doc", cd.getClientDescParams().getParam());
+                String address = getClientParamDescValueByName("address", cd.getClientDescParams().getParam());
+                String phone = getClientParamDescValueByName("phone", cd.getClientDescParams().getParam());
+                String mobilePhone = getClientParamDescValueByName("mobilePhone", cd.getClientDescParams().getParam());
+                String email = getClientParamDescValueByName("email", cd.getClientDescParams().getParam());
+                String notifyBySms = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
+                String notifyByEmail = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
+                String comments = getClientParamDescValueByName("comments", cd.getClientDescParams().getParam());
+                String cardNo = getClientParamDescValueByName("cardNo", cd.getClientDescParams().getParam());
+                String cardPrintedNo = getClientParamDescValueByName("cardPrintedNo", cd.getClientDescParams().getParam());
+                String cardType = getClientParamDescValueByName("cardType", cd.getClientDescParams().getParam());
+                String snils = getClientParamDescValueByName("snils", cd.getClientDescParams().getParam());
+                String cardExpiry = getClientParamDescValueByName("cardExpiry", cd.getClientDescParams().getParam());
+                String cardIssued = getClientParamDescValueByName("cardIssued", cd.getClientDescParams().getParam());
+
+                fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, contractSurname == null ? " " : contractSurname);
+                if (contractName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_NAME, contractName);
+                if (contractSecondName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME, contractSecondName);
+                if (contractDoc!=null) fc.setValue(ClientManager.FieldId.CONTRACT_DOC, contractDoc);
+                if (surname!=null) fc.setValue(ClientManager.FieldId.SURNAME, surname);
+                if (name!=null) fc.setValue(ClientManager.FieldId.NAME, name);
+                if (secondName!=null) fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+                if (doc!=null) fc.setValue(ClientManager.FieldId.DOC, doc);
+                if (address!=null) fc.setValue(ClientManager.FieldId.ADDRESS, address);
+                if (phone!=null) fc.setValue(ClientManager.FieldId.PHONE, phone);
+                if (mobilePhone!=null) fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
+                if (email!=null) fc.setValue(ClientManager.FieldId.EMAIL, email);
+                if (group!=null) fc.setValue(ClientManager.FieldId.GROUP, group);
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, notifyBySms);
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+                if (comments!=null) fc.setValue(ClientManager.FieldId.COMMENTS, comments);
+                if (cardNo!=null) fc.setValue(ClientManager.FieldId.CARD_ID, cardNo);
+                if (cardPrintedNo!=null) fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cardPrintedNo);
+                if (cardType!=null) fc.setValue(ClientManager.FieldId.CARD_TYPE, Integer.parseInt(cardType));
+                if (cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, CalendarUtils.parseDate(cardExpiry));
+                if (cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, CalendarUtils.parseDate(cardIssued));
+                if (snils!=null) fc.setValue(ClientManager.FieldId.SAN, snils);
+
+                logger.debug("register client v2");
+                long idOfClient = ClientManager.registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness);
+                results.add(new RegisterClientResult(idOfClient, recId, true, null));
+            } catch(Exception e) {
+                results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
+            }
+        }
+        return results;
+    }
+
+    private String getClientParamDescValueByName(String paramName, List<ClientDescV2.ClientDescItemParam> params) {
+        for(ClientDescV2.ClientDescItemParam param : params) {
+            if (param.paramName.equalsIgnoreCase(paramName)) {
+                return param.paramValue;
+            }
+        }
+        return null;
+    }
 
     @WebMethod(operationName = "registerClients")
     public List<RegisterClientResult> registerClients(@WebParam(name = "orgId")Long orgId,
