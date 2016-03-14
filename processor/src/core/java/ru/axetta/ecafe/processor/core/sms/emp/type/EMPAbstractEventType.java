@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sms.emp.type;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -139,6 +141,13 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("account", "" + client.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
+
+        Org org = client.getOrg();
+        params.put("OrgName", getOrgName(org));
+        params.put("OrgType", getOrgType(org));
+        params.put("OrgId", getOrgId(org));
+        params.put("OrgNum", getOrgNumber(org));
+
         BigDecimal balance = null;
         if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
             balance = new BigDecimal(0D).setScale(2);
@@ -186,5 +195,23 @@ public abstract class EMPAbstractEventType implements EMPEventType {
     @Override
     public String toString() {
         return buildText();
+    }
+
+    protected String getOrgName(Org org) {
+        return org.getShortName();
+    }
+
+    protected String getOrgType(Org org) {
+        return org.getType().toString();
+    }
+
+    protected String getOrgId(Org org) {
+        return "" + org.getIdOfOrg();
+    }
+
+    protected String getOrgNumber(Org org) {
+        String name = org.getShortName();
+        String number = Org.extractOrgNumberFromName(name);
+        return number;
     }
 }

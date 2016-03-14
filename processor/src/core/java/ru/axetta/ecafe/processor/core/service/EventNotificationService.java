@@ -590,21 +590,43 @@ public class EventNotificationService {
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
                 empType.getParameters().put("token", token);
             }  else if(type.equals(MESSAGE_PAYMENT)) {
+                int empEventType = -1;
+                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
+                    empEventType = EMPEventTypeFactory.PAYMENT_EVENT;
+                } else if(findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+                    empEventType = EMPEventTypeFactory.PAYMENT_PAY_EVENT;
+                } else if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
+                    empEventType = EMPEventTypeFactory.PAYMENT_REDUCED_EVENT;
+                } else {
+                    throw new RuntimeException("Попытка отправить уведомление о неизвестном типе события");
+                }
 
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(empEventType, dataClient, destClient);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.PAYMENT_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
                 }
 
-                String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
-                String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
 
-                if (amountPrice != null && amountPrice.length() > 0) {
-                    empType.getParameters().put("amountPrice", amountPrice);
+                //  дата только для платного комплекса + льготного комплекса
+                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
+                   findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+                    String orderEventDate = findValueInParams(new String[]{"orderEventDate"}, values);
+                    empType.getParameters().put("orderEventTime", orderEventDate);
                 }
-                if (amountLunch != null && amountLunch.length() > 0) {
-                    empType.getParameters().put("amountLunch", amountLunch);
+
+
+                //  сумма только для буфет + платное
+                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
+                   findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+                    String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
+                    String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
+                    if (amountPrice != null && amountPrice.length() > 0) {
+                        empType.getParameters().put("amountPrice", amountPrice);
+                    }
+                    if (amountLunch != null && amountLunch.length() > 0) {
+                        empType.getParameters().put("amountLunch", amountLunch);
+                    }
                 }
             }
 

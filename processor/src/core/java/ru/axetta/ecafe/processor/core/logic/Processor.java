@@ -2358,7 +2358,26 @@ public class Processor implements SyncProcessor,
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if(client!=null && payment.isNotify()){
+
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
+                    if(payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) ||
+                       payment.getOrderType().equals(OrderTypeEnumType.DEFAULT) ||
+                       payment.getOrderType().equals(OrderTypeEnumType.VENDING)) {
+                        values = EventNotificationService.attachToValues("isBarOrder", "true", values);
+                        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
+                        values = EventNotificationService.attachToValues("orderEventTime", date, values);
+                    } else if(payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) ||
+                              payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
+                        values = EventNotificationService.attachToValues("isPayOrder", "true", values);
+                        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
+                        values = EventNotificationService.attachToValues("orderEventTime", date, values);
+                    } else if(payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.DAILY_SAMPLE) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
+                        values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
+                    }
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService.attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
