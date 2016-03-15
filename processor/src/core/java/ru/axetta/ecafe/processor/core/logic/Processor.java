@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -66,6 +67,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -3469,7 +3471,22 @@ public class Processor implements SyncProcessor,
                 persistenceSession.save(newMenuDetail);
                 menu.addMenuDetail(newMenuDetail);
 
+                if (reqMenuDetail.getgBasket() != null) {
+                    linkBasket(persistenceSession, newMenuDetail, reqMenuDetail.getgBasket(), menu.getOrg().getIdOfOrg());
+                }
+
                 localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), newMenuDetail);
+            }
+        }
+    }
+
+    private void linkBasket(Session session, MenuDetail menuDetail, String guidBasket, Long idOfOrg) {
+        GoodsBasicBasket basicBasket = DAOUtils.findBasicGood(session, guidBasket);
+        if (basicBasket != null) {
+            GoodBasicBasketPrice basicBasketPrice = DAOUtils.findGoodBasicBasketPrice(session, basicBasket, idOfOrg);
+            if (basicBasketPrice != null) {
+                basicBasketPrice.setMenuDetail(menuDetail);
+                GoodBasicBasketPrice.save(session, basicBasketPrice);
             }
         }
     }

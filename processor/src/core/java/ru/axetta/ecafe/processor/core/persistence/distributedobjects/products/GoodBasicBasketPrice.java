@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
+import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -17,6 +19,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,6 +38,7 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
     private String guidOfGoodsBasicBasket;
     private GoodsBasicBasket goodsBasicBasket;
     private Long price;
+    private MenuDetail menuDetail;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -100,6 +104,33 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
         return this;
     }
 
+    public static GoodBasicBasketPrice save(Session session, GoodBasicBasketPrice goodBasicBasketPrice) {
+        Criteria criteria = session.createCriteria(DOVersion.class);
+        criteria.add(Restrictions.eq("distributedObjectClassName", GoodBasicBasketPrice.class.getSimpleName()).ignoreCase());
+        DOVersion doVersion = (DOVersion)criteria.uniqueResult();
+
+        Long version = null;
+        if (doVersion == null) {
+            doVersion = new DOVersion();
+            doVersion.setCurrentVersion(0L);
+            version = 0L;
+        } else {
+            version = doVersion.getCurrentVersion() + 1;
+            doVersion.setCurrentVersion(version);
+        }
+        doVersion.setDistributedObjectClassName(GoodBasicBasketPrice.class.getSimpleName());
+        if(goodBasicBasketPrice.getGlobalId()==null){
+            goodBasicBasketPrice.setGlobalVersion(version);
+            session.persist(doVersion);
+            session.persist(goodBasicBasketPrice);
+        } else {
+            goodBasicBasketPrice.setGlobalVersion(version);
+            session.persist(doVersion);
+            session.merge(goodBasicBasketPrice);
+        }
+        return goodBasicBasketPrice;
+    }
+
     public Long getPrice() {
         return price;
     }
@@ -138,5 +169,13 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
 
     public void setGoodsBasicBasket(GoodsBasicBasket goodsBasicBasket) {
         this.goodsBasicBasket = goodsBasicBasket;
+    }
+
+    public MenuDetail getMenuDetail() {
+        return menuDetail;
+    }
+
+    public void setMenuDetail(MenuDetail menuDetail) {
+        this.menuDetail = menuDetail;
     }
 }

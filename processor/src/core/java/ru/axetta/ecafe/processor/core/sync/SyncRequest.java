@@ -1031,6 +1031,8 @@ public class SyncRequest {
                             }
                         }
 
+                        String gBasket = getTextContent(namedNodeMap.getNamedItem("GBasketEl"));
+
                         Double protein = getDoubleValue(namedNodeMap, "Protein");
                         Double fat = getDoubleValue(namedNodeMap, "Fat");
                         Double carbohydrates = getDoubleValue(namedNodeMap, "Carbohydrates");
@@ -1048,7 +1050,7 @@ public class SyncRequest {
                         Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE,
-                                minCa, minP, minMg, minFe, vitB2, vitPp);
+                                minCa, minP, minMg, minFe, vitB2, vitPp, gBasket);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1120,11 +1122,12 @@ public class SyncRequest {
                 private final int availableNow;
                 private final Integer flags;
                 private final Integer priority;
+                private final String gBasket;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
-                        Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp) {
+                        Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp, String gBasket) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1149,6 +1152,7 @@ public class SyncRequest {
                     this.minFe = minFe;
                     this.vitB2 = vitB2;
                     this.vitPp = vitPp;
+                    this.gBasket = gBasket;
                 }
 
                 public Long getIdOfMenu() {
@@ -1247,6 +1251,10 @@ public class SyncRequest {
                     return vitPp;
                 }
 
+                public String getgBasket() {
+                    return gBasket;
+                }
+
                 @Override
                 public String toString() {
                     return "ReqMenuDetail{" + "idOfMenu=" + idOfMenu + ", path='" + path + '\'' + ", name='" + name
@@ -1255,7 +1263,8 @@ public class SyncRequest {
                             + ", calories=" + calories + ", vitB1=" + vitB1 + ", vitB2=" + vitB2 + ", vitPp=" + vitPp
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
                             + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", menuOrigin=" + menuOrigin
-                            + ", availableNow=" + availableNow + ", flags=" + flags + ", priority=" + priority + '}';
+                            + ", availableNow=" + availableNow + ", flags=" + flags + ", priority=" + priority
+                            + ", gBasketEl=" + gBasket + '}';
                 }
 
                 @Override
@@ -1336,6 +1345,9 @@ public class SyncRequest {
                     if (vitE != null ? !vitE.equals(that.vitE) : that.vitE != null) {
                         return false;
                     }
+                    if (gBasket != null ? !gBasket.equals(that.gBasket) : that.gBasket != null) {
+                        return false;
+                    }
 
                     return true;
                 }
@@ -1363,6 +1375,7 @@ public class SyncRequest {
                     builder.append(availableNow);
                     builder.append(flags);
                     builder.append(priority);
+                    builder.append(gBasket);
                     return builder.toHashCode();
                 }
             }

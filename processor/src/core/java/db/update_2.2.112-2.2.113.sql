@@ -13,3 +13,10 @@ ALTER TABLE cf_orgregistrychange_item ADD COLUMN shortnamesupplierfrom character
 --Новые поля ручного реестра талонов
 ALTER TABLE cf_taloon_approval RENAME COLUMN qty to soldedqty, ADD COLUMN requestedqty integer,
   ADD COLUMN shippedqty integer, ADD COLUMN ispp_state integer NOT NULL DEFAULT 0, ADD COLUMN pp_state integer NOT NULL DEFAULT 0;
+
+--Связь базовой корзины с детализацией меню
+ALTER TABLE cf_good_basic_basket_price ADD COLUMN idofmenudetail bigint;
+
+--внешний ключ на таблицу menudetails
+ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_menudetail_fk FOREIGN KEY (idofmenudetail)
+REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;

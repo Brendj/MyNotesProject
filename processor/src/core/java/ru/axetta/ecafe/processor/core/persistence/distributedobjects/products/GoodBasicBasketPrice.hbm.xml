@@ -40,6 +40,9 @@
         <many-to-one name="good" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="idOfGood" not-null="false" />
         </many-to-one>
+        <many-to-one name="menuDetail" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.MenuDetail">
+            <column name="idOfMenuDetail" not-null="false" />
+        </many-to-one>
 
 
     </class>
