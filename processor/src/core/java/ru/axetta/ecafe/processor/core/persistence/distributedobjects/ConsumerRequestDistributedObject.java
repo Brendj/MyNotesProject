@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -13,6 +16,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,6 +51,18 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
             return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         }
 
+    }
+
+    protected List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid, Integer currentLimit) throws
+            DistributedObjectException {
+        Org currentOrg = (Org) session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(getClass());
+        Set<Long> friendlyOrgIds = OrgUtils.getFriendlyOrgIds(currentOrg);
+        criteria.add(Restrictions.in("orgOwner", friendlyOrgIds));
+        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+        createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
     }
 
 }

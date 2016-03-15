@@ -72,6 +72,15 @@ public class Manager {
      * (Пример версии: атрибут Limit тега <Product LastGuid="00a7d120-6d6e-41cb-ba0b-2068d3308f68">)
      */
     private HashMap<String, String> currentLastGuids = new HashMap<String, String>();
+
+
+    /**
+     * Ключи = имена элементов (Пример элемента: <Product>),
+     * значения = объем информации, который запрашивает клиент
+     * (Пример версии: атрибут Limit тега <Product LastGuid="00a7d120-6d6e-41cb-ba0b-2068d3308f68">)
+     */
+    private Map<String, DistributedObject.InformationContents> currentInformationContents = new HashMap<String, DistributedObject.InformationContents>();
+
     private SortedMap<DOSyncClass, List<DistributedObject>> resultDOMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
     /**
      * Список глобальных объектов на базе процессинга
@@ -145,6 +154,10 @@ public class Manager {
         currentMaxVersions.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getLongAttributeValue(doNode, "V"));
         currentLimits.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getIntegerValueZeroSafe(doNode, "Limit"));
         currentLastGuids.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getAttributeValue(doNode, "LastGuid"));
+        if (XMLUtils.getIntegerAttributeValue(doNode, "Contents") != null) {
+            currentInformationContents.put(doSyncClass.getDoClass().getSimpleName(),DistributedObject.InformationContents.getByCode(
+                    XMLUtils.getIntegerAttributeValue(doNode, "Contents").intValue()));
+        }
         incomeDOMap.put(doSyncClass, new ArrayList<DistributedObject>());
         doNode = doNode.getFirstChild();
         while (doNode != null) {
@@ -362,6 +375,10 @@ public class Manager {
             final String classSimpleName = doClass.getSimpleName();
             Long currentMaxVersion = currentMaxVersions.get(classSimpleName);
             final String currentLastGuid = currentLastGuids.get(classSimpleName);
+            DistributedObject.InformationContents informationContent = currentInformationContents.get(classSimpleName);
+            if (informationContent != null){
+                refDistributedObject.setNewInformationContent(informationContent);
+            }
             List<DistributedObject> currentDOList = refDistributedObject.process(persistenceSession, idOfOrg, currentMaxVersion,
                     currentLastGuid, currentLimit);
             if(!CollectionUtils.isEmpty(currentDOList)){
@@ -409,7 +426,6 @@ public class Manager {
                 final String currentLastGuid = currentLastGuids.get(classSimpleName);
                 Long currentMaxVersion = currentMaxVersions.get(classSimpleName);
                 refDistributedObject.createProjections(criteria);
-
                 if (StringUtils.isNotEmpty(currentLastGuid)) {
                     Disjunction mainRestriction = Restrictions.disjunction();
                     mainRestriction.add(Restrictions.gt("globalVersion", currentMaxVersion));

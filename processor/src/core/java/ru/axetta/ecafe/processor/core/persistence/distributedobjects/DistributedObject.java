@@ -52,6 +52,40 @@ public abstract class DistributedObject{
     protected String tagName;
     private DistributedObjectException distributedObjectException;
 
+
+
+    /*
+    * Флаги, ограничивающие объем информации по распр. объектам
+    * */
+    public enum InformationContents {
+        ONLY_CURRENT_ORG(0),
+        FRIENDLY_ORGS(1);
+
+        private int code;
+
+        InformationContents(int code) {
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public static InformationContents getByCode(int code) {
+            for (InformationContents type : InformationContents.values()) {
+                if (type.getCode() == code) {
+                    return type;
+                }
+            }
+            return ONLY_CURRENT_ORG;
+        }
+
+        public boolean isDefault() {
+            return this.code == ONLY_CURRENT_ORG.code;
+        }
+    }
+
+
     public DistributedObject() {
         this.guid = UUID.randomUUID().toString();
     }
@@ -292,6 +326,9 @@ public abstract class DistributedObject{
 
     public void setSendAll(SendToAssociatedOrgs sendAll) {
         this.sendAll = sendAll;
+    }
+
+    public void setNewInformationContent(InformationContents informationContent) {
     }
 
     @Override
