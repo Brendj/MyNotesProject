@@ -184,14 +184,15 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                             }
                         }
 
-                        currentData = dataMap
-                                    .get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
 
+                        currentData = dataMap.get(
+                                prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
 
-
-                        notfoundItem = updateRowListWithOrder(currentData, orderItem);
-                        if (notfoundItem != null) {
-                            fillRowListWithClient(currentData, clientItem, startTime, endTime, orderItem);
+                        if (currentData != null) {
+                            notfoundItem = updateRowListWithOrder(currentData, orderItem);
+                            if (notfoundItem != null) {
+                                fillRowListWithClient(currentData, clientItem, startTime, endTime, orderItem);
+                            }
                         }
                     } catch (Exception e) {
                         logger.error("Не удалось найти клиента: " + orderItem.getIdOfClient());
@@ -199,8 +200,10 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
                 }
 
                 //todo 8 handle
-                updateTotalListWithOrder(currentData, orderItem, startTime, endTime);
-                updateOverallTotalListWithOrder(overallTotal, orderItem, startTime, endTime);
+                if (currentData != null) {
+                    updateTotalListWithOrder(currentData, orderItem, startTime, endTime);
+                    updateOverallTotalListWithOrder(overallTotal, orderItem, startTime, endTime);
+                }
             }
         }
 
