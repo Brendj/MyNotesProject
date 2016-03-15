@@ -144,8 +144,8 @@ public class OrganizationComplexesStructure {
 
     private boolean containComplexInResult(Set<ComplexInfo> result, ComplexInfo foundComplex) {
         for (ComplexInfo complex : result) {
-            if (!complex.equals(foundComplex)) {
-                continue;
+            if (complex.equals(foundComplex)) {
+                return true;
             }
             EqualsBuilder equalsBuilder = new EqualsBuilder();
             // сравнение по ключевым полям
