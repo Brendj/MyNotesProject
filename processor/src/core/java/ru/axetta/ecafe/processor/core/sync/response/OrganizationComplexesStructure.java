@@ -214,11 +214,12 @@ public class OrganizationComplexesStructure {
         private static final String ATTR_APPLY_DISCOUNT = "d";
         private static final String ATTR_APPLY_GRANT = "g";
         private static final String ATTR_APPLY_SUBSCRIPTION_FEEDING = "sf";
-        private static final String ATTR_GOODS_GUID = "gGuid";
         private static final String ATTR_CENTRALIZE_VISIBLE = "cv";
+        private static final String ATTR_GOOD_GUID = "gGuid";
+        private static final String ATTR_GOOD_NAME = "gsname";
+        private static final String ATTR_GOOD_FULL_NAME = "gsfullname";
 
         private final ComplexInfo complexInfo;
-
 
         public ComplexItem(ComplexInfo complexInfo) {
 
@@ -236,8 +237,10 @@ public class OrganizationComplexesStructure {
             element.setAttribute(ATTR_CENTRALIZE_VISIBLE,Integer.toString(complexInfo.getModeVisible()));
 
             Good good = complexInfo.getGood();
-            if (good !=null){
-                element.setAttribute(ATTR_GOODS_GUID,good.getGuid());
+            if (good !=null) {
+                element.setAttribute(ATTR_GOOD_GUID, good.getGuid());
+                element.setAttribute(ATTR_GOOD_NAME, good.getNameOfGood());
+                element.setAttribute(ATTR_GOOD_FULL_NAME, good.getFullName());
             }
             return element;
         }
