@@ -587,18 +587,32 @@ public class Manager {
             }
         }
         if (doSyncClass.getDoClass() == GoodRequestPosition.class && !distributedObjectList.isEmpty()) {
-            Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
-            final Date lastCreateOrUpdateDate = calendarEnd.getTime();
-            calendarEnd.add(Calendar.MINUTE, 1);
-            final Date endGenerateTime = calendarEnd.getTime();
-            List<String> guids = new ArrayList<String>();
-            for (DistributedObject distributedObject : distributedObjectList) {
-                guids.add(distributedObject.getGuid());
-            }
-            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate, guids);
+            notifyOrgsAboutChangeGoodRequests(startDate, distributedObjectList);
         }
         LOGGER.debug("processDistributedObjectsList: end");
         return distributedObjectList;
+    }
+
+    private void notifyOrgsAboutChangeGoodRequests(Date startDate, List<DistributedObject> distributedObjectList) {
+        Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+        final Date lastCreateOrUpdateDate = calendarEnd.getTime();
+        calendarEnd.add(Calendar.MINUTE, 1);
+        final Date endGenerateTime = calendarEnd.getTime();
+        // разослать уведомления всем организациям, чьи позиции изменились
+        HashMap<Long, List<String>> mapPositions = new HashMap<Long, List<String>>();
+        for (DistributedObject position : distributedObjectList) {
+            Long orgOwner = position.getOrgOwner();
+            if (!mapPositions.containsKey(orgOwner)) {
+                mapPositions.put(orgOwner, new ArrayList<String>());
+            }
+            mapPositions.get(orgOwner).add(position.getGuid());
+        }
+        GoodRequestsChangeAsyncNotificationService notificationService = GoodRequestsChangeAsyncNotificationService
+                .getInstance();
+        for (Long orgOwner : mapPositions.keySet()) {
+            List<String> guids = mapPositions.get(orgOwner);
+            notificationService.notifyOrg(orgOwner, startDate, endGenerateTime, lastCreateOrUpdateDate, guids);
+        }
     }
 
     private Long updateDOVersion(SessionFactory sessionFactory, String doClass){
