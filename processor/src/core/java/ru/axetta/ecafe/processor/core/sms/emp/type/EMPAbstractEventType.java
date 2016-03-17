@@ -148,13 +148,19 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("OrgId", getOrgId(org));
         params.put("OrgNum", getOrgNumber(org));
 
-        BigDecimal balance = null;
+        /*BigDecimal balance = null;
         if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
             balance = new BigDecimal(0D).setScale(2);
         } else {
             balance = new BigDecimal(Math.ceil((double) client.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
         }
-        params.put("balance", balance.toString());
+        params.put("balance", balance.toString());*/
+        if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
+            params.put("balance", "0,00");
+        } else {
+            String balance = Long.toString(client.getBalance()/100) + ',' + Long.toString(Math.abs(client.getBalance())%100);
+            params.put("balance", balance);
+        }
     }
 
     protected void parseChildAndGuardianInfo(Client child, Client guardian) {
