@@ -41,7 +41,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Итоговые показатели по пополнениям]]></text>
+				<text><![CDATA[Отчет по регулярным платежам]]></text>
 			</staticText>
 			<textField>
 				<reportElement uuid="f871eb10-036a-4eb0-b969-867c93372de0" x="0" y="30" width="1060" height="16">
