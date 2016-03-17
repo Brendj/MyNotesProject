@@ -617,10 +617,18 @@ public class EventNotificationService {
 
 
                 //  сумма только для буфет + платное
-                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
+                String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
+                String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
+                String amount = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice :
+                                amountLunch != null && !StringUtils.isEmpty(amountLunch) ? amountLunch :
+                                "" + 0D;
+                amountPrice = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice: "" + 0D;
+                amountLunch = amountLunch != null && !StringUtils.isEmpty(amountLunch) ? amountLunch : "" + 0D;
+                empType.getParameters().put("amountPrice", amountPrice);
+                empType.getParameters().put("amountLunch", amountLunch);
+                empType.getParameters().put("amount", amount);
+                /*if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
-                    String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
-                    String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
                     if (amountPrice != null && amountPrice.length() > 0) {
                         empType.getParameters().put("amountPrice", amountPrice);
                         empType.getParameters().put("amount", amountPrice);
@@ -629,7 +637,7 @@ public class EventNotificationService {
                         empType.getParameters().put("amountLunch", amountLunch);
                         empType.getParameters().put("amount", amountLunch);
                     }
-                }
+                }*/
             }
 
             //  Устанавливаем дату
