@@ -623,9 +623,11 @@ public class EventNotificationService {
                     String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
                     if (amountPrice != null && amountPrice.length() > 0) {
                         empType.getParameters().put("amountPrice", amountPrice);
+                        empType.getParameters().put("amount", amountPrice);
                     }
                     if (amountLunch != null && amountLunch.length() > 0) {
                         empType.getParameters().put("amountLunch", amountLunch);
+                        empType.getParameters().put("amount", amountLunch);
                     }
                 }
             }
