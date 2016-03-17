@@ -142,11 +142,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
 
-        Org org = client.getOrg();
-        params.put("OrgName", getOrgName(org));
-        params.put("OrgType", getOrgType(org));
-        params.put("OrgId", getOrgId(org));
-        params.put("OrgNum", getOrgNumber(org));
+        appendOrgParameters(client.getOrg().getIdOfOrg(), params);
 
         /*BigDecimal balance = null;
         if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
@@ -155,12 +151,7 @@ public abstract class EMPAbstractEventType implements EMPEventType {
             balance = new BigDecimal(Math.ceil((double) client.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
         }
         params.put("balance", balance.toString());*/
-        if(client.getBalance() == null || client.getBalance().longValue() == 0L) {
-            params.put("balance", "0,00");
-        } else {
-            String balance = Long.toString(client.getBalance()/100) + ',' + Long.toString(Math.abs(client.getBalance())%100);
-            params.put("balance", balance);
-        }
+        appendBalance(client.getBalance(), params);
     }
 
     protected void parseChildAndGuardianInfo(Client child, Client guardian) {
@@ -189,13 +180,34 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("account", "" + child.getContractId());
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
-        BigDecimal balance = null;
+
+        appendOrgParameters(child.getOrg().getIdOfOrg(), params);
+
+        /*BigDecimal balance = null;
         if(child.getBalance() == null || child.getBalance().longValue() == 0L) {
             balance = new BigDecimal(0D).setScale(2);
         } else {
             balance = new BigDecimal(Math.ceil((double) child.getBalance() / 100)).setScale(2, RoundingMode.CEILING);
         }
-        params.put("balance", balance.toString());
+        params.put("balance", balance.toString());*/
+        appendBalance(child.getBalance(), params);
+    }
+
+    protected void appendOrgParameters(Long idOfOrg, Map<String, String> params) {
+        Org org = DAOService.getInstance().findOrById(idOfOrg);
+        params.put("OrgName", getOrgName(org));
+        params.put("OrgType", getOrgType(org));
+        params.put("OrgId", getOrgId(org));
+        params.put("OrgNum", getOrgNumber(org));
+    }
+
+    protected void appendBalance(Long balance, Map<String, String> params) {
+        if(balance == null || balance.longValue() == 0L) {
+            params.put("balance", "0,00");
+        } else {
+            String bal = Long.toString(balance/100) + ',' + Long.toString(Math.abs(balance)%100);
+            params.put("balance", bal);
+        }
     }
 
     @Override
