@@ -2383,10 +2383,13 @@ public class Processor implements SyncProcessor,
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService.attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
+                    long totalRSum = totalBuffetRSum + totalLunchRSum;
                     values = EventNotificationService
                             .attachToValues("amountPrice", Long.toString(totalBuffetRSum/100) + ',' + Long.toString(totalBuffetRSum%100), values);
                     values = EventNotificationService
                             .attachToValues("amountLunch", Long.toString(totalLunchRSum/100) + ',' + Long.toString(totalLunchRSum%100), values);
+                    values = EventNotificationService
+                            .attachToValues("amount", Long.toString(totalRSum/100) + ',' + Long.toString(totalRSum%100), values);
                     if (client.getBalance() != null) {
                         values = EventNotificationService
                             .attachToValues("balance", Long.toString(client.getBalance()/100) + ',' + Long.toString(Math.abs(client.getBalance())%100), values);

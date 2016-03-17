@@ -619,11 +619,10 @@ public class EventNotificationService {
                 //  сумма только для буфет + платное
                 String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
                 String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
-                String amount = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice :
-                                amountLunch != null && !StringUtils.isEmpty(amountLunch) ? amountLunch :
-                                "" + 0D;
-                amountPrice = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice: "" + 0D;
+                String amount = findValueInParams(new String[]{"amount"}, values);
+                amountPrice = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice : "" + 0D;
                 amountLunch = amountLunch != null && !StringUtils.isEmpty(amountLunch) ? amountLunch : "" + 0D;
+                amount = amount != null && !StringUtils.isEmpty(amount) ? amount : "" + 0D;
                 empType.getParameters().put("amountPrice", amountPrice);
                 empType.getParameters().put("amountLunch", amountLunch);
                 empType.getParameters().put("amount", amount);
