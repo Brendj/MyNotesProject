@@ -36,9 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -73,12 +71,13 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
     }
 
     @Override
-    public void onShow() throws Exception {}
+    public void onShow() throws Exception {
+    }
 
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         htmlReport = null;
-        super.completeOrgSelection(session,idOfOrg);
+        super.completeOrgSelection(session, idOfOrg);
     }
 
     public void onReportPeriodChanged(ActionEvent event) {
@@ -137,11 +136,15 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
 
     public Object exportToHTML() {
 
-        if (invalidFormData()) return null;
+        if (invalidFormData()) {
+            return null;
+        }
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) return null;
+        if (StringUtils.isEmpty(templateFilename)) {
+            return null;
+        }
         PaymentTotalsReport.Builder builder = new PaymentTotalsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -189,10 +192,14 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
-        if (invalidFormData()) return;
+        if (invalidFormData()) {
+            return;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) return;
+        if (StringUtils.isEmpty(templateFilename)) {
+            return;
+        }
         Date generateTime = new Date();
         PaymentTotalsReport.Builder builder = new PaymentTotalsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
@@ -261,8 +268,8 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
 
     private boolean invalidFormData() {
 
-        if ((contragentFilter.getContragent().getIdOfContragent() == null)
-                && (idOfOrgList.size() <= 0) && (idOfOrg == null)) {
+        if ((contragentFilter.getContragent().getIdOfContragent() == null) && (idOfOrgList.size() <= 0) && (idOfOrg
+                == null)) {
             printError("Выберите поставщика и/или список ОО");
             return true;
         }
@@ -290,8 +297,8 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         filter = null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        localCalendar = runtimeContext.getDefaultLocalCalendar(
-                (HttpSession) facesContext.getExternalContext().getSession(false));
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
         localCalendar.setTime(new Date());
         this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
         localCalendar.setTime(this.startDate);
@@ -309,10 +316,13 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         Long idOfContragent = contragentFilter.getContragent().getIdOfContragent();
         String idOfContragentString = idOfContragent != null ? Long.toString(idOfContragent) : "";
         properties.setProperty(PaymentTotalsReport.P_CONTRAGENT, idOfContragentString);
-        if ((idOfContragent == null) && (idOfOrgList.size() <= 0) && (idOfOrg != null)) {
-            idOfOrgList.add(idOfOrg);
+        List<Long> orgList = new ArrayList<Long>();
+        if (idOfOrg != null) {
+            orgList.add(idOfOrg);
         }
-        properties.setProperty(PaymentTotalsReport.P_ORG_LIST, idOfOrgList.size() <= 0 ? "" : StringUtils.join(idOfOrgList.iterator(), ","));
+        idOfOrgList = orgList;
+        properties.setProperty(PaymentTotalsReport.P_ORG_LIST,
+                idOfOrgList.size() <= 0 ? "" : StringUtils.join(idOfOrgList.iterator(), ","));
         properties.setProperty(PaymentTotalsReport.P_HIDE_NULL_ROWS, Boolean.toString(hideNullRows));
         return properties;
     }
@@ -344,11 +354,12 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         contragentFilter.completeContragentSelection(session, idOfContragent);
     }
 
-    public void showOrgListSelectPage () {
+    public void showOrgListSelectPage() {
         Long idOfContragent = null;
         try {
             idOfContragent = this.contragentFilter.getContragent().getIdOfContragent();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
     }
 

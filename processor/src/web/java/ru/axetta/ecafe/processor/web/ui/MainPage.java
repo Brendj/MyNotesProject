@@ -1745,6 +1745,7 @@ public class MainPage implements Serializable {
     public Object clearOrgListSelectedItemsList() {
         orgFilterOfSelectOrgListSelectPage = "";
         orgListSelectPage.deselectAllItems();
+        updateOrgListSelectPage();
         return null;
     }
 
@@ -1755,6 +1756,7 @@ public class MainPage implements Serializable {
 
     public Object selectAllOrgListSelectedItemsList() {
         orgListSelectPage.selectAllItems();
+        updateOrgListSelectPage();
         return null;
     }
 
