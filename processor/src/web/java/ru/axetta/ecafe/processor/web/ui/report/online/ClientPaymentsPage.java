@@ -75,10 +75,10 @@ public class ClientPaymentsPage extends OnlineReportPage {
     }
 
     public boolean validateFormData() {
-        if (startDate == null) {
-            printError("Не указана Начальная дата");
-            return true;
-        }
+        //if (startDate == null) {
+        //    printError("Не указана Начальная дата");
+        //    return true;
+        //}
         if (endDate == null) {
             printError("Не указана Конечная дата");
             return true;

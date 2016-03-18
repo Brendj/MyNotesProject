@@ -27,6 +27,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
+    private String selectedOrgsString = "";
     private List<OrgShortItem> autoCompleteOrgs = new ArrayList<OrgShortItem>();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
@@ -142,5 +143,24 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
     public interface CompleteHandlerList {
 
         void completeOrgListSelection(Map<Long, String> orgMap) throws Exception;
+    }
+
+    public Map<Long, String> getSelectedOrgs() {
+        return selectedOrgs;
+    }
+
+    public void setSelectedOrgs(Map<Long, String> selectedOrgs) {
+        this.selectedOrgs = selectedOrgs;
+    }
+
+    public String getSelectedOrgsString() {
+        String s = "";
+        for (String org : getSelectedOrgs().values()) {
+            s = s + org + ", ";
+        }
+        if (s.length() > 2) {
+            return s.substring(0, s.length() - 2);
+        }
+        return s;
     }
 }

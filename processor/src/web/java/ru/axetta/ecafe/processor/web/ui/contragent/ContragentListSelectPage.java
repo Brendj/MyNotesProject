@@ -33,7 +33,8 @@ public class ContragentListSelectPage extends BasicPage {
 
     public interface CompleteHandler {
 
-        void completeContragentListSelection(Session session, List<Long> idOfContragent, int multiContrFlag, String classTypes) throws Exception;
+        void completeContragentListSelection(Session session, List<Long> idOfContragent, int multiContrFlag,
+                String classTypes) throws Exception;
     }
 
     public static class Item {
@@ -90,8 +91,9 @@ public class ContragentListSelectPage extends BasicPage {
         }
 
         if (!completeHandlers.empty()) {
-            completeHandlers.peek().completeContragentListSelection(session, selected/*selectedItem.getIdOfContragent()*/,
-                    multiContrFlag, classTypesString);
+            completeHandlers.peek()
+                    .completeContragentListSelection(session, selected/*selectedItem.getIdOfContragent()*/,
+                            multiContrFlag, classTypesString);
             completeHandlers.pop();
         }
     }
@@ -108,7 +110,7 @@ public class ContragentListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    public String getSelectedItems () {
+    public String getSelectedItems() {
         StringBuilder str = new StringBuilder();
         for (Item it : items) {
             if (!it.isSelected()) {
@@ -133,6 +135,11 @@ public class ContragentListSelectPage extends BasicPage {
             this.selectedItem = selected;
         }
     }*/
+
+    public Object cancelFilter() {
+        items = Collections.emptyList();
+        return null;
+    }
 
     public String getFilter() {
         return filter;
@@ -207,9 +214,14 @@ public class ContragentListSelectPage extends BasicPage {
         List<Contragent> contragentsByCriteria = criteria.list();
         Criteria criteria1 = session.createCriteria(Contragent.class);
         criteria1.add(Restrictions.eq("contragentName", OPERATOR));
-        Contragent operator = (Contragent)criteria1.uniqueResult();
+        Contragent operator = (Contragent) criteria1.uniqueResult();
         if (operator != null) {
-            contragentsByCriteria.add(operator);
+            if (filter == null) {
+                filter = "";
+            }
+            if (operator.getContragentName().toLowerCase().contains(filter.toLowerCase())) {
+                contragentsByCriteria.add(0, operator);
+            }
         }
         return contragentsByCriteria; // criteria.list();
     }

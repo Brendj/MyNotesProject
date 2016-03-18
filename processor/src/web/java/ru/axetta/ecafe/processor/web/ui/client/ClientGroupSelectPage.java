@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
@@ -13,7 +12,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,11 +25,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientGroupSelectPage extends BasicPage {
-   
+
     public interface CompleteHandler {
+
         void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception;
     }
-    
+
     public static class Item {
 
         private Long idOfClientGroup;
@@ -99,6 +102,11 @@ public class ClientGroupSelectPage extends BasicPage {
         return filter;
     }
 
+    public Object cancelFilter() {
+        selectedItem = new Item();
+        return null;
+    }
+
     public void setFilter(String filter) {
         this.filter = filter;
     }
@@ -107,14 +115,25 @@ public class ClientGroupSelectPage extends BasicPage {
         List<Item> items = new LinkedList<Item>();
         List clientGroups = retrieveClientGroups(session, idOfOrg);
         for (Object object : clientGroups) {
-            items.add(new Item((ClientGroup) object));
+            Item item = new Item((ClientGroup) object);
+            if (filter == null) {
+                filter = "";
+            }
+            if (!(item.getGroupName().isEmpty() || item.getGroupName() == null || filter.isEmpty())) {
+                if (item.getGroupName().toLowerCase().contains(filter.toLowerCase())) {
+                    items.add(item);
+                }
+            } else {
+                items.add(item);
+            }
         }
+
         this.items = items;
     }
 
     private List retrieveClientGroups(Session session, Long idOfOrg) throws HibernateException {
         Criteria criteria = session.createCriteria(ClientGroup.class);
-        criteria.add(Restrictions.eq("org.idOfOrg",idOfOrg));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return criteria.list();
     }
 }
