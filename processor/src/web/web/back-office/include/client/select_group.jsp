@@ -17,33 +17,33 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalClientGroupSelectorPanel" autosized="true" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalClientGroupSelectorPanel')}.hide();return false;"/>
+    <rich:hotKey key="esc" handler="#{rich:component('modalClientGroupSelectorPanel')}.hide();return false;" />
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор группы" />
     </f:facet>
-    <a4j:form id="modalClientGroupSelectorForm" binding="#{mainPage.clientGroupSelectPage.pageComponent}" styleClass="borderless-form"
-              eventsQueue="modalClientGroupSelectorFormEventsQueue">
+    <a4j:form id="modalClientGroupSelectorForm" binding="#{mainPage.clientGroupSelectPage.pageComponent}"
+              styleClass="borderless-form" eventsQueue="modalClientGroupSelectorFormEventsQueue">
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid styleClass="borderless-grid">
-                        <h:inputText value="#{mainPage.clientGroupSelectPage.selectedItem.groupName}" readonly="true" size="64"
-                                     styleClass="input-text" />
+                        <h:inputText value="#{mainPage.clientGroupSelectPage.selectedItem.groupName}" readonly="true"
+                                     size="64" styleClass="input-text" />
                     </h:panelGrid>
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
-                        <h:inputText value="#{mainPage.clientGroupSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text" />
-                        <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}" reRender="modalClientGroupSelectorForm"
-                                         styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                            <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
-                        </a4j:commandLink>
-                        <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}" reRender="modalClientGroupSelectorForm"
-                                         styleClass="command-link">
+                        <h:inputText value="#{mainPage.clientGroupSelectPage.filter}" size="52" maxlength="128"
+                                     styleClass="input-text">
+                            <a4j:support event="onkeyup" action="#{mainPage.updateClientGroupSelectPage}"
+                                         reRender="modalClientGroupSelectorClientGroupTable" />
+                        </h:inputText>
+                        <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}"
+                                         reRender="modalClientGroupSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.clientGroupSelectPage.filter}" />
                             <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+                            <a4j:support event="onclick" action="#{mainPage.clientGroupSelectPage.cancelFilter}"
+                                         reRender="modalClientGroupSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </td>
@@ -52,8 +52,7 @@
                 <td style="text-align: center;">
                     <rich:dataTable width="100%" align="center" id="modalClientGroupSelectorClientGroupTable"
                                     value="#{mainPage.clientGroupSelectPage.items}" var="item" rows="15"
-                                    footerClass="data-table-footer" columnClasses="left-aligned-column"
-                                    rowKeyVar="row"
+                                    footerClass="data-table-footer" columnClasses="left-aligned-column" rowKeyVar="row"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
                         <a4j:support event="onRowClick" reRender="modalClientGroupSelectorForm">
@@ -66,12 +65,12 @@
                         </rich:column>
 
                         <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{item.groupName}"
-                                          styleClass="output-text" />
+                            <h:outputText escape="true" value="#{item.groupName}" styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">
-                            <rich:datascroller for="modalClientGroupSelectorClientGroupTable" renderIfSinglePage="false" maxPages="5"
-                                               fastControls="hide" stepControls="auto" boundaryControls="hide">
+                            <rich:datascroller for="modalClientGroupSelectorClientGroupTable" renderIfSinglePage="false"
+                                               maxPages="5" fastControls="hide" stepControls="auto"
+                                               boundaryControls="hide">
                                 <f:facet name="previous">
                                     <h:graphicImage value="/images/16x16/left-arrow.png" />
                                 </f:facet>

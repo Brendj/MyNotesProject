@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalContragentSelectorPanel" autosized="true" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalContragentSelectorPanel')}.hide();return false;"/>
+    <rich:hotKey key="esc" handler="#{rich:component('modalContragentSelectorPanel')}.hide();return false;" />
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор контрагента" />
     </f:facet>
@@ -21,23 +21,20 @@
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:inputText value="#{mainPage.contragentSelectPage.selectedItem.contragentName}"
                                      readonly="true" size="64" styleClass="input-text" />
-                        <a4j:commandLink styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <a4j:support event="onclick" action="#{mainPage.contragentSelectPage.cancelFilter}" reRender="modalContragentSelectorForm"/>
-                        </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
-                        <h:inputText value="#{mainPage.contragentSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text" />
-                        <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
-                                         reRender="modalContragentSelectorForm" styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                        </a4j:commandLink>
+                        <h:inputText value="#{mainPage.contragentSelectPage.filter}" size="52" maxlength="128"
+                                     styleClass="input-text">
+                            <a4j:support event="onkeyup" action="#{mainPage.showContragentSelectPage}"
+                                         reRender="modalContragentSelectorTable" />
+                        </h:inputText>
                         <a4j:commandLink action="#{mainPage.showContragentSelectPage}"
                                          reRender="modalContragentSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.contragentSelectPage.filter}" />
+                            <a4j:support event="onclick" action="#{mainPage.contragentSelectPage.cancelFilter}"
+                                         reRender="modalContragentSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                 </td>

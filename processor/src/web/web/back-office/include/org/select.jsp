@@ -25,36 +25,46 @@
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}"
                                          reRender="modalOrgSelectorForm" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.filter}" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.tagFilter}" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.idFilter}" />
+                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.region}" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="3" styleClass="borderless-grid">
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.filter}" size="48" maxlength="128"
-                                         styleClass="input-text" />
+                                         styleClass="input-text">
+                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
+                            </h:inputText>
                             <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.tagFilter}" size="48" maxlength="128"
-                                         styleClass="input-text" />
+                                         styleClass="input-text">
+                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
+                            </h:inputText>
                             <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.idFilter}" size="48" maxlength="128"
-                                         styleClass="input-text" />
+                                         styleClass="input-text">
+                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
+                            </h:inputText>
                             <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text" />
                             <h:selectOneMenu id="regionsList" value="#{mainPage.orgSelectPage.region}"
                                              style="width:325px;"
                                              disabled="#{mainPage.orgSelectPage.districtFilterDisabled}">
                                 <f:selectItems value="#{mainPage.orgSelectPage.regions}" />
+                                <a4j:support event="onchange" action="#{mainPage.updateOrgSelectPage}"
+                                             reRender="modalOrgSelectorOrgTable" />
                             </h:selectOneMenu>
                         </h:panelGrid>
-                        <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
-                                         styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                        </a4j:commandLink>
                     </h:panelGrid>
                     <h:selectOneRadio value="#{mainPage.orgSelectPage.supplierFilter}" converter="javax.faces.Integer"
                                       styleClass="output-text">
                         <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
                                      reRender="modalOrgSelectorForm" />
-
                         <f:selectItem itemValue="0" itemLabel="Любые организации"
                                       itemDisabled="#{mainPage.orgSelectPage.allOrgFilterDisabled}" />
                         <f:selectItem itemValue="1" itemLabel="Только ОУ"

@@ -9,7 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalContragentListSelectorPanel" autosized="true" headerClass="modal-panel-header">
-    <rich:hotKey key="esc" handler="#{rich:component('modalContragentListSelectorPanel')}.hide();return false;"/>
+    <rich:hotKey key="esc" handler="#{rich:component('modalContragentListSelectorPanel')}.hide();return false;" />
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор контрагента" />
     </f:facet>
@@ -19,21 +19,23 @@
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid styleClass="borderless-grid">
-                        <h:inputText value="#{mainPage.contragentListSelectPage.selectedItems}"
+                        <h:inputText id="contragentListValue" value="#{mainPage.contragentListSelectPage.selectedItems}"
                                      readonly="true" size="64" styleClass="input-text" />
                     </h:panelGrid>
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                         <h:inputText value="#{mainPage.contragentListSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text" />
-                        <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
-                                         reRender="modalContragentListSelectorForm" styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                        </a4j:commandLink>
+                                     styleClass="input-text">
+                            <a4j:support event="onkeyup" action="#{mainPage.showContragentListSelectPage}"
+                                         reRender="modalContragentListSelectorTable" />
+                        </h:inputText>
                         <a4j:commandLink action="#{mainPage.showContragentListSelectPage}"
                                          reRender="modalContragentListSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.contragentListSelectPage.filter}" />
+                            <f:setPropertyActionListener value=""
+                                                         target="#{mainPage.contragentListSelectPage.filter}" />
+                            <a4j:support event="onclick" action="#{mainPage.contragentListSelectPage.cancelFilter}"
+                                         reRender="modalContragentListSelectorForm" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -58,7 +60,10 @@
                                                          target="#{mainPage.contragentListSelectPage.selectedItem}" />
                         </a4j:support>--%>
                         <rich:column>
-                            <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
+                            <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text">
+                                <a4j:support event="onchange" action="#{mainPage.completeContragentListSelection}"
+                                             reRender="contragentListValue" />
+                            </h:selectBooleanCheckbox>
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.idOfContragent}" styleClass="output-text" />
@@ -76,7 +81,7 @@
                                 <f:facet name="next">
                                     <h:graphicImage value="/images/16x16/right-arrow.png" />
                                 </f:facet>
-                                <a4j:support event="onpagechange"/>
+                                <a4j:support event="onpagechange" />
                             </rich:datascroller>
                         </f:facet>
                     </rich:dataTable>
