@@ -42,10 +42,12 @@ public class PaymentTotalsReportService {
         this.session = session;
     }
 
-    public List<Item> buildReportItems(Long idOfContragent, List<Long> idOfOrgList, Date startTime, Date endTime, boolean hideNullRows) throws Exception {
+    public List<Item> buildReportItems(Long idOfContragent, List<Long> idOfOrgList, Date startTime, Date endTime,
+            boolean hideNullRows) throws Exception {
 
-        if (idOfOrgList.size() <= 0)
+        if (idOfOrgList.size() <= 0) {
             idOfOrgList = getOrgs(idOfContragent);
+        }
 
         List<Long> reportOrgSet = DAOUtils.complementIdOfOrgSet(session, idOfOrgList);
 
@@ -107,8 +109,9 @@ public class PaymentTotalsReportService {
 
     /**
      * Разница между
-     *      1) суммой текущих балансов клиентов (принадлежащих данной ОО на дату toDate)
-     *      2) и суммой транзакций этих клиентов с даты toDate по текущий момент.
+     * 1) суммой текущих балансов клиентов (принадлежащих данной ОО на дату toDate)
+     * 2) и суммой транзакций этих клиентов с даты toDate по текущий момент.
+     *
      * @param idOfOrg
      * @param toDate
      * @return
@@ -119,15 +122,20 @@ public class PaymentTotalsReportService {
         Set<Client> clientMap = getOrgClientsToDate(idOfOrg, toDate);
 
         List<Long> clientIdList = new ArrayList<Long>();
+        clientIdList.add(-1L);
         for (Client client : clientMap) {
             clientIdList.add(client.getIdOfClient());
         }
 
         Criteria orgClientsToDateCriteria = session.createCriteria(Client.class);
-        orgClientsToDateCriteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
+        orgClientsToDateCriteria
+                .add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
         orgClientsToDateCriteria.add(Restrictions.in("idOfClient", clientIdList));
         orgClientsToDateCriteria.setProjection(Projections.sum("balance"));
         Long orgClientsBalanceToDate = (Long) orgClientsToDateCriteria.uniqueResult();
+        if (orgClientsBalanceToDate == null) {
+            orgClientsBalanceToDate = 0L;
+        }
 
         Criteria transactionsFromDateCriteria = session.createCriteria(AccountTransaction.class);
         transactionsFromDateCriteria.createAlias("client", "c");
@@ -144,6 +152,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Клиенты ОО на дату toDate
+     *
      * @param idOfOrg
      * @param toDate
      * @return
@@ -151,7 +160,8 @@ public class PaymentTotalsReportService {
 
     private Set<Client> getOrgClientsToDate(Long idOfOrg, Date toDate) {
 
-        HashMap<Client, List<ClientMigration>> clientMigrationListsMap = getClientMigrationsListHashMap(idOfOrg, toDate);
+        HashMap<Client, List<ClientMigration>> clientMigrationListsMap = getClientMigrationsListHashMap(idOfOrg,
+                toDate);
 
         Criteria orgClientsCriteria = session.createCriteria(Client.class);
         orgClientsCriteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
@@ -170,10 +180,14 @@ public class PaymentTotalsReportService {
                     registrationDate = clientMigration.getRegistrationDate();
                 }
             }
-            if (firstClientMigration != null && firstClientMigration.getOldOrg() != null && firstClientMigration.getOldOrg().getIdOfOrg() == idOfOrg && !clientMap.contains(firstClientMigration.getClient())) {
+            if (firstClientMigration != null && firstClientMigration.getOldOrg() != null
+                    && firstClientMigration.getOldOrg().getIdOfOrg() == idOfOrg && !clientMap
+                    .contains(firstClientMigration.getClient())) {
                 clientMap.add(client);
             }
-            if (firstClientMigration != null && firstClientMigration.getOrg() != null && firstClientMigration.getOrg().getIdOfOrg() == idOfOrg && clientMap.contains(firstClientMigration.getClient())) {
+            if (firstClientMigration != null && firstClientMigration.getOrg() != null
+                    && firstClientMigration.getOrg().getIdOfOrg() == idOfOrg && clientMap
+                    .contains(firstClientMigration.getClient())) {
                 clientMap.remove(client);
             }
         }
@@ -185,7 +199,8 @@ public class PaymentTotalsReportService {
         return getClientMigrationsListHashMap(idOfOrg, startDate, new Date());
     }
 
-    private HashMap<Client, List<ClientMigration>> getClientMigrationsListHashMap(Long idOfOrg, Date toDate, Date endDate) {
+    private HashMap<Client, List<ClientMigration>> getClientMigrationsListHashMap(Long idOfOrg, Date toDate,
+            Date endDate) {
         Org org = null;
         try {
             org = DAOUtils.findOrg(session, idOfOrg);
@@ -212,10 +227,7 @@ public class PaymentTotalsReportService {
         Criteria clientMigrationCriteria = session.createCriteria(ClientMigration.class);
         //clientMigrationCriteria.createAlias("org", "o");
         //clientMigrationCriteria.createAlias("oldOrg", "oo");
-        clientMigrationCriteria.add(
-                Restrictions.or(
-                        Restrictions.eq("org", org),
-                        Restrictions.eq("oldOrg", org)));
+        clientMigrationCriteria.add(Restrictions.or(Restrictions.eq("org", org), Restrictions.eq("oldOrg", org)));
         clientMigrationCriteria.add(Restrictions.between("registrationDate", start, end));
         List<ClientMigration> clientMigrations = clientMigrationCriteria.list();
         return clientMigrations != null ? clientMigrations : new ArrayList<ClientMigration>();
@@ -223,6 +235,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Поступления на счета клиентов ОО за период (транзакции ОО с положительной суммой за период)
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -234,6 +247,7 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.gt("transactionTime", startTime));
         criteria.add(Restrictions.lt("transactionTime", endTime));
         criteria.add(Restrictions.gt("transactionSum", 0L));
+        criteria.add(Restrictions.eq("sourceType", AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE));
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
         Long income = (Long) criteria.uniqueResult();
@@ -278,18 +292,15 @@ public class PaymentTotalsReportService {
     private String getStatusDetail(Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
         String statusDetailing = org.getStatusDetailing();
-        if (!statusDetailing.equals("") && !statusDetailing.equals("/"))
+        if (!statusDetailing.equals("") && !statusDetailing.equals("/")) {
             return statusDetailing;
+        }
         return "";
     }
 
     private boolean zeroCash(Item item) {
-        if (item.getIncome() != 0L
-            || item.getPaid() != 0L
-            || item.getPaidSnack() != 0L
-            || item.getPaidTotal() != 0L
-            || item.getRepayment() != 0L
-            || item.getCashMoved() != 0L) {
+        if (item.getIncome() != 0L || item.getPaid() != 0L || item.getPaidSnack() != 0L || item.getPaidTotal() != 0L
+                || item.getRepayment() != 0L || item.getCashMoved() != 0L) {
             return false;
         } else {
             return true;
@@ -301,8 +312,9 @@ public class PaymentTotalsReportService {
             Date newDate;
             newDate = new Date();
             Long diff = (newDate.getTime() - date.getTime());
-            if (diff > 1000L)
-                logger.warn((newDate.getTime()-date.getTime()) + message + " debug level - " + debugLevel);
+            if (diff > 1000L) {
+                logger.warn((newDate.getTime() - date.getTime()) + message + " debug level - " + debugLevel);
+            }
             date = newDate;
         }
         return date;
@@ -310,6 +322,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Сумма балансов клиентов на момент перемещения из или в ОО
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -319,8 +332,8 @@ public class PaymentTotalsReportService {
     private Long getCashMovedSum(Long idOfOrg, Date startTime, Date endTime) {
         Criteria criteria = session.createCriteria(ClientMigration.class, "c");
         criteria.add(Restrictions.between("c.registrationDate", startTime, endTime));
-        criteria.add(
-                Restrictions.or(Restrictions.eq("c.org.idOfOrg", idOfOrg), Restrictions.eq("c.oldOrg.idOfOrg", idOfOrg)));
+        criteria.add(Restrictions
+                .or(Restrictions.eq("c.org.idOfOrg", idOfOrg), Restrictions.eq("c.oldOrg.idOfOrg", idOfOrg)));
         List<ClientMigration> list = criteria.list();
         Long cashMovedSum = 0L;
         if (list != null) {
@@ -339,6 +352,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Вспомогательная функция для getCashMovedSum
+     *
      * @param client
      * @param registrationDate
      * @return
@@ -352,12 +366,14 @@ public class PaymentTotalsReportService {
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
         try {
             balance -= (Long) criteria.uniqueResult();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return balance;
     }
 
     /**
      * Сумма возвратов клиентам ОО за период
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -370,10 +386,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("at.sourceType", AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE));
         criteria.add(Restrictions.between("at.transactionTime", startTime, endTime));
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
-                        new Type[]{LongType.INSTANCE}))
-        );
+        criteria.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
         Long repaymentSum = (Long) criteria.uniqueResult();
         if (repaymentSum == null) {
             repaymentSum = 0L;
@@ -383,6 +398,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Сумма всех оплат в ОО за период
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -395,10 +411,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("od.state", 0));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
-                        new Type[]{LongType.INSTANCE}))
-        );
+        criteria.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
         Long allOrdersSum = (Long) criteria.uniqueResult();
         if (allOrdersSum == null) {
             allOrdersSum = 0L;
@@ -408,6 +423,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Сумма оплат за буфетную продукцию в ОО за период
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -422,10 +438,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.eq("od.menuType", OrderDetail.TYPE_DISH_ITEM));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
-                        new Type[]{LongType.INSTANCE}))
-        );
+        criteria.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
         Long paidSnackSum = (Long) criteria.uniqueResult();
         if (paidSnackSum == null) {
             paidSnackSum = 0L;
@@ -435,6 +450,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Сумма оплат за комплексы в ОО за период
+     *
      * @param idOfOrg
      * @param startTime
      * @param endTime
@@ -450,10 +466,9 @@ public class PaymentTotalsReportService {
         criteria.add(Restrictions.between("od.menuType", OrderDetail.TYPE_COMPLEX_MIN, OrderDetail.TYPE_COMPLEX_MAX));
         criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.between("o.createTime", startTime, endTime));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
-                        new Type[]{LongType.INSTANCE}))
-        );
+        criteria.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.rprice * this_.qty) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
         Long paidOrdersSum = (Long) criteria.uniqueResult();
         if (paidOrdersSum == null) {
             paidOrdersSum = 0L;
@@ -463,6 +478,7 @@ public class PaymentTotalsReportService {
 
     /**
      * Дата последней синхронизации
+     *
      * @param idOfSyncOrg
      * @return
      */
@@ -484,11 +500,14 @@ public class PaymentTotalsReportService {
         if (contragent != null) {
             orgs = contragent.getOrgs();
         }
-        for (Org org : orgs) orgList.add(org.getIdOfOrg());
+        for (Org org : orgs) {
+            orgList.add(org.getIdOfOrg());
+        }
         return orgList;
     }
 
     public static class Item implements Comparable {
+
         private Long orgNum;
         private Long orgID;
         private String orgName;
@@ -532,10 +551,12 @@ public class PaymentTotalsReportService {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             Item item = (Item) o;
             return lastSyncTime.equals(item.lastSyncTime) && orgName.equals(item.orgName);
         }
