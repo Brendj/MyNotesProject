@@ -361,6 +361,21 @@ public class RegularPaymentSubscriptionService {
                 pr.setCf3(StringUtils.trim(workNode.getTextContent()));
             }
         }
+
+
+        /*if(pr.getExtendedStatus().equalsIgnoreCase("DECLINE")) {
+            logDocument(doc);
+        }*/
+        // Обработка кода ошибки, полученной от Acquiro
+        Node responseCode = XMLUtils.findFirstChildElement(responseNode, "response_code");
+        if (responseCode != null) {
+            pr.setResponseCode(StringUtils.trim(responseCode.getTextContent()));
+            pr.setResponseCodeShortDescription(getResponseCodeShortDescription(pr.getResponseCode()));
+            pr.setResponseCodeFullDescription(getResponseCodeFullDescription(pr.getResponseCode()));
+        } else if(pr.getExtendedStatus().equalsIgnoreCase("DECLINE")) {
+            pr.setResponseCodeShortDescription(getResponseCodeShortDescription(DEFAULT_RESPONSE_CODE));
+            pr.setResponseCodeFullDescription(getResponseCodeFullDescription(DEFAULT_RESPONSE_CODE));
+        }
     }
 
     public void fillFromRequest(PaymentResponse pr, HttpServletRequest request) {
@@ -396,5 +411,82 @@ public class RegularPaymentSubscriptionService {
 
     protected SubscriptionRegRequest getSubscriptionRegRequest() {
         return subscriptionRegRequest;
+    }
+
+    public void logDocument(Document doc) {
+        try {
+            javax.xml.transform.dom.DOMSource domSource = new javax.xml.transform.dom.DOMSource(doc);
+            java.io.StringWriter writer = new java.io.StringWriter();
+            javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(writer);
+            javax.xml.transform.TransformerFactory tf = javax.xml.transform.TransformerFactory.newInstance();
+            javax.xml.transform.Transformer transformer = tf.newTransformer();
+            transformer.transform(domSource, result);
+            String log = writer.toString();
+            logger.error(String.format("Error message received from EMP service: %s", log));
+        } catch (Exception e) {
+            logger.error("Failed to receive/parse error message document from EMP", e);
+        }
+    }
+
+    protected String getResponseCodeShortDescription(String responseCode) {
+        String desc = getResponseCodeDescription(responseCode, 0);
+        if(desc == null || desc.equals("")) {
+            desc = getResponseCodeDescription(DEFAULT_RESPONSE_CODE, 0);
+        }
+        return desc;
+    }
+
+    protected String getResponseCodeFullDescription(String responseCode) {
+        String desc = getResponseCodeDescription(responseCode, 1);
+        if(desc == null || desc.equals("")) {
+            desc = getResponseCodeDescription(DEFAULT_RESPONSE_CODE, 1);
+        }
+        return desc;
+    }
+
+    protected String getResponseCodeDescription(String responseCode, int type) {
+        if(responseCode == null || StringUtils.isEmpty(responseCode)) {
+            return "";
+        }
+        String[] descs = MFR_RESPONSE_CODES.get(responseCode);
+        if(descs == null || descs.length != 2) {
+            return "";
+        }
+        return descs[type];
+    }
+
+    protected static final String DEFAULT_RESPONSE_CODE = "" + Integer.MIN_VALUE;
+    protected static Map<String, String[]> MFR_RESPONSE_CODES = new HashMap<String, String[]>();
+    static {
+        MFR_RESPONSE_CODES.put(DEFAULT_RESPONSE_CODE, new String[] {"Код ошибки не получен", "В сообщении от платежной системы код ошибки не найден. Возможно, произошла ошибка по фроду."});
+        MFR_RESPONSE_CODES.put("-17", new String[] {"Внутренняя ошибка банка", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("-18", new String[] {"Внутренняя ошибка банка", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("-19", new String[] {"Ошибка авторизации при 3DS", "«Платеж не выполнен. Не пройдена проверка 3 DSecure. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по 3D Sec."});
+        MFR_RESPONSE_CODES.put("-3", new String[] {"Внутренняя ошибка банка ", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("1", new String[] {"Требуется доавторизация голосовым подтверждением", "«Платеж не выполнен. Не пройдена проверка 3 DSecure. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по 3D Sec."});
+        MFR_RESPONSE_CODES.put("4", new String[] {"Карта заявлена как потерянная или украденная", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("5", new String[] {"Отказ эмитентом без объяснения причины", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("6", new String[] {"Ошибка на стороне банка, общая, без пояснений", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("7", new String[] {"Карта заявлена как украденная с особым вниманием", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("12", new String[] {"Отклонено эмитентом из-за неверного номера карты или типа запроса«Платеж не выполнен: проверьте данные карты.»", "Неверно указана expiration date или неверно введен cvv/cvc-код."});
+        MFR_RESPONSE_CODES.put("14", new String[] {"Неверный номер карты«Платеж не выполнен: проверьте данные карты.»", "Неверно указана expiration date или неверно введен cvv/cvc-код."});
+        MFR_RESPONSE_CODES.put("15", new String[] {"Банк-эмитент не определен", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("19", new String[] {"Временная ошибка в транзакции, требуется повтор транзакции", "«Платеж по карте не выполнен. Повторите операцию.»"});
+        MFR_RESPONSE_CODES.put("30", new String[] {"Ошибка формата входящего запроса", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("41", new String[] {"Карта была утеряна", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("43", new String[] {"Карта была украдена", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями ЗАО «Международные финансовые решения» | Список ошибок 2 обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("51", new String[] {"Недостаточно средств на карте", "«Платеж по карте не может быть выполнен, недостаточно средств на карте.»"});
+        MFR_RESPONSE_CODES.put("54", new String[] {"Неверно указана дата истечения срока действия либо срок действия истек«Платеж не выполнен: проверьте данные карты.»", "Неверно указана expiration date или неверно введен cvv/cvc-код."});
+        MFR_RESPONSE_CODES.put("57", new String[] {"Транзакция не разрешена для данного типа платежей", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("58", new String[] {"Транзакция не разрешена для данного типа платежей", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("61", new String[] {"Превышение общего лимита банка на терминал по данной карте", "«Платеж не выполнен: превышены установленные для карты лимиты. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по лимитам."});
+        MFR_RESPONSE_CODES.put("62", new String[] {"Для карты сработали установленные ограничения на сумму/частоту операций", "«Платеж не выполнен: превышены установленные для карты лимиты. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по лимитам."});
+        MFR_RESPONSE_CODES.put("65", new String[] {"Превышени дневного количества операций по данной карте", "«Платеж не выполнен: превышены установленные для карты лимиты. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по лимитам."});
+        MFR_RESPONSE_CODES.put("75", new String[] {"Превышено количество попыток авторизации с неверным вводом cvv/cvc", "«Платеж не выполнен: превышены установленные для карты лимиты. За подробностями обращайтесь в Ваш банк.» - отказ эквайера по лимитам."});
+        MFR_RESPONSE_CODES.put("82", new String[] {"Неверный формат cvv/cvc«Платеж не выполнен: проверьте данные карты.»", "Неверно указана expiration date или неверно введен cvv/cvc-код."});
+        MFR_RESPONSE_CODES.put("89", new String[] {"НАДО УТОЧНЯТЬ В БАНКЕ", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("91", new String[] {"Привышено время ожидания ответа от эмитента, МПС", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("93", new String[] {"Транзакция не может быть завершена в связи с нарешением закона", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
+        MFR_RESPONSE_CODES.put("96", new String[] {"Ошибка на стороне МПС, общая, без комментариев", "«Платеж по карте не может быть выполнен, операция отклонена. За подробностями обращайтесь в Ваш банк.» - отказ эмитента или эквайера по прочим причинам."});
     }
 }

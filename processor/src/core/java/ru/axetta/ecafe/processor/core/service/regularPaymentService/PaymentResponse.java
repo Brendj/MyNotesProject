@@ -32,6 +32,9 @@ public class PaymentResponse {
     private String authCode;
     private String rrn;
     private String errorDescription;
+    private String responseCode;
+    private String responseCodeShortDescription;
+    private String responseCodeFullDescription;
 
     public PaymentResponse() {
 
@@ -165,6 +168,30 @@ public class PaymentResponse {
         this.errorDescription = errorDescription;
     }
 
+    public String getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
+    }
+
+    public String getResponseCodeShortDescription() {
+        return responseCodeShortDescription;
+    }
+
+    public void setResponseCodeShortDescription(String responseCodeShortDescription) {
+        this.responseCodeShortDescription = responseCodeShortDescription;
+    }
+
+    public String getResponseCodeFullDescription() {
+        return responseCodeFullDescription;
+    }
+
+    public void setResponseCodeFullDescription(String responseCodeFullDescription) {
+        this.responseCodeFullDescription = responseCodeFullDescription;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("{");
@@ -213,6 +240,15 @@ public class PaymentResponse {
         }
         if (errorDescription != null) {
             sb.append(", errorDescription=").append(errorDescription);
+        }
+        if(responseCode != null) {
+            sb.append(", responseCode=").append(responseCode);
+        }
+        if(responseCodeShortDescription != null) {
+            sb.append(", responseCodeDescription (short)=").append(responseCodeShortDescription);
+        }
+        if(responseCodeFullDescription != null) {
+            sb.append(", responseCodeDescription (full)=").append(responseCodeFullDescription);
         }
         return sb.append("}").toString();
     }
