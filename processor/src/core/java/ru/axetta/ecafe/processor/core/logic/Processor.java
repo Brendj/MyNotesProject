@@ -2010,7 +2010,6 @@ public class Processor implements SyncProcessor,
         ClientGuardianData clientGuardianData = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
-            //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg, maxVersion);
             clientGuardianData = processor.process();
@@ -2028,33 +2027,37 @@ public class Processor implements SyncProcessor,
         return clientGuardianData;
     }
 
-    private ResultClientGuardian processClientGuardian(List<ClientGuardianItem> items, Long idOfOrg, SyncHistory syncHistory){
+    private ResultClientGuardian processClientGuardian(List<ClientGuardianItem> items, Long idOfOrg,
+            SyncHistory syncHistory) {
         ResultClientGuardian resultClientGuardian = new ResultClientGuardian();
-        for (ClientGuardianItem item: items){
+        Long resultClientGuardianVersion = 0L;
+        if (items.size() > 0) {
+            resultClientGuardianVersion = getClientGuardiansResultVersion();
+        }
+        for (ClientGuardianItem item : items) {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
-            if(item.getDeleteState()==0){
+            clientGuardian.setVersion(resultClientGuardianVersion);
+            if (item.getDeleteState() == 0) {
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
-                    //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Example.create(clientGuardian));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
-                    if(dbClientGuardian==null){
+                    if (dbClientGuardian == null) {
                         clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
-                    if(dbClientGuardian==null){
+                    if (dbClientGuardian == null) {
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
                         resultClientGuardian.addItem(dbClientGuardian, 0, "Client guardian exist");
                     }
                 } catch (Exception ex) {
-                    String message = String.format(
-                            "Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
+                    String message = String.format("Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
                     resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
@@ -2066,21 +2069,19 @@ public class Processor implements SyncProcessor,
             } else {
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
-                    //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Example.create(clientGuardian));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
-                    if(dbClientGuardian!=null){
+                    if (dbClientGuardian != null) {
                         persistenceSession.delete(dbClientGuardian);
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
-                    final String resultMessage = (dbClientGuardian==null?"Client guardian is removed":null);
+                    final String resultMessage = (dbClientGuardian == null ? "Client guardian is removed" : null);
                     resultClientGuardian.addItem(item, 0, resultMessage);
                 } catch (Exception ex) {
-                    String message = String.format(
-                            "Delete Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
+                    String message = String.format("Delete Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
                     resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
@@ -2093,6 +2094,27 @@ public class Processor implements SyncProcessor,
         }
         return resultClientGuardian;
     }
+
+    private Long getClientGuardiansResultVersion() {
+        Long version = 0L;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            version = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception ex) {
+            logger.error("Failed get max client guardians vesion, ", ex);
+            version = 0L;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return version;
+    }
+
 
     private ComplexRoles processComplexRoles() throws Exception {
         Session persistenceSession = null;

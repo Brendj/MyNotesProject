@@ -20,6 +20,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -1013,21 +1014,40 @@ public class ClientManager {
 
     /* Добавить список опекунов клиента */
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
-        for (ClientGuardianItem item: clientGuardians){
-            addGuardianByClient(session, idOfClient, item.getIdOfClient());
+        Long newGuardiansVersions = generateNewClientGuardianVersion(session);
+        for (ClientGuardianItem item : clientGuardians) {
+            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions);
         }
     }
 
     /* Добавить опекуна клиенту */
-    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian) {
+    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
-        if(clientGuardian==null){
+        if (clientGuardian == null) {
             clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
+            clientGuardian.setVersion(version);
             session.persist(clientGuardian);
         }
+    }
+
+    public static Long generateNewClientGuardianVersion(Session session) {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(ClientGuardian.class);
+            criteria.setProjection(Projections.max("version"));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max client guardians vesion, ", ex);
+            version = 0L;
+        }
+        return version;
     }
 
     /* История миграции клиента */

@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.process;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
 import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianData;
@@ -14,6 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,16 +39,14 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
 
     @Override
     public ClientGuardianData process() throws Exception {
-
         DetachedCriteria idOfClient = DetachedCriteria.forClass(Client.class);
-        idOfClient.createAlias("org","o");
-        idOfClient.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        idOfClient.createAlias("org", "o");
+        idOfClient.add(Restrictions.in("o.idOfOrg", getFriendlyOrgsId(idOfOrg)));
         idOfClient.setProjection(Property.forName("idOfClient"));
-
         Criteria subCriteria = idOfClient.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
         ClientGuardianData clientGuardianData;
-        if(countResult>0){
+        if (countResult > 0) {
             Criteria criteria = session.createCriteria(ClientGuardian.class);
             final Criterion idOfGuardian = Property.forName("idOfGuardian").in(idOfClient);
             final Criterion idOfChildren = Property.forName("idOfChildren").in(idOfClient);
@@ -53,12 +54,17 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
             criteria.add(Restrictions.gt("version", maxVersion));
             List<ClientGuardian> list = criteria.list();
             clientGuardianData = new ClientGuardianData(new ResultOperation(0, null));
-            for (ClientGuardian clientGuardian: list){
+            for (ClientGuardian clientGuardian : list) {
                 clientGuardianData.addItem(clientGuardian);
             }
         } else {
             clientGuardianData = new ClientGuardianData(new ResultOperation(400, "Client not found by this org"));
         }
         return clientGuardianData;
+    }
+
+    private Collection<Long> getFriendlyOrgsId(Long idOfOrg) {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        return OrgUtils.getFriendlyOrgIds(org);
     }
 }
