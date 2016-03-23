@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -15,9 +17,11 @@ import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.security.spec.ECField;
 import java.util.*;
 
 /**
@@ -27,7 +31,7 @@ import java.util.*;
  * Time: 19:06
  * To change this template use File | Settings | File Templates.
  */
-public class ECafeSettings extends DistributedObject{
+public class ECafeSettings extends DistributedObject {
 
     private String settingValue;
     private SettingsIds settingsId;
@@ -35,27 +39,65 @@ public class ECafeSettings extends DistributedObject{
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
-        List<DistributedObject> list = toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        List<DistributedObject> listSettings = toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion,
+                currentLastGuid, currentLimit);
+        for (Long orgId : getOrgIdsFromSettings(listSettings)) {
+            List<ECafeSettings> settingsForOrg = selectSettingsForOrganization(listSettings, orgId);
+            removeOldDuplicatedSettings(settingsForOrg);
+        }
+        return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+    }
+
+    private Set<Long> getOrgIdsFromSettings(List<DistributedObject> listSettings) {
+        Set<Long> uniqueOrgIds = new HashSet<Long>();
+        for (DistributedObject distributedObject : listSettings) {
+            uniqueOrgIds.add(distributedObject.getOrgOwner());
+        }
+        return uniqueOrgIds;
+    }
+
+    private List<ECafeSettings> selectSettingsForOrganization(List<DistributedObject> listSettings, Long orgId) {
+        ArrayList<ECafeSettings> result = new ArrayList<ECafeSettings>();
+        for (DistributedObject distributedObject : listSettings) {
+            ECafeSettings settings = (ECafeSettings) distributedObject;
+            if (settings.orgOwner == orgId) {
+                result.add(settings);
+            }
+        }
+        return result;
+    }
+
+    private void removeOldDuplicatedSettings(List<ECafeSettings> listSettings) {
         Map<SettingsIds, Long> map = new TreeMap<SettingsIds, Long>();
-        for (DistributedObject dobj: list){
-            ECafeSettings settings = (ECafeSettings) dobj;
-            if(map.keySet().contains(settings.getSettingsId())){
-                if(map.get(settings.getSettingsId())<settings.getGlobalVersion()){
+        for (ECafeSettings settings : listSettings) {
+            if (map.keySet().contains(settings.getSettingsId())) {
+                if (map.get(settings.getSettingsId()) < settings.getGlobalVersion()) {
                     map.put(settings.getSettingsId(), settings.getGlobalVersion());
                 }
             } else {
                 map.put(settings.getSettingsId(), settings.getGlobalVersion());
             }
         }
-        Iterator<DistributedObject> settingsIterator = list.iterator();
-        while (settingsIterator.hasNext()){
-            ECafeSettings settings = (ECafeSettings) settingsIterator.next();
+        Iterator<ECafeSettings> settingsIterator = listSettings.iterator();
+        while (settingsIterator.hasNext()) {
+            ECafeSettings settings = settingsIterator.next();
             Long maxVer = map.get(settings.getSettingsId());
-            if(settings.getGlobalVersion()<maxVer){
+            if (settings.getGlobalVersion() < maxVer) {
                 DAOService.getInstance().removeSetting(settings);
             }
         }
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+    }
+
+    private List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid, Integer currentLimit) throws
+            DistributedObjectException {
+        Org currentOrg = (Org) session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(getClass());
+        Set<Long> friendlyOrgIds = OrgUtils.getFriendlyOrgIds(currentOrg);
+        criteria.add(Restrictions.in("orgOwner", friendlyOrgIds));
+        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+        createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
     }
 
     @Override
@@ -71,18 +113,19 @@ public class ECafeSettings extends DistributedObject{
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         //if(getTagName().equals("C")){
-            Criteria criteria = session.createCriteria(ECafeSettings.class);
-            criteria.add(Restrictions.eq("settingsId", settingsId));
-            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
-            criteria.add(Restrictions.ne("guid", guid));
-            criteria.setMaxResults(1);
-            ECafeSettings settings = (ECafeSettings) criteria.uniqueResult();
-            session.clear();
-            if(settings!=null){
-                DistributedObjectException distributedObjectException =  new DistributedObjectException("ECafeSettings DATA_EXIST_VALUE");
-                distributedObjectException.setData(settings.getGuid());
-                throw distributedObjectException;
-            }
+        Criteria criteria = session.createCriteria(ECafeSettings.class);
+        criteria.add(Restrictions.eq("settingsId", settingsId));
+        criteria.add(Restrictions.eq("orgOwner", orgOwner));
+        criteria.add(Restrictions.ne("guid", guid));
+        criteria.setMaxResults(1);
+        ECafeSettings settings = (ECafeSettings) criteria.uniqueResult();
+        session.clear();
+        if (settings != null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException(
+                    "ECafeSettings DATA_EXIST_VALUE");
+            distributedObjectException.setData(settings.getGuid());
+            throw distributedObjectException;
+        }
         //}
     }
 
@@ -116,8 +159,8 @@ public class ECafeSettings extends DistributedObject{
         if (stringValue != null) {
             setSettingValue(stringValue);
             AbstractParserBySettingValue value = getSplitSettingValue();
-            if(!value.check()) {
-                final String message = "ECafeSettings invalid string value: "+getSettingsId()+" "+getSettingValue();
+            if (!value.check()) {
+                final String message = "ECafeSettings invalid string value: " + getSettingsId() + " " + getSettingValue();
                 throw new DistributedObjectException(message);
             }
         }
