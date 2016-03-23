@@ -51,6 +51,7 @@ public class CycleDiagram extends DistributedObject{
     private String sundayPrice;
     private Staff staff;
     private String guidOfStaff;
+    private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -136,7 +137,12 @@ public class CycleDiagram extends DistributedObject{
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        if (informationContent != null && informationContent == InformationContents.FRIENDLY_ORGS) {
+            return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
+        else {
+            return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
     }
 
     @Override
@@ -225,7 +231,10 @@ public class CycleDiagram extends DistributedObject{
         setGuidOfStaff(((CycleDiagram) distributedObject).getGuidOfStaff());
     }
 
-
+    @Override
+    public void setNewInformationContent(InformationContents informationContent) {
+        this.informationContent = informationContent;
+    }
 
     public boolean isActual() {
         return deletedState != null && !deletedState && stateDiagram == StateDiagram.ACTIVE;

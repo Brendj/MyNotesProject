@@ -53,6 +53,7 @@ public class SubscriptionFeeding extends DistributedObject{
 
     private Staff staff;
     private String guidOfStaff;
+    private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -92,7 +93,12 @@ public class SubscriptionFeeding extends DistributedObject{
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        if (informationContent!=null && informationContent == InformationContents.FRIENDLY_ORGS) {
+            return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
+        else {
+            return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(SubscriptionFeeding.class);
@@ -187,6 +193,11 @@ public class SubscriptionFeeding extends DistributedObject{
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
         setStaff(((SubscriptionFeeding) distributedObject).getStaff());
         setGuidOfStaff(((SubscriptionFeeding) distributedObject).getGuidOfStaff());
+    }
+
+    @Override
+    public void setNewInformationContent(InformationContents informationContent) {
+        this.informationContent = informationContent;
     }
 
     // Проверка подписки на актуальность.
