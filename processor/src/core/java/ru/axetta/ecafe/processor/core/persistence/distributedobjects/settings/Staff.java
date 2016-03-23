@@ -104,13 +104,13 @@ public class Staff extends DistributedObject {
             String currentLastGuid, Integer currentLimit) throws Exception {
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         if (isSupplier) {
-            return toSupplierOrgProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+            return processStaffsToSelfOrg(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         } else {
-            return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+            return processStaffsToFriendlyOrgs(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         }
     }
 
-    private List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
+    private List<DistributedObject> processStaffsToFriendlyOrgs(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
             Integer currentLimit) {
         Org currentOrg = (Org) session.load(Org.class,idOfOrg);
         List<DistributedObject> result = new ArrayList<DistributedObject>();
@@ -124,7 +124,7 @@ public class Staff extends DistributedObject {
         return result;
     }
 
-    private List<DistributedObject> toSupplierOrgProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
+    private List<DistributedObject> processStaffsToSelfOrg(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid,
             Integer currentLimit) {
         List<DistributedObject> result = new ArrayList<DistributedObject>();
         List<Long> orgOwners = getDestOrgsForSupplier(session, idOfOrg);

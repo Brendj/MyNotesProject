@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -17,6 +19,7 @@ import org.w3c.dom.Node;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -216,6 +219,18 @@ public abstract class DistributedObject{
         criteria.add(Restrictions.eq("orgOwner",idOfOrg));
         buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         //criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
+        createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
+    }
+
+    protected List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid, Integer currentLimit) throws
+            DistributedObjectException {
+        Org currentOrg = (Org) session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(getClass());
+        Set<Long> friendlyOrgIds = OrgUtils.getFriendlyOrgIds(currentOrg);
+        criteria.add(Restrictions.in("orgOwner", friendlyOrgIds));
+        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
         createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();

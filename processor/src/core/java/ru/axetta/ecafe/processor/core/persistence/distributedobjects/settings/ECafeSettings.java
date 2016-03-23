@@ -4,11 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -17,11 +15,9 @@ import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.security.spec.ECField;
 import java.util.*;
 
 /**
@@ -35,29 +31,44 @@ public class ECafeSettings extends DistributedObject {
 
     private String settingValue;
     private SettingsIds settingsId;
+    private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
+        if (informationContent != null && informationContent == InformationContents.FRIENDLY_ORGS) {
+            return processSettingsFriendlyOrgs(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
+        else {
+            return processSettingsSelfOrg(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+        }
+    }
+
+    private List<DistributedObject> processSettingsSelfOrg(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws DistributedObjectException {
+        List<DistributedObject> listSettings = toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid,
+                currentLimit);
+        removeOldDuplicatedSettings(listSettings);
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+    }
+
+    private List<DistributedObject> processSettingsFriendlyOrgs(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws DistributedObjectException {
         List<DistributedObject> listSettings = toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion,
                 currentLastGuid, currentLimit);
-        for (Long orgId : getOrgIdsFromSettings(listSettings)) {
-            List<ECafeSettings> settingsForOrg = selectSettingsForOrganization(listSettings, orgId);
+        Set<Long> uniqueOrgIds = new HashSet<Long>();
+        for (DistributedObject distributedObject : listSettings) {
+            uniqueOrgIds.add(distributedObject.getOrgOwner());
+        }
+        for (Long orgId : uniqueOrgIds) {
+            List<DistributedObject> settingsForOrg = selectSettingsForOrganization(listSettings, orgId);
             removeOldDuplicatedSettings(settingsForOrg);
         }
         return toFriendlyOrgsProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
-    private Set<Long> getOrgIdsFromSettings(List<DistributedObject> listSettings) {
-        Set<Long> uniqueOrgIds = new HashSet<Long>();
-        for (DistributedObject distributedObject : listSettings) {
-            uniqueOrgIds.add(distributedObject.getOrgOwner());
-        }
-        return uniqueOrgIds;
-    }
-
-    private List<ECafeSettings> selectSettingsForOrganization(List<DistributedObject> listSettings, Long orgId) {
-        ArrayList<ECafeSettings> result = new ArrayList<ECafeSettings>();
+    private List<DistributedObject> selectSettingsForOrganization(List<DistributedObject> listSettings, Long orgId) {
+        ArrayList<DistributedObject> result = new ArrayList<DistributedObject>();
         for (DistributedObject distributedObject : listSettings) {
             ECafeSettings settings = (ECafeSettings) distributedObject;
             if (settings.orgOwner == orgId) {
@@ -67,9 +78,10 @@ public class ECafeSettings extends DistributedObject {
         return result;
     }
 
-    private void removeOldDuplicatedSettings(List<ECafeSettings> listSettings) {
+    private void removeOldDuplicatedSettings(List<DistributedObject> listSettings) {
         Map<SettingsIds, Long> map = new TreeMap<SettingsIds, Long>();
-        for (ECafeSettings settings : listSettings) {
+        for (DistributedObject distributedObject : listSettings) {
+            ECafeSettings settings = (ECafeSettings) distributedObject;
             if (map.keySet().contains(settings.getSettingsId())) {
                 if (map.get(settings.getSettingsId()) < settings.getGlobalVersion()) {
                     map.put(settings.getSettingsId(), settings.getGlobalVersion());
@@ -78,26 +90,14 @@ public class ECafeSettings extends DistributedObject {
                 map.put(settings.getSettingsId(), settings.getGlobalVersion());
             }
         }
-        Iterator<ECafeSettings> settingsIterator = listSettings.iterator();
+        Iterator<DistributedObject> settingsIterator = listSettings.iterator();
         while (settingsIterator.hasNext()) {
-            ECafeSettings settings = settingsIterator.next();
+            ECafeSettings settings = (ECafeSettings) settingsIterator.next();
             Long maxVer = map.get(settings.getSettingsId());
             if (settings.getGlobalVersion() < maxVer) {
                 DAOService.getInstance().removeSetting(settings);
             }
         }
-    }
-
-    private List<DistributedObject> toFriendlyOrgsProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid, Integer currentLimit) throws
-            DistributedObjectException {
-        Org currentOrg = (Org) session.load(Org.class, idOfOrg);
-        Criteria criteria = session.createCriteria(getClass());
-        Set<Long> friendlyOrgIds = OrgUtils.getFriendlyOrgIds(currentOrg);
-        criteria.add(Restrictions.in("orgOwner", friendlyOrgIds));
-        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
-        createProjections(criteria);
-        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
-        return criteria.list();
     }
 
     @Override
@@ -174,6 +174,12 @@ public class ECafeSettings extends DistributedObject {
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
         setSettingsId(((ECafeSettings) distributedObject).getSettingsId());
     }
+
+    @Override
+    public void setNewInformationContent(InformationContents informationContent) {
+        this.informationContent = informationContent;
+    }
+
 
     // Настройки, заданные на клиенте, имеют приоритет над серверными.
     // Поэтому активную настройку, созданную на сервере, мы блокируем и прикрываем активной клиентской.
