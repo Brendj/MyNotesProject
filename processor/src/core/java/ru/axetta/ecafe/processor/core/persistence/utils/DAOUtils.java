@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Sub
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
@@ -2125,5 +2126,31 @@ public class DAOUtils {
             return (Org) res.get(0);
         }
         return null;
+    }
+
+    public static List<InteractiveReportDataItem> getInteractiveReportDatas(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "SELECT cfi.idofrecord, cfi.value FROM cf_interactive_report_data cfi  WHERE cfi.idoforg =:idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+
+        List res = query.list();
+
+        if (res != null && res.size() > 0) {
+            List<InteractiveReportDataItem> itemList = new ArrayList<InteractiveReportDataItem>();
+            for (Object o : res) {
+                Object[] result = (Object[]) o;
+                InteractiveReportDataItem inter = new InteractiveReportDataItem((String) result[1],
+                        ((BigInteger) result[0]).longValue());
+                itemList.add(inter);
+            }
+            return itemList;
+        }
+        return null;
+    }
+
+    public static InteractiveReportDataEntity findInteractiveDataReport(Session session,
+            CompositeIdOfInteractiveReportData compositeIdOfInteractiveReportData) {
+        return (InteractiveReportDataEntity) session
+                .get(InteractiveReportDataEntity.class, compositeIdOfInteractiveReportData);
     }
 }

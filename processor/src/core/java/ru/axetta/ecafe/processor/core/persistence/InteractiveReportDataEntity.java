@@ -11,7 +11,7 @@ package ru.axetta.ecafe.processor.core.persistence;
  * Time: 09:48
  * To change this template use File | Settings | File Templates.
  */
-public class InteractiveReportData {
+public class InteractiveReportDataEntity {
 
     private Long idOfRecord;
     private Org org;
@@ -19,10 +19,11 @@ public class InteractiveReportData {
 
     private CompositeIdOfInteractiveReportData compositeIdOfInteractiveReportData;
 
-    public InteractiveReportData() {
+    public InteractiveReportDataEntity() {
     }
 
-    public InteractiveReportData(Long idOfRecord, Org org, String value) {
+    public InteractiveReportDataEntity(CompositeIdOfInteractiveReportData compositeIdOfInteractiveReportData, Long idOfRecord, Org org, String value) {
+        this.compositeIdOfInteractiveReportData = compositeIdOfInteractiveReportData;
         this.idOfRecord = idOfRecord;
         this.org = org;
         this.value = value;

@@ -29,6 +29,5 @@ CREATE TABLE cf_interactive_report_data (
   idofrecord bigint,
   idoforg bigint,
   value varchar (255),
-
   CONSTRAINT cf_interactivereport_cf_orgs_pk PRIMARY KEY (idoforg, idofrecord)
 );

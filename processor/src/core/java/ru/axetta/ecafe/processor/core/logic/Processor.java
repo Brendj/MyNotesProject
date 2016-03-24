@@ -32,6 +32,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
@@ -820,6 +822,8 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
+        InteractiveReport interactiveReport = null;
 
         boolean bError = false;
 
@@ -972,6 +976,24 @@ public class Processor implements SyncProcessor,
             String message = String.format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             organizationComplexesStructure = new OrganizationComplexesStructure(100, String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
+
+        try {
+            if(request.getInteractiveReport() != null) {
+                interactiveReport = processInteractiveReport(request.getIdOfOrg(), request.getInteractiveReport());
+            }
+        } catch (Exception e) {
+            String message = String.format("processInteractiveReport: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            interactiveReportData = processInteractiveReportData(request.getIdOfOrg());
+        } catch (Exception e) {
+            String message = String.format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
 
@@ -1155,7 +1177,7 @@ public class Processor implements SyncProcessor,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
                 accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure);
+                organizationComplexesStructure, interactiveReportData);
     }
 
 
@@ -1213,6 +1235,7 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure=null;
+        InteractiveReportData interactiveReportData = null;
 
         boolean bError = false;
 
@@ -1254,7 +1277,8 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure,
+                interactiveReportData);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1289,6 +1313,7 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
 
         boolean bError = false;
 
@@ -1310,7 +1335,8 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure,
+                interactiveReportData);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1350,6 +1376,7 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
 
         boolean bError = false;
 
@@ -1460,7 +1487,8 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure,
+                interactiveReportData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1500,6 +1528,7 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
 
         //Process AccountOperationsRegistry
         try {
@@ -1597,7 +1626,8 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure,
+                interactiveReportData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1634,6 +1664,7 @@ public class Processor implements SyncProcessor,
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
 
         boolean bError = false;
 
@@ -1739,7 +1770,8 @@ public class Processor implements SyncProcessor,
 
         try {
             accountsRegistry =
-                    RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class).accRegistryHandler(request,request.getIdOfOrg());
+                    RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class).accRegistryHandler(request,
+                            request.getIdOfOrg());
             //accountsRegistry = new AccountsRegistryHandler().accRegistryHandler(request,request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
@@ -1753,7 +1785,8 @@ public class Processor implements SyncProcessor,
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate, prohibitionsMenu,
-                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure);
+                accountsRegistry, resCardsOperationsRegistry, organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,organizationComplexesStructure,
+                interactiveReportData);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -1984,6 +2017,45 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return reestrTaloonApprovalData;
+    }
+
+    //responce
+    private InteractiveReportData processInteractiveReportData(Long idOfOrg) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        InteractiveReportData interactiveReportData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            InteractiveReportDataProcessor processor = new InteractiveReportDataProcessor(persistenceSession, idOfOrg);
+            interactiveReportData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return interactiveReportData;
+    }
+
+    //request
+    private InteractiveReport processInteractiveReport(Long idOfOrg, InteractiveReport interactiveReportItem) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        InteractiveReport interactiveReport = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new InteractiveReportProcessor(persistenceSession, idOfOrg, interactiveReportItem);
+            interactiveReport = (InteractiveReport) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return interactiveReport;
     }
 
     private TempCardOperationData processClientRequestsOperations(Long idOfOrg) throws Exception {

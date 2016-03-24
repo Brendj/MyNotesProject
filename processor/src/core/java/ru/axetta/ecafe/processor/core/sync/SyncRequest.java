@@ -8,6 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -2159,6 +2162,7 @@ public class SyncRequest {
         private final OrganizationStructureRequestBuilder organizationStructureRequestBuilder;
         private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
         private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
+        private final InteractiveReportDataBuilder interactiveReportDataBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2188,6 +2192,7 @@ public class SyncRequest {
             this.organizationStructureRequestBuilder = new OrganizationStructureRequestBuilder();
             this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
             this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
+            this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2343,6 +2348,11 @@ public class SyncRequest {
             }
             //        reestrTaloonApprovalBuilder.build();
 
+            Node interactiveReportNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
+            InteractiveReport interactiveReportRequest = null;
+            if(interactiveReportNode != null) {
+                interactiveReportRequest = interactiveReportDataBuilder.buildInteractiveReport(interactiveReportNode);
+            }
 
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
@@ -2369,7 +2379,7 @@ public class SyncRequest {
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest, interactiveReportRequest);
         }
 
 
@@ -2408,6 +2418,7 @@ public class SyncRequest {
     private final CardsOperationsRegistry cardsOperationsRegistry;
     private final AccountsRegistryRequest accountsRegistryRequest;
     private final ReestrTaloonApproval reestrTaloonApprovalRequest;
+    private final InteractiveReport interactiveReport;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
             AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
@@ -2416,7 +2427,7 @@ public class SyncRequest {
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
-            ReestrTaloonApproval reestrTaloonApprovalRequest) {
+            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2446,6 +2457,7 @@ public class SyncRequest {
         this.cardsOperationsRegistry = cardsOperationsRegistry;
         this.accountsRegistryRequest = accountsRegistryRequest;
         this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
+        this.interactiveReport = interactiveReport;
     }
 
     public String getClientVersion() {
@@ -2554,6 +2566,10 @@ public class SyncRequest {
 
     public ReestrTaloonApproval getReestrTaloonApproval() {
         return reestrTaloonApprovalRequest;
+    }
+
+    public InteractiveReport getInteractiveReport() {
+        return interactiveReport;
     }
 
     @Override

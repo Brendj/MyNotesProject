@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1247,6 +1248,7 @@ public class SyncResponse {
     private final ResReestrTaloonApproval resReestrTaloonApproval;
     private final ReestrTaloonApprovalData reestrTaloonApprovalData;
     private final OrganizationComplexesStructure organizationComplexesStructure;
+    private final ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
 
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1261,7 +1263,7 @@ public class SyncResponse {
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
-            OrganizationComplexesStructure organizationComplexesStructure) {
+            OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1301,6 +1303,7 @@ public class SyncResponse {
         this.resReestrTaloonApproval = resReestrTaloonApproval;
         this.reestrTaloonApprovalData = reestrTaloonApprovalData;
         this.organizationComplexesStructure = organizationComplexesStructure;
+        this.interactiveReportData = interactiveReportData;
     }
 
     public Document toDocument() throws Exception {
@@ -1434,6 +1437,10 @@ public class SyncResponse {
         // CorrectingNumbersOrdersRegistry
         if (correctingNumbersOrdersRegistry != null){
             ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
+        }
+
+        if (interactiveReportData != null) {
+            ecafeEnvelopeElement.appendChild(interactiveReportData.toElement(document));
         }
 
         if(manager != null){
