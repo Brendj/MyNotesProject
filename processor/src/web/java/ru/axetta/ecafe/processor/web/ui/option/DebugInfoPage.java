@@ -6,12 +6,15 @@ package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
-import org.quartz.Scheduler;
-import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +30,10 @@ import java.util.*;
 public class DebugInfoPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(DebugInfoPage.class);
+
+    private Date startDate = new Date(System.currentTimeMillis());
+    private Date endDate = new Date(System.currentTimeMillis());
+    private String result = "";
 
     @Override
     public String getPageFilename() {
@@ -72,7 +79,12 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runTest2() throws Exception {
         //CardService cardService = CardService.getInstance();
         //System.out.println(DAOService.getInstance().runDebugTest2());
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        service.run(getStartDate(), getEndDate(),
+                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+
+        /*RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         Scheduler scheduler = runtimeContext.getAutoReportGenerator().getScheduler();
         for (String groupName : scheduler.getJobGroupNames()) {
@@ -88,7 +100,13 @@ public class DebugInfoPage extends BasicWorkspacePage {
                         + groupName + " - " + nextFireTime);
 
             }
-        }
+        }*/
+    }
+
+    private void testNewEMPFuncs() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        service.run(new Date(1455062400000L), new Date(1455148799000L), ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
     }
 
     public void runTestAISReestr() throws Exception {
@@ -107,4 +125,50 @@ public class DebugInfoPage extends BasicWorkspacePage {
         }
     }
 
+    public void runQuickTest() throws Exception {
+        List<Client> list = DAOService.getInstance().findClientsForOrgAndFriendly(57L, false);
+        System.out.println(list.size());
+    }
+
+    public void runEmpSummary() throws Exception {
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        List<SummaryCalculationService.ClientEE> list = service.generateNotificationParams(getStartDate(), getEndDate(),
+                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+        String res = "";
+        for (SummaryCalculationService.ClientEE client : list) {
+            res += String.format("Ид клиента=%s\n", client.getIdOfClient());
+            for (int i = 0; i < client.getValues().length-1; i=i+2) {
+                res += client.getValues()[i] + " | " + client.getValues()[i+1] + "\n";
+            }
+            res += "\n";
+        }
+        result = res;
+    }
+
+
+    public Date getStartDate() {
+        //Calendar calendar = new GregorianCalendar();
+        //return CalendarUtils.calculateTodayStart(calendar, startDate);
+        return CalendarUtils.truncateToDayOfMonth(startDate);
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return CalendarUtils.endOfDay(endDate);
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
 }

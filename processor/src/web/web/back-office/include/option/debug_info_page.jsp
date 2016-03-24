@@ -25,6 +25,34 @@
             <h:outputText escape="true" value="Тест обращения к АИС Реестр" styleClass="output-text" />
             <h:commandButton value="Запуск" action="#{debugInfoPage.runTestAISReestr()}" />
         </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Быстрые тесты" styleClass="output-text" />
+            <h:commandButton value="Запуск" action="#{debugInfoPage.runQuickTest()}" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Ежедневные итоги для ЕМП" styleClass="output-text" />
+            <a4j:commandButton value="Запуск" action="#{debugInfoPage.runEmpSummary()}" reRender="debug_result"
+                    status="debugTaskStatus" />
+        </h:panelGrid>
+
+        <a4j:status id="debugTaskStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+
+        <h:panelGrid columns="4" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
+            <rich:calendar value="#{debugInfoPage.startDate}" datePattern="dd.MM.yyyy"
+                       inputClass="input-text" showWeeksBar="false" />
+            <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
+            <rich:calendar value="#{debugInfoPage.endDate}" datePattern="dd.MM.yyyy"
+                           inputClass="input-text" showWeeksBar="false" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Результат" styleClass="output-text" />
+            <h:inputTextarea value="#{debugInfoPage.result}" cols="50" rows="20" id="debug_result" readonly="true" />
+        </h:panelGrid>
     </rich:simpleTogglePanel>
 </h:panelGrid>
 

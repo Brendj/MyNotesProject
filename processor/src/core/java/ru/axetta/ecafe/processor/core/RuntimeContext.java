@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
+import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
@@ -610,7 +611,7 @@ public class RuntimeContext implements ApplicationContextAware {
                         .getBean("regularPaymentSubscriptionService");
             }
 
-
+            RuntimeContext.getAppContext().getBean(SummaryCalculationService.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();

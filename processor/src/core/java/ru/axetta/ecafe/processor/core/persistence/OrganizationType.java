@@ -1,5 +1,8 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -16,6 +19,13 @@ public enum OrganizationType {
 
     private final String description;
 
+    static Map<Integer,OrganizationType> map = new HashMap<Integer,OrganizationType>();
+    static {
+        for (OrganizationType questionaryStatus : OrganizationType.values()) {
+            map.put(questionaryStatus.ordinal(), questionaryStatus);
+        }
+    }
+
     private OrganizationType(String description) {
         this.description = description;
     }
@@ -23,5 +33,9 @@ public enum OrganizationType {
     @Override
     public String toString() {
         return description;
+    }
+
+    public static OrganizationType fromInteger(Integer value){
+        return map.get(value);
     }
 }

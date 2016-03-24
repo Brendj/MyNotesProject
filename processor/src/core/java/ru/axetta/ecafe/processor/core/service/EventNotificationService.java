@@ -50,6 +50,8 @@ public class EventNotificationService {
     public static String NOTIFICATION_SUBSCRIPTION_FEEDING = "subscriptionFeeding";
     public static String NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS = "subFeeWithdrawNotSuccessful";
     public static String NOTIFICATION_GOOD_REQUEST_CHANGE = "goodRequestChange";
+    public static String NOTIFICATION_SUMMARY_BY_DAY = "summaryByDay";
+    public static String NOTIFICATION_SUMMARY_BY_WEEK = "summaryByWeek";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -427,7 +429,10 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING;
             } else if (type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS)){
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS;
-            }else {
+            } else if (type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
+                clientSMSType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
+            }
+            else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
 
@@ -447,6 +452,46 @@ public class EventNotificationService {
             return false;
         }
         return result;
+    }
+
+    public boolean sendNotificationSummary(Client destClient, String type, String[] values, Date eventTime) {
+        boolean result = false;
+        int clientSMSType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
+        try {
+            Object textObject = getSummaryNotificationObject(type, destClient, values);
+            if (textObject != null) {
+                smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                result = true;
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to send summary notification to client with contract_id = %s.", destClient.getContractId());
+            logger.error(message, e);
+            return false;
+        }
+        return result;
+    }
+
+    private Object getSummaryNotificationObject(String type, Client destClient, String[] values) {
+        EMPEventType empType = null;
+        if(type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient);
+        }
+
+        for (int i = 0; i < values.length-1; i=i+2) {
+            empType.getParameters().put(values[i], values[i+1]);
+        }
+
+        String empDateStr = findValueInParams(new String [] {"empTime"}, values);
+        if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
+            try {
+                DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+                Date eventDate = df.parse(empDateStr);
+                empType.setTime(eventDate.getTime());
+            } catch (Exception e) {
+                logger.error("Failed to parse EMP date", e);
+            }
+        }
+        return empType;
     }
 
     public static final String[] attachToValues(String key, String val, String [] values) {
