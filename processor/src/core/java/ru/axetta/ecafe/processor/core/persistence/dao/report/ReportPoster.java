@@ -38,7 +38,7 @@ public class ReportPoster implements Runnable {
     public void run() {
         File temp = null;
         try {
-            temp = File.createTempFile(String.format("DeliveredServicesReport_%s", System.currentTimeMillis()), ".xls");
+            temp = File.createTempFile(String.format("%s_%s",subject, System.currentTimeMillis()), ".xls");
             temp.deleteOnExit();
             FileUtils.writeByteArrayToFile(temp, document);
             ReportDocument reportDocument = new ReportDocument(temp);

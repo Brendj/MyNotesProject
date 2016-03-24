@@ -13,10 +13,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
-import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
-import ru.axetta.ecafe.processor.core.report.DeliveredServicesElectronicCollationReport;
-import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -48,6 +46,16 @@ import java.util.*;
 @Repository
 @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 public class ReportRepository extends BaseJpaDao {
+    private final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
+    private final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
+    private final String REPORT_REGISTER_STAMP = "RegisterStampReport";
+    private final String REPORT_REGISTER_STAMP_SUBJECT = "Реестр талонов по льготному питанию";
+    private final String REPORT_REGISTER_STAMP_PAID = "RegisterStampPaidReport";
+    private final String REPORT_REGISTER_STAMP_PAID_SUBJECT = "Реестр талонов по платному питанию";
+    private final String REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING = "RegisterStampSubscriptionFeedingReport";
+    private final String REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT = "Реестр талонов по абонементному питанию";
+    private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT = "DailySalesByGroupsReport";
+    private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT_SUBJECT = "Дневные продажи по категориям";
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
 
@@ -62,27 +70,24 @@ public class ReportRepository extends BaseJpaDao {
         return RuntimeContext.getAppContext().getBean(ReportRepository.class);
     }
 
-    public byte[] getDeliveredServicesReport(List<ReportParameter> parameters, String subject) throws Exception {
-        Session session = entityManager.unwrap(Session.class);
-        DeliveredServicesReportParameters reportParameters = new DeliveredServicesReportParameters(
-                parameters).parse();
-        if (!reportParameters.checkRequiredParameters()) {
-            return null; //не переданы или заполнены с ошибкой обязательные параметры
+    public byte[] buildReportAndReturnRawDataByType(String reportType, List<ReportParameter> parameters) throws Exception {
+        if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
+            return getDeliveredServicesElectronicCollationReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
+        } else if (reportType.equals(REPORT_DAILY_SALES_BY_GROUPS_REPORT)) {
+            return getDailySalesByGroupsReport(parameters, REPORT_DAILY_SALES_BY_GROUPS_REPORT_SUBJECT);
+        } else if (reportType.equals(REPORT_REGISTER_STAMP)) {
+           return getRegisterStampReport(parameters, REPORT_REGISTER_STAMP_SUBJECT);
+        } else if (reportType.equals(REPORT_REGISTER_STAMP_PAID)) {
+            return getRegisterStampPaidReport(parameters, REPORT_REGISTER_STAMP_PAID_SUBJECT);
+        } else if (reportType.equals(REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING)) {
+            return getRegisterStampSubscriptionFeedingReport(parameters,REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT);
         }
-        BasicJasperReport jasperReport = buildDelivererdServicesReport(session,reportParameters);
-        if (jasperReport == null
-                || isEmptyReportPrintPages(jasperReport)) {
-            return null;
-        }
-        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
-        byte[] arr = stream.toByteArray();
-        postReportToEmails(subject, reportParameters, arr);
-        return arr;
+        return null;
     }
 
-    public byte[] getDeliveredServicesElectronicCollationReport(List<ReportParameter> parameters, String subject) throws Exception {
+    private byte[] getDeliveredServicesElectronicCollationReport(List<ReportParameter> parameters, String subject) throws Exception {
         Session session = entityManager.unwrap(Session.class);
-        DeliveredServicesReportParameters reportParameters = new DeliveredServicesReportParameters(
+        ReportParameters reportParameters = new ReportParameters(
                 parameters).parse();
         if (!reportParameters.checkRequiredParameters()) {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
@@ -99,12 +104,75 @@ public class ReportRepository extends BaseJpaDao {
         return arr;
     }
 
+    private byte[] getRegisterStampReport(List<ReportParameter> parameters,String subject) throws Exception {
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null;
+        }
+        BasicJasperReport jasperReport = buildRegisterStampReport(reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getRegisterStampPaidReport(List<ReportParameter> parameters, String subject) throws Exception {
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null;
+        }
+        BasicJasperReport jasperReport = buildRegisterStampPaidReport(reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getRegisterStampSubscriptionFeedingReport(List<ReportParameter> parameters, String subject) throws Exception {
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null;
+        }
+        BasicJasperReport jasperReport = buildRegisterStampSubscriptionFeedingReport(reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getDailySalesByGroupsReport(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildDailySalesByGroupsReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+
+
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
                 && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
     }
 
-    private void postReportToEmails(String subject, DeliveredServicesReportParameters reportParameters, byte[] arr) {
+    private void postReportToEmails(String subject, ReportParameters reportParameters, byte[] arr) {
         String email = reportParameters.getEmail();
         if (email != null && !email.isEmpty()) {
             String[] emails = email.split(";");
@@ -115,28 +183,9 @@ public class ReportRepository extends BaseJpaDao {
         }
     }
 
-    private BasicJasperReport buildDelivererdServicesReport(Session session,DeliveredServicesReportParameters reportParameters)
+    private BasicJasperReport buildDeliveredServicesElectronicCollationReport(Session session, ReportParameters reportParameters)
             throws Exception {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateFilename =
-                autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
-        DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
-        builder.setOrg(reportParameters.getIdOfOrg());
-        try {
-            BasicJasperReport deliveredServicesReport = builder
-                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar(),
-                            reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
-                            reportParameters.getRegion(), false);
-            return deliveredServicesReport;
-        } catch (EntityNotFoundException e) {
-            logger.error("Not found organization to generate report");
-            return null;  //не найдена организация
-        }
-    }
-
-    private BasicJasperReport buildDeliveredServicesElectronicCollationReport(Session session, DeliveredServicesReportParameters reportParameters)
-            throws Exception {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class.getSimpleName() + ".jasper";
         DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(
@@ -153,6 +202,75 @@ public class ReportRepository extends BaseJpaDao {
             return null;  //не найдена организация
         }
     }
+
+    private BasicJasperReport buildRegisterStampReport(ReportParameters reportParameters) throws Exception {
+        String templateFilename = getAutoReportGenerator().getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
+        RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
+        return buildCommonRegisterStampReport(builder,reportParameters);
+    }
+
+    private BasicJasperReport buildRegisterStampPaidReport(ReportParameters reportParameters) throws Exception {
+        String templateFilename = getAutoReportGenerator().getReportsTemplateFilePath() + RegisterStampPaidReport.class.getSimpleName() + ".jasper";
+        RegisterStampPaidReport.Builder builder = new RegisterStampPaidReport.Builder(templateFilename);
+        return buildCommonRegisterStampReport(builder,reportParameters);
+    }
+
+    private BasicJasperReport buildRegisterStampSubscriptionFeedingReport(ReportParameters reportParameters) throws Exception {
+        String templateFilename =
+                getAutoReportGenerator().getReportsTemplateFilePath() + RegisterStampSubscriptionFeedingReport.class.getSimpleName() + ".jasper";
+        RegisterStampSubscriptionFeedingReport.Builder builder = new RegisterStampSubscriptionFeedingReport.Builder(
+                templateFilename);
+        return buildCommonRegisterStampReport(builder, reportParameters);
+    }
+
+    private BasicJasperReport buildCommonRegisterStampReport(BasicReportJob.Builder builder, ReportParameters reportParameters) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+        builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName(),
+                org.getAddress()));
+        Properties properties = new Properties();
+        addContractProperties(properties, org);
+        builder.setReportProperties(properties);
+        BasicJasperReport jasperReport = builder
+                .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+        return jasperReport;
+    }
+
+    private BasicJasperReport buildDailySalesByGroupsReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
+        DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
+        try {
+            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+            builder.setOrg(orgShortItem);
+            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
+
+
+    private AutoReportGenerator getAutoReportGenerator() {
+        return RuntimeContext.getInstance().getAutoReportGenerator();
+    }
+
+    private void addContractProperties(Properties properties, Org org) {
+        Contract orgContract = org.getContract();
+        properties.setProperty("contractNumber", orgContract != null ? orgContract.getContractNumber() : "           ");
+        DateFormat formatter = new SimpleDateFormat("\"dd\" MMMMM yyyyг.", new Locale("ru"));
+        properties.setProperty("contractDate", orgContract != null ? CalendarUtils.replaceMonthNameByGenitive(
+                formatter.format(CalendarUtils.addOneDay(org.getContract().getDateOfConclusion()))) : "           г.");
+    }
+
+
 
     private ByteArrayOutputStream exportReportToJRXls(BasicJasperReport deliveredServicesReport) throws JRException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -251,7 +369,10 @@ public class ReportRepository extends BaseJpaDao {
         return result;
     }
 
-    private class DeliveredServicesReportParameters {
+
+
+
+    private class ReportParameters {
         private List<ReportParameter> parameters;
         private Date startDate;
         private Date endDate;
@@ -261,7 +382,7 @@ public class ReportRepository extends BaseJpaDao {
         private String region;
         private String email;
 
-        public DeliveredServicesReportParameters(List<ReportParameter> parameters) {
+        public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
         }
 
@@ -293,7 +414,7 @@ public class ReportRepository extends BaseJpaDao {
             return email;
         }
 
-        public DeliveredServicesReportParameters parse() throws ParseException {
+        public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
             idOfOrg = null;

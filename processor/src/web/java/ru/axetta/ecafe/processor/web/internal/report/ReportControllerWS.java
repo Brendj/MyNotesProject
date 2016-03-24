@@ -51,8 +51,6 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
     private static final String RC_FILE_NOT_FOUND_ERROR_DESC = "Запрашиваемый файл не найден в репозитории";
     private static final String RC_NO_DATA_ERROR_DESC = "Нет данных по запрошенным параметрам";
     private static final String RC_ORG_NOT_FOUND_ERROR_DESC = "Не удалось найти главную организацию";
-    public final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
-    public final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
 
     @Override
     public ReportTradeMaterialGoodDataInfo generateReportTradeMaterialGood(@WebParam(name = "idOfOrg") Long idOfOrg,
@@ -138,16 +136,15 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
             return result;
         }
         try {
-            if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
-                byte[] jasper_content = RuntimeContext.getAppContext().getBean(ReportRepository.class).getDeliveredServicesElectronicCollationReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
-                if (jasper_content == null) {
-                    result.setCode(RC_NO_DATA_ERROR);
-                    result.setResult(RC_NO_DATA_ERROR_DESC);
-                } else {
-                    result.setReport(jasper_content);
-                    result.setCode(RC_OK);
-                    result.setResult(RC_OK_DESC);
-                }
+            ReportRepository reportRepository = RuntimeContext.getAppContext().getBean(ReportRepository.class);
+            byte[] jasper_content = reportRepository.buildReportAndReturnRawDataByType(reportType, parameters);
+            if (jasper_content == null) {
+                result.setCode(RC_NO_DATA_ERROR);
+                result.setResult(RC_NO_DATA_ERROR_DESC);
+            } else {
+                result.setReport(jasper_content);
+                result.setCode(RC_OK);
+                result.setResult(RC_OK_DESC);
             }
         } catch (Exception e) {
             result.setCode(RC_INTERNAL_ERROR);
