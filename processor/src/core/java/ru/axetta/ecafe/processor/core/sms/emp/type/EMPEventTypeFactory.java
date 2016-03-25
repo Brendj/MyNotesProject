@@ -82,6 +82,9 @@ public class EMPEventTypeFactory {
             case SUMMARY_DAILY_EVENT:
                 event = new EMPSummaryDailyEventType();
                 break;
+            case SUMMARY_WEEKLY_EVENT:
+                event = new EMPSummaryWeeklyEventType();
+                break;
             default:
                 throw new IllegalArgumentException("Unknown type");
         }

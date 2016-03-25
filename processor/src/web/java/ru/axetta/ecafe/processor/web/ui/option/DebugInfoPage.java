@@ -15,11 +15,15 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -34,6 +38,9 @@ public class DebugInfoPage extends BasicWorkspacePage {
     private Date startDate = new Date(System.currentTimeMillis());
     private Date endDate = new Date(System.currentTimeMillis());
     private String result = "";
+
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     @Override
     public String getPageFilename() {
@@ -125,12 +132,33 @@ public class DebugInfoPage extends BasicWorkspacePage {
         }
     }
 
+    @Transactional
     public void runQuickTest() throws Exception {
-        List<Client> list = DAOService.getInstance().findClientsForOrgAndFriendly(57L, false);
-        System.out.println(list.size());
+        //List<Client> list = DAOService.getInstance().findClientsForOrgAndFriendly(57L, false);
+        //System.out.println(list.size());
+        EntityManager em = entityManager.getEntityManagerFactory().createEntityManager();
+        Session session = em.unwrap(Session.class);
+
+        List<Client> clients = DAOService.getInstance().findClientsForOrgAndFriendly(20L, false);
+        for (Client cc : clients) {
+            //Client client = (Client)session.load(Client.class, cc.getIdOfClient());
+            /*Set<ClientNotificationSetting> settings = client.getNotificationSettings();
+            List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
+            for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+                if (predefined.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                    continue;
+                }
+                notificationSettings.add(new NotificationSettingItem(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY, settings));
+            }
+            client.getNotificationSettings().add(new ClientNotificationSetting(client, ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue()));*/
+            ClientNotificationSetting setting = new ClientNotificationSetting(cc, ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+            session.save(setting);
+            ClientNotificationSetting setting2 = new ClientNotificationSetting(cc, ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
+            session.save(setting2);
+        }
     }
 
-    public void runEmpSummary() throws Exception {
+    public void runEmpSummaryDay() throws Exception {
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         List<SummaryCalculationService.ClientEE> list = service.generateNotificationParams(getStartDate(), getEndDate(),
                 ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
@@ -145,6 +173,20 @@ public class DebugInfoPage extends BasicWorkspacePage {
         result = res;
     }
 
+    public void runEmpSummaryWeek() throws Exception {
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        List<SummaryCalculationService.ClientEE> list = service.generateNotificationParams(getStartDate(), getEndDate(),
+                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
+        String res = "";
+        for (SummaryCalculationService.ClientEE client : list) {
+            res += String.format("Ид клиента=%s\n", client.getIdOfClient());
+            for (int i = 0; i < client.getValues().length-1; i=i+2) {
+                res += client.getValues()[i] + " | " + client.getValues()[i+1] + "\n";
+            }
+            res += "\n";
+        }
+        result = res;
+    }
 
     public Date getStartDate() {
         //Calendar calendar = new GregorianCalendar();

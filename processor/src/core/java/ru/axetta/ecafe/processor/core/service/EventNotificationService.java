@@ -454,9 +454,9 @@ public class EventNotificationService {
         return result;
     }
 
-    public boolean sendNotificationSummary(Client destClient, String type, String[] values, Date eventTime) {
+    public boolean sendNotificationSummary(Client destClient, String type, String[] values, Date eventTime, int notificationType) {
         boolean result = false;
-        int clientSMSType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
+        int clientSMSType = notificationType; //ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
         try {
             Object textObject = getSummaryNotificationObject(type, destClient, values);
             if (textObject != null) {
@@ -475,6 +475,9 @@ public class EventNotificationService {
         EMPEventType empType = null;
         if(type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
             empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient);
+        }
+        if(type.equals(NOTIFICATION_SUMMARY_BY_WEEK)) {
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, destClient);
         }
 
         for (int i = 0; i < values.length-1; i=i+2) {

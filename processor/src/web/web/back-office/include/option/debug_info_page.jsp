@@ -31,8 +31,13 @@
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Ежедневные итоги для ЕМП" styleClass="output-text" />
-            <a4j:commandButton value="Запуск" action="#{debugInfoPage.runEmpSummary()}" reRender="debug_result"
+            <a4j:commandButton value="Запуск" action="#{debugInfoPage.runEmpSummaryDay()}" reRender="debug_result"
                     status="debugTaskStatus" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Еженедельные итоги для ЕМП" styleClass="output-text" />
+            <a4j:commandButton value="Запуск" action="#{debugInfoPage.runEmpSummaryWeek()}" reRender="debug_result"
+                               status="debugTaskStatus" />
         </h:panelGrid>
 
         <a4j:status id="debugTaskStatus">
