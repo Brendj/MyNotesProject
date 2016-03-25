@@ -112,15 +112,16 @@ public class Client {
     private Set<GoodComplaintBook> goodComplaintBookInternal;
     private Set<LibVisit> libVisitInternal;
     private Set<Circulation> circulationInternal;
+    private Set<DiscountChange> discountChanges = new HashSet<DiscountChange>();
 
     protected Client() {
         // For Hibernate only
     }
 
     public Client(Org org, Person person, Person contractPerson, int flags, boolean notifyViaEmail,
-            boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState, String plainPassword,
-            int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit, String categoriesDiscounts)
-            throws Exception {
+            boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState,
+            String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit,
+            String categoriesDiscounts) throws Exception {
         this.org = org;
         this.person = person;
         this.contractPerson = contractPerson;
@@ -173,8 +174,8 @@ public class Client {
         return null;
     }
 
-    public boolean isParentGroup(){
-        return idOfClientGroup!=null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    public boolean isParentGroup() {
+        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
@@ -312,22 +313,33 @@ public class Client {
     }
 
     public Boolean getSubBalanceIsNull(Integer num) {
-        if(num==0) return getBalance()==null;
-        if(num==1) return getSubBalance1()==null;
+        if (num == 0) {
+            return getBalance() == null;
+        }
+        if (num == 1) {
+            return getSubBalance1() == null;
+        }
         final long subBalanceNum = contractId * 100 + num;
         throw new NullPointerException(String.format("Sub balance not found %d", subBalanceNum));
     }
 
     // Обновление баланса только через ClientAccountManager!
     public void addSubBalanceNotForSave(final Long sum, final Integer num) {
-        if(num==null) throw new NullPointerException("Sub balance not found");
-        switch (num){
-            case 0: addBalanceNotForSave(sum); break; // вносим сумму в основной счет
+        if (num == null) {
+            throw new NullPointerException("Sub balance not found");
+        }
+        switch (num) {
+            case 0:
+                addBalanceNotForSave(sum);
+                break; // вносим сумму в основной счет
             case 1: {
                 Long balance = getSubBalance1();
-                if(balance==null) balance=0L;
+                if (balance == null) {
+                    balance = 0L;
+                }
                 setSubBalance1(balance + sum);
-            } break; // вносим сумму в субсчет №1
+            }
+            break; // вносим сумму в субсчет №1
             default: {
                 // в других случаях выбрасывать исключение об отсутсвии такого субсчета
                 throw new NullPointerException("Sub balance not found");
@@ -486,6 +498,7 @@ public class Client {
     public void setNotifyViaSMS(boolean notifyViaSMS) {
         this.notifyViaSMS = notifyViaSMS;
     }
+
     public boolean isNotifyViaPUSH() {
         return notifyViaPUSH;
     }
@@ -542,7 +555,7 @@ public class Client {
         this.contractId = contractId;
     }
 
-    public String getContractIdFormat(){
+    public String getContractIdFormat() {
         return ContractIdFormat.format(contractId);
     }
 
@@ -890,6 +903,14 @@ public class Client {
         this.ssoid = ssoid;
     }
 
+    public Set<DiscountChange> getDiscountChanges() {
+        return discountChanges;
+    }
+
+    public void setDiscountChanges(Set<DiscountChange> discountChanges) {
+        this.discountChanges = discountChanges;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -900,7 +921,7 @@ public class Client {
         }
         final Client client = (Client) o;
         return idOfClient != null && idOfClient.equals(client.getIdOfClient());
-        }
+    }
 
     @Override
     public int hashCode() {

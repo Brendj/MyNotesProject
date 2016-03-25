@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -79,7 +80,7 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
     }
 
     public void onShow() throws Exception {
-        number1 = random.nextInt(98) + 1 ;
+        number1 = random.nextInt(98) + 1;
         number2 = random.nextInt(8) + 1;
         disabled = true;
         plusResult = null;
@@ -107,6 +108,9 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
                     } else {
                         clientGroup = "";
                     }
+
+                    // Сохраняем историю изменения льгот
+                    saveClientDiscountChange(persistenceSession, client, 0, "");
 
                     Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
 
@@ -166,6 +170,13 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
         } finally {
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
+            String categoriesDiscount) {
+        DiscountChange discountChange = new DiscountChange(client, discountMode, client.getDiscountMode(),
+                categoriesDiscount, client.getCategoriesDiscounts());
+        session.save(discountChange);
     }
 
     public List<GroupControlBenefitsItems> getGroupControlBenefitsItemsList() {

@@ -38,7 +38,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.*;
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
         ClientGroupSelectPage.CompleteHandler,
-        ClientSelectPage.CompleteHandler{
+        ClientSelectPage.CompleteHandler {
 
 
     private String fax;
@@ -595,12 +595,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         fill(client);
     }
 
-    public Boolean getAddClientGuardianButtonRendered(){
+    public Boolean getAddClientGuardianButtonRendered() {
         return clientGuardianItems == null || clientGuardianItems.isEmpty() || clientGuardianItems.size() < 2;
     }
 
     public Object removeClientGuardian() {
-        if(currentClientGuardian!=null && !clientGuardianItems.isEmpty()){
+        if (currentClientGuardian != null && !clientGuardianItems.isEmpty()) {
             clientGuardianItems.remove(currentClientGuardian);
             removeListGuardianItems.add(currentClientGuardian);
         }
@@ -644,10 +644,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGroupMigrationHistory.setOrg(org);
             clientGroupMigrationHistory.setClient(client);
             clientGroupMigrationHistory.setRegistrationDate(new Date());
-            if(client.getIdOfClientGroup() != null){
+            if (client.getIdOfClientGroup() != null) {
                 clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
             }
-            if(client.getClientGroup() != null){
+            if (client.getClientGroup() != null) {
                 clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
             }
 
@@ -658,7 +658,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGroupMigrationHistory.setNewGroupId(this.idOfClientGroup);
             clientGroupMigrationHistory.setNewGroupName(this.clientGroupName);
             clientGroupMigrationHistory.setComment(
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                            .getExternalContext().getRemoteUser());
 
             session.save(clientGroupMigrationHistory);
         }
@@ -671,8 +672,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             this.org = new OrgItem(org);
             if (!oldOrgId.equals(idOfOrg) && !idOfCategoryList.isEmpty()) {
                 newOrgHasCatDiscount = checkOrgDiscounts(session, idOfOrg);
+            }
         }
-    }
     }
 
     public Object changeClientCategory() {
@@ -709,7 +710,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         }
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
-        if(isReplaceOrg){
+        if (isReplaceOrg) {
             clientMigration = new ClientMigration(client.getOrg());
 
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -725,13 +726,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setAddress(this.address);
         client.setPhone(this.phone);
         //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-        if(client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
+        if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
             client.setSsoid("");
         }
         client.setMobile(mobile);
         client.setFax(this.fax);
         //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-        if(client != null && client.getEmail() != null && !client.getEmail().equals(this.email)) {
+        if (client != null && client.getEmail() != null && !client.getEmail().equals(this.email)) {
             client.setSsoid("");
         }
         client.setEmail(this.email);
@@ -770,7 +771,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         /*Set <GuardSan> guardSans = client.getGuardSan();
         guardSans.removeAll(guardSans);*/
         ClientGuardSanRebuildService.getInstance().removeGuardSan(idOfClient);
-        Set <GuardSan> newGuardSans = ClientGuardSanRebuildService.getInstance().addGuardSan(idOfClient, guardsan);
+        Set<GuardSan> newGuardSans = ClientGuardSanRebuildService.getInstance().addGuardSan(idOfClient, guardsan);
         /*guardSans.addAll(newGuardSans);
         client.setGuardSan(guardSans);*/
         if (this.externalId == null || this.externalId == 0) {
@@ -787,9 +788,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setPassword(this.plainPassword);
         }
         client.setPayForSMS(this.payForSMS);
-        if (null != discountMode) {
-            client.setDiscountMode(discountMode);
-        }
+
         if (discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size() == 0) {
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
@@ -812,13 +811,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 categoryDiscount.getClients().remove(client);
                 persistenceSession.update(categoryDiscount);
             }
-            client.setCategories(new HashSet<CategoryDiscount>(0));
             //Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
+
+        if (isDiscountsChanged(client)) {
+            saveDiscountChange(client, persistenceSession);
+        }
+
+        if (null != discountMode) {
+            client.setDiscountMode(discountMode);
+        }
+
         client.setCategoriesDiscounts(
                 clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
-        client.setCategories(categoryDiscountSet);
+        client.setCategories(categoryDiscountSet.isEmpty() ? new HashSet<CategoryDiscount>() : categoryDiscountSet);
+
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
             ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
@@ -834,10 +842,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientGroupMigrationHistory.setOrg(org);
             clientGroupMigrationHistory.setClient(client);
             clientGroupMigrationHistory.setRegistrationDate(new Date());
-            if(client.getIdOfClientGroup() != null){
+            if (client.getIdOfClientGroup() != null) {
                 clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
             }
-            if(client.getClientGroup() != null){
+            if (client.getClientGroup() != null) {
                 clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
                 clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
             }
@@ -869,8 +877,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             clientMigration.setOrg(org);
             clientMigration.setNewContragent(org.getDefaultSupplier());
             clientMigration.setBalance(client.getBalance());
-            clientMigration.setComment(
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+            clientMigration.setComment(ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                    .getExternalContext().getRemoteUser());
 
             persistenceSession.save(clientMigration);
         } else {
@@ -879,10 +887,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
 
-        if(clientGuardianItems!=null && !clientGuardianItems.isEmpty()){
+        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
             addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
         }
-        if(removeListGuardianItems!=null && !removeListGuardianItems.isEmpty()){
+        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
@@ -894,6 +902,34 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
         }
+    }
+
+    private boolean isDiscountsChanged(Client client) {
+        int a = client.getDiscountMode();
+        int b = discountMode;
+        boolean isDiscountModeChanged = !(client.getDiscountMode().equals(discountMode));
+        boolean isCategoryListChanged = !(client.getCategories().equals(getCategoryDiscountSet()));
+        Set<CategoryDiscount> old = client.getCategories();
+        Set<CategoryDiscount> newSet = getCategoryDiscountSet();
+        boolean isOld = old.equals(newSet);
+        return isDiscountModeChanged || isCategoryListChanged;
+    }
+
+    private void saveDiscountChange(Client client, Session persistenceSession) {
+        DiscountChange discountChange = new DiscountChange(client, discountMode, client.getDiscountMode(),
+                getCategoriesString(getCategoryDiscountSet()), getCategoriesString(client.getCategories()));
+
+        persistenceSession.save(discountChange);
+
+    }
+
+    private String getCategoriesString(Set<CategoryDiscount> categoryDiscounts) {
+        StringBuilder clientCategories = new StringBuilder();
+        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
+            clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
+            clientCategories.append(",");
+        }
+        return clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1);
     }
 
     public void removeClient(Session persistenceSession) throws Exception {
@@ -936,14 +972,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.contractState = client.getContractState();
         this.payForSMS = client.getPayForSMS();
         this.balance = client.getBalance();
-        this.subBalance1 = client.getSubBalance1()==null?0L:client.getSubBalance1();
+        this.subBalance1 = client.getSubBalance1() == null ? 0L : client.getSubBalance1();
         this.subBalance0 = this.balance - this.subBalance1;
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.san = client.getSan();
-        Set <GuardSan> guardSans = client.getGuardSan();
-        this.guardsan="";
+        Set<GuardSan> guardSans = client.getGuardSan();
+        this.guardsan = "";
         for (GuardSan guard : guardSans) {
             if (this.guardsan.length() > 0) {
                 this.guardsan = this.guardsan + ",";
@@ -1029,10 +1065,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     // Проверяет, имеет ли организация льготы по категориям льгот клиента.
     @SuppressWarnings("unchecked")
     private boolean checkOrgDiscounts(Session session, Long idOfOrg) {
-        Criteria criteria = session.createCriteria(CategoryDiscount.class)
-                .createAlias("discountRulesInternal", "dri")
-                .createAlias("dri.categoryOrgsInternal", "coi")
-                .createAlias("coi.orgsInternal", "o")
+        Criteria criteria = session.createCriteria(CategoryDiscount.class).createAlias("discountRulesInternal", "dri")
+                .createAlias("dri.categoryOrgsInternal", "coi").createAlias("coi.orgsInternal", "o")
                 .add(Restrictions.eq("o.idOfOrg", idOfOrg))
                 .add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList))
                 .setProjection(Projections.projectionList().add(Projections.countDistinct("idOfCategoryDiscount")));

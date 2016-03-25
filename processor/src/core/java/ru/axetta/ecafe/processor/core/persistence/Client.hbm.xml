@@ -43,11 +43,14 @@
                   not-null="true"/>
         <property name="notifyViaPUSH" column="NotifyViaPUSH" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
-        <property name="dontShowToExternal" column="DontShowToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+        <property name="dontShowToExternal" column="DontShowToExternal"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
-        <property name="useLastEEModeForPlan" column="UseLastEEModeForPlan" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+        <property name="useLastEEModeForPlan" column="UseLastEEModeForPlan"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="false"/>
-        <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+        <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
         <!--property name="image" column="Image" type="blob"/-->
         <property name="remarks" column="Remarks" type="string" length="1024"/>
@@ -67,7 +70,7 @@
         <property name="balance" column="Balance" type="long" not-null="true" update="false"/>
 
         <property name="subBalance1" column="SubBalance1" type="long" not-null="true" update="false"/>
-        <property name="ssoid" column="SSOID" type="string" length="50" />
+        <property name="ssoid" column="SSOID" type="string" length="50"/>
 
 
         <property name="limit" column="Limits" type="long" not-null="true"/>
@@ -126,7 +129,8 @@
 
         <set name="categoriesInternal" table="CF_Clients_CategoryDiscounts" cascade="all">
             <key column="IdOfClient"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount"
+                          column="IdOfCategoryDiscount"/>
         </set>
 
         <set name="clientAnswerByQuestionary" inverse="true" cascade="all">
@@ -143,33 +147,39 @@
             <key>
                 <column name="IdOfClient"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition"/>
         </set>
 
         <set name="goodComplaintBookInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfClient"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook" />
+            <one-to-many
+                    class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook"/>
         </set>
 
         <set name="libVisitInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfClient"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit"/>
         </set>
 
         <set name="circulationInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfClient"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation"/>
         </set>
 
         <set name="guardSan" table="CF_GuardSAN" lazy="true">
             <key column="IdOfClient"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.GuardSan" column="IdOfGuardSan"/>
+        </set>
+
+        <set name="discountChanges" lazy="true" cascade="all">
+            <key column="IdOfClient"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountChange"/>
         </set>
     </class>
 </hibernate-mapping>

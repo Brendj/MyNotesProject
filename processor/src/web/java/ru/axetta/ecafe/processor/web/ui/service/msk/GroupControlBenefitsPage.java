@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -199,8 +200,10 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                             }
                                         }
 
-                                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+                                        long clientRegistryVersion = DAOUtils
+                                                .updateClientRegistryVersion(persistenceSession);
 
+                                        saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
                                         client.setDiscountMode(3);
                                         client.setCategories(clientCategoryDiscounts);
                                         client.setCategoriesDiscounts(categoryDiscounts);
@@ -217,8 +220,10 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                     } else {
                                         //добавляем с удаление прежних льгот
 
-                                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+                                        long clientRegistryVersion = DAOUtils
+                                                .updateClientRegistryVersion(persistenceSession);
 
+                                        saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
                                         client.setDiscountMode(3);
                                         client.setCategoriesDiscounts(categoriesDiscounts);
                                         client.setCategories(categoryDiscountSet);
@@ -268,5 +273,12 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         } else {
             printError("Сделайте загрузку файла");
         }
+    }
+
+    public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
+            String categoriesDiscount) {
+        DiscountChange discountChange = new DiscountChange(client, discountMode, client.getDiscountMode(),
+                categoriesDiscount, client.getCategoriesDiscounts());
+        session.save(discountChange);
     }
 }
