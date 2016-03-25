@@ -4,21 +4,29 @@
 
 -- Пакет обновлений 2.2.112
 
---Увеличение размерности поля для условия выборки в отчетах по расписанию ALTER TABLE cf_ruleconditions ALTER conditionconstant TYPE CHARACTER VARYING(50000);
+--Увеличение размерности поля для условия выборки в отчетах по расписанию
+ALTER TABLE cf_ruleconditions ALTER conditionconstant TYPE CHARACTER VARYING(50000);
 
---Новое поле для краткого наименование организации для поставщика в сверке организаций ALTER TABLE cf_orgregistrychange_item ADD COLUMN shortnamesupplierfrom CHARACTER VARYING(128);
+--Новое поле для краткого наименование организации для поставщика в сверке организаций
+ALTER TABLE cf_orgregistrychange_item ADD COLUMN shortnamesupplierfrom CHARACTER VARYING(128);
 
---Новые поля ручного реестра талонов ALTER TABLE cf_taloon_approval RENAME COLUMN qty TO soldedqty;
-ALTER TABLE cf_taloon_approval ADD COLUMN requestedqty INTEGER, ADD COLUMN shippedqty INTEGER, ADD COLUMN ispp_state INTEGER NOT NULL DEFAULT 0, ADD COLUMN pp_state INTEGER NOT NULL DEFAULT 0;
+--Новые поля ручного реестра талонов
+ALTER TABLE cf_taloon_approval RENAME COLUMN qty TO soldedqty;
+ALTER TABLE cf_taloon_approval ADD COLUMN requestedqty INTEGER, ADD COLUMN shippedqty INTEGER,
+  ADD COLUMN ispp_state INTEGER NOT NULL DEFAULT 0, ADD COLUMN pp_state INTEGER NOT NULL DEFAULT 0;
 
---Связь базовой корзины с детализацией меню ALTER TABLE cf_good_basic_basket_price ADD COLUMN idofmenudetail BIGINT;
+--Связь базовой корзины с детализацией меню
+ALTER TABLE cf_good_basic_basket_price ADD COLUMN idofmenudetail BIGINT;
 
---внешний ключ на таблицу menudetails ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_menudetail_fk FOREIGN KEY (idofmenudetail) REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+--внешний ключ на таблицу menudetails
+ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_menudetail_fk FOREIGN KEY (idofmenudetail)
+REFERENCES cf_menudetails (idofmenudetail) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 --новый индекс на таблицу cf_ComplexInfo
 --CREATE INDEX cf_complexinfo_menudate_idx ON cf_complexinfo USING btree (menudate);
 
-CREATE TABLE cf_interactive_report_data (idofrecord BIGINT, idoforg BIGINT, value VARCHAR(255), CONSTRAINT cf_interactivereport_cf_orgs_pk PRIMARY KEY (idoforg, idofrecord));
+CREATE TABLE cf_interactive_report_data (idofrecord BIGINT, idoforg BIGINT, value VARCHAR(255),
+  CONSTRAINT cf_interactivereport_cf_orgs_pk PRIMARY KEY (idoforg, idofrecord));
 
 --Таблица истории льгот
 CREATE TABLE cf_discountchangehistory
