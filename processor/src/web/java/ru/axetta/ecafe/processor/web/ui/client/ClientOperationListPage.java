@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientDiscountChangeHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -45,7 +46,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<ClientPassItem> clientPasses = new ArrayList<ClientPassItem>();
     private List<RegularPayment> regularPayments = new ArrayList<RegularPayment>();
     private List<ClientGroupMigrationHistory> clientGroupMigrationHistories = new ArrayList<ClientGroupMigrationHistory>();
-    private List<ClientMigration> clientMigrations= new ArrayList<ClientMigration>();
+    private List<ClientMigration> clientMigrations = new ArrayList<ClientMigration>();
+    private List<DiscountChange> discountChanges = new ArrayList<DiscountChange>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -125,6 +127,10 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return clientMigrations;
     }
 
+    public List<DiscountChange> getDiscountChanges() {
+        return discountChanges;
+    }
+
     @SuppressWarnings("unchecked")
 
     public void fill(Session session, Long idOfClient) throws Exception {
@@ -134,7 +140,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         this.clientOrderList.fill(session, client, this.startTime, this.endTime);
         this.clientSmsList.fill(session, client, this.startTime, this.endTime);
         /////
-        accountTransferList = DAOUtils.getAccountTransfersForClient(session,  client, startTime,  endTime);
+        accountTransferList = DAOUtils.getAccountTransfersForClient(session, client, startTime, endTime);
         for (AccountTransfer at : accountTransferList) {
             // lazy load
             at.getClientBenefactor().getPerson().getFullName();
@@ -142,7 +148,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             at.getCreatedBy().getUserName();
         }
         /////
-        accountRefundList = DAOUtils.getAccountRefundsForClient(session, client, startTime,  endTime);
+        accountRefundList = DAOUtils.getAccountRefundsForClient(session, client, startTime, endTime);
         for (AccountRefund ar : accountRefundList) {
             // lazy load
             ar.getCreatedBy().getUserName();
@@ -155,9 +161,15 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.addOrder(Order.asc("transactionTime"));
         this.accountTransactionList = new ArrayList<AccountTransaction>();
         for (Object o : criteria.list()) {
-            AccountTransaction accTrans = (AccountTransaction)o;
-            if (accTrans.getCard()!=null) accTrans.getCard().getCardNo(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
-            if (accTrans.getClient()!=null) accTrans.getClient().getContractId(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
+            AccountTransaction accTrans = (AccountTransaction) o;
+            if (accTrans.getCard() != null) {
+                accTrans.getCard()
+                        .getCardNo(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
+            }
+            if (accTrans.getClient() != null) {
+                accTrans.getClient()
+                        .getContractId(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
+            }
             accountTransactionList.add(accTrans);
         }
 
@@ -177,15 +189,21 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         regularPayments = (List<RegularPayment>) criteria.list();
 
         //// client group migrations
-        ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext().getBean(ClientGroupMigrationHistoryService.class);
+        ClientGroupMigrationHistoryService clientGroupMigrationHistoryService = RuntimeContext.getAppContext()
+                .getBean(ClientGroupMigrationHistoryService.class);
 
-        clientGroupMigrationHistories = clientGroupMigrationHistoryService.findAll(client.getOrg(),client);
-
+        clientGroupMigrationHistories = clientGroupMigrationHistoryService.findAll(client.getOrg(), client);
 
         //// client  migrations
-        ClientMigrationHistoryService clientMigrationHistoryService = RuntimeContext.getAppContext().getBean(ClientMigrationHistoryService.class);
+        ClientMigrationHistoryService clientMigrationHistoryService = RuntimeContext.getAppContext()
+                .getBean(ClientMigrationHistoryService.class);
 
-        clientMigrations = clientMigrationHistoryService.findAll(client.getOrg(),client);
+        clientMigrations = clientMigrationHistoryService.findAll(client.getOrg(), client);
+
+        ClientDiscountChangeHistoryService clientDiscountChangeService = RuntimeContext.getAppContext()
+                .getBean(ClientDiscountChangeHistoryService.class);
+
+        discountChanges = clientDiscountChangeService.findAll(client);
     }
 
 }

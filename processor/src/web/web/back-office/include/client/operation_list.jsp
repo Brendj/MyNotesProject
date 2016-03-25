@@ -28,7 +28,7 @@
     </a4j:status>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-<h:outputText value="Операции по счету:"/>
+<h:outputText value="Операции по счету:" />
 <rich:dataTable id="clientAccountTransTable" value="#{mainPage.clientOperationListPage.accountTransactionList}"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
                 var="item" rows="8" footerClass="data-table-footer">
@@ -42,15 +42,19 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Номер счета" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.sourceBalanceNumberFormat}" styleClass="output-text" rendered="#{item.sourceBalanceNumber!=null}"/>
-        <h:outputText escape="true" value="#{item.client.contractIdFormat}" styleClass="output-text" rendered="#{item.sourceBalanceNumber==null}"/>
+        <h:outputText escape="true" value="#{item.sourceBalanceNumberFormat}" styleClass="output-text"
+                      rendered="#{item.sourceBalanceNumber!=null}" />
+        <h:outputText escape="true" value="#{item.client.contractIdFormat}" styleClass="output-text"
+                      rendered="#{item.sourceBalanceNumber==null}" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Карта" />
         </f:facet>
-        <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
-            <h:outputText escape="true" value="#{(item.card==null)?(null):item.card.cardNo}" converter="cardNoConverter" />
+        <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link"
+                         reRender="mainMenu, workspaceForm">
+            <h:outputText escape="true" value="#{(item.card==null)?(null):item.card.cardNo}"
+                          converter="cardNoConverter" />
             <f:setPropertyActionListener value="#{item.card.cardNo}" target="#{mainPage.selectedIdOfCard}" />
         </a4j:commandLink>
     </rich:column>
@@ -58,31 +62,36 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Время транзакции" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.transactionTime}" converter="timeConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.transactionTime}" converter="timeConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Входящий баланс" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.balanceBeforeTransaction}" converter="copeckSumConverter" styleClass="output-text"/>
+        <h:outputText escape="true" value="#{item.balanceBeforeTransaction}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Субс. АП" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.subBalance1BeforeTransaction}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.subBalance1BeforeTransaction}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Сумма" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.transactionSum}" converter="copeckSumConverter" styleClass="output-text"/>
+        <h:outputText escape="true" value="#{item.transactionSum}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Субс. АП" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.transactionSubBalance1Sum}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.transactionSubBalance1Sum}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -109,7 +118,7 @@
     </f:facet>
 </rich:dataTable>
 
-<h:outputText value="Зачисления:"/>
+<h:outputText value="Зачисления:" />
 <rich:dataTable id="clientPaymentsTable" value="#{mainPage.clientOperationListPage.clientPaymentList.items}" var="item"
                 rows="8"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
@@ -130,8 +139,8 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Контрагент" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
-                       styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragentName}"
+                         action="#{mainPage.showContragentViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
         </a4j:commandLink>
     </rich:column>
@@ -178,7 +187,7 @@
     </f:facet>
 </rich:dataTable>
 
-<h:outputText value="Переводы:"/>
+<h:outputText value="Переводы:" />
 <rich:dataTable id="clientTransfersTable" value="#{mainPage.clientOperationListPage.accountTransferList}" var="item"
                 rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
@@ -205,25 +214,30 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Плательщик" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.clientBenefactor.contractId} (#{item.clientBenefactor.person.fullName})" action="#{mainPage.showClientViewPage}"
-                       styleClass="command-link">
-            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+        <a4j:commandLink reRender="mainMenu, workspaceForm"
+                         value="#{item.clientBenefactor.contractId} (#{item.clientBenefactor.person.fullName})"
+                         action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}"
+                                         target="#{mainPage.selectedIdOfClient}" />
         </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Получатель" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.clientBeneficiary.contractId} (#{item.clientBeneficiary.person.fullName})" action="#{mainPage.showClientViewPage}"
-                       styleClass="command-link">
-            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+        <a4j:commandLink reRender="mainMenu, workspaceForm"
+                         value="#{item.clientBeneficiary.contractId} (#{item.clientBeneficiary.person.fullName})"
+                         action="#{mainPage.showClientViewPage}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{item.clientBenefactor.idOfClient}"
+                                         target="#{mainPage.selectedIdOfClient}" />
         </a4j:commandLink>
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Сумма" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.transferSum}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.transferSum}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -236,7 +250,7 @@
             <h:outputText escape="true" value="Пользователь" />
         </f:facet>
         <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.createdBy.userName}"
-                       action="#{mainPage.showUserViewPage}" styleClass="command-link">
+                         action="#{mainPage.showUserViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
         </a4j:commandLink>
     </rich:column>
@@ -253,7 +267,7 @@
     </f:facet>
 </rich:dataTable>
 
-<h:outputText value="Покупки:"/>
+<h:outputText value="Покупки:" />
 <rich:dataTable id="clientOrdersTable" value="#{mainPage.clientOperationListPage.clientOrderList.items}" var="item"
                 rows="8"
                 columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column"
@@ -268,7 +282,8 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Организация" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgViewPage}"
+                         styleClass="command-link">
             <h:outputText escape="true" value="#{item.org.shortName}" />
             <f:setPropertyActionListener value="#{item.org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
         </a4j:commandLink>
@@ -283,7 +298,8 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Карта" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showCardViewPage}"
+                         styleClass="command-link">
             <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter" />
             <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
         </a4j:commandLink>
@@ -304,13 +320,15 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Социальная скидка" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.socDiscount}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.socDiscount}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Скидка поставщика" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.tradeDiscount}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.tradeDiscount}" converter="copeckSumConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -365,9 +383,8 @@
     </f:facet>
 </rich:dataTable>
 
-<h:outputText value="Возвраты:"/>
-<rich:dataTable id="clientRefundTable" value="#{mainPage.clientOperationListPage.accountRefundList}" var="item"
-                rows="8"
+<h:outputText value="Возвраты:" />
+<rich:dataTable id="clientRefundTable" value="#{mainPage.clientOperationListPage.accountRefundList}" var="item" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
                 footerClass="data-table-footer">
     <rich:column headerClass="column-header">
@@ -399,7 +416,7 @@
             <h:outputText escape="true" value="Пользователь" />
         </f:facet>
         <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.createdBy.userName}"
-                       action="#{mainPage.showUserViewPage}" styleClass="command-link">
+                         action="#{mainPage.showUserViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.createdBy.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
         </a4j:commandLink>
     </rich:column>
@@ -417,7 +434,7 @@
 </rich:dataTable>
 
 
-<h:outputText value="Сообщения:"/>
+<h:outputText value="Сообщения:" />
 <rich:dataTable id="clientSmsTable" value="#{mainPage.clientOperationListPage.clientSmsList.items}" var="item" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column"
                 footerClass="data-table-footer">
@@ -620,8 +637,9 @@
 
 
 <h:outputText value="Перемещения внутри ОО:" />
-<rich:dataTable id="clientGroupMigrationHistoriesTable" var="gMig" value="#{mainPage.clientOperationListPage.clientGroupMigrationHistories}"
-               footerClass="data-table-footer" rows="8"
+<rich:dataTable id="clientGroupMigrationHistoriesTable" var="gMig"
+                value="#{mainPage.clientOperationListPage.clientGroupMigrationHistories}"
+                footerClass="data-table-footer" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
 
     <rich:column headerClass="column-header">
@@ -652,8 +670,8 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Дата перемещения" />
         </f:facet>
-        <h:outputText escape="true" value="#{gMig.registrationDate}" styleClass="output-text" >
-            <f:convertDateTime pattern="dd.MM.yyyy"/>
+        <h:outputText escape="true" value="#{gMig.registrationDate}" styleClass="output-text">
+            <f:convertDateTime pattern="dd.MM.yyyy" />
         </h:outputText>
     </rich:column>
     <rich:column headerClass="column-header">
@@ -664,8 +682,8 @@
     </rich:column>
 
     <f:facet name="footer">
-        <rich:datascroller for="clientGroupMigrationHistoriesTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                           stepControls="auto" boundaryControls="hide">
+        <rich:datascroller for="clientGroupMigrationHistoriesTable" renderIfSinglePage="false" maxPages="5"
+                           fastControls="hide" stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
             </f:facet>
@@ -714,7 +732,6 @@
             </rich:column>
 
 
-
             <rich:column headerClass="column-header" breakBefore="true">
                 <h:outputText value="Ид" />
             </rich:column>
@@ -732,7 +749,6 @@
             <rich:column headerClass="column-header">
                 <h:outputText value="Группа" />
             </rich:column>
-
 
 
             <rich:column headerClass="column-header">
@@ -758,62 +774,132 @@
     </f:facet>
 
 
-    <rich:column  >
+    <rich:column>
         <h:outputText value="#{mig.oldContragent.idOfContragent}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.oldContragent.contragentName}" styleClass="output-text" />
     </rich:column>
 
 
-    <rich:column  >
+    <rich:column>
         <h:outputText value="#{mig.oldOrg.idOfOrg}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.oldOrg.shortName}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.oldGroupName}" styleClass="output-text" />
     </rich:column>
 
 
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.newContragent.idOfContragent}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.newContragent.contragentName}" styleClass="output-text" />
     </rich:column>
 
 
-    <rich:column  >
+    <rich:column>
         <h:outputText value="#{mig.org.idOfOrg}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.org.shortName}" styleClass="output-text" />
     </rich:column>
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.newGroupName}" styleClass="output-text" />
     </rich:column>
 
 
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.registrationDate}" styleClass="output-text">
             <f:convertDateTime pattern="dd.MM.yyyy" />
         </h:outputText>
     </rich:column>
 
 
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.balance}" styleClass="output-text" />
     </rich:column>
 
 
-    <rich:column >
+    <rich:column>
         <h:outputText value="#{mig.comment}" styleClass="output-text" />
     </rich:column>
 
     <f:facet name="footer">
         <rich:datascroller for="clientMigrationsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
+<h:outputText value="Изменение льгот:" />
+<rich:dataTable id="clientDiscountsChangeTable" var="dis" value="#{mainPage.clientOperationListPage.discountChanges}"
+                rowKeyVar="row" footerClass="data-table-footer" rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
+
+    <f:facet name="header">
+        <rich:columnGroup columnClasses="gray">
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText value="Новые данные" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText value="Прежние данные" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText value="Дата изменения" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" breakBefore="true">
+                <h:outputText value="Тип льготы" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Категории" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText value="Тип льготы" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Категории" />
+            </rich:column>
+
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column>
+        <h:outputText value="#{dis.getDiscountModeString(dis.discountMode)}" styleClass="output-text" />
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{dis.getCategoriesDiscountsString(dis.categoriesDiscounts)}" styleClass="output-text" />
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{dis.getDiscountModeString(dis.oldDiscountMode)}" styleClass="output-text" />
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{dis.getCategoriesDiscountsString(dis.oldCategoriesDiscounts)}"
+                      styleClass="output-text" />
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{dis.registrationDate}" styleClass="output-text">
+            <f:convertDateTime pattern="dd.MM.yyyy" />
+        </h:outputText>
+    </rich:column>
+
+    <f:facet name="footer">
+        <rich:datascroller for="clientDiscountsChangeTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
             <f:facet name="previous">
                 <h:graphicImage value="/images/16x16/left-arrow.png" />
