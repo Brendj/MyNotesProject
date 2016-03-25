@@ -2153,4 +2153,10 @@ public class DAOUtils {
         return (InteractiveReportDataEntity) session
                 .get(InteractiveReportDataEntity.class, compositeIdOfInteractiveReportData);
     }
+
+    public static void deleteInteractiveReportDataEntity(Session session,
+            InteractiveReportDataEntity interactiveReportDataEntity) {
+        session.delete(interactiveReportDataEntity);
+        session.flush();
+    }
 }

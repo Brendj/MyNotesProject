@@ -51,12 +51,18 @@ public class InteractiveReportProcessor extends AbstractProcessor<InteractiveRep
                     CompositeIdOfInteractiveReportData compositeIdOfInteractiveReportData = new CompositeIdOfInteractiveReportData(idOfOrg, item.getIdOfRecord());
                     InteractiveReportDataEntity interactiveReportDataEntity = DAOUtils.findInteractiveDataReport(session, compositeIdOfInteractiveReportData);
 
-                     if (interactiveReportDataEntity == null) {
-                         Org org = (Org) session.load(Org.class, idOfOrg);
-                         interactiveReportDataEntity = new InteractiveReportDataEntity(compositeIdOfInteractiveReportData, item.getIdOfRecord(), org, item.getValue());
-                     }
+                    if (interactiveReportDataEntity == null) {
+                        Org org = (Org) session.load(Org.class, idOfOrg);
+                        interactiveReportDataEntity = new InteractiveReportDataEntity(
+                                compositeIdOfInteractiveReportData, item.getIdOfRecord(), org, item.getValue());
+                    } else {
+                        DAOUtils.deleteInteractiveReportDataEntity(session, interactiveReportDataEntity);
+                        Org org = (Org) session.load(Org.class, idOfOrg);
+                        interactiveReportDataEntity = new InteractiveReportDataEntity(
+                                compositeIdOfInteractiveReportData, item.getIdOfRecord(), org, item.getValue());
+                    }
 
-                     session.saveOrUpdate(interactiveReportDataEntity);
+                    session.saveOrUpdate(interactiveReportDataEntity);
                      reportItem = new InteractiveReportItem(item.getIdOfRecord(), item.getValue(), "");
                 }
                 items.add(reportItem);
