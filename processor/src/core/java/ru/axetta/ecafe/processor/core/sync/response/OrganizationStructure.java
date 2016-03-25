@@ -10,7 +10,6 @@ import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.persistence.Persistence;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,8 +47,11 @@ public class OrganizationStructure {
 
     public void addOrganizationStructureInfo(Session session, Long idOfOrg){
         Org org = (Org)session.load(Org.class, idOfOrg);
-        OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(), org.getShortNameInfoService(), org.getOfficialName(),
-                org.getShortName(), org.getOfficialPerson().getFullName(), org.getAddress());
+        OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
+                org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
+                org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
+                org.getConfigurationProvider() != null ? org.getConfigurationProvider().getIdOfConfigurationProvider()
+                        : null);
         organizationItemMap.put(org.getIdOfOrg(), item);
     }
 
@@ -61,12 +63,12 @@ public class OrganizationStructure {
         private final String shortName;
         private final String chief;
         private final String address;
+        private final Boolean useSubscriptionFeeding;
+        private final Long configurationId;
         //private final Long version;
 
-        //private List<ProhibitionMenuDetail> prohibitionMenuDetails = new LinkedList<ProhibitionMenuDetail>();
-
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address) {
+                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -74,6 +76,8 @@ public class OrganizationStructure {
             this.shortName = shortName;
             this.chief = chief;
             this.address = address;
+            this.useSubscriptionFeeding = useSubscriptionFeeding;
+            this.configurationId = configurationId;
         }
 
         public Element toElement(Document document) throws Exception{
@@ -85,6 +89,11 @@ public class OrganizationStructure {
             element.setAttribute("NForService", shortName);
             element.setAttribute("DirName", chief);
             element.setAttribute("Address", address);
+            element.setAttribute("UsePaydableSF", useSubscriptionFeeding ? "1" : "0");
+            element.setAttribute("Version", "-1"); //todo remove stub
+            if (configurationId != null) {
+                element.setAttribute("ConfId", Long.toString(configurationId));
+            }
             element.setAttribute("Version", "-1"); //todo remove stub
             return element;
         }
