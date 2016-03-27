@@ -1141,6 +1141,9 @@
     <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                         reRender="workspaceForm" />
+    <rich:panelMenuItem id="interactiveCardDataMenuItem" binding="#{interactiveCardDataReportPage.mainMenuComponent}"
+                        label="Отчет по обороту электронных карт" action="#{interactiveCardDataReportPage.show}"
+                        reRender="workspaceForm" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
