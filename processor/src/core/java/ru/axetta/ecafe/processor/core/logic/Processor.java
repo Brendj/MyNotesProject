@@ -1191,8 +1191,10 @@ public class Processor
         }
 
         try {
-            zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
-            resZeroTransactions = processZeroTransactions(request.getZeroTransactions()) ;
+            if (request.getZeroTransactions() != null) {
+                zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
+                resZeroTransactions = processZeroTransactions(request.getZeroTransactions()) ;
+            }
         } catch(Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
@@ -1415,8 +1417,10 @@ public class Processor
         boolean bError = false;
 
         try {
-            zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
-            resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
+            if (request.getZeroTransactions() != null) {
+                zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
+                resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
+            }
         } catch(Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
