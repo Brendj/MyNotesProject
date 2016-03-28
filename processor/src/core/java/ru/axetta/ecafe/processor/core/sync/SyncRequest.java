@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -18,6 +17,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.Reest
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
+import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactions;
+import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionsBuilder;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
@@ -50,6 +51,10 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
 public class SyncRequest {
 
     private static Logger logger = LoggerFactory.getLogger(SyncRequest.class);
+
+    public ZeroTransactions getZeroTransactions() {
+        return zeroTransactions;
+    }
 
     public static class ClientParamRegistry {
 
@@ -2163,6 +2168,7 @@ public class SyncRequest {
         private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
         private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
         private final InteractiveReportDataBuilder interactiveReportDataBuilder;
+        private final ZeroTransactionsBuilder zeroTransactionsBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2193,6 +2199,7 @@ public class SyncRequest {
             this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
             this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
             this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
+            this.zeroTransactionsBuilder = new ZeroTransactionsBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2346,7 +2353,12 @@ public class SyncRequest {
             if (reestrTaloonApprovalNode != null) {
                 reestrTaloonApprovalRequest = reestrTaloonApprovalBuilder.build(reestrTaloonApprovalNode, org.getIdOfOrg());
             }
-            //        reestrTaloonApprovalBuilder.build();
+
+            Node zeroTransactionsNode = findFirstChildElement(envelopeNode, "ZeroTransactions");
+            ZeroTransactions zeroTransactionsRequest = null;
+            if (zeroTransactionsNode != null) {
+                zeroTransactionsRequest = zeroTransactionsBuilder.build(zeroTransactionsNode, org.getIdOfOrg());
+            }
 
             Node interactiveReportNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
             InteractiveReport interactiveReportRequest = null;
@@ -2379,7 +2391,8 @@ public class SyncRequest {
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest, interactiveReportRequest);
+                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
+                    interactiveReportRequest, zeroTransactionsRequest);
         }
 
 
@@ -2419,6 +2432,7 @@ public class SyncRequest {
     private final AccountsRegistryRequest accountsRegistryRequest;
     private final ReestrTaloonApproval reestrTaloonApprovalRequest;
     private final InteractiveReport interactiveReport;
+    private final ZeroTransactions zeroTransactions;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
             AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
@@ -2427,7 +2441,7 @@ public class SyncRequest {
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
-            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport) {
+            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2458,6 +2472,7 @@ public class SyncRequest {
         this.accountsRegistryRequest = accountsRegistryRequest;
         this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
         this.interactiveReport = interactiveReport;
+        this.zeroTransactions = zeroTransactions;
     }
 
     public String getClientVersion() {

@@ -313,6 +313,10 @@ public class DAOUtils {
         return (TaloonApproval) persistenceSession.get(TaloonApproval.class, compositeIdOfTaloonApproval);
     }
 
+    public static ZeroTransaction findZeroTransaction(Session persistenceSession, CompositeIdOfZeroTransaction compositeIdOfZeroTransaction) throws Exception {
+        return (ZeroTransaction) persistenceSession.get(ZeroTransaction.class, compositeIdOfZeroTransaction);
+    }
+
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
@@ -2059,7 +2063,17 @@ public class DAOUtils {
 
     public static long nextVersionByTaloonApproval(Session session){
         long version = 0L;
-        Query query = session.createSQLQuery("select max(t.version) from cf_taloon_approval as t");
+        Query query = session.createSQLQuery("select max(t.version) from cf_taloon_approval as t order by t.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static long nextVersionByZeroTransaction(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select t.version from cf_zerotransactions as t order by t.version desc limit 1 for update");
         Object o = query.uniqueResult();
         if(o!=null){
             version = Long.valueOf(o.toString())+1;
@@ -2074,6 +2088,14 @@ public class DAOUtils {
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
+
+    public static List<ZeroTransaction> getZeroTransactionsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Org org = (Org)session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(ZeroTransaction.class);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
 

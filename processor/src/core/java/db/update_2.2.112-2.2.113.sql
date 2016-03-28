@@ -41,3 +41,20 @@ CREATE TABLE cf_discountchangehistory
 ) WITH
 (OIDS = FALSE
 );
+
+--Таблица с нулевыми транзакциями
+CREATE TABLE cf_zerotransactions
+(
+  idoforg BIGINT NOT NULL,
+  transactiondate BIGINT NOT NULL,
+  idofcriteria INTEGER NOT NULL,
+  targetlevel INTEGER NOT NULL,
+  actuallevel INTEGER NOT NULL,
+  criterialevel INTEGER NOT NULL,
+  idofreason INTEGER,
+  comment character varying(256),
+  version BIGINT NOT NULL,
+  CONSTRAINT cf_zero_transaction_pk PRIMARY KEY (idoforg, transactiondate, idofcriteria),
+  CONSTRAINT cf_zero_transaction_idoforg_fk FOREIGN KEY (idoforg)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);

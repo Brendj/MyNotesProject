@@ -8,17 +8,19 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
+import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ResZeroTransactions;
+import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionData;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
-import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1249,6 +1251,8 @@ public class SyncResponse {
     private final ReestrTaloonApprovalData reestrTaloonApprovalData;
     private final OrganizationComplexesStructure organizationComplexesStructure;
     private final ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
+    private final ZeroTransactionData zeroTransactionData;
+    private final ResZeroTransactions resZeroTransactions;
 
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1263,7 +1267,8 @@ public class SyncResponse {
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
-            OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData) {
+            OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
+            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1304,6 +1309,8 @@ public class SyncResponse {
         this.reestrTaloonApprovalData = reestrTaloonApprovalData;
         this.organizationComplexesStructure = organizationComplexesStructure;
         this.interactiveReportData = interactiveReportData;
+        this.zeroTransactionData = zeroTransactionData;
+        this.resZeroTransactions = resZeroTransactions;
     }
 
     public Document toDocument() throws Exception {
@@ -1478,8 +1485,17 @@ public class SyncResponse {
         if (reestrTaloonApprovalData != null) {
             ecafeEnvelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
         }
+
         if (organizationComplexesStructure != null) {
             ecafeEnvelopeElement.appendChild(organizationComplexesStructure.toElement(document));
+        }
+
+        if (resZeroTransactions != null) {
+            ecafeEnvelopeElement.appendChild(resZeroTransactions.toElement(document));
+        }
+
+        if (zeroTransactionData != null) {
+            ecafeEnvelopeElement.appendChild(zeroTransactionData.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);
