@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TransactionsReport;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: Anvarov
  * Date: 25.03.16
  * Time: 18:30
  * To change this template use File | Settings | File Templates.
@@ -30,13 +32,15 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
     private final static Logger logger = LoggerFactory.getLogger(InteractiveCardDataReport.class);
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    //protected List<InteractiveCardDataReportItem> items;
+    protected List<InteractiveCardDataReportItem> items;
     private String htmlReport;
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
     }
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
+
         private final String templateFilename;
 
         public Builder(String templateFilename) {
@@ -45,16 +49,22 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
         public Builder() {
             String templateName = InteractiveCardDataReport.class.getSimpleName();
-            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + templateName + ".jasper";
+            templateFilename =
+                    RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + templateName
+                            + ".jasper";
         }
 
         @Override
-        public InteractiveCardDataReport build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        public InteractiveCardDataReport build(Session session, Date startTime, Date endTime, Calendar calendar)
+                throws Exception {
             return doBuild(session, calendar);
         }
 
         public InteractiveCardDataReport doBuild(Session session, Calendar calendar) throws Exception {
-                        Date generateTime = new Date();
+            String idOfOrg = StringUtils
+                    .trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+
+            Date generateTime = new Date();
 
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
@@ -97,8 +107,16 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
         return this;
     }
 
-    public static final class InteracticeCardDataReportItem {
-        protected long idOfRule;
+    public static final class InteractiveCardDataReportItem {
+
+        protected String idOfRecord;
+        protected long value;
+
+
+        public InteractiveCardDataReportItem(String idOfRecord, long value) {
+            this.idOfRecord = idOfRecord;
+            this.value = value;
+        }
     }
 }
 

@@ -19,14 +19,12 @@
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:panelGrid styleClass="borderless-grid" columns="2">
-                <a4j:commandButton value="Генерировать отчет" action="#{interactiveCardDataReportPage.doGenerate}"
-                                   reRender="workspaceTogglePanel, reportPanel" styleClass="command-button"
-                                   status="reportGenerateStatus" />
-                <h:commandButton value="Выгрузить в Excel"
-                                 actionListener="#{interactiveCardDataReportPage.doGenerateXLS}"
-                                 styleClass="command-button" />
-            </h:panelGrid>
+            <a4j:commandButton value="Генерировать отчет" action="#{interactiveCardDataReportPage.doGenerate}"
+                               reRender="workspaceTogglePanel, reportPanel" styleClass="command-button"
+                               status="reportGenerateStatus" />
+            <h:commandButton value="Выгрузить в Excel" actionListener="#{interactiveCardDataReportPage.doGenerateXLS}"
+                             styleClass="command-button" />
+
             <a4j:status id="reportGenerateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
