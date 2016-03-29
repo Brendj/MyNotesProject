@@ -463,7 +463,7 @@ public class SummaryCalculationService {
                                 clientEE.setValues(attachValue(clientEE.getValues(), VALUE_TIME_ENTER, "-"));
                                 clientEE.setValues(attachValue(clientEE.getValues(), VALUE_TIME_EXIT, CalendarUtils.dateTimeToString(new Date(exitTime))));
                             }
-                            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_TIME_MAX, "-"));
+                            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_TIME_MAX, "+"));
                             attachEnterMethod(enterExists, session, clientEE);
                             attachExitMethod(exitExists, session, clientEE);
                             continue;
@@ -486,7 +486,11 @@ public class SummaryCalculationService {
                         minutes = (seconds / 60) % 60;
                         clientEE.setValues(attachValue(clientEE.getValues(), day, hours.toString() + ":" + minutes.toString()));
                     } else {
-                        clientEE.setValues(attachValue(clientEE.getValues(), day, "-"));
+                        if (enterExists || exitExists) {
+                            clientEE.setValues(attachValue(clientEE.getValues(), day, "+"));
+                        } else {
+                            clientEE.setValues(attachValue(clientEE.getValues(), day, "-"));
+                        }
                     }
 
                 }
@@ -494,7 +498,9 @@ public class SummaryCalculationService {
             if (enterExists || exitExists) {
                 daysInside++;
             }
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_DATE, daysInside.toString()));
+            if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_DATE, daysInside.toString()));
+            }
         }
     }
 
@@ -596,7 +602,7 @@ public class SummaryCalculationService {
         Long cop = money % 100;
         String cop_str = cop.toString();
         while (cop_str.length() < 2) {
-            cop_str += "0";
+            cop_str = "0" + cop_str;
         }
         return rub.toString() + "," + cop_str;
     }
