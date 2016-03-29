@@ -19,9 +19,6 @@
     <%--<h:outputText styleClass="output-text" escape="true" value="Период по-умолчанию - текущая неделя." />--%>
     <h:panelGrid columns="2" columnClasses="valign, valign">
         <h:outputLabel value="Сборка статистики"/>
-        <a4j:commandButton id="switchButton" ajaxSingle="true" value="#{mainPage.syncStatsPage.state? 'Вкл' : 'Выкл'}" action="#{mainPage.syncStatsPage.switchState}"
-                reRender="switchButton"/>
-
 
         <h:outputText styleClass="output-text" escape="true" value="Организации(я)" />
         <h:panelGroup id="orgFilter">

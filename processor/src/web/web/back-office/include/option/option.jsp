@@ -102,6 +102,12 @@
                                                   disabled="#{!optionPage.enableNotificationGoodRequestChange}"
                                                   minValue="7" maxValue="31"/>
         </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Сохранять агрегированные данные по синхронизациям" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.reportOn}" styleClass="output-text">
+                <a4j:support event="onclick" ajaxSingle="true"/>
+            </h:selectBooleanCheckbox>
+        </h:panelGrid>
 
     </rich:tab>
     <rich:tab label="Платежные системы">

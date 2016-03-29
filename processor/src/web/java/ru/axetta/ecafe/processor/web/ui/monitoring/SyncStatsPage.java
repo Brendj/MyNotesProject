@@ -5,7 +5,6 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryCalc;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.SyncCollector;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
 
 import org.hibernate.Session;
@@ -126,10 +125,10 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
             HibernateUtils.close(persistenceSession, logger);
         }
         result.add(new Item("Успешных синхронизаций", successfulSyncCount.toString()));
-        result.add(new Item("Отбитых синхронизаций", filteredSyncCount.toString()));
-        result.add(new Item("Не завершенных синхронизаций", errorSyncCount.toString()));
+        result.add(new Item("Повторных синхронизаций", filteredSyncCount.toString()));
+        result.add(new Item("Неуспешных синхронизаций", errorSyncCount.toString()));
         result.add(new Item("Среднее время реконнекта (мс)", averageResyncTime.toString()));
-        result.add(new Item("Минимальное время синхронизации (мс)", minSyncDuration !=  null ? minSyncDuration.toString() : "null"));
+        result.add(new Item("Минимальное время синхронизации (мс)", minSyncDuration !=  null ? minSyncDuration.toString() : "0"));
         result.add(new Item("Среднее время синхронизации (мс)", averageSyncDuration.toString()));
         result.add(new Item("Максимальное время синхронизации (мс)", maxSyncDuration.toString()));
 
@@ -187,15 +186,6 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
 
     public void setApplyUserSettings(Boolean applyUserSettings) {
         this.applyUserSettings = applyUserSettings;
-    }
-
-    public Object switchState() {
-        SyncCollector.switchState();
-        return null;
-    }
-
-    public boolean getState(){
-        return SyncCollector.getReportOn();
     }
 
     public class Item {

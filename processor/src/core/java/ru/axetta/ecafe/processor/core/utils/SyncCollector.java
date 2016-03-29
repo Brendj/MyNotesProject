@@ -120,16 +120,10 @@ public class SyncCollector {
         setSyncType(syncTime, syncType);
     }
 
-    public static void setProperties(Properties properties, String PROCESSOR_PARAM_BASE) {
-        String prop = properties.getProperty(PROCESSOR_PARAM_BASE + ".sync.collector.status");
-        if (prop == null || prop.equals("false")) {
-            reportOn = false;
-        }
+    public static void setProperties(Boolean isReportOn) {
+        reportOn = isReportOn;
     }
 
-    public static void switchState(){
-        reportOn = !reportOn;
-    }
 
     public static Boolean getReportOn() {
         return reportOn;

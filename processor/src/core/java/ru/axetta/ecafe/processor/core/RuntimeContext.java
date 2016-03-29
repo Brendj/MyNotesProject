@@ -561,7 +561,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.paymentLogger = processLogger;
             this.integroLogger = processLogger;
 
-            this.syncCollector.setProperties(properties, PROCESSOR_PARAM_BASE);
+            this.syncCollector.setProperties(getOptionValueBool(Option.OPTION_SAVE_SYNC_CALC));
 
             eventNotificator = createEventNotificator(properties, executorService, sessionFactory, ruleProcessor);
 

@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -66,6 +66,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean importMSRLogging;
     private String externalURL;
     private Boolean recalculateBenefits;
+    private Boolean reportOn;
     private Boolean syncRegisterClients;
     private String syncRegisterURL;
     private String syncRegisterWSDL;
@@ -430,6 +431,14 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setRNIPPaymentsStore(String RNIPPaymentsStore) {
         this.RNIPPaymentsStore = RNIPPaymentsStore;
+    }
+
+    public Boolean getReportOn() {
+        return reportOn;
+    }
+
+    public void setReportOn(Boolean reportOn) {
+        this.reportOn = reportOn;
     }
 
     public Boolean getSyncRegisterIsTestingService() {
@@ -822,6 +831,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
         syncRestrictFullSyncPeriods = runtimeContext.getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS);
+        reportOn = runtimeContext.getOptionValueBool(Option.OPTION_SAVE_SYNC_CALC);
 
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
@@ -974,6 +984,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
             runtimeContext.setOptionValue(Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT, getDaysRestrictionPaymentDateImport());
+            runtimeContext.setOptionValue(Option.OPTION_SAVE_SYNC_CALC, reportOn);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

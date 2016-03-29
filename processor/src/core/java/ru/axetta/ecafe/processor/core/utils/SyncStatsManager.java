@@ -66,13 +66,27 @@ public class SyncStatsManager {
 
         Map<Long, List<SyncData>> syncDataMap = buildSyncDataMap(syncListCopy);
 
-        for (Long idOfOrg : syncDataMap.keySet()) {
-            List<SyncData> orgSyncDataList = syncDataMap.get(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
 
-            Map<Integer, String> orgStats = getOrgStats(orgSyncDataList);
-            for (Integer type : orgStats.keySet()) {
-                createSyncHistoryCalc(idOfOrg, syncTime, type, orgStats.get(type));
+            for (Long idOfOrg : syncDataMap.keySet()) {
+                List<SyncData> orgSyncDataList = syncDataMap.get(idOfOrg);
+
+                Map<Integer, String> orgStats = getOrgStats(orgSyncDataList);
+                for (Integer type : orgStats.keySet()) {
+                    createSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, type, orgStats.get(type));
+                }
             }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
     }
 
@@ -285,36 +299,25 @@ public class SyncStatsManager {
      * @return - сохраненный объект
      * @throws Exception
      */
-    private static SyncHistoryCalc createSyncHistoryCalc(Long idOfOrg, Date syncTime, Integer syncType,
-            String syncValue) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            List<SyncHistoryCalc> existedSyncHistoryCalcList = DAOUtils
-                    .getSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, new Date(), syncType);
-            SyncHistoryCalc syncHistoryCalc;
-            if (existedSyncHistoryCalcList.size() > 0) {
-                if (existedSyncHistoryCalcList.size() > 1) {
-                    throw new Exception("Critical error in SyncStatsManager");
-                }
-                syncHistoryCalc = existedSyncHistoryCalcList.get(0);
-                Long syncValueLong = (Long.parseLong(syncValue) + Long.parseLong(syncHistoryCalc.getValue()));
-                syncValue = syncValueLong.toString();
-                persistenceSession.delete(syncHistoryCalc);
+    private static SyncHistoryCalc createSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date syncTime,
+            Integer syncType, String syncValue) throws Exception {
+        List<SyncHistoryCalc> existedSyncHistoryCalcList = DAOUtils
+                .getSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, new Date(), syncType);
+        SyncHistoryCalc syncHistoryCalc;
+        if (existedSyncHistoryCalcList.size() > 0) {
+            if (existedSyncHistoryCalcList.size() > 1) {
+                throw new Exception("Critical error in SyncStatsManager");
             }
-            syncHistoryCalc = new SyncHistoryCalc(idOfOrg, syncTime, syncType, syncValue);
-            persistenceSession.save(syncHistoryCalc);
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return syncHistoryCalc;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            syncHistoryCalc = existedSyncHistoryCalcList.get(0);
+            Long syncValueLong = (Long.parseLong(syncValue) + Long.parseLong(syncHistoryCalc.getValue()));
+            syncValue = syncValueLong.toString();
+            persistenceSession.delete(syncHistoryCalc);
         }
+        syncHistoryCalc = new SyncHistoryCalc(idOfOrg, syncTime, syncType, syncValue);
+        persistenceSession.save(syncHistoryCalc);
+        return syncHistoryCalc;
     }
+
 
     /**
      * Обертка для запуска по расписанию
@@ -361,6 +364,9 @@ public class SyncStatsManager {
 
             Criteria criteria = persistenceSession.createCriteria(SyncHistoryCalc.class);
             criteria.add(Restrictions.between("syncDay", periodStart, periodEnd));
+            System.out.println(periodStart);
+            System.out.println(periodEnd);
+            System.out.println(criteria);
 
             yesterdaySyncHistoryCalcList = criteria.list();
 
@@ -377,10 +383,64 @@ public class SyncStatsManager {
                         newSyncHistoryCalc.add(syncHistoryCalc);
                         syncMapByOrg.put(idOfOrg, newSyncHistoryCalc);
                     }
-                    persistenceSession.delete(o);
                 }
+                persistenceSession.createQuery("delete SyncHistoryCalc where syncDay between :periodStart and :periodEnd")
+                        .setDate("periodStart", periodStart).setDate("periodEnd", periodEnd).executeUpdate();
             }
 
+            for (Long idOfOrg : syncMapByOrg.keySet()) {
+                List<SyncHistoryCalc> orgShorSyncData = syncMapByOrg.get(idOfOrg);
+                Long successfullSyncCount = 0L;
+                Long filteredSyncCount = 0L;
+                Long errorSyncCount = 0L;
+                Long averageReconnectTime = 0L; // in ms
+                List<Long> reconnectIntervals = new ArrayList<Long>();
+                Long minSyncDuration = null; // in ms
+                Long averageSyncDuration = 0L; // in ms
+                Long maxSyncDuration = 0L; // in ms
+                List<Long> syncDurations = new ArrayList<Long>();
+                for (SyncHistoryCalc syncHistoryCalc : orgShorSyncData) {
+                    switch (syncHistoryCalc.getDataType()) {
+                        case SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION:
+                            successfullSyncCount += Long.parseLong(syncHistoryCalc.getValue());
+                            break;
+                        case SyncHistoryCalc.FILTERED_SYNC_COUNT_POSITION:
+                            filteredSyncCount += Long.parseLong(syncHistoryCalc.getValue());
+                            break;
+                        case SyncHistoryCalc.ERROR_SYNC_COUNT_POSITION:
+                            errorSyncCount += Long.parseLong(syncHistoryCalc.getValue());
+                            break;
+                        case SyncHistoryCalc.AVG_RESYNC_TIME_POSITION:
+                            reconnectIntervals.add(Long.parseLong(syncHistoryCalc.getValue()));
+                            break;
+                        case SyncHistoryCalc.MIN_SYNC_DURATION:
+                            if (minSyncDuration == null) {
+                                minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                            } else {
+                                if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
+                                    minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                                }
+                            }
+                            break;
+                        case SyncHistoryCalc.AVG_SYNC_DURATION:
+                            syncDurations.add(Long.parseLong(syncHistoryCalc.getValue()));
+                            break;
+                        case SyncHistoryCalc.MAX_SYNC_DURATION:
+                            if (maxSyncDuration < Long.parseLong(syncHistoryCalc.getValue())) {
+                                maxSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
+                            }
+                            break;
+                        default:
+
+                    }
+                }
+                Map<Integer, String> stats = getStats(successfullSyncCount, filteredSyncCount, errorSyncCount,
+                        averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration,
+                        maxSyncDuration, syncDurations);
+                for (Integer type : stats.keySet()) {
+                    createSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, type, stats.get(type));
+                }
+            }
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -389,58 +449,6 @@ public class SyncStatsManager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        for (Long idOfOrg : syncMapByOrg.keySet()) {
-            List<SyncHistoryCalc> orgShorSyncData = syncMapByOrg.get(idOfOrg);
-            Long successfullSyncCount = 0L;
-            Long filteredSyncCount = 0L;
-            Long errorSyncCount = 0L;
-            Long averageReconnectTime = 0L; // in ms
-            List<Long> reconnectIntervals = new ArrayList<Long>();
-            Long minSyncDuration = null; // in ms
-            Long averageSyncDuration = 0L; // in ms
-            Long maxSyncDuration = 0L; // in ms
-            List<Long> syncDurations = new ArrayList<Long>();
-            for (SyncHistoryCalc syncHistoryCalc : orgShorSyncData) {
-                switch (syncHistoryCalc.getDataType()) {
-                    case SyncHistoryCalc.SUCCESSFUL_SYNC_COUNT_POSITION:
-                        successfullSyncCount += Long.parseLong(syncHistoryCalc.getValue());
-                        break;
-                    case SyncHistoryCalc.FILTERED_SYNC_COUNT_POSITION:
-                        filteredSyncCount += Long.parseLong(syncHistoryCalc.getValue());
-                        break;
-                    case SyncHistoryCalc.ERROR_SYNC_COUNT_POSITION:
-                        errorSyncCount += Long.parseLong(syncHistoryCalc.getValue());
-                        break;
-                    case SyncHistoryCalc.AVG_RESYNC_TIME_POSITION:
-                        reconnectIntervals.add(Long.parseLong(syncHistoryCalc.getValue()));
-                        break;
-                    case SyncHistoryCalc.MIN_SYNC_DURATION:
-                        if (minSyncDuration == null) {
-                            minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
-                        } else {
-                            if (minSyncDuration > Long.parseLong(syncHistoryCalc.getValue())) {
-                                minSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
-                            }
-                        }
-                        break;
-                    case SyncHistoryCalc.AVG_SYNC_DURATION:
-                        syncDurations.add(Long.parseLong(syncHistoryCalc.getValue()));
-                        break;
-                    case SyncHistoryCalc.MAX_SYNC_DURATION:
-                        if (maxSyncDuration < Long.parseLong(syncHistoryCalc.getValue())) {
-                            maxSyncDuration = Long.parseLong(syncHistoryCalc.getValue());
-                        }
-                        break;
-                    default:
 
-                }
-            }
-            Map<Integer, String> stats = getStats(successfullSyncCount, filteredSyncCount, errorSyncCount,
-                    averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration,
-                    maxSyncDuration, syncDurations);
-            for (Integer type : stats.keySet()) {
-                createSyncHistoryCalc(idOfOrg, periodStart, type, stats.get(type));
-            }
-        }
     }
 }
