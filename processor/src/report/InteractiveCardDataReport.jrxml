@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InteractiveReportData" language="groovy" pageWidth="800" pageHeight="842" columnWidth="760" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="36e4e1e2-70e5-4a61-a039-4259d5b11287">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="reportDate" class="java.lang.String"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="percent" class="java.lang.String"/>
+	<field name="rowNum" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="value" class="java.lang.Long"/>
+	<field name="ruleName" class="java.lang.String"/>
+	<title>
+		<band height="145" splitType="Stretch">
+			<textField>
+				<reportElement uuid="72aacc3c-7b04-4aa3-b3ab-01739d528e15" x="189" y="94" width="571" height="25"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Арес здания:_______________________________________"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="08f15a1f-64c8-4342-ba1b-830499cdb05a" x="372" y="119" width="388" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["на дату: " + $P{reportDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b6b60c43-4604-4905-a04a-8a17ac51bca7" x="0" y="0" width="760" height="94"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Отчет по обороту карт по зданию ОО: " + $P{orgName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="80">
+			<staticText>
+				<reportElement uuid="7f17a453-cb4a-415c-898e-a2091d4490c5" positionType="Float" x="0" y="38" width="42" height="42"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[№]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dc88b5d8-73aa-4920-bc62-d678316d9dc9" positionType="Float" x="42" y="38" width="240" height="42"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Название показателей]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9205cfdc-f869-42af-89da-656f63e1e21f" positionType="Float" x="282" y="38" width="90" height="42"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество едениц]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f3a16787-bbdb-49e2-b821-e68f559f54c1" positionType="Float" x="372" y="38" width="388" height="42"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Описание показателей]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a635d923-709a-46ce-9ae0-cfc69849ef76" x="372" y="1" width="388" height="37"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Покрытие потребности в картах на текущую дату имеющимися в наличии резервными картами, % к контингенту]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="eca973f6-b3a4-4cd0-8388-800ab7c234ff" x="282" y="1" width="90" height="37"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{percent} + "%"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="31" splitType="Stretch">
+			<textField>
+				<reportElement uuid="de68c2c0-a87d-4e7c-9040-187c8ad9453b" positionType="Float" x="372" y="0" width="388" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f9a2103e-e0e5-4d5f-85ff-fd042691b3bb" positionType="Float" x="282" y="0" width="90" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="93cde042-92d2-487d-ae3f-5d407c483ca0" positionType="Float" x="42" y="0" width="240" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ruleName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7469e8d7-f90a-4ad9-a3da-8f6d305e7b3f" positionType="Float" x="0" y="0" width="42" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

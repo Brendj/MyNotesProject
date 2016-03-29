@@ -29,7 +29,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.event.ActionEvent;
+import javax.faces.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.util.GregorianCalendar;
 
 
@@ -71,7 +72,11 @@ public class InteractiveCardDataReportPage extends OnlineReportPage {
         Session session;
         try {
             session = (Session) entityManager.getDelegate();
-            generateReport(session, null);
+            AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+            String templateFilename =
+                    autoReportGenerator.getReportsTemplateFilePath() + InteractiveCardDataReport.class.getSimpleName()
+                            + ".jasper";
+            generateReport(session, templateFilename);
         } catch (Exception e) {
             logger.error("Failed to load clients data", e);
         } finally {
@@ -81,7 +86,7 @@ public class InteractiveCardDataReportPage extends OnlineReportPage {
 
     @Transactional
     public void generateXLS() {
-        Session session = null;
+        Session session;
         try {
             session = (Session) entityManager.getDelegate();
             generateXLS(session);
@@ -93,23 +98,19 @@ public class InteractiveCardDataReportPage extends OnlineReportPage {
     }
 
     public void generateReport(Session session, String templateFile) throws Exception {
-        InteractiveCardDataReport.Builder reportBuilder = null;
+        InteractiveCardDataReport.Builder reportBuilder;
         if (templateFile != null) {
+
+            reportBuilder = new InteractiveCardDataReport.Builder(templateFile);
+
             if (idOfOrg == null) {
                 printError("Не указана организация");
             }
             String idOfOrgString = String.valueOf(idOfOrg);
             reportBuilder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
 
-            reportBuilder = new InteractiveCardDataReport.Builder(templateFile);
         } else {
-            reportBuilder = new InteractiveCardDataReport.Builder();
-
-            AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-            String templateFilename =
-                    autoReportGenerator.getReportsTemplateFilePath() + InteractiveCardDataReport.class.getSimpleName()
-                            + ".jasper";
-            printError("Файл шаблона не найден: " + templateFilename);
+            throw new FileNotFoundException("Файл шаблона не найден: " + templateFile);
         }
         this.report = reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
     }
@@ -129,7 +130,7 @@ public class InteractiveCardDataReportPage extends OnlineReportPage {
 
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            response.setHeader("Content-disposition", "inline;filename=transactions_report.xls");
+            response.setHeader("Content-disposition", "inline;filename=interactive_report.xls");
 
             JRXlsExporter xlsExport = new JRXlsExporter();
             xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, this.report.getPrint());
