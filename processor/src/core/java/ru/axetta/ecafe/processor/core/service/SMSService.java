@@ -231,8 +231,7 @@ public class SMSService {
 
             boolean result = false;
 
-            if (sendResponse != null && messageType != ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION
-                    && messageType != ClientSms.TYPE_SUMMARY_WEEKLY_NOTIFICATION) {
+            if (sendResponse != null) {
                 Long idOfSourceOrg = EventNotificationService.getSourceOrgIdFromValues(values);
                 result = registerClientSMSCharge(sendResponse.isSuccess(), client, sendResponse.getMessageId(),
                         phoneNumber, messageTargetId, messageType, textMessage, eventTime, idOfSourceOrg);
