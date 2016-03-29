@@ -75,6 +75,7 @@ public class SummaryCalculationService {
     public static String VALUE_METHOD_END = "Method_Enterevents_EndTime";
     public static String VALUE_AMOUNT_ENTER_EVENTS_DATE = "amountEntereventsDate";
     public static String VALUE_QUANTITY_AMOUNT = "quantityamount";
+    public static String VALUE_PAYMENT_SUM = "PaymentSum";
 
     final static String JOB_NAME_DAILY="NotificationSummaryDaily";
     final static String JOB_NAME_WEEKLY="NotificationSummaryWeekly";
@@ -274,8 +275,8 @@ public class SummaryCalculationService {
                 + "WHERE n.notifytype = :notifyType "
                 + "ORDER BY c.idofclient, p.surname, p.firstname";*/
         //выше медленный запрос, ниже быстрый
-        String query_balance = "SELECT c.idofclient, p.surname, p.firstname, c.limits, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
-                + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2 "
+        String query_balance = "SELECT c.idofclient, p.surname, p.firstname, c.expenditurelimit, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
+                + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4 "
                 + "FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(t1.transactionsum) AS sum1 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
@@ -283,19 +284,19 @@ public class SummaryCalculationService {
                 + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query1 ON c.idofclient = query1.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(-t2.transactionsum) AS sum2 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
-                + "LEFT JOIN cf_transactions t2 ON t2.idofclient = c.idofclient AND t2.transactionDate BETWEEN :startTime AND :endTime AND t2.sourcetype = :transactionType "
-                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query2 ON c.idofclient = query2.idofclient "
+                + "LEFT JOIN cf_transactions t2 ON t2.idofclient = c.idofclient AND t2.transactionDate BETWEEN :startTime AND :endTime AND (t2.sourcetype = :transactionType1 "
+                + "OR t2.sourcetype = :transactionType2) WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query2 ON c.idofclient = query2.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, count(distinct extract(day from TO_TIMESTAMP(o.createddate / 1000))) AS count1 FROM cf_clientsnotificationsettings n "
                 + "INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
-                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query3 ON c.idofclient = query3.idofclient "
+                + "AND o.state = :orderState WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query3 ON c.idofclient = query3.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(t.transactionsum) AS sum3 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate >= :endTime AND t.transactionDate <= :curTime "
                 + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query4 ON c.idofclient = query4.idofclient "
                 + "INNER JOIN "
-                + "(SELECT c.idofclient, count(idofclientpayment) as count2 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
+                + "(SELECT c.idofclient, count(idofclientpayment) as count2, sum(paysum) as sum4 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate BETWEEN :startTime AND :endTime "
                 + "LEFT OUTER JOIN cf_clientpayments p ON p.idoftransaction = t.idoftransaction AND p.createddate BETWEEN :startTime AND :endTime "
                 + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query5 ON c.idofclient = query5.idofclient "
@@ -305,7 +306,9 @@ public class SummaryCalculationService {
         bquery.setParameter("startTime", startDate.getTime());
         bquery.setParameter("endTime", endDate.getTime());
         bquery.setParameter("curTime", System.currentTimeMillis());
-        bquery.setParameter("transactionType", AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE);
+        bquery.setParameter("transactionType1", AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE);
+        bquery.setParameter("transactionType2", AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE);
+        bquery.setParameter("orderState", Order.STATE_COMMITED);
         Set<Integer> oTypes = new HashSet<Integer>();
         oTypes.add(OrderTypeEnumType.PAY_PLAN.ordinal());
         oTypes.add(OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
@@ -328,6 +331,7 @@ public class SummaryCalculationService {
             Long amountComplexDate = ((BigInteger)row[8]).longValue();
             Long byTransEnd = ((BigDecimal)row[9]).longValue();
             Long quantityAmount = ((BigInteger)row[10]).longValue();
+            Long paymentSum = ((BigDecimal)row[11]).longValue();
             clientEE = findClientEEByClientId(clients, id);
             if (clientEE == null) {
                 clientEE = new ClientEE();
@@ -345,6 +349,7 @@ public class SummaryCalculationService {
             balances.setAmountBuyAll(orderSum);
             balances.setAmountComplexDate(amountComplexDate); // > 0 ? 1L : 0L);
             balances.setQuantityAmount(quantityAmount);
+            balances.setPaymentSum(paymentSum);
             clientEE.setBalances(balances);
         }
 
@@ -383,19 +388,12 @@ public class SummaryCalculationService {
         boolean inside = false;
         long eTime;
         long clientInside;
+        Integer daysInside;
         for (ClientEE clientEE : clients) {
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ORG_NAME, clientEE.getOrgName()));
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ORG_TYPE, clientEE.getOrgType()));
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ORG_ID, clientEE.getOrgId().toString()));
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ORG_NUM, clientEE.getOrgNum()));
-
-            /*Long clientInsideMonday = 0L;
-            Long clientInsideTuesday = 0L;
-            Long clientInsideWednesday = 0L;
-            Long clientInsideThursday = 0L;
-            Long clientInsideFriday = 0L;
-            Long clientInsideSaturday = 0L;
-            Long clientInsideSunday = 0L;*/
 
             int upto = 0;
             if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
@@ -404,9 +402,14 @@ public class SummaryCalculationService {
                 upto = 7;
             }
 
+            daysInside = 0;
             for (int iteration = 1; iteration <= upto; iteration++) {
                 resetGlobals();
                 clientInside = 0L;
+
+                if (enterExists || exitExists) {
+                    daysInside++;
+                }
 
                 eTime = 0L;
                 enterExists = false;
@@ -485,8 +488,13 @@ public class SummaryCalculationService {
                     } else {
                         clientEE.setValues(attachValue(clientEE.getValues(), day, "-"));
                     }
+
                 }
             }
+            if (enterExists || exitExists) {
+                daysInside++;
+            }
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_DATE, daysInside.toString()));
         }
     }
 
@@ -524,12 +532,12 @@ public class SummaryCalculationService {
                     if (enterEmployeeId == null && enterGuardianId == null) {
                         enterMethod = "Самостоятельно на турникете";
                     } else {
-                        if (enterGuardianId != null) {
-                            Person person = ((Client)session.load(Client.class, enterGuardianId)).getPerson();
-                            enterMethod = String.format("Представитель (%s)", person.getFullName());
-                        } else {
+                        if (enterEmployeeId != null) {
                             Person person = ((Client)session.load(Client.class, enterEmployeeId)).getPerson();
                             enterMethod = String.format("Сотрудником ОО (%s)", person.getFullName());
+                        } else {
+                            Person person = ((Client)session.load(Client.class, enterGuardianId)).getPerson();
+                            enterMethod = String.format("Представитель (%s)", person.getFullName());
                         }
                     }
                 }
@@ -546,12 +554,12 @@ public class SummaryCalculationService {
             if (exitEmployeeId == null && exitGuardianId == null) {
                 exitMethod = "Самостоятельно на турникете";
             } else {
-                if (exitGuardianId != null) {
-                    Person person = ((Client)session.load(Client.class, exitGuardianId)).getPerson();
-                    exitMethod = String.format("Представитель (%s)", person.getFullName());
-                } else {
+                if (exitEmployeeId != null) {
                     Person person = ((Client)session.load(Client.class, exitEmployeeId)).getPerson();
                     exitMethod = String.format("Сотрудником ОО (%s)", person.getFullName());
+                } else {
+                    Person person = ((Client)session.load(Client.class, exitGuardianId)).getPerson();
+                    exitMethod = String.format("Представитель (%s)", person.getFullName());
                 }
             }
         }
@@ -571,12 +579,15 @@ public class SummaryCalculationService {
                     clientEE.getValues(), VALUE_AMOUNT_BUY_ALL, getStringMoneyValue(
                     clientEE.getBalances().getAmountBuyAll())));
             clientEE.setValues(
-                    attachValue(clientEE.getValues(), VALUE_LIMIT, clientEE.getBalances().getLimit().toString()));
+                    attachValue(clientEE.getValues(), VALUE_LIMIT, getStringMoneyValue(clientEE.getBalances().getLimit())));
             clientEE.setValues(attachValue(
                     clientEE.getValues(), VALUE_AMOUNT_COMPLEX_DATE, clientEE.getBalances().getAmountComplexDate()
                     .toString()));
             clientEE.setValues(
                     attachValue(clientEE.getValues(), VALUE_QUANTITY_AMOUNT, clientEE.getBalances().getQuantityAmount().toString()));
+            clientEE.setValues(attachValue(
+                    clientEE.getValues(), VALUE_PAYMENT_SUM, getStringMoneyValue(
+                    clientEE.getBalances().getPaymentSum())));
         }
     }
 
@@ -760,6 +771,7 @@ public class SummaryCalculationService {
         private Long amountBuyAll;
         private Long amountComplexDate;
         private Long quantityAmount;
+        private Long paymentSum;
 
         public Long getLimit() {
             return limit;
@@ -815,6 +827,14 @@ public class SummaryCalculationService {
 
         public void setQuantityAmount(Long quantityAmount) {
             this.quantityAmount = quantityAmount;
+        }
+
+        public Long getPaymentSum() {
+            return paymentSum;
+        }
+
+        public void setPaymentSum(Long paymentSum) {
+            this.paymentSum = paymentSum;
         }
     }
 }
