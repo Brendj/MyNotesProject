@@ -28,6 +28,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
@@ -810,7 +812,7 @@ public class Processor
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
@@ -1086,7 +1088,7 @@ public class Processor
 
         // Process ResCategoriesDiscountsAndRules
         try {
-            resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
+            resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg(),request.getCategoriesAndDiscountsRequest());
         } catch (Exception e) {
             String message = String
                     .format("Failed to process categories and rules, IdOfOrg == %s", request.getIdOfOrg());
@@ -1247,7 +1249,7 @@ public class Processor
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
@@ -1329,7 +1331,7 @@ public class Processor
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
         ComplexRoles complexRoles = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
@@ -1392,7 +1394,7 @@ public class Processor
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
         ComplexRoles complexRoles = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
@@ -1457,7 +1459,7 @@ public class Processor
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
@@ -1614,7 +1616,7 @@ public class Processor
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
@@ -1758,7 +1760,7 @@ public class Processor
         ResTempCardsOperations resTempCardsOperations = null;
         TempCardOperationData tempCardOperationData = null;
         ComplexRoles complexRoles = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
@@ -4167,84 +4169,21 @@ public class Processor
         return resEnterEvents;
     }
 
-    private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
+    private ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg,CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new SyncResponse.ResCategoriesDiscountsAndRules();
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new ResCategoriesDiscountsAndRules();
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            Criteria criteriaDiscountRule = persistenceSession.createCriteria(DiscountRule.class);
-            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
-            Set<CategoryOrg> categoryOrgSet = org.getCategories();
-            if (!categoryOrgSet.isEmpty()) {
-                for (Object object : criteriaDiscountRule.list()) {
-                    DiscountRule discountRule = (DiscountRule) object;
-                    /*
-                   * проверяем вхождение одного множества в другое
-                   * результат categoryOrgSet.containsAll(discountRule.getCategoryOrgs())
-                   * вернет true если все категории организации взятые из таблицы организации
-                   * пренадлежат категорий организаций приявязанных к Правилам скидок.
-                   *
-                   * Если все категории организации содержатся в правиле то выводим
-                   * */
-                    boolean bIncludeRule = false;
-                    if (discountRule.getCategoryOrgs().isEmpty()) {
-                        bIncludeRule = true;
-                    } else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())) {
-                        bIncludeRule = true;
-                    }
-                    /*
-                 if(categoryOrgSet.isEmpty()){
-                     if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
-                 } else {
-                     if(discountRule.getCategoryOrgs().isEmpty()) bIncludeRule = true;
-                     else if (categoryOrgSet.containsAll(discountRule.getCategoryOrgs())){
-                         bIncludeRule = true;
-                     }
-                 }
-
-                 if(discountRule.getCategoryOrgs().isEmpty()
-                 || (!categoryOrgSet.isEmpty() && categoryOrgSet.containsAll(discountRule.getCategoryOrgs())))
-                    */
-                    if (bIncludeRule) {
-                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri = new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
-                                discountRule);
-                        resCategoriesDiscountsAndRules.addDCRI(dcri);
-                    }
-                }
-            }  /* Организация не пренадлежит ни к одной категории*/ else {
-                for (Object object : criteriaDiscountRule.list()) {
-                    DiscountRule discountRule = (DiscountRule) object;
-                    /* если правила не установлены категории организаций то отправляем*/
-                    if (discountRule.getCategoryOrgs().isEmpty()) {
-                        SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri = new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
-                                discountRule);
-                        resCategoriesDiscountsAndRules.addDCRI(dcri);
-                    }
-                }
-            }
-
-            Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
-
-
-            List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
-            for (CategoryDiscount categoryDiscount : categoryDiscounts) {
-                SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
-                        categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
-                        categoryDiscount.getCategoryType().getValue(), categoryDiscount.getDiscountRules(),
-                        categoryDiscount.getOrgType());
-                resCategoriesDiscountsAndRules.addDCI(dci);
-            }
-
+            boolean isManyOrgs = categoriesAndDiscountsRequest!=null && categoriesAndDiscountsRequest.isManyOrgs();
+            resCategoriesDiscountsAndRules.fillData(persistenceSession,idOfOrg,isManyOrgs);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-
         return resCategoriesDiscountsAndRules;
     }
 

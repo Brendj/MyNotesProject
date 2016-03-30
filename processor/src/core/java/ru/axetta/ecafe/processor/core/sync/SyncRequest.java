@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
@@ -2165,6 +2167,7 @@ public class SyncRequest {
         private final ClientGuardianBuilder clientGuardianBuilder;
         private final ProhibitionMenuRequestBuilder prohibitionMenuRequestBuilder;
         private final OrganizationStructureRequestBuilder organizationStructureRequestBuilder;
+        private final CategoriesDiscountsAndRulesBuilder categoriesAndDiscountsBuilder;
         private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
         private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
         private final InteractiveReportDataBuilder interactiveReportDataBuilder;
@@ -2196,6 +2199,7 @@ public class SyncRequest {
             this.clientGuardianBuilder = new ClientGuardianBuilder();
             this.prohibitionMenuRequestBuilder = new ProhibitionMenuRequestBuilder();
             this.organizationStructureRequestBuilder = new OrganizationStructureRequestBuilder();
+            this.categoriesAndDiscountsBuilder = new CategoriesDiscountsAndRulesBuilder();
             this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
             this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
             this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
@@ -2345,6 +2349,9 @@ public class SyncRequest {
             organizationStructureRequestBuilder.createMainNode(envelopeNode);
             OrganizationStructureRequest organizationStructureRequest = organizationStructureRequestBuilder.build();
 
+            categoriesAndDiscountsBuilder.createMainNode(envelopeNode);
+            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest = categoriesAndDiscountsBuilder.build();
+
             accountsRegistryRequestBuilder.createMainNode(envelopeNode);
             AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
 
@@ -2392,7 +2399,7 @@ public class SyncRequest {
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
                     clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
-                    interactiveReportRequest, zeroTransactionsRequest);
+                    interactiveReportRequest, zeroTransactionsRequest, categoriesAndDiscountsRequest);
         }
 
 
@@ -2428,6 +2435,7 @@ public class SyncRequest {
     private final ClientGuardianRequest clientGuardianRequest;
     private final ProhibitionMenuRequest prohibitionMenuRequest;
     private final OrganizationStructureRequest organizationStructureRequest;
+    private final CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest;
     private final CardsOperationsRegistry cardsOperationsRegistry;
     private final AccountsRegistryRequest accountsRegistryRequest;
     private final ReestrTaloonApproval reestrTaloonApprovalRequest;
@@ -2441,7 +2449,8 @@ public class SyncRequest {
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
-            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions) {
+            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions,
+            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2453,6 +2462,7 @@ public class SyncRequest {
         this.clientGuardianRequest = clientGuardianRequest;
         this.prohibitionMenuRequest = prohibitionMenuRequest;
         this.organizationStructureRequest = organizationStructureRequest;
+        this.categoriesAndDiscountsRequest = categoriesAndDiscountsRequest;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -2474,6 +2484,7 @@ public class SyncRequest {
         this.interactiveReport = interactiveReport;
         this.zeroTransactions = zeroTransactions;
     }
+
 
     public String getClientVersion() {
         return clientVersion;
@@ -2569,6 +2580,10 @@ public class SyncRequest {
 
     public OrganizationStructureRequest getOrganizationStructureRequest() {
         return organizationStructureRequest;
+    }
+
+    public CategoriesDiscountsAndRulesRequest getCategoriesAndDiscountsRequest() {
+        return categoriesAndDiscountsRequest;
     }
 
     public CardsOperationsRegistry getCardsOperationsRegistry() {
