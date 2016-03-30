@@ -44,6 +44,18 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
             + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
             + "order by cf_orgs.shortname, cf_contragents.contragentname";
 
+    private static final String TRANSACTIONS_SQL = "select " + "cf_orgs.idoforg, "
+            + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+            + "cf_contragents.contragentname, " + "int8(sum(cf_clientpayments.paysum)) as payments, "
+            + "cf_orgs.shortname " + "from cf_orgs "
+            + "left join cf_transactions on cf_orgs.idoforg=cf_transactions.idoforg and "
+            + "cf_transactions.transactiondate between :fromCreatedDate and :toCreatedDate "
+            + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
+            + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
+            + "where cf_orgs.idOfOrg in (:ids) "
+            + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
+            + "order by cf_orgs.shortname";
+
     private static final String SALES_SQL_WITHOUT_START_DATE = "select " + "cf_orgs.idoforg, "
             + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
             + "cf_contragents.contragentname, " + "int8(sum(cf_orders.rsum)) as sales, "
@@ -55,24 +67,12 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
             + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
             + "order by cf_orgs.shortname, cf_contragents.contragentname";
 
-    private static final String TRANSACTIONS_SQL = "select " + "cf_orgs.idoforg, "
-            + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-            + "cf_contragents.contragentname, " + "int8(sum(cf_clientpayments.paysum)) as payments, "
-            + "cf_orgs.shortname " + "from cf_orgs " + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
-            + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
-            + "                             cf_transactions.transactiondate between :fromCreatedDate and :toCreatedDate "
-            + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
-            + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
-            + "where cf_orgs.idOfOrg in (:ids) "
-            + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
-            + "order by cf_orgs.shortname";
-
     private static final String TRANSACTIONS_SQL_WITHOUT_START_DATE = "select " + "cf_orgs.idoforg, "
             + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
             + "cf_contragents.contragentname, " + "int8(sum(cf_clientpayments.paysum)) as payments, "
-            + "cf_orgs.shortname " + "from cf_orgs " + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
-            + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
-            + "                             cf_transactions.transactiondate <= :toCreatedDate "
+            + "cf_orgs.shortname " + "from cf_orgs "
+            + "left join cf_transactions on cf_orgs.idoforg=cf_transactions.idoforg and "
+            + "cf_transactions.transactiondate  <= :toCreatedDate "
             + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
             + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
             + "where cf_orgs.idOfOrg in (:ids) "
@@ -118,7 +118,12 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
 
         /* Параметры для передачи в jasper */
         Map<String, Object> parameterMap = new HashMap<String, Object>();
-        parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
+        if (startTime != null) {
+            parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
+        } else {
+            parameterMap.put("beginDate", "Начало использования ИС ПП");
+        }
+
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         if (organizationType != null) {
             parameterMap.put("orgType", organizationType.toString());
@@ -160,14 +165,14 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
         Long totalDiff = 0L;
         Long totalDiscounts = 0L;
 
-        for (ClientPaymentItem clientPaymentItem: items) {
+        for (ClientPaymentItem clientPaymentItem : items) {
             totalPayment += clientPaymentItem.getP();
             totalSales += clientPaymentItem.getS();
             totalDiff += clientPaymentItem.getDif();
             totalDiscounts += clientPaymentItem.getDis();
         }
 
-        for (ClientPaymentItem clientPaymentItem: items) {
+        for (ClientPaymentItem clientPaymentItem : items) {
             clientPaymentItem.setTotalPayments(totalPayment);
             clientPaymentItem.setTotalSales(totalSales);
             clientPaymentItem.setTotalDiscounts(totalDiscounts);
@@ -262,7 +267,7 @@ public class ClientPaymentsBuilder extends BasicReportForAllOrgJob.Builder {
         }
 
         public Long getDif() {
-            return  (payments == null ? 0L : payments) - (sales == null ? 0L : sales);
+            return (payments == null ? 0L : payments) - (sales == null ? 0L : sales);
         }
 
         public String getSales() {
