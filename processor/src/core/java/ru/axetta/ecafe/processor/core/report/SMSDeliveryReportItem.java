@@ -19,6 +19,7 @@ import java.util.Map;
 public class SMSDeliveryReportItem implements Serializable {
     private int uniqueId;
     private long orgId;
+    private String district;
     private String orgName;
     private int columnId;
     private String shortNameInfoService;
@@ -30,11 +31,17 @@ public class SMSDeliveryReportItem implements Serializable {
     public SMSDeliveryReportItem() {
     }
 
-    public SMSDeliveryReportItem(int uniqueId, String orgName, int columnId, Map<String, String> values) {
+    public SMSDeliveryReportItem(int uniqueId, long orgId, String district, String orgName, int columnId,
+            String shortNameInfoService, String shortAddress, String introductionQueue, String orgStatus) {
         this.uniqueId = uniqueId;
+        this.orgId = orgId;
+        this.district = district;
         this.orgName = orgName;
         this.columnId = columnId;
-        this.values = values;
+        this.shortNameInfoService = shortNameInfoService;
+        this.shortAddress = shortAddress;
+        this.introductionQueue = introductionQueue;
+        this.orgStatus = orgStatus;
     }
 
     public int getUniqueId() {
@@ -51,6 +58,14 @@ public class SMSDeliveryReportItem implements Serializable {
 
     public void setOrgId(long orgId) {
         this.orgId = orgId;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     public String getOrgName() {

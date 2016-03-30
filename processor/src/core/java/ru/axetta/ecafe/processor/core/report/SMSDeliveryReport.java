@@ -525,6 +525,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             for(SMSDeliveryReportItem reportItem : items) {
                 Long orgId = reportItem.getOrgId();
                 Org org = (Org) session.get(Org.class, orgId);
+                reportItem.setDistrict(org.getDistrict());
                 reportItem.setShortNameInfoService(org.getShortNameInfoService());
                 reportItem.setShortAddress(org.getShortAddress());
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());

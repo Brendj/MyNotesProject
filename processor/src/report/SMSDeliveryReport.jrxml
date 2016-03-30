@@ -101,6 +101,7 @@
 	<field name="shortAddress" class="java.lang.String"/>
 	<field name="orgStatus" class="java.lang.String"/>
 	<field name="introductionQueue" class="java.lang.String"/>
+	<field name="district" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -160,43 +161,50 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e3fa2efa47" style="Crosstab Data Text" x="60" y="0" width="250" height="120"/>
+							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e3fa2efa47" style="Crosstab Data Text" x="180" y="0" width="250" height="120"/>
 							<textElement>
-								<font size="9" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Наименование ОО для поставщика]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="261d0b11-d9b2-4c16-bbab-92e3fa2efa47" style="Crosstab Data Text" x="310" y="0" width="250" height="120"/>
+							<reportElement uuid="261d0b11-d9b2-4c16-bbab-92e3fa2efa47" style="Crosstab Data Text" x="430" y="0" width="250" height="120"/>
 							<textElement>
-								<font size="9" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Краткое наименование ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="261b0b11-d9b2-4c36-bbab-91e2fa2efa47" style="Crosstab Data Text" x="560" y="0" width="250" height="120"/>
+							<reportElement uuid="261b0b11-d9b2-4c36-bbab-91e2fa2efa47" style="Crosstab Data Text" x="680" y="0" width="250" height="120"/>
 							<textElement>
-								<font size="9" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Короткий адрес]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="0" y="0" width="30" height="120"/>
 							<textElement>
-								<font size="9" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ п/п]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e7fa2efa27" style="Crosstab Data Text" x="30" y="0" width="30" height="120"/>
 							<textElement>
-								<font size="9" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[ИД]]></text>
 						</staticText>
+						<staticText>
+							<reportElement uuid="09f2075e-0ef1-4de8-9b86-ff48bf800d1c" style="Crosstab Data Text" x="60" y="0" width="120" height="120"/>
+							<textElement>
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Округ]]></text>
+						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="uniqueId" width="810">
+				<rowGroup name="uniqueId" width="930">
 					<bucket class="java.lang.Integer">
 						<bucketExpression><![CDATA[$F{uniqueId}]]></bucketExpression>
 					</bucket>
@@ -204,38 +212,33 @@
 						<cellContents>
 							<textField>
 								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063025" style="Crosstab Data Text" x="0" y="0" width="30" height="15"/>
-								<textElement>
-									<font size="9"/>
-								</textElement>
+								<textElement/>
 								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
 							</textField>
 							<textField>
 								<reportElement uuid="dea8f175-8b48-4a4a-8939-029c9a063022" style="Crosstab Data Text" x="30" y="0" width="30" height="15"/>
-								<textElement>
-									<font size="9"/>
-								</textElement>
+								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgId}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063021" style="Crosstab Data Text" x="60" y="0" width="250" height="15"/>
-								<textElement>
-									<font size="9"/>
-								</textElement>
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063021" style="Crosstab Data Text" x="180" y="0" width="250" height="15"/>
+								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgName}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="310" y="0" width="250" height="15"/>
-								<textElement>
-									<font size="9"/>
-								</textElement>
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="430" y="0" width="250" height="15"/>
+								<textElement/>
 								<textFieldExpression><![CDATA[$V{shortNameInfoService}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f111-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="560" y="0" width="250" height="15"/>
-								<textElement>
-									<font size="9"/>
-								</textElement>
+								<reportElement uuid="dea8f111-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="680" y="0" width="250" height="15"/>
+								<textElement/>
 								<textFieldExpression><![CDATA[$V{shortAddress}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="e7039376-1c25-4ae8-949d-9435f4d2f9cc" style="Crosstab Data Text" x="60" y="0" width="120" height="15"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -395,7 +398,10 @@
 				<measure name="orgStatus" class="java.lang.String">
 					<measureExpression><![CDATA[$F{orgStatus}]]></measureExpression>
 				</measure>
-				<crosstabCell width="1160" height="15">
+				<measure name="district" class="java.lang.String" calculation="Count">
+					<measureExpression><![CDATA[$F{district}]]></measureExpression>
+				</measure>
+				<crosstabCell width="1160" height="30">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
