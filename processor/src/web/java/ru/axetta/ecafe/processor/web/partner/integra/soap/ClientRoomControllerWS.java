@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import net.bull.javamelody.PayloadNameRequestWrapper;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
@@ -194,6 +196,65 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
               Transaction transaction) throws Exception {
+        }
+    }
+
+    private interface ISetHTTPData {
+        public void setIdOfSystem(String idOfSystem);
+        public void setSsoId(String ssoId);
+        public void setOperationType(String operationType);
+    }
+
+    private static class HTTPDataHandler implements ISetHTTPData {
+        private final HTTPData data;
+
+        public HTTPDataHandler(HTTPData data) {
+            this.data = data;
+        }
+        @Override
+        public void setIdOfSystem(String idOfSystem) {
+            data.setIdOfSystem(idOfSystem);
+        }
+        @Override
+        public void setSsoId(String ssoId) {
+            data.setSsoId(ssoId);
+        }
+        @Override
+        public void setOperationType(String operationType) {
+            data.setOperationType(operationType);
+        }
+        public HTTPData getData() {
+            return data;
+        }
+    }
+
+    private static class HTTPData {
+        private String idOfSystem;
+        private String ssoId;
+        private String operationType;
+
+        public String getIdOfSystem() {
+            return idOfSystem;
+        }
+
+        public void setIdOfSystem(String idOfSystem) {
+            this.idOfSystem = idOfSystem;
+        }
+
+        public String getSsoId() {
+            return ssoId;
+        }
+
+        public void setSsoId(String ssoId) {
+            this.ssoId = ssoId;
+        }
+
+        public String getOperationType() {
+            return operationType;
+        }
+
+        public void setOperationType(String operationType) {
+            this.operationType = operationType;
         }
     }
 
@@ -1626,7 +1687,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryResult getSummary(String san) {
-        authenticateRequest(null);
+        HTTPData data1 = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data1);
+        authenticateRequest(null, handler);
+        Date date = new Date(System.currentTimeMillis());
+        //authenticateRequest(null);
 
         Data data = new ClientRequest()
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
@@ -1636,6 +1701,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                   }
               });
 
+        if (data.getClientSummaryExt() != null) {
+            Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
+            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                idOfClient, handler.getData().getOperationType());
+        }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
         clientSummaryResult.clientSummary = data.getClientSummaryExt();
         clientSummaryResult.resultCode = data.getResultCode();
@@ -1645,7 +1715,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryResult getSummaryByTypedId(String id, int idType) {
-        authenticateRequest(null);
+        HTTPData data1 = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data1);
+        authenticateRequest(null, handler);
+        Date date = new Date(System.currentTimeMillis());
+        //authenticateRequest(null);
 
         Object idVal = null;
         if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) {
@@ -1667,6 +1741,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         });
 
+        if (data.getClientSummaryExt() != null) {
+            Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
+            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                idOfClient, handler.getData().getOperationType());
+        }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
         clientSummaryResult.clientSummary = data.getClientSummaryExt();
         clientSummaryResult.resultCode = data.getResultCode();
@@ -3300,7 +3379,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     public ClientsData getClientsByGuardMobile(String mobile) {
-        authenticateRequest(null);
+        //authenticateRequest(null);
 
         ClientsData data = new ClientsData();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -3644,7 +3723,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryExt[] getSummaryByGuardSan(String guardSan) {
-        authenticateRequest(null);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(null, handler);
+        Date date = new Date(System.currentTimeMillis());
+        //authenticateRequest(null);
 
         ClientsData cd = getClientsByGuardSan(guardSan);
         LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
@@ -3653,6 +3736,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ClientSummaryResult cs = getSummary(ci.getContractId());
                 if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
+                    Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId()).getIdOfClient();
+                    saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                            idOfClient, handler.getData().getOperationType());
                 }
             }
         }
@@ -3661,7 +3747,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public ClientSummaryExtListResult getSummaryByGuardMobile(String guardMobile) {
-        authenticateRequest(null);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(null, handler);
+        Date date = new Date(System.currentTimeMillis());
 
         ClientsData cd = getClientsByGuardMobile(guardMobile);
 
@@ -3671,6 +3760,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ClientSummaryResult cs = getSummary(ci.getContractId());
                 if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
+                    Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId()).getIdOfClient();
+                    saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                            idOfClient, handler.getData().getOperationType());
                 }
             }
         }
@@ -3683,6 +3775,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryExtListResult;
     }
 
+    private void saveLogInfoService(String idOfSystem, Date createdDate, String ssoId, Long idOfClient, String opType) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String strIsOn = runtimeContext.getConfigProperties().getProperty("ecafe.processor.log.infoservice", "0");
+        if (strIsOn.equals("0")) {
+            return;
+        }
+        if (opType != null && opType.trim().equals("")) {
+            return;
+        }
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(LogInfoServiceOperationType.class);
+            criteria.add(Restrictions.eq("nameOfOperationType", opType));
+            LogInfoServiceOperationType type = (LogInfoServiceOperationType)criteria.uniqueResult();
+            if (type == null) {
+                type = new LogInfoServiceOperationType(opType);
+                session.persist(type);
+            }
+
+            LogInfoService log = new LogInfoService(idOfSystem, createdDate, ssoId, idOfClient, type);
+            session.persist(log);
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error saving record to LogInfoService: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 /*    @Override
     public ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
         Long contractIdLong = Long.valueOf(contractId);
@@ -3879,7 +4005,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "limit") long limit) {
-        authenticateRequest(contractId);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
+        Date date = new Date(System.currentTimeMillis());
+        //authenticateRequest(contractId);
 
         Result r = new Result(RC_OK, RC_OK_DESC);
         if (limit < 0) {
@@ -3888,6 +4018,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
             r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+        } else {
+            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                    idOfClient, handler.getData().getOperationType());
         }
         return r;
     }
@@ -4881,6 +5015,100 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error("Failed to send linking token", e);
             return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         }
+    }
+
+    //TODO оставить только один метод authenticateRequest
+    IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId, HTTPDataHandler handler) throws Error {
+        if (RuntimeContext.getInstance().isTestMode()){
+            return null;
+        }
+        MessageContext jaxwsContext = context.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
+        String clientAddress = request.getRemoteAddr();
+        ////
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        X509Certificate[] certificates = (X509Certificate[]) request
+                .getAttribute("javax.servlet.request.X509Certificate");
+        ////
+        IntegraPartnerConfig.LinkConfig linkConfig = null;
+        String DNs = "";
+        if (certificates != null && certificates.length > 0) {
+            for (int n = 0; n < certificates.length; ++n) {
+                String dn = certificates[0].getSubjectDN().getName();
+                linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
+                if (linkConfig != null) {
+                    break;
+                }
+                DNs += dn + ";";
+            }
+        }
+        /////
+        // пробуем по имени и паролю
+        if (linkConfig == null) {
+            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) jaxwsContext
+                    .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
+            if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
+                linkConfig = runtimeContext.getIntegraPartnerConfig()
+                        .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
+                                authorizationPolicy.getPassword());
+                if (handler != null) {
+                    handler.setIdOfSystem(authorizationPolicy.getUserName());
+                }
+            }
+            if (handler != null) {
+                if (jaxwsContext.containsKey("org.apache.cxf.message.Message.PROTOCOL_HEADERS")) {
+                    Map<String, Object> map = (Map)jaxwsContext.get("org.apache.cxf.message.Message.PROTOCOL_HEADERS");
+                    if (map.containsKey("USER_SSOID")) {
+                        List<String> ssoIds = (List)map.get("USER_SSOID");
+                        String ssoId = ssoIds.get(0);
+                        handler.setSsoId(ssoId);
+                    }
+                }
+                if (jaxwsContext.containsKey("HTTP.REQUEST")) {
+                    PayloadNameRequestWrapper wrapper = (PayloadNameRequestWrapper)jaxwsContext.get("HTTP.REQUEST");
+                    String methodName = wrapper.getPayloadRequestName();
+                    if (methodName != null && methodName.startsWith(".")) {
+                        methodName = methodName.substring(1, methodName.length());
+                    }
+                    handler.setOperationType(methodName);
+                }
+            }
+        }
+        /////
+        if (linkConfig == null) {
+            linkConfig = runtimeContext.getIntegraPartnerConfig()
+                    .getLinkConfigWithAuthTypeNoneAndMatchingAddress(clientAddress);
+        } else {
+            // check remote addr
+            if (!linkConfig.matchAddress(clientAddress)) {
+                throw new Error("Integra partner auth failed: remote address does not match: " + clientAddress
+                        + " for link config: " + linkConfig.id + "; request: ip=" + clientAddress + "; ssl DNs=" + DNs);
+            }
+        }
+        /////
+        if (linkConfig == null) {
+            throw new Error(
+                    "Integra partner auth failed: link config not found: ip=" + clientAddress + "; ssl DNs=" + DNs);
+        }
+        /////
+        if (contractId != null && linkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
+            DAOService daoService = DAOService.getInstance();
+            Client client = null;
+            try {
+                client = daoService.getClientByContractId(contractId);
+            } catch (Throwable e) {
+            }
+            if (client == null) {
+                throw new Error("Integra partner auth failed: client not found: contractId=" + contractId + "; ip="
+                        + clientAddress + "; ssl DNs=" + DNs);
+            }
+
+            if (!client.hasIntegraPartnerAccessPermission(linkConfig.id)) {
+                throw new Error("Integra partner auth failed: access prohibited for client: contractId=" + contractId
+                        + ", authorize client first; ip=" + clientAddress + "; ssl DNs=" + DNs);
+            }
+        }
+        return linkConfig;
     }
 
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
@@ -6914,6 +7142,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //ProhibitionResult
     @Override
     public ProhibitionsResult addProhibition(Long contractId, String filterText, Integer filterType) {
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
+        Date date = new Date(System.currentTimeMillis());
         Session session = null;
         Transaction transaction = null;
         ProhibitionsResult result = new ProhibitionsResult();
@@ -6928,6 +7160,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_CLIENT_NOT_FOUND_DESC;
                     return result;
                 }
+                saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        client.getIdOfClient(), handler.getData().getOperationType());
 
                 long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
 
@@ -6983,6 +7217,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //возврат result
     @Override
     public ProhibitionsResult removeProhibition(Long contractId, Long prohibitionId) {
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
+        Date date = new Date(System.currentTimeMillis());
         Session session = null;
         Transaction transaction = null;
         ProhibitionsResult result = new ProhibitionsResult();
@@ -6996,6 +7234,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_CLIENT_NOT_FOUND_DESC;
                     return result;
                 }
+
+                saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                        client.getIdOfClient(), handler.getData().getOperationType());
+
                 long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
                 ProhibitionMenu prohibitionMenu = null;
 

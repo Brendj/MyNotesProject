@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.LogInfoServiceOperationType" table="cf_log_infoservice_operation_types">
+        <id name="idOfOperationType" column="IdOfOperationType" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="nameOfOperationType" column="NameOfOperationType" type="string" length="50" />
+    </class>
+</hibernate-mapping>
+
+
