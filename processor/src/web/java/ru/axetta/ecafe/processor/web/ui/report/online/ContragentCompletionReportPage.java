@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.card.CardExpireBatchEditPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrganizationTypeModifyMenu;
 
@@ -172,7 +171,9 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
                     ContragentCompletionItem resultContragentCompletionItem = new ContragentCompletionItem(contragentList);
                     resultContragentCompletionItem.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
                     resultContragentCompletionItem.addContragentPayItems(contragentCompletionItemWithTransactionOrgIsNull.getContragentPayItems());
-                    resultContragentCompletionItem.setEducationalInstitutionName(contragentCompletionItem.getEducationalInstitutionName());
+                    resultContragentCompletionItem.setEducationalId(contragentCompletionItem.getEducationalId());
+                    // Добавляем ИД организации в строку ее названия
+                    resultContragentCompletionItem.setEducationalInstitutionName(contragentCompletionItem.getEducationalId() + " " + contragentCompletionItem.getEducationalInstitutionName());
                     resultContragentCompletionItem.setEducationalCity(contragentCompletionItem.getEducationalCity());
                     resultContragentCompletionItem.setEducationalLocation(contragentCompletionItem.getEducationalLocation());
                     resultContragentCompletionItem.setEducationalTags(contragentCompletionItem.getEducationalTags());

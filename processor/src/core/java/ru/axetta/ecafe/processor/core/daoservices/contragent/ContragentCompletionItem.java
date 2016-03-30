@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class ContragentCompletionItem {
 
+    /* ИД образовательного учереждения */
+    private Long educationalId;
     /* короткое наименование образовательного учереждения */
     private String educationalInstitutionName;
     /* короткое наименование образовательного учереждения */
@@ -51,6 +53,14 @@ public class ContragentCompletionItem {
             contragentPayItems.put(id, value);
             totalSumByOrg+=value;
         }
+    }
+
+    public Long getEducationalId() {
+        return educationalId;
+    }
+
+    public void setEducationalId(Long educationalId) {
+        this.educationalId = educationalId;
     }
 
     public Long getContragentPayValue(Long idOfContragent){

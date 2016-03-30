@@ -79,8 +79,8 @@
                     var="contragentCompletionItem" rowKeyVar="row">
         <f:facet name="header">
             <rich:columnGroup>
-                <%--colspan="4" с учетом скрытия полей "Локация", "Тэги"--%>
-                <rich:column colspan="2">
+                <%--colspan="5" с учетом скрытия полей "Локация", "Тэги"--%>
+                <rich:column colspan="3">
                     <h:outputText value="Организация"/>
                 </rich:column>
                 <rich:column colspan="#{contragentCompletionReportPage.contragentListCount}">
@@ -94,6 +94,9 @@
                 </rich:column>
                 <rich:column breakBefore="true">
                     <h:outputText value="Город"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="ИД"/>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="Наименование"/>
@@ -111,6 +114,9 @@
         </f:facet>
         <rich:column>
             <h:outputText value="#{contragentCompletionItem.educationalCity}"/>
+        </rich:column>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalId}"/>
         </rich:column>
         <rich:column>
             <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
