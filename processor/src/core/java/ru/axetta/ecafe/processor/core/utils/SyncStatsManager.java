@@ -364,10 +364,6 @@ public class SyncStatsManager {
 
             Criteria criteria = persistenceSession.createCriteria(SyncHistoryCalc.class);
             criteria.add(Restrictions.between("syncDay", periodStart, periodEnd));
-            System.out.println(periodStart);
-            System.out.println(periodEnd);
-            System.out.println(criteria);
-
             yesterdaySyncHistoryCalcList = criteria.list();
 
 
@@ -384,8 +380,10 @@ public class SyncStatsManager {
                         syncMapByOrg.put(idOfOrg, newSyncHistoryCalc);
                     }
                 }
-                persistenceSession.createQuery("delete SyncHistoryCalc where syncDay between :periodStart and :periodEnd")
-                        .setDate("periodStart", periodStart).setDate("periodEnd", periodEnd).executeUpdate();
+                persistenceSession.createQuery(
+                        "delete SyncHistoryCalc where syncDay between :periodStart and :periodEnd")
+                        .setLong("periodStart", periodStart.getTime())
+                        .setLong("periodEnd", periodEnd.getTime()).executeUpdate();
             }
 
             for (Long idOfOrg : syncMapByOrg.keySet()) {
