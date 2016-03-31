@@ -159,7 +159,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             query.setParameter("idoforg", idOfOrgL);
             Long count = ((BigInteger) query.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(1L, "1.1", count, "Социальные карты учащихся", "Количество СКУ.");
+            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(1L, "1.1", count, "Социальные карты учащихся", "Количество СКУ, зарегистрированных в ОО и активных");
             items.add(item);
 
             //1.2
@@ -173,18 +173,18 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryEno.setParameter("idoforg", idOfOrgL);
             Long countEno = ((BigInteger) queryEno.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemEno = new InteractiveCardDataReportItem(2L, "1.2", countEno, "Другие виды электронных карт", "Количество прочих видов карт (УЭК, транспортная, СКМ и т.д.).");
+            InteractiveCardDataReportItem itemEno = new InteractiveCardDataReportItem(2L, "1.2", countEno, "Другие виды электронных карт", "Количество прочих видов  карт, зарегистрированных в ОО и активных (УЭК, транспортная, СКМ и т.д.)");
             items.add(itemEno);
 
             //1.3 Будут считаться отдельно только после введения данного типа карты, пока 0
             Long countOth = 0L;
-            InteractiveCardDataReportItem itemOth = new InteractiveCardDataReportItem(3L, "1.3", countOth, "Прочие электронные карты", "Количество карт внештатных работников (сотрудники поставщика питания и т.д.)");
+            InteractiveCardDataReportItem itemOth = new InteractiveCardDataReportItem(3L, "1.3", countOth, "Прочие электронные карты", "Количество карт сотрудников поставщика питания");
             items.add(itemOth);
 
             //1.
             Long fondEl = count + countEno + countOth;
 
-            InteractiveCardDataReportItem itemFondEl = new InteractiveCardDataReportItem(0L, "1", fondEl, "Фонд поступивших электронных карт (не сервисных)", "Количество не сервисных ЭК различных видов, которые используются в качестве постоянных (зарегистрированы в ИС ПП и находятся на руках у пользователей на текущую дату).");
+            InteractiveCardDataReportItem itemFondEl = new InteractiveCardDataReportItem(0L, "1", fondEl, "Фонд поступивших электронных карт (не сервисных)", "Количество не сервисных электронных карт различных видов, используемых в ОО в качестве постоянных (зарегистрированы в ОО и находятся на руках у пользователей на текущую дату)");
             items.add(itemFondEl);
 
             //3.
@@ -198,7 +198,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryActive.setParameter("idoforg", idOfOrgL);
             Long countActive = ((BigInteger) queryActive.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemActive = new InteractiveCardDataReportItem(8L, "3", countActive, "Фонд активных сервисных карт (в обороте)", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт.");
+            InteractiveCardDataReportItem itemActive = new InteractiveCardDataReportItem(8L, "3", countActive, "Фонд активных сервисных карт (в обороте)", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт");
             items.add(itemActive);
 
             //3.1
@@ -212,7 +212,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryFin.setParameter("idoforg", idOfOrgL);
             Long countFin = ((BigInteger) queryFin.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemFin = new InteractiveCardDataReportItem(9L, "3.1", countFin, "В том числе карты с истекшим сроком действия", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт с истекшим сроком действия.");
+            InteractiveCardDataReportItem itemFin = new InteractiveCardDataReportItem(9L, "3.1", countFin, "В том числе карты с истекшим сроком действия", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт с истекшим сроком действия");
             items.add(itemFin);
 
             //4.
@@ -259,7 +259,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             vibivZablock = countVibiv + countNeisp + countNeispProch;
 
             //4.
-            InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", vibivZablock, "Фонд заблокированных и иных неиспользуемых сервисных карт", "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда.");
+            InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", vibivZablock, "Фонд заблокированных и иных неиспользуемых сервисных карт", "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
             items.add(itemZablock);
         }
 
@@ -286,34 +286,34 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
                 if (idOfRecord == 0L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1", Long.valueOf(value), "в рамках ГК на внедрение", "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1).");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1", Long.valueOf(value), "в рамках ГК на внедрение", "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 1L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2", Long.valueOf(value), "в рамках ГК на сервис", "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2).");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2", Long.valueOf(value), "в рамках ГК на сервис", "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 2L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(7L, "2.3", Long.valueOf(value), "Закуплено ОО", "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3).");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(7L, "2.3", Long.valueOf(value), "Закуплено ОО", "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 3L) {
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(12L, "6", Long.valueOf(value), "Фонд резервных карт, доступных к использованию", "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5).");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(12L, "6", Long.valueOf(value), "Фонд резервных карт, доступных к использованию", "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 4L) {
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(11L, "5", Long.valueOf(value), "Потери сервисных  карт", "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5).");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(11L, "5", Long.valueOf(value), "Потери сервисных  карт", "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
                     items.add(item);
                 }
             }
 
-            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk, "Фонд поступивших сервисных карт", "Количество сервисных карт, зарегистрированных в ИС ПП.");
+            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk, "Фонд поступивших сервисных карт", "Количество сервисных карт, зарегистрированных в ИС ПП");
             items.add(item);
 
             return items;
