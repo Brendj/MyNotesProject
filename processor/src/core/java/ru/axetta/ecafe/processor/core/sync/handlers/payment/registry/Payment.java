@@ -227,7 +227,7 @@ public class Payment {
      * @return true - информирование разрешено, false - информирование запрещено
      */
     public boolean isNotify() {
-        switch (orderType) {
+        /*switch (orderType) {
             case DEFAULT:
             case VENDING:
             case PAY_PLAN:
@@ -235,6 +235,7 @@ public class Payment {
                 return true;
             default:
                 return false;
-        }
+        }*/
+        return true;
     }
 }
