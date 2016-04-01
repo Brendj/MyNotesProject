@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryCalc;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.SyncType;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -330,13 +331,21 @@ public class SyncStatsManager {
         }
     }
 
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.savesynchistory.node", "1");
+        return !(StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
+                .equals(reqInstance.trim()));
+    }
+
     /**
      * Обертка для запуска по расписанию
      *
      * @throws Exception
      */
     public void processLogData() throws Exception {
-        if (SyncCollector.getReportOn()) {
+        if (SyncCollector.getReportOn() && isOn()) {
             processLogData(1);
         }
     }
