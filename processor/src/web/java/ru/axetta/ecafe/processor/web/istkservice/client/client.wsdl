@@ -1,0 +1,147 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="IstkController" targetNamespace="http://soap.services.school.istk.axetta.ru/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.services.school.istk.axetta.ru/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://soap.services.school.istk.axetta.ru/" version="1.0" xmlns:tns="http://soap.services.school.istk.axetta.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="baseResult" type="tns:baseResult"/>
+<xs:element name="getSchools" type="tns:getSchools"/>
+<xs:element name="getSchoolsResponse" type="tns:getSchoolsResponse"/>
+<xs:element name="pair" type="tns:pair"/>
+<xs:element name="plainSchool" type="tns:plainSchool"/>
+<xs:element name="saveSchoolsGamePermissions" type="tns:saveSchoolsGamePermissions"/>
+<xs:element name="saveSchoolsGamePermissionsResponse" type="tns:saveSchoolsGamePermissionsResponse"/>
+<xs:element name="schoolListResult" type="tns:schoolListResult"/>
+<xs:complexType name="saveSchoolsGamePermissions">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="options" type="tns:pair"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="pair">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:long"/>
+      <xs:element minOccurs="0" name="flag" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="saveSchoolsGamePermissionsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:baseResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="baseResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="resultDescription" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSchools">
+    <xs:sequence/>
+  </xs:complexType>
+<xs:complexType name="getSchoolsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:schoolListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="schoolListResult">
+    <xs:complexContent>
+      <xs:extension base="tns:baseResult">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="schoolList" nillable="true" type="tns:plainSchool"/>
+          <xs:element name="districts">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:long"/>
+                      <xs:element minOccurs="0" name="value" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="areas">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="entry">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" name="key" type="xs:long"/>
+                      <xs:element minOccurs="0" name="value" type="xs:string"/>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+<xs:complexType name="plainSchool">
+    <xs:sequence>
+      <xs:element name="schoolId" type="xs:long"/>
+      <xs:element minOccurs="0" name="schoolName" type="xs:string"/>
+      <xs:element name="permitGame" type="xs:boolean"/>
+      <xs:element name="districtId" type="xs:long"/>
+      <xs:element name="areaId" type="xs:long"/>
+      <xs:element name="isppId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="saveSchoolsGamePermissionsResponse">
+    <wsdl:part element="tns:saveSchoolsGamePermissionsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSchoolsResponse">
+    <wsdl:part element="tns:getSchoolsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="saveSchoolsGamePermissions">
+    <wsdl:part element="tns:saveSchoolsGamePermissions" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSchools">
+    <wsdl:part element="tns:getSchools" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IstkController">
+    <wsdl:operation name="saveSchoolsGamePermissions">
+      <wsdl:input message="tns:saveSchoolsGamePermissions" name="saveSchoolsGamePermissions">
+    </wsdl:input>
+      <wsdl:output message="tns:saveSchoolsGamePermissionsResponse" name="saveSchoolsGamePermissionsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSchools">
+      <wsdl:input message="tns:getSchools" name="getSchools">
+    </wsdl:input>
+      <wsdl:output message="tns:getSchoolsResponse" name="getSchoolsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="IstkControllerSoapBinding" type="tns:IstkController">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="saveSchoolsGamePermissions">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="saveSchoolsGamePermissions">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="saveSchoolsGamePermissionsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSchools">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSchools">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSchoolsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="IstkController">
+    <wsdl:port binding="tns:IstkControllerSoapBinding" name="IstkControllerPort">
+      <soap:address location="http://localhost:8080/istk-school/soap/client"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

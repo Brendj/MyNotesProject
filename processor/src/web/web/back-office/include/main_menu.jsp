@@ -1182,6 +1182,9 @@
     <%--@elvariable id="licInfoPage" type="ru.axetta.ecafe.processor.web.ui.option.LicInfoPage"--%>
     <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
                         action="#{licInfoPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="istkKioskOptionsPage" type="ru.axetta.ecafe.processor.web.ui.option.IstkKioskOptionsPage"--%>
+    <rich:panelMenuItem id="showIstkKioskOptionsMenuItem" binding="#{istkKioskOptionsPage.mainMenuComponent}"
+                        label="Инфокиоски" action="#{istkKioskOptionsPage.show}" reRender="workspaceForm"/>
 
 </rich:panelMenuGroup>
 
