@@ -95,9 +95,22 @@ public class ZeroTransactionsProcessor extends AbstractProcessor<ResZeroTransact
         ResZeroTransactionItem resItem;
         List<ZeroTransaction> list = DAOUtils.getZeroTransactionsForOrgSinceVersion(session,
                 zeroTransactions.getIdOfOrgOwner(), zeroTransactions.getMaxVersion());
+        boolean found = false;
         for (ZeroTransaction zt : list) {
-            resItem = new ResZeroTransactionItem(zt);
-            items.add(resItem);
+            for (ZeroTransactionItem z : zeroTransactions.getItems()) {
+                if (zt.getCompositeIdOfZeroTransaction().getIdOfOrg().equals(z.getIdOfOrg())
+                        &&
+                        zt.getCompositeIdOfZeroTransaction().getIdOfCriteria().equals(z.getIdOfCriteria())
+                        &&
+                        zt.getCompositeIdOfZeroTransaction().getTransactionDate().equals(z.getDate())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                resItem = new ResZeroTransactionItem(zt);
+                items.add(resItem);
+            }
         }
 
         result.setItems(items);
