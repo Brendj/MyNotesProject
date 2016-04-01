@@ -46,7 +46,11 @@ public class ZeroTransactionsReport extends BasicReportForListOrgsJob {
     }
 
     public ZeroTransactionsReport setHtmlReport(String htmlReport) {
-        this.htmlReport = htmlReport;
+        if (htmlReport.length() < 500) {
+            this.htmlReport = "Нет данных по выбранному условию";
+        } else {
+            this.htmlReport = htmlReport;
+        }
         return this;
     }
 

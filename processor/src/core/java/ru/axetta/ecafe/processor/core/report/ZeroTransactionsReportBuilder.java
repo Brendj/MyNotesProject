@@ -69,6 +69,7 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
         exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
         exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
         exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+        exporter.setParameter(JRHtmlExporterParameter.IS_WRAP_BREAK_WORD, Boolean.TRUE);
         exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
         exporter.exportReport();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
@@ -114,18 +115,18 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
             String commentPaydable = "";
             switch (zt.getCompositeIdOfZeroTransaction().getIdOfCriteria()) {
                 case ZT_TYPE_INOUT:
-                    normInOut = zt.getTargetLevel();
-                    factInOut = zt.getActualLevel() * 100 / zt.getTargetLevel();
+                    normInOut = zt.getCriteriaLevel();
+                    factInOut = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
                     commentInOut = zt.getComment();
                     break;
                 case ZT_TYPE_DISCOUNTPLAN:
-                    normDiscount = zt.getTargetLevel();
-                    factDiscount = zt.getActualLevel() * 100 / zt.getTargetLevel();
+                    normDiscount = zt.getCriteriaLevel();
+                    factDiscount = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
                     commentDiscount = zt.getComment();
                     break;
                 case ZT_TYPE_PAYDABLEPLAN:
-                    normPaydable = zt.getTargetLevel();
-                    factPaydable = zt.getActualLevel() * 100 / zt.getTargetLevel();
+                    normPaydable = zt.getCriteriaLevel();
+                    factPaydable = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
                     commentPaydable = zt.getComment();
                     break;
             }
