@@ -933,6 +933,15 @@ public class Processor
             logger.error(message, e);
         }
 
+        try {
+            goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process goods basic basket data , IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
         // Process menu from Org
         try {
             processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
@@ -1130,14 +1139,14 @@ public class Processor
             logger.error(message, e);
         }
 
-        try {
+        /*try {
             goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String
                     .format("Failed to process goods basic basket data , IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
-        }
+        }*/
 
         try {
             if (request.getManager() != null) {
@@ -3711,6 +3720,11 @@ public class Processor
 
             String delSql = "delete ComplexInfo  where menuDetail=:md";
             query = persistenceSession.createQuery(delSql);
+            query.setParameter("md", menuDetail);
+            query.executeUpdate();
+
+            String updSql = "update GoodBasicBasketPrice b set b.menuDetail=null where b.menuDetail=:md";
+            query = persistenceSession.createQuery(updSql);
             query.setParameter("md", menuDetail);
             query.executeUpdate();
 
