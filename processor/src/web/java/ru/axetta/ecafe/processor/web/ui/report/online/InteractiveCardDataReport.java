@@ -227,7 +227,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             //3.1
             String sqlFin = "SELECT count(cfc.cardno) FROM cf_cards cfc"
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
                     + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
                     + " AND cfc.validdate < :validdate "
@@ -248,35 +248,41 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             Long vibivZablock = 0L;
 
             //4.1
-            String sqlVibiv = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0, 6) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " IN (1100000060, 1100000070)";
+            String sqlVibiv = "SELECT count(cfc.cardno) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,6,4,1) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
+                    + " AND cfcl.idofclientgroup IN (1100000060, 1100000070)";
 
             Query queryVibiv = session.createSQLQuery(sqlVibiv);
             queryVibiv.setParameter("idoforg", idOfOrgL);
+            queryVibiv.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countVibiv = ((BigInteger) queryVibiv.uniqueResult()).longValue();
 
             //4.2
-            String sqlNeisp = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (6) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " NOT IN (1100000060, 1100000070)";
+            String sqlNeisp = "SELECT count(cfc.idofclient) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (6) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
+                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryNeisp = session.createSQLQuery(sqlNeisp);
             queryNeisp.setParameter("idoforg", idOfOrgL);
+            queryNeisp.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countNeisp = ((BigInteger) queryNeisp.uniqueResult()).longValue();
 
             //4.3
-            String sqlNeispProch = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.state IN (5) AND cfo.idoforg = :idoforg";
+            String sqlNeispProch = "SELECT count(cfc.idofclient) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " WHERE cfc.state IN (5) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)";
 
             Query queryNeispProch = session.createSQLQuery(sqlNeispProch);
             queryNeispProch.setParameter("idoforg", idOfOrgL);
+            queryNeispProch.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countNeispProch = ((BigInteger) queryNeispProch.uniqueResult()).longValue();
 
             for (InteractiveCardDataReportItem itemThree : items) {
