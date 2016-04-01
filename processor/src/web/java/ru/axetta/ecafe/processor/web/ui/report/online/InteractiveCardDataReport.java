@@ -15,10 +15,10 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TransactionsReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -153,14 +153,14 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
             List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOfOrgL);
 
-            for (Org org: friendlyOrgs) {
+            for (Org org : friendlyOrgs) {
                 friendlyOrgsIds.add(org.getIdOfOrg());
             }
 
             //1.1
             String sql = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                     + " WHERE cfc.cardtype IN (3) AND cfc.state IN (0, 4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
@@ -177,7 +177,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             //1.2
             String sqlEno = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                     + " WHERE cfc.cardtype IN (0,4,5,6) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
@@ -207,14 +207,16 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             items.add(itemFondEl);
 
             //3.
-            String sqlActive = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " NOT IN (1100000060, 1100000070)";
+            String sqlActive = "SELECT count(cfc.cardno) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
+                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryActive = session.createSQLQuery(sqlActive);
             queryActive.setParameter("idoforg", idOfOrgL);
+            queryActive.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countActive = ((BigInteger) queryActive.uniqueResult()).longValue();
 
             InteractiveCardDataReportItem itemActive = new InteractiveCardDataReportItem(8L, "3", countActive,
@@ -223,14 +225,18 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             items.add(itemActive);
 
             //3.1
-            String sqlFin = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " NOT IN (1100000060, 1100000070)";
+            String sqlFin = "SELECT count(cfc.cardno) FROM cf_cards cfc"
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
+                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
+                    + " AND cfc.validdate < :validdate "
+                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryFin = session.createSQLQuery(sqlFin);
             queryFin.setParameter("idoforg", idOfOrgL);
+            queryFin.setParameterList("friendlyOrgs", friendlyOrgsIds);
+            queryFin.setParameter("validdate", CalendarUtils.truncateToDayOfMonth(new Date()).getTime());
             Long countFin = ((BigInteger) queryFin.uniqueResult()).longValue();
 
             InteractiveCardDataReportItem itemFin = new InteractiveCardDataReportItem(9L, "3.1", countFin,
