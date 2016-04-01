@@ -14,6 +14,8 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TransactionsReport;
@@ -27,10 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.*;
 
 /**
@@ -106,9 +106,9 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
 
 
-
             if (!exportToHTML) {
-                return new InteractiveCardDataReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint, items);
+                return new InteractiveCardDataReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, items);
             } else {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -130,7 +130,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        private List<InteractiveCardDataReportItem> findItems(Session session, String idOfOrg) {
+        private List<InteractiveCardDataReportItem> findItems(Session session, String idOfOrg) throws Exception {
 
             List<InteractiveCardDataReportItem> items = new ArrayList<InteractiveCardDataReportItem>();
 
@@ -143,48 +143,67 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             return items;
         }
 
-        private void getFromCardData(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items) {
+        private void getFromCardData(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items)
+                throws Exception {
 
             Long idOfOrgL = Long.valueOf(idOfOrg);
 
 
+            List<Long> friendlyOrgsIds = new ArrayList<Long>();
+
+            List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOfOrgL);
+
+            for (Org org: friendlyOrgs) {
+                friendlyOrgsIds.add(org.getIdOfOrg());
+            }
+
             //1.1
-            String sql = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (3) AND cfc.state IN (0, 4) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " NOT IN (1100000060, 1100000070)";
+            String sql = "SELECT count(cfc.cardno) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                    + " WHERE cfc.cardtype IN (3) AND cfc.state IN (0, 4) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
+                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query query = session.createSQLQuery(sql);
             query.setParameter("idoforg", idOfOrgL);
+            query.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long count = ((BigInteger) query.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(1L, "1.1", count, "Социальные карты учащихся", "Количество СКУ, зарегистрированных в ОО и активных");
+            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(1L, "1.1", count,
+                    "Социальные карты учащихся", "Количество СКУ, зарегистрированных в ОО и активных");
             items.add(item);
 
             //1.2
-            String sqlEno = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                    + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (0,4,5,6) AND cfc.state IN (0) AND cfo.idoforg = :idoforg  AND cfcl.idofclientgroup "
-                    + " NOT IN (1100000060, 1100000070)";
+            String sqlEno = "SELECT count(cfc.cardno) FROM cf_cards cfc "
+                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
+                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
+                    + " WHERE cfc.cardtype IN (0,4,5,6) AND cfc.state IN (0,4) "
+                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
+                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryEno = session.createSQLQuery(sqlEno);
             queryEno.setParameter("idoforg", idOfOrgL);
+            queryEno.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countEno = ((BigInteger) queryEno.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemEno = new InteractiveCardDataReportItem(2L, "1.2", countEno, "Другие виды электронных карт", "Количество прочих видов  карт, зарегистрированных в ОО и активных (УЭК, транспортная, СКМ и т.д.)");
+            InteractiveCardDataReportItem itemEno = new InteractiveCardDataReportItem(2L, "1.2", countEno,
+                    "Другие виды электронных карт",
+                    "Количество прочих видов  карт, зарегистрированных в ОО и активных (УЭК, транспортная, СКМ и т.д.)");
             items.add(itemEno);
 
             //1.3 Будут считаться отдельно только после введения данного типа карты, пока 0
             Long countOth = 0L;
-            InteractiveCardDataReportItem itemOth = new InteractiveCardDataReportItem(3L, "1.3", countOth, "Прочие электронные карты", "Количество карт сотрудников поставщика питания");
+            InteractiveCardDataReportItem itemOth = new InteractiveCardDataReportItem(3L, "1.3", countOth,
+                    "Прочие электронные карты", "Количество карт сотрудников поставщика питания");
             items.add(itemOth);
 
             //1.
             Long fondEl = count + countEno + countOth;
 
-            InteractiveCardDataReportItem itemFondEl = new InteractiveCardDataReportItem(0L, "1", fondEl, "Фонд поступивших электронных карт (не сервисных)", "Количество не сервисных электронных карт различных видов, используемых в ОО в качестве постоянных (зарегистрированы в ОО и находятся на руках у пользователей на текущую дату)");
+            InteractiveCardDataReportItem itemFondEl = new InteractiveCardDataReportItem(0L, "1", fondEl,
+                    "Фонд поступивших электронных карт (не сервисных)",
+                    "Количество не сервисных электронных карт различных видов, используемых в ОО в качестве постоянных (зарегистрированы в ОО и находятся на руках у пользователей на текущую дату)");
             items.add(itemFondEl);
 
             //3.
@@ -198,7 +217,9 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryActive.setParameter("idoforg", idOfOrgL);
             Long countActive = ((BigInteger) queryActive.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemActive = new InteractiveCardDataReportItem(8L, "3", countActive, "Фонд активных сервисных карт (в обороте)", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт");
+            InteractiveCardDataReportItem itemActive = new InteractiveCardDataReportItem(8L, "3", countActive,
+                    "Фонд активных сервисных карт (в обороте)",
+                    "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт");
             items.add(itemActive);
 
             //3.1
@@ -212,7 +233,9 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryFin.setParameter("idoforg", idOfOrgL);
             Long countFin = ((BigInteger) queryFin.uniqueResult()).longValue();
 
-            InteractiveCardDataReportItem itemFin = new InteractiveCardDataReportItem(9L, "3.1", countFin, "В том числе карты с истекшим сроком действия", "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт с истекшим сроком действия");
+            InteractiveCardDataReportItem itemFin = new InteractiveCardDataReportItem(9L, "3.1", countFin,
+                    "В том числе карты с истекшим сроком действия",
+                    "Количество сервисных карт, находящихся на текущую дату на руках у пользователей в виде постоянных карт с истекшим сроком действия");
             items.add(itemFin);
 
             //4.
@@ -250,7 +273,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             queryNeispProch.setParameter("idoforg", idOfOrgL);
             Long countNeispProch = ((BigInteger) queryNeispProch.uniqueResult()).longValue();
 
-            for (InteractiveCardDataReportItem itemThree: items) {
+            for (InteractiveCardDataReportItem itemThree : items) {
                 if (itemThree.getId().equals(12L)) {
                     countNeispProch = countNeispProch - itemThree.getValue();
                 }
@@ -259,16 +282,18 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             vibivZablock = countVibiv + countNeisp + countNeispProch;
 
             //4.
-            InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", vibivZablock, "Фонд заблокированных и иных неиспользуемых сервисных карт", "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
+            InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", vibivZablock,
+                    "Фонд заблокированных и иных неиспользуемых сервисных карт",
+                    "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
             items.add(itemZablock);
         }
 
-        private List<InteractiveCardDataReportItem>  getInteractiveReportDataEntity(Session session, String idOfOrg,
-               List<InteractiveCardDataReportItem> items) {
+        private List<InteractiveCardDataReportItem> getInteractiveReportDataEntity(Session session, String idOfOrg,
+                List<InteractiveCardDataReportItem> items) {
 
             Long idOfOrgL = Long.valueOf(idOfOrg);
 
-            String sql = "select idofrecord, value from cf_interactive_report_data where idoforg = :idoforg ";
+            String sql = "SELECT idofrecord, value FROM cf_interactive_report_data WHERE idoforg = :idoforg ";
             Query query = session.createSQLQuery(sql);
             query.setParameter("idoforg", idOfOrgL);
             List res = query.list();
@@ -286,34 +311,45 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
                 if (idOfRecord == 0L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1", Long.valueOf(value), "в рамках ГК на внедрение", "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1",
+                            Long.valueOf(value), "в рамках ГК на внедрение",
+                            "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 1L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2", Long.valueOf(value), "в рамках ГК на сервис", "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2",
+                            Long.valueOf(value), "в рамках ГК на сервис",
+                            "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 2L) {
                     fondGk += Long.valueOf(value);
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(7L, "2.3", Long.valueOf(value), "Закуплено ОО", "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(7L, "2.3",
+                            Long.valueOf(value), "Закуплено ОО",
+                            "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 3L) {
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(12L, "6", Long.valueOf(value), "Фонд резервных карт, доступных к использованию", "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(12L, "6",
+                            Long.valueOf(value), "Фонд резервных карт, доступных к использованию",
+                            "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
                     items.add(item);
                 }
 
                 if (idOfRecord == 4L) {
-                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(11L, "5", Long.valueOf(value), "Потери сервисных  карт", "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
+                    InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(11L, "5",
+                            Long.valueOf(value), "Потери сервисных  карт",
+                            "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
                     items.add(item);
                 }
             }
 
-            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk, "Фонд поступивших сервисных карт", "Количество сервисных карт, зарегистрированных в ИС ПП");
+            InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk,
+                    "Фонд поступивших сервисных карт", "Количество сервисных карт, зарегистрированных в ИС ПП");
             items.add(item);
 
             return items;
@@ -337,7 +373,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
         Long count = 0L;
 
-        for (InteractiveCardDataReportItem itemThree: items) {
+        for (InteractiveCardDataReportItem itemThree : items) {
             if (itemThree.getId().equals(12L)) {
                 count = count - itemThree.getValue();
             }
@@ -346,7 +382,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
         String c = "0";
 
         if (countPercent != 0L) {
-           c = String.valueOf(count/countPercent);
+            c = String.valueOf(count / countPercent);
         }
 
         return c;
