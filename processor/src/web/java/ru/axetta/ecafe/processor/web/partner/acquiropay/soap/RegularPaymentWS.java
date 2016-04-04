@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
+import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -34,6 +36,7 @@ import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -109,6 +112,12 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
                 return requestResult;
             }
+            HTTPData data = new HTTPData();
+            HTTPDataHandler handler = new HTTPDataHandler(data);
+            Date date = new Date(System.currentTimeMillis());
+            logRequest(handler);
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                    c.getIdOfClient(), handler.getData().getOperationType());
             MfrRequest mfrRequest = rpService
                     .createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount, period);
             Map<String, String> params = rpService.getParamsForRegRequest(mfrRequest);
@@ -183,6 +192,13 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
                 return requestResult;
             }
+            HTTPData data = new HTTPData();
+            HTTPDataHandler handler = new HTTPDataHandler(data);
+            Date date = new Date(System.currentTimeMillis());
+            logRequest(handler);
+            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                    idOfClient, handler.getData().getOperationType());
             result = !bs.isActive() || rpService.deactivateSubscription(regularPaymentSubscriptionID);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
@@ -194,6 +210,34 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
         }
         return requestResult;
+    }
+
+    private void logRequest(HTTPDataHandler handler) {
+        MessageContext jaxwsContext = context.getMessageContext();
+        if (handler != null) {
+            handler.setData(jaxwsContext);
+        }
+        /*AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) jaxwsContext
+                .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
+        if (handler != null) {
+            handler.setIdOfSystem(authorizationPolicy.getUserName());
+            if (jaxwsContext.containsKey("org.apache.cxf.message.Message.PROTOCOL_HEADERS")) {
+                Map<String, Object> map = (Map)jaxwsContext.get("org.apache.cxf.message.Message.PROTOCOL_HEADERS");
+                if (map.containsKey("USER_SSOID")) {
+                    List<String> ssoIds = (List)map.get("USER_SSOID");
+                    String ssoId = ssoIds.get(0);
+                    handler.setSsoId(ssoId);
+                }
+            }
+            if (jaxwsContext.containsKey("HTTP.REQUEST")) {
+                PayloadNameRequestWrapper wrapper = (PayloadNameRequestWrapper)jaxwsContext.get("HTTP.REQUEST");
+                String methodName = wrapper.getPayloadRequestName();
+                if (methodName != null && methodName.startsWith(".")) {
+                    methodName = methodName.substring(1, methodName.length());
+                }
+                handler.setOperationType(methodName);
+            }
+        }*/
     }
 
     private boolean checkSubscriptionContractId(BankSubscription bs, Long contractId, RequestResult requestResult) {

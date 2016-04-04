@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
-import net.bull.javamelody.PayloadNameRequestWrapper;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
@@ -58,6 +56,8 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
+import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -196,65 +196,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
               Transaction transaction) throws Exception {
-        }
-    }
-
-    private interface ISetHTTPData {
-        public void setIdOfSystem(String idOfSystem);
-        public void setSsoId(String ssoId);
-        public void setOperationType(String operationType);
-    }
-
-    private static class HTTPDataHandler implements ISetHTTPData {
-        private final HTTPData data;
-
-        public HTTPDataHandler(HTTPData data) {
-            this.data = data;
-        }
-        @Override
-        public void setIdOfSystem(String idOfSystem) {
-            data.setIdOfSystem(idOfSystem);
-        }
-        @Override
-        public void setSsoId(String ssoId) {
-            data.setSsoId(ssoId);
-        }
-        @Override
-        public void setOperationType(String operationType) {
-            data.setOperationType(operationType);
-        }
-        public HTTPData getData() {
-            return data;
-        }
-    }
-
-    private static class HTTPData {
-        private String idOfSystem;
-        private String ssoId;
-        private String operationType;
-
-        public String getIdOfSystem() {
-            return idOfSystem;
-        }
-
-        public void setIdOfSystem(String idOfSystem) {
-            this.idOfSystem = idOfSystem;
-        }
-
-        public String getSsoId() {
-            return ssoId;
-        }
-
-        public void setSsoId(String ssoId) {
-            this.ssoId = ssoId;
-        }
-
-        public String getOperationType() {
-            return operationType;
-        }
-
-        public void setOperationType(String operationType) {
-            this.operationType = operationType;
         }
     }
 
@@ -1703,7 +1644,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         if (data.getClientSummaryExt() != null) {
             Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
-            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                 idOfClient, handler.getData().getOperationType());
         }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
@@ -1743,7 +1684,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         if (data.getClientSummaryExt() != null) {
             Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
-            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                 idOfClient, handler.getData().getOperationType());
         }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
@@ -3737,7 +3678,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
                     Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId()).getIdOfClient();
-                    saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                    handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                             idOfClient, handler.getData().getOperationType());
                 }
             }
@@ -3761,7 +3702,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
                     Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId()).getIdOfClient();
-                    saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                    handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                             idOfClient, handler.getData().getOperationType());
                 }
             }
@@ -4020,7 +3961,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
         } else {
             Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
-            saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                     idOfClient, handler.getData().getOperationType());
         }
         return r;
@@ -5043,6 +4984,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         }
         /////
+        //данные для логирования запроса
+        if (handler != null) {
+            handler.setData(jaxwsContext);
+        }
         // пробуем по имени и паролю
         if (linkConfig == null) {
             AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) jaxwsContext
@@ -5051,27 +4996,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 linkConfig = runtimeContext.getIntegraPartnerConfig()
                         .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
                                 authorizationPolicy.getPassword());
-                if (handler != null) {
-                    handler.setIdOfSystem(authorizationPolicy.getUserName());
-                }
-            }
-            if (handler != null) {
-                if (jaxwsContext.containsKey("org.apache.cxf.message.Message.PROTOCOL_HEADERS")) {
-                    Map<String, Object> map = (Map)jaxwsContext.get("org.apache.cxf.message.Message.PROTOCOL_HEADERS");
-                    if (map.containsKey("USER_SSOID")) {
-                        List<String> ssoIds = (List)map.get("USER_SSOID");
-                        String ssoId = ssoIds.get(0);
-                        handler.setSsoId(ssoId);
-                    }
-                }
-                if (jaxwsContext.containsKey("HTTP.REQUEST")) {
-                    PayloadNameRequestWrapper wrapper = (PayloadNameRequestWrapper)jaxwsContext.get("HTTP.REQUEST");
-                    String methodName = wrapper.getPayloadRequestName();
-                    if (methodName != null && methodName.startsWith(".")) {
-                        methodName = methodName.substring(1, methodName.length());
-                    }
-                    handler.setOperationType(methodName);
-                }
             }
         }
         /////
@@ -7160,8 +7084,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_CLIENT_NOT_FOUND_DESC;
                     return result;
                 }
-                saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                        client.getIdOfClient(), handler.getData().getOperationType());
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date,
+                        handler.getData().getSsoId(), client.getIdOfClient(), handler.getData().getOperationType());
 
                 long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
 
@@ -7235,7 +7159,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
 
-                saveLogInfoService(handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                         client.getIdOfClient(), handler.getData().getOperationType());
 
                 long maxVersion = DAOUtils.nextVersionByProhibitionsMenu(session);
