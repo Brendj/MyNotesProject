@@ -230,8 +230,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
                     + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
-                    + " AND cfc.validdate < :validdate "
-                    + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
+                    + " AND cfc.validdate < :validdate " + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryFin = session.createSQLQuery(sqlFin);
             queryFin.setParameter("idoforg", idOfOrgL);
@@ -264,7 +263,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             String sqlNeisp = "SELECT count(cfc.idofclient) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (6) "
+                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (1,6) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
@@ -274,15 +273,10 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             Long countNeisp = ((BigInteger) queryNeisp.uniqueResult()).longValue();
 
             //4.3
-            String sqlNeispProch = "SELECT count(cfc.idofclient) FROM cf_cards cfc "
-                    + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
-                    + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.state IN (5) "
-                    + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)";
+            String sqlNeispProch = "SELECT count(cfc.cardno) FROM cf_cards cfc WHERE cfc.state IN (5)AND cfc.idoforg = :idoforg";
 
             Query queryNeispProch = session.createSQLQuery(sqlNeispProch);
             queryNeispProch.setParameter("idoforg", idOfOrgL);
-            queryNeispProch.setParameterList("friendlyOrgs", friendlyOrgsIds);
             Long countNeispProch = ((BigInteger) queryNeispProch.uniqueResult()).longValue();
 
             for (InteractiveCardDataReportItem itemThree : items) {
@@ -316,6 +310,12 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
             long fondGk = 0;
 
+            boolean existsSix = false;
+            boolean existsTO = false;
+            boolean existsTT = false;
+            boolean existsTTH = false;
+            boolean existsFive = false;
+
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
                 long idOfRecord = ((BigInteger) e[0]).longValue();
@@ -327,6 +327,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                             Long.valueOf(value), "в рамках ГК на внедрение",
                             "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
                     items.add(item);
+                    existsTO = true;
                 }
 
                 if (idOfRecord == 1L) {
@@ -335,6 +336,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                             Long.valueOf(value), "в рамках ГК на сервис",
                             "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
                     items.add(item);
+                    existsTT = true;
                 }
 
                 if (idOfRecord == 2L) {
@@ -343,6 +345,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                             Long.valueOf(value), "Закуплено ОО",
                             "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
                     items.add(item);
+                    existsTTH = true;
                 }
 
                 if (idOfRecord == 3L) {
@@ -350,6 +353,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                             Long.valueOf(value), "Фонд резервных карт, доступных к использованию",
                             "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
                     items.add(item);
+                    existsSix = true;
                 }
 
                 if (idOfRecord == 4L) {
@@ -357,7 +361,42 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                             Long.valueOf(value), "Потери сервисных  карт",
                             "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
                     items.add(item);
+                    existsFive = true;
                 }
+            }
+
+            if (existsTO == false) {
+                InteractiveCardDataReportItem itemTO = new InteractiveCardDataReportItem(5L, "2.1", 0L,
+                        "в рамках ГК на внедрение",
+                        "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
+                items.add(itemTO);
+            }
+
+            if (existsTT == false) {
+                InteractiveCardDataReportItem itemTT = new InteractiveCardDataReportItem(6L, "2.2", 0L,
+                        "в рамках ГК на сервис",
+                        "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
+                items.add(itemTT);
+            }
+
+            if (existsTTH == false) {
+                InteractiveCardDataReportItem itemTTH = new InteractiveCardDataReportItem(7L, "2.3", 0L, "Закуплено ОО",
+                        "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
+                items.add(itemTTH);
+            }
+
+            if (existsFive == false) {
+                InteractiveCardDataReportItem itemFive = new InteractiveCardDataReportItem(11L, "5", 0L,
+                        "Потери сервисных  карт",
+                        "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
+                items.add(itemFive);
+            }
+
+            if (existsSix == false) {
+                InteractiveCardDataReportItem itemSix = new InteractiveCardDataReportItem(12L, "6", 0L,
+                        "Фонд резервных карт, доступных к использованию",
+                        "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
+                items.add(itemSix);
             }
 
             InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk,
@@ -374,27 +413,30 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
         Long idOfOrgL = Long.valueOf(idOfOrg);
 
-        String sqlPercent = "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl "
+        String sqlPercent = "SELECT count(cfc.cardno) FROM cf_cards cfc LEFT JOIN cf_clients cl "
                 + " ON cfc.idofclient = cl.idofclient LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg"
                 + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfo.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                + " WHERE cfcl.idofclientgroup IN (1100000010, 1100000000, 1100000020) AND cfo.idoforg = :idoforg ";
+                + " WHERE cfcl.idofclientgroup NOT IN (1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) AND cfo.idoforg = :idoforg"
+                + " AND cfc.idofclient is not null ";
 
         Query queryPercent = session.createSQLQuery(sqlPercent);
         queryPercent.setParameter("idoforg", idOfOrgL);
-        Long countPercent = ((BigInteger) queryPercent.uniqueResult()).longValue();
+        int countPercent = ((BigInteger) queryPercent.uniqueResult()).intValue();
 
-        Long count = 0L;
+        int count = 0;
 
         for (InteractiveCardDataReportItem itemThree : items) {
             if (itemThree.getId().equals(12L)) {
-                count = count - itemThree.getValue();
+                count = (int) itemThree.getValue();
             }
         }
 
         String c = "0";
 
         if (countPercent != 0L) {
-            c = String.valueOf(count / countPercent);
+            int co = count / countPercent;
+            int cop = count % countPercent;
+            c = String.valueOf(co) + "," + String.valueOf(cop);
         }
 
         return c;
