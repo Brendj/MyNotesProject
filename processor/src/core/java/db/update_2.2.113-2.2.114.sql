@@ -58,3 +58,8 @@ CREATE TABLE cf_zerotransactions
   CONSTRAINT cf_zero_transaction_idoforg_fk FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Увеличение длины полей
+ALTER TABLE cf_log_infoservice
+  ALTER idofsystem TYPE character varying(50),
+  ALTER ssoid TYPE character varying(50);
