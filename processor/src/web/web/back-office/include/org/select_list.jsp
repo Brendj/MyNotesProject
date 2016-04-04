@@ -66,27 +66,35 @@
                                         <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
-                                    <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
-                                    <h:inputText id="inputTagFilter" value="#{mainPage.orgListSelectPage.tagFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                        <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                    </h:inputText>
-                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
-                                    <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                        <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                    </h:inputText>
-                                    <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text" />
+                                    <h:outputText escape="true" value="Округ: " styleClass="output-text" />
                                     <h:selectOneMenu id="regionsList" value="#{mainPage.orgListSelectPage.region}"
-                                                     style="width:325px;"
+                                                     style="width:386px;"
                                                      disabled="#{mainPage.orgListSelectPage.districtFilterDisabled}">
                                         <f:selectItems value="#{mainPage.orgListSelectPage.regions}" />
                                         <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
                                 </h:panelGrid>
+                                    <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
+                                                            styleClass="borderNone" timeout="10"
+                                                            headerClass="imageNone borderNone linkClass"
+                                                            bodyClass="imageNone borderNone">
+                                        <h:panelGrid id="contentDiv22" columns="2" styleClass="borderless-grid">
+                                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
+                                            <h:inputText id="inputTagFilter" value="#{mainPage.orgListSelectPage.tagFilter}"
+                                                 size="60" maxlength="120" styleClass="input-text">
+                                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                     reRender="modalOrgListSelectorOrgTable" />
+                                            </h:inputText>
+                                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
+                                            <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
+                                                 size="60" maxlength="120" styleClass="input-text">
+                                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                     reRender="modalOrgListSelectorOrgTable" />
+                                            </h:inputText>
+                                        </h:panelGrid>
+                                    </rich:simpleTogglePanel>
+
                                 <h:panelGrid id="radioButtons" columns="1" styleClass="borderless-grid">
                                     <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}"
                                                       converter="javax.faces.Integer" styleClass="output-text">
