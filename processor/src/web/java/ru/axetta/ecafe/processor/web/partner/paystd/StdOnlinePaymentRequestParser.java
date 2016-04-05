@@ -110,7 +110,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (linkConfig.screening) {
             if (response.getClientBlurName() != null) {
                 vals.addLast("CLIENTFIO");
-                vals.addLast(response.getClientBlurName());
+                vals.addLast(response.getClientBlurWithoutClientFirstName());
             }
         } else {
             if (response.getClientFullName() != null) {

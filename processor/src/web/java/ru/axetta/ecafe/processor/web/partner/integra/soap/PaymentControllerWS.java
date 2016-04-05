@@ -75,7 +75,7 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             paymentResult.desc = payResponse.getResultDescription();
             paymentResult.bal = payResponse.getBalance();
             if (paymentResult.response.contains("*")) {
-                paymentResult.clientFIO = payResponse.getClientBlurName();
+                paymentResult.clientFIO = payResponse.getClientBlurWithoutClientFirstName();
             } else {
                 paymentResult.clientFIO = payResponse.getClientFullName();
             }
