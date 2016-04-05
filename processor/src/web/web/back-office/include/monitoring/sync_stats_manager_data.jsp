@@ -18,7 +18,6 @@
     <%--<h:outputText styleClass="output-text" escape="true" value="Если не указаны конкретные ОО, то будет показана информация по всем ОО за период." />--%>
     <%--<h:outputText styleClass="output-text" escape="true" value="Период по-умолчанию - текущая неделя." />--%>
     <h:panelGrid columns="2" columnClasses="valign, valign">
-        <h:outputLabel value="Сборка статистики"/>
 
         <h:outputText styleClass="output-text" escape="true" value="Организации(я)" />
         <h:panelGroup id="orgFilter">
