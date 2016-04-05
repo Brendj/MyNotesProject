@@ -20,9 +20,15 @@
         <h:outputText escape="true" value="Адрес веб-сервиса"
                       styleClass="output-text" />
         <h:inputText value="#{istkKioskOptionsPage.wsAddress}" styleClass="input-text" size="35" />
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="4">
         <a4j:commandButton value="Получить список школ" styleClass="command-button" action="#{istkKioskOptionsPage.connect}" reRender="istkKioskOptionPanel" />
+        <a4j:commandButton value="Разрешить всем" styleClass="command-button" reRender="istkKioskOptionPanel" disabled="#{empty istkKioskOptionsPage.schoolItemList}"
+                action="#{istkKioskOptionsPage.setAllFlags(true)}" />
+        <a4j:commandButton value="Запретить всем" styleClass="command-button" reRender="istkKioskOptionPanel" disabled="#{empty istkKioskOptionsPage.schoolItemList}"
+                action="#{istkKioskOptionsPage.setAllFlags(false)}" />
         <a4j:commandButton value="Сохранить изменения" styleClass="command-button" action="#{istkKioskOptionsPage.saveChangedParameters}" reRender="istkKioskOptionPanel"
-                disabled="#{empty istkKioskOptionsPage.changedPermissions}" />
+                           disabled="#{empty istkKioskOptionsPage.changedPermissions}" />
     </h:panelGrid>
 
 <rich:dataTable id="schoolKioskTable"
@@ -68,7 +74,6 @@
                 <f:setPropertyActionListener value="#{item}" target="#{istkKioskOptionsPage.currentItem}" />
             </a4j:support>
         </h:selectBooleanCheckbox>
-
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="schoolKioskTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"

@@ -140,6 +140,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String WS_CRYPTO_BASE = PROCESSOR_PARAM_BASE + ".ws.crypto";
     private static final String INSTANCE_NAME = PROCESSOR_PARAM_BASE + ".instance";
     private static final String NODE_INFO_FILE = PROCESSOR_PARAM_BASE + ".nodeInfoFile";
+    public static final String ISTK_WEBSERVICE = PROCESSOR_PARAM_BASE + ".istk.webservice";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger

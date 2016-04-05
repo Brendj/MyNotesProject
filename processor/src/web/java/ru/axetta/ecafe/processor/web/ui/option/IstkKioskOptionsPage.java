@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.istkservice.client.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -26,12 +27,17 @@ public class IstkKioskOptionsPage extends BasicWorkspacePage {
     private static final Long SUCCESS_CODE = 0L;
     private static final String ERROR_DURING_USING_WEB_SERVICE = "Error using client of web service istk-school:";
     private static final Logger logger = LoggerFactory.getLogger(IstkKioskOptionsPage.class);
+    private static final String DEFAULT_WEBSERVICE_ADDRESS = "http://localhost:8080/istk-school/soap/client";
 
     private String wsAddress;
     private boolean tableVisible = false;
     private List<SchoolItem> schoolItemList;
     private SchoolItem currentItem;
     private Map<Long, Boolean> changedPermissions = new HashMap<Long, Boolean>();
+
+    public IstkKioskOptionsPage() {
+        wsAddress = RuntimeContext.getInstance().getPropertiesValue(RuntimeContext.ISTK_WEBSERVICE, DEFAULT_WEBSERVICE_ADDRESS);
+    }
 
     public Object connect() {
         try {
@@ -84,6 +90,17 @@ public class IstkKioskOptionsPage extends BasicWorkspacePage {
             logger.error(String.format("%s %s", ERROR_DURING_USING_WEB_SERVICE, "method - saveSchoolsGamePermissions()"));
             printError("Возникла ошибка во время сохранения данных.");
         }
+        return null;
+    }
+
+    public Object setAllFlags(boolean newValue) {
+        SchoolItem preservationCurrent = currentItem;
+        for(SchoolItem item : schoolItemList) {
+            currentItem = item;
+            currentItem.setPermitGame(newValue);
+            processGameFlag();
+        }
+        currentItem = preservationCurrent;
         return null;
     }
 
