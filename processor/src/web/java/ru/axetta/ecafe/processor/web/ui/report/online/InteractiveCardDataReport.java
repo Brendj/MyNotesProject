@@ -95,6 +95,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("reportDate", dailyItemsFormat.format(generateTime));
             parameterMap.put("orgName", org.getShortName());
+            parameterMap.put("address", org.getAddress());
 
             List<InteractiveCardDataReportItem> items = findItems(session, idOfOrg);
 
@@ -230,7 +231,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
                     + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
-                    + " AND cfc.validdate < :validdate " + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
+                    + " AND cfc.validdate < :validdate AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
             Query queryFin = session.createSQLQuery(sqlFin);
             queryFin.setParameter("idoforg", idOfOrgL);

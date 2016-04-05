@@ -6,6 +6,7 @@
 	<parameter name="reportDate" class="java.lang.String"/>
 	<parameter name="orgName" class="java.lang.String"/>
 	<parameter name="percent" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
 	<field name="rowNum" class="java.lang.String"/>
 	<field name="description" class="java.lang.String"/>
 	<field name="value" class="java.lang.Long"/>
@@ -17,7 +18,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Арес здания:_______________________________________"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Арес здания: " + $P{address}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="08f15a1f-64c8-4342-ba1b-830499cdb05a" stretchType="RelativeToBandHeight" x="372" y="119" width="538" height="25"/>
