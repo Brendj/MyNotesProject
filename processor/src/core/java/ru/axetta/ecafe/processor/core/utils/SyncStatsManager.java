@@ -78,7 +78,7 @@ public class SyncStatsManager {
 
                 Map<Integer, String> orgStats = getOrgStats(orgSyncDataList);
                 for (Integer type : orgStats.keySet()) {
-                    createSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, type, orgStats.get(type));
+                    createSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, type, orgStats.get(type), false);
                 }
             }
 
@@ -301,12 +301,12 @@ public class SyncStatsManager {
      * @throws Exception
      */
     private static SyncHistoryCalc createSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date syncTime,
-            Integer syncType, String syncValue) throws Exception {
+            Integer syncType, String syncValue, boolean isProcessLogData) throws Exception {
         List<SyncHistoryCalc> existedSyncHistoryCalcList = DAOUtils
                 .getSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, new Date(), syncType);
         SyncHistoryCalc syncHistoryCalc;
         if (existedSyncHistoryCalcList.size() > 0) {
-            if (existedSyncHistoryCalcList.size() > 1) {
+            if (existedSyncHistoryCalcList.size() > 1 && !isProcessLogData) {
                 throw new Exception("Critical error in SyncStatsManager");
             }
             syncHistoryCalc = existedSyncHistoryCalcList.get(0);
@@ -445,7 +445,7 @@ public class SyncStatsManager {
                         averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration,
                         maxSyncDuration, syncDurations);
                 for (Integer type : stats.keySet()) {
-                    createSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, type, stats.get(type));
+                    createSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, type, stats.get(type), true);
                 }
             }
 
