@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -1074,6 +1075,32 @@ public class DAOUtils {
         criteria.add(Restrictions.le("transactionTime", toDateTime));   // <=
         HibernateUtils.addAscOrder(criteria, "client.idOfClient");
         return criteria.list();
+    }
+
+    public static List getAccountTransactionsForOrgSinceTimeV2(Session persistenceSession, Org org,
+            Date fromDateTime, Date toDateTime) {
+        String str_query = "select t.idOfTransaction, t.source, t.transactionDate, " +
+                "t.sourceType, t.transactionSum, t.idOfClient, " +
+                "coalesce(t.transactionSubBalance1Sum, 0) as transactionSubBalance1Sum, coalesce(query.sum, 0) as complexSum, " +
+                "coalesce(query.discount, 0) as discountSum, coalesce(query.orderType, 0) as orderType " +
+                "from cf_transactions t left join " +
+                "(select coalesce(sum(dd.qty * dd.rprice), 0) as sum, coalesce(sum(dd.socDiscount), 0) as discount, oo.orderType, oo.idOfTransaction " +
+                "from cf_orders oo join cf_orderdetails dd on oo.idOfOrder = dd.idOfOrder and oo.idOfOrg = dd.idOfOrg " +
+                "where oo.createdDate > :begDate AND oo.createddate <= :endDate AND oo.idOfOrg in (:orgs) " +
+                "AND dd.idOfOrg in (:orgs) AND dd.menuType between :menuMin and :menuMax " +
+                "group by oo.orderType, oo.idOfTransaction) as query " +
+                "on t.idOfTransaction = query.idOfTransaction " +
+                "where t.idOfOrg in (:orgs) AND t.transactionDate > :begDate AND t.transactionDate <= :endDate " +
+                "order by t.idOfClient";
+        Query q = persistenceSession.createSQLQuery(str_query);
+        q.setParameter("begDate", fromDateTime.getTime());
+        q.setParameter("endDate", toDateTime.getTime());
+        q.setParameterList("orgs", org.getFriendlyOrg());
+        q.setParameter("menuMin", OrderDetail.TYPE_COMPLEX_MIN);
+        q.setParameter("menuMax", OrderDetail.TYPE_COMPLEX_MAX);
+
+        q.setResultTransformer(Transformers.aliasToBean(AccountTransactionExtended.class));
+        return q.list();
     }
 
     @SuppressWarnings("unchecked")

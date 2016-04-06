@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,6 +41,37 @@ public class AccRegistryUpdate {
             element.appendChild(item.toElement(document, timeFormat));
         }
         return element;
+    }
+
+    public void addAccountTransactionInfoV2(AccountTransactionExtended accountTransaction) {
+        final Long idOfClient = accountTransaction.getIdofclient();
+        final Client client = DAOService.getInstance().findClientById(idOfClient);
+        AccItem accItem = accItemMap.get(client.getIdOfClient());
+        if(accItem==null){
+            accItem = new AccItem();
+            accItem.idOfClient = client.getIdOfClient();
+            if(client.getSubBalance1()==null){
+                accItem.subBalance1 = 0L;
+            }else {
+                accItem.subBalance1 = client.getSubBalance1();
+            }
+            accItem.balance = client.getBalance() - accItem.subBalance1;
+            accItemMap.put(accItem.idOfClient, accItem);
+        }
+        final TransactionItem transactionItem = new TransactionItem();
+        transactionItem.idOfTransaction = accountTransaction.getIdoftransaction();
+        transactionItem.source = accountTransaction.getSource();
+        transactionItem.transactionDateTime = accountTransaction.getTransactiondate();
+        transactionItem.transactionType = accountTransaction.getSourcetype();
+        transactionItem.sumMainBalance = accountTransaction.getTransactionsum();
+        transactionItem.sumSubBalance = accountTransaction.getTransactionsubbalance1sum();
+        transactionItem.sumComplex = accountTransaction.getComplexsum();
+        transactionItem.sumSocDiscount = accountTransaction.getDiscountsum();
+        transactionItem.orderType = accountTransaction.getOrdertype();
+        accItem.transactionItems.add(transactionItem);
+        if(maxTransactionDate==null || maxTransactionDate.getTime()<accountTransaction.getTransactiondate().getTime()){
+            maxTransactionDate = accountTransaction.getTransactiondate();
+        }
     }
 
     public void addAccountTransactionInfo(AccountTransaction accountTransaction) {
@@ -94,7 +126,10 @@ public class AccRegistryUpdate {
         private Date transactionDateTime;   // Дата транзакции
         private int transactionType;        // Тип транзакции
         private long  sumMainBalance;       // Сумма изменения основного баланса
-        private long  sumSubBalance;       // Сумма изменения основного баланса
+        private long  sumSubBalance;        // Сумма изменения основного баланса
+        private long sumComplex;            // Сумма только по комплексам
+        private long sumSocDiscount;        // Сумма скидки
+        private int orderType;              // Тип заказа
 
         public Element toElement(Document document, DateFormat timeFormat) throws Exception {
             Element element = document.createElement("TI");
@@ -104,6 +139,9 @@ public class AccRegistryUpdate {
             element.setAttribute("T", Integer.toString(transactionType));
             element.setAttribute("SM", Long.toString(sumMainBalance));
             element.setAttribute("SSB1", Long.toString(sumSubBalance));
+            element.setAttribute("SC", Long.toString(sumComplex));
+            element.setAttribute("SocD", Long.toString(sumSocDiscount));
+            element.setAttribute("OT", Integer.toString(orderType));
             return element;
         }
 

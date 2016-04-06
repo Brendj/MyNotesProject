@@ -3406,11 +3406,15 @@ public class Processor
 
             final Date currentDate = new Date();
             persistenceSession.refresh(org);
-            List<AccountTransaction> accountTransactionList;
-            accountTransactionList = getAccountTransactionsForOrgSinceTime(persistenceSession, org, fromDateTime,
+            List<AccountTransactionExtended> accountTransactionList = null;
+            try {
+                accountTransactionList = getAccountTransactionsForOrgSinceTimeV2(persistenceSession, org, fromDateTime,
                     currentDate);
-            for (AccountTransaction accountTransaction : accountTransactionList) {
-                accRegistryUpdate.addAccountTransactionInfo(accountTransaction);
+                for (AccountTransactionExtended accountTransaction : accountTransactionList) {
+                    accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
+                }
+            } catch (Exception e) {
+                logger.error("Oops", e);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
