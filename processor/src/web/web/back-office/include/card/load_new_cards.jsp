@@ -71,7 +71,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор карты в БД (IdOfCard)" />
+                <h:outputText escape="true" value="Идентификатор карты в БД (IdOfNewCard)" />
             </f:facet>
             <h:outputText escape="true" value="#{item.idOfNewCard}" styleClass="output-text" />
         </rich:column>
