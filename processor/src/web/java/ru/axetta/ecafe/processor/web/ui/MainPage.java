@@ -196,6 +196,7 @@ public class MainPage implements Serializable {
     private final CardCreatePage cardCreatePage = new CardCreatePage();
     private final CardOperationListPage cardOperationListPage = new CardOperationListPage();
     private final CardFileLoadPage cardFileLoadPage = new CardFileLoadPage();
+    private final NewCardFileLoadPage newCardFileLoadPage = new NewCardFileLoadPage();
     private final CardExpireBatchEditPage cardExpireBatchEditPage = new CardExpireBatchEditPage();
 
     // Service pages
@@ -2965,6 +2966,10 @@ public class MainPage implements Serializable {
         return "showCardLoadResultCSVList";
     }
 
+    public String showNewCardLoadResultCSVList() {
+        return "showNewCardLoadResultCSVList";
+    }
+
     public Long getSelectedIdOfCard() {
         return selectedIdOfCard;
     }
@@ -3862,6 +3867,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
+
     public void cardLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
@@ -3878,6 +3884,64 @@ public class MainPage implements Serializable {
                 inputStream = new ByteArrayInputStream(data);
             }
             cardFileLoadPage.loadCards(inputStream, dataSize);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Карты загружены и зарегистрированы успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to load cards from file", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных по картам: " + e.getMessage(), null));
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public NewCardFileLoadPage getNewCardFileLoadPage() {
+        return newCardFileLoadPage;
+    }
+
+    public Object showNewCardFileLoadPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            newCardFileLoadPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = newCardFileLoadPage;
+        } catch (Exception e) {
+            logger.error("Failed to show new card file load page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы загрузки новых непривязанных карт на регистрацию: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public void newCardLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        InputStream inputStream = null;
+        long dataSize = 0;
+        try {
+            if (item.isTempFile()) {
+                File file = item.getFile();
+                dataSize = file.length();
+                inputStream = new FileInputStream(file);
+            } else {
+                byte[] data = item.getData();
+                dataSize = data.length;
+                inputStream = new ByteArrayInputStream(data);
+            }
+            newCardFileLoadPage.loadCards(inputStream, dataSize);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Карты загружены и зарегистрированы успешно", null));
         } catch (Exception e) {

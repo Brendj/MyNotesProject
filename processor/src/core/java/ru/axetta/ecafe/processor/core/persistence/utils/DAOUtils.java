@@ -347,6 +347,12 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static NewCard findNewCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(NewCard.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        return (NewCard) criteria.uniqueResult();
+    }
+
     public static CardTemp findCardTempByCardNo(Session persistenceSession, long cardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
@@ -807,6 +813,13 @@ public class DAOUtils {
 
     public static boolean existCard(Session persistenceSession, long cardPrintedNo) throws Exception {
         Query query = persistenceSession.createQuery("select 1 from Card card where card.cardPrintedNo = ?");
+        query.setParameter(0, cardPrintedNo);
+        query.setMaxResults(1);
+        return !query.list().isEmpty();
+    }
+
+    public static boolean existNewCard(Session persistenceSession, long cardPrintedNo) throws Exception {
+        Query query = persistenceSession.createQuery("select 1 from NewCard card where card.cardPrintedNo = ?");
         query.setParameter(0, cardPrintedNo);
         query.setMaxResults(1);
         return !query.list().isEmpty();

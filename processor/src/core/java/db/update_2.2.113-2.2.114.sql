@@ -63,3 +63,13 @@ CREATE TABLE cf_zerotransactions
 ALTER TABLE cf_log_infoservice
   ALTER idofsystem TYPE character varying(50),
   ALTER ssoid TYPE character varying(50);
+
+--Таблица свежезагруженных новых непривязанных карт
+CREATE TABLE cf_newcards
+(
+  idofnewcard BIGSERIAL NOT NULL,
+  createddate BIGINT NOT NULL,
+  cardno BIGINT NOT NULL,
+  cardprintedno BIGINT NOT NULL,
+  CONSTRAINT cf_newcards_pk PRIMARY KEY (idofnewcard)
+);

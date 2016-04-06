@@ -557,6 +557,104 @@ public class Processor
     }
 
     @Override
+    public Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo,
+            Long cardPrintedNo) throws Exception {
+
+        logger.debug("check exist card");
+        Card c = findCardByCardNo(persistenceSession, cardNo);
+        if (c != null && c.getClient() != null) {
+            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
+        }
+
+        logger.debug("check exist temp card");
+        CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
+        if (ct != null) {
+            if (ct.getClient() != null) {
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
+                        ct.getClient().getIdOfClient(), ct.getCardStation()));
+            }
+            if (ct.getVisitor() != null) {
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на посетителя: %s. Статус карты - %s.",
+                        ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
+            }
+        }
+
+        logger.debug("check exist newcard");
+        NewCard uCard = findNewCardByCardNo(persistenceSession, cardNo);
+        if (uCard != null) {
+            throw new Exception("Карта с данным номером уже зарегистрирована как непривязанная карта.");
+        }
+
+        logger.debug("create card");
+        NewCard card = new NewCard(cardNo, cardPrintedNo);
+        persistenceSession.save(card);
+
+        return card.getIdOfNewCard();
+    }
+
+    @Override
+    public Long createNewCard(long cardNo, Long cardPrintedNo) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Long idOfCard = createNewCard(persistenceSession, persistenceTransaction, cardNo, cardPrintedNo);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return idOfCard;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @Override
+    public Long getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception {
+        logger.debug("check exist card");
+        Card c = findCardByCardNo(persistenceSession, cardNo);
+        if (c != null) {
+            return c.getCardPrintedNo();
+        }
+        logger.debug("check exist temp card");
+        CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
+        if (ct != null) {
+            return Long.parseLong(ct.getCardPrintedNo());
+        }
+        logger.debug("check exist newcard");
+        NewCard uCard = findNewCardByCardNo(persistenceSession, cardNo);
+        if (uCard != null) {
+            return  uCard.getCardPrintedNo();
+        }
+        return null;
+    }
+
+    @Override
+    public Long getNewCardPrintedNo(long cardNo) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Long cardPrintedNo = getNewCardPrintedNo(persistenceSession, persistenceTransaction, cardNo);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return cardPrintedNo;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @Override
     public void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

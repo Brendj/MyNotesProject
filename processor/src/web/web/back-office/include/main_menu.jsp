@@ -398,6 +398,8 @@
 
     <rich:panelMenuItem id="loadCardFromFileMenuItem" binding="#{mainPage.cardFileLoadPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{mainPage.showCardFileLoadPage}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="loadNewCardFromFileMenuItem" binding="#{mainPage.newCardFileLoadPage.mainMenuComponent}"
+                        label="Загрузить из файла новые карты" action="#{mainPage.showNewCardFileLoadPage}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="cardExpireBatchEditMenu" label="Изменить дату валидности"
                         binding="#{mainPage.cardExpireBatchEditPage.mainMenuComponent}"

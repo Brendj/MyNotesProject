@@ -30,4 +30,13 @@ public interface CardManager {
             String lockReason, Date issueTime, String externalId) throws Exception;
 
     void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
+
+    Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo) throws Exception;
+
+    Long createNewCard(long cardNo, Long cardPrintedNo) throws Exception;
+
+    Long getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception;
+
+    Long getNewCardPrintedNo(long cardNo) throws Exception;
+
 }
