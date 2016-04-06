@@ -322,6 +322,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showNewCardLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/new_card_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showCCAccountCSVList</from-outcome>
             <to-view-id>/back-office/ccaccount_csv_list.jsp</to-view-id>
             <redirect/>

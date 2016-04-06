@@ -392,6 +392,24 @@ public class FrontController extends HttpServlet {
         }
     }
 
+    /* Метод возвращает номер, напечатанный на новой карте, по номеру чипа карты */
+    @WebMethod(operationName = "getCardPrintedNoByCardNo")
+    public Long getCardPrintedNoByCardNo(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo)
+            throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        try {
+            Long cardPrintedNo = RuntimeContext.getInstance().getCardManager().getNewCardPrintedNo(cardNo);
+            if (cardPrintedNo == null){
+                throw new Exception("Номер карты не найден.");
+            }
+            return cardPrintedNo;
+        } catch (Exception e) {
+            logger.error("Ошибка при запросе номера на карте по номеру чипа", e);
+            throw new FrontControllerException(
+                    String.format("Ошибка при запросе номера на карте по номеру чипа: %s", e.getMessage()), e);
+        }
+    }
+
 
     @WebMethod(operationName = "registerVisitor")
     public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
