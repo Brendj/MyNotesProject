@@ -166,4 +166,13 @@
 			</textField>
 		</band>
 	</detail>
+	<pageFooter>
+		<band height="25">
+			<staticText>
+				<reportElement uuid="7070163c-d6d7-47d9-a0ba-fbe6b45b2b61" x="0" y="0" width="910" height="25"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[*Примечание: п.4 может расходиться по данным с аналогичным отчетом, сформированным в АРМе ]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
 </jasperReport>
