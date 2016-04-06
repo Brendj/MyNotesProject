@@ -32,6 +32,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.Categor
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagersProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ResClientgroupManagers;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
@@ -934,6 +938,9 @@ public class Processor
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
 
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+
         boolean bError = false;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
@@ -1195,7 +1202,8 @@ public class Processor
 
         // Process ResCategoriesDiscountsAndRules
         try {
-            resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg(),request.getCategoriesAndDiscountsRequest());
+            resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg(),
+                    request.getCategoriesAndDiscountsRequest());
         } catch (Exception e) {
             String message = String
                     .format("Failed to process categories and rules, IdOfOrg == %s", request.getIdOfOrg());
@@ -1302,13 +1310,32 @@ public class Processor
         try {
             if (request.getZeroTransactions() != null) {
                 zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
-                resZeroTransactions = processZeroTransactions(request.getZeroTransactions()) ;
+                resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+
+        //Process GroupManagers
+        try {
+            ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
+            if (clientGroupManagerRequest != null) {
+                ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
+                        clientGroupManagerRequest);
+                ResClientgroupManagers resClientgroupManagers = processor.process();
+                ClientgroupManagerData clientgroupManagerData = processor.processData(request.getIdOfOrg());
+                responseSections.add(resClientgroupManagers);
+                responseSections.add(clientgroupManagerData);
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to process GroupManagers, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
@@ -1318,7 +1345,7 @@ public class Processor
                 manager, orgOwnerData, questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian,
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
 
@@ -1379,6 +1406,8 @@ public class Processor
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
 
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
         boolean bError = false;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
@@ -1420,7 +1449,7 @@ public class Processor
                 manager, orgOwnerData, questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian,
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1460,6 +1489,8 @@ public class Processor
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
 
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
         boolean bError = false;
 
         try {
@@ -1483,7 +1514,7 @@ public class Processor
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -1523,6 +1554,8 @@ public class Processor
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
 
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
         boolean bError = false;
 
         try {
@@ -1530,7 +1563,7 @@ public class Processor
                 zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
                 resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
@@ -1546,7 +1579,7 @@ public class Processor
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1589,6 +1622,8 @@ public class Processor
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
         boolean bError = false;
 
@@ -1703,7 +1738,7 @@ public class Processor
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1746,6 +1781,8 @@ public class Processor
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
         //Process AccountOperationsRegistry
         try {
@@ -1848,7 +1885,7 @@ public class Processor
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1888,6 +1925,8 @@ public class Processor
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
         boolean bError = false;
 
@@ -2010,7 +2049,7 @@ public class Processor
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions);
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,responseSections);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -2253,8 +2292,7 @@ public class Processor
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            ZeroTransactionsProcessor processor = new ZeroTransactionsProcessor(persistenceSession,
-                    zeroTransactions);
+            ZeroTransactionsProcessor processor = new ZeroTransactionsProcessor(persistenceSession, zeroTransactions);
             zeroTransactionData = processor.processData();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2265,8 +2303,7 @@ public class Processor
         return zeroTransactionData;
     }
 
-    private ResZeroTransactions processZeroTransactions(ZeroTransactions zeroTransactions)
-            throws Exception {
+    private ResZeroTransactions processZeroTransactions(ZeroTransactions zeroTransactions) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ResZeroTransactions resZeroTransactions = null;
@@ -4285,15 +4322,16 @@ public class Processor
         return resEnterEvents;
     }
 
-    private ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg,CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest) {
+    private ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg,
+            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new ResCategoriesDiscountsAndRules();
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            boolean isManyOrgs = categoriesAndDiscountsRequest!=null && categoriesAndDiscountsRequest.isManyOrgs();
-            resCategoriesDiscountsAndRules.fillData(persistenceSession,idOfOrg,isManyOrgs);
+            boolean isManyOrgs = categoriesAndDiscountsRequest != null && categoriesAndDiscountsRequest.isManyOrgs();
+            resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {

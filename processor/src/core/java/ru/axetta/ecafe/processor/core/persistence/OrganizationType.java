@@ -12,22 +12,28 @@ import java.util.Map;
  */
 public enum OrganizationType {
 
-    /*0*/ SCHOOL("Общеобразовательное ОУ"),
-    /*1*/ KINDERGARTEN("Дошкольное ОУ"),
-    /*2*/ SUPPLIER("Поставщик питания"),
-    /*3*/ PROFESSIONAL("Профессиональное ОУ");
+    /*0*/ SCHOOL(0,"Общеобразовательное ОУ"),
+    /*1*/ KINDERGARTEN(1,"Дошкольное ОУ"),
+    /*2*/ SUPPLIER(2,"Поставщик питания"),
+    /*3*/ PROFESSIONAL(3,"Профессиональное ОУ");
 
+    private final Integer code;
     private final String description;
 
     static Map<Integer,OrganizationType> map = new HashMap<Integer,OrganizationType>();
     static {
         for (OrganizationType questionaryStatus : OrganizationType.values()) {
-            map.put(questionaryStatus.ordinal(), questionaryStatus);
+            map.put(questionaryStatus.getCode(), questionaryStatus);
         }
     }
 
-    private OrganizationType(String description) {
+    private OrganizationType(int code, String description) {
+        this.code = code;
         this.description = description;
+    }
+
+    public Integer getCode() {
+        return code;
     }
 
     @Override

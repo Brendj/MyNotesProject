@@ -73,3 +73,23 @@ CREATE TABLE cf_newcards
   cardprintedno BIGINT NOT NULL,
   CONSTRAINT cf_newcards_pk PRIMARY KEY (idofnewcard)
 );
+
+--Таблица руководителей клиентских групп
+CREATE TABLE cf_clientgroup_manager
+(
+  idofgroupmanager BIGSERIAL              NOT NULL,
+  version          BIGINT                 NOT NULL,
+  clientgroupname  CHARACTER VARYING(256) NOT NULL,
+  idofclient       BIGINT                 NOT NULL,
+  idoforg          BIGINT                 NOT NULL,
+  managertype      INTEGER                NOT NULL,
+  deleted          INTEGER                NOT NULL,
+  CONSTRAINT cf_clientgroup_manager_pk PRIMARY KEY (idofgroupmanager),
+  CONSTRAINT cf_clientgroup_manager_idofclient_fk FOREIGN KEY (idofclient) REFERENCES cf_clients (idofclient) ON DELETE NO ACTION ON UPDATE NO ACTION
+) WITH (OIDS = FALSE
+);
+
+--индекс по ид. клиента для таблицы руководители группы
+CREATE INDEX cf_clientgroup_manager_client_idx ON cf_clientgroup_manager USING BTREE (idofclient);
+--индекс по ид. группы и ид. организации для таблицы руководители группы
+CREATE INDEX cf_clientgroup_manager_org_idx ON cf_clientgroup_manager USING BTREE (idoforg);

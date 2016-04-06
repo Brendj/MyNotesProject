@@ -1014,6 +1014,8 @@ public class SyncResponse {
     private final ZeroTransactionData zeroTransactionData;
     private final ResZeroTransactions resZeroTransactions;
 
+    private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
             String directorName, Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
@@ -1028,7 +1030,7 @@ public class SyncResponse {
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
-            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions) {
+            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, List<AbstractToElement> responseSections) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1071,6 +1073,7 @@ public class SyncResponse {
         this.interactiveReportData = interactiveReportData;
         this.zeroTransactionData = zeroTransactionData;
         this.resZeroTransactions = resZeroTransactions;
+        this.responseSections = responseSections;
     }
 
     public Document toDocument() throws Exception {
@@ -1258,6 +1261,11 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(zeroTransactionData.toElement(document));
         }
 
+        if (this.responseSections != null) {
+            for (AbstractToElement section : this.responseSections) {
+                ecafeEnvelopeElement.appendChild(section.toElement(document));
+            }
+        }
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);
         document.appendChild(dataElement);

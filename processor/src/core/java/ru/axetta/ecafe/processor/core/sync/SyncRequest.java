@@ -23,6 +23,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransa
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionsBuilder;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.request.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistry;
@@ -2172,6 +2174,7 @@ public class SyncRequest {
         private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
         private final InteractiveReportDataBuilder interactiveReportDataBuilder;
         private final ZeroTransactionsBuilder zeroTransactionsBuilder;
+        private final ClientGroupManagerBuilder clientGroupManagerBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2204,6 +2207,7 @@ public class SyncRequest {
             this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
             this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
             this.zeroTransactionsBuilder = new ZeroTransactionsBuilder();
+            this.clientGroupManagerBuilder = new ClientGroupManagerBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2352,6 +2356,9 @@ public class SyncRequest {
             categoriesAndDiscountsBuilder.createMainNode(envelopeNode);
             CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest = categoriesAndDiscountsBuilder.build();
 
+            clientGroupManagerBuilder.createMainNode(envelopeNode);
+            ClientGroupManagerRequest clientGroupManagerRequest = clientGroupManagerBuilder.build();
+
             accountsRegistryRequestBuilder.createMainNode(envelopeNode);
             AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
 
@@ -2399,7 +2406,8 @@ public class SyncRequest {
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
                     clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
-                    interactiveReportRequest, zeroTransactionsRequest, categoriesAndDiscountsRequest);
+                    interactiveReportRequest, zeroTransactionsRequest, categoriesAndDiscountsRequest,
+                    clientGroupManagerRequest);
         }
 
 
@@ -2441,6 +2449,7 @@ public class SyncRequest {
     private final ReestrTaloonApproval reestrTaloonApprovalRequest;
     private final InteractiveReport interactiveReport;
     private final ZeroTransactions zeroTransactions;
+    ClientGroupManagerRequest clientGroupManagerRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
             AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
@@ -2450,7 +2459,7 @@ public class SyncRequest {
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
             ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions,
-            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest) {
+            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest, ClientGroupManagerRequest clientGroupManagerRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2483,6 +2492,7 @@ public class SyncRequest {
         this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
         this.interactiveReport = interactiveReport;
         this.zeroTransactions = zeroTransactions;
+        this.clientGroupManagerRequest = clientGroupManagerRequest;
     }
 
 
@@ -2572,6 +2582,10 @@ public class SyncRequest {
 
     public ClientGuardianRequest getClientGuardianRequest() {
         return clientGuardianRequest;
+    }
+
+    public ClientGroupManagerRequest getClientGroupManagerRequest() {
+        return clientGroupManagerRequest;
     }
 
     public ProhibitionMenuRequest getProhibitionMenuRequest() {

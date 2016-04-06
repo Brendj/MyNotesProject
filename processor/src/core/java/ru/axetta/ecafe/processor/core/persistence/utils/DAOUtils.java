@@ -2121,6 +2121,18 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByClientgroupManager(Session session) {
+        long version = 0L;
+        Criteria criteria = session.createCriteria(ClientGroupManager.class);
+        criteria.setProjection(Projections.max("version"));
+        Object result = criteria.uniqueResult();
+        if (result != null) {
+            Long currentMaxVersion = (Long) result;
+            version = currentMaxVersion + 1;
+        }
+        return version;
+    }
+
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientGroupManager" table="cf_clientgroup_manager">
+        <id name="idOfClientGroupManager" column="idofgroupmanager" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="clientGroupName" column="clientgroupname" type="string" not-null="true"/>
+        <property name="idOfClient" column="idofclient" type="long" not-null="true"/>
+        <property name="managerType" column="managertype" not-null="true" type="integer"/>
+        <property name="orgOwner" column="idoforg" not-null="true" type="long"/>
+        <property name="deleted" column="deleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+    </class>
+</hibernate-mapping>
