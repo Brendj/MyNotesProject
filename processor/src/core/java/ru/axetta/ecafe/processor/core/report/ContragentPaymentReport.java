@@ -331,7 +331,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             if (contragent != null)
                 clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
             clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
-            clientPaymentCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+            Object[] types = {ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, ClientPayment.CANCELLED_PAYMENT};
+            clientPaymentCriteria.add(Restrictions.in("payType", types));
             HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");
             List clientPayments = clientPaymentCriteria.list();
 
