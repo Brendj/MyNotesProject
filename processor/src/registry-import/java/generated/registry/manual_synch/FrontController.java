@@ -69,6 +69,26 @@ public interface FrontController {
         String nameFilter);
 
     /**
+     * @param idOfOrg
+     * @param nameFilter
+     * @param revisionDate
+     * @param actionFilter
+     * @return returns java.util.List<generated.registry.manual_synch.RegistryChangeItemV2>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeItemsV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.LoadRegistryChangeItemsV2")
+    @ResponseWrapper(localName = "loadRegistryChangeItemsResponseV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.LoadRegistryChangeItemsResponseV2")
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(
+            @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg,
+            @WebParam(name = "revisionDate", targetNamespace = "") long revisionDate,
+            @WebParam(name = "actionFilter", targetNamespace = "") int actionFilter,
+            @WebParam(name = "nameFilter", targetNamespace = "") String nameFilter);
+
+
+    /**
      * 
      * @param idOfOrg
      * @return
@@ -81,6 +101,19 @@ public interface FrontController {
     public List<RegistryChangeItem> refreshRegistryChangeItems(
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg);
+
+    /**
+     * @param idOfOrg
+     * @return returns java.util.List<generated.registry.manual_synch.RegistryChangeItemV2>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "refreshRegistryChangeItemsV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsV2")
+    @ResponseWrapper(localName = "refreshRegistryChangeItemsResponseV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsResponseV2")
+    public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(
+            @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg);
 
     /**
      * 
@@ -237,7 +270,7 @@ public interface FrontController {
         boolean fullNameValidation);
 
     /**
-     * 
+     *
      * @param idOfOrg
      * @return
      *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItem>
@@ -249,6 +282,20 @@ public interface FrontController {
     public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg);
+
+    /**
+     * @param idOfOrg
+     * @return returns java.util.List<generated.registry.manual_synch.RegistryChangeItemV2>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "refreshRegistryChangeItemsInternalV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalV2")
+    @ResponseWrapper(localName = "refreshRegistryChangeItemsInternalResponseV2",
+            targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalResponseV2")
+    public List<RegistryChangeItemV2> refreshRegistryChangeItemsInternalV2(
+            @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg);
 
     /**
      * 
