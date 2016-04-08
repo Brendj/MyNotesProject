@@ -29,8 +29,18 @@ public class CatalogFindTest {
     }
 
     @Test
-    public void searchInCatalogue() {
-        SelectEntriesRequest request = empProcessor.buildSelectEntryParams("79162224001");
+    public void searchInCatalogueByPhone() {
+        SelectEntriesRequest request = empProcessor.buildSelectEntryParams("79162224001", null);
+        searchInCatalogue(request);
+    }
+
+    @Test
+    public void searchInCatalogueByContractId() {
+        SelectEntriesRequest request = empProcessor.buildSelectEntryParams(null, 1L);
+        searchInCatalogue(request);
+    }
+
+    public void searchInCatalogue(SelectEntriesRequest request) {
         SelectEntriesResponse response = empProcessor.createStorageController().selectEntries(request);
         if (response.getErrorCode() == EMPProcessor.EMP_ERROR_CODE_NOTHING_FOUND) {
             System.out.println("Client not found in catalog");

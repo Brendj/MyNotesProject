@@ -71,6 +71,7 @@ public class EMPProcessor {
     public static final String ATTRIBUTE_EMAIL_SEND = "EMAIL_SEND";
     public static final String ATTRIBUTE_PUSH_SEND = "PUSH_SEND";
     //
+    public static final String SSOID_FAILED_TO_REGISTER = "-2";
     public static final String SSOID_REGISTERED_AND_WAITING_FOR_DATA = "-1";
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPSmsServiceImpl.class);
@@ -93,27 +94,33 @@ public class EMPProcessor {
     }
     protected String getConfigCatalogName() {
         if (catalogName!=null) return catalogName;
-        return catalogName=RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".catalogName", "SYS666254CAT0000000SUBSCRIPTIONS");
+        return catalogName=RuntimeContext.getInstance().getConfigProperties().getProperty(
+                CONFIG_PARAM_BASE + ".catalogName", "SYS666254CAT0000000SUBSCRIPTIONS");
     }
     protected String getConfigStorageServiceUrl() {
         if (storageServiceUrl!=null) return storageServiceUrl;
-        return storageServiceUrl=RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");
+        return storageServiceUrl=RuntimeContext.getInstance().getConfigProperties().getProperty(
+                CONFIG_PARAM_BASE + ".storageUrl", "http://api.uat.emp.msk.ru:8090/ws/storage/?wsdl");
     }
     protected String getConfigSyncServiceNode() {
         if (syncServiceNode!=null) return syncServiceNode;
-        return syncServiceNode=RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".syncServiceNode", "1");
+        return syncServiceNode=RuntimeContext.getInstance().getConfigProperties().getProperty(
+                CONFIG_PARAM_BASE + ".syncServiceNode", "1");
     }
     protected int getConfigPackageSize() {
         if (packageSize!=null) return packageSize;
-        return packageSize=Integer.parseInt(RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".packageSize", "100"));
+        return packageSize=Integer.parseInt(RuntimeContext.getInstance().getConfigProperties()
+                .getProperty(CONFIG_PARAM_BASE + ".packageSize", "100"));
     }
     protected Boolean getConfigLogging() {
         if (logging!=null) return logging;
-        return logging=Boolean.parseBoolean(RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".logging", "false"));
+        return logging=Boolean.parseBoolean(
+                RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE + ".logging", "false"));
     }
     protected long getConfigStatsLifetime() {
         if (statsLifetime!=null) return statsLifetime;
-        return statsLifetime=Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty(CONFIG_PARAM_BASE+".statsLifetime", "600000"));
+        return statsLifetime=Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty(
+                CONFIG_PARAM_BASE + ".statsLifetime", "600000"));
     }
     
     public boolean isAllowed() {
@@ -326,21 +333,31 @@ public class EMPProcessor {
 
     protected void bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
             String synchDate/*, EMPStatistics statistics*/) throws EMPException {
-        if (bindThrowSelect(storage, client, synchDate)) {
-            /*statistics.addBinded();
-            statistics.removeNotBinded();*/
+        /*if (bindThrowSelect(storage, client, synchDate)) {
+            / *statistics.addBinded();
+            statistics.removeNotBinded();* /
         } else if (bindThrowAdd(storage, client, synchDate)) {
-            /*statistics.addWaitBinding();
-            statistics.removeNotBinded();*/
+            / *statistics.addWaitBinding();
+            statistics.removeNotBinded();* /
+        }*/
+
+        if (bindThrowSelectByPhone(storage, client, synchDate)) {
+            return;
         }
+
+        if (!findAndDeleteThrowSelectByContractId(storage, client, synchDate)) {
+            log(synchDate + "Попытка удаления клиента [" + client.getIdOfClient() + "] " + client.getMobile()
+                    + " с использованием поиска по контракту завершилась неудачей (см. причину выше)");
+        }
+        bindThrowAdd(storage, client, synchDate);
     }
 
-    protected boolean bindThrowSelect(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
+    protected boolean bindThrowSelectByPhone(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
             String synchDate) throws EMPException {
         log(synchDate + "Попытка связать клиента [" + client.getIdOfClient() + "] " + client.getMobile()
                 + " с использованием поиска по телефону");
         //  execute reqeuest
-        SelectEntriesRequest request = buildSelectEntryParams(client);
+        SelectEntriesRequest request = buildSelectByPhoneEntryParams(client);
         SelectEntriesResponse response = storage.selectEntries(request);
         if (response==null) {
             log(synchDate + "Получен ответ: null");
@@ -424,6 +441,78 @@ public class EMPProcessor {
         return true;
     }
 
+    protected boolean findAndDeleteThrowSelectByContractId
+                                (StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
+                                String synchDate) throws EMPException {
+        log(synchDate + "Попытка найти клиента [" + client.getIdOfClient() + "] " + client.getMobile()
+                + " с использованием поиска по номеру контракта [" + client.getContractId() + "]");
+        //  execute reqeuest
+        SelectEntriesRequest request = buildSelectByContractEntryParams(client);
+        SelectEntriesResponse response = storage.selectEntries(request);
+        if (response==null) {
+            log(synchDate + "Получен ответ: null");
+            return false;
+        }
+        log(synchDate + "Получен ответ: " + response.getErrorCode() + ": " + response.getErrorMessage() + ", записей: "
+                + ((response.getResult()==null || response.getResult().getEntry()==null)?"null":response.getResult().getEntry().size()));
+        if (response.getErrorCode() == EMP_ERROR_CODE_NOTHING_FOUND || response.getResult()==null) {
+            return true;
+        }
+        if (response.getErrorCode() != 0) {
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+            String idsList = getClientIdsAsString(clients);
+            String newSsoid = String.format("E:[%s]", response.getErrorCode());
+            log(synchDate + "Произошла ошибка при попытке поиска клиента в ЕМП с телефоном [SSOID: " + client.getMobile() +
+                    "]: " + response.getErrorMessage() + ". Всем клиентам " + clients.size() + " [" + idsList +
+                    "] будут обновлены следующие параметры: {SSOID: " + newSsoid + "}");
+            for(Client cl : clients) {
+                cl.setSsoid(newSsoid);
+                DAOService.getInstance().saveEntity(cl);
+            }
+            throw new EMPException(response.getErrorCode(), response.getErrorMessage());
+        }
+
+        //  parse response entries
+        List<Entry> entries = response.getResult().getEntry();
+        if (entries.size() == 0) {
+            log(synchDate + "Клиент [" + client.getIdOfClient() + "] " + client.getMobile() + " не найден по номеру контракта [" + client.getContractId() + "]");
+            return true;
+        }
+        if (entries.size() > 1) {
+            log(synchDate + "Внимание! Больше 1 записи в каталоге по клиенту с телефоном [" + client.getIdOfClient()
+                    + "] " + client.getMobile() + " найден по номеру контракта [" + client.getContractId() + "] ");
+        }
+
+
+        log(synchDate + "Внимание! Осуществляем удаление клиента  с телефоном [" + client.getIdOfClient() + "] "
+                + client.getMobile() + ", найденный по номеру контракта [" + client.getContractId() + "] ");
+        DeleteEntriesRequest delRequest = buildDeleteByContractEntryParams(client);
+        DeleteEntriesResponse delResponse = storage.deleteEntries(delRequest);
+        if (delResponse==null) {
+            log(synchDate + "Получен ответ: null");
+            return false;
+        }
+        log(synchDate + "Получен ответ: " + delResponse.getErrorCode() + ": " + delResponse.getErrorMessage() + ", записей: " +
+                (delResponse.getResult() == null ||
+                 delResponse.getResult().getAffected() == null ? "-unknown-" : delResponse.getResult().getAffected()));
+        if(delResponse.getResult()==null) {
+            log(synchDate + "Получен ответ при удалении: null");
+            return false;
+        }
+        BigInteger affected = delResponse.getResult().getAffected();
+        if(affected == null) {
+            log(synchDate + "Получено пустое количество при удалении: null");
+            return false;
+        }
+        if(affected.longValue() > 1) {
+            log(synchDate + "Внимание! При попытке удаления записи клиента с телефоном [" + client.getIdOfClient() + "] "
+                + client.getMobile() + ", найденный по номеру контракта [" + client.getContractId() + "] было удалено БОЛЕЕ 1 записи!");
+        }
+        log(synchDate + "Удаление записи клиента с телефоном [" + client.getIdOfClient() + "] "
+                + client.getMobile() + ", найденный по номеру контракта [" + client.getContractId() + "] выполнено успешно.");
+        return true;
+    }
+
     private String getString(Client client, EntryAttribute attr) throws EMPException {
         String newValue = null;
         if (attr.getValue() != null &&
@@ -466,10 +555,7 @@ public class EMPProcessor {
             log(synchDate + "Произошла ошибка при попытке добавления клиента в ЕМП с телефоном [" + client.getMobile() +
                     "]: " + response.getErrorMessage() + ". Всем клиентам " + clients.size() + " [" + idsList +
                     "] будут обновлены следующие параметры: {SSOID: " + newSsoid + "}");
-            for(Client cl : clients) {
-                cl.setSsoid(newSsoid);
-                DAOService.getInstance().saveEntity(cl);
-            }
+            updateClientsSsoid(clients, newSsoid);
             throw new EMPException(response.getErrorCode(), response.getErrorMessage());
         }
 
@@ -477,18 +563,27 @@ public class EMPProcessor {
             List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
             String idsList = getClientIdsAsString(clients);
             log(synchDate + "Запрос выполнен, найдено " + clients.size() + " клиентов с телефоном " + client.getMobile() +
-                " [" + idsList + "] установлено {SSOID: -1}");
-            for(Client cl : clients) {
-                cl.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
-                DAOService.getInstance().saveEntity(cl);
-            }
+                " [" + idsList + "] установлено {SSOID: " + SSOID_REGISTERED_AND_WAITING_FOR_DATA + "}");
+            updateClientsSsoid(clients, SSOID_REGISTERED_AND_WAITING_FOR_DATA);
             /*client.setSsoid(SSOID_REGISTERED_AND_WAITING_FOR_DATA);
             DAOService.getInstance().saveEntity(client);*/
             return true;
         }
+
         log(synchDate + "Не удалось зарегистрировать клиента [" + client.getIdOfClient() + "] " + client.getMobile() + ", либо клиент уже зарегистрирован в ЕМП");
-        //throw new EMPException("Failed to make registration request");
-        return true;
+        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
+        String idsList = getClientIdsAsString(clients);
+        log(synchDate + "Всем клиентам (" + clients.size() + ") с телефоном [" + client.getMobile() + "] [" + idsList +
+                "] будут обновлены следующие параметры: {SSOID: " + SSOID_FAILED_TO_REGISTER + "}");
+        updateClientsSsoid(clients, SSOID_FAILED_TO_REGISTER);
+        return false;
+    }
+
+    protected void updateClientsSsoid(List<Client> clients, String newSsoid) {
+        for(Client cl : clients) {
+            cl.setSsoid(newSsoid);
+            DAOService.getInstance().saveEntity(cl);
+        }
     }
 
     protected AddEntriesRequest buildAddEntryParams(ru.axetta.ecafe.processor.core.persistence.Client client) {
@@ -509,7 +604,8 @@ public class EMPProcessor {
         entry.getAttribute().add(msisdn);
         EntryAttribute email = new EntryAttribute();
         email.setName(ATTRIBUTE_EMAIL_NAME);
-        email.getValue().add(client.getEmail());
+        //email.getValue().add(client.getEmail());  TODO: is it correct??
+        email.getValue().add("");
         entry.getAttribute().add(email);
         EntryAttribute ruleId = new EntryAttribute();
         ruleId.setName(ATTRIBUTE_RULE_ID);
@@ -556,11 +652,15 @@ public class EMPProcessor {
         return request;
     }
 
-    protected SelectEntriesRequest buildSelectEntryParams(Client client) {
-        return buildSelectEntryParams(client.getMobile());
+    protected SelectEntriesRequest buildSelectByPhoneEntryParams(Client client) {
+        return buildSelectEntryParams(client.getMobile(), null);
     }
 
-    protected SelectEntriesRequest buildSelectEntryParams(String clientMobile) {
+    protected SelectEntriesRequest buildSelectByContractEntryParams(Client client) {
+        return buildSelectEntryParams(null, client.getContractId());
+    }
+
+    protected SelectEntriesRequest buildSelectEntryParams(String clientMobile, Long clientContractId) {
         SelectEntriesRequest request = new SelectEntriesRequest();
         //  base
         request.setToken(getConfigToken());
@@ -575,12 +675,49 @@ public class EMPProcessor {
 
         //  criterions
         List<EntryAttribute> criteries = request.getCriteria();
-        EntryAttribute msisdn = new EntryAttribute();
-        msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
-        msisdn.getValue().add(clientMobile);
-        criteries.add(msisdn);
+        addCriteries(criteries, clientMobile, clientContractId);
 
         return request;
+    }
+
+    protected DeleteEntriesRequest buildDeleteByPhoneEntryParams(Client client) {
+        return buildDeleteEntryParams(client.getMobile(), null);
+    }
+
+    protected DeleteEntriesRequest buildDeleteByContractEntryParams(Client client) {
+        return buildDeleteEntryParams(null, client.getContractId());
+    }
+
+    protected DeleteEntriesRequest buildDeleteEntryParams(String clientMobile, Long clientContractId) {
+        DeleteEntriesRequest request = new DeleteEntriesRequest();
+        //  base
+        request.setToken(getConfigToken());
+        //request.setCatalogOwner("System");
+        request.setCatalogName(getConfigCatalogName());
+
+        //  criterions
+        List<EntryAttribute> criteries = request.getCriteria();
+        addCriteries(criteries, clientMobile, clientContractId);
+
+        return request;
+    }
+
+    private void addCriteries(List<EntryAttribute> criteries, String clientMobile, Long clientContractId) {
+        if(criteries == null) {
+            return;
+        }
+        if(clientMobile != null && clientMobile.length() > 0) {
+            EntryAttribute msisdn = new EntryAttribute();
+            msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
+            msisdn.getValue().add(clientMobile);
+            criteries.add(msisdn);
+        }
+        if (clientContractId != null) {
+            EntryAttribute msisdn = new EntryAttribute();
+            msisdn.setName(ATTRIBUTE_RULE_ID);
+            msisdn.getValue().add(clientContractId);
+            criteries.add(msisdn);
+        }
     }
 
     protected ReceiveDataChangesRequest buildReceiveEntryParams(long changeSequence) {
