@@ -737,13 +737,17 @@ public class EMPProcessor {
 
         return request;
     }
+
     @Async
     public void updateNotificationParams(Long contractId) {
-        Client client = ClientReadOnlyRepository.getInstance().findByContractId(contractId);
+        log("Получен запрос на изменение способа уведомления клиента с № контракта " + contractId);
+        Client client = DAOService.getInstance().getClientByContractId(contractId);
+        //Client client = ClientReadOnlyRepository.getInstance().findByContractId(contractId);
         if (client != null){
             updateNotificationParams(client);
         }
     }
+
     @Async
     public void updateNotificationParams(Client client) {
 
@@ -756,12 +760,15 @@ public class EMPProcessor {
 
         List<EntryAttribute> criteria = request.getCriteria();
 
-        if (client.getSsoid() != null && !client.getSsoid().equals("") && !client.getSsoid().equals("-1")) {
+        if (client.getSsoid() != null && !client.getSsoid().equals("") &&
+            !client.getSsoid().equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA) && !client.getSsoid().equals(SSOID_FAILED_TO_REGISTER)) {
+            logger.debug("Клиент уже привязан к ЕМП, обновление через SSOID " + client.getSsoid());
             EntryAttribute ssoid = new EntryAttribute();
             ssoid.setName(ATTRIBUTE_SSOID_NAME);
             ssoid.getValue().add(client.getSsoid());
             criteria.add(ssoid);
         } else {
+            logger.debug("Клиент не привязан к ЕМП, обновление через мобильный телефон " + client.getMobile());
             EntryAttribute msisdn = new EntryAttribute();
             msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
             msisdn.getValue().add(client.getMobile());
@@ -785,7 +792,18 @@ public class EMPProcessor {
         emailSend.getValue().add(client.isNotifyViaEmail());
         attribute.add(emailSend);
 
-        storage.updateEntries(request);
+        logger.debug("Отправка запроса на изменение информирования клиента...");
+        UpdateEntriesResponse response = storage.updateEntries(request);
+        if (response.getErrorCode() != 0) {
+            logger.error(String.format("Failed to proceed updates: [code=%s] %s", response.getErrorCode(),
+                    response.getErrorMessage()));
+            return;
+        }
+
+        log("на изменение информирования: " + response.getErrorCode() + ": " + response.getErrorMessage()
+                + ", записей: " +
+                (response.getResult() == null || response.getResult().getAffected() == null ? "-unknown-"
+                        : response.getResult().getAffected()));
     }
 
     public HashMap<String, List<String>> getEntryAttributesByMobile(String clientMobileString) {
@@ -819,7 +837,8 @@ public class EMPProcessor {
             ssoidString = client.getSsoid();
         } catch (Exception e) {}
 
-        if (client != null && ssoidString != null && !ssoidString.equals("") && !ssoidString.equals("-1")) {
+        if (client != null && ssoidString != null && !ssoidString.equals("") &&
+            !ssoidString.equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA) && !ssoidString.equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA)) {
             EntryAttribute ssoid = new EntryAttribute();
             ssoid.setName(ATTRIBUTE_SSOID_NAME);
             ssoid.getValue().add(client.getSsoid());
