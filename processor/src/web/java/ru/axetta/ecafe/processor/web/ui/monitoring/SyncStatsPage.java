@@ -125,7 +125,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
             HibernateUtils.close(persistenceSession, logger);
         }
         result.add(new Item("Успешных синхронизаций", successfulSyncCount.toString()));
-        result.add(new Item("Повторных синхронизаций", filteredSyncCount.toString()));
+        result.add(new Item("Повторных (отбитых) синхронизаций", filteredSyncCount.toString())); // todo заменить слово "повторных" на "отбитых"
         result.add(new Item("Неуспешных синхронизаций", errorSyncCount.toString()));
         result.add(new Item("Среднее время реконнекта (мс)", averageResyncTime.toString()));
         result.add(new Item("Минимальное время синхронизации (мс)", minSyncDuration !=  null ? minSyncDuration.toString() : "0"));
