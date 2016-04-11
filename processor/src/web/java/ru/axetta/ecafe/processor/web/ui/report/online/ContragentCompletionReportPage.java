@@ -5,9 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
-import net.sf.jasperreports.engine.export.JRXlsExporter;
-import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionItem;
@@ -39,6 +38,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 /**
@@ -51,7 +51,8 @@ import java.util.*;
 @Component
 @Scope("session")
 public class ContragentCompletionReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
-
+    
+    private String htmlReport;
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
     protected Date startDate;
@@ -62,6 +63,8 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
     private Contragent defaultSupplier;
     private Integer contragentListCount = 0;
     private Calendar localCalendar;
+
+    private Boolean showNullValues = false;
 
     private Boolean transactionsWithoutOrgIsPresented = false;
 
@@ -230,6 +233,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         Session session = (Session) entityManager.getDelegate();
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
+        builder.getReportProperties().setProperty("showNullValues", showNullValues.toString());
         try {
             //ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
             BasicReportJob report = builder.build(session,startDate, endDate, localCalendar);
@@ -278,6 +282,39 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         }
     }
 
+    public Object buildReportHTML() {
+        if (validateFormData()) return null;
+        AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentCompletionReport.class.getSimpleName() + ".jasper";
+        ContragentCompletionReport.Builder builder = new ContragentCompletionReport.Builder(templateFilename);
+        builder.setContragent(defaultSupplier);
+        Session session = (Session) entityManager.getDelegate();
+        builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+        builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
+        builder.getReportProperties().setProperty("showNullValues", showNullValues.toString());
+        try {
+            BasicReportJob report = builder.build(session, startDate, endDate, localCalendar);
+            if (report != null) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                htmlReport = os.toString("UTF-8");
+                os.close();
+            }
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при построении отчета:", e);
+        }
+        return null;
+    }
+
     public Integer getContragentListCount() {
         return contragentListCount;
     }
@@ -318,6 +355,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
     }
 
     public void setEndDate(Date endDate) {
+        if(endDate == null) return;
         localCalendar.setTime(endDate);
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         localCalendar.add(Calendar.SECOND, -1);
@@ -332,8 +370,24 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         this.startDate = startDate;
     }
 
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+    }
+
     public boolean isAllHide() {
         return false;
+    }
+
+    public Boolean getShowNullValues() {
+        return showNullValues;
+    }
+
+    public void setShowNullValues(Boolean showNullValues) {
+        this.showNullValues = showNullValues;
     }
 
     public Object showOrgListSelectPage() {

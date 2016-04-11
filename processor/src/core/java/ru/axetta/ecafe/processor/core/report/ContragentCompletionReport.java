@@ -21,7 +21,8 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormatSymbols;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -47,15 +48,11 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            calendar.setTime(startTime);
-            int month = calendar.get(Calendar.MONTH);
-            parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
-            parameterMap.put("month", month + 1);
-            parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
-            parameterMap.put("year", calendar.get(Calendar.YEAR));
-            parameterMap.put("startDate", startTime);
-            parameterMap.put("endDate", endTime);
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            parameterMap.put("startDate", dateFormat.format(startTime));
+            parameterMap.put("endDate", dateFormat.format(endTime));
             parameterMap.put("contragentName", contragent.getContragentName());
+            parameterMap.put("showNullValues", getReportProperties().getProperty("showNullValues"));
 
             String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -129,8 +126,8 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                         Org org1 = contragentDAOService.getOrdByOrgId(idOrg);
                         ContragentCompletionReportItem contragentCompletionReportItem = null;
                         for (int i = 0; i < contragentList.size(); i++) {
-                            contragentCompletionReportItem = new ContragentCompletionReportItem(
-                                    contragentList.get(i).getContragentName(), org1.getShortName(), 0L);
+                            contragentCompletionReportItem = new ContragentCompletionReportItem(org1.getIdOfOrg(),
+                                    org1.getShortName(), org1.getCity(), contragentList.get(i).getContragentName(), 0L, 0);
                             list.add(contragentCompletionReportItem);
                         }
                     }
@@ -138,8 +135,8 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                     for (Org org : orgItems) {
                         ContragentCompletionReportItem contragentCompletionReportItem = null;
                         for (int i = 0; i < contragentList.size(); i++) {
-                            contragentCompletionReportItem = new ContragentCompletionReportItem(
-                                    contragentList.get(i).getContragentName(), org.getShortName(), 0L);
+                            contragentCompletionReportItem = new ContragentCompletionReportItem(org.getIdOfOrg(),
+                                    org.getShortName(), org.getCity(), contragentList.get(i).getContragentName(), 0L, 0);
                             list.add(contragentCompletionReportItem);
                         }
                         idOfOrgList.add(org.getIdOfOrg());
@@ -153,8 +150,21 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
             List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateReportItems(idOfOrgList,
                     startTime, endTime);
             list.addAll(contragentCompletionReportItems);
+            if(parameterMap.get("showNullValues") == "false") {
+                list = deleteAllNullPayments(list);
+            }
             return new JRBeanCollectionDataSource(list);
         }
+    }
+
+    private static List<ContragentCompletionReportItem> deleteAllNullPayments(List<ContragentCompletionReportItem> list){
+        List<ContragentCompletionReportItem> newList = new ArrayList<ContragentCompletionReportItem>();
+        for(ContragentCompletionReportItem item : list){
+            if ((item.getPaySum() > 0L) || (item.getPaymentCount() > 0)){
+                newList.add(item);
+            }
+        }
+        return newList;
     }
 
     @Override

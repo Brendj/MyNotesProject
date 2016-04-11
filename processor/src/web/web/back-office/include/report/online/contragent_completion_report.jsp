@@ -15,6 +15,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
 <h:panelGrid binding="#{contragentCompletionReportPage.pageComponent}" id="contragentCompletionReportPanelGrid" styleClass="borderless-grid">
@@ -60,10 +61,14 @@
             </h:selectOneMenu>
         </h:panelGroup>
 
+        <h:outputText escape="false" value="Показать нулевые значения" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{contragentCompletionReportPage.showNullValues}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.generate}"
+        <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.buildReportHTML}"
                            reRender="contragentCompletionReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <h:commandButton value="Генерировать отчет в Excel" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
@@ -75,73 +80,23 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="contragentCompletionReportTable" value="#{contragentCompletionReportPage.contragentCompletionItems}"
-                    var="contragentCompletionItem" rowKeyVar="row">
-        <f:facet name="header">
-            <rich:columnGroup>
-                <%--colspan="5" с учетом скрытия полей "Локация", "Тэги"--%>
-                <rich:column colspan="3">
-                    <h:outputText value="Организация"/>
-                </rich:column>
-                <rich:column colspan="#{contragentCompletionReportPage.contragentListCount}">
-                    <h:outputText value="Агент" />
-                </rich:column>
-                <rich:column rowspan="2">
-                    <h:outputText value="Количество оплат" />
-                </rich:column>
-                <rich:column rowspan="2">
-                    <h:outputText value="Итого"/>
-                </rich:column>
-                <rich:column breakBefore="true">
-                    <h:outputText value="Город"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="ИД"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="Наименование"/>
-                </rich:column>
-                <rich:column rendered="#{contragentCompletionReportPage.allHide}">
-                    <h:outputText value="Локация"/>
-                </rich:column>
-                <rich:column rendered="#{contragentCompletionReportPage.allHide}">
-                    <h:outputText value="Тэги"/>
-                </rich:column>
-                <rich:columns var="contragent" value="#{contragentCompletionReportPage.contragentList}">
-                    <h:outputText value="#{contragent.contragentName}"/>
-                </rich:columns>
-            </rich:columnGroup>
-        </f:facet>
-        <rich:column>
-            <h:outputText value="#{contragentCompletionItem.educationalCity}"/>
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{contragentCompletionItem.educationalId}"/>
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
-        </rich:column>
-        <rich:column rendered="#{contragentCompletionReportPage.allHide}">
-            <h:outputText value="#{contragentCompletionItem.educationalLocation}"/>
-        </rich:column>
-        <rich:column rendered="#{contragentCompletionReportPage.allHide}">
-            <h:outputText value="#{contragentCompletionItem.educationalTags}"/>
-        </rich:column>
-        <rich:columns  var="contragent" value="#{contragentCompletionReportPage.contragentList}">
-            <h:outputText value="#{contragentCompletionItem.getContragentPayValue(contragent.idOfContragent) /100}">
-                <f:convertNumber pattern="#0.00"/>
-            </h:outputText>
-        </rich:columns>
-        <rich:column>
-            <h:outputText value="#{contragentCompletionItem.paymentsCount}" />
-        </rich:column>
-        <rich:column>
-            <h:outputText value="#{contragentCompletionItem.totalSumByOrg / 100}">
-                <f:convertNumber pattern="#0.00"/>
-            </h:outputText>
-        </rich:column>
-    </rich:dataTable>
-    <%--<h:commandButton value="Выгрузить в CSV" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />--%>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+
+    <h:panelGrid styleClass="borderless-grid" id="contragentCompletionReportTable">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty contragentCompletionReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по обороту" styleClass="output-text" />
+            <f:verbatim>
+                <%--<style type="text/css">--%>
+                <%--div.htmlReportContent :empty {--%>
+                <%--display: none;--%>
+                <%--}--%>
+                <%--</style>--%>
+                <div class="htmlReportContent"> ${contragentCompletionReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
+    </h:panelGrid>
+
 </h:panelGrid>

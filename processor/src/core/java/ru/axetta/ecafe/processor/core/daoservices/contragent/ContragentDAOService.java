@@ -111,12 +111,15 @@ public class ContragentDAOService extends AbstractDAOService {
         List<ContragentCompletionReportItem> contragentCompletionReportItems = new ArrayList<ContragentCompletionReportItem>();
         for (ContragentCompletionItem contragentCompletionItem : contragentCompletionItems) {
             for (Contragent contragent : getPayAgentContragent()) {
+                Long educationalId = contragentCompletionItem.getEducationalId();
                 String educationalInstitutionName = contragentCompletionItem.getEducationalInstitutionName();
                 String contragentName = contragent.getContragentName();
+                String educationalCity = contragentCompletionItem.getEducationalCity();
+                int paymentCount = contragentCompletionItem.getPaymentsCount();
                 Long paySum = contragentCompletionItem.getContragentPayValue(contragent.getIdOfContragent());
                 if ((paySum > 0) && (contragentName != null) && (educationalInstitutionName != null)) {
-                    ContragentCompletionReportItem contragentCompletionReportItem = new ContragentCompletionReportItem(
-                            contragentName, educationalInstitutionName, paySum);
+                    ContragentCompletionReportItem contragentCompletionReportItem = new ContragentCompletionReportItem(educationalId,
+                            educationalInstitutionName, educationalCity, contragentName,  paySum, paymentCount);
                     contragentCompletionReportItems.add(contragentCompletionReportItem);
                 }
             }
