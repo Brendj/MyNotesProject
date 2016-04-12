@@ -78,6 +78,8 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
             Date generateEndTime = new Date();
+
+            session.close();
             return new ContragentCompletionReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, contragent.getIdOfContragent());
         }

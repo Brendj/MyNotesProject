@@ -104,6 +104,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         localCalendar.add(Calendar.DAY_OF_MONTH, 1);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
+        contragentDAOService.getSession().close();
     }
 
     public Object generate(){
