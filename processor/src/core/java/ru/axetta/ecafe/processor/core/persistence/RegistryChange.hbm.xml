@@ -34,6 +34,9 @@
         <property name="applied" column="Applied" type="boolean" not-null="true"/>
         <property name="error" column="Error" type="string" length="256"/>
         <property name="notificationId" column="NotificationId" type="string" length="15"/>
+        <property name="gender" column="Gender" type="int"/>
+        <property name="birthDate" column="BirthDate" type="long"/>
+        <property name="benefitOnAdmission" column="BenefitOnAdmission" type="string" length="3000"/>
     </class>
 </hibernate-mapping>
 

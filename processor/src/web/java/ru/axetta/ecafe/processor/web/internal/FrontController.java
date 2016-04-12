@@ -91,6 +91,26 @@ public class FrontController extends HttpServlet {
                                             loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
     }
 
+    @WebMethod(operationName = "loadRegistryChangeItemsV2")
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+            @WebParam(name = "nameFilter") String nameFilter) {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
+        Integer af = actionFilter;
+        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            af = null;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
+    }
+
     @WebMethod(operationName = "loadRegistryChangeItemsInternal")
     public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
             @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,

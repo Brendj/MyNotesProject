@@ -32,6 +32,11 @@ public class RegistryChange {
     protected String notificationId;
     protected Integer type;
     protected Boolean applied;
+
+    protected Integer gender;
+    protected Long birthDate;
+    protected String benefitOnAdmission;
+
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
 
@@ -41,7 +46,7 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId) {
+            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -62,6 +67,9 @@ public class RegistryChange {
         this.applied = applied;
         this.error = error;
         this.notificationId = notificationId;
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.benefitOnAdmission = benefitOnAdmission;
     }
 
     public Long getIdOfOrg() {
@@ -222,5 +230,29 @@ public class RegistryChange {
 
     public void setNotificationId(String notificationId) {
         this.notificationId = notificationId;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Long getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Long birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBenefitOnAdmission() {
+        return benefitOnAdmission;
+    }
+
+    public void setBenefitOnAdmission(String benefitOnAdmission) {
+        this.benefitOnAdmission = benefitOnAdmission;
     }
 }

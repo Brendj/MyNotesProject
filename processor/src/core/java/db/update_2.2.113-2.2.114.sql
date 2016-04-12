@@ -93,3 +93,7 @@ CREATE TABLE cf_clientgroup_manager
 CREATE INDEX cf_clientgroup_manager_client_idx ON cf_clientgroup_manager USING BTREE (idofclient);
 --индекс по ид. группы и ид. организации для таблицы руководители группы
 CREATE INDEX cf_clientgroup_manager_org_idx ON cf_clientgroup_manager USING BTREE (idoforg);
+
+ALTER TABLE CF_RegistryChange ADD COLUMN gender integer;
+ALTER TABLE CF_RegistryChange ADD COLUMN birthDate bigint;
+ALTER TABLE CF_RegistryChange ADD COLUMN benefitOnAdmission character varying (3000);

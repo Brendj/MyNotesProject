@@ -10,10 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeCallback;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeRevisionItem;
+import ru.axetta.ecafe.processor.web.internal.front.items.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +59,35 @@ public class FrontControllerProcessor {
             }
             return items;
         } catch(FrontController.FrontControllerException fce) {
+            logger.error("Failed to pass auth", fce);
+            return Collections.EMPTY_LIST;
+        } catch (Exception e) {
+            logger.error("Failed to load registry change items form database", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(long idOfOrg, long revisionDate) {
+        return loadRegistryChangeItemsV2(idOfOrg, revisionDate, null, null);
+    }
+
+
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(long idOfOrg, long revisionDate, Integer actionFilter,
+            String nameFilter) {
+
+        try {
+            List<RegistryChangeItemV2> itemParams = new ArrayList<RegistryChangeItemV2>();
+
+            List<RegistryChange> changes = DAOService.getInstance()
+                    .getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter);
+
+            RegistryChangeItemV2 registryChangeItemV2;
+
+            for (RegistryChange c : changes) {
+            }
+
+            return itemParams;
+        } catch (FrontController.FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
             return Collections.EMPTY_LIST;
         } catch (Exception e) {
