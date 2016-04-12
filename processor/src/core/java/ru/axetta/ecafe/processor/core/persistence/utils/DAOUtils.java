@@ -27,6 +27,7 @@ import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1077,14 +1078,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getAccountTransactionsForOrgSinceTimeV2(Session persistenceSession, Org org,
+    public static List<AccountTransactionExtended> getAccountTransactionsForOrgSinceTimeV2(Session persistenceSession, Org org,
             Date fromDateTime, Date toDateTime) {
         String str_query = "select t.idOfTransaction, t.source, t.transactionDate, " +
-                "t.sourceType, t.transactionSum, t.idOfClient, " +
-                "coalesce(t.transactionSubBalance1Sum, 0) as transactionSubBalance1Sum, coalesce(query.sum, 0) as complexSum, " +
-                "coalesce(query.discount, 0) as discountSum, coalesce(query.orderType, 0) as orderType " +
+                "t.sourceType, t.transactionSum,  " +
+                "coalesce(t.transactionSubBalance1Sum, 0) as transactionSubBalance1Sum, coalesce(query.complexsum, 0) as complexsum, " +
+                "coalesce(query.discountsum, 0) as discountsum, coalesce(query.orderType, 0) as ordertype, t.idOfClient " +
                 "from cf_transactions t left join " +
-                "(select coalesce(sum(dd.qty * dd.rprice), 0) as sum, coalesce(sum(dd.socDiscount), 0) as discount, oo.orderType, oo.idOfTransaction " +
+                "(select coalesce(sum(dd.qty * dd.rprice), 0) as complexsum, coalesce(sum(dd.socDiscount), 0) as discountsum, oo.orderType, oo.idOfTransaction " +
                 "from cf_orders oo join cf_orderdetails dd on oo.idOfOrder = dd.idOfOrder and oo.idOfOrg = dd.idOfOrg " +
                 "where oo.createdDate > :begDate AND oo.createddate <= :endDate AND oo.idOfOrg in (:orgs) " +
                 "AND dd.idOfOrg in (:orgs) AND dd.menuType between :menuMin and :menuMax " +
@@ -1092,14 +1093,17 @@ public class DAOUtils {
                 "on t.idOfTransaction = query.idOfTransaction " +
                 "where t.idOfOrg in (:orgs) AND t.transactionDate > :begDate AND t.transactionDate <= :endDate " +
                 "order by t.idOfClient";
-        Query q = persistenceSession.createSQLQuery(str_query);
+        SQLQuery q = persistenceSession.createSQLQuery(str_query);
         q.setParameter("begDate", fromDateTime.getTime());
         q.setParameter("endDate", toDateTime.getTime());
         q.setParameterList("orgs", org.getFriendlyOrg());
         q.setParameter("menuMin", OrderDetail.TYPE_COMPLEX_MIN);
         q.setParameter("menuMax", OrderDetail.TYPE_COMPLEX_MAX);
-
         q.setResultTransformer(Transformers.aliasToBean(AccountTransactionExtended.class));
+        q.addScalar("idoftransaction").addScalar("source").addScalar("transactiondate").addScalar("sourcetype").addScalar("transactionsum")
+                .addScalar("transactionsubbalance1sum").addScalar("complexsum", StandardBasicTypes.BIG_INTEGER).addScalar("discountsum",
+                StandardBasicTypes.BIG_INTEGER).addScalar("ordertype")
+                .addScalar("idofclient");
         return q.list();
     }
 
