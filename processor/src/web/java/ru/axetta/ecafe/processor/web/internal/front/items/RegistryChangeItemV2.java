@@ -14,4 +14,14 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class RegistryChangeItemV2 {
+/*
+    public List<RegistryChangeItemParam> list;
+
+    public List<RegistryChangeItemParam> getList() {
+        return list;
+    }
+
+    public void setList(List<RegistryChangeItemParam> list) {
+        this.list = list;
+    }*/
 }

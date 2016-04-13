@@ -77,10 +77,10 @@ public interface FrontController {
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "loadRegistryChangeItems", targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.LoadRegistryChangeItems")
-    @ResponseWrapper(localName = "loadRegistryChangeItemsResponse", targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.LoadRegistryChangeItemsResponse")
+    @RequestWrapper(localName = "loadRegistryChangeItemsV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.LoadRegistryChangeItemsV2")
+    @ResponseWrapper(localName = "loadRegistryChangeItemsResponseV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.LoadRegistryChangeItemsResponseV2")
     public List<RegistryChangeItemV2> loadRegistryChangeItemsV2(
             @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg,
             @WebParam(name = "revisionDate", targetNamespace = "") long revisionDate,
@@ -108,10 +108,10 @@ public interface FrontController {
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "refreshRegistryChangeItems", targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.RefreshRegistryChangeItems")
-    @ResponseWrapper(localName = "refreshRegistryChangeItemsResponse", targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsResponse")
+    @RequestWrapper(localName = "refreshRegistryChangeItemsV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsV2")
+    @ResponseWrapper(localName = "refreshRegistryChangeItemsResponseV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsResponseV2")
     public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(
             @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg);
 
@@ -289,11 +289,11 @@ public interface FrontController {
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "refreshRegistryChangeItemsInternal", targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternal")
-    @ResponseWrapper(localName = "refreshRegistryChangeItemsInternalResponse",
+    @RequestWrapper(localName = "refreshRegistryChangeItemsInternalV2", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalV2")
+    @ResponseWrapper(localName = "refreshRegistryChangeItemsInternalResponseV2",
             targetNamespace = "http://ru.axetta.ecafe",
-            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalResponse")
+            className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalResponseV2")
     public List<RegistryChangeItemV2> refreshRegistryChangeItemsInternalV2(
             @WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg);
 

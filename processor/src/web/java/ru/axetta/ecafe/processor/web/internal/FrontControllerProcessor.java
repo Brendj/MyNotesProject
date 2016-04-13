@@ -83,7 +83,78 @@ public class FrontControllerProcessor {
 
             RegistryChangeItemV2 registryChangeItemV2;
 
+            List<RegistryChangeItemParam> registryChangeItemParams;
+
             for (RegistryChange c : changes) {
+                registryChangeItemV2 = new RegistryChangeItemV2();
+                registryChangeItemParams = new ArrayList<RegistryChangeItemParam>();
+
+                RegistryChangeItemParam r1 = new RegistryChangeItemParam("idOfOrg", c.getIdOfOrg().toString());
+                registryChangeItemParams.add(r1);
+
+                RegistryChangeItemParam r2 = new RegistryChangeItemParam("idOfMigrateOrgTo",  c.getIdOfMigrateOrgTo() == null ? "-1" : c.getIdOfMigrateOrgTo().toString());
+                registryChangeItemParams.add(r2);
+
+                RegistryChangeItemParam r3 = new RegistryChangeItemParam("idOfMigrateOrgFrom", c.getIdOfMigrateOrgFrom() == null ? "-1" : c.getIdOfMigrateOrgFrom().toString());
+                registryChangeItemParams.add(r3);
+
+                RegistryChangeItemParam r4 = new RegistryChangeItemParam("createDate", c.getCreateDate().toString());
+                registryChangeItemParams.add(r4);
+
+                RegistryChangeItemParam r5 = new RegistryChangeItemParam("idOfRegistryChange", c.getIdOfRegistryChange().toString());
+                registryChangeItemParams.add(r5);
+
+                RegistryChangeItemParam r6 = new RegistryChangeItemParam("clientGUID", c.getClientGUID());
+                registryChangeItemParams.add(r6);
+
+                RegistryChangeItemParam r7 = new RegistryChangeItemParam("firstName", c.getFirstName());
+                registryChangeItemParams.add(r7);
+
+                RegistryChangeItemParam r8 = new RegistryChangeItemParam("secondName", c.getSecondName());
+                registryChangeItemParams.add(r8);
+
+                RegistryChangeItemParam r9 = new RegistryChangeItemParam("surname", c.getSurname());
+                registryChangeItemParams.add(r9);
+
+                RegistryChangeItemParam r10 = new RegistryChangeItemParam("groupName", c.getGroupName());
+                registryChangeItemParams.add(r10);
+
+                RegistryChangeItemParam r11 = new RegistryChangeItemParam("firstNameFrom", c.getFirstNameFrom());
+                registryChangeItemParams.add(r11);
+
+                RegistryChangeItemParam r12 = new RegistryChangeItemParam("secondNameFrom", c.getSecondNameFrom());
+                registryChangeItemParams.add(r12);
+
+                RegistryChangeItemParam r13 = new RegistryChangeItemParam("surnameFrom", c.getSurnameFrom());
+                registryChangeItemParams.add(r13);
+
+                RegistryChangeItemParam r14 = new RegistryChangeItemParam("groupNameFrom", c.getGroupNameFrom());
+                registryChangeItemParams.add(r14);
+
+                RegistryChangeItemParam r15 = new RegistryChangeItemParam("idOfClient", c.getIdOfClient() == null ? "-1" : c.getIdOfClient().toString());
+                registryChangeItemParams.add(r15);
+
+                RegistryChangeItemParam r16 = new RegistryChangeItemParam("operation", c.getOperation().toString());
+                registryChangeItemParams.add(r16);
+
+                RegistryChangeItemParam r17 = new RegistryChangeItemParam("applied", c.getApplied().toString());
+                registryChangeItemParams.add(r17);
+
+                RegistryChangeItemParam r18 = new RegistryChangeItemParam("error", c.getError().toString());
+                registryChangeItemParams.add(r18);
+
+                RegistryChangeItemParam r19 = new RegistryChangeItemParam("gender", c.getGender().toString());
+                registryChangeItemParams.add(r19);
+
+                RegistryChangeItemParam r20 = new RegistryChangeItemParam("birthDate", c.getBirthDate().toString());
+                registryChangeItemParams.add(r20);
+
+                RegistryChangeItemParam r21 = new RegistryChangeItemParam("benefitOnAdmission", c.getBenefitOnAdmission());
+                registryChangeItemParams.add(r21);
+
+               // registryChangeItemV2.setList(registryChangeItemParams);
+
+                itemParams.add(registryChangeItemV2);
             }
 
             return itemParams;
