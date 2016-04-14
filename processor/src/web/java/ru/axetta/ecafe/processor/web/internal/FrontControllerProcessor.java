@@ -143,13 +143,13 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r18 = new RegistryChangeItemParam("error", c.getError().toString());
                 registryChangeItemParams.add(r18);
 
-                RegistryChangeItemParam r19 = new RegistryChangeItemParam("gender", c.getGender().toString());
+                RegistryChangeItemParam r19 = new RegistryChangeItemParam("gender", c.getGender() == null ? " " : c.getGender().toString());
                 registryChangeItemParams.add(r19);
 
-                RegistryChangeItemParam r20 = new RegistryChangeItemParam("birthDate", c.getBirthDate().toString());
+                RegistryChangeItemParam r20 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? " " : c.getBirthDate().toString());
                 registryChangeItemParams.add(r20);
 
-                RegistryChangeItemParam r21 = new RegistryChangeItemParam("benefitOnAdmission", c.getBenefitOnAdmission());
+                RegistryChangeItemParam r21 = new RegistryChangeItemParam("benefitOnAdmission", c.getBenefitOnAdmission() == null ? " " : c.getBenefitOnAdmission());
                 registryChangeItemParams.add(r21);
 
                // registryChangeItemV2.setList(registryChangeItemParams);
@@ -191,6 +191,19 @@ public class FrontControllerProcessor {
         try {
             RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
+        } catch (BadOrgGuidsException eGuid) {
+            throw eGuid;
+        }
+        catch (Exception e) {
+            logger.error("Failed to refresh registry change items", e);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(long idOfOrg) throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
+            return loadRegistryChangeItemsV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
         } catch (BadOrgGuidsException eGuid) {
             throw eGuid;
         }

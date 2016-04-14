@@ -144,6 +144,19 @@ public class FrontController extends HttpServlet {
                 refreshRegistryChangeItems(idOfOrg);
     }
 
+    @WebMethod(operationName = "refreshRegistryChangeItemsV2")
+    public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch(FrontControllerException fce) {
+            logger.error("Failed to pass auth", fce);
+            return Collections.EMPTY_LIST;
+        }
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeItemsV2(idOfOrg);
+    }
+
     @WebMethod(operationName = "refreshRegistryChangeItemsInternal")
     public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
         try {
@@ -153,6 +166,17 @@ public class FrontController extends HttpServlet {
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 refreshRegistryChangeItems(idOfOrg);
+    }
+
+    @WebMethod(operationName = "refreshRegistryChangeItemsInternalV2")
+    public List<RegistryChangeItemV2> refreshRegistryChangeItemsInternalV2(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeItemsV2(idOfOrg);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItem")
