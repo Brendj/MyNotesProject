@@ -244,9 +244,19 @@ public class ContragentListSelectPage extends BasicPage {
         for (Item item : getItems()) {
             item.setSelected(true);
         }
+        selectedIds = "";
+        StringBuilder str = new StringBuilder();
+        for (Item item : items) {
+            if (str.length() > 0) {
+                str.append(",");
+            }
+            str.append(item.getIdOfContragent());
+        }
+        selectedIds = str.toString();
     }
 
     public void deselectAllItems() {
+        selectedIds = "";
         for (Item item : getItems()) {
             item.setSelected(false);
         }
