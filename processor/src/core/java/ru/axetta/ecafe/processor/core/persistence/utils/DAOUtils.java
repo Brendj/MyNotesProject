@@ -36,6 +36,7 @@ import javax.persistence.TypedQuery;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -1101,8 +1102,8 @@ public class DAOUtils {
         q.setParameter("menuMax", OrderDetail.TYPE_COMPLEX_MAX);
         q.setResultTransformer(Transformers.aliasToBean(AccountTransactionExtended.class));
         q.addScalar("idoftransaction").addScalar("source").addScalar("transactiondate").addScalar("sourcetype").addScalar("transactionsum")
-                .addScalar("transactionsubbalance1sum").addScalar("complexsum", StandardBasicTypes.BIG_INTEGER).addScalar("discountsum",
-                StandardBasicTypes.BIG_INTEGER).addScalar("ordertype")
+                .addScalar("transactionsubbalance1sum").addScalar("complexsum", StandardBasicTypes.BIG_DECIMAL).addScalar("discountsum",
+                StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
     }

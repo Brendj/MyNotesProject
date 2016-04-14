@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync.response;
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.ResultOperation;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,9 +24,9 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class AccRegistryUpdate {
-
     private Map<Long, AccItem> accItemMap = new HashMap<Long, AccItem>();
     private Date maxTransactionDate; //Дата конечной выборки транзакций на процессинге
+    private ResultOperation result = new ResultOperation();
 
     public Date getMaxTransactionDate() {
         Date currentDate = new Date();
@@ -34,8 +36,20 @@ public class AccRegistryUpdate {
         return maxTransactionDate;
     }
 
+    public ResultOperation getResult() {
+        return result;
+    }
+
+    public void setResult(ResultOperation result) {
+        this.result = result;
+    }
+
     public Element toElement(Document document, DateFormat timeFormat) throws Exception {
         Element element = document.createElement("AccRegistryUpdate");
+        if (this.result != null) {
+            XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
+            XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
+        }
         element.setAttribute("Date", timeFormat.format(getMaxTransactionDate()));
         for (AccItem item : this.accItemMap.values()) {
             element.appendChild(item.toElement(document, timeFormat));

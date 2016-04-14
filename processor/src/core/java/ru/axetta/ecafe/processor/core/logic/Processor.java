@@ -3451,7 +3451,8 @@ public class Processor
                     accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
                 }
             } catch (Exception e) {
-                logger.error("Oops", e);
+                logger.error("AccRegistryUpdate section failed", e);
+                accRegistryUpdate.setResult(new ResultOperation(500, e.getMessage()));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;

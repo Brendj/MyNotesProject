@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -78,7 +79,7 @@ public class AccountTransactionExtended {
         return complexsum;
     }
 
-    public void setComplexsum(BigInteger complexsum) {
+    public void setComplexsum(BigDecimal complexsum) {
         this.complexsum = complexsum.longValue();
     }
 
@@ -86,7 +87,7 @@ public class AccountTransactionExtended {
         return discountsum;
     }
 
-    public void setDiscountsum(BigInteger discountsum) {
+    public void setDiscountsum(BigDecimal discountsum) {
         this.discountsum = discountsum.longValue();
     }
 
