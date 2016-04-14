@@ -61,7 +61,7 @@
                         </a4j:support>--%>
                         <rich:column>
                             <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text">
-                                <a4j:support event="onchange" action="#{mainPage.completeContragentListSelection}"
+                                <a4j:support event="onchange" action="#{mainPage.contragentListSelectPage.updateSelectedIds(item.idOfContragent, item.selected)}"
                                              reRender="contragentListValue" />
                             </h:selectBooleanCheckbox>
                         </rich:column>

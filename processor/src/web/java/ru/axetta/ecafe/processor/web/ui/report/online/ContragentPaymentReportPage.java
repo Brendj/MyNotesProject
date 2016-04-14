@@ -54,11 +54,14 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     private String htmlReport;
 
     private String contragentReceiverFilter = "Не выбрано";
+    private String contragentPaymentReceiverFilter = "Не выбрано";
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
 
     private String contragentReceiverIds;
+    private String contragentPaymentReceiverIds;
 
     private List<CCAccountFilter.ContragentItem > contragentReceiverItems = new ArrayList<CCAccountFilter.ContragentItem >();
+    private List<CCAccountFilter.ContragentItem > contragentPaymentReceiverItems = new ArrayList<CCAccountFilter.ContragentItem >();
 
     private boolean receiverSelection;
     private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
@@ -171,6 +174,10 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         return contragentReceiverFilter;
     }
 
+    public String getContragentPaymentReceiverFilter() {
+        return contragentPaymentReceiverFilter;
+    }
+
     public String getContragentReceiverIds() {
         return contragentReceiverIds;
     }
@@ -179,37 +186,40 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         this.contragentReceiverIds = contragentReceiverIds;
     }
 
-    public void showContragentSelectPage (boolean isReceiver) {
-        idOfOrgList.clear();
-        filter = "Не выбрано";
-        receiverSelection = isReceiver;
-        if (isReceiver == false) {
-           showContragentSelectPageOwn();
-        } else {
-        MainPage.getSessionInstance().showContragentListSelectPage();
-        }
+    public String getContragentPaymentReceiverIds() {
+        return contragentPaymentReceiverIds;
     }
 
-    public Object showContragentSelectPageOwn() {
+    public void setContragentPaymentReceiverIds(String contragentPaymentReceiverIds) {
+        this.contragentPaymentReceiverIds = contragentPaymentReceiverIds;
+    }
+
+    public void showContragentSelectPageOwn(Boolean isPaymentContragent) {
         BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
-        if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler
-                || currentTopMostPage instanceof ContragentSelectPage) {
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentListSelectPage) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
+            String classType;
+            if(isPaymentContragent){
+                classType = "2";
+            } else {
+                classType = "1";
+            }
             try {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                MainPage.getSessionInstance().getContragentSelectPage().setItems(retrieveContragents(persistenceSession));
+                MainPage.getSessionInstance().getContragentListSelectPage().fill(persistenceSession, 0, classType);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                if (currentTopMostPage instanceof ContragentSelectPage.CompleteHandler) {
-                    MainPage.getSessionInstance().getContragentSelectPage().pushCompleteHandler(
-                            (ContragentSelectPage.CompleteHandler) currentTopMostPage);
+                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+                    MainPage.getSessionInstance().getContragentListSelectPage().pushCompleteHandler(
+                            (ContragentListSelectPage.CompleteHandler) currentTopMostPage);
                     MainPage.getSessionInstance().getModalPages().push(
-                            MainPage.getSessionInstance().getContragentSelectPage());
+                            MainPage.getSessionInstance().getContragentListSelectPage());
                 }
             } catch (Exception e) {
                 logger.error("Failed to fill contragent selection page", e);
@@ -220,33 +230,42 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
                 HibernateUtils.close(persistenceSession, logger);
             }
         }
-        return null;
     }
 
-    private List<ContragentSelectPage.Item> retrieveContragents(Session session) throws HibernateException {
+    private List<ContragentListSelectPage.Item> retrieveContragents(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(Contragent.class);
         criteria.add(Restrictions.eq("classId", 1));
         criteria.addOrder(Order.asc("contragentName"));
         List contragents = criteria.list();
-        List<ContragentSelectPage.Item> items = new LinkedList<ContragentSelectPage.Item>();
+        List<ContragentListSelectPage.Item> items = new LinkedList<ContragentListSelectPage.Item>();
         for (Object object : contragents) {
             Contragent contragent = (Contragent) object;
-            ContragentSelectPage.Item item = new ContragentSelectPage.Item(contragent);
+            ContragentListSelectPage.Item item = new ContragentListSelectPage.Item(contragent);
+            item.setSelected(false);
             items.add(item);
         }
         return items;
     }
 
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag, String classTypes) throws Exception {
+        if("1".equals(classTypes)){
+            contragentPaymentReceiverItems.clear();
+        } else {
             contragentReceiverItems.clear();
-            for (Long idOfContragent : idOfContragentList) {
-                Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
-                CCAccountFilter.ContragentItem contragentItem = new CCAccountFilter.ContragentItem(currentContragent);
+        }
+        for (Long idOfContragent : idOfContragentList) {
+            Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            CCAccountFilter.ContragentItem contragentItem = new CCAccountFilter.ContragentItem(currentContragent);
+            if("1".equals(classTypes)){
+                contragentPaymentReceiverItems.add(contragentItem);
+            } else {
                 contragentReceiverItems.add(contragentItem);
             }
-            setContragentFilterReceiverInfo(contragentReceiverItems);
-    }
 
+        }
+        setContragentFilterReceiverInfo();
+        setContragentPaymentFilterReceiverInfo();
+    }
 
     @Override
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
@@ -256,13 +275,13 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         }
     }
 
-    private void setContragentFilterReceiverInfo(List<CCAccountFilter.ContragentItem> contragentItems) {
+    private void setContragentFilterReceiverInfo() {
         StringBuilder str = new StringBuilder();
         StringBuilder ids = new StringBuilder();
-        if (contragentItems.isEmpty()) {
+        if (contragentReceiverItems.isEmpty()) {
             contragentReceiverFilter = "Не выбрано";
         } else {
-            for (CCAccountFilter.ContragentItem it : contragentItems) {
+            for (CCAccountFilter.ContragentItem it : contragentReceiverItems) {
                 if (str.length() > 0) {
                     str.append("; ");
                     ids.append(",");
@@ -273,6 +292,25 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             contragentReceiverFilter = str.toString();
         }
         contragentReceiverIds = ids.toString();
+    }
+
+    private void setContragentPaymentFilterReceiverInfo() {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (contragentPaymentReceiverItems.isEmpty()) {
+            contragentPaymentReceiverFilter = "Не выбрано";
+        } else {
+            for (CCAccountFilter.ContragentItem it : contragentPaymentReceiverItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getContragentName());
+                ids.append(it.getIdOfContragent());
+            }
+            contragentPaymentReceiverFilter = str.toString();
+        }
+        contragentPaymentReceiverIds = ids.toString();
     }
 
     private final static Logger logger = LoggerFactory.getLogger(ContragentPaymentReportPage.class);
@@ -286,12 +324,12 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder(templateFilename);
         //Date generateTime = new Date();
         //builder.setReportProperties(fillContragentReceiver());
-        if (contragentFilter.getContragent().getIdOfContragent() == null
+        if (contragentPaymentReceiverFilter.equals("Не выбрано")
                 || contragentReceiverFilter.equals("Не выбрано")) {
             printError("Не выбран 'Агент по приему платежей' или 'Контрагент-получатель'");
         } else {
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
-                    Long.toString(contragentFilter.getContragent().getIdOfContragent()));
+                    contragentPaymentReceiverIds);
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                     contragentReceiverIds);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
@@ -422,7 +460,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
             }
         }
 
-        if (contragentFilter.getContragent().getIdOfContragent() == null
+        if (contragentPaymentReceiverFilter.equals("Не выбрано")
                 || contragentReceiverFilter.equals("Не выбрано")) {
             printError("Не выбран 'Агент по приему платежей' и 'Контрагент-получатель'");
         }
@@ -432,7 +470,7 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
     public Object buildReport() {
         htmlReport="";
         if (validateFormData()) return null;
-        if (contragentFilter.equals("Не выбрано")
+        if (contragentPaymentReceiverFilter.equals("Не выбрано")
                 || contragentReceiverFilter.equals("Не выбрано")) {
             printError("Не выбран 'Агент по приему платежей' или 'Контрагент-получатель'");
         } else {
@@ -440,12 +478,12 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder();
-        if (contragentFilter.getContragent().getIdOfContragent() == null) return null;
-        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
-                Long.toString(contragentFilter.getContragent().getIdOfContragent()));
         if (contragentReceiverFilter == null) return null;
         builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
                 contragentReceiverIds);
+        if (contragentPaymentReceiverFilter == null) return null;
+        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
+                contragentPaymentReceiverIds);
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         builder.getReportProperties().setProperty("organizationTypeModify", String.valueOf(getOrganizationTypeModify()));
         builder.getReportProperties().setProperty("terminal", terminal);
@@ -497,14 +535,14 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
         return null;
     }
 
-    public void buildReport(Session session, Contragent contragent) throws Exception {
-        ContragentPaymentReport.Builder reportBuilder = new ContragentPaymentReport.Builder();
-        reportBuilder.setContragent(contragent);
-        /*reportProperties.setProperty(ContragentPaymentReport.PARAM_PERIOD_TYPE, "");*/
-        reportBuilder.setReportProperties(fillContragentReceiver());
-        contragentPaymentReport = (ContragentPaymentReport) reportBuilder.build(session, startDate, endDate, localCalendar);
-        htmlReport = contragentPaymentReport.getHtmlReport();
-    }
+    //public void buildReport(Session session, Contragent contragent) throws Exception {
+    //    ContragentPaymentReport.Builder reportBuilder = new ContragentPaymentReport.Builder();
+    //    reportBuilder.setContragent(contragent);
+    //    /*reportProperties.setProperty(ContragentPaymentReport.PARAM_PERIOD_TYPE, "");*/
+    //    reportBuilder.setReportProperties(fillContragentReceiver());
+    //    contragentPaymentReport = (ContragentPaymentReport) reportBuilder.build(session, startDate, endDate, localCalendar);
+    //    htmlReport = contragentPaymentReport.getHtmlReport();
+    //}
 
     /*private Contragent getContragent() throws Exception {
         Contragent contragent = null;

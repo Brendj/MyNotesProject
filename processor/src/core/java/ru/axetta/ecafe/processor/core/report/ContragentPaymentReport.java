@@ -211,15 +211,25 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
 
-            String idOfContragentPayer = getReportProperties().getProperty(PARAM_CONTRAGENT_PAYER_ID);
-            Long lIdOfContragentPayer=null; Contragent contragentPayer=null;
-            if (idOfContragentPayer!=null) {
+            String idOfContragentPaymentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_PAYER_ID);
+
+            String [] idOfContragentPaymentReceiverIds =  idOfContragentPaymentReceiver.split(",");
+
+            List<Contragent> contragentPaymentReceiverList = new ArrayList<Contragent>();
+
+            Long idPaymentReceiver = null;
+            Contragent contragentPaymentReceiverItem;
+            String contragentPaymentReceiverString = "";
+            for (String contragentPaymentReceiverId: idOfContragentPaymentReceiverIds) {
                 try {
-                    lIdOfContragentPayer=Long.parseLong(idOfContragentPayer);
+                    idPaymentReceiver =Long.parseLong(contragentPaymentReceiverId);
                 } catch (Exception e) {
-                    throw new Exception("Ошибка парсинга идентификатора контрагента-плательщика: "+idOfContragentPayer, e);
+                    throw new Exception("Ошибка парсинга идентификатора контрагента-получателя: "+idPaymentReceiver, e);
                 }
-                contragentPayer = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentPayer));
+
+                contragentPaymentReceiverItem = (Contragent)session.get(Contragent.class, idPaymentReceiver);
+                contragentPaymentReceiverString = contragentPaymentReceiverString + contragentPaymentReceiverItem.getContragentName() + ", ";
+                contragentPaymentReceiverList.add(contragentPaymentReceiverItem);
             }
 
             String idOfContragentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID);
@@ -243,7 +253,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 contragentReceiverList.add(contragentReceiverItem);
             }
 
-            parameterMap.put("nameOfContragentSender", contragentPayer.getContragentName());
+            parameterMap.put("nameOfContragentSender", contragentPaymentReceiverString);
             parameterMap.put("nameOfContragentReceiver", contragentReceiverString);
 
             String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
@@ -254,10 +264,13 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             }
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, contragentPayer, contragentReceiverList, startTime, endTime, (Calendar) calendar.clone(),
+                    createDataSource(session, contragentPaymentReceiverList, contragentReceiverList, startTime, endTime, (Calendar) calendar.clone(),
                             parameterMap, idOfOrgList));
             Date generateEndTime = new Date();
-            Long idOfContragent1 = contragentPayer == null?null:contragentPayer.getIdOfContragent();
+            if(contragent == null){
+                contragent = contragentPaymentReceiverList.get(0);
+            }
+            Long idOfContragent1 = contragent.getIdOfContragent();
             if (!exportToHTML) {
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         jasperPrint, startTime, endTime, idOfContragent1);
@@ -283,7 +296,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
 
         private Boolean transactionsWithoutOrgIsPresented = false;
 
-        private JRDataSource createDataSource(Session session, Contragent contragent, List<Contragent> contragentReceiverList,
+        private JRDataSource createDataSource(Session session, List<Contragent> contragentPaymentReceiverList, List<Contragent> contragentReceiverList,
                 Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
 
             // терминал
@@ -318,18 +331,18 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             clientPaymentCriteria.createAlias("transaction.client", "cl");
             clientPaymentCriteria.createAlias("transaction.client.org", "o");
             if (terminal != null && !terminal.equals("")) {
-                clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%"));
+                clientPaymentCriteria.add(Restrictions.like("addIdOfPayment", "%" + terminal + "%").ignoreCase());
             }
             if (paymentIdentifier != null && !paymentIdentifier.equals("")) {
-                clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%"));
+                clientPaymentCriteria.add(Restrictions.like("idOfPayment", "%" + paymentIdentifier + "%").ignoreCase());
             }
             if (orgType != null) {
                 clientPaymentCriteria.add(Restrictions.eq("o.type", orgType));
             }
             if (contragentReceiverList != null)
                 clientPaymentCriteria.add(Restrictions.in("contragentReceiver", contragentReceiverList));
-            if (contragent != null)
-                clientPaymentCriteria.add(Restrictions.eq("contragent", contragent));
+            if (contragentPaymentReceiverList != null)
+                clientPaymentCriteria.add(Restrictions.in("contragent", contragentPaymentReceiverList));
             clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
             Object[] types = {ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, ClientPayment.CANCELLED_PAYMENT};
             clientPaymentCriteria.add(Restrictions.in("payType", types));
@@ -356,8 +369,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             if (contragentReceiverList != null)
                 clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("contragentReceiver",
                         contragentReceiverList));
-            if (contragent != null)
-                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("contragent", contragent));
+            if (contragentPaymentReceiverList != null)
+                clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.in("contragent", contragentPaymentReceiverList));
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.between("createTime", startTime, endTime));
             clientPaymentCriteriaWithTransactionOrgIsNull.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
             HibernateUtils.addAscOrder(clientPaymentCriteriaWithTransactionOrgIsNull, "createTime");

@@ -2195,6 +2195,9 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                if(contragentListSelectPage.getClassTypesString() != null){
+                    classTypes = contragentListSelectPage.getClassTypesString();
+                }
                 contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;

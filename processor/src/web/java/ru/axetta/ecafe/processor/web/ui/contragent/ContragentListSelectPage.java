@@ -82,12 +82,10 @@ public class ContragentListSelectPage extends BasicPage {
     }
 
     public void completeContragentSelection(Session session) throws Exception {
+        List<String> list = Arrays.asList(StringUtils.split(selectedIds, ","));
         List<Long> selected = new ArrayList<Long>();
-        for (Item it : items) {
-            if (!it.isSelected()) {
-                continue;
-            }
-            selected.add(it.getIdOfContragent());
+        for(String s : list){
+            selected.add(Long.parseLong(s));
         }
 
         if (!completeHandlers.empty()) {
@@ -124,6 +122,26 @@ public class ContragentListSelectPage extends BasicPage {
         return str.toString();
     }
 
+    public void updateSelectedIds(Long id, boolean selected) {
+        List<String> list = Arrays.asList(StringUtils.split(selectedIds, ","));
+        List<String> selectedIdsList = new ArrayList<String>(list);
+        if (selectedIdsList.contains(id.toString()) && !selected) {
+            selectedIdsList.remove(id.toString());
+        } else {
+            if (!selectedIdsList.contains(id.toString()) && selected) {
+                selectedIdsList.add(id.toString());
+            }
+        }
+        StringBuilder str = new StringBuilder();
+        for (String s : selectedIdsList) {
+            if (str.length() > 0) {
+                str.append(",");
+            }
+            str.append(s);
+        }
+        selectedIds = str.toString();
+    }
+
     /*public Item getSelectedItem() {
         return selectedItem;
     }
@@ -157,6 +175,14 @@ public class ContragentListSelectPage extends BasicPage {
         this.selectedIds = selectedIds;
     }
 
+    public String getClassTypesString() {
+        return classTypesString;
+    }
+
+    public void setClassTypesString(String classTypesString) {
+        this.classTypesString = classTypesString;
+    }
+
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {
         this.multiContrFlag = multiContrFlag;
         this.classTypesString = classTypes;
@@ -174,30 +200,16 @@ public class ContragentListSelectPage extends BasicPage {
         this.items = items;
     }
 
-    /*public void fill(Session session, Long idOfContragent) throws HibernateException {
-        List<Item> items = new LinkedList<Item>();
-        List contragents = retrieveContragents(session);
-        for (Object object : contragents) {
-            Contragent contragent = (Contragent) object;
-            Item item = new Item(contragent);
-            items.add(item);
-        }
-        Item selectedItem = new Item();
-        if (null != idOfContragent) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            selectedItem = new Item(contragent);
-        }
-        this.items = items;
-        this.selectedItem = selectedItem;
-    }*/
-
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
-        //  Ограничение на просмотр только тех контрагентов, которые доступны пользователю
-        try {
-            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-            ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
-        } catch (Exception e) {
+
+        if(!"1".equals(classTypesString)) {
+            //  Ограничение на просмотр только тех контрагентов, которые доступны пользователю
+            try {
+                Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+                ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
+            } catch (Exception e) {
+            }
         }
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
@@ -212,15 +224,17 @@ public class ContragentListSelectPage extends BasicPage {
         }
         criteria.addOrder(Order.asc("contragentName"));
         List<Contragent> contragentsByCriteria = criteria.list();
-        Criteria criteria1 = session.createCriteria(Contragent.class);
-        criteria1.add(Restrictions.eq("contragentName", OPERATOR));
-        Contragent operator = (Contragent) criteria1.uniqueResult();
-        if (operator != null) {
-            if (filter == null) {
-                filter = "";
-            }
-            if (operator.getContragentName().toLowerCase().contains(filter.toLowerCase())) {
-                contragentsByCriteria.add(0, operator);
+        if(!"1".equals(classTypesString)) {
+            Criteria criteria1 = session.createCriteria(Contragent.class);
+            criteria1.add(Restrictions.eq("contragentName", OPERATOR));
+            Contragent operator = (Contragent) criteria1.uniqueResult();
+            if (operator != null) {
+                if (filter == null) {
+                    filter = "";
+                }
+                if (operator.getContragentName().toLowerCase().contains(filter.toLowerCase())) {
+                    contragentsByCriteria.add(0, operator);
+                }
             }
         }
         return contragentsByCriteria; // criteria.list();
