@@ -28,7 +28,7 @@ public class RegistryChangeItemV2 {
     public List<RegistryChangeItemParam> list;
 
     /**
-     * Gets the value of the registryChangeItemParamList property.
+     * Gets the value of the list property.
      *
      * @return
      *     possible object is

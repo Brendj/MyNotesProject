@@ -23,21 +23,4 @@ public class RegistryChangeItemParam {
         this.fieldNameParam = fieldNameParam;
         this.fieldValueParam = fieldValueParam;
     }
-
-    public String getFieldNameParam() {
-        return fieldNameParam;
-    }
-
-    public void setFieldNameParam(String fieldNameParam) {
-        this.fieldNameParam = fieldNameParam;
-    }
-
-    public String getFieldValueParam() {
-        return fieldValueParam;
-    }
-
-    public void setFieldValueParam(String fieldValueParam) {
-        this.fieldValueParam = fieldValueParam;
-    }
-
 }
