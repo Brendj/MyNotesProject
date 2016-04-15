@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -1088,22 +1089,25 @@ public class DAOUtils {
                 "from cf_transactions t left join " +
                 "(select coalesce(sum(dd.qty * dd.rprice), 0) as complexsum, coalesce(sum(dd.socDiscount), 0) as discountsum, oo.orderType, oo.idOfTransaction " +
                 "from cf_orders oo join cf_orderdetails dd on oo.idOfOrder = dd.idOfOrder and oo.idOfOrg = dd.idOfOrg " +
-                "where oo.createdDate > :begDate AND oo.createddate <= :endDate AND oo.idOfOrg in (:orgs) " +
+                "where oo.createdDate > :orders_begDate AND oo.createddate <= :orders_endDate AND oo.idOfOrg in (:orgs) " +
                 "AND dd.idOfOrg in (:orgs) AND dd.menuType between :menuMin and :menuMax " +
                 "group by oo.orderType, oo.idOfTransaction) as query " +
                 "on t.idOfTransaction = query.idOfTransaction " +
-                "where t.idOfOrg in (:orgs) AND t.transactionDate > :begDate AND t.transactionDate <= :endDate " +
+                "where t.idOfOrg in (:orgs) AND t.transactionDate > :trans_begDate AND t.transactionDate <= :trans_endDate " +
                 "order by t.idOfClient";
         SQLQuery q = persistenceSession.createSQLQuery(str_query);
-        q.setParameter("begDate", fromDateTime.getTime());
-        q.setParameter("endDate", toDateTime.getTime());
+        // заказы будем искать за последние 24 часа от времени запроса
+        q.setParameter("orders_begDate", CalendarUtils.addDays(toDateTime,-1).getTime());
+        q.setParameter("orders_endDate",toDateTime.getTime());
+        // транзакции будем искать строго от запрашиваемого времени
+        q.setParameter("trans_begDate", fromDateTime.getTime());
+        q.setParameter("trans_endDate", toDateTime.getTime());
         q.setParameterList("orgs", org.getFriendlyOrg());
         q.setParameter("menuMin", OrderDetail.TYPE_COMPLEX_MIN);
         q.setParameter("menuMax", OrderDetail.TYPE_COMPLEX_MAX);
         q.setResultTransformer(Transformers.aliasToBean(AccountTransactionExtended.class));
-        q.addScalar("idoftransaction").addScalar("source").addScalar("transactiondate").addScalar("sourcetype").addScalar("transactionsum")
-                .addScalar("transactionsubbalance1sum").addScalar("complexsum", StandardBasicTypes.BIG_DECIMAL).addScalar("discountsum",
-                StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
+        q.addScalar("idoftransaction").addScalar("source").addScalar("transactiondate").addScalar("sourcetype").addScalar("transactionsum").addScalar("transactionsubbalance1sum")
+                .addScalar("complexsum", StandardBasicTypes.BIG_DECIMAL).addScalar("discountsum", StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
     }
