@@ -97,3 +97,20 @@ CREATE INDEX cf_clientgroup_manager_org_idx ON cf_clientgroup_manager USING BTRE
 ALTER TABLE CF_RegistryChange ADD COLUMN gender integer;
 ALTER TABLE CF_RegistryChange ADD COLUMN birthDate bigint;
 ALTER TABLE CF_RegistryChange ADD COLUMN benefitOnAdmission character varying (3000);
+
+--Таблица календаря учебных дней
+CREATE TABLE cf_specialdates
+(
+  idoforg BIGINT NOT NULL,
+  date BIGINT NOT NULL,
+  isweekend INTEGER NOT NULL,
+  deleted INTEGER NOT NULL,
+  version BIGINT NOT NULL,
+  comment CHARACTER VARYING(256) NOT NULL DEFAULT '' :: CHARACTER VARYING,
+  idoforgowner BIGINT NOT NULL,
+  CONSTRAINT cf_specialdates_pk PRIMARY KEY (idoforg, date),
+  CONSTRAINT cf_specialdates_idoforg_fk FOREIGN KEY (idoforg)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_specialdates_idoforgowner_fk FOREIGN KEY (idoforgowner)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);

@@ -37,7 +37,6 @@ import javax.persistence.TypedQuery;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -319,6 +318,10 @@ public class DAOUtils {
 
     public static ZeroTransaction findZeroTransaction(Session persistenceSession, CompositeIdOfZeroTransaction compositeIdOfZeroTransaction) throws Exception {
         return (ZeroTransaction) persistenceSession.get(ZeroTransaction.class, compositeIdOfZeroTransaction);
+    }
+
+    public static SpecialDate findSpecialDate(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        return (SpecialDate) persistenceSession.get(SpecialDate.class, compositeIdOfSpecialDate);
     }
 
     public static OrderDetail findOrderDetail(Session persistenceSession,
@@ -2130,6 +2133,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionBySpecialDate(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select sd.version from cf_specialdates as sd order by sd.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByClientgroupManager(Session session) {
         long version = 0L;
         Criteria criteria = session.createCriteria(ClientGroupManager.class);
@@ -2155,6 +2168,14 @@ public class DAOUtils {
     public static List<ZeroTransaction> getZeroTransactionsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         Org org = (Org)session.load(Org.class, idOfOrg);
         Criteria criteria = session.createCriteria(ZeroTransaction.class);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<SpecialDate> getSpecialDatesForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Org org = (Org)session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.eq("org", org));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();

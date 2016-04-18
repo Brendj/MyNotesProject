@@ -181,12 +181,12 @@ public class PaymentTotalsReportService {
                 }
             }
             if (firstClientMigration != null && firstClientMigration.getOldOrg() != null
-                    && firstClientMigration.getOldOrg().getIdOfOrg() == idOfOrg && !clientMap
+                    && firstClientMigration.getOldOrg().getIdOfOrg().equals(idOfOrg) && !clientMap
                     .contains(firstClientMigration.getClient())) {
                 clientMap.add(client);
             }
             if (firstClientMigration != null && firstClientMigration.getOrg() != null
-                    && firstClientMigration.getOrg().getIdOfOrg() == idOfOrg && clientMap
+                    && firstClientMigration.getOrg().getIdOfOrg().equals(idOfOrg) && clientMap
                     .contains(firstClientMigration.getClient())) {
                 clientMap.remove(client);
             }
@@ -243,11 +243,12 @@ public class PaymentTotalsReportService {
      */
 
     private Long getOrgClientsIncomeOnPeriod(Long idOfOrg, Date startTime, Date endTime) {
+        Object[] objects = {AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE};
         Criteria criteria = session.createCriteria(AccountTransaction.class);
         criteria.add(Restrictions.gt("transactionTime", startTime));
         criteria.add(Restrictions.lt("transactionTime", endTime));
         criteria.add(Restrictions.gt("transactionSum", 0L));
-        criteria.add(Restrictions.eq("sourceType", AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE));
+        criteria.add(Restrictions.in("sourceType", objects));
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.setProjection(Projections.projectionList().add(Projections.sum("transactionSum")));
         Long income = (Long) criteria.uniqueResult();

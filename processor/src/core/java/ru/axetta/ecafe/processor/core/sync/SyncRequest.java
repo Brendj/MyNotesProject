@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
@@ -17,14 +19,14 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegi
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
+import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactions;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionsBuilder;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.request.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistry;
@@ -2174,6 +2176,7 @@ public class SyncRequest {
         private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
         private final InteractiveReportDataBuilder interactiveReportDataBuilder;
         private final ZeroTransactionsBuilder zeroTransactionsBuilder;
+        private final SpecialDatesBuilder specialDatesBuilder;
         private final ClientGroupManagerBuilder clientGroupManagerBuilder;
 
         public Builder() {
@@ -2207,6 +2210,7 @@ public class SyncRequest {
             this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
             this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
             this.zeroTransactionsBuilder = new ZeroTransactionsBuilder();
+            this.specialDatesBuilder = new SpecialDatesBuilder();
             this.clientGroupManagerBuilder = new ClientGroupManagerBuilder();
         }
 
@@ -2374,6 +2378,12 @@ public class SyncRequest {
                 zeroTransactionsRequest = zeroTransactionsBuilder.build(zeroTransactionsNode, org.getIdOfOrg());
             }
 
+            Node specialDatesNode = findFirstChildElement(envelopeNode, "SpecialDates");
+            SpecialDates specialDatesRequest = null;
+            if (specialDatesNode != null) {
+                specialDatesRequest = specialDatesBuilder.build(specialDatesNode, org.getIdOfOrg());
+            }
+
             Node interactiveReportNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
             InteractiveReport interactiveReportRequest = null;
             if(interactiveReportNode != null) {
@@ -2406,7 +2416,7 @@ public class SyncRequest {
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
                     clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
-                    interactiveReportRequest, zeroTransactionsRequest, categoriesAndDiscountsRequest,
+                    interactiveReportRequest, zeroTransactionsRequest, specialDatesRequest, categoriesAndDiscountsRequest,
                     clientGroupManagerRequest);
         }
 
@@ -2449,6 +2459,7 @@ public class SyncRequest {
     private final ReestrTaloonApproval reestrTaloonApprovalRequest;
     private final InteractiveReport interactiveReport;
     private final ZeroTransactions zeroTransactions;
+    private final SpecialDates specialDates;
     ClientGroupManagerRequest clientGroupManagerRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
@@ -2458,7 +2469,7 @@ public class SyncRequest {
             AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
-            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions,
+            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions, SpecialDates specialDates,
             CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest, ClientGroupManagerRequest clientGroupManagerRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
@@ -2492,6 +2503,7 @@ public class SyncRequest {
         this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
         this.interactiveReport = interactiveReport;
         this.zeroTransactions = zeroTransactions;
+        this.specialDates = specialDates;
         this.clientGroupManagerRequest = clientGroupManagerRequest;
     }
 
@@ -2614,6 +2626,10 @@ public class SyncRequest {
 
     public InteractiveReport getInteractiveReport() {
         return interactiveReport;
+    }
+
+    public SpecialDates getSpecialDates() {
+        return specialDates;
     }
 
     @Override

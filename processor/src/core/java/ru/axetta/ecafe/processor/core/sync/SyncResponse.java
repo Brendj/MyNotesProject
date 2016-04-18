@@ -15,6 +15,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentR
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
+import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ResZeroTransactions;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionData;
@@ -1013,6 +1015,8 @@ public class SyncResponse {
     private final ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
     private final ZeroTransactionData zeroTransactionData;
     private final ResZeroTransactions resZeroTransactions;
+    private final SpecialDatesData specialDatesData;
+    private final ResSpecialDates resSpecialDates;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1030,7 +1034,8 @@ public class SyncResponse {
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
-            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, List<AbstractToElement> responseSections) {
+            ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
+            ResSpecialDates resSpecialDates, List<AbstractToElement> responseSections) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1073,6 +1078,8 @@ public class SyncResponse {
         this.interactiveReportData = interactiveReportData;
         this.zeroTransactionData = zeroTransactionData;
         this.resZeroTransactions = resZeroTransactions;
+        this.specialDatesData = specialDatesData;
+        this.resSpecialDates = resSpecialDates;
         this.responseSections = responseSections;
     }
 
@@ -1259,6 +1266,14 @@ public class SyncResponse {
 
         if (zeroTransactionData != null) {
             ecafeEnvelopeElement.appendChild(zeroTransactionData.toElement(document));
+        }
+
+        if (resSpecialDates != null) {
+            ecafeEnvelopeElement.appendChild(resSpecialDates.toElement(document));
+        }
+
+        if (specialDatesData != null) {
+            ecafeEnvelopeElement.appendChild(specialDatesData.toElement(document));
         }
 
         if (this.responseSections != null) {
