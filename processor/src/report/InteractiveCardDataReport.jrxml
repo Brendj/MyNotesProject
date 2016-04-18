@@ -14,15 +14,15 @@
 	<title>
 		<band height="144" splitType="Stretch">
 			<textField>
-				<reportElement uuid="72aacc3c-7b04-4aa3-b3ab-01739d528e15" stretchType="RelativeToBandHeight" x="189" y="94" width="721" height="25"/>
-				<textElement>
+				<reportElement uuid="72aacc3c-7b04-4aa3-b3ab-01739d528e15" stretchType="RelativeToBandHeight" x="0" y="94" width="910" height="25"/>
+				<textElement textAlignment="Right">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Арес здания: " + $P{address}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="08f15a1f-64c8-4342-ba1b-830499cdb05a" stretchType="RelativeToBandHeight" x="372" y="119" width="538" height="25"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement uuid="08f15a1f-64c8-4342-ba1b-830499cdb05a" stretchType="RelativeToBandHeight" x="0" y="119" width="910" height="25"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["на дату: " + $P{reportDate}]]></textFieldExpression>
@@ -102,8 +102,8 @@
 				<text><![CDATA[Покрытие потребности в картах на текущую дату имеющимися в наличии резервными картами, % к контингенту]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="eca973f6-b3a4-4cd0-8388-800ab7c234ff" stretchType="RelativeToBandHeight" x="282" y="1" width="90" height="37"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement uuid="eca973f6-b3a4-4cd0-8388-800ab7c234ff" stretchType="RelativeToBandHeight" x="0" y="1" width="372" height="37"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{percent} + "%"]]></textFieldExpression>
@@ -166,13 +166,4 @@
 			</textField>
 		</band>
 	</detail>
-	<pageFooter>
-		<band height="25">
-			<staticText>
-				<reportElement uuid="7070163c-d6d7-47d9-a0ba-fbe6b45b2b61" x="0" y="0" width="910" height="25"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<text><![CDATA[*Примечание: п.4 может расходиться по данным с аналогичным отчетом, сформированным в АРМе ]]></text>
-			</staticText>
-		</band>
-	</pageFooter>
 </jasperReport>
