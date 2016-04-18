@@ -414,10 +414,9 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
         Long idOfOrgL = Long.valueOf(idOfOrg);
 
-        String sqlPercent = "SELECT count(cfc.cardno) FROM cf_cards cfc LEFT JOIN cf_clients cl "
-                + " ON cfc.idofclient = cl.idofclient "
-                + " LEFT OUTER JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                + " WHERE cfcl.idofclientgroup NOT IN (1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) AND cfc.idoforg = :idoforg";
+        String sqlPercent =
+                "SELECT count(cfc.cardno) FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient"
+                        + " WHERE cl.idofclientgroup NOT IN (1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) AND cfc.idoforg = :idoforg";
 
         Query queryPercent = session.createSQLQuery(sqlPercent);
         queryPercent.setParameter("idoforg", idOfOrgL);
