@@ -435,7 +435,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
         if (countPercent != 0L) {
             float co = (count * 100) / (float) countPercent;
-            c = String.valueOf(co);
+            c = String.valueOf(co).substring(0,4);
         }
 
         return c;
