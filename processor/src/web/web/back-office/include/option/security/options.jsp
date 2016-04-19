@@ -20,6 +20,10 @@
         <h:outputText escape="true" value="Период неиспользования учетной записи, после чего она будет заблокирована (в днях)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityPage.periodBlockUnusedLogin}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
+
+        <h:outputText escape="true" value="Период действия sms-кода" styleClass="output-text" />
+        <h:inputText value="#{mainPage.optionsSecurityPage.periodSmsCodeAlive}" maxlength="10"
+                     styleClass="input-text" style="margin-left: 10px;" />
     </h:panelGrid>
 
     <h:panelGrid columns="1" styleClass="borderless-grid">

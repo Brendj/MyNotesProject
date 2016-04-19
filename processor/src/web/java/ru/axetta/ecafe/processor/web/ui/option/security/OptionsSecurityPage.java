@@ -21,11 +21,13 @@ public class OptionsSecurityPage extends BasicWorkspacePage {
 
     private Integer periodBlockLoginReUse;
     private Integer periodBlockUnusedLogin;
+    private Integer periodSmsCodeAlive;
 
     public void fill(Session session) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         periodBlockLoginReUse = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE);
         periodBlockUnusedLogin = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+        periodSmsCodeAlive = runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
     }
 
     public void save() {
@@ -33,6 +35,7 @@ public class OptionsSecurityPage extends BasicWorkspacePage {
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE,
                 periodBlockLoginReUse);
         runtimeContext.setOptionValue(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER, periodBlockUnusedLogin);
+        runtimeContext.setOptionValue(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE, periodSmsCodeAlive);
         RuntimeContext.getInstance().saveOptionValues();
         printMessage("Настройки сохранены. Для применения необходим перезапуск");
     }
@@ -58,4 +61,11 @@ public class OptionsSecurityPage extends BasicWorkspacePage {
         this.periodBlockUnusedLogin = periodBlockUnusedLogin;
     }
 
+    public Integer getPeriodSmsCodeAlive() {
+        return periodSmsCodeAlive;
+    }
+
+    public void setPeriodSmsCodeAlive(Integer periodSmsCodeAlive) {
+        this.periodSmsCodeAlive = periodSmsCodeAlive;
+    }
 }
