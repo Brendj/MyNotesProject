@@ -198,6 +198,7 @@ public class JBossLoginModule implements LoginModule {
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria userCriteria = persistenceSession.createCriteria(User.class);
             userCriteria.add(Restrictions.eq("userName", username));
+            userCriteria.add(Restrictions.eq("deletedState", false));
             User user = (User) userCriteria.uniqueResult();
             if (user == null)
                 throw new LoginException("User not found");
