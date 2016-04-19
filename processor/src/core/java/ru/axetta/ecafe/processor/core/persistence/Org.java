@@ -111,6 +111,7 @@ public class Org implements Serializable {
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
     private OrganizationStatus status;
+    private OrganizationSecurityLevel securityLevel;
     private Long btiUnom;
     private Long btiUnad;
     private Long uniqueAddressId; //поле unique_address_id из сверки по реестрам
@@ -173,7 +174,6 @@ public class Org implements Serializable {
         this.orgSync.setIdOfPacket(0L);
         this.orgSync.setOrg(this);
         updateTime = new Date();
-
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -954,4 +954,11 @@ public class Org implements Serializable {
                 + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +", updateTime=" + updateTime+'}';
     }
 
+    public OrganizationSecurityLevel getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
+        this.securityLevel = securityLevel;
+    }
 }

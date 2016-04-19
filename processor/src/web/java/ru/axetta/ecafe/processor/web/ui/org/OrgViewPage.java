@@ -75,6 +75,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long additionalIdBuilding;
     private Long uniqueAddressId;
     private String statusDetailing;
+    private String securityLevel;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -239,6 +240,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
         this.interdistrictCouncil = org.getInterdistrictCouncil();
         this.interdistrictCouncilChief = org.getInterdistrictCouncilChief();
+        this.securityLevel = org.getSecurityLevel().toString();
     }
 
     public String getFriendlyFilterOrgs() {
@@ -569,5 +571,9 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setShortNameInfoService(String shortNameInfoService) {
         this.shortNameInfoService = shortNameInfoService;
+    }
+
+    public String getSecurityLevel() {
+        return securityLevel;
     }
 }

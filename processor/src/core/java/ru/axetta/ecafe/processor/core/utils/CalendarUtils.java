@@ -37,6 +37,9 @@ public class CalendarUtils {
     private final static ThreadLocal<SimpleDateFormat> timeUnderscoreFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH_mm"); }
     };
+    private final static ThreadLocal<SimpleDateFormat> timeUnderscoreExtendedFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH_mm_ss"); }
+    };
     private final static ThreadLocal<SimpleDateFormat> dateShortdd_mmFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM"); }
     };
@@ -223,6 +226,11 @@ public class CalendarUtils {
     public static String formatTimeUnderscoreToString(Long date) {
         SimpleDateFormat safeTimeUnderscoreFormat = timeUnderscoreFormat.get();
         return safeTimeUnderscoreFormat.format(new Date(date));
+    }
+
+    public static String formatTimeUnderscoreExtendedToString(Long date) {
+        SimpleDateFormat safeTimeUnderscoreExtendedFormat = timeUnderscoreExtendedFormat.get();
+        return safeTimeUnderscoreExtendedFormat.format(new Date(date));
     }
 
     public static Date parseDayInWeek(String validTime) throws ParseException {

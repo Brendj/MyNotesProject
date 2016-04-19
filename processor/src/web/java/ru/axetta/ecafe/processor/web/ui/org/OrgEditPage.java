@@ -83,6 +83,7 @@ public class OrgEditPage extends BasicWorkspacePage
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+    private OrganizationSecurityLevel securityLevel;
 
     private Integer refectoryType;
     private List<SelectItem> refectoryTypeComboMenuItems;
@@ -106,6 +107,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean oneActiveCard;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+    private SelectItem[] securityLevels = readSecurityLevels();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
@@ -114,6 +116,13 @@ public class OrgEditPage extends BasicWorkspacePage
         items[2] = new SelectItem(2, "На ремонте");
         items[3] = new SelectItem(3, "Закрыто");
         items[4] = new SelectItem(4, "Другое");
+        return items;
+    }
+
+    private SelectItem[] readSecurityLevels() {
+        SelectItem[] items = new SelectItem[2];
+        items[0] = new SelectItem(OrganizationSecurityLevel.STANDARD, OrganizationSecurityLevel.STANDARD.toString());
+        items[1] = new SelectItem(OrganizationSecurityLevel.EXTENDED, OrganizationSecurityLevel.EXTENDED.toString());
         return items;
     }
 
@@ -285,6 +294,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
+        org.setSecurityLevel(securityLevel);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);
@@ -415,6 +425,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         this.payByCashier = org.getPayByCashier();
         this.oneActiveCard = org.getOneActiveCard();
+        this.securityLevel = org.getSecurityLevel();
 
     }
 
@@ -904,6 +915,14 @@ public class OrgEditPage extends BasicWorkspacePage
         this.shortNameInfoService = shortNameInfoService;
     }
 
+    public OrganizationSecurityLevel getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
+        this.securityLevel = securityLevel;
+    }
+
     public static class ContragentItem {
         private final Long idOfContragent;
 
@@ -985,6 +1004,10 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public SelectItem[] getStatusDetails() {
         return statusDetails;
+    }
+
+    public SelectItem[] getSecurityLevels() {
+        return securityLevels;
     }
 
     public void setStatusDetails(SelectItem[] statusDetails) {

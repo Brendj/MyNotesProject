@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -31,7 +35,8 @@ public class User {
         DEFAULT(0,"настраиваемая роль"),
         ADMIN(1,"администратор"),
         SUPPLIER(2,"отчетность поставщика питания"),
-        MONITORING(3,"мониторинг");
+        MONITORING(3,"мониторинг"),
+        ADMIN_SECURITY(4, "администратор ИБ");
 
         private Integer identification;
         private String description;
@@ -80,6 +85,8 @@ public class User {
     private String lastEntryIP;
     private Date lastEntryTime;
     private Boolean blocked;
+    private Boolean deletedState;
+    private Date deleteDate;
     private String region;
     private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
 
@@ -120,6 +127,7 @@ public class User {
         this.cypheredPassword = encryptPassword(plainPassword);
         this.phone = phone;
         this.updateTime = updateTime;
+        this.deletedState = false;
     }
 
     public Long getIdOfUser() {
@@ -249,6 +257,10 @@ public class User {
         return false;
     }
 
+    public boolean isSecurityAdmin() {
+        return idOfRole.equals(DefaultRole.ADMIN_SECURITY.ordinal());
+    }
+
     public String getRegion() {
         return region;
     }
@@ -263,6 +275,50 @@ public class User {
 
     public void setUserOrgses(Set<UserOrgs> userOrgses) {
         this.userOrgses = userOrgses;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
+    }
+
+    /*
+    * Если прошел срок, в течение которого было запрещено создавать пользователя с ранее существующим аккаунтом, то
+    * отправляем удаленного пользователя в архив (добавляем к имени _archieved_XXX
+    */
+    public static void testAndMoveToArchieve(User user, Session session) throws Exception {
+        if (!user.getDeletedState()) {
+            throw new RuntimeException("Уже существует пользователь с таким именем");
+        } else {
+            Date d = user.getDeleteDate();
+            Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE);
+            if (CalendarUtils.getDifferenceInDays(d, new Date(System.currentTimeMillis())) < days) {
+                throw new RuntimeException("Пользователь с выбранным именем не может быть создан. Введите другое имя пользователя");
+            } else {
+                Integer postfix = 0;
+                String newName = user.getUserName() + "_archieved_" + postfix.toString();
+                User u = DAOUtils.findUser(session, newName);
+                while (u != null) {
+                    postfix++;
+                    newName = user.getUserName() + "_archieved_" + postfix.toString();
+                    u = DAOUtils.findUser(session, newName);
+                }
+                user.setUserName(newName);
+                session.save(user);
+                session.flush();
+            }
+        }
     }
 
     @Override

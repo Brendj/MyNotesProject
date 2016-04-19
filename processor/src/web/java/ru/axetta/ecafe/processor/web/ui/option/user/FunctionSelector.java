@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Function;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -66,13 +67,22 @@ public class FunctionSelector {
     }
 
     private List<Item> items = Collections.emptyList();
+    private static final String[] userFunctions = new String[] {"viewUser", "editUser", "deleteUser"};
+    private static final String[] securityAdminFunctions = new String[] {"viewUser", "editUser", "deleteUser", "workOption"};
 
     public List<Item> getItems() {
         return items;
     }
 
+    public Set<Function> getSecurityAdminFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        allFunctionsCriteria.add(Restrictions.in("functionName", securityAdminFunctions));
+        return new HashSet<Function>((List<Function>)allFunctionsCriteria.list());
+    }
+
     public Set<Function> getAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions)));
         return new HashSet<Function>((List<Function>)allFunctionsCriteria.list());
     }
 
@@ -115,6 +125,7 @@ public class FunctionSelector {
 
     public void fill(Session session) throws Exception {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
         List allFunctions = allFunctionsCriteria.list();
         List<Item> items = new ArrayList<Item>(allFunctions.size());
         for (Object object : allFunctions) {

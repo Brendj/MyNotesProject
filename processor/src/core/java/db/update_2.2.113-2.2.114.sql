@@ -114,3 +114,40 @@ CREATE TABLE cf_specialdates
   CONSTRAINT cf_specialdates_idoforgowner_fk FOREIGN KEY (idoforgowner)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Создание пользователя с предопределенным именем security и ролью Админа ИБ
+create or replace function inline_0() returns integer as '
+declare v_exists integer;
+ id bigint;
+ max_id bigint;
+ work_option bigint;
+begin
+ select into v_exists count(*) from cf_users where username = ''security'';
+ if v_exists = 0 then
+   select into max_id max(IdOfUser) from cf_users;
+   insert into CF_Users(IdOfUser, Version, UserName, Password, LastChange, Phone, IdOfRole, Isblocked)
+     values(max_id + 1, 0, ''security'', ''MTIz'', 0, '''', 4, false);
+   update CF_Generators set IdOfUser = IdOfUser + 1;
+ end if;
+
+--Далее убираем у всех права на операции с пользователями и даем эти права админу ИБ
+--delete from cf_permissions where IdOfFunction in (1,2,3);
+select into id IdOfUser from cf_users where UserName = ''security'';
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(id, 1);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(id, 2);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(id, 3);
+  select into work_option IdOfFunction from CF_Functions where FunctionName = ''workOption'';
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(id, work_option);
+
+return null;
+end;' language 'plpgsql';
+
+select inline_0();
+drop function inline_0();
+
+--Удаление пользователя через установку флага, а не физически записью
+ALTER TABLE cf_users ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
+  ADD COLUMN deletedate bigint;
+
+--Флаг "Уровень безопасности" у организации
+ALTER TABLE cf_orgs ADD COLUMN securitylevel integer NOT NULL DEFAULT 0;

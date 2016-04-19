@@ -222,6 +222,16 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             this.printError("Заполните имя пользователя");
             throw new RuntimeException("Username field is null");
         }
+        if (StringUtils.isEmpty(phone)) {
+            this.printError("Заполните поле контактного телефона");
+            throw new RuntimeException("Phone field is null");
+        } else {
+            String mobile = Client.checkAndConvertMobile(this.phone);
+            if (mobile == null) {
+                throw new Exception("Неверный формат контактного (мобильного) телефона");
+            }
+            phone = mobile;
+        }
         User user = new User(userName, plainPassword, phone, new Date());
         user.setEmail(email);
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
@@ -243,6 +253,12 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 throw new RuntimeException("Contragent list is empty");
             }
         }
+
+        User u = DAOUtils.findUser(session, userName);
+        if (u != null) {
+            User.testAndMoveToArchieve(u, session);
+        }
+
         user.getContragents().clear();
         for (ContragentItem it : this.contragentItems) {
             Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
@@ -259,6 +275,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         }
         if(role.equals(User.DefaultRole.ADMIN)){
             user.setFunctions(functionSelector.getAdminFunctions(session));
+            user.setRoleName(role.toString());
+        }
+        if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
+            user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
             user.setRoleName(role.toString());
         }
         session.save(user);

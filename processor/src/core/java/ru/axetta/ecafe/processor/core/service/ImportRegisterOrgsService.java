@@ -233,6 +233,7 @@ public class ImportRegisterOrgsService {
         org.setTag("");
         org.setStatus(OrganizationStatus.PLANNED);
         org.setState(0);
+        org.setSecurityLevel(OrganizationSecurityLevel.STANDARD);
 
         return org;
     }

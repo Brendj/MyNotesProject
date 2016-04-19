@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -11,6 +12,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -97,6 +99,7 @@ public class UserListPage extends BasicWorkspacePage {
         List<Item> items = new LinkedList<Item>();
         Criteria criteria = session.createCriteria(User.class);
         userFilter.addFilter(criteria);
+        criteria.add(Restrictions.eq("deletedState", false));
         List users = criteria.list();
         for (Object object : users) {
             User user = (User) object;
@@ -107,7 +110,9 @@ public class UserListPage extends BasicWorkspacePage {
 
     public void removeUser(Session session, Long idOfUser) throws Exception {
         User user = (User) session.load(User.class, idOfUser);
-        session.delete(user);
+        user.setDeletedState(true);
+        user.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
+        session.save(user);
         fill(session);
     }
 

@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -71,6 +68,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     // тип организации "Общеобразовательнок ОУ / Дошкольное ОУ / Поставщик питания / Профессиональное ОУ"
     private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+    private OrganizationSecurityLevel securityLevel;
 
     private Long btiUnom;
     private Long btiUnad;
@@ -83,6 +81,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean oneActiveCard;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
+    private SelectItem[] securityLevels = readSecurityLevels();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
@@ -91,6 +90,13 @@ public class OrgCreatePage extends BasicWorkspacePage
         items[2] = new SelectItem(2, "На ремонте");
         items[3] = new SelectItem(3, "Закрыто");
         items[4] = new SelectItem(4, "Другое");
+        return items;
+    }
+
+    private SelectItem[] readSecurityLevels() {
+        SelectItem[] items = new SelectItem[2];
+        items[0] = new SelectItem(OrganizationSecurityLevel.STANDARD, OrganizationSecurityLevel.STANDARD.toString());
+        items[1] = new SelectItem(OrganizationSecurityLevel.EXTENDED, OrganizationSecurityLevel.EXTENDED.toString());
         return items;
     }
 
@@ -162,6 +168,14 @@ public class OrgCreatePage extends BasicWorkspacePage
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         this.menuExchangeSourceOrg = idOfOrg;
         reloadMenuExchangeSourceOrgName(session);
+    }
+
+    public OrganizationSecurityLevel getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
+        this.securityLevel = securityLevel;
     }
 
     public static class ContragentItem {
@@ -479,7 +493,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
 
-
+        org.setSecurityLevel(securityLevel);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 
@@ -588,6 +602,10 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public SelectItem[] getStatusDetails() {
         return statusDetails;
+    }
+
+    public SelectItem[] getSecurityLevels() {
+        return securityLevels;
     }
 
     public void setStatusDetails(SelectItem[] statusDetails) {

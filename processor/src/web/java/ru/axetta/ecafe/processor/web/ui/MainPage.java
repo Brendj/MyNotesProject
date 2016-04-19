@@ -38,6 +38,7 @@ import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSele
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategorySelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.security.OptionsSecurityPage;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
@@ -124,6 +125,8 @@ public class MainPage implements Serializable {
     private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
     private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
 
+    private boolean eligibleToViewUsers;
+
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
@@ -135,6 +138,8 @@ public class MainPage implements Serializable {
     private final UserViewPage userViewPage = new UserViewPage();
     private final UserEditPage userEditPage = new UserEditPage();
     private final UserCreatePage userCreatePage = new UserCreatePage();
+
+    private final OptionsSecurityPage optionsSecurityPage = new OptionsSecurityPage();
 
     // Org manipulation
     private final BasicWorkspacePage orgGroupPage = new BasicWorkspacePage();
@@ -590,6 +595,31 @@ public class MainPage implements Serializable {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showOptionsSecurityPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            optionsSecurityPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = optionsSecurityPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill options security page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы настроек ИБ: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -8108,7 +8138,12 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewUsers() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_USER_VIEW);
+        //return getCurrentUser().hasFunction(Function.FUNC_USER_VIEW);
+        return getCurrentUser().isSecurityAdmin();
+    }
+
+    public void setEligibleToViewUsers(boolean value) throws Exception {
+        eligibleToViewUsers = getCurrentUser().isSecurityAdmin();
     }
 
     public boolean isEligibleToViewContragents() throws Exception {
@@ -8581,5 +8616,9 @@ public class MainPage implements Serializable {
 
     public QuartzJobsListPage getQuartzJobsListPage() {
         return quartzJobsListPage;
+    }
+
+    public OptionsSecurityPage getOptionsSecurityPage() {
+        return optionsSecurityPage;
     }
 }

@@ -285,6 +285,10 @@
                         <h:inputText value="#{optionPage.daysRestrictionPaymentDateImport}" styleClass="input-text" size="10" />
                         <h:outputText escape="true" value="- не импортировать платежи РНИП, старше {N} дней" styleClass="output-text" />
                     </h:panelGrid>
+                    <h:outputText escape="true" value="Мнемоника отправителя Sender/Code" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPSenderCode}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Мнемоника отправителя Sender/Name" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPSenderName}" styleClass="input-text" size="100" />
                 </h:panelGrid>
             </rich:panel>
 

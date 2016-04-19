@@ -1167,11 +1167,11 @@
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="optionGroupMenu" label="Настройки" binding="#{mainPage.optionGroupPage.mainMenuComponent}"
-                     rendered="#{mainPage.eligibleToEditOptions}">
+                     rendered="#{mainPage.eligibleToEditOptions}" expanded="#{mainPage.eligibleToViewUsers}">
 <a4j:support event="onclick" action="#{mainPage.showOptionGroupPage}" reRender="workspaceForm" />
 
 <rich:panelMenuGroup id="optionsGroupMenu" label="Настройки" binding="#{mainPage.optionsGroupPage.mainMenuComponent}"
-                     rendered="true">
+                     rendered="#{!mainPage.eligibleToViewUsers}">
     <%--@elvariable id="optionPage" type="ru.axetta.ecafe.processor.web.ui.option.OptionPage"--%>
     <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
                         action="#{optionPage.show}" reRender="workspaceForm" />
@@ -1221,7 +1221,7 @@
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
-                     rendered="#{mainPage.eligibleToViewUsers}">
+                     rendered="#{mainPage.eligibleToViewUsers}" expanded="true">
     <a4j:support event="onclick" action="#{mainPage.showUserGroupPage}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="showUserListMenuItem" binding="#{mainPage.userListPage.mainMenuComponent}" label="Список"
@@ -1258,12 +1258,17 @@
             <f:setPropertyActionListener value="-1" target="#{thinClientUserEditPage.idOfClient}" />
             <f:setPropertyActionListener value="1" target="#{thinClientUserEditPage.callFromMenu}" />
         </rich:panelMenuItem>
-</rich:panelMenuGroup>
+    </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="showOptionsSecurityMenuItem" binding="#{mainPage.optionsSecurityPage.mainMenuComponent}" label="Настройки"
+                        action="#{mainPage.showOptionsSecurityPage}" reRender="workspaceForm" rendered="#{mainPage.eligibleToViewUsers}"/>
+
 
 <%--@elvariable id="employeesGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesGroupPage"--%>
-<rich:panelMenuGroup id="employeesGroupMenu" label="Инженеры" binding="#{employeesGroupPage.mainMenuComponent}">
+<rich:panelMenuGroup id="employeesGroupMenu" label="Инженеры" binding="#{employeesGroupPage.mainMenuComponent}"
+                     rendered="#{!mainPage.eligibleToViewUsers}">
 
     <%--@elvariable id="employeeListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeListPage"--%>
     <%--@elvariable id="employeeGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeGroupPage"--%>
@@ -1327,7 +1332,7 @@
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организаций"
-                     binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}" rendered="true">
+                     binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}" rendered="#{!mainPage.eligibleToViewUsers}">
 
     <a4j:support event="onclick" action="#{mainPage.showCategoryOrgGroupPage}" reRender="workspaceForm" />
 
@@ -1392,7 +1397,7 @@
 
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="reportGroupMenu" binding="#{mainPage.reportGroupPage.mainMenuComponent}" label="Отчеты">
+<rich:panelMenuGroup id="reportGroupMenu" binding="#{mainPage.reportGroupPage.mainMenuComponent}" label="Отчеты" rendered="#{!mainPage.eligibleToViewUsers}">
     <a4j:support event="onclick" action="#{mainPage.showReportGroupPage}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="showReportTemplateManagerMenuItem"
@@ -1462,7 +1467,7 @@
 
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="infoGroupMenu" binding="#{mainPage.infoGroupMenu.mainMenuComponent}" label="Информация">
+<rich:panelMenuGroup id="infoGroupMenu" binding="#{mainPage.infoGroupMenu.mainMenuComponent}" label="Информация" rendered="#{!mainPage.eligibleToViewUsers}">
     <rich:panelMenuItem id="showCryptoInfo" binding="#{cryptoInfoPage.mainMenuComponent}" label="Крипто-провайдер"
                         action="#{cryptoInfoPage.show}" reRender="workspaceForm" />
 

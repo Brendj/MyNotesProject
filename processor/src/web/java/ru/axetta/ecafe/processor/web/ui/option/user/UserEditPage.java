@@ -111,6 +111,16 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             this.printError("Заполните имя пользователя");
             throw new RuntimeException("Username field is null");
         }
+        if (StringUtils.isEmpty(phone)) {
+            this.printError("Заполните поле контактного телефона");
+            throw new RuntimeException("Phone field is null");
+        } else {
+            String mobile = Client.checkAndConvertMobile(this.phone);
+            if (mobile == null) {
+                throw new Exception("Неверный формат контактного (мобильного) телефона");
+            }
+            phone = mobile;
+        }
         User user = (User) session.load(User.class, idOfUser);
         user.setUserName(userName);
         if (changePassword) {
@@ -142,6 +152,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         }
         if(role.equals(User.DefaultRole.ADMIN)){
             user.setFunctions(functionSelector.getAdminFunctions(session));
+            user.setRoleName(role.toString());
+        }
+        if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
+            user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
             user.setRoleName(role.toString());
         }
         if (User.DefaultRole.DEFAULT.equals(role)) {

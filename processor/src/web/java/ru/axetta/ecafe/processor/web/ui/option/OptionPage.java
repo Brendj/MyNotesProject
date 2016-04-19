@@ -115,6 +115,8 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPPaymentsWorkingVersion;
     private Boolean NotifyByPushNewClients;
     private Integer DaysRestrictionPaymentDateImport;
+    private String RNIPSenderCode;
+    private String RNIPSenderName;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -851,6 +853,8 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
         DaysRestrictionPaymentDateImport = runtimeContext.getOptionValueInt((Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT));
+        RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
+        RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
 
         bankListPage.onShow();
 
@@ -985,6 +989,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
             runtimeContext.setOptionValue(Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT, getDaysRestrictionPaymentDateImport());
             runtimeContext.setOptionValue(Option.OPTION_SAVE_SYNC_CALC, reportOn);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_CODE, RNIPSenderCode);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_NAME, RNIPSenderName);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -999,4 +1005,19 @@ public class OptionPage extends BasicWorkspacePage {
         return null;
     }
 
+    public String getRNIPSenderCode() {
+        return RNIPSenderCode;
+    }
+
+    public void setRNIPSenderCode(String RNIPSenderCode) {
+        this.RNIPSenderCode = RNIPSenderCode;
+    }
+
+    public String getRNIPSenderName() {
+        return RNIPSenderName;
+    }
+
+    public void setRNIPSenderName(String RNIPSenderName) {
+        this.RNIPSenderName = RNIPSenderName;
+    }
 }

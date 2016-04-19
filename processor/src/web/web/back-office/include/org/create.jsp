@@ -153,6 +153,12 @@
 
     <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
+
+    <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgCreatePage.securityLevel}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationSecurityLevelConverter"/>
+        <f:selectItems value="#{mainPage.orgCreatePage.securityLevels}" />
+    </h:selectOneMenu>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать новую организацию" action="#{mainPage.createOrg}"

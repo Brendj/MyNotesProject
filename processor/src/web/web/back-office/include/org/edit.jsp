@@ -218,6 +218,12 @@
 
     <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.oneActiveCard}"  styleClass="input-text"  />
+
+    <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgEditPage.securityLevel}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationSecurityLevelConverter"/>
+        <f:selectItems value="#{mainPage.orgEditPage.securityLevels}" />
+    </h:selectOneMenu>
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"
