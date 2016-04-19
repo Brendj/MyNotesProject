@@ -245,10 +245,10 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             items.add(itemFin);
 
             //4.
-            Long vibivZablock = 0L;
+            //Long vibivZablock = 0L;
 
             //4.1
-            String sqlVibiv = "SELECT count(cfc.cardno) FROM cf_cards cfc "
+            /*String sqlVibiv = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
                     + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,6,4,1) "
@@ -286,13 +286,8 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                 }
             }
 
-            vibivZablock = countVibiv + countNeisp + countNeispProch;
+            vibivZablock = countVibiv + countNeisp + countNeispProch;*/
 
-            //4.
-            InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", vibivZablock,
-                    "Фонд заблокированных и иных неиспользуемых сервисных карт",
-                    "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
-            items.add(itemZablock);
         }
 
         private List<InteractiveCardDataReportItem> getInteractiveReportDataEntity(Session session, String idOfOrg,
@@ -316,6 +311,8 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             boolean existsTT = false;
             boolean existsTTH = false;
             boolean existsFive = false;
+
+            boolean existingFour = false;
 
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
@@ -364,6 +361,15 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     items.add(item);
                     existsFive = true;
                 }
+
+                if (idOfRecord == 5L) {
+                    //4.
+                    InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", Long.valueOf(value),
+                            "Фонд заблокированных и иных неиспользуемых сервисных карт",
+                            "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
+                    items.add(itemZablock);
+                    existingFour = true;
+                }
             }
 
             if (existsTO == false) {
@@ -398,6 +404,14 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                         "Фонд резервных карт, доступных к использованию",
                         "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
                 items.add(itemSix);
+            }
+
+            if (existingFour == false) {
+                //4.
+                InteractiveCardDataReportItem itemZablock = new InteractiveCardDataReportItem(10L, "4", 0L,
+                        "Фонд заблокированных и иных неиспользуемых сервисных карт",
+                        "Количество неиспользуемых сервисных карт, которые находятся на руках у пользователей (заблокированные карты клиентов из групп \"Выбывшие\", \"Удаленные\"). Источник пополнения резервного фонда");
+                items.add(itemZablock);
             }
 
             InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(4L, "2", fondGk,
