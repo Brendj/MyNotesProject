@@ -97,11 +97,22 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             parameterMap.put("orgName", org.getShortName());
             parameterMap.put("address", org.getAddress());
 
-            List<InteractiveCardDataReportItem> items = findItems(session, idOfOrg);
+            Long idOfOrgL = Long.valueOf(idOfOrg);
+
+
+            List<Long> friendlyOrgsIds = new ArrayList<Long>();
+
+            List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOfOrgL);
+
+            for (Org org1 : friendlyOrgs) {
+                friendlyOrgsIds.add(org1.getIdOfOrg());
+            }
+
+            List<InteractiveCardDataReportItem> items = findItems(session, idOfOrg, friendlyOrgsIds);
 
             JRDataSource dataSource = createDataSource(items);
 
-            parameterMap.put("percent", getPercent(session, idOfOrg, items));
+            parameterMap.put("percent", getPercent(session, idOfOrg, items, friendlyOrgsIds));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
@@ -131,32 +142,23 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        private List<InteractiveCardDataReportItem> findItems(Session session, String idOfOrg) throws Exception {
+        private List<InteractiveCardDataReportItem> findItems(Session session, String idOfOrg, List<Long> friendlyOrgsIds) throws Exception {
 
             List<InteractiveCardDataReportItem> items = new ArrayList<InteractiveCardDataReportItem>();
 
             getInteractiveReportDataEntity(session, idOfOrg, items);
 
-            getFromCardData(session, idOfOrg, items);
+            getFromCardData(session, idOfOrg, items, friendlyOrgsIds);
 
             Collections.sort(items);
 
             return items;
         }
 
-        private void getFromCardData(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items)
+        private void getFromCardData(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items, List<Long> friendlyOrgsIds)
                 throws Exception {
 
             Long idOfOrgL = Long.valueOf(idOfOrg);
-
-
-            List<Long> friendlyOrgsIds = new ArrayList<Long>();
-
-            List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOfOrgL);
-
-            for (Org org : friendlyOrgs) {
-                friendlyOrgsIds.add(org.getIdOfOrg());
-            }
 
             //1.1
             String sql = "SELECT count(cfc.cardno) FROM cf_cards cfc "
@@ -424,16 +426,17 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
     }
 
-    public static String getPercent(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items) {
+    public static String getPercent(Session session, String idOfOrg, List<InteractiveCardDataReportItem> items, List<Long> friendlyOrgsIds) {
 
         Long idOfOrgL = Long.valueOf(idOfOrg);
 
         String sqlPercent =
                 "SELECT count(cfc.cardno) FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient"
-                        + " WHERE cl.idofclientgroup NOT IN (1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) AND cfc.idoforg = :idoforg";
+                        + " WHERE cl.idoforg IN (:friendlyOrgs) and cl.idofclientgroup NOT IN (1100000030, 1100000040, 1100000050, 1100000060, 1100000070, 1100000080) AND cfc.idoforg = :idoforg";
 
         Query queryPercent = session.createSQLQuery(sqlPercent);
         queryPercent.setParameter("idoforg", idOfOrgL);
+        queryPercent.setParameterList("friendlyOrgs", friendlyOrgsIds);
         int countPercent = ((BigInteger) queryPercent.uniqueResult()).intValue();
 
         int count = 0;
