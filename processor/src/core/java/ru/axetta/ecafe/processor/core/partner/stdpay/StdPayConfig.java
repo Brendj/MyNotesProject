@@ -30,9 +30,11 @@ public class StdPayConfig {
     private static final String PARAM_ADAPTER = ".adapter";
     //private static final String PARAM_CHECK_ONLY = ".checkOnly";
     private static final String BLOCKED_TERMINALS = ".blockTerminal";
+    private static final String PARAM_USERNAME= ".username";
+    private static final String PARAM_PASSWORD= ".password";
 
 
-    private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2;
+    private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2, AUTH_TYPE_BASIC=3;
 
     public static class LinkConfig {
         public String name;
@@ -45,6 +47,7 @@ public class StdPayConfig {
         public boolean screening;
         public String adapter;
         public String[] blockedTerminals;
+        public String username, password;
         //public boolean checkOnly;
     }
     LinkedList<LinkConfig> linkConfigs = new LinkedList<LinkConfig>();
@@ -65,6 +68,8 @@ public class StdPayConfig {
             //String checkOnlyParam = paramBaseName + n + PARAM_CHECK_ONLY;
             String blockedTerminalsParam = paramBaseName + n + BLOCKED_TERMINALS;
             String adapterParam = paramBaseName + n + PARAM_ADAPTER;
+            String usernameParam = paramBaseName+n+ PARAM_USERNAME;
+            String passwordParam = paramBaseName+n+ PARAM_PASSWORD;
 
             LinkConfig linkConfig = new LinkConfig();
             linkConfig.name = getRequiredParam(nameParam, properties);
@@ -97,7 +102,13 @@ public class StdPayConfig {
                 if (0==authType.compareToIgnoreCase("none")) linkConfig.authType = AUTH_TYPE_NONE;
                 else if (0==authType.compareToIgnoreCase("signature")) { linkConfig.authType = AUTH_TYPE_SIGNATURE; linkConfig.checkSignature = true; }
                 else if (0==authType.compareToIgnoreCase("sslcert")) linkConfig.authType = AUTH_TYPE_CLIENT_CERT;
+                else if (0==authType.compareToIgnoreCase("basic")) linkConfig.authType = AUTH_TYPE_BASIC;
                 else throw new Exception("Invalid authType: "+authType);
+
+                if (linkConfig.authType == AUTH_TYPE_BASIC) {
+                    linkConfig.username = getRequiredParam(usernameParam, properties);
+                    linkConfig.password = getRequiredParam(passwordParam, properties);
+                }
             }
             if (properties.containsKey(idOfAllowedClientOrgsParam)) {
                 String[] v = properties.getProperty(idOfAllowedClientOrgsParam).replaceAll("\\s", "").split(",");
@@ -137,9 +148,14 @@ public class StdPayConfig {
         return null;
     }
 
-    //public ArrayList<LinkConfig> getLinkConfigs() {
-    //    return new ArrayList<LinkConfig>(linkConfigs);
-    //}
+    public LinkConfig getLinkConfigWithAuthTypeBasicMatching(String userName, String password) {
+        for (LinkConfig lc : linkConfigs) {
+            if (lc.authType==AUTH_TYPE_BASIC && (lc.username.equals(userName) && lc.password.equals(password))) {
+                return lc;
+            }
+        }
+        return null;
+    }
 
     private static String getRequiredParam(String param, Properties properties) throws Exception {
         String value = properties.getProperty(param);

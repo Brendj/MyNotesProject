@@ -9,8 +9,10 @@ import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentServlet;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS;
 import ru.axetta.ecafe.processor.web.partner.sberbank_rt.SBRTOnlinePaymentRequestParser;
 
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +55,17 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
                 if (linkConfig!=null) break;
                 DNs+=dn+";";
             }
-            if (linkConfig==null) throw new Exception("PID parameter missing and invalid client certificatew: DNs: "+DNs);
+            // try auth by login and password
+            if (linkConfig == null) {
+                AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) httpRequest.getAttribute(
+                        PaymentControllerWS.AUTH_POLICY_KEY);
+                if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
+                    linkConfig = runtimeContext.getPartnerStdPayConfig()
+                            .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
+                                    authorizationPolicy.getPassword());
+                }
+            }
+            if (linkConfig==null) throw new Exception("PID parameter missing and invalid client certificatew: DNs: "+DNs + " and authentication failed");
 
         } else {
             partnerName = requestParser.getRequestParams().getParam("PID").toLowerCase();

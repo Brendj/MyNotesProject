@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ import java.io.*;
 public class PaymentControllerWS extends HttpServlet implements PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentControllerWS.class);
     private static final int STD_PAYMENT = 1;
+    public static final String AUTH_POLICY_KEY = "paymentAuthPolicyKey";
 
     StdPayConfig.LinkConfig linkConfig;
     public void setLinkConfig(StdPayConfig.LinkConfig linkConfig) {
@@ -64,6 +66,13 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             HttpServletResponse response = (HttpServletResponse) context.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
             BufferResponseWrapper bufResponse = new BufferResponseWrapper(response);
             request.setAttribute(StdOnlinePaymentServlet.ATTR_SOAP_REQUEST, requestParams);
+
+            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) context.getMessageContext()
+                    .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
+            if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
+                request.setAttribute(AUTH_POLICY_KEY, authorizationPolicy);
+            }
+
             servletContext.getRequestDispatcher("/"+path).include(request, bufResponse);
             paymentResult.response = bufResponse.getBuffer("UTF-8");
             //checkSignature(paymentResult.response);
