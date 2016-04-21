@@ -31,6 +31,9 @@
         <property name="blocked" column="IsBlocked" type="boolean" not-null="true"/>
         <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastSmsCode" column="LastSmsCode" type="string" length="10"/>
+        <property name="smsCodeEnterDate" column="SmsCodeEnterDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="smsCodeGenerateDate" column="SmsCodeGenerateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="region" column="Region" type="string" length="128" not-null="false"/>
 
         <set name="contragents" table="CF_UserContragents">

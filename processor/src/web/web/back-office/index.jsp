@@ -2,7 +2,16 @@
 <%--
   ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
   --%>
-
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.User" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%
+    if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
+        String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+        response.sendRedirect(mainPage);
+        return;
+    }
+%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>

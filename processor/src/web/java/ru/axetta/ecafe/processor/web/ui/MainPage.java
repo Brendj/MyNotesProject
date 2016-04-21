@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -72,10 +73,7 @@ import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,6 +86,7 @@ public class MainPage implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
 
+    private String smsCode;
     private Long selectedIdOfMenu;
     private Long selectedIdOfOrg;
     private CompositeIdOfContragentClientAccount removedIdOfCCAccount;
@@ -8620,5 +8619,30 @@ public class MainPage implements Serializable {
 
     public OptionsSecurityPage getOptionsSecurityPage() {
         return optionsSecurityPage;
+    }
+
+    public Object checkUserSmsCode() throws Exception {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        String userName = context.getRemoteUser();
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        String reqCode = user.getLastSmsCode();
+        if (reqCode != null && smsCode != null && reqCode.equals(smsCode)) {
+            user.setSmsCodeEnterDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+            context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
+        } else {
+            smsCode = "";
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Введен неверный код активации", null));
+        }
+        return null;
+    }
+
+    public String getSmsCode() {
+        return smsCode;
+    }
+
+    public void setSmsCode(String smsCode) {
+        this.smsCode = smsCode;
     }
 }

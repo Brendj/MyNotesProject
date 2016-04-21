@@ -147,7 +147,10 @@ drop function inline_0();
 
 --Удаление пользователя через установку флага, а не физически записью
 ALTER TABLE cf_users ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
-  ADD COLUMN deletedate bigint;
+  ADD COLUMN deletedate bigint,
+  ADD COLUMN lastsmscode character varying(10),
+  ADD COLUMN smscodeenterdate bigint,
+  ADD COLUMN smscodegeneratedate bigint;
 
 --Флаг "Уровень безопасности" у организации
 ALTER TABLE cf_orgs ADD COLUMN securitylevel integer NOT NULL DEFAULT 0;

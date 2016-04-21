@@ -363,6 +363,7 @@
         <web-resource-collection>
             <web-resource-name>Restrict unauthorized access to service functions</web-resource-name>
             <url-pattern>/back-office/index.faces</url-pattern>
+            <url-pattern>/back-office/confirm-sms.faces</url-pattern>
             <url-pattern>/back-office/client_csv_list.faces</url-pattern>
             <url-pattern>/back-office/client_org_csv_list.faces</url-pattern>
             <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>

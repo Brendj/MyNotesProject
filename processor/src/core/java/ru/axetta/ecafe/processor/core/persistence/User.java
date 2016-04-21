@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Base64;
@@ -17,9 +19,11 @@ import org.hibernate.Session;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -30,6 +34,30 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class User {
+
+    public String getLastSmsCode() {
+        return lastSmsCode;
+    }
+
+    public void setLastSmsCode(String lastSmsCode) {
+        this.lastSmsCode = lastSmsCode;
+    }
+
+    public Date getSmsCodeEnterDate() {
+        return smsCodeEnterDate;
+    }
+
+    public void setSmsCodeEnterDate(Date smsCodeDate) {
+        this.smsCodeEnterDate = smsCodeDate;
+    }
+
+    public Date getSmsCodeGenerateDate() {
+        return smsCodeGenerateDate;
+    }
+
+    public void setSmsCodeGenerateDate(Date smsCodeGenerateDate) {
+        this.smsCodeGenerateDate = smsCodeGenerateDate;
+    }
 
     public enum DefaultRole{
         DEFAULT(0,"настраиваемая роль"),
@@ -87,6 +115,9 @@ public class User {
     private Boolean blocked;
     private Boolean deletedState;
     private Date deleteDate;
+    private String lastSmsCode;
+    private Date smsCodeEnterDate;
+    private Date smsCodeGenerateDate;
     private String region;
     private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
 
@@ -352,5 +383,60 @@ public class User {
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         IOUtils.copy(digestInputStream, arrayOutputStream);
         return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
+    }
+
+    public static boolean needEnterSmsCode(String userName) throws Exception {
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
+        boolean needRegenerateCode = false;
+        if (StringUtils.isEmpty(user.getLastSmsCode()) || user.getSmsCodeGenerateDate() == null ||
+                CalendarUtils.getDifferenceInDays(user.getSmsCodeGenerateDate(), new Date(System.currentTimeMillis())) > days) {
+            needRegenerateCode = true;
+        }
+        if (needRegenerateCode) {
+            requestSmsCode(userName);
+            return true;
+        }
+        if (user.getSmsCodeEnterDate() == null) {
+            return true;
+        }
+
+        if (CalendarUtils.getDifferenceInDays(user.getSmsCodeEnterDate(), new Date(System.currentTimeMillis())) < days) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static void requestSmsCode(String userName) throws Exception {
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        if (user == null) {
+            throw new Exception(String.format("Cannot find user %s", userName));
+        }
+        String code = generateSmsCode();
+        Client fakeClient = createFakeClient(user.getPhone());
+
+        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                .sendMessageAsync(fakeClient, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
+                        new String[]{"linkingToken", code}, new Date());
+        user.setLastSmsCode(code);
+        user.setSmsCodeEnterDate(null);
+        user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
+        DAOService.getInstance().setUserInfo(user);
+    }
+
+    private static String generateSmsCode() {
+        return new BigInteger(4 * 5, new SecureRandom()).toString(32);
+    }
+
+    private static Client createFakeClient(String mobile) {
+        Client client = new Client();
+        client.setMobile(mobile);
+        Person person = new Person();
+        person.setFirstName("1");
+        person.setSecondName("2");
+        person.setSurname("3");
+        client.setPerson(person);
+        return client;
     }
 }
