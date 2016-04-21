@@ -116,7 +116,8 @@ public class Option {
             OPTION_IMPORT_RNIP_SENDER_NAME = 100066,
             OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE = 100067,
             OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER = 100068,
-            OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE = 100069;
+            OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE = 100069,
+            OPTION_IMPORT_RNIP_TSA_SERVER = 100070;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -210,6 +211,7 @@ public class Option {
             OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE, "365",
             OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER, "90",
             OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE, "30",
+            OPTION_IMPORT_RNIP_TSA_SERVER, "http://www.cryptopro.ru/tsp/tsp.srf",
 };
 
     private Long idOfOption;

@@ -289,6 +289,8 @@
                     <h:inputText value="#{optionPage.RNIPSenderCode}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="Мнемоника отправителя Sender/Name" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPSenderName}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Адрес сервиса TSA" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.RNIPTSAServer}" styleClass="input-text" size="100" />
                 </h:panelGrid>
             </rich:panel>
 

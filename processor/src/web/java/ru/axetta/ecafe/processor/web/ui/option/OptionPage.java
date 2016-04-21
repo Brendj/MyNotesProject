@@ -117,6 +117,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer DaysRestrictionPaymentDateImport;
     private String RNIPSenderCode;
     private String RNIPSenderName;
+    private String RNIPTSAServer;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -855,6 +856,7 @@ public class OptionPage extends BasicWorkspacePage {
         DaysRestrictionPaymentDateImport = runtimeContext.getOptionValueInt((Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT));
         RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
         RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
+        RNIPTSAServer = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_TSA_SERVER);
 
         bankListPage.onShow();
 
@@ -991,6 +993,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SAVE_SYNC_CALC, reportOn);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_CODE, RNIPSenderCode);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_NAME, RNIPSenderName);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_TSA_SERVER, RNIPTSAServer);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -1019,5 +1022,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setRNIPSenderName(String RNIPSenderName) {
         this.RNIPSenderName = RNIPSenderName;
+    }
+
+    public String getRNIPTSAServer() {
+        return RNIPTSAServer;
+    }
+
+    public void setRNIPTSAServer(String RNIPTSAServer) {
+        this.RNIPTSAServer = RNIPTSAServer;
     }
 }
