@@ -13,6 +13,7 @@ package ru.axetta.ecafe.processor.web.ui;
  */
 public class Constants {
     public static final String UNKNOWN_CARD_TYPE_NAME = "Неизвестный";
-    public static final String[] CARD_TYPE_NAMES = {UNKNOWN_CARD_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК"};
+    public static final String[] CARD_TYPE_NAMES = {UNKNOWN_CARD_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК",
+                                                    "Транспортная карта", "Банковская карта", "Соц. карта москвича", "Соц. карта учащегося"};
     public static final String[] CARD_STATE_NAMES = {"Активна", "Временно заблокирована", "Окончательно заблокирована"};
 }

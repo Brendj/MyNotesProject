@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,7 +16,8 @@ import java.util.Set;
 public class Card {
 
     public static final String UNKNOWN_TYPE_NAME = "Неизвестный";
-    public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК"};
+    public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК",
+                                               "Транспортная карта", "Банковская карта", "Соц. карта москвича", "Соц. карта учащегося"};
     public static final int TYPE_UEC=4;
 
     public static final String[] STATE_NAMES = {"Активна", "Временно заблокирована", "Окончательно заблокирована"};
