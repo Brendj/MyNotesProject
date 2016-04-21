@@ -19,11 +19,9 @@ import org.hibernate.Session;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -426,7 +424,13 @@ public class User {
     }
 
     private static String generateSmsCode() {
-        return new BigInteger(4 * 5, new SecureRandom()).toString(32);
+        //return new BigInteger(4 * 5, new SecureRandom()).toString(32); - символьно-цифровой код. Ниже чисто цифровой
+        String result = "";
+        Random random = new Random(System.currentTimeMillis());
+        for (int i = 0; i < 4; i++) {
+            result += random.nextInt(10);
+        }
+        return result;
     }
 
     private static Client createFakeClient(String mobile) {

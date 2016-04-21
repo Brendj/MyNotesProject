@@ -71,6 +71,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.*;
@@ -519,12 +520,13 @@ public class MainPage implements Serializable {
         return "\r\n";
     }
 
-    public String logout() {
+    public String logout() throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext facesExternalContext = facesContext.getExternalContext();
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
+            ((HttpServletRequest)facesExternalContext.getRequest()).logout();
         }
         return "logout";
     }
