@@ -90,7 +90,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
         SpecialDatesData result = new SpecialDatesData();
         List<ResSpecialDatesItem> items = new ArrayList<ResSpecialDatesItem>();
         ResSpecialDatesItem resItem;
-        List<SpecialDate> list = DAOUtils.getSpecialDatesForOrgSinceVersion(session,
+        List<SpecialDate> list = DAOUtils.getSpecialDatesForFriendlyOrgsSinceVersion(session,
                 specialDates.getIdOfOrgOwner(), specialDates.getMaxVersion());
         for(SpecialDate sd : list){
             resItem = new ResSpecialDatesItem(sd);

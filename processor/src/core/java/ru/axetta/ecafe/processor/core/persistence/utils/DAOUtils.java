@@ -2181,6 +2181,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<SpecialDate> getSpecialDatesForFriendlyOrgsSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.in("org", orgs));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
     public static List enterEventsSummary(){
                  return null;
     }

@@ -251,6 +251,7 @@ public class MainPage implements Serializable {
     private final ClientBalanceByOrgReportPage clientBalanceByOrgReportPage = new ClientBalanceByOrgReportPage();
     private final BalanceLeavingReportPage balanceLeavingReportPage = new BalanceLeavingReportPage();
     private final ZeroTransactionsReportPage zeroTransactionsReportPage = new ZeroTransactionsReportPage();
+    private final SpecialDatesReportPage specialDatesReportPage = new SpecialDatesReportPage();
 
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
@@ -6543,6 +6544,23 @@ public class MainPage implements Serializable {
             currentWorkspacePage = zeroTransactionsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set ZeroTransactionsReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public SpecialDatesReportPage getSpecialDatesReportPage() {
+        return specialDatesReportPage;
+    }
+
+    public Object showSpecialDatesReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = specialDatesReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set SpecialDatesReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }
