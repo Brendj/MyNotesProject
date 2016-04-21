@@ -34,7 +34,8 @@
         </rich:simpleTogglePanel>
     </h:panelGrid>
 
-
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 
     <rich:dataTable id="userListTable"
                     value="#{mainPage.userListPage.items}" var="item" rows="20"

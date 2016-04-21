@@ -14,6 +14,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -110,6 +111,9 @@ public class UserListPage extends BasicWorkspacePage {
 
     public void removeUser(Session session, Long idOfUser) throws Exception {
         User user = (User) session.load(User.class, idOfUser);
+        if (FacesContext.getCurrentInstance().getExternalContext().getRemoteUser().equals(user.getUserName())) {
+            throw new Exception("Невозможно удалить пользователя, под которым осуществлен вход в систему");
+        }
         user.setDeletedState(true);
         user.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
         session.save(user);
