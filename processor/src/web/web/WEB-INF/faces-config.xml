@@ -206,6 +206,12 @@
     </converter>
 
     <converter>
+        <description>Organization Security Level Converter</description>
+        <converter-id>organizationSecurityLevelConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationSecurityLevelConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Organization Type Modify Converter</description>
         <converter-id>organizationTypeModifyConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeModifyConverter</converter-class>
