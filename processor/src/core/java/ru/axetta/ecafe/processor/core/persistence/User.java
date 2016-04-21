@@ -433,6 +433,19 @@ public class User {
         return result;
     }
 
+    public boolean loginAllowed() {
+        if (idOfRole.equals(DefaultRole.ADMIN_SECURITY.getIdentification())) {
+            return true; //для роли администратора безопасности проверку на необходимость блокировки по времени неактивности не выполняем
+        }
+        Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+        if (CalendarUtils.getDifferenceInDays(lastEntryTime, new Date(System.currentTimeMillis())) > days) {
+            this.setBlocked(true);
+            DAOService.getInstance().setUserInfo(this);
+            return false;
+        }
+        return true;
+    }
+
     private static Client createFakeClient(String mobile) {
         Client client = new Client();
         client.setMobile(mobile);

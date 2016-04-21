@@ -129,6 +129,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         user.setPhone(phone);
         user.setEmail(email);
         user.setUpdateTime(new Date());
+        if (user.isBlocked() && !blocked) {
+            //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
+            user.setLastEntryTime(new Date());
+        }
         user.setBlocked(blocked);
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         user.setIdOfRole(role.getIdentification());

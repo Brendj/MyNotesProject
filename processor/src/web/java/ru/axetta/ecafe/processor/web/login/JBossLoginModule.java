@@ -209,6 +209,12 @@ public class JBossLoginModule implements LoginModule {
                 logger.debug(mess);
                 throw new LoginException(mess);
             }
+            if (!user.loginAllowed()) {
+                request.setAttribute("errorMessage", String.format("Пользователь с именем \"%s\" заблокирован по причине длительного неиспользования учетной записи", username));
+                String mess = String.format("User \"%s\" is blocked . Access denied.", username);
+                logger.debug(mess);
+                throw new LoginException(mess);
+            }
             if (user.hasPassword(plainPassword)) {
                 userPrincipal = new PrincipalImpl(username);
                 user.setLastEntryIP(request.getRemoteAddr());
