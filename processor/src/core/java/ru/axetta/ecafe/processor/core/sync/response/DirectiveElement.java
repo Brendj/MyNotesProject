@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
@@ -63,6 +65,17 @@ public class DirectiveElement {
 
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+
+        Integer securityModeFlag = org.getSecurityLevel().getCode();
+        directiveItemList.add(new DirectiveItem("IS_SECURITY_MODE_FLAG", securityModeFlag.toString()));
+
+        Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE);
+        directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));
+
+        Integer maxInactiveTime = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+        directiveItemList.add(new DirectiveItem("IS_MAX_INACTIVITY_TIME", maxInactiveTime.toString()));
     }
 
     public Element toElement(Document document) throws Exception {
