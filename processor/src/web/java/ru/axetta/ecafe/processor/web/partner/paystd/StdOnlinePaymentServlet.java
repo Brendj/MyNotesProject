@@ -25,6 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
+
     private static final Logger logger = LoggerFactory.getLogger(StdOnlinePaymentServlet.class);
     public static final String ATTR_PAY_RESPONSE = "payResponse";
 
@@ -39,42 +40,50 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
     }
 
     @Override
-    protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest, OnlinePaymentRequestParser requestParser)  throws Exception {
+    protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest,
+            OnlinePaymentRequestParser requestParser) throws Exception {
         String partnerName = requestParser.getRequestParams().getParam("PID");
         StdPayConfig.LinkConfig linkConfig = null;
-        if (partnerName==null) {
+        if (partnerName == null) {
             // try auth by ssl cert
-            String DNs="";
-            X509Certificate[] certificates = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
-            if (certificates==null || certificates.length==0) {
-                throw new Exception("Parameter missing: PID");
-            }
-            for (int n=0;n<certificates.length;++n) {
-                String dn = certificates[0].getSubjectDN().getName();
-                linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfigByCertDN(dn);
-                if (linkConfig!=null) break;
-                DNs+=dn+";";
+            String DNs = "";
+            X509Certificate[] certificates = (X509Certificate[]) httpRequest
+                    .getAttribute("javax.servlet.request.X509Certificate");
+            if (certificates != null && certificates.length > 0) {
+                for (int n = 0; n < certificates.length; ++n) {
+                    String dn = certificates[0].getSubjectDN().getName();
+                    linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfigByCertDN(dn);
+                    if (linkConfig != null) {
+                        break;
+                    }
+                    DNs += dn + ";";
+                }
             }
             // try auth by login and password
             if (linkConfig == null) {
-                AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) httpRequest.getAttribute(
-                        PaymentControllerWS.AUTH_POLICY_KEY);
+                AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) httpRequest
+                        .getAttribute(PaymentControllerWS.AUTH_POLICY_KEY);
                 if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
                     linkConfig = runtimeContext.getPartnerStdPayConfig()
                             .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
                                     authorizationPolicy.getPassword());
                 }
             }
-            if (linkConfig==null) throw new Exception("PID parameter missing and invalid client certificatew: DNs: "+DNs + " and authentication failed");
+            if (linkConfig == null) {
+                throw new Exception("PID parameter missing and invalid client certificatew: DNs: " + DNs
+                        + " and authentication by login and password failed");
+            }
 
         } else {
             partnerName = requestParser.getRequestParams().getParam("PID").toLowerCase();
             linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
         }
-        if (linkConfig==null) throw new Exception("Invalid PID");
-        ((StdOnlinePaymentRequestParser)requestParser).setLinkConfig(linkConfig);
+        if (linkConfig == null) {
+            throw new Exception("Invalid PID");
+        }
+        ((StdOnlinePaymentRequestParser) requestParser).setLinkConfig(linkConfig);
         ///
-        if (linkConfig.checkSignature && linkConfig.partnerPublicKey==null) {
+        if (linkConfig.checkSignature && linkConfig.partnerPublicKey == null) {
             linkConfig.partnerPublicKey = DAOUtils.getContragentPublicKey(runtimeContext, linkConfig.idOfContragent);
         }
 
