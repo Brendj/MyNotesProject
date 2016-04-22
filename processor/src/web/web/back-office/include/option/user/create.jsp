@@ -21,6 +21,8 @@
     <h:outputText escape="true" value="Повторите пароль" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.userCreatePage.plainPasswordConfirmation}" maxlength="64"
                    styleClass="input-text" />
+    <h:outputText escape="true" value="Затребовать смену пароля при первом входе в систему" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.userCreatePage.needChangePassword}" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.userCreatePage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />

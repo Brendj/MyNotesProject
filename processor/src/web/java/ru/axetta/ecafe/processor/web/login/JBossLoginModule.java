@@ -17,6 +17,7 @@ import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.context.FacesContext;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -25,6 +26,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.security.Principal;
 import java.security.acl.Group;
@@ -208,6 +210,10 @@ public class JBossLoginModule implements LoginModule {
                 String mess = String.format("User \"%s\" is blocked. Access denied.", username);
                 logger.debug(mess);
                 throw new LoginException(mess);
+            }
+            if (user.isFirstLogon()) {
+                HttpSession session = (HttpSession)FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+                session.setAttribute("firstLogon", true);
             }
             if (!user.loginAllowed()) {
                 request.setAttribute("errorMessage", String.format("Пользователь с именем \"%s\" заблокирован по причине длительного неиспользования учетной записи", username));

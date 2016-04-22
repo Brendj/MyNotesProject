@@ -16,6 +16,7 @@ import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.security.auth.login.CredentialException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,6 +56,21 @@ public class User {
 
     public void setSmsCodeGenerateDate(Date smsCodeGenerateDate) {
         this.smsCodeGenerateDate = smsCodeGenerateDate;
+    }
+
+    public Boolean getNeedChangePassword() {
+        return needChangePassword;
+    }
+
+    public void setNeedChangePassword(Boolean needChangePassword) {
+        this.needChangePassword = needChangePassword;
+    }
+
+    public void doChangePassword(String plainPassword) throws Exception {
+        if (this.cypheredPassword.equals(encryptPassword(plainPassword))) {
+            throw new CredentialException("Не допускается использовать пароль, совпадающий с действующим на данный момент");
+        }
+        this.setPassword(plainPassword);
     }
 
     public enum DefaultRole{
@@ -116,6 +132,7 @@ public class User {
     private String lastSmsCode;
     private Date smsCodeEnterDate;
     private Date smsCodeGenerateDate;
+    private Boolean needChangePassword;
     private String region;
     private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
 
@@ -340,7 +357,7 @@ public class User {
                 User u = DAOUtils.findUser(session, newName);
                 while (u != null) {
                     postfix++;
-                    newName = user.getUserName() + "_archieved_" + postfix.toString();
+                    newName = newName + postfix.toString(); //user.getUserName() + "_archieved_" + postfix.toString();
                     u = DAOUtils.findUser(session, newName);
                 }
                 user.setUserName(newName);
@@ -381,6 +398,11 @@ public class User {
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         IOUtils.copy(digestInputStream, arrayOutputStream);
         return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
+    }
+
+    public static boolean isNeedChangePassword(String userName) throws Exception {
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        return user.getNeedChangePassword();
     }
 
     public static boolean needEnterSmsCode(String userName) throws Exception {
@@ -436,11 +458,21 @@ public class User {
         return result;
     }
 
+    public boolean isFirstLogon() {
+        return lastEntryTime == null;
+    }
+
     public boolean loginAllowed() {
         if (idOfRole.equals(DefaultRole.ADMIN_SECURITY.getIdentification())) {
             return true; //для роли администратора безопасности проверку на необходимость блокировки по времени неактивности не выполняем
         }
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+        if (lastEntryTime == null && CalendarUtils.getDifferenceInDays(getUpdateTime(), new Date(System.currentTimeMillis())) > days) {
+            return false; //пользователь никогда не выполнял вход и создан более days дней назад, блокируем его
+        }
+        if (lastEntryTime == null) {
+            return true; //новый пользователь, создан менее days назад
+        }
         if (CalendarUtils.getDifferenceInDays(lastEntryTime, new Date(System.currentTimeMillis())) > days) {
             this.setBlocked(true);
             DAOService.getInstance().setUserInfo(this);

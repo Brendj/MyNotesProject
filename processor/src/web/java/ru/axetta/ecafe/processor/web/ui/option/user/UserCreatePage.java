@@ -49,6 +49,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     private String orgFilterCanceled = "Не выбрано";
     private UserNotificationType selectOrgType;
     private String orgIds;
+    private Boolean needChangePassword;
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
 
@@ -203,6 +204,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     public void fill(Session session) throws Exception {
+        this.needChangePassword = true;
         this.functionSelector.fill(session);
         this.idOfRole = User.DefaultRole.DEFAULT.getIdentification();
         initRegions(session);
@@ -281,6 +283,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
             user.setRoleName(role.toString());
         }
+        user.setNeedChangePassword(needChangePassword);
         session.save(user);
         for (OrgItem orgItem : orgItems) {
             Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
@@ -310,6 +313,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
+    }
+
+    public Boolean getNeedChangePassword() {
+        return needChangePassword;
+    }
+
+    public void setNeedChangePassword(Boolean needChangePassword) {
+        this.needChangePassword = needChangePassword;
     }
 
     public static class ContragentItem {

@@ -53,6 +53,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private String region;
     private String orgFilter = "Не выбрано";
     private String orgFilterCanceled = "Не выбрано";
+    private Boolean needChangePassword;
 
     private UserNotificationType selectOrgType;
 
@@ -175,6 +176,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         } else {
             user.setRegion(null);
         }
+        user.setNeedChangePassword(needChangePassword);
         user.getUserOrgses().clear();
         session.update(user);
         session.flush();
@@ -411,7 +413,16 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
         this.region = user.getRegion();
+        this.needChangePassword = user.getNeedChangePassword();
         initRegions(session);
+    }
+
+    public Boolean getNeedChangePassword() {
+        return needChangePassword;
+    }
+
+    public void setNeedChangePassword(Boolean needChangePassword) {
+        this.needChangePassword = needChangePassword;
     }
 
     public static class ContragentItem {

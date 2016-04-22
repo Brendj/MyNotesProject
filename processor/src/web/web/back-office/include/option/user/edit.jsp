@@ -30,6 +30,9 @@
     <h:inputSecret id="userEditorPasswordConfirmation" value="#{mainPage.userEditPage.plainPasswordConfirmation}"
                    maxlength="64" rendered="#{mainPage.userEditPage.changePassword}"
                    readonly="#{!mainPage.userEditPage.changePassword}" styleClass="input-text" />
+    <h:outputText escape="true" value="Затребовать смену пароля при следующем входе в систему" styleClass="output-text"
+                  rendered="#{mainPage.userEditPage.changePassword}"/>
+    <h:selectBooleanCheckbox value="#{mainPage.userEditPage.needChangePassword}" rendered="#{mainPage.userEditPage.changePassword}" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />

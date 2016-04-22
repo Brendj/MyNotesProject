@@ -71,6 +71,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.PersistenceException;
+import javax.security.auth.login.CredentialException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -88,6 +89,8 @@ public class MainPage implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
 
     private String smsCode;
+    private String newPassword;
+    private String newPasswordConfirm;
     private Long selectedIdOfMenu;
     private Long selectedIdOfOrg;
     private CompositeIdOfContragentClientAccount removedIdOfCCAccount;
@@ -767,7 +770,6 @@ public class MainPage implements Serializable {
     }
 
     public Object userSendActivationCode(String userName) throws Exception {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
         User.requestSmsCode(userName);
         return null;
     }
@@ -8228,11 +8230,13 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToEditUsers() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_USER_EDIT);
+        return getCurrentUser().isSecurityAdmin();
+        //return getCurrentUser().hasFunction(Function.FUNC_USER_EDIT);
     }
 
     public boolean isEligibleToDeleteUsers() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_USER_DELETE);
+        return getCurrentUser().isSecurityAdmin();
+        //return getCurrentUser().hasFunction(Function.FUNC_USER_DELETE);
     }
 
     public boolean isEligibleToEditOptions() throws Exception {
@@ -8664,11 +8668,51 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object doChangeUserPassword() throws Exception {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        String userName = context.getRemoteUser();
+        User user = DAOService.getInstance().findUserByUserName(userName);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if (!newPassword.equals(newPasswordConfirm)) {
+            newPassword = "";
+            newPasswordConfirm = "";
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ОШИБКА: введенные значения не совпадают", null));
+            return null;
+        }
+        try {
+            user.doChangePassword(newPassword);
+            user.setNeedChangePassword(false);
+            DAOService.getInstance().setUserInfo(user);
+            context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
+        } catch (CredentialException e) {
+            newPassword = "";
+            newPasswordConfirm = "";
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+        }
+        return null;
+    }
+
     public String getSmsCode() {
         return smsCode;
     }
 
     public void setSmsCode(String smsCode) {
         this.smsCode = smsCode;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getNewPasswordConfirm() {
+        return newPasswordConfirm;
+    }
+
+    public void setNewPasswordConfirm(String newPasswordConfirm) {
+        this.newPasswordConfirm = newPasswordConfirm;
     }
 }

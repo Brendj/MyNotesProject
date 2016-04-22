@@ -11,6 +11,11 @@
         response.sendRedirect(mainPage);
         return;
     }
+    if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.isNeedChangePassword(request.getRemoteUser())) {
+        String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
+        response.sendRedirect(mainPage);
+        return;
+    }
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
