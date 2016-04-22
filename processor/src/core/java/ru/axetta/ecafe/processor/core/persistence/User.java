@@ -458,10 +458,6 @@ public class User {
         return result;
     }
 
-    public boolean isFirstLogon() {
-        return lastEntryTime == null;
-    }
-
     public boolean loginAllowed() {
         if (idOfRole.equals(DefaultRole.ADMIN_SECURITY.getIdentification())) {
             return true; //для роли администратора безопасности проверку на необходимость блокировки по времени неактивности не выполняем
