@@ -164,7 +164,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             String sql = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
-                    + " WHERE cfc.cardtype IN (3) AND cfc.state IN (0, 4) "
+                    + " WHERE cfc.cardtype IN (3,8) AND cfc.state IN (0, 4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
@@ -181,7 +181,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             String sqlEno = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup "
-                    + " WHERE cfc.cardtype IN (0,4,5,6) AND cfc.state IN (0,4) "
+                    + " WHERE cfc.cardtype IN (0,4,5,6,7) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
