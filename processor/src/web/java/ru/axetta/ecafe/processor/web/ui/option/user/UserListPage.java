@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -37,6 +38,7 @@ public class UserListPage extends BasicWorkspacePage {
         private final String roleName;
         private final boolean blocked;
         private final List<Contragent> contragentList;
+        private boolean phoneEmpty;
 
         public Item(User user) {
             this.idOfUser = user.getIdOfUser();
@@ -53,6 +55,7 @@ public class UserListPage extends BasicWorkspacePage {
             }
             this.functions = itemFunctions;
             this.contragentList = new ArrayList<Contragent>(user.getContragents());
+            this.phoneEmpty = StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''");
         }
 
         public Long getIdOfUser() {
@@ -89,6 +92,10 @@ public class UserListPage extends BasicWorkspacePage {
 
         public boolean isBlocked() {
             return blocked;
+        }
+
+        public boolean isPhoneEmpty() {
+            return phoneEmpty;
         }
     }
 

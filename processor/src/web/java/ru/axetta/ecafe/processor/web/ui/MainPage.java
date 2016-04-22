@@ -766,6 +766,12 @@ public class MainPage implements Serializable {
         return userEditPage;
     }
 
+    public Object userSendActivationCode(String userName) throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        User.requestSmsCode(userName);
+        return null;
+    }
+
     public Object showUserEditPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;

@@ -385,6 +385,9 @@ public class User {
 
     public static boolean needEnterSmsCode(String userName) throws Exception {
         User user = DAOService.getInstance().findUserByUserName(userName);
+        if (StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''")) {
+            return false; //если не указан номер телефона, то и смс отправить некуда.
+        }
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
         boolean needRegenerateCode = false;
         if (StringUtils.isEmpty(user.getLastSmsCode()) || user.getSmsCodeGenerateDate() == null ||
