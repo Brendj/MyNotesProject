@@ -9,9 +9,9 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.CompareFilterMenu;
 
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
 import java.util.List;
 
@@ -163,24 +163,25 @@ public class CardFilter {
     }
 
     public List retrieveCards(Session session) throws Exception {
-        Criteria criteria = session.createCriteria(Card.class);
-        criteria.setFetchMode("client", FetchMode.JOIN);
+        Criteria criteria = session.createCriteria(Card.class, "card");
         if (!this.isEmpty()) {
             if (null != this.cardNo) {
-                criteria.add(Restrictions.eq("cardNo", this.cardNo));
+                criteria.add(Restrictions.eq("card.cardNo", this.cardNo));
             }
             if (null != this.cardPrintedNo) {
-                criteria.add(Restrictions.eq("cardPrintedNo", this.cardPrintedNo));
+                criteria.add(Restrictions.eq("card.cardPrintedNo", this.cardPrintedNo));
             }
             if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
-                criteria.add(Restrictions.eq("state", this.cardState));
+                criteria.add(Restrictions.eq("card.state", this.cardState));
             }
             if (CardLifeStateFilterMenu.NO_CONDITION != this.cardLifeState) {
-                criteria.add(Restrictions.eq("lifeState", this.cardLifeState));
+                criteria.add(Restrictions.eq("card.lifeState", this.cardLifeState));
             }
             if (!this.org.isEmpty()) {
                 Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
-                criteria.createCriteria("client").add(Restrictions.eq("org", org));
+                criteria.createAlias("client", "client", JoinType.LEFT_OUTER_JOIN);
+                criteria.add(Restrictions.disjunction().add(Restrictions.eq("card.org", org))
+                        .add(Restrictions.eq("client.org", org)));
             }
         }
         return criteria.list();
