@@ -8229,6 +8229,10 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_ORG_EDIT);
     }
 
+    public boolean isAdmin() throws Exception {
+        return getCurrentUser().isAdmin();
+    }
+
     public boolean isEligibleToEditUsers() throws Exception {
         return getCurrentUser().isSecurityAdmin();
         //return getCurrentUser().hasFunction(Function.FUNC_USER_EDIT);

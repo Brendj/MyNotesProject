@@ -307,6 +307,10 @@ public class User {
         return idOfRole.equals(DefaultRole.ADMIN_SECURITY.ordinal());
     }
 
+    public boolean isAdmin() {
+        return idOfRole.equals(DefaultRole.ADMIN.ordinal());
+    }
+
     public String getRegion() {
         return region;
     }

@@ -8,7 +8,8 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%--@elvariable id="messageConfigurePage" type="ru.axetta.ecafe.processor.web.ui.option.MessageConfigurePage"--%>
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditUsers())
+<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditUsers() &&
+        !ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isAdmin())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <h:panelGrid id="messageConfigurePanelGrid" binding="#{messageConfigurePage.pageComponent}" styleClass="borderless-grid">
