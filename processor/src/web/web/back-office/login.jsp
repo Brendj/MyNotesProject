@@ -37,6 +37,7 @@
                                 headerClass="login-panel-header" bodyClass="login-panel-body">
                         <form id="loginForm" method="post" enctype="application/x-www-form-urlencoded"
                               action="j_security_check" class="borderless-form">
+                            <input type="hidden" name="ecafeUserRole" value="<%= (String)request.getAttribute("ru.axetta.ecafe.userRole") %>" />
                             <div align="center">
                                 <%if (null != request.getParameter("error")) {%>
                                 <h:outputText styleClass="error-output-text"

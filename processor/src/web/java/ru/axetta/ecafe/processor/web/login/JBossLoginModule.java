@@ -40,6 +40,8 @@ import java.util.*;
 public class JBossLoginModule implements LoginModule {
 
     private static final Logger logger = LoggerFactory.getLogger(JBossLoginModule.class);
+    private static final String AUTH_ERROR_THROUGH_CURRENT_URL = "Запрашиваемый ресурс аутентификации недоступен пользователю с данной ролью.";
+    private static final String AUTH_USER_ROLE_ATTRIBUTE_NAME = "ru.axetta.ecafe.userRole";
 
     /**
      * Created by IntelliJ IDEA.
@@ -200,20 +202,36 @@ public class JBossLoginModule implements LoginModule {
             userCriteria.add(Restrictions.eq("userName", username));
             userCriteria.add(Restrictions.eq("deletedState", false));
             User user = (User) userCriteria.uniqueResult();
-            if (user == null)
+            if (user == null) {
                 throw new LoginException("User not found");
+            }
             HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+            request.setAttribute(AUTH_USER_ROLE_ATTRIBUTE_NAME, request.getParameter("ecafeUserRole"));//for auth fault
+
             if (user.isBlocked()) {
-                request.setAttribute("errorMessage", String.format("Пользователь с именем \"%s\" заблокирован", username));
+                request.setAttribute("errorMessage",
+                        String.format("Пользователь с именем \"%s\" заблокирован", username));
                 String mess = String.format("User \"%s\" is blocked. Access denied.", username);
                 logger.debug(mess);
                 throw new LoginException(mess);
             }
             if (!user.loginAllowed()) {
-                request.setAttribute("errorMessage", String.format("Пользователь с именем \"%s\" заблокирован по причине длительного неиспользования учетной записи", username));
+                request.setAttribute("errorMessage", String.format(
+                        "Пользователь с именем \"%s\" заблокирован по причине длительного неиспользования учетной записи",
+                        username));
                 String mess = String.format("User \"%s\" is blocked . Access denied.", username);
                 logger.debug(mess);
                 throw new LoginException(mess);
+            }
+            final Integer idOfRole = user.getIdOfRole();
+            final String userRole = request.getParameter("ecafeUserRole");
+            final boolean isAdminLoginAttempt = userRole == null ? false : userRole.equals("admin");
+            if (isCommonUserLoginFromWrongURL(isAdminLoginAttempt, idOfRole) || (isAdminLoginFromWrongURL(
+                    isAdminLoginAttempt, idOfRole))) {
+                request.setAttribute("errorMessage", AUTH_ERROR_THROUGH_CURRENT_URL);
+                final String message = String.format("%s Login: %s.", AUTH_ERROR_THROUGH_CURRENT_URL, username);
+                logger.debug(message);
+                throw new LoginException(message);
             }
             if (user.hasPassword(plainPassword)) {
                 userPrincipal = new PrincipalImpl(username);
@@ -254,6 +272,16 @@ public class JBossLoginModule implements LoginModule {
         logger.debug("User \"{}\": logged out", username);
         loginSucceeded = false;
         return true;
+    }
+
+    private boolean isCommonUserLoginFromWrongURL(boolean isAdmin, Integer idOfRole) {
+        return ((isAdmin) && !(User.DefaultRole.ADMIN.getIdentification().equals(idOfRole)) && !(User.DefaultRole
+                .ADMIN_SECURITY.getIdentification().equals(idOfRole)));
+    }
+
+    private boolean isAdminLoginFromWrongURL(boolean isAdmin, Integer idOfRole) {
+        return ((!isAdmin) && ((User.DefaultRole.ADMIN.getIdentification().equals(idOfRole)) || (User.DefaultRole
+                .ADMIN_SECURITY.getIdentification().equals(idOfRole))));
     }
 
 }
