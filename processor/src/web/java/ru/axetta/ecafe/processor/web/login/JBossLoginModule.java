@@ -206,7 +206,7 @@ public class JBossLoginModule implements LoginModule {
                 throw new LoginException("User not found");
             }
             HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
-            //request.setAttribute(AUTH_USER_ROLE_ATTRIBUTE_NAME, request.getParameter("ecafeUserRole"));//for auth fault
+            request.setAttribute(AUTH_USER_ROLE_ATTRIBUTE_NAME, request.getParameter("ecafeUserRole"));//for auth fault
 
             if (user.isBlocked()) {
                 request.setAttribute("errorMessage",
@@ -223,7 +223,7 @@ public class JBossLoginModule implements LoginModule {
                 logger.debug(mess);
                 throw new LoginException(mess);
             }
-            /*final Integer idOfRole = user.getIdOfRole();
+            final Integer idOfRole = user.getIdOfRole();
             final String userRole = request.getParameter("ecafeUserRole");
             final boolean isAdminLoginAttempt = userRole == null ? false : userRole.equals("admin");
             if (isCommonUserLoginFromWrongURL(isAdminLoginAttempt, idOfRole) || (isAdminLoginFromWrongURL(
@@ -232,7 +232,7 @@ public class JBossLoginModule implements LoginModule {
                 final String message = String.format("%s Login: %s.", AUTH_ERROR_THROUGH_CURRENT_URL, username);
                 logger.debug(message);
                 throw new LoginException(message);
-            }*/
+            }
             if (user.hasPassword(plainPassword)) {
                 userPrincipal = new PrincipalImpl(username);
                 user.setLastEntryIP(request.getRemoteAddr());

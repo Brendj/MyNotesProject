@@ -46,16 +46,6 @@
         <filter-class>ru.axetta.ecafe.processor.web.RichFacesFirefox11Filter</filter-class>
     </filter>
 
-    <!--<filter>
-        <filter-name>AdminLoginFilter</filter-name>
-        <filter-class>ru.axetta.ecafe.processor.web.login.AdminLoginFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>AdminLoginFilter</filter-name>
-        <url-pattern>/back-office/admin/index.faces</url-pattern>
-    </filter-mapping>-->
-
     <filter-mapping>
         <filter-name>LimitFilter</filter-name>
         <servlet-name>SyncServlet</servlet-name>
@@ -339,6 +329,7 @@
             <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
             <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/admin/index.jsp</url-pattern>
         </web-resource-collection>
         <auth-constraint/>
     </security-constraint>
@@ -393,6 +384,7 @@
             <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
             <url-pattern>/repository/download</url-pattern>
             <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
+            <url-pattern>/back-office/admin/index.faces</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>AuthorizedUser</role-name>
