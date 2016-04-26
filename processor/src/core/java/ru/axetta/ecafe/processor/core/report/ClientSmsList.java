@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -44,7 +43,7 @@ public class ClientSmsList {
         private final Date deliveryTime;
         private final Long price;
         private final Long idOfTransaction;
-        private final String eventType;
+        private final Integer eventType;
         private final Long eventId;
         private final Date eventTime;
         private final Long contractId;
@@ -77,7 +76,7 @@ public class ClientSmsList {
                 this.idOfCard = card.getIdOfCard();
                 this.cardNo = card.getCardNo();
             }
-            this.eventType = ClientSms.CONTENTS_TYPE_DESCRIPTION[clientSms.getContentsType()];
+            this.eventType = clientSms.getContentsType();
             this.eventId = clientSms.getContentsId();
             this.eventTime = clientSms.getEventTime();
             this.contractId = clientSms.getClient().getContractId();
@@ -147,7 +146,7 @@ public class ClientSmsList {
             return idOfTransaction;
         }
 
-        public String getEventType() {
+        public Integer getEventType() {
             return eventType;
         }
 

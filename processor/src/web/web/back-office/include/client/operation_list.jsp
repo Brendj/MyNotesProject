@@ -499,7 +499,8 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Тип события" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.eventType}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.eventType}" converter="smsContentsTypeConverter"
+                      styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
