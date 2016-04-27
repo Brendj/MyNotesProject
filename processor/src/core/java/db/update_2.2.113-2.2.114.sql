@@ -155,3 +155,9 @@ ALTER TABLE cf_users ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
 
 --Флаг "Уровень безопасности" у организации
 ALTER TABLE cf_orgs ADD COLUMN securitylevel integer NOT NULL DEFAULT 0;
+
+--Поле дата, до которой действует блокировка
+--Заблокированным на момент выполнения скрипта пользователям выставляется дата = текущий момент + 50 лет
+ALTER TABLE cf_users ADD COLUMN blockeduntildate bigint;
+UPDATE cf_users SET blockeduntildate=((SELECT cast((extract(epoch FROM now())*1000) as bigint)) + 1577846300000) 
+WHERE isblocked=true;

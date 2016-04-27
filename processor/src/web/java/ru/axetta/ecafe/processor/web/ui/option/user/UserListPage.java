@@ -39,6 +39,7 @@ public class UserListPage extends BasicWorkspacePage {
         private final boolean blocked;
         private final List<Contragent> contragentList;
         private boolean phoneEmpty;
+        private Date blockedUntilDate;
 
         public Item(User user) {
             this.idOfUser = user.getIdOfUser();
@@ -56,6 +57,7 @@ public class UserListPage extends BasicWorkspacePage {
             this.functions = itemFunctions;
             this.contragentList = new ArrayList<Contragent>(user.getContragents());
             this.phoneEmpty = StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''");
+            this.blockedUntilDate = user.getBlockedUntilDate();
         }
 
         public Long getIdOfUser() {
@@ -96,6 +98,10 @@ public class UserListPage extends BasicWorkspacePage {
 
         public boolean isPhoneEmpty() {
             return phoneEmpty;
+        }
+
+        public Date getBlockedUntilDate() {
+            return blockedUntilDate;
         }
     }
 

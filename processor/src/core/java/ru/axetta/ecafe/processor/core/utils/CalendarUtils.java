@@ -59,6 +59,7 @@ public class CalendarUtils {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("EE", new Locale("ru")); }
     };
     public final static Date AFTER_DATE = getAfterDate();
+    public final static Long FIFTY_YEARS_MILLIS = 1577846300000L;
 
     public static XMLGregorianCalendar getXMLGregorianCalendarByDate(Date date) throws DatatypeConfigurationException {
         GregorianCalendar calendar = new GregorianCalendar();

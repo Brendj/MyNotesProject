@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
@@ -16,6 +17,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,6 +56,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private String orgFilter = "Не выбрано";
     private String orgFilterCanceled = "Не выбрано";
     private Boolean needChangePassword;
+    private Date blockedUntilDate;
 
     private UserNotificationType selectOrgType;
 
@@ -135,6 +138,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             user.setLastEntryTime(new Date());
         }
         user.setBlocked(blocked);
+        user.setBlockedUntilDate(blockedUntilDate);
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         user.setIdOfRole(role.getIdentification());
         if (User.DefaultRole.SUPPLIER.equals(role)) {
@@ -190,6 +194,24 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
             session.save(userOrgs);
         }
+    }
+
+    public void blockedChange(ValueChangeEvent e){
+        Boolean newBlockedValue = (Boolean)e.getNewValue();
+        if(newBlockedValue) {
+            blockedUntilDate = new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS);
+        } else {
+            blockedUntilDate = null;
+        }
+    }
+
+    public void blockedDateChange(ValueChangeEvent e) {
+        Date newBlockedUntilDate = (Date)e.getNewValue();
+        if(newBlockedUntilDate == null) {
+            blocked = false;
+            return;
+        }
+        blocked = new Date().after(newBlockedUntilDate) ? false : true;
     }
 
     private void initRegions (Session session) {
@@ -412,6 +434,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.idOfRole = user.getIdOfRole();
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
+        this.blockedUntilDate = user.getBlockedUntilDate();
         this.region = user.getRegion();
         this.needChangePassword = user.getNeedChangePassword();
         initRegions(session);
@@ -595,5 +618,13 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setBlocked(Boolean blocked) {
         this.blocked = blocked;
+    }
+
+    public Date getBlockedUntilDate() {
+        return blockedUntilDate;
+    }
+
+    public void setBlockedUntilDate(Date blockedUntilDate) {
+        this.blockedUntilDate = blockedUntilDate;
     }
 }

@@ -135,6 +135,7 @@ public class User {
     private Boolean needChangePassword;
     private String region;
     private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
+    private Date blockedUntilDate;
 
     public String getRoleName() {
         return roleName;
@@ -343,6 +344,14 @@ public class User {
         this.deleteDate = deleteDate;
     }
 
+    public Date getBlockedUntilDate() {
+        return blockedUntilDate;
+    }
+
+    public void setBlockedUntilDate(Date blockedUntilDate) {
+        this.blockedUntilDate = blockedUntilDate;
+    }
+
     /*
     * Если прошел срок, в течение которого было запрещено создавать пользователя с ранее существующим аккаунтом, то
     * отправляем удаленного пользователя в архив (добавляем к имени _archieved_XXX
@@ -475,9 +484,17 @@ public class User {
         }
         if (CalendarUtils.getDifferenceInDays(lastEntryTime, new Date(System.currentTimeMillis())) > days) {
             this.setBlocked(true);
+            this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
             DAOService.getInstance().setUserInfo(this);
             return false;
         }
+        return true;
+    }
+
+    public boolean blockedDateExpired() {
+        if ((blockedUntilDate == null) || (new Date().before(blockedUntilDate))) return false;
+        this.setBlocked(false);
+        DAOService.getInstance().setUserInfo(this);
         return true;
     }
 

@@ -40,8 +40,14 @@
     <h:inputText value="#{mainPage.userEditPage.email}" maxlength="128" styleClass="input-text"/>
 
     <h:outputText escape="true" value="Заблокировать пользователя" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.userEditPage.blocked}" />
-
+    <h:selectBooleanCheckbox id="blockedFlag" value="#{mainPage.userEditPage.blocked}" valueChangeListener="#{mainPage.userEditPage.blockedChange}" >
+       <a4j:support ajaxSingle="true" event="onchange" reRender="blockedUntilId"/>
+    </h:selectBooleanCheckbox>
+    <h:outputText escape="true" value="Дата окончания блокировки" styleClass="output-text" />
+    <rich:calendar id="blockedUntilId" value="#{mainPage.userEditPage.blockedUntilDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                   inputClass="input-text" showWeeksBar="false" valueChangeListener="#{mainPage.userEditPage.blockedDateChange}" >
+        <a4j:support ajaxSingle="true" event="onchanged" reRender="blockedFlag"/>
+    </rich:calendar>
     <h:outputText escape="true" value="Роль" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.userEditPage.idOfRole}" styleClass="input-text">
         <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />

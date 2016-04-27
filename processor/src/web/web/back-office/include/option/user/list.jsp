@@ -39,7 +39,7 @@
 
     <rich:dataTable id="userListTable"
                     value="#{mainPage.userListPage.items}" var="item" rows="20"
-                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -98,6 +98,12 @@
             </f:facet>
             <h:outputText escape="true" value="#{item.blocked ? 'Да' : 'Нет'}"
                           styleClass="output-text #{item.blocked ? 'warn-messages' : ''}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата разблокирования" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.blockedUntilDate}" converter="dateConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

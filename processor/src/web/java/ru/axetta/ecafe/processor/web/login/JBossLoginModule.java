@@ -208,7 +208,7 @@ public class JBossLoginModule implements LoginModule {
             HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
             request.setAttribute(AUTH_USER_ROLE_ATTRIBUTE_NAME, request.getParameter("ecafeUserRole"));//for auth fault
 
-            if (user.isBlocked()) {
+            if ((user.isBlocked())&&(!user.blockedDateExpired())) {
                 request.setAttribute("errorMessage",
                         String.format("Пользователь с именем \"%s\" заблокирован", username));
                 String mess = String.format("User \"%s\" is blocked. Access denied.", username);
