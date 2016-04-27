@@ -56,8 +56,10 @@ import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPag
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -524,14 +526,47 @@ public class MainPage implements Serializable {
     }
 
     public String logout() throws Exception {
+        String outcome = "logout";
+        User user = null;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         ExternalContext facesExternalContext = facesContext.getExternalContext();
+        final String userLogin = facesExternalContext.getRemoteUser();
+        if(StringUtils.isNotEmpty(userLogin)) {
+            user = getUserByLogin(userLogin);
+            if(user != null) {
+                Integer idOfRole = user.getIdOfRole();
+                if((idOfRole.equals(User.DefaultRole.ADMIN.getIdentification()))||(idOfRole.equals(User.DefaultRole.ADMIN_SECURITY.getIdentification())))
+                    outcome = "logoutAdmin";
+            }
+        }
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
             ((HttpServletRequest)facesExternalContext.getRequest()).logout();
         }
-        return "logout";
+        return outcome;
+    }
+
+    private User getUserByLogin(String login) throws Exception{
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        User user = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria userCriteria = persistenceSession.createCriteria(User.class);
+            userCriteria.add(Restrictions.eq("userName", login));
+            userCriteria.add(Restrictions.eq("deletedState", false));
+            user = (User) userCriteria.uniqueResult();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        }finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return user;
     }
 
     public void updateSelectedMainMenu() {

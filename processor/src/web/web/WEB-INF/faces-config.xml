@@ -247,6 +247,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>logoutAdmin</from-outcome>
+            <to-view-id>/back-office/admin/index.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showClientCSVList</from-outcome>
             <to-view-id>/back-office/client_csv_list.jsp</to-view-id>
             <redirect/>
