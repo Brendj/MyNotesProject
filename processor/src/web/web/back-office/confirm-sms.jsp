@@ -32,7 +32,7 @@
                         <h:panelGrid cellpadding="0" cellspacing="0" styleClass="borderless-grid">
                             <div align="center">
                                 <h:panelGrid columns="2">
-                                    <h:outputText value="Введите код активации, полученный в смс-сообщении" styleClass="output-text" />
+                                    <h:outputText value="Введите код активации, полученный в СМС-сообщении" styleClass="output-text" />
                                     <h:inputText id="smscode-security" size="16" maxlength="64" styleClass="input-text" value="#{mainPage.smsCode}"/>
                                 </h:panelGrid>
                                 <a4j:commandButton id="enterSmsCodeButton" type="submit" value="Войти" action="#{mainPage.checkUserSmsCode}" reRender="smscode-security" />
