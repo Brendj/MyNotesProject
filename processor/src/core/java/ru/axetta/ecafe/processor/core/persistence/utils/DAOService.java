@@ -2195,4 +2195,9 @@ public class DAOService {
                 .setParameter("cardNo", 1666500521L)
                 .executeUpdate();*/
     }
+
+    public void saveSecurityJournalBalance(SecurityJournalBalance object) {
+        entityManager.persist(object);
+        entityManager.flush();
+    }
 }

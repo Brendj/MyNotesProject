@@ -122,8 +122,12 @@ public class Processor
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            SecurityJournalBalance journal = SecurityJournalBalance.getSecurityJournalBalanceDataFromPayment(payment);
+
             Contragent contragent = findContragent(persistenceSession, idOfContragent);
             if (null == contragent) {
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false, "Не найден контрагент",
+                        null);
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s",
@@ -131,6 +135,8 @@ public class Processor
                                 payment.getContractId()), null);
             }
             if (existClientPayment(persistenceSession, contragent, payment)) {
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
+                        "Платеж с такими атрибутами уже зарегистрирован", null);
                 logger.warn(
                         String.format("Payment request with duplicated attributes IdOfContragent == %s, payment == %s",
                                 idOfContragent, payment.toString()));
@@ -165,6 +171,8 @@ public class Processor
             }
 
             if (contractId == null) {
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
+                        "ContractId клиента не найден", null);
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
@@ -176,6 +184,7 @@ public class Processor
             Client client = findPaymentClient(persistenceSession, contragent, contractId, payment.getClientId());
 
             if (null == client) {
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false, "Клиент не найден", null);
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
@@ -184,6 +193,7 @@ public class Processor
             }
 
             if (subBalanceNum != null && subBalanceNum > 1 && enableSubBalanceOperation) {
+                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false, "Не найден субсчет", null);
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.SUB_BALANCE_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
@@ -198,6 +208,8 @@ public class Processor
             if (payment.getTspContragentId() != null) {
                 // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
                 if (defaultTsp == null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
+                    SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
+                            "Merchant (TSP) contragent is prohibited for this client", null);
                     return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                             PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
                             String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
@@ -249,6 +261,9 @@ public class Processor
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
+
+            SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, true, "OK", clientPayment);
+
             return result;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2841,6 +2856,11 @@ public class Processor
                             "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
                 }
+
+                SecurityJournalBalance journalBalance = SecurityJournalBalance
+                        .getSecurityJournalBalanceDataFromOrder(payment, client, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER,
+                                SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER, idOfOrg);
+
                 // Create order
                 RuntimeContext.getFinancialOpsManager()
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card,
@@ -2904,6 +2924,9 @@ public class Processor
                 // Commit data model transaction
                 persistenceSession.flush();
                 persistenceTransaction.commit();
+
+                SecurityJournalBalance.saveSecurityJournalBalanceFromOrder(journalBalance, true, "OK");
+
                 persistenceTransaction = null;
 
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
@@ -2968,10 +2991,17 @@ public class Processor
                 // TODO: есть ли необходимость оповещать клиента о сторне?
                 // отмена заказа
                 if (null != order) {
+                    Client client = DAOService.getInstance().findClientById(payment.getIdOfClient());
+                    SecurityJournalBalance journalBalance = SecurityJournalBalance
+                            .getSecurityJournalBalanceDataFromOrder(payment, client, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT,
+                                    SJBalanceSourceEnum.SJBALANCE_SOURCE_CANCEL_ORDER, idOfOrg);
                     // Update client balance
                     RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
+
+                    SecurityJournalBalance.saveSecurityJournalBalanceFromOrder(journalBalance, true, "OK");
+
                     persistenceTransaction = null;
                 } else {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,

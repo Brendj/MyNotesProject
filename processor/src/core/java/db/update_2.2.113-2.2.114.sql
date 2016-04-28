@@ -155,6 +155,37 @@ ALTER TABLE cf_users ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
 
 --Флаг "Уровень безопасности" у организации
 ALTER TABLE cf_orgs ADD COLUMN securitylevel integer NOT NULL DEFAULT 0;
+--Таблица журнала изменений баланса лицевого счета
+CREATE TABLE cf_security_journal_balances
+(
+  idofjournalbalance bigserial not null,
+  eventtype integer not null,
+  eventdate bigint not null,
+  eventsource integer,
+  issuccess boolean not null,
+  terminal character varying(256),
+  protocol character varying(32),
+  eventinterface character varying(128),
+  idofclient bigint,
+  idofclientpayment bigint,
+  idoforg bigint,
+  idoforder bigint,
+  request character varying(1024),
+  clientaddress character varying(128),
+  serveraddress character varying(128),
+  certificate character varying(16384),
+  message character varying(128),
+  CONSTRAINT cf_cf_security_journal_balances_pk PRIMARY KEY (idofjournalbalance),
+  CONSTRAINT cf_security_journal_balances_idofclient_fk FOREIGN KEY (idofclient)
+  REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_security_journal_balances_idofclientpayment_fk FOREIGN KEY (idofclientpayment)
+  REFERENCES cf_clientpayments (idofclientpayment) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_security_journal_balances_order_fk FOREIGN KEY (idoforg, idoforder)
+  REFERENCES cf_orders (idoforg, idoforder) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE INDEX cf_security_journal_balances_client_idx ON cf_security_journal_balances USING BTREE (idofclient);
+CREATE INDEX cf_security_journal_balances_eventdate_idx ON cf_security_journal_balances USING BTREE (eventdate);
 
 --Поле дата, до которой действует блокировка
 --Заблокированным на момент выполнения скрипта пользователям выставляется дата = текущий момент + 50 лет
