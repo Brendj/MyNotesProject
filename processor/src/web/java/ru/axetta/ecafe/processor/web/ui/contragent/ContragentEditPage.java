@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -486,10 +485,14 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
 
         try {
             if (isEmpty(prevId)) {
-                RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
+                //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
+                RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+                rnipLoadPaymentsService.createCatalogForContragent(contragent);
             }
             else {
-                RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
+                //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
+                RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+                rnipLoadPaymentsService.modifyCatalogForContragent(contragent);
             }
             return Boolean.TRUE;
         } catch (IllegalStateException ise) {

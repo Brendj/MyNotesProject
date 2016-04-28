@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsServiceV116;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -86,10 +87,10 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runTest2() throws Exception {
         //CardService cardService = CardService.getInstance();
         //System.out.println(DAOService.getInstance().runDebugTest2());
-
-        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsServiceV116.class).executeExportCatalog(DAOService.getInstance().getContragentById(16L), null, null);
+        /*SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         service.run(getStartDate(), getEndDate(),
-                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());*/
 
         /*RuntimeContext runtimeContext = RuntimeContext.getInstance();
 

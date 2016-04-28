@@ -83,14 +83,12 @@ public class ResponseMessageType {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String rqId;
     @XmlAttribute(required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar timestamp;
+    protected XMLGregorianCalendar timeStamp;
     @XmlAttribute(required = true)
     protected String senderIdentifier;
 
     /**
-     * ������ ������
-     * 
+     *
      * @return
      *     possible object is
      *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}
@@ -129,8 +127,7 @@ public class ResponseMessageType {
     }
 
     /**
-     * ��
-     * 
+     *
      * @return
      *     possible object is
      *     {@link SignatureType }
@@ -208,8 +205,8 @@ public class ResponseMessageType {
      *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getTimestamp() {
-        return timestamp;
+    public XMLGregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 
     /**
@@ -220,8 +217,8 @@ public class ResponseMessageType {
      *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
-    public void setTimestamp(XMLGregorianCalendar value) {
-        this.timestamp = value;
+    public void setTimeStamp(XMLGregorianCalendar value) {
+        this.timeStamp = value;
     }
 
     /**

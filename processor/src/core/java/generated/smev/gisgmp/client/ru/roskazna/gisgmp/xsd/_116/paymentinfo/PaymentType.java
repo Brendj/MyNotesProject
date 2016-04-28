@@ -234,6 +234,7 @@ import java.util.List;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name="FinalPayment", namespace = "http://roskazna.ru/gisgmp/xsd/116/PaymentInfo")
 @XmlType(name = "PaymentType", propOrder = {
     "supplierBillID",
     "narrative",

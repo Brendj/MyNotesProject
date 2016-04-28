@@ -12,14 +12,11 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -142,7 +139,9 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         params.put("surname", person.getSurname());
         params.put("name", person.getFirstName());
 
-        appendOrgParameters(client.getOrg().getIdOfOrg(), params);
+        if (client.getOrg() != null) {
+            appendOrgParameters(client.getOrg().getIdOfOrg(), params);
+        }
 
         /*BigDecimal balance = null;
         if(client.getBalance() == null || client.getBalance().longValue() == 0L) {

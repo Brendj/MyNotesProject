@@ -28,6 +28,7 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.token.X509Security;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -50,44 +51,45 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.*;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Component
+@Primary
+@Component("RNIPLoadPaymentsService")
 @Scope("singleton")
 public class RNIPLoadPaymentsService {
 
-    
     /**
      * Файл с документом для подписи.
      */
-    private final static String RNIP_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd";
-    private final static String RNIP_DATE_IMPORT_RESTRICT_FORMAT = "yyyy-MM-dd'T'";
+    protected final static String RNIP_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    protected final static String RNIP_DATE_FORMAT = "yyyy-MM-dd";
+    //private final static String RNIP_DATE_IMPORT_RESTRICT_FORMAT = "yyyy-MM-dd'T'";
     private final static String LOAD_PAYMENTS_TEMPLATE = "META-INF/rnip/getPayments_byDate.xml";
     public final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
     private final static String MODIFY_CATALOG_TEMPLATE = "META-INF/rnip/modifyCatalog.xml";
 
-    public final static String CREATE_CATALOG_TEMPLATE_V116 = "META-INF/rnip/createCatalog_v116.xml";
-    private final static String MODIFY_CATALOG_TEMPLATE_V116 = "META-INF/rnip/modifyCatalog_v116.xml";
+    //public final static String CREATE_CATALOG_TEMPLATE_V116 = "META-INF/rnip/createCatalog_v116.xml";
+    //private final static String MODIFY_CATALOG_TEMPLATE_V116 = "META-INF/rnip/modifyCatalog_v116.xml";
     ////
     public static final int REQUEST_CREATE_CATALOG=0, REQUEST_MODIFY_CATALOG=1, REQUEST_LOAD_PAYMENTS=2;
     ////
-    //private final static String LOAD_PAYMENTS_TEMPLATE = "D:/2/test.xml";// !!!!!!!!!! ЗАМенить !!!!!!!!!
-    /**
-     * Адрес тестового сервиса СМЭВ.
-     */
     private String URL_ADDR = null;//"http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsService.class);
     private ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
@@ -102,13 +104,13 @@ public class RNIPLoadPaymentsService {
     private static final String CHANGE_STATUS_NEW = "1";    //Поле ChangeStatus в ответе РНИП. 1 - новый платеж;
     private static final String CHANGE_STATUS_CHANGE = "2";                                  //2 - корректировка
     //Константы, соответствующие данным пакета РНИП
-    private static final String SYSTEM_IDENTIFIER_KEY = "SystemIdentifier";
-    private static final String AMOUNT_KEY = "Amount";
-    private static final String PAYMENT_DATE_KEY = "PaymentDate";
-    private static final String PAYMENT_TO_KEY = "PAYMENT_TO";
-    private static final String SRV_CODE_KEY = "SRV_CODE";
-    private static final String BIK_KEY = "BIK";
-    private static final String CHANGE_STATUS_KEY = "ChangeStatus";
+    protected static final String SYSTEM_IDENTIFIER_KEY = "SystemIdentifier";
+    protected static final String AMOUNT_KEY = "Amount";
+    protected static final String PAYMENT_DATE_KEY = "PaymentDate";
+    protected static final String PAYMENT_TO_KEY = "PAYMENT_TO";
+    protected static final String SRV_CODE_KEY = "SRV_CODE";
+    protected static final String BIK_KEY = "BIK";
+    protected static final String CHANGE_STATUS_KEY = "ChangeStatus";
 
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
@@ -124,7 +126,7 @@ public class RNIPLoadPaymentsService {
     }
 
     public static RNIPLoadPaymentsService getInstance() {
-        return RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
+        return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsService", RNIPLoadPaymentsService.class);
     }
 
     protected void info(String str, Object ... args) {
@@ -167,7 +169,7 @@ public class RNIPLoadPaymentsService {
                 .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, "" + (on ? "1" : "0"));
     }
 
-    private Date getLastUpdateDate(Contragent contragent) {
+    protected Date getLastUpdateDate(Contragent contragent) {
         try {
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
             String d = contragent.getContragentSync().getLastRNIPUpdate();
@@ -199,7 +201,7 @@ public class RNIPLoadPaymentsService {
         }
 
         //  Отправка запроса на получение платежей
-        SOAPMessage response = null;
+        Object response = null;
         try {
             Date lastUpdateDate = getLastUpdateDate(contragent);
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent, lastUpdateDate);
@@ -228,7 +230,7 @@ public class RNIPLoadPaymentsService {
         }
 
         //  Отправка запроса на получение платежей
-        SOAPMessage response = null;
+        Object response = null;
         try {
             Date lastUpdateDate = getLastUpdateDate(contragent);
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent, lastUpdateDate);
@@ -251,13 +253,13 @@ public class RNIPLoadPaymentsService {
         run(null, null);
     }
     public void run(Date startDate, Date endDate) {
-        if (/*!RuntimeContext.getInstance().isMainNode() || */!isOn()) {
+        if (!isOn()) {
             return;
         }
 
         long l = System.currentTimeMillis();
         info("Загрузка платежей РНИП..");
-        RNIPLoadPaymentsService rnipLoadPaymentsService = RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
+        RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean(); //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
                 rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
@@ -283,7 +285,7 @@ public class RNIPLoadPaymentsService {
 
         info("Попытка получения платежей для контрагента %s", contragent.getContragentName());
         //  Отправка запроса на получение платежей
-        SOAPMessage response = null;
+        Object response = null;
         try {
             response = executeRequest(REQUEST_LOAD_PAYMENTS, contragent, lastUpdateDate, startDate, endDate);
         } catch (Exception e) {
@@ -296,7 +298,7 @@ public class RNIPLoadPaymentsService {
 
         info("Ответ на получение платежей для контрагента %s получен, разбор..", contragent.getContragentName());
         try {
-            String soapError = checkError (response);
+            String soapError = checkError(response);
             if (soapError != null) {
                 logger.error("Произошла ошибка при запросе в РНИП на получение платежей: " + soapError);
                 return;
@@ -366,7 +368,7 @@ public class RNIPLoadPaymentsService {
         return fileName;
     }
 
-    private String getRNIPUrl() {
+    protected String getRNIPUrl() {
         RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
         String url = null;
         switch (version) {
@@ -381,21 +383,12 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate) throws Exception {
+    public Object executeRequest(Date updateTime, int requestType, Contragent contragent, Date updateDate) throws Exception {
         return executeRequest(requestType, contragent, updateDate, null, null);
     }
 
-    public SOAPMessage executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         String fileName = getTemplateFileName(requestType);
-        /*if (requestType==REQUEST_MODIFY_CATALOG) {
-            fileName = MODIFY_CATALOG_TEMPLATE;
-        } else if (requestType==REQUEST_CREATE_CATALOG) {
-            fileName = CREATE_CATALOG_TEMPLATE;
-        } else if (requestType==REQUEST_LOAD_PAYMENTS) {
-            fileName = LOAD_PAYMENTS_TEMPLATE;
-        } else {
-            throw new Exception("Invalid request type: "+requestType);
-        }*/
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         SOAPMessage out = signRequest(
                 doMacroReplacement(new StreamSource(is), contragent, updateDate, startDate, endDate, requestType), requestType);
@@ -417,7 +410,18 @@ public class RNIPLoadPaymentsService {
         Array.writeFile(paymentDirPath + RNIP_INPUT_FILE + "_" + CalendarUtils.formatTimeUnderscoreToString(timestamp) + ".xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
         return in;
     }
-    
+
+    public static RNIPLoadPaymentsService getRNIPServiceBean() {
+        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
+        switch (version) {
+            case RNIP_V115:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsService", RNIPLoadPaymentsService.class);
+            case RNIP_V116:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV116", RNIPLoadPaymentsServiceV116.class);
+        }
+        return null;
+    }
+
     public static String messageToString(SOAPMessage msg) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
@@ -447,8 +451,8 @@ public class RNIPLoadPaymentsService {
             com.sun.org.apache.xml.internal.security.Init.init();
 
             // Инициализация ключевого контейнера.
+            Security.insertProviderAt(new ru.CryptoPro.JCP.JCP(), 1);
             String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
-            //Security.insertProviderAt(new ru.CryptoPro.JCP.JCP(), 1);
             KeyStore keyStore = KeyStore.getInstance(store);
             keyStore.load(null, null);
 
@@ -646,13 +650,13 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public RNIPPaymentsResponse parsePayments(SOAPMessage response) throws Exception {
+    public RNIPPaymentsResponse parsePayments(Object response) throws Exception {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setNamespaceAware(true);
 
         JAXBContext jc = JAXBContext.newInstance(UnifoTransferMsg.class);
         Unmarshaller u = jc.createUnmarshaller();
-        Object o = u.unmarshal(response.getSOAPBody().getFirstChild());
+        Object o = u.unmarshal(((SOAPMessage)response).getSOAPBody().getFirstChild());
 
         UnifoTransferMsg m = (UnifoTransferMsg) o;
         jc = JAXBContext.newInstance(PaymentInfoType.class);
@@ -687,7 +691,7 @@ public class RNIPLoadPaymentsService {
         return vals;
     }
 
-    private void parseNode (NodeList nodelist, Map<String, String> vals) {
+    protected void parseNode (NodeList nodelist, Map<String, String> vals) {
         for (int i=0; i<nodelist.getLength(); i++) {
             Node node = nodelist.item(i);
 
@@ -1058,7 +1062,7 @@ public class RNIPLoadPaymentsService {
         return 0L;
     }
 
-    private Date getEndDateByStartDate(Date start_date) {
+    protected Date getEndDateByStartDate(Date start_date) {
         Date curtime = new Date(System.currentTimeMillis());
         Calendar cal = Calendar.getInstance();
         cal.setTime(start_date);
@@ -1072,7 +1076,7 @@ public class RNIPLoadPaymentsService {
         }
     }
 
-    private Date getStartDateByLastUpdateDate(Date updateDate) {
+    protected Date getStartDateByLastUpdateDate(Date updateDate) {
         Date lastUpdateDate = new Date(updateDate.getTime());
         lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
         return lastUpdateDate;
@@ -1198,7 +1202,7 @@ public class RNIPLoadPaymentsService {
         return res;
     }
 
-    public String formatString(String str) {
+    protected String formatString(String str) {
         try {
             return StringEscapeUtils.escapeXml(str);//URLEncoder.encode(str, "UTF-8");
         } catch (Exception e) {
@@ -1207,7 +1211,7 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public String checkError (SOAPMessage response) throws Exception {
+    public String checkError (Object response) throws Exception {
         if (response == null) {
             return null;
         }
@@ -1217,7 +1221,7 @@ public class RNIPLoadPaymentsService {
 
         JAXBContext jc = JAXBContext.newInstance(UnifoTransferMsg.class);
         Unmarshaller u = jc.createUnmarshaller();
-        Object o = u.unmarshal(response.getSOAPBody().getFirstChild());
+        Object o = u.unmarshal(((SOAPMessage)response).getSOAPBody().getFirstChild());
 
         UnifoTransferMsg m = (UnifoTransferMsg) o;
         jc = JAXBContext.newInstance(PaymentInfoType.class);
@@ -1276,11 +1280,11 @@ public class RNIPLoadPaymentsService {
         return getRNIPIdFromRemarks(contragent.getRemarks());
     }
 
-    private static class RNIPPaymentsResponse {
+    protected static class RNIPPaymentsResponse {
         List<Map<String, String>> payments;
         Date rnipDate;
 
-        private RNIPPaymentsResponse(List<Map<String, String>> payments, Date rnipDate) {
+        protected RNIPPaymentsResponse(List<Map<String, String>> payments, Date rnipDate) {
             this.payments = payments;
             this.rnipDate = rnipDate;
         }

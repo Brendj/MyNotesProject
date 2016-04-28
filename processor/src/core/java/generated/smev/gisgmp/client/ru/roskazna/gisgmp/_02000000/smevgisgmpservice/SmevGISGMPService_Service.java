@@ -21,11 +21,12 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "SmevGISGMPService", targetNamespace = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/", wsdlLocation = "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/wsdl")
+@WebServiceClient(name = "SmevGISGMPService", targetNamespace = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/")
 public class SmevGISGMPService_Service
     extends Service
 {
 
+    private final static String WSDL_LOCATION = "META-INF/rnip/SmevUnifoService.wsdl";
     private final static URL SMEVGISGMPSERVICE_WSDL_LOCATION;
     private final static Logger logger = Logger.getLogger(generated.smev.gisgmp.client.ru.roskazna.gisgmp._02000000.smevgisgmpservice.SmevGISGMPService_Service.class.getName());
 
@@ -34,9 +35,9 @@ public class SmevGISGMPService_Service
         try {
             URL baseUrl;
             baseUrl = generated.smev.gisgmp.client.ru.roskazna.gisgmp._02000000.smevgisgmpservice.SmevGISGMPService_Service.class.getResource(".");
-            url = new URL(baseUrl, "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/wsdl");
+            url = new URL(baseUrl, SmevGISGMPService_Service.class.getClassLoader().getResource(WSDL_LOCATION).getPath()); // "SmevUnifoService.wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003663/wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'SmevUnifoService.wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         SMEVGISGMPSERVICE_WSDL_LOCATION = url;

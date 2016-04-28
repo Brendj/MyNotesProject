@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.ContragentSync;
 import ru.axetta.ecafe.processor.core.persistence.Person;
@@ -393,7 +392,9 @@ public class ContragentCreatePage extends BasicWorkspacePage {
 
 
     try {
-        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
+        //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        rnipLoadPaymentsService.createCatalogForContragent(contragent);
     } catch (IllegalStateException ise) {
         //throw ise;
     } catch (Exception e) {

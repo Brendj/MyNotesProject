@@ -1,0 +1,596 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common"
+            targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Common" elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+	<xsd:simpleType name="UUID">
+		<xsd:annotation>
+			<xsd:documentation>Универсальный уникальный идентификатор (UUID - Universally Unique Identifier) RFC 4122</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="36"/>
+			<xsd:pattern value="([0-9]|[a-f]|[A-F]){8}(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){12})"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ContactsType">
+		<xsd:annotation>
+			<xsd:documentation>Список контактов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Contact" type="com:ContactInfoType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ContactInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Содержит описание возможных способов связи</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Kind">
+				<xsd:annotation>
+					<xsd:documentation>Вид контакта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+						<xsd:enumeration value="Internal number"/>
+						<xsd:enumeration value="Work phone"/>
+						<xsd:enumeration value="Mobile phone"/>
+						<xsd:enumeration value="Home phone"/>
+						<xsd:enumeration value="Pager"/>
+						<xsd:enumeration value="Fax"/>
+						<xsd:enumeration value="Mail"/>
+						<xsd:enumeration value="ICQ"/>
+						<xsd:enumeration value="Web site"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Value">
+				<xsd:annotation>
+					<xsd:documentation>Значение</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Comment" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Комментарий</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="2000"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="AccountNumType">
+		<xsd:annotation>
+			<xsd:documentation>Номер счета.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:length value="20"/>
+			<xsd:whiteSpace value="collapse"/>
+			<xsd:pattern value="\c{20}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="INNType">
+		<xsd:annotation>
+			<xsd:documentation>ИНН юр.лица</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+		   <xsd:whiteSpace value="collapse"/>
+		   <xsd:pattern value="([^0^\D]\d{2}|\d{2}[^0^\D]|\d[^0^\D]\d)\d{7}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="KPPType">
+		<xsd:annotation>
+			<xsd:documentation>КПП юр.лица</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="9"/>
+		   <xsd:whiteSpace value="collapse"/>
+		   <xsd:pattern value="([^0^\D]\d{2}|\d{2}[^0^\D]|\d[^0^\D]\d)\d{2}[A-Z0-9]\d{3}"/>
+   		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OKTMOType">
+		<xsd:annotation>
+			<xsd:documentation>Код ОКТМО</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="11"/>
+			<xsd:minLength value="1"/>
+			<xsd:pattern value="\d{11}"/>
+			<xsd:pattern value="\d{8}"/>
+			<xsd:pattern value="0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="KBKType">
+		<xsd:annotation>
+			<xsd:documentation>КБК</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:whiteSpace value="collapse"/>
+			<xsd:pattern value="\d{20}"/>
+			<xsd:pattern value="0"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OGRNType">
+		<xsd:annotation>
+			<xsd:documentation>ОГРН</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="13"/>
+			<xsd:whiteSpace value="collapse"/>
+			<xsd:pattern value="\d{13}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BIKType">
+		<xsd:annotation>
+			<xsd:documentation>БИК</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="9"/>
+			<xsd:whiteSpace value="collapse"/>
+			<xsd:pattern value="\d{9}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SWIFTType">
+		<xsd:annotation>
+			<xsd:documentation>SWIFT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:whiteSpace value="collapse"/>
+			<xsd:maxLength value="11"/>
+			<xsd:minLength value="8"/>
+			<xsd:pattern value="[A-Z0-9]{8}"/>
+			<xsd:pattern value="[A-Z0-9]{11}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SupplierBillIDType">
+		<xsd:annotation>
+			<xsd:documentation>УИН</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\w{20}"/>
+			<xsd:pattern value="\d{25}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="URNType">
+		<xsd:annotation>
+			<xsd:documentation>УРН</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="6"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="AdditionalDataType">
+		<xsd:sequence>
+			<xsd:element name="Name">
+				<xsd:annotation>
+					<xsd:documentation>Наименование поля</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Value">
+				<xsd:annotation>
+					<xsd:documentation>Значение поля</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AdditionalData" type="com:AdditionalDataType">
+		<xsd:annotation>
+			<xsd:documentation>Дополнительные поля</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:simpleType name="CurrencyCodeType">
+		<xsd:annotation>
+			<xsd:documentation>ISO 4217 3-буквенный код валюты.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="EUR"/>
+			<xsd:enumeration value="USD"/>
+			<xsd:enumeration value="RUB"/>
+			<xsd:enumeration value="RUR"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="Money" mixed="true">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:long">
+				<xsd:attribute name="currency" type="com:CurrencyCodeType" default="RUR">
+					<xsd:annotation>
+						<xsd:documentation>Код валюты в соответствии с ISO 4217</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="exponent" use="optional" default="2">
+					<xsd:annotation>
+						<xsd:documentation>количество дробных знаков</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:integer">
+							<xsd:pattern value="([0-9]{1})"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:element name="PayerIdentifier">
+		<xsd:annotation>
+			<xsd:documentation>Идентификатор плательщика</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:string">
+				    <xsd:pattern value="2\d{14}[A-Z0-9]{2}\d{3}">
+					<xsd:annotation>
+						<xsd:documentation>ЮЛ резидент</xsd:documentation>
+					</xsd:annotation>
+				</xsd:pattern>
+				<xsd:pattern value="3\d{14}[A-Z0-9]{2}\d{3}|3\d{14}">
+					<xsd:annotation>
+						<xsd:documentation>ЮЛ не резидент</xsd:documentation>
+					</xsd:annotation>
+				</xsd:pattern>
+				<xsd:pattern value="4\d{12}">
+					<xsd:annotation>
+						<xsd:documentation>ИП</xsd:documentation>
+					</xsd:annotation>
+				</xsd:pattern>
+				  <xsd:pattern value="((0[1-9])|(1[0-5])|(2[12456]))[0-9a-zA-Zа-яА-Я]{23}">
+					<xsd:annotation>
+						<xsd:documentation>ФЛ</xsd:documentation>
+					</xsd:annotation>
+				</xsd:pattern>
+				<xsd:pattern value="0"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="ChangeStatus">
+		<xsd:annotation>
+			<xsd:documentation>Статус изменения</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:element name="Reason">
+					<xsd:annotation>
+						<xsd:documentation>Основание изменения</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="512"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="meaning" use="required">
+				<xsd:annotation>
+					<xsd:documentation>1 - новый 2 - уточнение 3 - аннулирование 4 - отмена аннулирования</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="1"/>
+						<xsd:enumeration value="1">
+							<xsd:annotation>
+								<xsd:documentation>Новый</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="2">
+							<xsd:annotation>
+								<xsd:documentation>Уточнение</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="3">
+							<xsd:annotation>
+								<xsd:documentation>Аннулирование</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TransKind">
+		<xsd:annotation>
+			<xsd:documentation>Вид операции</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration value="01"/>
+				<xsd:enumeration value="02"/>
+				<xsd:enumeration value="06"/>
+				<xsd:enumeration value="16"/>
+				<xsd:enumeration value="ПД"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:simpleType name="AddressKindType">
+		<xsd:annotation>
+			<xsd:documentation>Почтовый Адрес.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Zip"/>
+			<xsd:enumeration value="Country"/>
+			<xsd:enumeration value="Region"/>
+			<xsd:enumeration value="State"/>
+			<xsd:enumeration value="Town"/>
+			<xsd:enumeration value="City"/>
+			<xsd:enumeration value="Street"/>
+			<xsd:enumeration value="House"/>
+			<xsd:enumeration value="Building"/>
+			<xsd:enumeration value="Flat"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="AddressesType">
+		<xsd:annotation>
+			<xsd:documentation>Список адресов</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Address" type="com:AddressType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AddressType">
+		<xsd:annotation>
+			<xsd:documentation>Служит для  представления адреса контрагента или любого другого участника бизнес-процесса</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="View">
+				<xsd:annotation>
+					<xsd:documentation>Строковое представление адреса.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Comment" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Произвольный комментарий. </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="2000"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="AddressField" minOccurs="0" maxOccurs="10">
+				<xsd:annotation>
+					<xsd:documentation>Структурированный адрес контрагента или любого другого участника бизнес-процесса</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Type" type="com:AddressKindType">
+							<xsd:annotation>
+								<xsd:documentation>Возможные значения: Почтовый индекс, Страна, Регион, Район, Населенный пункт, Город, Улица, Дом, Корпус, Квартира</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Value">
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="255"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="kind">
+			<xsd:annotation>
+				<xsd:documentation>Вид адреса
+1 - юридический
+2 - фактический
+3 - почтовый</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ParamValue_Type">
+		<xsd:attribute name="label">
+			<xsd:annotation>
+				<xsd:documentation>Наименование значения</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="80"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="isSelected" type="xsd:boolean">
+			<xsd:annotation>
+				<xsd:documentation>Указывает, что данное значение выбрано в качестве текущего значения параметра в случае если присутствует список значений</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="data" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Значение</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="4000"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Field_Type">
+		<xsd:sequence>
+			<xsd:element name="Value" type="com:ParamValue_Type" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Значение</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Наименование поля параметра</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="Parameter_Type">
+		<xsd:attribute name="name" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Наименование параметра</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="supplierSrvCode">
+			<xsd:annotation>
+				<xsd:documentation>Код услуги в каталоге поставщика</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="40"/>
+					<xsd:minLength value="1"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="supplierID" type="com:UUID">
+			<xsd:annotation>
+				<xsd:documentation>Id поставщика из каталога которого взята услуга</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="isId" type="xsd:integer">
+			<xsd:annotation>
+				<xsd:documentation>Указывает что данный параметр является идентификатором плательщика
+0 - параметр определяет платеж в группе параметров с таким же значением isID
+1 - параметр является уникальным, если присутствует несколько параметров с таким значением isID, то для идентификации может использоваться любой параметр</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="SimpleParameterType">
+		<xsd:complexContent>
+			<xsd:extension base="com:Parameter_Type">
+				<xsd:sequence>
+					<xsd:element name="Value" type="com:ParamValue_Type" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Значение параметра</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ComplexParameterType">
+		<xsd:complexContent>
+			<xsd:extension base="com:Parameter_Type">
+				<xsd:sequence>
+					<xsd:element name="Field" type="com:Field_Type" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Поле сложного параметра</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="label">
+					<xsd:annotation>
+						<xsd:documentation>Наименование значения</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="256"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="SimpleParameter" type="com:SimpleParameterType">
+		<xsd:annotation>
+			<xsd:documentation>Простой параметр</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="ComplexParameter" type="com:ComplexParameterType">
+		<xsd:annotation>
+			<xsd:documentation>Сложный параметр</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PayerIdentification_Type">
+		<xsd:annotation>
+			<xsd:documentation>Тип для идентификации плательщика</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ServiceCode" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код услуги из каталога РНиП</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element ref="com:SimpleParameter"/>
+				<xsd:element ref="com:ComplexParameter"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="PayerIdentification" type="com:PayerIdentification_Type">
+		<xsd:annotation>
+			<xsd:documentation>Идентификация начисления по каталогу услуг</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Commission_Type">
+		<xsd:annotation>
+			<xsd:documentation>Тип - комиссия</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Kind">
+				<xsd:annotation>
+					<xsd:documentation>Вид комиссии
+1 - за операцию, с плательщика в пользу поставщика
+2 - за операцию, с агента в пользу поставщика
+3 - вознаграждение агенту за период взаиморасчётов агента и поставщика</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="1"/>
+						<xsd:enumeration value="2"/>
+						<xsd:enumeration value="3"/>
+						<xsd:enumeration value="4"/>
+						<xsd:enumeration value="5"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Percent" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Процент комиссии в валюте платежа. Указывается в процентах (0 - 100). При отсутствии тега процент принимается равным 0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MinValue" type="com:Money" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Минимальная сумма комиссии. При отсутствии тега процент принимается равным 0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaxValue" type="com:Money" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Максимальная сумма комиссии.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Commissions_Type">
+		<xsd:sequence>
+			<xsd:element name="Comission" type="com:Commission_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

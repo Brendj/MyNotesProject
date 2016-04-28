@@ -8,6 +8,7 @@
             <module name="org.apache.cxf"/>
             <module name="javax.servlet.api"/>
             <module name="ecafe"/>
+            <module name="ru.cryptopro" />
             <module name="com.google.zxing"/>
             <module name="com.google.guava"/>
             <module name="com.google.visualization.datasource">
