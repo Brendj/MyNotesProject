@@ -33,6 +33,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class User {
+    public static final String USER_ID_ATTRIBUTE_NAME = "ru.axetta.ecafe.userId";
+    public static final String USER_IP_ADDRESS_ATTRIBUTE_NAME = "ru.axetta.ecafe.ipAddress";
 
     public String getLastSmsCode() {
         return lastSmsCode;

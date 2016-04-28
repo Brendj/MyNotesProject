@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.login;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +27,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.security.Principal;
 import java.security.acl.Group;
@@ -166,6 +169,7 @@ public class JBossLoginModule implements LoginModule {
     public boolean login() throws LoginException {
         loginSucceeded = false;
         Callback[] callbacks = new Callback[]{new NameCallback("Username"), new PasswordCallback("Password", false)};
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
         try {
             callbackHandler.handle(callbacks);
         } catch (Exception e) {
@@ -177,9 +181,19 @@ public class JBossLoginModule implements LoginModule {
         String plainPassword = new String(passwordCallback.getPassword());
         logger.debug("User \"{}\": try to login", username);
         if (StringUtils.isEmpty(username)) {
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createLoginFaultRecord(request.getRemoteAddr(), null, null,
+                            SecurityJournalAuthenticate.DenyCause.LOGIN_MISSING.getIdentification());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+
             throw new LoginException("Username missing");
         }
         if (StringUtils.isEmpty(plainPassword)) {
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createLoginFaultRecord(request.getRemoteAddr(), username, null,
+                            SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+
             throw new LoginException(String.format("User \"%s\": password missing", username));
         }
         try {
@@ -194,6 +208,7 @@ public class JBossLoginModule implements LoginModule {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -203,16 +218,26 @@ public class JBossLoginModule implements LoginModule {
             userCriteria.add(Restrictions.eq("deletedState", false));
             User user = (User) userCriteria.uniqueResult();
             if (user == null) {
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(request.getRemoteAddr(), username, null,
+                                SecurityJournalAuthenticate.DenyCause.USER_NOT_FOUND.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
+
                 throw new LoginException("User not found");
             }
-            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+
             request.setAttribute(AUTH_USER_ROLE_ATTRIBUTE_NAME, request.getParameter("ecafeUserRole"));//for auth fault
 
-            if ((user.isBlocked())&&(!user.blockedDateExpired())) {
+            if ((user.isBlocked()) && (!user.blockedDateExpired())) {
                 request.setAttribute("errorMessage",
                         String.format("Пользователь с именем \"%s\" заблокирован", username));
                 String mess = String.format("User \"%s\" is blocked. Access denied.", username);
                 logger.debug(mess);
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                                SecurityJournalAuthenticate.DenyCause.USER_BLOCKED.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
+
                 throw new LoginException(mess);
             }
             if (!user.loginAllowed()) {
@@ -221,6 +246,11 @@ public class JBossLoginModule implements LoginModule {
                         username));
                 String mess = String.format("User \"%s\" is blocked . Access denied.", username);
                 logger.debug(mess);
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                                SecurityJournalAuthenticate.DenyCause.LONG_INACTIVITY.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
+
                 throw new LoginException(mess);
             }
             final Integer idOfRole = user.getIdOfRole();
@@ -231,6 +261,11 @@ public class JBossLoginModule implements LoginModule {
                 request.setAttribute("errorMessage", AUTH_ERROR_THROUGH_CURRENT_URL);
                 final String message = String.format("%s Login: %s.", AUTH_ERROR_THROUGH_CURRENT_URL, username);
                 logger.debug(message);
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                                SecurityJournalAuthenticate.DenyCause.WRONG_AUTH_URL.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
+
                 throw new LoginException(message);
             }
             if (user.hasPassword(plainPassword)) {
@@ -238,8 +273,19 @@ public class JBossLoginModule implements LoginModule {
                 user.setLastEntryIP(request.getRemoteAddr());
                 user.setLastEntryTime(new Date());
                 logger.debug("User \"{}\": password validation successful", username);
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createSuccessAuthRecord(request.getRemoteAddr(), username, user);
+                DAOService.getInstance().writeAuthJournalRecord(record);
+                HttpSession httpSession = request.getSession(true);
+                httpSession.setAttribute(User.USER_ID_ATTRIBUTE_NAME, user.getIdOfUser());
+                httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
                 loginSucceeded = true;
             } else {
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                                SecurityJournalAuthenticate.DenyCause.WRONG_PASSWORD.getIdentification());
+                DAOService.getInstance().writeAuthJournalRecord(record);
+
                 throw new LoginException("Password is invalid");
             }
             persistenceTransaction.commit();

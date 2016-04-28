@@ -161,3 +161,23 @@ ALTER TABLE cf_orgs ADD COLUMN securitylevel integer NOT NULL DEFAULT 0;
 ALTER TABLE cf_users ADD COLUMN blockeduntildate bigint;
 UPDATE cf_users SET blockeduntildate=((SELECT cast((extract(epoch FROM now())*1000) as bigint)) + 1577846300000) 
 WHERE isblocked=true;
+
+--Журнал входа-выхода пользоватлей в/из бэк-офиса
+CREATE TABLE cf_security_journal_authenticate
+(
+  idofjournalauthenticate bigserial not null,
+  eventtype integer not null,
+  eventdate bigint not null,
+  idofuser bigint,
+  issuccess boolean not null,
+  ipaddress character varying(15),
+  idofarmtype integer,
+  login character varying(64),
+  denycause integer,    
+  
+  CONSTRAINT cf_security_journal_authenticate_pk PRIMARY KEY (idofjournalauthenticate),
+  CONSTRAINT cf_security_journal_authenticate_fk FOREIGN KEY (idofuser)
+  REFERENCES cf_users (idofuser) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION  
+);
+
+CREATE INDEX cf_security_journal_authenticate_users_idx ON cf_security_journal_authenticate USING BTREE (idofuser);

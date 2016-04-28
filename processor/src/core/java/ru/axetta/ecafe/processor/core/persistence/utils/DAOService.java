@@ -83,6 +83,10 @@ public class DAOService {
         return entityManager.merge(user);
     }
 
+    public void writeAuthJournalRecord(SecurityJournalAuthenticate record) {
+        entityManager.persist(record);
+    }
+
     public Boolean isMenuExchange(Long idOfOrg) {
         TypedQuery<Long> query = entityManager
                 .createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",
