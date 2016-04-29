@@ -110,7 +110,7 @@
                 <h:outputText escape="true" value="Код активации" />
             </f:facet>
             <a4j:commandLink reRender="workspaceForm" action="#{mainPage.userSendActivationCode(item.userName)}" styleClass="command-link"
-                    rendered="#{!item.phoneEmpty}" oncomplete="window.alert('Новый код активации выслан на номер мобильного телефона пользователя.');">
+                    rendered="#{!item.phoneEmpty}">
                 <h:graphicImage value="/images/16x16/mobile.png" style="border: 0;" />
             </a4j:commandLink>
         </rich:column>

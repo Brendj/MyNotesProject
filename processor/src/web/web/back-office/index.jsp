@@ -5,7 +5,10 @@
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.User" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="javax.faces.application.FacesMessage" %>
+<%@ page import="javax.faces.context.FacesContext" %>
 <%
+    try {
     if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
         String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
         response.sendRedirect(mainPage);
@@ -15,6 +18,10 @@
         String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
         response.sendRedirect(mainPage);
         return;
+    }
+    } catch (Exception e) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                e.getMessage(), null));
     }
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

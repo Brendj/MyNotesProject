@@ -163,6 +163,8 @@ public class SecurityJournalBalance {
                     String[] term = (String[])m.get("termid");
                     terminal = term[0];
                 }
+            } else if (uri.equals("/processor/pay")) {
+                source = SJBalanceSourceEnum.SJBALANCE_SOURCE_PAY;
             } else {
                 source = SJBalanceSourceEnum.SJBALANCE_SOURCE_UNKNOWN;
             }

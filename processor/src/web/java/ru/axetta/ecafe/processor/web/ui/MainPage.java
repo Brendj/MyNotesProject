@@ -805,7 +805,14 @@ public class MainPage implements Serializable {
     }
 
     public Object userSendActivationCode(String userName) throws Exception {
-        User.requestSmsCode(userName);
+        try {
+            User.requestSmsCode(userName);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Новый код активации выслан на номер мобильного телефона пользователя.", null));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    e.getMessage(), null));
+        }
         return null;
     }
 

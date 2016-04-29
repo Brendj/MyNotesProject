@@ -7,14 +7,19 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.CredentialException;
 import java.io.ByteArrayInputStream;
@@ -35,6 +40,11 @@ import java.util.*;
 public class User {
     public static final String USER_ID_ATTRIBUTE_NAME = "ru.axetta.ecafe.userId";
     public static final String USER_IP_ADDRESS_ATTRIBUTE_NAME = "ru.axetta.ecafe.ipAddress";
+
+    protected static Logger logger;
+    static {
+        try {  logger = LoggerFactory.getLogger(User.class); } catch (Throwable ignored) {}
+    }
 
     public String getLastSmsCode() {
         return lastSmsCode;
@@ -452,15 +462,67 @@ public class User {
             throw new Exception(String.format("Cannot find user %s", userName));
         }
         String code = generateSmsCode();
-        Client fakeClient = createFakeClient(user.getPhone());
 
+        /*Client fakeClient = createFakeClient(user.getPhone());
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendMessageAsync(fakeClient, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
-                        new String[]{"linkingToken", code}, new Date());
-        user.setLastSmsCode(code);
-        user.setSmsCodeEnterDate(null);
-        user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
-        DAOService.getInstance().setUserInfo(user);
+                        new String[]{"linkingToken", code}, new Date());*/
+        String errCode = sendServiceSMSRequest(user.getPhone(), code);
+        if (errCode.equals("0")) {
+            user.setLastSmsCode(code);
+            user.setSmsCodeEnterDate(null);
+            user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
+            DAOService.getInstance().setUserInfo(user);
+        } else {
+            throw new Exception(String.format("Ошибка при отправке СМС-сообщения. Ответ сервиса: %s", errCode));
+        }
+    }
+
+    private static String sendServiceSMSRequest(String mobile, String code) throws Exception {
+        NameValuePair[] parameters = new NameValuePair[] {
+            new NameValuePair("login", "i-teco"),
+            new NameValuePair("passwd", "e2GDH0"),
+            new NameValuePair("service", "14"),
+            new NameValuePair("msisdn", mobile),
+            new NameValuePair("text", String.format("Код авторизации - %s", code)),
+            new NameValuePair("operation", "send"),
+            new NameValuePair("type", "sms"),
+        };
+
+        GetMethod httpMethod = new GetMethod("http://utils.services.altarix.ru:8000/sms/output/");
+        httpMethod.setQueryString(parameters);
+
+        try {
+            HttpClient httpClient = new HttpClient();
+            httpClient.getParams().setContentCharset("UTF-8");
+            int statusCode = HttpStatus.SC_BAD_REQUEST;
+            for (int attempts=0;attempts<3;++attempts) {
+                statusCode = httpClient.executeMethod(httpMethod);
+                attempts++;
+                if (statusCode == HttpStatus.SC_OK) {
+                    break;
+                }
+            }
+            if (statusCode != HttpStatus.SC_OK) {
+                return "Ошибка сети или неправильный формат мобильного телефона";
+            }
+
+            String response = httpMethod.getResponseBodyAsString();
+
+            logger.info(String.format("Retrieved response for User auth code generation from SMS service: %s", response));
+
+            String errCode = "";
+            if (response != null) {
+                StringTokenizer st = new StringTokenizer(response, "|");
+                if (!st.hasMoreTokens()) {
+                    return "Ошибка при обращении к сервису отправки СМС";
+                }
+                errCode = st.nextToken();
+            }
+            return errCode;
+        } finally {
+            httpMethod.releaseConnection();
+        }
     }
 
     private static String generateSmsCode() {
