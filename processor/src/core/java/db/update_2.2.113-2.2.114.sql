@@ -33,8 +33,8 @@ CREATE TABLE cf_discountchangehistory
 (
   idofdiscountchange BIGSERIAL NOT NULL,
   idofclient BIGINT NOT NULL, registrationdate BIGINT NOT NULL, discountmode INTEGER NOT NULL,
-  olddiscountmode INTEGER NOT NULL, categoriesdiscounts CHARACTER VARYING(60) NOT NULL DEFAULT '' :: CHARACTER VARYING,
-  oldcategoriesdiscounts CHARACTER VARYING(60) NOT NULL DEFAULT '' :: CHARACTER VARYING,
+  olddiscountmode INTEGER NOT NULL, categoriesdiscounts CHARACTER VARYING(60) NOT NULL DEFAULT '',
+  oldcategoriesdiscounts CHARACTER VARYING(60) NOT NULL DEFAULT '',
   CONSTRAINT cf_discountchangehistory_pk PRIMARY KEY (idofdiscountchange),
   CONSTRAINT cf_discountchangehistory_idofclient_fk FOREIGN KEY (idofclient)
   REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
@@ -106,7 +106,7 @@ CREATE TABLE cf_specialdates
   isweekend INTEGER NOT NULL,
   deleted INTEGER NOT NULL,
   version BIGINT NOT NULL,
-  comment CHARACTER VARYING(256) NOT NULL DEFAULT '' :: CHARACTER VARYING,
+  comment CHARACTER VARYING(256) NOT NULL DEFAULT '',
   idoforgowner BIGINT NOT NULL,
   CONSTRAINT cf_specialdates_pk PRIMARY KEY (idoforg, date),
   CONSTRAINT cf_specialdates_idoforg_fk FOREIGN KEY (idoforg)
@@ -212,3 +212,6 @@ CREATE TABLE cf_security_journal_authenticate
 );
 
 CREATE INDEX cf_security_journal_authenticate_users_idx ON cf_security_journal_authenticate USING BTREE (idofuser);
+
+
+--! ФИНАЛИЗИРОВАН (Семенов, 290416) НЕ МЕНЯТЬ
