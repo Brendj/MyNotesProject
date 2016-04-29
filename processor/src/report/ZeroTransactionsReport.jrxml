@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ZeroTransactionsReport" pageWidth="1346" pageHeight="595" orientation="Landscape" columnWidth="1306" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="300db74b-afe9-4084-97db-23a78eab4b7f">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="127"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date">
@@ -327,7 +327,7 @@
 	</columnHeader>
 	<detail>
 		<band height="24" splitType="Stretch">
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="11650504-4848-4941-9e5a-7a4bedea46b7" stretchType="RelativeToBandHeight" x="0" y="0" width="32" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -339,7 +339,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{num}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="eb4172eb-396f-49f7-bb1a-36656191e24a" stretchType="RelativeToBandHeight" x="32" y="0" width="64" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -351,7 +351,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="4f5b70e7-b727-42cb-960a-e0c74e201b49" stretchType="RelativeToBandHeight" x="96" y="0" width="146" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -363,7 +363,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{orgShortName}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="09582fec-c5c7-4039-a1a6-d042cd71cfef" stretchType="RelativeToBandHeight" x="242" y="0" width="110" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -375,7 +375,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yyyy">
+			<textField pattern="dd.MM.yyyy" isBlankWhenNull="true">
 				<reportElement uuid="468ec0e2-7093-437a-9039-36971c2cfd50" stretchType="RelativeToBandHeight" x="490" y="0" width="99" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -459,7 +459,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{factPaydable}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="dd272638-f573-4d04-be63-dc773a5f4266" stretchType="RelativeToBandHeight" x="352" y="0" width="138" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -471,7 +471,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="6d674381-7b32-465d-b9bc-1bcc4ddbdd77" stretchType="RelativeToBandHeight" x="926" y="0" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -483,7 +483,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{commentDiscount}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="f675cd23-89f2-48e7-b89f-b974d06651fd" stretchType="RelativeToBandHeight" x="687" y="0" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -495,7 +495,7 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{commentInOut}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="d4e45d26-bd4f-4ede-b8cb-c47ec44c00fd" stretchType="RelativeToBandHeight" x="1165" y="0" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
