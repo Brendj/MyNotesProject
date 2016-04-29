@@ -88,6 +88,8 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
     private JRDataSource buildDataSource(Session session, Date startDate, Date endDate) throws Exception {
         List<SpecialDatesReportItem> list = new ArrayList<SpecialDatesReportItem>();
 
+        Boolean showComments = Boolean.valueOf(getReportProperties().getProperty("showComments"));
+
         String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
         List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
         List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
@@ -131,16 +133,20 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
                 criteria.add(Restrictions.eq("compositeIdOfSpecialDate.date", currentDate));
                 criteria.add(Restrictions.eq("compositeIdOfSpecialDate.idOfOrg", orgId));
                 SpecialDate specialDate = (SpecialDate) criteria.uniqueResult();
+                String comment = "";
 
                 Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
                 if(specialDate != null){
                     if(!specialDate.getDeleted()){
                         isWeekend = specialDate.getIsWeekend();
+                        if(showComments) {
+                            comment = specialDate.getComment();
+                        }
                     }
                 }
                 String dateStr = getDayOfWeekString(CalendarUtils.getDayOfWeek(currentDate) - 1) + " " + CalendarUtils.dateShortToString(currentDate);
 
-                list.add(new SpecialDatesReportItem(orgId, dateStr, org.getShortName(), isWeekend));
+                list.add(new SpecialDatesReportItem(orgId, dateStr, org.getShortName(), isWeekend, comment));
 
                 c.add(Calendar.DATE, 1);
             }

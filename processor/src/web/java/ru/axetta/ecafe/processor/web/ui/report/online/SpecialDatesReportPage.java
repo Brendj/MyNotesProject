@@ -51,6 +51,7 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     private Boolean applyUserSettings = false;
     private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
+    private Boolean showComments = true;
 
     public SpecialDatesReportPage() {
         super();
@@ -245,6 +246,7 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        properties.setProperty("showComments", Boolean.toString(showComments));
         return properties;
     }
 
@@ -281,4 +283,11 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
         this.applyUserSettings = applyUserSettings;
     }
 
+    public Boolean getShowComments() {
+        return showComments;
+    }
+
+    public void setShowComments(Boolean showComments) {
+        this.showComments = showComments;
+    }
 }

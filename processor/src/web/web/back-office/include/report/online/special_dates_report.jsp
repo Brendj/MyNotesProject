@@ -81,6 +81,10 @@
                          actionListener="#{mainPage.specialDatesReportPage.onEndDateSpecified}" />
         </rich:calendar>
 
+        <h:outputText escape="false" value="Показать комментарий" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.specialDatesReportPage.showComments}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="3">

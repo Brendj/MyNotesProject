@@ -15,12 +15,14 @@ public class SpecialDatesReportItem {
     private String date;
     private String orgShortName;
     private Boolean isWeekend;
+    private String comment;
 
-    public SpecialDatesReportItem(Long idOfOrg, String date, String orgShortName, Boolean isWeekend) {
+    public SpecialDatesReportItem(Long idOfOrg, String date, String orgShortName, Boolean isWeekend, String comment) {
         this.idOfOrg = idOfOrg;
         this.date = date;
         this.orgShortName = orgShortName;
         this.isWeekend = isWeekend;
+        this.comment = comment;
     }
 
     public Long getIdOfOrg() {
@@ -53,5 +55,13 @@ public class SpecialDatesReportItem {
 
     public void setIsWeekend(Boolean isWeekend) {
         this.isWeekend = isWeekend;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

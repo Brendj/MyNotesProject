@@ -1003,7 +1003,7 @@
         <rich:panelMenuItem id="zeroTransactionsReportMenuItem" binding="#{mainPage.zeroTransactionsReportPage.mainMenuComponent}"
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
-                            label="Отчет по рабочим дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
+                            label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
