@@ -2725,8 +2725,27 @@ public class Processor
             Long idOfOrganization = getIdOfOrg(persistenceSession, idOfOrg);
             if (null == idOfOrganization) {
                 return new ResPaymentRegistryItem(payment.getIdOfOrder(), 130,
-                        String.format("Organization no found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                        String.format("Organization not found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
+            }
+
+            Long idOfOrgPayment = payment.getIdOfOrg();
+            if (null != idOfOrgPayment) {
+                Long idOfOrganizationPayment = getIdOfOrg(persistenceSession, idOfOrgPayment);
+
+                if (null == idOfOrganizationPayment) {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 130,
+                            String.format("Organization not found, IdOfOrg == %s, IdOfOrder == %s", idOfOrgPayment,
+                                    payment.getIdOfOrder()));
+                }
+
+                if(!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgPayment)){
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 150,
+                            String.format("Organization is not friendly, IdOfOrg == %s, IdOfOrder == %s", idOfOrgPayment,
+                                    payment.getIdOfOrder()));
+                }
+
+                idOfOrg = idOfOrgPayment;
             }
 
             CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder());

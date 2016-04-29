@@ -57,8 +57,9 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                             p.getRootMenu(), p.getMenuOutput(), p.getType(), p.getMenuGroup(), p.getMenuOrigin(), p.getItemCode(), p.getGuidOfGoods(), p.getIdOfRule(), p.getIdOfMenu());
                     purchases.add(purchase);
                 }
+                // for friendly org access pass here idOfFriendlyOrg instead of null
                 Payment payment = new Payment(posPayment.getCardNo(), posPayment.getTime(), posPayment.getOrderDate(), posPayment.getSocDiscount(),
-                  posPayment.getTrdDiscount(), posPayment.getGrant(), posPayment.getIdOfClient(), posPayment.getIdOfPayForClient(), posPayment.getIdOfOrder(), posPayment.getIdOfCashier(),
+                  posPayment.getTrdDiscount(), posPayment.getGrant(), posPayment.getIdOfClient(), null, posPayment.getIdOfPayForClient(), posPayment.getIdOfOrder(), posPayment.getIdOfCashier(),
                         posPayment.getSumByCard(), posPayment.getSumByCash(), posPayment.getrSum(), posPayment.getIdOfPOS(), posPayment.getConfirmerId(),
                         0, posPayment.getComments(), OrderTypeEnumType.fromInteger(posPayment.getOrderType()), purchases);
 

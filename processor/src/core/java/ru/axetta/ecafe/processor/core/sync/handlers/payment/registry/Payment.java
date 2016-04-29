@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getLongValue;
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getLongValueNullSafe;
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringValueNullSafe;
+import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +29,7 @@ public class Payment {
     private final Long trdDiscount;
     private final Long confirmerId;
     private final long grant;
+    private final Long idOfOrg;
     private final Long idOfClient;
     private final Long idOfPayForClient;
     private final long idOfOrder;
@@ -78,6 +77,7 @@ public class Payment {
         }
         Long confirmerId = getLongValueNullSafe(namedNodeMap, "ConfirmerId");
         long grant = getLongValue(namedNodeMap, "Grant");
+        Long idOfOrg = getLongValueNullSafe(namedNodeMap, "IdOfOrg");
         Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
         Long idOfPayForClient = getLongValueNullSafe(namedNodeMap, "IdOfPayForClient");
         long idOfOrder = getLongValue(namedNodeMap, "IdOfOrder");
@@ -114,13 +114,13 @@ public class Payment {
             state = Integer.parseInt(stateStr);
         }
 
-        return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfClient, idOfPayForClient, idOfOrder,
+        return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfOrg, idOfClient, idOfPayForClient, idOfOrder,
                 idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType), purchases);
     }
 
-    public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long idOfClient, Long idOfPayForClient,
-            long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS, Long confirmerId,
-            int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
+    public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long IdOfOrg, Long idOfClient,
+            Long idOfPayForClient, long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS,
+            Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
         this.cardNo = cardNo;
         this.time = time;
         this.orderDate = orderDate;
@@ -128,6 +128,7 @@ public class Payment {
         this.trdDiscount = trdDiscount;
         this.confirmerId = confirmerId;
         this.grant = grant;
+        this.idOfOrg = IdOfOrg;
         this.idOfClient = idOfClient;
         this.idOfPayForClient = idOfPayForClient;
         this.idOfOrder = idOfOrder;
@@ -168,6 +169,10 @@ public class Payment {
 
     public Long getGrant() {
         return grant;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
     }
 
     public Long getIdOfClient() {
