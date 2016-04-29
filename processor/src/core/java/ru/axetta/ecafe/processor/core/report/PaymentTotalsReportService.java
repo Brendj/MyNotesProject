@@ -128,8 +128,6 @@ public class PaymentTotalsReportService {
         }
 
         Criteria orgClientsToDateCriteria = session.createCriteria(Client.class);
-        orgClientsToDateCriteria
-                .add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
         orgClientsToDateCriteria.add(Restrictions.in("idOfClient", clientIdList));
         orgClientsToDateCriteria.setProjection(Projections.sum("balance"));
         Long orgClientsBalanceToDate = (Long) orgClientsToDateCriteria.uniqueResult();
@@ -158,13 +156,13 @@ public class PaymentTotalsReportService {
      * @return
      */
 
-    private Set<Client> getOrgClientsToDate(Long idOfOrg, Date toDate) {
+    private Set<Client>
+    getOrgClientsToDate(Long idOfOrg, Date toDate) {
 
         HashMap<Client, List<ClientMigration>> clientMigrationListsMap = getClientMigrationsListHashMap(idOfOrg,
                 toDate);
 
         Criteria orgClientsCriteria = session.createCriteria(Client.class);
-        orgClientsCriteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", ClientGroupMenu.getNotStudent())));
         orgClientsCriteria.createAlias("org", "o");
         orgClientsCriteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         List<Client> todayClientList = orgClientsCriteria.list();
@@ -225,8 +223,6 @@ public class PaymentTotalsReportService {
 
     private List<ClientMigration> getClientMigrationsForOrg(Org org, Date start, Date end) {
         Criteria clientMigrationCriteria = session.createCriteria(ClientMigration.class);
-        //clientMigrationCriteria.createAlias("org", "o");
-        //clientMigrationCriteria.createAlias("oldOrg", "oo");
         clientMigrationCriteria.add(Restrictions.or(Restrictions.eq("org", org), Restrictions.eq("oldOrg", org)));
         clientMigrationCriteria.add(Restrictions.between("registrationDate", start, end));
         List<ClientMigration> clientMigrations = clientMigrationCriteria.list();
@@ -394,7 +390,7 @@ public class PaymentTotalsReportService {
         if (repaymentSum == null) {
             repaymentSum = 0L;
         }
-        return repaymentSum;
+        return repaymentSum * -1L;
     }
 
     /**

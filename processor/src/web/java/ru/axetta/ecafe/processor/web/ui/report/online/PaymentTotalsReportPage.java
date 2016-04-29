@@ -36,7 +36,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -270,7 +272,7 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
 
         if ((contragentFilter.getContragent().getIdOfContragent() == null) && (idOfOrgList.size() <= 0) && (idOfOrg
                 == null)) {
-            printError("Выберите поставщика и/или список ОО");
+            printError("Выберите список ОО");
             return true;
         }
 
@@ -316,11 +318,6 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         Long idOfContragent = contragentFilter.getContragent().getIdOfContragent();
         String idOfContragentString = idOfContragent != null ? Long.toString(idOfContragent) : "";
         properties.setProperty(PaymentTotalsReport.P_CONTRAGENT, idOfContragentString);
-        List<Long> orgList = new ArrayList<Long>();
-        if (idOfOrg != null) {
-            orgList.add(idOfOrg);
-        }
-        idOfOrgList = orgList;
         properties.setProperty(PaymentTotalsReport.P_ORG_LIST,
                 idOfOrgList.size() <= 0 ? "" : StringUtils.join(idOfOrgList.iterator(), ","));
         properties.setProperty(PaymentTotalsReport.P_HIDE_NULL_ROWS, Boolean.toString(hideNullRows));

@@ -17,12 +17,13 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
 
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
-            <h:panelGroup styleClass="borderless-div">
-                <h:inputText value="#{mainPage.paymentTotalsReportPage.filter}" readonly="true" styleClass="input-text long-field"
-                             style="margin-right: 2px;" />
-                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;" />
+            <h:panelGroup>
+                <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" >
+                    <f:setPropertyActionListener value="#{mainPage.paymentTotalsReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.paymentTotalsReportPage.filter}}" />
             </h:panelGroup>
 
             <%--Добавить варниг сообщ--%>
