@@ -107,6 +107,10 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
                     return false;
                 }
             }
+            if (StringUtils.isEmpty(phone)) {
+                printError("Необходимо указать номер телефона");
+                return false;
+            }
             currUser.setUserName(userName);
             currUser.setPhone(phone);
             currUser.setEmail(email);
