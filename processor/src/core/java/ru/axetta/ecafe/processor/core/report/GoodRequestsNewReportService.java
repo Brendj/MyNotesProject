@@ -148,6 +148,8 @@ public class GoodRequestsNewReportService {
                             FeedingPlanType feedingPlanType = null;
                             if (allGoodsInfo.containsKey(idOfGood)) {
                                 feedingPlanType = allGoodsInfo.get(idOfGood).feedingPlanType;
+                            } else {
+                                continue;
                             }
                             fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType));
                         }
