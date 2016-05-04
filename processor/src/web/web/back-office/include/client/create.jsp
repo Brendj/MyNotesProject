@@ -121,11 +121,22 @@
     <h:inputText value="#{mainPage.clientCreatePage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.clientGUID}" maxlength="64" styleClass="input-text"/>
+    <h:outputText escape="true" value="Пол" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.clientCreatePage.gender}" styleClass="input-text">
+        <f:selectItems value="#{mainPage.clientCreatePage.clientGenderMenu.items}" />
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
+    <rich:calendar value="#{mainPage.clientCreatePage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                   inputClass="input-text" showWeeksBar="false" />
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.remarks}" styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
+    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.benefitOnAdmission}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"

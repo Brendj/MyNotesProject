@@ -40,8 +40,11 @@ public class Client {
     public static final String UNKNOWN_PAY_FOR_SMS_STATE_NAME = "Неизвестно";
     public static final String[] CONTRACT_STATE_NAMES = {
             "Не заключен", "Активен", "Расторгнут по времени", "Расторгнут по желанию клиента"};
+    public static final String[] CLIENT_GENDER_NAMES = {
+            "Мужской", "Женский"};
     public static final int ACTIVE_CONTRACT_STATE = 1;
     public static final int CONTRACT_INIT_STATE_COUNT = 2;
+    public static final int CLIENT_GENDER_COUNT = 2;
     public static final String UNKNOWN_CONTRACT_STATE_NAME = "Статус неизвестен";
     public static final int DISCOUNT_MODE_NONE = 0;
     public static final int INITIAL_DISCOUNT_MODE = DISCOUNT_MODE_NONE;
@@ -113,6 +116,10 @@ public class Client {
     private Set<LibVisit> libVisitInternal;
     private Set<Circulation> circulationInternal;
     private Set<DiscountChange> discountChanges = new HashSet<DiscountChange>();
+
+    private Integer gender;
+    private Date birthDate;
+    private String benefitOnAdmission;
 
     protected Client() {
         // For Hibernate only
@@ -909,6 +916,30 @@ public class Client {
 
     public void setDiscountChanges(Set<DiscountChange> discountChanges) {
         this.discountChanges = discountChanges;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBenefitOnAdmission() {
+        return benefitOnAdmission;
+    }
+
+    public void setBenefitOnAdmission(String benefitOnAdmission) {
+        this.benefitOnAdmission = benefitOnAdmission;
     }
 
     @Override

@@ -196,6 +196,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String clientGUID;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+    private Integer gender;
+    private Date birthDate;
+    private String benefitOnAdmission;
+
 
     public String getFax() {
         return fax;
@@ -226,6 +230,30 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.selectItemList = selectItemList;
     }
 
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBenefitOnAdmission() {
+        return benefitOnAdmission;
+    }
+
+    public void setBenefitOnAdmission(String benefitOnAdmission) {
+        this.benefitOnAdmission = benefitOnAdmission;
+    }
+
     public String getSan() {
         return san;
     }
@@ -244,6 +272,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientInitContractStateMenu clientInitContractStateMenu = new ClientInitContractStateMenu();
+    private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
     private boolean autoContractId = true;
 
     public String getPageFilename() {
@@ -413,6 +442,10 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         return clientInitContractStateMenu;
     }
 
+    public ClientGenderMenu getClientGenderMenu() {
+        return clientGenderMenu;
+    }
+
     public Long getLimit() {
         return limit;
     }
@@ -510,6 +543,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setEmail(this.email);
         client.setFax(this.fax);
         client.setRemarks(this.remarks);
+        client.setBirthDate(this.birthDate);
+        client.setGender(this.gender);
+        client.setBenefitOnAdmission(this.benefitOnAdmission);
         if (this.externalId==null || this.externalId==0) client.setExternalId(null);
         else client.setExternalId(this.externalId);
         if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);

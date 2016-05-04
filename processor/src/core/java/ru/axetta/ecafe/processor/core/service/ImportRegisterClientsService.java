@@ -648,6 +648,9 @@ public class ImportRegisterClientsService {
         ch.setCreateDate(ts);
         ch.setApplied(false);
         ch.setNotificationId(notificationId);
+        ch.setGender(currentClient.getGender());
+        ch.setBirthDate(currentClient.getBirthDate().getTime());
+        ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
         sess.save(ch);
     }
 

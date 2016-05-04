@@ -72,6 +72,9 @@
         <property name="subBalance1" column="SubBalance1" type="long" not-null="true" update="false"/>
         <property name="ssoid" column="SSOID" type="string" length="50"/>
 
+        <property name="gender" column="Gender" type="int"/>
+        <property name="birthDate" column="BirthDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+        <property name="benefitOnAdmission" column="BenefitOnAdmission" type="string" length="3000"/>
 
         <property name="limit" column="Limits" type="long" not-null="true"/>
         <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
