@@ -119,7 +119,16 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long externalId;
     private String clientGUID;
     private List<BankSubscription> bankSubscriptions;
+    private Integer gender;
+    private Date birthDate;
+    private String benefitOnAdmission;
 
+
+    private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
+
+    public ClientGenderMenu getClientGenderMenu() {
+        return clientGenderMenu;
+    }
 
     public Long getExternalId() {
         return externalId;
@@ -312,6 +321,30 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.bankSubscriptions = bankSubscriptions;
     }
 
+    public String getBenefitOnAdmission() {
+        return benefitOnAdmission;
+    }
+
+    public void setBenefitOnAdmission(String benefitOnAdmission) {
+        this.benefitOnAdmission = benefitOnAdmission;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
     @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
@@ -351,6 +384,9 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.clientGUID = client.getClientGUID();
         this.externalId = client.getExternalId();
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
+        this.gender = client.getGender();
+        this.birthDate = client.getBirthDate();
+        this.benefitOnAdmission = client.getBenefitOnAdmission();
 
         // опекуны
         // (Kadyrov D) 23.12.2011

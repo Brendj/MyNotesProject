@@ -329,6 +329,10 @@ public class SyncResponse {
             private boolean tempClient;
             private int clientType;
             private final boolean isUseLastEEModeForPlan;
+            private final int gender;
+            private final Date birthDate;
+            private final String benefitOnAdmission;
+
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -359,6 +363,9 @@ public class SyncResponse {
                 this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
+                this.gender = client.getGender();
+                this.birthDate = client.getBirthDate();
+                this.benefitOnAdmission = client.getBenefitOnAdmission();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -434,7 +441,19 @@ public class SyncResponse {
                 return tempClient;
             }
 
-            public Element toElement(Document document) throws Exception {
+            public String getBenefitOnAdmission() {
+                return benefitOnAdmission;
+            }
+
+            public Date getBirthDate() {
+                return birthDate;
+            }
+
+            public int getGender() {
+                return gender;
+            }
+
+            public Element toElement(Document document, DateFormat timeFormat) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("OrgOwner", Long.toString(this.orgOwner));
                 element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
@@ -474,6 +493,9 @@ public class SyncResponse {
                 }
                 element.setAttribute("ClientType", Integer.toString(this.clientType));
                 element.setAttribute("IsUseLastEEModeForPlan", this.isUseLastEEModeForPlan?"1":"0");
+                element.setAttribute("Gender", Integer.toString(this.gender));
+                element.setAttribute("BirthDate", timeFormat.format(this.birthDate));
+                element.setAttribute("BenefitOnAdmission", benefitOnAdmission);
                 return element;
             }
 
@@ -504,10 +526,10 @@ public class SyncResponse {
             return items.iterator();
         }
 
-        public Element toElement(Document document) throws Exception {
+        public Element toElement(Document document, DateFormat timeFormat) throws Exception {
             Element element = document.createElement("ClientRegistry");
             for (Item item : this.items) {
-                element.appendChild(item.toElement(document));
+                element.appendChild(item.toElement(document, timeFormat));
             }
             if (activeClientsId.size() != 0) {
                 Element activeClientsElem = document.createElement("ActiveClients");
@@ -1145,7 +1167,7 @@ public class SyncResponse {
 
         // ClientRegistry
         if (null != clientRegistry) {
-            ecafeEnvelopeElement.appendChild(clientRegistry.toElement(document));
+            ecafeEnvelopeElement.appendChild(clientRegistry.toElement(document, timeFormat));
         }
 
         if(resultClientGuardian != null){

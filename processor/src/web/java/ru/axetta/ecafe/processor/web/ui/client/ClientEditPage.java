@@ -234,6 +234,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private final ClientPayForSMSMenu clientPayForSMSMenu = new ClientPayForSMSMenu();
     private final ClientContractStateMenu clientContractStateMenu = new ClientContractStateMenu();
     private Integer freePayMaxCount;
+    private Integer gender;
+    private Date birthDate;
+    private String benefitOnAdmission;
+
+    private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
+
+    public ClientGenderMenu getClientGenderMenu() {
+        return clientGenderMenu;
+    }
 
     public List<SelectItem> getSelectItemList() {
         return selectItemList;
@@ -506,6 +515,30 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setFreePayMaxCount(Integer freePayMaxCount) {
         this.freePayMaxCount = freePayMaxCount;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBenefitOnAdmission() {
+        return benefitOnAdmission;
+    }
+
+    public void setBenefitOnAdmission(String benefitOnAdmission) {
+        this.benefitOnAdmission = benefitOnAdmission;
     }
 
     public Long getExternalId() {
@@ -894,6 +927,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
+        client.setGender(this.gender);
+        client.setBirthDate(this.birthDate);
+        client.setBenefitOnAdmission(this.benefitOnAdmission);
+
         persistenceSession.update(client);
 
         fill(client);
@@ -1001,6 +1038,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             categoriesFilter.append("Не выбрано");
         }
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
+        this.gender = client.getGender();
+        this.birthDate = client.getBirthDate();
+        this.benefitOnAdmission = client.getBenefitOnAdmission();
     }
 
     public String getIdOfCategoryListString() {

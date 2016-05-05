@@ -174,6 +174,14 @@
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text"/>
 
+    <h:outputText escape="true" value="Пол" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.clientEditPage.gender}" styleClass="input-text">
+        <f:selectItems value="#{mainPage.clientEditPage.clientGenderMenu.items}" />
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
+    <rich:calendar value="#{mainPage.clientEditPage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                   inputClass="input-text" showWeeksBar="false" />
+
     <h:outputText escape="true" value="Опекуны" styleClass="output-text" rendered="false"/>
     <rich:dataTable id="clientGuardianEditTable" value="#{mainPage.clientEditPage.clientGuardianItems}" var="clientGuardian"
                     columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
@@ -222,6 +230,10 @@
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.remarks}" styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
+    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.benefitOnAdmission}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel"

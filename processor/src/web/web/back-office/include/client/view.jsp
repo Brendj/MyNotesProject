@@ -145,6 +145,13 @@
     <h:inputText value="#{mainPage.clientViewPage.externalId}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text" readonly="true"/>
+    <h:outputText escape="true" value="Пол" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.clientViewPage.gender}" styleClass="input-text">
+        <f:selectItems value="#{mainPage.clientViewPage.clientGenderMenu.items}" />
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
+    <rich:calendar value="#{mainPage.clientViewPage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+                   inputClass="input-text" showWeeksBar="false" />
 
     <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
     <rich:dataTable id="clientGuardianViewTable" value="#{mainPage.clientViewPage.clientGuardianItems}" var="clientGuardian"
@@ -227,6 +234,10 @@
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea readonly="true" rows="5" cols="64" value="#{mainPage.clientViewPage.remarks}"
                      styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid">
+    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
+    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientViewPage.benefitOnAdmission}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"
