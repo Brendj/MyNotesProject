@@ -162,8 +162,8 @@ public class PayStatsPage extends BasicWorkspacePage implements ContragentSelect
 
     public void setToDate(Date toDate) {
         localCalendar.setTime(toDate);
-        localCalendar.add(Calendar.DAY_OF_MONTH,1);
-        localCalendar.add(Calendar.SECOND, -1);
+        //localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        //localCalendar.add(Calendar.SECOND, -1);
         this.toDate = localCalendar.getTime();
     }
 

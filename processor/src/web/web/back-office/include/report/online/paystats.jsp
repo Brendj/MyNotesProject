@@ -13,10 +13,10 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{payStatsPage.fromDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+        <rich:calendar value="#{payStatsPage.fromDate}" datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter"
                        inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{payStatsPage.toDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+        <rich:calendar value="#{payStatsPage.toDate}" datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter"
                        inputClass="input-text" showWeeksBar="false" />
 
         <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
