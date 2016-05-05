@@ -494,7 +494,7 @@ public class SyncResponse {
                 element.setAttribute("ClientType", Integer.toString(this.clientType));
                 element.setAttribute("IsUseLastEEModeForPlan", this.isUseLastEEModeForPlan?"1":"0");
                 element.setAttribute("Gender", Integer.toString(this.gender));
-                element.setAttribute("BirthDate", timeFormat.format(this.birthDate));
+                element.setAttribute("BirthDate", this.birthDate == null ? "" : timeFormat.format(this.birthDate));
                 element.setAttribute("BenefitOnAdmission", benefitOnAdmission);
                 return element;
             }
