@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -110,6 +111,12 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
             if (StringUtils.isEmpty(phone)) {
                 printError("Необходимо указать номер телефона");
                 return false;
+            } else {
+                String mobile = Client.checkAndConvertMobile(phone);
+                if (mobile == null) {
+                    printError("Неверный формат контактного (мобильного) телефона");
+                }
+                phone = mobile;
             }
             currUser.setUserName(userName);
             currUser.setPhone(phone);
