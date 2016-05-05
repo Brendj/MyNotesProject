@@ -363,7 +363,7 @@ public class SyncResponse {
                 this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
-                this.gender = client.getGender();
+                this.gender = client.getGender() == null ? 0 : client.getGender();
                 this.birthDate = client.getBirthDate();
                 this.benefitOnAdmission = client.getBenefitOnAdmission();
             }
