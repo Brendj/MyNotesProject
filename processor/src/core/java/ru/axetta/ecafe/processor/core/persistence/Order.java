@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import org.hibernate.type.EnumType;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -46,6 +44,7 @@ public class Order{
     private OrderTypeEnumType orderType;
     private Long idOfClientGroup;
     private Long idOfPayForClient;
+    private Boolean isFromFriendlyOrg;
 
     public OrderTypeEnumType getOrderType() {
         return orderType;
@@ -80,6 +79,7 @@ public class Order{
         this.comments = comments;
         this.orderType = orderType;
         this.idOfPayForClient = idOfPayForClient;
+        this.isFromFriendlyOrg = false;
     }
 
     public CompositeIdOfOrder getCompositeIdOfOrder() {
@@ -273,6 +273,14 @@ public class Order{
 
     public void setIdOfPayForClient(Long idOfPayForClient) {
         this.idOfPayForClient = idOfPayForClient;
+    }
+
+    public Boolean getIsFromFriendlyOrg() {
+        return isFromFriendlyOrg;
+    }
+
+    public void setIsFromFriendlyOrg(Boolean isFromFriendlyOrg) {
+        this.isFromFriendlyOrg = isFromFriendlyOrg;
     }
 
     @Override

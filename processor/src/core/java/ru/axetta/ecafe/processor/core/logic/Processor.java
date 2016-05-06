@@ -2730,6 +2730,7 @@ public class Processor
             }
 
             Long idOfOrgPayment = payment.getIdOfOrg();
+            boolean isFromFriendlyOrg = false;
             if (null != idOfOrgPayment) {
                 Long idOfOrganizationPayment = getIdOfOrg(persistenceSession, idOfOrgPayment);
 
@@ -2746,6 +2747,7 @@ public class Processor
                 }
 
                 idOfOrg = idOfOrgPayment;
+                isFromFriendlyOrg = true;
             }
 
             CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder());
@@ -2883,7 +2885,7 @@ public class Processor
                 // Create order
                 RuntimeContext.getFinancialOpsManager()
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card,
-                                payment.getConfirmerId());
+                                payment.getConfirmerId(), isFromFriendlyOrg);
                 long totalPurchaseDiscount = 0;
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
