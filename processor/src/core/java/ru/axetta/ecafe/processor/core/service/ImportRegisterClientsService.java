@@ -581,6 +581,9 @@ public class ImportRegisterClientsService {
         ch.setApplied(false);
         ch.setType(type);
         ch.setNotificationId(notificationId);
+        ch.setGender(currentClient.getGender());
+        ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
+        ch.setBirthDate(currentClient.getBirthDate().getTime());
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
