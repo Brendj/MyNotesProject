@@ -64,13 +64,19 @@
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;"
                                disabled="#{!mainPage.deliveredServicesReportPage.emptyRegion() || !mainPage.deliveredServicesReportPage.emptyContract()
                                || !mainPage.deliveredServicesReportPage.emptyContragent()}"
-                               id="orgDeliveredServicesSelectButton"/>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.filter}}"
+                               id="orgDeliveredServicesSelectButton">
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.deliveredServicesReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.filter != mainPage.deliveredServicesReportPage.FILTER_SUPER ?
+            mainPage.deliveredServicesReportPage.filter : mainPage.deliveredServicesReportPage.FILTER_INIT}}"
                           id="orgDeliveredServicesOrgText"/>
         </h:panelGroup>
 

@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.210000000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="197"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -127,8 +127,8 @@
 				</textElement>
 				<text><![CDATA[(наименование образовательной организации)]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="7d5afef2-d27d-4e60-b3b3-8b46bcedc8a0" x="1" y="44" width="801" height="15"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="7d5afef2-d27d-4e60-b3b3-8b46bcedc8a0" positionType="Float" stretchType="RelativeToTallestObject" x="1" y="44" width="801" height="15" isPrintWhenDetailOverflows="true"/>
 				<textElement textAlignment="Center">
 					<font isUnderline="true"/>
 				</textElement>

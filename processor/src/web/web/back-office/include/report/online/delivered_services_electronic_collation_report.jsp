@@ -72,16 +72,21 @@
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..."
-                               action="#{mainPage.deliveredServicesElectronicCollationReportPage.showOrgSelectPage}"
-                               reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesElectronicCollationReportPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.deliveredServicesElectronicCollationReportPage.emptyRegion() || !mainPage.deliveredServicesReportPage.emptyContract()
                                || !mainPage.deliveredServicesElectronicCollationReportPage.emptyContragent()}"
-                               id="orgDeliveredServicesSelectButton" />
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{mainPage.deliveredServicesElectronicCollationReportPage.filter}}"
-                          id="orgDeliveredServicesOrgText" />
+                               id="orgDeliveredServicesSelectButton">
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.deliveredServicesElectronicCollationReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesElectronicCollationReportPage.filter
+            != mainPage.deliveredServicesElectronicCollationReportPage.FILTER_SUPER ?
+            mainPage.deliveredServicesElectronicCollationReportPage.filter : mainPage.deliveredServicesElectronicCollationReportPage.FILTER_INIT}}"
+                          id="orgDeliveredServicesOrgText"/>
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет"

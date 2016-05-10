@@ -121,10 +121,16 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             String nameOrg = "";
-            if (org == null) {
+            if (orgShortItemList == null || orgShortItemList.isEmpty()) {
                 nameOrg = "                                                                   ";
             } else  {
-                nameOrg = ((Org)session.load(Org.class, org.getIdOfOrg())).getOfficialName();
+                StringBuilder stringBuilder = new StringBuilder();
+                for(OrgShortItem orgShortItem : orgShortItemList) {
+                    Org org = (Org) session.load(Org.class, orgShortItem.getIdOfOrg());
+                    stringBuilder.append(org.getOfficialName());
+                    stringBuilder.append(", ");
+                }
+                nameOrg = stringBuilder.substring(0, stringBuilder.length() - 2);
                 if ((nameOrg == null) || nameOrg.isEmpty()) {
                     nameOrg = "                                                                   ";
                 }
@@ -227,15 +233,20 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 contractOrgsCondition = " cf_orgs.idoforg in (" + contractOrgsCondition + ") and ";
             }
             String orgCondition = "";
-            if (org != null) {
-                Org o = (Org)session.load(Org.class, org.getIdOfOrg());
-                String in_str = "";
-                for (Org fo : o.getFriendlyOrg()) {
-                    in_str += fo.getIdOfOrg().toString() + ",";
-                }
-                if (in_str.length() > 0) {
-                    in_str = in_str.substring(0, in_str.length()-1);
-                    orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
+            String in_str = "";
+            if (orgShortItemList != null) {
+                if(!orgShortItemList.isEmpty()) {
+                    for (OrgShortItem orgShortItem : orgShortItemList) {
+                        Org o = (Org) session.load(Org.class, orgShortItem.getIdOfOrg());
+
+                        for (Org fo : o.getFriendlyOrg()) {
+                            in_str += fo.getIdOfOrg().toString() + ",";
+                        }
+                    }
+                    if (in_str.length() > 0) {
+                        in_str = in_str.substring(0, in_str.length() - 1);
+                        orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
+                    }
                 }
             }
 

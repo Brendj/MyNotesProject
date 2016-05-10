@@ -43,7 +43,7 @@ import java.util.List;
  * Отчет по предоставленным услугам
  */
 public class DeliveredServicesReportPage extends OnlineReportPage
-        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler, OrgSelectPage.CompleteHandler {
+        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
     private DeliveredServicesReport deliveredServices;
     private String goodName;
     private Boolean hideMissedColumns;
@@ -54,25 +54,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     private String region;
     private Boolean otherRegions;
     private final String FILTER_INIT = "Не выбрано. Отчет будет построен по всем образовательным организациям города";
-    protected String filter = FILTER_INIT;
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        this.idOfOrg = idOfOrg;
-        if (this.idOfOrg == null) {
-            filter = FILTER_INIT;
-        } else {
-            Org org = (Org)session.load(Org.class, this.idOfOrg);
-            filter = org.getShortName();
-        }
-    }
+    private final String FILTER_SUPER = "Не выбрано";
 
     public String getPageFilename() {
         return "report/online/delivered_services_report";
@@ -100,7 +82,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         return null;
     }
 
-    public void showOrgSelectPage () {
+    public void showOrgListSelectPage () {
         Long idOfContragent = null;
         try {
             idOfContragent = this.contragentFilter.getContragent().getIdOfContragent();
@@ -111,7 +93,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             idOfContract = this.contractFilter.getContract().getIdOfContract();
         } catch (Exception e) {
         }
-        MainPage.getSessionInstance().showOrgSelectPage (idOfContragent,idOfContract);
+        MainPage.getSessionInstance().showOrgListSelectPage(idOfContragent);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
@@ -132,12 +114,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
             DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
-            if (idOfOrg != null) {
-                Org org = null;
-                if (idOfOrg > -1) {
-                    org = DAOService.getInstance().findOrById(idOfOrg);
-                    builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            if (idOfOrgList != null) {
+                List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
+                for(Long idOfOrg : idOfOrgList) {
+                    Org org = null;
+                    if (idOfOrg > -1) {
+                        org = DAOService.getInstance().findOrById(idOfOrg);
+                        list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+                    }
                 }
+                builder.setOrgShortItemList(list);
             }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
@@ -181,12 +167,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public void buildReport(Session session) throws Exception {
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
-        if (idOfOrg != null) {
-            Org org = null;
-            if (idOfOrg > -1) {
-                org = DAOService.getInstance().findOrById(idOfOrg);
-                reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        if (idOfOrgList != null) {
+            List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
+            for(Long idOfOrg : idOfOrgList) {
+                Org org = null;
+                if (idOfOrg > -1) {
+                    org = DAOService.getInstance().findOrById(idOfOrg);
+                    list.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+                }
             }
+            reportBuilder.setOrgShortItemList(list);
         }
         fixDates();
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar, idOfOrg,
@@ -199,6 +189,10 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         if(startDate.after(endDate)) {
             startDate.setTime(endDate.getTime() - MILLIS_IN_DAY);
         }
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
     public List<SelectItem> getRegions() {
@@ -242,7 +236,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     public void resetOrg() {
         if (!emptyRegion() || !emptyContract() || !emptyContragent()) {
             idOfOrg = null;
-            setFilter(FILTER_INIT);
+            idOfOrgList = null;
+            filter = FILTER_INIT;
         }
+    }
+
+    public String getFILTER_INIT() {
+        return FILTER_INIT;
+    }
+
+    public String getFILTER_SUPER() {
+        return FILTER_SUPER;
     }
 }
