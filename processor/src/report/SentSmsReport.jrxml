@@ -108,7 +108,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Статистика отправки СМС период с " + (new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})) + " по " + (new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Статистика отправки сообщений информирования период с " + (new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})) + " по " + (new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

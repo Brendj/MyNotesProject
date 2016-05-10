@@ -60,7 +60,7 @@
                 </style>
                 <div class="htmlReportContent"> ${sentSmsReportPage.report.htmlReport} </div>
             </f:verbatim>
-            <h:outputText escape="true" value="Общая статистика по отправленным СМС" styleClass="output-text" />
+            <h:outputText escape="true" value="Общая статистика по отправленным сообщениям информирования" styleClass="output-text" />
         </c:if>
     </h:panelGrid>
 </h:panelGrid>
