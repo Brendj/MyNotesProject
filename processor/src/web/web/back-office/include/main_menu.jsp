@@ -1023,11 +1023,11 @@
         <a4j:support event="onclick" action="#{mainPage.showInformReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="SentSmsReportPageMenuItem"
                             binding="#{sentSmsReportPage.mainMenuComponent}"
-                            label="Статистика отправки СМС по дням"
+                            label="Статистика отправки сообщений информирования по дням"
                             action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="OrgSmsDeliveryReportPageMenuItem"
                             binding="#{smsDeliveryReportPage.mainMenuComponent}"
-                            label="Отчет по времени доставки СМС"
+                            label="Отчет по времени доставки сообщений информирования"
                             action="#{smsDeliveryReportPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
                             binding="#{orgSmsStatsReportPage.mainMenuComponent}"

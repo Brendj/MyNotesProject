@@ -55,7 +55,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty smsDeliveryReportPage.report && not empty smsDeliveryReportPage.report.htmlReport}" >
-            <h:outputText escape="true" value="Общая статистика по отправленным СМС" styleClass="output-text" />
+            <h:outputText escape="true" value="Общая статистика по отправленным сообщениям информирования" styleClass="output-text" />
 
             <f:verbatim>
                 <style type="text/css">
