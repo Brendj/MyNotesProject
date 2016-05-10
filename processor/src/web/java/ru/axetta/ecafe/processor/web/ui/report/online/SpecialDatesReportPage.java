@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +43,7 @@ import java.util.Properties;
  * Date: 17.04.16
  * Time: 11:18
  */
-public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
+public class SpecialDatesReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(SpecialDatesReportPage.class);
     private final static String generateBeginDateKey = "specialDatesReport.generateBeginDate";
@@ -59,6 +60,10 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
         localCalendar.add(Calendar.DATE, 7);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
+    }
+
+    public void showOrgListSelectPage () {
+        MainPage.getSessionInstance().showOrgListSelectPage();
     }
 
     public void onReportPeriodChanged(ActionEvent event) {
@@ -97,11 +102,6 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
         if(startDate.after(endDate)){
             printError("Дата выборки от меньше дата выборки до");
         }
-    }
-
-    @Override
-    public String getContragentStringIdOfOrgList() {
-        return idOfContragentOrgList.toString().replaceAll("[^0-9,]", "");
     }
 
     public Object buildReportHTML() {
@@ -164,8 +164,8 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
     }
 
     private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
-            printError("Выберите список организаций или поставщиков");
+        if(CollectionUtils.isEmpty(idOfOrgList)){
+            printError("Выберите список организаций");
             return true;
         }
         if(startDate==null){
@@ -239,8 +239,6 @@ public class SpecialDatesReportPage extends OnlineReportWithContragentPage {
 
     private Properties buildProperties() {
         Properties properties = new Properties();
-        String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, sourceMenuOrgId);
         String idOfOrgString = "";
         if(idOfOrgList != null) {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");

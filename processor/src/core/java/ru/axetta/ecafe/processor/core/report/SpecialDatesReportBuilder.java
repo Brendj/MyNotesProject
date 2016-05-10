@@ -97,14 +97,7 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
 
-        String idOfMenuSourceOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
-        List<String> idOfMenuSourceOrgStrList = Arrays.asList(StringUtils.split(idOfMenuSourceOrgs, ','));
-        List<Long> idOfMenuSourceOrgList = new ArrayList<Long>(idOfMenuSourceOrgStrList.size());
-        for (String idOfMenuSourceOrg : idOfMenuSourceOrgStrList) {
-            idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
-        }
-
-        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(session, idOfOrgList, idOfMenuSourceOrgList);
+        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(session, idOfOrgList, new ArrayList<Long>());
 
         TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
         Calendar c = Calendar.getInstance();

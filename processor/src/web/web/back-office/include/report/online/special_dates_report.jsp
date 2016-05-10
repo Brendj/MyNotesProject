@@ -20,24 +20,6 @@
              styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
-        <h:panelGroup id="contragetFilter">
-            <a4j:commandButton value="..."
-                               action="#{mainPage.specialDatesReportPage.showContragentListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
-                               disabled="#{mainPage.specialDatesReportPage.applyUserSettings}"
-                               oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener
-                        value="#{mainPage.specialDatesReportPage.contragentStringIdOfOrgList}"
-                        target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-                <f:setPropertyActionListener value="Выбор организации - источника меню" target="#{mainPage.orgFilterPageName}" />
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{mainPage.specialDatesReportPage.contragentFilter}}" />
-        </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup id="orgFilter">
