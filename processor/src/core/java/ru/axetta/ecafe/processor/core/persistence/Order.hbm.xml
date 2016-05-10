@@ -64,8 +64,7 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrderDetail"/>
         </set>
-        <property name="isFromFriendlyOrg" column="IsFromFriendlyOrg" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
-                  not-null="true"/>
+        <property name="isFromFriendlyOrg" column="IsFromFriendlyOrg" type="boolean" not-null="true"/>
     </class>
 </hibernate-mapping>
 
