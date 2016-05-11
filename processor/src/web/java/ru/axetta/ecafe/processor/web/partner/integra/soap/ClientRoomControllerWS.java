@@ -135,6 +135,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ORDER_PUBLICATION_ALREADY_EXISTS = 370L;
     private static final Long RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN = 380L;
     private static final Long RC_ORG_HOLDER_NOT_FOUND = 390L;
+    private static final Long RC_CLIENT_GUID_NOT_FOUND = 400L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -159,6 +160,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORDER_PUBLICATION_ALREADY_EXISTS_DESC = "Заказ на выбранную книгу уже существует";
     private static final String RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN_DESC = "Клиент не найден или не является опекаемым для данного опекуна";
     private static final String RC_ORG_HOLDER_NOT_FOUND_DESC = "Не найдена организация - держатель экземпляра";
+    private static final String RC_CLIENT_GUID_NOT_FOUND_DESC = "GUID клиента не найден";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -7314,5 +7316,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
       // visitorsSummaryList.put(visitorsSummary.id,visitorsSummary);
         return visitorsSummaryList;
+    }
+
+    @Override
+    public ClientGuidResult getClientGuidByContractId(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+
+        ClientGuidResult result = new ClientGuidResult();
+        try {
+            DAOService daoService = DAOService.getInstance();
+            Client client = daoService.getClientByContractId(contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            if (client.getClientGUID() == null) {
+                result.resultCode = RC_CLIENT_GUID_NOT_FOUND;
+                result.description = RC_CLIENT_GUID_NOT_FOUND_DESC;
+                return result;
+            }
+            result.clientGUID = client.getClientGUID();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Failed to generate linking token", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
     }
 }

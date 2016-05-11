@@ -456,4 +456,6 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getVisitorsSummaryByDate")
     public VisitorsSummaryResult getVisitorsSummaryByDate(@WebParam(name = "dateTime")Long datetime);
 
+    @WebMethod ClientGuidResult getClientGuidByContractId(@WebParam(name = "contractId") Long contractId);
+
 }
