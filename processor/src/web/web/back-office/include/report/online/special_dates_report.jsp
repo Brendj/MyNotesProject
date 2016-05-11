@@ -82,16 +82,18 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" id="specialDatesReportTable">
-        <f:verbatim>
-            <style type="text/css">
-                div.htmlReportContent :empty {
-                    display: none;
-                }
-            </style>
-            <div class="htmlReportContent">
-                    ${mainPage.specialDatesReportPage.htmlReport}
-            </div>
-        </f:verbatim>
+        <c:if test="${not empty mainPage.specialDatesReportPage.htmlReport}">
+            <h:outputText escape="true" value="Отчет по учебным дням" styleClass="output-text" />
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent"> ${mainPage.specialDatesReportPage.htmlReport} </div>
+            </f:verbatim>
+            <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
+        </c:if>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

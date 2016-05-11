@@ -105,6 +105,7 @@ public class SpecialDatesReportPage extends OnlineReportPage {
     }
 
     public Object buildReportHTML() {
+        htmlReport = null;
         if (validateFormData())  return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
