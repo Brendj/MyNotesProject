@@ -10,10 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
@@ -40,6 +36,13 @@ import java.util.*;
 public class User {
     public static final String USER_ID_ATTRIBUTE_NAME = "ru.axetta.ecafe.userId";
     public static final String USER_IP_ADDRESS_ATTRIBUTE_NAME = "ru.axetta.ecafe.ipAddress";
+
+    private static final String PASS_LETTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String PASS_SPECIAL_SYMBOLS = "0123456789[]{},.<>;:|\\/?!`~@#$%^&*()-_=+";
+    private static final int MIN_PASSWORD_LENGTH = 6;
+    public static final Integer PASSWORD_EXPIRED_AFTER_DAYS = 120; //Период действия пароля после последней смены, в днях
+    public static final Integer MAX_FAULT_LOGIN_ATTEMPTS = 10; //сколько попыток неудачного логина допустимо. После превышения блокируем пользователя
+    public static final Integer BLOCK_ON_FAULT_LOGIN_MINUTES = 5; //блокируем на сколько минут
 
     protected static Logger logger;
     static {
@@ -71,7 +74,7 @@ public class User {
     }
 
     public Boolean getNeedChangePassword() {
-        return needChangePassword;
+        return needChangePassword || (CalendarUtils.getDifferenceInDays(passwordDate, new Date(System.currentTimeMillis())) > PASSWORD_EXPIRED_AFTER_DAYS);
     }
 
     public void setNeedChangePassword(Boolean needChangePassword) {
@@ -83,6 +86,32 @@ public class User {
             throw new CredentialException("Не допускается использовать пароль, совпадающий с действующим на данный момент");
         }
         this.setPassword(plainPassword);
+    }
+
+    public Date getPasswordDate() {
+        return passwordDate;
+    }
+
+    public void setPasswordDate(Date passwordDate) {
+        this.passwordDate = passwordDate;
+    }
+
+    public Integer getAttemptNumber() {
+        return attemptNumber;
+    }
+
+    public void setAttemptNumber(Integer attemptNumber) {
+        this.attemptNumber = attemptNumber;
+    }
+
+    public User incAttemptNumbersAndBlock() {
+        Integer currentAttempts = attemptNumber == null ? 0 : attemptNumber;
+        this.setAttemptNumber(currentAttempts + 1);
+        if (attemptNumber > MAX_FAULT_LOGIN_ATTEMPTS) {
+            this.setBlocked(true);
+            this.setBlockedUntilDate(new Date(System.currentTimeMillis() + BLOCK_ON_FAULT_LOGIN_MINUTES * 60 * 1000));
+        }
+        return DAOService.getInstance().setUserInfo(this);
     }
 
     public enum DefaultRole{
@@ -148,6 +177,8 @@ public class User {
     private String region;
     private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
     private Date blockedUntilDate;
+    private Date passwordDate;
+    private Integer attemptNumber;
 
     public String getRoleName() {
         return roleName;
@@ -467,7 +498,7 @@ public class User {
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendMessageAsync(fakeClient, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
                         new String[]{"linkingToken", code}, new Date());*/
-        String errCode = sendServiceSMSRequest(user.getPhone(), code);
+        String errCode = sendServiceSMSRequest(user, code);
         if (errCode.equals("0")) {
             user.setLastSmsCode(code);
             user.setSmsCodeEnterDate(null);
@@ -478,12 +509,27 @@ public class User {
         }
     }
 
-    private static String sendServiceSMSRequest(String mobile, String code) throws Exception {
-        NameValuePair[] parameters = new NameValuePair[] {
+    //todo Временная заглушка. В продакшене должен использоваться метод серверного обращения к сервису смс ниже - sendServiceSMSRequest
+    public static String getStubSMS(String userName) {
+        try {
+            User user = DAOService.getInstance().findUserByUserName(userName);
+            if (user == null) {
+                return "#";
+            }
+            return "http://utils.services.altarix.ru:8000/sms/output/?login=i-teco&passwd=e2GDH0&service=14&msisdn=".concat(user.getPhone())
+                    .concat("&text=Код авторизации - ").concat(user.getLastSmsCode()).concat("&operation=send&type=sms");
+        } catch (Exception e) {
+            return "#";
+        }
+    }
+
+    private static String sendServiceSMSRequest(final User user, String code) throws Exception {
+        return "0";
+        /*NameValuePair[] parameters = new NameValuePair[] {
             new NameValuePair("login", "i-teco"),
             new NameValuePair("passwd", "e2GDH0"),
             new NameValuePair("service", "14"),
-            new NameValuePair("msisdn", mobile),
+            new NameValuePair("msisdn", user.getPhone()),
             new NameValuePair("text", String.format("Код авторизации - %s", code)),
             new NameValuePair("operation", "send"),
             new NameValuePair("type", "sms"),
@@ -495,14 +541,7 @@ public class User {
         try {
             HttpClient httpClient = new HttpClient();
             httpClient.getParams().setContentCharset("UTF-8");
-            int statusCode = HttpStatus.SC_BAD_REQUEST;
-            for (int attempts=0;attempts<3;++attempts) {
-                statusCode = httpClient.executeMethod(httpMethod);
-                attempts++;
-                if (statusCode == HttpStatus.SC_OK) {
-                    break;
-                }
-            }
+            int statusCode = httpClient.executeMethod(httpMethod);
             if (statusCode != HttpStatus.SC_OK) {
                 return "Ошибка сети или неправильный формат мобильного телефона";
             }
@@ -520,9 +559,12 @@ public class User {
                 errCode = st.nextToken();
             }
             return errCode;
-        } finally {
-            httpMethod.releaseConnection();
+        } catch (Exception e) {
+            return "Ошибка при обращении к сервису отправки СМС";
         }
+        finally {
+            httpMethod.releaseConnection();
+        }*/
     }
 
     private static String generateSmsCode() {
@@ -558,18 +600,30 @@ public class User {
     public boolean blockedDateExpired() {
         if ((blockedUntilDate == null) || (new Date().before(blockedUntilDate))) return false;
         this.setBlocked(false);
-        DAOService.getInstance().setUserInfo(this);
+        this.setBlockedUntilDate(null);
+        this.setAttemptNumber(0);
+        //DAOService.getInstance().setUserInfo(this);
         return true;
     }
 
-    private static Client createFakeClient(String mobile) {
-        Client client = new Client();
-        client.setMobile(mobile);
-        Person person = new Person();
-        person.setFirstName("1");
-        person.setSecondName("2");
-        person.setSurname("3");
-        client.setPerson(person);
-        return client;
+    public static boolean passwordIsEnoughComplex(String password) {
+        if (password == null || password.length() < MIN_PASSWORD_LENGTH) {
+            return false;
+        }
+        boolean hasLetters = false;
+        boolean hasLettersCaps = false;
+        boolean hasSpecialSymbols = false;
+        for (int i = 0; i < password.length(); i++) {
+            if (PASS_LETTERS.contains(password.subSequence(i,i+1))) {
+                hasLetters = true;
+            }
+            if (PASS_LETTERS.toUpperCase().contains(password.subSequence(i,i+1))) {
+                hasLettersCaps = true;
+            }
+            if (PASS_SPECIAL_SYMBOLS.contains(password.subSequence(i,i+1))) {
+                hasSpecialSymbols = true;
+            }
+        }
+        return hasLetters && hasLettersCaps && hasSpecialSymbols;
     }
 }

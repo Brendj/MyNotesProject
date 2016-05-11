@@ -851,7 +851,15 @@ public class MainPage implements Serializable {
                 .equals(userEditPage.getPlainPassword(), userEditPage.getPlainPasswordConfirmation())) {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-        } else {
+        } else if (!User.passwordIsEnoughComplex(userEditPage.getPlainPassword())) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Пароль не удовлетворяет требованиям безопасности:", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- минимальная длина - 6 символов", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
+        }
+        else {
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -915,30 +923,35 @@ public class MainPage implements Serializable {
         if (!StringUtils.equals(userCreatePage.getPlainPassword(), userCreatePage.getPlainPasswordConfirmation())) {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
+        } else if (!User.passwordIsEnoughComplex(userCreatePage.getPlainPassword())) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Пароль не удовлетворяет требованиям безопасности:", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- минимальная длина - 6 символов", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
         } else {
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                userCreatePage.createUser(persistenceSession);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
-            } catch (Exception e) {
-                logger.error("Failed to create user", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при создании пользователя: " + e.getMessage(), null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-
-
+                RuntimeContext runtimeContext = null;
+                Session persistenceSession = null;
+                Transaction persistenceTransaction = null;
+                try {
+                    runtimeContext = RuntimeContext.getInstance();
+                    persistenceSession = runtimeContext.createPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    userCreatePage.createUser(persistenceSession);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    facesContext.addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
+                } catch (Exception e) {
+                    logger.error("Failed to create user", e);
+                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Ошибка при создании пользователя: " + e.getMessage(), null));
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
             }
-        }
         return null;
     }
 
@@ -8725,9 +8738,21 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ОШИБКА: введенные значения не совпадают", null));
             return null;
         }
+        if (!User.passwordIsEnoughComplex(newPassword)) {
+            /*facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));*/
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Пароль не удовлетворяет требованиям безопасности:", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- минимальная длина - 6 символов", null));
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
+            return false;
+        }
         try {
             user.doChangePassword(newPassword);
             user.setNeedChangePassword(false);
+            user.setPasswordDate(new Date(System.currentTimeMillis()));
             DAOService.getInstance().setUserInfo(user);
             context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
         } catch (CredentialException e) {

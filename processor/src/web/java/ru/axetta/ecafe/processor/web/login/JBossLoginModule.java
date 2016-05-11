@@ -272,6 +272,7 @@ public class JBossLoginModule implements LoginModule {
                 userPrincipal = new PrincipalImpl(username);
                 user.setLastEntryIP(request.getRemoteAddr());
                 user.setLastEntryTime(new Date());
+                user.setAttemptNumber(0); //при успешном логине сбрасываем количество ошибочных попыток входа
                 logger.debug("User \"{}\": password validation successful", username);
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createSuccessAuthRecord(request.getRemoteAddr(), username, user);
@@ -281,6 +282,19 @@ public class JBossLoginModule implements LoginModule {
                 httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
                 loginSucceeded = true;
             } else {
+                user = user.incAttemptNumbersAndBlock();
+                if (user.getAttemptNumber() > User.MAX_FAULT_LOGIN_ATTEMPTS) {
+                    request.setAttribute("errorMessage",
+                            String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
+                                    username, User.BLOCK_ON_FAULT_LOGIN_MINUTES));
+                    String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username, User.MAX_FAULT_LOGIN_ATTEMPTS);
+                    logger.debug(mess);
+                    SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                            .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                                    SecurityJournalAuthenticate.DenyCause.MAX_FAULT_LOGIN_ATTEMPTS.getIdentification());
+                    DAOService.getInstance().writeAuthJournalRecord(record);
+                    throw new LoginException(mess);
+                }
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createLoginFaultRecord(request.getRemoteAddr(), username, user,
                                 SecurityJournalAuthenticate.DenyCause.WRONG_PASSWORD.getIdentification());

@@ -25,7 +25,7 @@
         <tr valign="middle">
             <td align="center">
                 <h:panelGrid cellpadding="0" cellspacing="0">
-                    <a4j:form id="confirmSmsForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                    <a4j:form id="changePasswordForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
                     <rich:panel header="Необходима смена пароля" styleClass="login-panel"
                                 headerClass="login-panel-header" bodyClass="login-panel-body">
                         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

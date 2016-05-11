@@ -156,6 +156,10 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
             printError("Недопустимое значение для нового пароля");
             return false;
         }
+        if (!User.passwordIsEnoughComplex(plainPassword)) {
+            printError("Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
+            return false;
+        }
         if(!StringUtils.equals(plainPassword,plainPasswordConfirmation)) {
             printError("Новый пароль и подтверждение не совпадают");
             return false;

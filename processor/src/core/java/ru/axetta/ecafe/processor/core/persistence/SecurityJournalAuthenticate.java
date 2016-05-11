@@ -218,7 +218,8 @@ public class SecurityJournalAuthenticate implements Serializable {
         USER_BLOCKED(3, "Пользователь заблокирован"),
         LONG_INACTIVITY(4, "Длительное неиспользование учетной записи"),
         WRONG_AUTH_URL(5, "Неверный адрес аутентификации"),
-        WRONG_PASSWORD(6, "Неверный пароль");
+        WRONG_PASSWORD(6, "Неверный пароль"),
+        MAX_FAULT_LOGIN_ATTEMPTS(7, "Превышено максимально возможное количество неудачных попыток входа");
 
         private Integer identification;
         private String description;

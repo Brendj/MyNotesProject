@@ -239,6 +239,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         user.setIdOfRole(idOfRole);
         user.setBlocked(false);
+        user.setPasswordDate(new Date(System.currentTimeMillis()));
         if (User.DefaultRole.DEFAULT.equals(role)) {
             if (StringUtils.isEmpty(roleName)) {
                 this.printError("Заполните имя роли");

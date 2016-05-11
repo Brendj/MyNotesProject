@@ -9,16 +9,21 @@
 <%@ page import="javax.faces.context.FacesContext" %>
 <%
     try {
-    if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
-        String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
-        response.sendRedirect(mainPage);
-        return;
+        if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
+            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+            response.sendRedirect(mainPage);
+            return;
+        }
+    } catch (Exception e) {
+            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+            response.sendRedirect(mainPage);
     }
-    if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.isNeedChangePassword(request.getRemoteUser())) {
-        String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
-        response.sendRedirect(mainPage);
-        return;
-    }
+    try {
+        if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.isNeedChangePassword(request.getRemoteUser())) {
+            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/change-password.faces");
+            response.sendRedirect(mainPage);
+            return;
+        }
     } catch (Exception e) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                 e.getMessage(), null));

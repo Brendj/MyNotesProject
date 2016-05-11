@@ -129,6 +129,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         user.setUserName(userName);
         if (changePassword) {
             user.setPassword(plainPassword);
+            user.setPasswordDate(new Date(System.currentTimeMillis()));
         }
         user.setPhone(phone);
         user.setEmail(email);

@@ -37,6 +37,8 @@
         <property name="needChangePassword" column="NeedChangePassword" type="boolean" not-null="true"/>
         <property name="region" column="Region" type="string" length="128" not-null="false"/>
         <property name="blockedUntilDate" column="BlockedUntilDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="passwordDate" column="PasswordDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="attemptNumber" column="AttemptNumber" type="integer"/>
 
         <set name="contragents" table="CF_UserContragents">
             <key column="IdOfUser"/>
