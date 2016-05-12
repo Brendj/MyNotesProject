@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SmsAddressesReport" pageWidth="1510" pageHeight="595" orientation="Landscape" columnWidth="1470" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="ef1b814a-1ef5-4d07-9b7f-015204ea0c57">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="291"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Column header" forecolor="#666666" fill="Solid" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman">
 		<pen lineWidth="1.0" lineStyle="Solid"/>
@@ -19,7 +19,7 @@
 	<field name="serviceSendTime" class="java.util.Date"/>
 	<field name="deliveryTime" class="java.util.Date"/>
 	<field name="price" class="java.lang.Long"/>
-	<field name="eventType" class="java.lang.String"/>
+	<field name="eventType" class="java.lang.Integer"/>
 	<field name="eventId" class="java.lang.Long"/>
 	<field name="contractId" class="java.lang.Long"/>
 	<field name="fio" class="java.lang.String"/>
