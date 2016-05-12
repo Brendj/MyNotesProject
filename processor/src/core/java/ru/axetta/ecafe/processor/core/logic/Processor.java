@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -3642,8 +3643,10 @@ public class Processor
             persistenceSession.refresh(org);
             List<AccountTransactionExtended> accountTransactionList = null;
             try {
-                accountTransactionList = getAccountTransactionsForOrgSinceTimeV2(persistenceSession, org, fromDateTime,
+                accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, fromDateTime,
                     currentDate);
+                /*accountTransactionList = getAccountTransactionsForOrgSinceTimeV2(persistenceSession, org, fromDateTime,
+                        currentDate);*/
                 for (AccountTransactionExtended accountTransaction : accountTransactionList) {
                     accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
                 }

@@ -16,8 +16,6 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -28,7 +26,6 @@ import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1072,7 +1069,7 @@ public class DAOUtils {
      * @param toDateTime время до которого учитывается <=
      * @return возвращается список транзакций клиентов
      */
-    @SuppressWarnings("unchecked")
+    /*@SuppressWarnings("unchecked")
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Org org,
             Date fromDateTime, Date toDateTime) {
         Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
@@ -1113,7 +1110,7 @@ public class DAOUtils {
                 .addScalar("complexsum", StandardBasicTypes.BIG_DECIMAL).addScalar("discountsum", StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
-    }
+    }*/
 
     @SuppressWarnings("unchecked")
     public static List<Card> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs, List<Long> clientIds) {
