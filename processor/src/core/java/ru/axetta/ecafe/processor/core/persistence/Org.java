@@ -369,7 +369,7 @@ public class Org implements Serializable {
         this.idOfOrg = idOfOrg;
     }
 
-    private long getVersion() {
+    public long getVersion() {
         // For Hibernate only
         return version;
     }

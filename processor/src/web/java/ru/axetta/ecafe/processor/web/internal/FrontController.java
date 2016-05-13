@@ -21,8 +21,10 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1087,4 +1089,32 @@ public class FrontController extends HttpServlet {
         return clientsList;
     }
 
+    @WebMethod
+    public List<OrgIstkSummaryItem> getOrgsForIstkSync() throws FrontControllerException {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        List<OrgIstkSummaryItem> listResult = new LinkedList<OrgIstkSummaryItem>();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria criteria = persistenceSession.createCriteria(Org.class);
+            criteria.addOrder(org.hibernate.criterion.Order.asc("idOfOrg"));
+
+            List<Org> list = criteria.list();
+            for (Org org : list) {
+                OrgIstkSummaryItem item = new OrgIstkSummaryItem(org.getShortName(), org.getIdOfOrg(), org.getAddress(),
+                        org.getVersion(), org.getGuid());
+                listResult.add(item);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при синхронизации организаций с инфокиосками", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return listResult;
+    }
 }
