@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
-import java.util.Date;
 import java.util.List;
 
 
@@ -587,6 +586,6 @@ public interface FrontController {
     public ClientsInsideItem getClientsInside(@WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg,
             @WebParam(name = "mode", targetNamespace = "") int mode,
             @WebParam(name = "group", targetNamespace = "") String group,
-            @WebParam(name = "requestDate", targetNamespace = "") Date requestDate);
+            @WebParam(name = "requestDate", targetNamespace = "") long requestDate);
 
 }

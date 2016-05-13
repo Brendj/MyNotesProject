@@ -1037,7 +1037,7 @@ public class FrontController extends HttpServlet {
     }
 
     public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "requestDate") Date requestDate) throws FrontControllerException {
+            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1045,11 +1045,12 @@ public class FrontController extends HttpServlet {
         List<ClientsInsideItem> clientsList = new ArrayList<ClientsInsideItem>();
 
         //Обнуление часов, минут, секунд
-        requestDate.setHours(0);
-        requestDate.setMinutes(0);
-        requestDate.setSeconds(0);
+        Date date = new Date(requestDate);
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
 
-        Date secondDate =  CalendarUtils.addOneDay(requestDate);
+        Date secondDate =  CalendarUtils.addOneDay(date);
 
         if (mode == 1) {
             try {
@@ -1060,7 +1061,7 @@ public class FrontController extends HttpServlet {
                         + "FROM cf_enterevents ee WHERE ee.idoforg = :idOfOrg  AND ee.evtdatetime BETWEEN :startDate AND :endDate AND ee.idofclient IS NOT null AND "
                         + "ee.PassDirection IN (0, 1, 5, 6, 7, 100, 101, 102)");
                 query.setParameter("idOfOrg", idOfOrg);
-                query.setParameter("startDate", requestDate.getTime());
+                query.setParameter("startDate", date.getTime());
                 query.setParameter("endDate", secondDate.getTime());
 
                 List result = query.list();
