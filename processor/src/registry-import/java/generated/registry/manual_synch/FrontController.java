@@ -575,6 +575,7 @@ public interface FrontController {
      * @param idOfOrg
      * @param mode
      * @param group
+     * @param requestDate
      * @return returns java.util.List<generated.registry.manual_synch.ClientInsideItem>
      */
     @WebMethod
