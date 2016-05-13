@@ -17,6 +17,8 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -32,6 +34,7 @@ import java.util.*;
 public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.Builder {
 
     private final String templateFilename;
+    private final static Logger logger = LoggerFactory.getLogger(OutOfSynchronizationReportBuilder.class);
 
     public OutOfSynchronizationReportBuilder(String templateFilename) {
         this.templateFilename = templateFilename;
@@ -102,7 +105,15 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "ORDER BY cfos.lastsucbalancesync DESC NULLS LAST, cfor.statusdetailing DESC");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
+        logger.info("OutOfSynchronizationReport start query");
+
         List result = query.list();
+
+        if (result != null) {
+            logger.info(String.format("OutOfSynchronizationReport query result = %s records", result.size()));
+        } else {
+            logger.info("OutOfSynchronizationReport query result is null");
+        }
 
         for (Object resultItem : result) {
             Object[] object = (Object[]) resultItem;
@@ -126,6 +137,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
             }
+        logger.info("OutOfSynchronizationReport OK");
 //        Collections.sort(outOfSynchronizationReportList);
         return new JRBeanCollectionDataSource(outOfSynchronizationReportList);
     }

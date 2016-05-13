@@ -274,12 +274,16 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                             basicReport.setReportProperties(reportProperties);
                             reportInfo = registerQuartzJobTriggeredStage(subject, idOfOrg, currRule);
                             try {
-                                    reportDocument = documentBuilder.buildDocument(currRule.getRuleId() + "", basicReport);
-                            }catch(Exception ex) {
+                                logger.info(String.format("Start build report with rule id=%s, report class=%s", currRule.getRuleId(), basicReport.getClass().getSimpleName()));
+                                reportDocument = documentBuilder.buildDocument(currRule.getRuleId() + "", basicReport);
+                                logger.info(String.format("End build report with rule id=%s, report class=%s", currRule.getRuleId(), basicReport.getClass().getSimpleName()));
+                            }catch(Throwable ex) {
                                 String fullStackTrace = ExceptionUtils.getFullStackTrace(ex);
                                 registerErrorDuringReportGeneration(reportInfo, fullStackTrace);
                                 logger.error(String.format("Error during report generation with report info id=%d. Error is %s", reportInfo.getIdOfReportInfo(), ExceptionUtils.getFullStackTrace(ex)));
-                                continue;
+                                if (ex instanceof Exception) {
+                                    continue;
+                                }
                             }
                             if (basicReport instanceof BasicReportJob) {
                                 BasicReportJob basicReportJob = (BasicReportJob) basicReport;
