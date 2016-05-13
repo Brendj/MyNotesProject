@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -129,6 +131,26 @@ public class FrontController extends HttpServlet {
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeItemsInternalV2")
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsInternalV2(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+            @WebParam(name = "nameFilter") String nameFilter) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
+        Integer af = actionFilter;
+        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            af = null;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
     }
 
     @WebMethod(operationName = "refreshRegistryChangeItems")
@@ -1012,6 +1034,61 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return listResult;
+    }
+
+    public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group) throws FrontControllerException {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        List<ClientsInsideItem> clientsList = new ArrayList<ClientsInsideItem>();
+
+        //Дата текущая
+        Date currentDate = new Date();
+
+        //Обнуление часов, минут, секунд
+        currentDate.setHours(0);
+        currentDate.setMinutes(0);
+        currentDate.setSeconds(0);
+
+        Date secondDate =  CalendarUtils.addOneDay(currentDate);
+
+        if (mode == 1) {
+            try {
+                persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                Query query = persistenceSession.createSQLQuery("SELECT ee.idofclient "
+                        + "FROM cf_enterevents ee LEFT JOIN cf_clients cs ON ee.idofclient = cs.idofclient "
+                        + "LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
+                        + "LEFT JOIN cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg = :idOfOrg  AND cs.idoforg = :idOfOrg AND ee.evtdatetime BETWEEN :startDate AND :endDate AND ee.idofclient IS NOT null AND "
+                        + "ee.PassDirection IN (0, 1, 5, 6, 7, 100, 101, 102) AND cs.idofclientgroup != 1100000060");
+                query.setParameter("idOfOrg", idOfOrg);
+                query.setParameter("startDate", currentDate.getTime());
+                query.setParameter("endDate", secondDate.getTime());
+
+                List result = query.list();
+
+                //Парсим данные
+                for (Object o : result) {
+                    ClientsInsideItem clientsInsideItem = new ClientsInsideItem();
+                    clientsInsideItem.setIdOfClient(((BigInteger) o).longValue());
+                    clientsList.add(clientsInsideItem);
+                }
+
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Ошибка при получении клиентов, которые сегодня хотя бы раз были в школе", e);
+                throw new FrontControllerException("Ошибка: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+
+        return clientsList;
     }
 
 }

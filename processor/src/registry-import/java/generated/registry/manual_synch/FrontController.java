@@ -1,7 +1,5 @@
-
 package generated.registry.manual_synch;
 
-import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -10,6 +8,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
+import java.util.List;
 
 
 /**
@@ -444,6 +443,29 @@ public interface FrontController {
         String nameFilter);
 
     /**
+     *
+     * @param idOfOrg
+     * @param nameFilter
+     * @param revisionDate
+     * @param actionFilter
+     * @return
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItemV2>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeItemsInternalV2", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeItemsInternalV2")
+    @ResponseWrapper(localName = "loadRegistryChangeItemsInternalResponseV2", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeItemsInternalResponseV2")
+    public List<RegistryChangeItemV2> loadRegistryChangeItemsInternalV2(
+            @WebParam(name = "idOfOrg", targetNamespace = "")
+            long idOfOrg,
+            @WebParam(name = "revisionDate", targetNamespace = "")
+            long revisionDate,
+            @WebParam(name = "actionFilter", targetNamespace = "")
+            int actionFilter,
+            @WebParam(name = "nameFilter", targetNamespace = "")
+            String nameFilter);
+
+    /**
      * 
      * @param cardNo
      * @param orgId
@@ -548,5 +570,21 @@ public interface FrontController {
         String error,
         @WebParam(name = "errorDetails", targetNamespace = "")
         String errorDetails);
+
+    /**
+     * @param idOfOrg
+     * @param mode
+     * @param group
+     * @return returns java.util.List<generated.registry.manual_synch.ClientInsideItem>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "getClientsInside", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.GetClientsInside")
+    @ResponseWrapper(localName = "getClientsInsideResponse", targetNamespace = "http://ru.axetta.ecafe",
+            className = "generated.registry.manual_synch.GetClientsInsideResponse")
+    public ClientsInsideItem getClientsInside(@WebParam(name = "idOfOrg", targetNamespace = "") long idOfOrg,
+            @WebParam(name = "mode", targetNamespace = "") int mode,
+            @WebParam(name = "group", targetNamespace = "") String group);
 
 }
