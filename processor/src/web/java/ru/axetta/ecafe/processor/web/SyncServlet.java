@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -160,7 +161,8 @@ public class SyncServlet extends HttpServlet {
             Org org;
             PublicKey publicKey;
             try {
-                org = findOrg(runtimeContext, idOfOrg);
+                //org = findOrg(runtimeContext, idOfOrg);
+                org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
                 publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();

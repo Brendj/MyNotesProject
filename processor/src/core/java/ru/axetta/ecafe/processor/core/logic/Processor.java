@@ -3640,7 +3640,7 @@ public class Processor
             persistenceTransaction = persistenceSession.beginTransaction();
 
             final Date currentDate = new Date();
-            persistenceSession.refresh(org);
+            //persistenceSession.refresh(org);
             List<AccountTransactionExtended> accountTransactionList = null;
             try {
                 accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, fromDateTime,

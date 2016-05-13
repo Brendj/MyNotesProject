@@ -61,6 +61,7 @@ public class DAOReadonlyService {
                 "where t.idOfOrg in (:orgs) AND t.transactionDate > :trans_begDate AND t.transactionDate <= :trans_endDate " +
                 "order by t.idOfClient";
         Session session = entityManager.unwrap(Session.class);
+        session.refresh(org);
         SQLQuery q = session.createSQLQuery(str_query);
         // заказы будем искать за последние 24 часа от времени запроса
         q.setParameter("orders_begDate", CalendarUtils.addDays(toDateTime, -1).getTime());
@@ -76,5 +77,16 @@ public class DAOReadonlyService {
                 .addScalar("complexsum", StandardBasicTypes.BIG_DECIMAL).addScalar("discountsum", StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
+    }
+
+    public Org findOrg(Long idOfOrg) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        Org org = (Org) session.get(Org.class, idOfOrg);
+        if (null == org) {
+            final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
+            logger.error(message);
+            throw new NullPointerException(message);
+        }
+        return org;
     }
 }
