@@ -1037,7 +1037,7 @@ public class FrontController extends HttpServlet {
     }
 
     public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "date") Date requestDate) throws FrontControllerException {
+            @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "requestDate") Date requestDate) throws FrontControllerException {
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
