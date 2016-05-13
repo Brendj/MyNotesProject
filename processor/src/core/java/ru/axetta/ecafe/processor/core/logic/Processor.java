@@ -1117,7 +1117,7 @@ public class Processor
             final OrganizationStructureRequest organizationStructureRequest = request.getOrganizationStructureRequest();
             if (organizationStructureRequest != null) {
                 organizationStructure = getOrganizationStructureData(request.getOrg(),
-                        organizationStructureRequest.getMaxVersion());
+                        organizationStructureRequest.getMaxVersion(), organizationStructureRequest.isAllOrgs());
             }
         } catch (Exception e) {
             String message = String
@@ -3770,16 +3770,20 @@ public class Processor
         return clientRegistry;
     }
 
-    private OrganizationStructure getOrganizationStructureData(Org org, long version) throws Exception {
+    private OrganizationStructure getOrganizationStructureData(Org org, long version, boolean isAllOrgs) throws Exception {
         OrganizationStructure organizationStructure = new OrganizationStructure();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            for (Org fOrg : org.getFriendlyOrg()) {
-                organizationStructure.addOrganizationStructureInfo(persistenceSession, fOrg.getIdOfOrg());
+            List<Org> list;
+            if (isAllOrgs) {
+                list = DAOUtils.getOrgsByStatusSinceVersion(persistenceSession, OrganizationStatus.ACTIVE, version);
+            } else {
+                list = DAOUtils.findAllFriendlyOrgs(persistenceSession, org.getIdOfOrg());
             }
+            organizationStructure.addOrganizationStructureInfo(persistenceSession, org, list, isAllOrgs);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {

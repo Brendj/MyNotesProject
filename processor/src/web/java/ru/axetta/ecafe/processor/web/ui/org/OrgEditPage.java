@@ -295,6 +295,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
+        org.setOrgStructureVersion(DAOUtils.nextVersionByOrgStucture(session));
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);

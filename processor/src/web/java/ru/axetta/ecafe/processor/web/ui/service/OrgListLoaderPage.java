@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.OrgListLoader;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
@@ -270,10 +268,12 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     return new OrgEntry(lineNo, 0, "Org has been modified", currentOrg.getIdOfOrg());
                 }
 
+                long version = DAOUtils.nextVersionByOrgStucture(session);
+
                 Org org = new Org(shortName, shortNameInfoService, officialName, address, shortAddress, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
-                        "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/");
+                        "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/", version);
                 org.setCity(city);
                 org.setDistrict(region);
                 org.setLocation("");

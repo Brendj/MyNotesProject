@@ -629,6 +629,13 @@ public class DAOUtils {
         return res;
     }
 
+    public static List<Org> getOrgsByStatusSinceVersion(Session session, OrganizationStatus status, long version) throws Exception {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("status", status));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
     public static Boolean allOrgRegistryChangeItemsApplied(Session session, Long idOfOrgRegistryChange) {
         Query q = session.createQuery("from OrgRegistryChangeItem where mainRegistry=:idOfOrgRegistryChange and applied=false");
         q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
@@ -2133,6 +2140,16 @@ public class DAOUtils {
     public static long nextVersionBySpecialDate(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select sd.version from cf_specialdates as sd order by sd.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static long nextVersionByOrgStucture(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select o.orgStructureVersion from cf_orgs as o order by o.orgStructureVersion desc limit 1 for update");
         Object o = query.uniqueResult();
         if(o!=null){
             version = Long.valueOf(o.toString())+1;

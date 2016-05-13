@@ -44,6 +44,7 @@ public class Org implements Serializable {
 
     private Long idOfOrg;
     private long version;
+    private Long orgStructureVersion;
     private String shortName;
     private String shortNameInfoService;
     private String officialName;
@@ -133,7 +134,7 @@ public class Org implements Serializable {
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
-            Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing) throws Exception {
+            Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing, Long orgStructureVersion) throws Exception {
         this.shortName = shortName;
         this.shortNameInfoService = shortNameInfoService;
         this.officialName = officialName;
@@ -174,6 +175,7 @@ public class Org implements Serializable {
         this.orgSync.setIdOfPacket(0L);
         this.orgSync.setOrg(this);
         updateTime = new Date();
+        this.orgStructureVersion = orgStructureVersion;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -375,6 +377,14 @@ public class Org implements Serializable {
     private void setVersion(long version) {
         // For Hibernate only
         this.version = version;
+    }
+
+    public Long getOrgStructureVersion() {
+        return orgStructureVersion;
+    }
+
+    public void setOrgStructureVersion(Long orgStructureVersion) {
+        this.orgStructureVersion = orgStructureVersion;
     }
 
     public Long getSubscriptionPrice() {
@@ -943,7 +953,7 @@ public class Org implements Serializable {
 
     @Override
     public String toString() {
-        return "Org{" + "idOfOrg=" + idOfOrg + ", version=" + version + ", shortName='" + shortName + '\''
+        return "Org{" + "idOfOrg=" + idOfOrg + ", version=" + version + ", globalVersion=" + orgStructureVersion + ", shortName='" + shortName + '\''
                 + ", shortNameInfoService='" + shortNameInfoService + '\''
                 + ", officialName='" + officialName + '\'' + ", address='" + address + '\'' + ", shortAddress='" + shortAddress + '\'' + ", phone='" + phone + '\''
                 + ", officialPerson=" + officialPerson + ", officialPosition='" + officialPosition + '\''

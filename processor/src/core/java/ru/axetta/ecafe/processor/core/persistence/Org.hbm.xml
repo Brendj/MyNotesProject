@@ -16,6 +16,7 @@
             </generator>
         </id>
         <version name="version" column="Version" type="long"/>
+        <property name="orgStructureVersion" column="orgStructureVersion" type="long" not-null="true"/>
         <property name="shortName" column="ShortName" type="string" length="128" unique="true" not-null="true"/>
         <property name="shortNameInfoService" column="ShortNameInfoService" type="string" length="128"/>
         <property name="officialName" column="OfficialName" type="string" length="256" not-null="true"/>

@@ -17,18 +17,29 @@ import org.w3c.dom.Node;
  */
 public class OrganizationStructureRequest {
     private final Long maxVersion;
+    private final boolean isAllOrgs;
 
-    private OrganizationStructureRequest(Long maxVersion) {
+    private OrganizationStructureRequest(Long maxVersion, boolean isAllOrgs) {
         this.maxVersion = maxVersion;
+        this.isAllOrgs = isAllOrgs;
     }
 
     public Long getMaxVersion() {
         return maxVersion;
     }
 
+    public boolean isAllOrgs() {
+        return isAllOrgs;
+    }
+
     static OrganizationStructureRequest build(Node organizationStructureRequestNode) throws Exception {
         final Long maxVersion = XMLUtils.getLongAttributeValue(organizationStructureRequestNode, "V");
-        return new OrganizationStructureRequest(maxVersion);
+        Boolean isAllOrgsValue = XMLUtils.getBooleanAttributeValue(organizationStructureRequestNode, "IsAllOrgs");
+        if (isAllOrgsValue == null){
+            isAllOrgsValue = false;
+        }
+        final boolean isAllOrgs = isAllOrgsValue;
+        return new OrganizationStructureRequest(maxVersion, isAllOrgs);
     }
 
 }

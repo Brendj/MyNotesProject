@@ -473,11 +473,13 @@ public class OrgCreatePage extends BasicWorkspacePage
             }
         }
 
+        long version = DAOUtils.nextVersionByOrgStucture(session);
+
         Org org = new Org(this.shortName, this.shortNameInfoService, this.officialName, this.address, this.shortAddress, officialPerson, this.officialPosition,
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.uniqueAddressId,
-                this.introductionQueue, this.additionalIdBuilding, this.statusDetailing);
+                this.introductionQueue, this.additionalIdBuilding, this.statusDetailing, version);
         org.setCity(city);
         org.setDistrict(district);
         org.setLocation(location);

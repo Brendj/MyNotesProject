@@ -30,3 +30,5 @@ CREATE TABLE cf_security_journal_processes
   REFERENCES cf_users (idofuser) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
+--Версия для справочника организаций, передаваемого на клиент
+ALTER TABLE cf_orgs ADD COLUMN orgStructureVersion BIGINT NOT NULL DEFAULT 0;

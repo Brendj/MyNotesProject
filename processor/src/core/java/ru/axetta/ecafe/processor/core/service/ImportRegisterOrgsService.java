@@ -173,6 +173,9 @@ public class ImportRegisterOrgsService {
                     if (org != null) {
                         orgRegistryChangeItem.setApplied(true);
                     }
+                    if (org != null) {
+                        org.setOrgStructureVersion(DAOUtils.nextVersionByOrgStucture(session));
+                    }
                     addToShortname++;
                     friendlyOrgs.add(org); //все созданные организации загоняем в список, чтобы ниже связать их как дружественные
                     session.persist(org);
@@ -221,7 +224,7 @@ public class ImportRegisterOrgsService {
                 0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
                 "", "", "",
                 orgRegistryChangeItem.getUnom(), orgRegistryChangeItem.getUnad(),
-                orgRegistryChangeItem.getUniqueAddressId(), "", additionalId, "/");
+                orgRegistryChangeItem.getUniqueAddressId(), "", additionalId, "/", 0L);
         org.setCity(orgRegistryChange.getCity());
         org.setDistrict(orgRegistryChange.getRegion());
         org.setLocation("");

@@ -5,12 +5,15 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,14 +48,23 @@ public class OrganizationStructure {
         return element;
     }
 
-    public void addOrganizationStructureInfo(Session session, Long idOfOrg){
-        Org org = (Org)session.load(Org.class, idOfOrg);
-        OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
-                org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
-                org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
-                org.getConfigurationProvider() != null ? org.getConfigurationProvider().getIdOfConfigurationProvider()
-                        : null);
-        organizationItemMap.put(org.getIdOfOrg(), item);
+    public void addOrganizationStructureInfo(Session session, Org org, List<Org> orgList, boolean isAllOrgs) {
+        List<Long> friendlyOrgsIds = new ArrayList<Long>();
+        if (isAllOrgs) {
+             friendlyOrgsIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
+        }
+        for(Org o : orgList) {
+            boolean isFriendly = true;
+            if (isAllOrgs) {
+                isFriendly = friendlyOrgsIds.contains(o.getIdOfOrg());
+            }
+            OrganizationStructureItem item = new OrganizationStructureItem(o.getIdOfOrg(), o.getType().ordinal(),
+                    o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
+                    o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
+                    o.getConfigurationProvider() != null ? o.getConfigurationProvider()
+                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict());
+            organizationItemMap.put(o.getIdOfOrg(), item);
+        }
     }
 
     private static class OrganizationStructureItem {
@@ -65,10 +77,12 @@ public class OrganizationStructure {
         private final String address;
         private final Boolean useSubscriptionFeeding;
         private final Long configurationId;
+        private final Boolean isFriendly;
+        private final String nCounty;
         //private final Long version;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId) {
+                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly, String nCounty) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -78,6 +92,8 @@ public class OrganizationStructure {
             this.address = address;
             this.useSubscriptionFeeding = useSubscriptionFeeding;
             this.configurationId = configurationId;
+            this.isFriendly = isFriendly;
+            this.nCounty = nCounty;
         }
 
         public Element toElement(Document document) throws Exception{
@@ -95,6 +111,8 @@ public class OrganizationStructure {
                 element.setAttribute("ConfId", Long.toString(configurationId));
             }
             element.setAttribute("Version", "-1"); //todo remove stub
+            element.setAttribute("Fr", isFriendly ? "1" : "0");
+            element.setAttribute("NCounty", nCounty);
             return element;
         }
 
