@@ -58,11 +58,13 @@ public class OrganizationStructure {
             if (isAllOrgs) {
                 isFriendly = friendlyOrgsIds.contains(o.getIdOfOrg());
             }
+            // подгрузка объекта из lazy инициализации
+            session.update(o);
             OrganizationStructureItem item = new OrganizationStructureItem(o.getIdOfOrg(), o.getType().ordinal(),
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     o.getConfigurationProvider() != null ? o.getConfigurationProvider()
-                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict());
+                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict(), o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
     }
@@ -79,10 +81,10 @@ public class OrganizationStructure {
         private final Long configurationId;
         private final Boolean isFriendly;
         private final String nCounty;
-        //private final Long version;
+        private final Long version;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly, String nCounty) {
+                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly, String nCounty, Long version) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -94,6 +96,7 @@ public class OrganizationStructure {
             this.configurationId = configurationId;
             this.isFriendly = isFriendly;
             this.nCounty = nCounty;
+            this.version = version;
         }
 
         public Element toElement(Document document) throws Exception{
@@ -106,11 +109,10 @@ public class OrganizationStructure {
             element.setAttribute("DirName", chief);
             element.setAttribute("Address", address);
             element.setAttribute("UsePaydableSF", useSubscriptionFeeding ? "1" : "0");
-            element.setAttribute("Version", "-1"); //todo remove stub
+            element.setAttribute("Version", Long.toString(version));
             if (configurationId != null) {
                 element.setAttribute("ConfId", Long.toString(configurationId));
             }
-            element.setAttribute("Version", "-1"); //todo remove stub
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
             return element;
