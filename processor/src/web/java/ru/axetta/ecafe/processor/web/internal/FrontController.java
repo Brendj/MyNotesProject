@@ -1060,10 +1060,8 @@ public class FrontController extends HttpServlet {
                 persistenceTransaction = persistenceSession.beginTransaction();
 
                 Query query = persistenceSession.createSQLQuery("SELECT ee.idofclient "
-                        + "FROM cf_enterevents ee LEFT JOIN cf_clients cs ON ee.idofclient = cs.idofclient "
-                        + "LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
-                        + "LEFT JOIN cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg = :idOfOrg  AND cs.idoforg = :idOfOrg AND ee.evtdatetime BETWEEN :startDate AND :endDate AND ee.idofclient IS NOT null AND "
-                        + "ee.PassDirection IN (0, 1, 5, 6, 7, 100, 101, 102) AND cs.idofclientgroup != 1100000060");
+                        + "FROM cf_enterevents ee WHERE ee.idoforg = :idOfOrg  AND ee.evtdatetime BETWEEN :startDate AND :endDate AND ee.idofclient IS NOT null AND "
+                        + "ee.PassDirection IN (0, 1, 5, 6, 7, 100, 101, 102)");
                 query.setParameter("idOfOrg", idOfOrg);
                 query.setParameter("startDate", currentDate.getTime());
                 query.setParameter("endDate", secondDate.getTime());
