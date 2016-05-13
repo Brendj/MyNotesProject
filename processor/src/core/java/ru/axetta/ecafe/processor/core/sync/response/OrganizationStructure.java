@@ -58,8 +58,6 @@ public class OrganizationStructure {
             if (isAllOrgs) {
                 isFriendly = friendlyOrgsIds.contains(o.getIdOfOrg());
             }
-            // подгрузка объекта из lazy инициализации
-            session.update(o);
             OrganizationStructureItem item = new OrganizationStructureItem(o.getIdOfOrg(), o.getType().ordinal(),
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),

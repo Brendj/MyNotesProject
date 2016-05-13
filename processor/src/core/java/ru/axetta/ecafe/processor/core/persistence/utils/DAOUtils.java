@@ -621,18 +621,16 @@ public class DAOUtils {
     }
     //Находит все включая текущую.
     public static List<Org> findAllFriendlyOrgs(Session session, long organization) throws Exception {
-        List<Long> orgIds = findFriendlyOrgIds(session, organization);
-        List<Org> res = new ArrayList<Org>();
-        for (Long idoforg : orgIds) {
-            res.add(DAOService.getInstance().getOrg(idoforg));
-        }
-        return res;
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.in("idOfOrg", findFriendlyOrgIds(session, organization)));
+        List<Org> result = criteria.list();
+        return result !=null ? result : new ArrayList<Org>();
     }
 
     public static List<Org> getOrgsByStatusSinceVersion(Session session, OrganizationStatus status, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("status", status));
-        criteria.add(Restrictions.gt("version", version));
+        criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();
     }
 
