@@ -304,10 +304,23 @@ public class ImportRegisterOrgsService {
         String synchDate = "[Синхронизация с Реестрами от " + date + " по всем ОУ]: ";
         log(synchDate + "Производится синхронизация по всем организациям", logBuffer);
 
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.NSI_ORGS, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
+
         //  Итеративно загружаем организации, используя ограничения
-        List<OrgInfo> orgs = nsiService.getOrgs(orgName);
-        log(synchDate + "Получено " + orgs.size() + " записей", logBuffer);
-        saveOrgs(synchDate, date, System.currentTimeMillis(), orgs, logBuffer);
+        try {
+            List<OrgInfo> orgs = nsiService.getOrgs(orgName);
+            log(synchDate + "Получено " + orgs.size() + " записей", logBuffer);
+            saveOrgs(synchDate, date, System.currentTimeMillis(), orgs, logBuffer);
+        } catch (Exception e) {
+            isSuccessEnd = false;
+            logger.error("Failed to refresh orgs from registry", e);
+        }
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                SecurityJournalProcess.EventType.NSI_ORGS, new Date());
+        processEnd.saveWithSuccess(isSuccessEnd);
         return logBuffer;
     }
 

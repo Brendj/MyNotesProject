@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -19,12 +18,13 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,6 +51,10 @@ public class OrderStateChangeService {
         if (!runtimeContext.isMainNode()) {
             return;
         }
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.ORDER_STATE_CHANGE, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
         Long duration = System.currentTimeMillis();
         Date currentDate = new Date();
         Date endDate = CalendarUtils.truncateToDayOfMonth(currentDate);
@@ -77,7 +81,11 @@ public class OrderStateChangeService {
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } finally {
+        } catch (Exception e) {
+            isSuccessEnd = false;
+            LOGGER.error("Error in OrderStateChangeService 1", e);
+        }
+        finally {
             HibernateUtils.rollback(persistenceTransaction, LOGGER);
             HibernateUtils.close(persistenceSession, LOGGER);
         }
@@ -124,6 +132,9 @@ public class OrderStateChangeService {
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        } catch (Exception e) {
+            isSuccessEnd = false;
+            LOGGER.error("Error in OrderStateChangeService 2", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, LOGGER);
             HibernateUtils.close(persistenceSession, LOGGER);
@@ -158,6 +169,9 @@ public class OrderStateChangeService {
                     });
                     try {
                         writeReportDocumentTo(orderItems, stringWriter, dateTimeFormat, emailSubject, startDate, endDate);
+                    } catch (Exception e) {
+                        isSuccessEnd = false;
+                        LOGGER.error("Error in OrderStateChangeService writeReportDocument", e);
                     } finally {
                         IOUtils.closeQuietly(stringWriter);
                     } //файл С//
@@ -172,6 +186,7 @@ public class OrderStateChangeService {
                             try {
                                 RuntimeContext.getInstance().getPostman().postNotificationEmail(address, emailSubject, stringWriter.toString());
                             } catch (Exception e) {
+                                isSuccessEnd = false;
                                 LOGGER.error("Failed to post event", e);
                             }
                         }
@@ -181,6 +196,9 @@ public class OrderStateChangeService {
         }
         duration = System.currentTimeMillis() - duration;
         LOGGER.debug("OrderStateChangeService generateTime: "+duration);
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                SecurityJournalProcess.EventType.ORDER_STATE_CHANGE, new Date());
+        processEnd.saveWithSuccess(isSuccessEnd);
     }
 
     protected static class ContragentItem {

@@ -1030,27 +1030,42 @@ public class ImportRegisterClientsService {
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
                 + "]", logBuffer);
 
-        //Проверка на устаревшие гуиды организаций
-        OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
-        List<String> list = service.getBadGuids(orgGuids.orgGuids);
-        if (list != null && !list.isEmpty()) {
-            String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
-            for (String g : list) {
-                badGuids += g;
-            }
-            throw new BadOrgGuidsException(badGuids); // UnsupportedOperationException(badGuids);
-        }
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
 
-        //  Итеративно загружаем клиентов, используя ограничения
-        List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
-        log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
-        //  !!!!!!!!!!
-        //  !!!!!!!!!!
-        //  parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
-        //  !!!!!!!!!!
-        //  !!!!!!!!!!
-        saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
-        return logBuffer;
+        try {
+            //Проверка на устаревшие гуиды организаций
+            OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
+            List<String> list = service.getBadGuids(orgGuids.orgGuids);
+            if (list != null && !list.isEmpty()) {
+                String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
+                for (String g : list) {
+                    badGuids += g;
+                }
+                isSuccessEnd = false;
+                throw new BadOrgGuidsException(badGuids); // UnsupportedOperationException(badGuids);
+            }
+
+            //  Итеративно загружаем клиентов, используя ограничения
+            List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
+            log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
+            //  !!!!!!!!!!
+            //  !!!!!!!!!!
+            //  parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
+            //  !!!!!!!!!!
+            //  !!!!!!!!!!
+            saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
+            return logBuffer;
+        } catch (Exception e) {
+            isSuccessEnd = false;
+            throw e;
+        } finally {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                    SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
+            processEnd.saveWithSuccess(isSuccessEnd);
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

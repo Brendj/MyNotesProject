@@ -259,14 +259,22 @@ public class RNIPLoadPaymentsService {
 
         long l = System.currentTimeMillis();
         info("Загрузка платежей РНИП..");
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.RNIP, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
         RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean(); //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
+                isSuccessEnd = isSuccessEnd && rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
             } catch (Exception e) {
+                isSuccessEnd = false;
                 logger.error("Failed to receive or proceed payments", e);
             }
         }
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                SecurityJournalProcess.EventType.RNIP, new Date());
+        processEnd.saveWithSuccess(isSuccessEnd);
         l = System.currentTimeMillis() - l;
         if(l > 50000){
             logger.warn("RNIPLoadPaymentsService time:" + l);
@@ -274,12 +282,12 @@ public class RNIPLoadPaymentsService {
         info("Загрузка платежей РНИП завершена");
     }
 
-    // @Transactional
-    public void receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
+    //returns true если не было ошибок, иначе false
+    public Boolean receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
-            return;
+            return true; //ошибки нет, у контрагента нет ремарки рнипа
         }
         Date lastUpdateDate = getLastUpdateDate(contragent);
 
@@ -293,7 +301,7 @@ public class RNIPLoadPaymentsService {
         }
 
         if (response == null) {
-            return;
+            return false;
         }
 
         info("Ответ на получение платежей для контрагента %s получен, разбор..", contragent.getContragentName());
@@ -301,10 +309,10 @@ public class RNIPLoadPaymentsService {
             String soapError = checkError(response);
             if (soapError != null) {
                 logger.error("Произошла ошибка при запросе в РНИП на получение платежей: " + soapError);
-                return;
+                return false;
             }
         } catch (Exception e) {
-            return;
+            return false;
         }
 
         info("Разбор новых платежей для контрагента %s..", contragent.getContragentName());
@@ -315,7 +323,7 @@ public class RNIPLoadPaymentsService {
         } catch (Exception e) {
             logger.error(
                     String.format("Не удалось разобрать платежи для контрагента %s", contragent.getContragentName()), e);
-            return;
+            return false;
         }
         info("Получено %s новых платежей для контрагента %s, применение..", res.getPayments().size(), contragent.getContragentName());
         //  И записываем в БД
@@ -344,6 +352,7 @@ public class RNIPLoadPaymentsService {
         //Сохранили
 
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
+        return true;
     }
 
     private String getTemplateFileName(int requestType) throws Exception {

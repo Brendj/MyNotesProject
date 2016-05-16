@@ -87,6 +87,11 @@ public class DAOService {
         entityManager.persist(record);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void writeProcessJournalRecord(SecurityJournalProcess record) {
+        entityManager.persist(record);
+    }
+
     public Boolean isMenuExchange(Long idOfOrg) {
         TypedQuery<Long> query = entityManager
                 .createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",

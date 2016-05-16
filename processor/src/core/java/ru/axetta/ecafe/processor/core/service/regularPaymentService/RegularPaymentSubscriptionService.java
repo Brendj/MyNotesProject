@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -87,6 +88,10 @@ public class RegularPaymentSubscriptionService {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
         }
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.REGULAR_PAYMENTS, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
         logger.info("RegularPaymentSubscriptionService work started.");
         List<Long> subIds = findSubscriptions(0, idOfOrg);
         Date today = new Date();
@@ -99,10 +104,14 @@ public class RegularPaymentSubscriptionService {
                     refillOneClientBalance(id);
                 }
             } catch (Exception ex) {
+                isSuccessEnd = false;
                 logger.error(ex.getMessage());
             }
         }
         logger.info("RegularPaymentSubscriptionService work is over.");
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                SecurityJournalProcess.EventType.REGULAR_PAYMENTS, new Date());
+        processEnd.saveWithSuccess(isSuccessEnd);
     }
 
     private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {

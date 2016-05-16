@@ -20,11 +20,11 @@ CREATE TABLE cf_security_journal_processes
 (
   idofjournalprocess bigserial not null,
   eventtype integer not null,
+  eventclass integer not null,
   eventdate bigint not null,
   idofuser bigint,
   issuccess boolean not null,
-  idofprocess integer not null,
-
+  serveraddress character varying(128),
   CONSTRAINT cf_security_journal_processes_pk PRIMARY KEY (idofjournalprocess),
   CONSTRAINT cf_security_journal_processes_fk FOREIGN KEY (idofuser)
   REFERENCES cf_users (idofuser) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION

@@ -10,7 +10,7 @@ import generated.emp_storage.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.apache.commons.lang.StringUtils;
@@ -163,7 +163,10 @@ public class EMPProcessor {
         if (!isAllowed()) {
             return;
         }
-
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.EMP_BIND_CLIENTS, new Date());
+        process.saveWithSuccess(true);
+        boolean isSuccessEnd = true;
         //  Загружаем статистику
         //EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
@@ -180,16 +183,21 @@ public class EMPProcessor {
         //  Отправка запроса на привязку
         StoragePortType storage = createStorageController();
         if (storage == null) {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_BIND_CLIENTS, new Date());
+            processEnd.saveWithSuccess(false);
             throw new EMPException("Failed to create connection with EMP web service");
         }
         for (ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
-                bindClient(storage, c, synchDate/*, statistics*/);
+                isSuccessEnd = isSuccessEnd && bindClient(storage, c, synchDate/*, statistics*/);
             } catch (EMPException empe) {
+                isSuccessEnd = false;
                 logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()),
                         empe);
             }
         }
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_BIND_CLIENTS, new Date());
+        processEnd.saveWithSuccess(isSuccessEnd); //todo дописать по примеру рнипа дальше
         //  Обновляем изменившуюся статистику
         //saveEMPStatistics(statistics);
     }
@@ -199,7 +207,9 @@ public class EMPProcessor {
         if (!isAllowed()) {
             return;
         }
-
+        SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
+        process.saveWithSuccess(true);
         //  Загружаем статистику
         //EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
@@ -210,12 +220,16 @@ public class EMPProcessor {
         long changeSequence = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_EMP_CHANGE_SEQUENCE);//750
         StoragePortType storage = createStorageController();
         if (storage == null) {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
+            processEnd.saveWithSuccess(false);
             throw new EMPException("Failed to create connection with EMP web service");
         }
         ReceiveDataChangesRequest request = buildReceiveEntryParams(changeSequence);
         logRequest(request);
         ReceiveDataChangesResponse response = storage.receiveDataChanges(request);
         if (response.getErrorCode() != 0) {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
+            processEnd.saveWithSuccess(false);
             logger.error(String.format("Failed to receive updates: [code=%s] %s", response.getErrorCode(),
                     response.getErrorMessage()));
             return;
@@ -223,6 +237,8 @@ public class EMPProcessor {
 
         List<ReceiveDataChangesResponse.Result.Entry> entries = response.getResult().getEntry();
         if (entries.size() < 1) {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
+            processEnd.saveWithSuccess(true);
             log(synchDate + "Новых изменений по очереди " + changeSequence + " в ЕМП нет");
             return;
         }
@@ -327,11 +343,13 @@ public class EMPProcessor {
             log(synchDate + "Изменения в ЕМП обработаны не до конца, запрос будет выполнен повторно");
             RuntimeContext.getAppContext().getBean(EMPProcessor.class).runReceiveUpdates();
         }
+        SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(SecurityJournalProcess.EventType.EMP_RECEIVE_UPDATES, new Date());
+        processEnd.saveWithSuccess(true);
         //  Обновляем изменившуюся статистику
         //saveEMPStatistics(statistics);
     }
 
-    protected void bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
+    protected Boolean bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
             String synchDate/*, EMPStatistics statistics*/) throws EMPException {
         /*if (bindThrowSelect(storage, client, synchDate)) {
             / *statistics.addBinded();
@@ -342,14 +360,14 @@ public class EMPProcessor {
         }*/
 
         if (bindThrowSelectByPhone(storage, client, synchDate)) {
-            return;
+            return true;
         }
 
         if (!findAndDeleteThrowSelectByContractId(storage, client, synchDate)) {
             log(synchDate + "Попытка удаления клиента [" + client.getIdOfClient() + "] " + client.getMobile()
                     + " с использованием поиска по контракту завершилась неудачей (см. причину выше)");
         }
-        bindThrowAdd(storage, client, synchDate);
+        return bindThrowAdd(storage, client, synchDate);
     }
 
     protected boolean bindThrowSelectByPhone(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,

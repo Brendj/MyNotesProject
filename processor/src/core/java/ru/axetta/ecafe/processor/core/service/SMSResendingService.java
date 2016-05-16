@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.PersistenceContext;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,8 +63,19 @@ public class SMSResendingService {
     }
 
     protected void processResendings(List<ClientSmsResending> resendings) {
+        if (resendings != null && resendings.size() > 0) {
+            SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
+                SecurityJournalProcess.EventType.SMS_RESENDING, new Date());
+            process.saveWithSuccess(true);
+        }
+        boolean isSuccessEnd = true;
         for(ClientSmsResending resending : resendings) {
-            boolean success = getInstance().processResendingMessage(resending);
+            isSuccessEnd = isSuccessEnd && getInstance().processResendingMessage(resending);
+        }
+        if (resendings != null && resendings.size() > 0) {
+            SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
+                    SecurityJournalProcess.EventType.SMS_RESENDING, new Date());
+            processEnd.saveWithSuccess(isSuccessEnd);
         }
     }
 
