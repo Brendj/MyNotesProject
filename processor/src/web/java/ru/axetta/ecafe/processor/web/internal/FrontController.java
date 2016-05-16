@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
@@ -18,13 +19,10 @@ import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -1040,53 +1037,26 @@ public class FrontController extends HttpServlet {
 
     public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
             @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
-
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-
-        List<ClientsInsideItem> clientsList = new ArrayList<ClientsInsideItem>();
-
-        //Обнуление часов, минут, секунд
-        Date date = new Date(requestDate);
-        date.setHours(0);
-        date.setMinutes(0);
-        date.setSeconds(0);
-
-        Date secondDate =  CalendarUtils.addOneDay(date);
-
-        if (mode == 1) {
-            try {
-                persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-
-                Query query = persistenceSession.createSQLQuery("SELECT ee.idofclient "
-                        + "FROM cf_enterevents ee WHERE ee.idoforg = :idOfOrg  AND ee.evtdatetime BETWEEN :startDate AND :endDate AND ee.idofclient IS NOT null AND "
-                        + "ee.PassDirection IN (0, 1, 5, 6, 7, 100, 101, 102)");
-                query.setParameter("idOfOrg", idOfOrg);
-                query.setParameter("startDate", date.getTime());
-                query.setParameter("endDate", secondDate.getTime());
-
-                List result = query.list();
-
-                //Парсим данные
-                for (Object o : result) {
+        try {
+            if (mode == 1) {
+                //Обнуление часов, минут, секунд
+                Date beginDate = CalendarUtils.truncateToDayOfMonth(new Date(requestDate));
+                Date endDate = CalendarUtils.addOneDay(beginDate);
+                List<Long> result = DAOReadonlyService.getInstance()
+                        .getClientsIdsWhereHasEnterEvents(idOfOrg, beginDate, endDate);
+                List<ClientsInsideItem> clientsList = new ArrayList<ClientsInsideItem>();
+                for (Long value : result) {
                     ClientsInsideItem clientsInsideItem = new ClientsInsideItem();
-                    clientsInsideItem.setIdOfClient(((BigInteger) o).longValue());
+                    clientsInsideItem.setIdOfClient(value.longValue());
                     clientsList.add(clientsInsideItem);
                 }
-
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Ошибка при получении клиентов, которые сегодня хотя бы раз были в школе", e);
-                throw new FrontControllerException("Ошибка: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+                return clientsList;
             }
+            throw new Exception(String.format("Неизвестное значение параметра 'mode'=%s", mode));
+        } catch (Exception e) {
+            logger.error("Ошибка при получении клиентов, которые сегодня хотя бы раз были в школе", e);
+            throw new FrontControllerException(String.format("Ошибка: %s", e.getMessage()));
         }
-
-        return clientsList;
     }
 
     @WebMethod

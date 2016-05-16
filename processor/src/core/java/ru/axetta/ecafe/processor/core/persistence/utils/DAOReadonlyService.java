@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -89,4 +92,24 @@ public class DAOReadonlyService {
         }
         return org;
     }
+
+    public List<Long> getClientsIdsWhereHasEnterEvents(long idOfOrg, Date beginDate, Date endDate) {
+        Session session = entityManager.unwrap(Session.class);
+        SQLQuery query = session.createSQLQuery(" SELECT ee.idofclient " +
+                " FROM cf_enterevents ee " +
+                " WHERE ee.idoforg = :idOfOrg  AND ee.evtdatetime BETWEEN :beginDate AND :endDate " +
+                " AND ee.idofclient IS NOT NULL AND ee.PassDirection IN (:passDirections)");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("beginDate", beginDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        query.setParameterList("passDirections",
+                Arrays.asList(EnterEvent.ENTRY, EnterEvent.EXIT, EnterEvent.PASSAGE_RUFUSAL, EnterEvent.RE_ENTRY,
+                        EnterEvent.RE_EXIT, EnterEvent.DETECTED_INSIDE, EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT));
+        query.addScalar("idofclient", StandardBasicTypes.LONG);
+        List result = query.list();
+        if (result == null)
+            return new ArrayList<Long>();
+        return result;
+    }
+
 }
