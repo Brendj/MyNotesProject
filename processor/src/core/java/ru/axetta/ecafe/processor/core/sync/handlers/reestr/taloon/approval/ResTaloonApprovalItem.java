@@ -84,6 +84,8 @@ public class ResTaloonApprovalItem {
         if (resultCode != null && resultCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
         }
+        // для поддежки старых версий
+        XMLUtils.setAttributeIfNotNull(element, "Qty", soldedQty);
         return element;
     }
 

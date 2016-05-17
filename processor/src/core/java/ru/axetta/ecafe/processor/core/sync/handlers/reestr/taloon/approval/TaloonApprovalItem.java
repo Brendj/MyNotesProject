@@ -59,8 +59,8 @@ public class TaloonApprovalItem {
         Integer ppState = null;
         Boolean deletedState = false;
         Long taloonNumber = null;
+        StringBuilder errorMessage = new StringBuilder();
 
-        String errorMessageComposite = "";
         //Три обязательных поля (orgId, date, name)- первичный ключ
         String strOrgId = XMLUtils.getAttributeValue(itemNode, "OrgId");
         if(StringUtils.isNotEmpty(strOrgId)){
@@ -68,66 +68,47 @@ public class TaloonApprovalItem {
                 orgId =  Long.parseLong(strOrgId);
                 Org o = DAOService.getInstance().getOrg(orgId);
                 if (o == null) {
-                    errorMessageComposite += String.format("Org with id=%s not found\n", orgId);
+                    errorMessage.append(String.format("Org with id=%s not found", orgId));
                 } else {
                     DAOService daoService = DAOService.getInstance();
                     Set<Org> fOrgs = daoService.getFriendlyOrgs(orgOwner);
                     if (!daoService.getInstance().isOrgFriendly(orgId, orgOwner)) {
-                        errorMessageComposite += String.format("Org id=%s is not friendly to Org id=%s", orgId, orgOwner);
+                        errorMessage.append(String.format("Org id=%s is not friendly to Org id=%s", orgId, orgOwner));
                     }
                 }
             } catch (NumberFormatException e){
-                errorMessageComposite += "NumberFormatException OrgId not found\n";
+                errorMessage.append("NumberFormatException OrgId not found");
             }
         } else {
-            errorMessageComposite += "Attribute OrgId not found\n";
+            errorMessage.append("Attribute OrgId not found");
         }
         String strDate = XMLUtils.getAttributeValue(itemNode,"Date");
         if(StringUtils.isNotEmpty(strDate)){
             try {
                 date = CalendarUtils.parseDate(strDate);
             } catch (Exception e){
-                errorMessageComposite += "Attribute Date not found or incorrect\n";
+                errorMessage.append("Attribute Date not found or incorrect");
             }
         } else {
-            errorMessageComposite += "Attribute Date not found\n";
+            errorMessage.append("Attribute Date not found");
         }
         name = XMLUtils.getAttributeValue(itemNode, "Name");
         if (StringUtils.isEmpty(name)) {
-            errorMessageComposite += "Attribute Name not found\n";
+            errorMessage.append( "Attribute Name not found");
         }
 
-        String strSoldedQty = XMLUtils.getAttributeValue(itemNode, "SoldedQty");
-        if (StringUtils.isNotEmpty(strSoldedQty)) {
-            try {
-                soldedQty = Integer.parseInt(strSoldedQty);
-            } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format SoldedQty\n";
+        if (isOldQtyFormat(itemNode)){
+            Integer qty = readIntegerValue(itemNode, "Qty", errorMessage);
+            if (qty != null) {
+                soldedQty = qty;
+                requestedQty = qty;
+                shippedQty = qty;
             }
-        } else {
-            errorMessageComposite += "Attribute SoldedQty not found\n";
         }
-
-        String strRequestedQty = XMLUtils.getAttributeValue(itemNode, "RequestedQty");
-        if (StringUtils.isNotEmpty(strRequestedQty)) {
-            try {
-                requestedQty = Integer.parseInt(strRequestedQty);
-            } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format RequestedQty\n";
-            }
-        } else {
-            errorMessageComposite += "Attribute RequestedQty not found\n";
-        }
-
-        String strShippedQty = XMLUtils.getAttributeValue(itemNode, "ShippedQty");
-        if (StringUtils.isNotEmpty(strShippedQty)) {
-            try {
-                shippedQty = Integer.parseInt(strShippedQty);
-            } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format ShippedQty\n";
-            }
-        } else {
-            errorMessageComposite += "Attribute ShippedQty not found\n";
+        else {
+            soldedQty = readIntegerValue(itemNode, "SoldedQty", errorMessage);
+            requestedQty = readIntegerValue(itemNode, "RequestedQty", errorMessage);
+            shippedQty = readIntegerValue(itemNode, "ShippedQty", errorMessage);
         }
 
         String strPrice = XMLUtils.getAttributeValue(itemNode, "Price");
@@ -135,10 +116,10 @@ public class TaloonApprovalItem {
             try {
                 price = Long.parseLong(strPrice);
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format Price\n";
+                errorMessage.append("NumberFormatException incorrect format Price");
             }
         } else {
-            errorMessageComposite += "Attribute Price not found\n";
+            errorMessage.append("Attribute Price not found");
         }
 
         String strCreatedType = XMLUtils.getAttributeValue(itemNode, "CreatedType");
@@ -146,13 +127,13 @@ public class TaloonApprovalItem {
             try {
                 createdType = Integer.parseInt(strCreatedType);
                 if (!createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_AUTO.ordinal()) && !createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_MANUAL.ordinal())) {
-                    errorMessageComposite += "Attribute CreatedType not valid\n";
+                    errorMessage.append("Attribute CreatedType not valid\n");
                 }
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format CreatedType\n";
+                errorMessage.append("NumberFormatException incorrect format CreatedType\n");
             }
         } else {
-            errorMessageComposite += "Attribute CreatedType not found\n";
+            errorMessage.append("Attribute CreatedType not found");
         }
 
         String strIsppState = XMLUtils.getAttributeValue(itemNode, "ISPP_State");
@@ -160,13 +141,13 @@ public class TaloonApprovalItem {
             try {
                 isppState = Integer.parseInt(strIsppState);
                 if (!isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal()) && !isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED.ordinal())) {
-                    errorMessageComposite += "Attribute ISPP_State not valid\n";
+                    errorMessage.append("Attribute ISPP_State not valid");
                 }
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format ISPP_State\n";
+                errorMessage.append("NumberFormatException incorrect format ISPP_State");
             }
         } else {
-            errorMessageComposite += "Attribute ISPP_State not found\n";
+            isppState = TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal();
         }
 
         String strPpState = XMLUtils.getAttributeValue(itemNode, "PP_State");
@@ -176,13 +157,13 @@ public class TaloonApprovalItem {
                 if (!ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal())
                         && !ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED.ordinal())
                         && !ppState.equals(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED.ordinal())) {
-                    errorMessageComposite += "Attribute PP_State not valid\n";
+                    errorMessage.append("Attribute PP_State not valid");
                 }
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format PP_State\n";
+                errorMessage.append("NumberFormatException incorrect format PP_State");
             }
         } else {
-            errorMessageComposite += "Attribute PP_State not found\n";
+            ppState = TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal();
         }
 
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
@@ -190,7 +171,7 @@ public class TaloonApprovalItem {
             try {
                 deletedState = (Integer.parseInt(strDeletedState) == 1);
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format DeletedState";
+                errorMessage.append( "NumberFormatException incorrect format DeletedState");
             }
         }
 
@@ -199,14 +180,34 @@ public class TaloonApprovalItem {
             try {
                 taloonNumber = Long.parseLong(strTaloonNumber);
             } catch (NumberFormatException e) {
-                errorMessageComposite += "NumberFormatException incorrect format TaloonNumber";
+                errorMessage.append("NumberFormatException incorrect format TaloonNumber");
             }
         }
 
         return new TaloonApprovalItem(orgId, date, name, soldedQty, requestedQty, shippedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
-                taloonNumber, orgOwner, deletedState, errorMessageComposite);
+                taloonNumber, orgOwner, deletedState, errorMessage.toString());
     }
+
+    private static boolean isOldQtyFormat(Node itemNode) {
+        String strValue = XMLUtils.getAttributeValue(itemNode, "Qty");
+        return StringUtils.isNotEmpty(strValue);
+    }
+
+    private static Integer readIntegerValue(Node itemNode, String nameAttr, StringBuilder errorMessage) {
+        String strValue = XMLUtils.getAttributeValue(itemNode, nameAttr);
+        if (StringUtils.isNotEmpty(strValue)) {
+            try {
+                return Integer.parseInt(strValue);
+            } catch (NumberFormatException e) {
+                errorMessage.append(String.format("NumberFormatException incorrect format %s", nameAttr));
+            }
+        } else {
+            errorMessage.append(String.format("Attribute %s not found", nameAttr));
+        }
+        return null;
+    }
+
 
     private TaloonApprovalItem(Long orgId, Date date, String name, Integer soldedQty, Integer requestedQty, Integer shippedQty,
             Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
