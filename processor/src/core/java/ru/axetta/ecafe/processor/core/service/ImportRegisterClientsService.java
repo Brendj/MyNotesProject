@@ -400,6 +400,18 @@ public class ImportRegisterClientsService {
                     cl == null ? null : cl.getPerson().getFirstName(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
+            if (pupil.getGender() != null) {
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GENDER, pupil.getGender(),
+                        cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
+            }
+
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_ON_ADMISSION, pupil.getBenefitOnAdmission(),
+                    cl == null ? null : cl.getBenefitOnAdmission() == null ? null : cl.getBenefitOnAdmission(), updateClient);
+
+            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
+                    cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
+
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
                         cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
@@ -568,6 +580,9 @@ public class ImportRegisterClientsService {
         String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, clientGuid, "Отчество ученика");
         String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
         String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 64, clientGuid, "Наименование группы");
+        String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
+        String clientBenefitOnAdmission = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION), 3000, clientGuid, "Льгота при поступлении");
+        String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
         RegistryChange ch = new RegistryChange();
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
@@ -581,9 +596,23 @@ public class ImportRegisterClientsService {
         ch.setApplied(false);
         ch.setType(type);
         ch.setNotificationId(notificationId);
-        ch.setGender(currentClient.getGender());
-        ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
-        ch.setBirthDate(currentClient.getBirthDate().getTime());
+
+        if (clientGender != null) {
+            if (clientGender.equals("Женский")) {
+                ch.setGender(0);
+            }
+            if (clientGender.equals("Мужской")) {
+                ch.setGender(1);
+            }
+        }
+
+        ch.setBenefitOnAdmission(clientBenefitOnAdmission);
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        Date date = format.parse(clientBirthDate);
+
+        ch.setBirthDate(date.getTime());
+
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
             ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
@@ -594,6 +623,12 @@ public class ImportRegisterClientsService {
             } else {
                 ch.setGroupNameFrom("");
             }
+
+            ch.setGenderFrom(currentClient.getGender());
+            if (currentClient.getBirthDate() != null) {
+                ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
+            }
+            ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
@@ -606,6 +641,11 @@ public class ImportRegisterClientsService {
             ch.setFirstNameFrom(currentClient.getPerson().getFirstName());
             ch.setSecondNameFrom(currentClient.getPerson().getSecondName());
             ch.setSurnameFrom(currentClient.getPerson().getSurname());
+            ch.setGenderFrom(currentClient.getGender());
+            if (currentClient.getBirthDate() != null) {
+                ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
+            }
+            ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
         }
         sess.save(ch);
     }
@@ -652,7 +692,9 @@ public class ImportRegisterClientsService {
         ch.setApplied(false);
         ch.setNotificationId(notificationId);
         ch.setGender(currentClient.getGender());
-        ch.setBirthDate(currentClient.getBirthDate().getTime());
+        if (currentClient.getBirthDate() != null) {
+            ch.setBirthDate(currentClient.getBirthDate().getTime());
+        }
         ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
         sess.save(ch);
     }
@@ -925,7 +967,7 @@ public class ImportRegisterClientsService {
         if (change.getIdOfClient() != null) {
             dbClient = em.find(Client.class, change.getIdOfClient());
         }
-
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         switch (change.getOperation()) {
             case CREATE_OPERATION:
                 //  добавление нового клиента
@@ -937,6 +979,11 @@ public class ImportRegisterClientsService {
                 createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                 createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+                createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                Date createDateBirth = new Date(change.getBirthDate());
+                createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
+                createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                 ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                         (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
                 break;
@@ -967,6 +1014,10 @@ public class ImportRegisterClientsService {
                 modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                 modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                 modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                Date modifyDateBirth = new Date(change.getBirthDate());
+                modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
+                modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                 if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
                     addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
                     dbClient.setOrg(newOrg1);
@@ -1162,11 +1213,13 @@ public class ImportRegisterClientsService {
 
         public String familyName, firstName, secondName, guid, group, enterGroup, enterDate, leaveDate;
         public String birthDate;
+        public String benefitOnAdmission;
 
         public boolean deleted;
         public boolean created;
         public String guidOfOrg;
         public String recordState;
+        public String gender;
 
         public boolean isDeleted() {
             return deleted;
@@ -1212,12 +1265,28 @@ public class ImportRegisterClientsService {
             this.birthDate = birthDate;
         }
 
+        public String getBenefitOnAdmission() {
+            return benefitOnAdmission;
+        }
+
+        public void setBenefitOnAdmission(String benefitOnAdmission) {
+            this.benefitOnAdmission = benefitOnAdmission;
+        }
+
         public String getRecordState() {
             return recordState;
         }
 
         public void setRecordState(String recordState) {
             this.recordState = recordState;
+        }
+
+        public void setGender(String gender) {
+            this.gender = gender;
+        }
+
+        public String getGender() {
+            return gender;
         }
 
         public String getEnterGroup() {
@@ -1251,10 +1320,12 @@ public class ImportRegisterClientsService {
             this.guid = pi.guid;
             this.group = pi.group;
             this.birthDate = pi.birthDate;
+            this.benefitOnAdmission = pi.benefitOnAdmission;
             this.deleted = pi.deleted;
             this.created = pi.created;
             this.guidOfOrg = pi.guidOfOrg;
             this.recordState = pi.recordState;
+            this.gender = pi.gender;
             this.enterGroup = pi.enterGroup;
             this.enterDate = pi.enterDate;
             this.leaveDate = pi.leaveDate;

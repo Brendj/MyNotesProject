@@ -254,6 +254,14 @@ public class ClientMskNSIService extends MskNSIService {
                     pupilInfo.recordState = attr.getValue().get(0).getValue();
                 }*/
 
+                if (attr.getName().equals("Льгота при поступлении")) {
+                    pupilInfo.benefitOnAdmission = attr.getValue().get(0).getValue();
+                }
+
+                if (attr.getName().equals("Пол")) {
+                    pupilInfo.gender = attr.getValue().get(0).getValue();
+                }
+
             }
 
             pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();

@@ -37,6 +37,10 @@ public class RegistryChange {
     protected Long birthDate;
     protected String benefitOnAdmission;
 
+    protected Integer genderFrom;
+    protected Long birthDateFrom;
+    protected String benefitOnAdmissionFrom;
+
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
 
@@ -46,7 +50,7 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission) {
+            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission, Integer genderFrom, Long birthDateFrom, String benefitOnAdmissionFrom) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -70,6 +74,9 @@ public class RegistryChange {
         this.gender = gender;
         this.birthDate = birthDate;
         this.benefitOnAdmission = benefitOnAdmission;
+        this.genderFrom = genderFrom;
+        this.birthDateFrom = birthDateFrom;
+        this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
     }
 
     public Long getIdOfOrg() {
@@ -254,5 +261,29 @@ public class RegistryChange {
 
     public void setBenefitOnAdmission(String benefitOnAdmission) {
         this.benefitOnAdmission = benefitOnAdmission;
+    }
+
+    public Integer getGenderFrom() {
+        return genderFrom;
+    }
+
+    public void setGenderFrom(Integer genderFrom) {
+        this.genderFrom = genderFrom;
+    }
+
+    public Long getBirthDateFrom() {
+        return birthDateFrom;
+    }
+
+    public void setBirthDateFrom(Long birthDateFrom) {
+        this.birthDateFrom = birthDateFrom;
+    }
+
+    public String getBenefitOnAdmissionFrom() {
+        return benefitOnAdmissionFrom;
+    }
+
+    public void setBenefitOnAdmissionFrom(String benefitOnAdmissionFrom) {
+        this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
     }
 }

@@ -41,7 +41,7 @@ public class Client {
     public static final String[] CONTRACT_STATE_NAMES = {
             "Не заключен", "Активен", "Расторгнут по времени", "Расторгнут по желанию клиента"};
     public static final String[] CLIENT_GENDER_NAMES = {
-            "Мужской", "Женский"};
+            "Женский", "Мужской"};
     public static final int ACTIVE_CONTRACT_STATE = 1;
     public static final int CONTRACT_INIT_STATE_COUNT = 2;
     public static final int CLIENT_GENDER_COUNT = 2;

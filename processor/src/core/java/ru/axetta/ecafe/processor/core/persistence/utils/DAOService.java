@@ -1589,7 +1589,8 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and lower(surname||firstname||secondname) like lower('%" + nameFilter + "%') ";
+            String filter = nameFilter.trim().toLowerCase().replaceAll(" ", "");
+            nameStatement = " and lower(surname||firstname||secondname) like lower('%" + filter + "%') ";
         }
         String actionStatement = "";
         if (actionFilter != null) {

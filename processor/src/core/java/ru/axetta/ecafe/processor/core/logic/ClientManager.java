@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ClientManager {
@@ -65,7 +66,10 @@ public class ClientManager {
         SAN,
         EXTERNAL_ID,
         CLIENT_GUID,
-        FAX
+        FAX,
+        GENDER,
+        BIRTH_DATE,
+        BENEFIT_ON_ADMISSION
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -102,6 +106,9 @@ public class ClientManager {
             new FieldProcessor.Def(29, false, false, "Внешний идентификатор", null, FieldId.EXTERNAL_ID, true),
             new FieldProcessor.Def(30, false, false, "GUID", null, FieldId.CLIENT_GUID, true),
             new FieldProcessor.Def(31, false, false, "Факс", null, FieldId.FAX, true),
+            new FieldProcessor.Def(32, false, false, "Пол", null, FieldId.GENDER, true),
+            new FieldProcessor.Def(33, false, false, "Дата рождения", null, FieldId.BIRTH_DATE, true),
+            new FieldProcessor.Def(34, false, false, "Льгота при поступлении", null, FieldId.BENEFIT_ON_ADMISSION, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -441,6 +448,24 @@ public class ClientManager {
                     client.setClientGUID(clientGUID);
                 }
             }
+            //tokens[32])
+            if (fieldConfig.getValue(FieldId.GENDER) != null) {
+                client.setGender(Integer.valueOf(fieldConfig.getValue(FieldId.GENDER)));
+            }
+
+            //token[33])
+            if (fieldConfig.getValue(FieldId.BIRTH_DATE) != null) {
+                String birthDate = fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE);
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+                Date date = format.parse(birthDate);
+                client.setBirthDate(date);
+            }
+
+            //token[34])
+            if (fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION) != null) {
+                client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
+            }
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -687,6 +712,24 @@ public class ClientManager {
                 } else {
                     client.setClientGUID(clientGUID);
                 }
+            }
+
+            //tokens[32])
+            if (fieldConfig.getValue(FieldId.GENDER) != null) {
+                client.setGender(Integer.valueOf(fieldConfig.getValue(FieldId.GENDER)));
+            }
+
+            //token[33])
+            if (fieldConfig.getValue(FieldId.BIRTH_DATE) != null) {
+                String birthDate = fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE);
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+                Date date = format.parse(birthDate);
+                client.setBirthDate(date);
+            }
+
+            //token[34])
+            if (fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION) != null) {
+                client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
             }
 
             logger.debug("save client");

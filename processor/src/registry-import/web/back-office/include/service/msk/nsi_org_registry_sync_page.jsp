@@ -118,6 +118,30 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
+                                <h:outputText value="Дата рождения" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.birthDate}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Предыдущая Дата рождения" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.birthDateFrom}" rendered="#{e.birthDateFromChangeExists}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Пол" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.gender}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Предыдущий Пол" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.genderFrom}" rendered="#{e.genderFromChangeExists}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
                                 <h:outputText value="ФИО" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.fullname}" />
@@ -145,6 +169,18 @@
                                 <h:outputText value="Перевод из школы" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.migrateFromOrgName}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Льгота при поступлении" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.benefitOnAdmission}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Предыдущая Льгота при поступлении" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.benefitOnAdmissionFrom}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">

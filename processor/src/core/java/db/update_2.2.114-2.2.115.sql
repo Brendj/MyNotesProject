@@ -89,3 +89,7 @@ CREATE TABLE cf_visitreqresolutionhist
   CONSTRAINT cf_visitreqresolutionhist_idofclientresol_fk FOREIGN KEY (idofclientresol)
   REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+ALTER TABLE cf_registrychange ADD COLUMN genderFrom integer;
+ALTER TABLE cf_registrychange ADD COLUMN birthDateFrom bigint;
+ALTER TABLE cf_registrychange ADD COLUMN benefitOnAdmissionFrom character varying (3000);

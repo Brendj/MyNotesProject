@@ -37,6 +37,9 @@
         <property name="gender" column="Gender" type="int"/>
         <property name="birthDate" column="BirthDate" type="long"/>
         <property name="benefitOnAdmission" column="BenefitOnAdmission" type="string" length="3000"/>
+        <property name="genderFrom" column="GenderFrom" type="int"/>
+        <property name="birthDateFrom" column="BirthDateFrom" type="long"/>
+        <property name="benefitOnAdmissionFrom" column="BenefitOnAdmissionFrom" type="string" length="3000"/>
     </class>
 </hibernate-mapping>
 

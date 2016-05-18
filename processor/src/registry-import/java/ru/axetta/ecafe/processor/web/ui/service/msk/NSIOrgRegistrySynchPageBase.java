@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -194,7 +195,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     @Override
     public void onShow() {
         revisions = loadRevisions();
-        doUpdate();
+        //doUpdate();
         displayMode = DISPLAY_NON_COMMENTED_MODE;
     }
 
@@ -205,8 +206,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             logger.error("FrontControllerService is null");
             return;
         }
-        
-        
+
+
         List<Long> list = new ArrayList<Long>();
         for (WebRegistryChangeItem i : items) {
             if (i.isSelected()) {
@@ -233,14 +234,24 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     }
 
     public void doRefresh() {
-        nameFilter = "";
-        actionFilter = ALL_OPERATIONS;
-        load(true);
+        long idOfOrg = getIdOfOrg();
+        if (idOfOrg != -1) {
+            nameFilter = "";
+            actionFilter = ALL_OPERATIONS;
+            load(true);
+        } else {
+            errorMessages = "Выберите организацию";
+        }
     }
 
     public void doUpdate() {
-        load(false);
-        loadErrors();
+        long idOfOrg = getIdOfOrg();
+        if (idOfOrg != -1) {
+            load(false);
+            loadErrors();
+        } else {
+            errorMessages = "Выберите организацию";
+        }
     }
 
     public void doChangePanel(ValueChangeEvent event) {
@@ -307,7 +318,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
     }
 
-    private void load (boolean refresh) {
+    private void load(boolean refresh) {
         resetMessages();
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 0L) {
@@ -328,14 +339,14 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        List<RegistryChangeItem> changedItems = null;
+        List<RegistryChangeItemV2> changedItems = null;
         if (!refresh) {
-            changedItems = controller.loadRegistryChangeItemsInternal(getIdOfOrg(), revisionCreateDate,
-                                                                      actionFilter, nameFilter);
+            changedItems = controller
+                    .loadRegistryChangeItemsInternalV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
         } else {
             try {
-                changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
-            } catch(Exception e) {
+                changedItems = controller.refreshRegistryChangeItemsInternalV2(getIdOfOrg());
+            } catch (Exception e) {
                 if (e instanceof SOAPFaultException) {
                     errorMessages = e.getMessage();
                     return;
@@ -347,9 +358,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             }
         }
         items = new ArrayList<WebRegistryChangeItem>();
-        for (RegistryChangeItem i : changedItems) {
-            if(showOnlyClientGoups) {
-                if(!i.getGroupName().matches("^[0-9].*")) {
+        for (RegistryChangeItemV2 i : changedItems) {
+            if (showOnlyClientGoups) {
+                if (!i.getList().get(9).getFieldValueParam().matches("^[0-9].*")) {
                     continue;
                 }
             }
@@ -487,7 +498,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private int getCountOfOperation() {
         return items.size();
     }
-    
+
     private int getCountOfOperation(int operation) {
         if (items == null) {
             return 0;
@@ -530,37 +541,111 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         this.fullNameValidation = fullNameValidation;
     }
 
-    public class WebRegistryChangeItem extends RegistryChangeItem {
+    public class WebRegistryChangeItem extends RegistryChangeItemV2 {
+
+        protected Long idOfOrg;
+        protected Long idOfMigrateOrgTo;
+        protected Long idOfMigrateOrgFrom;
+        protected Long createDate;
+        protected Long idOfRegistryChange;
+        protected String clientGUID;
+        protected String firstName;
+        protected String secondName;
+        protected String surname;
+        protected String groupName;
+        protected String firstNameFrom;
+        protected String secondNameFrom;
+        protected String surnameFrom;
+        protected String groupNameFrom;
+        protected Long idOfClient;
+        protected Integer operation;
+        protected Boolean applied;
+        protected String error;
+
         protected boolean selected;
+
+        protected String gender;
+        protected String genderFrom;
+        protected String birthDate;
+        protected String birthDateFrom;
+        protected String benefitOnAdmission;
+        protected String benefitOnAdmissionFrom;
 
         public WebRegistryChangeItem() {
             super();
             selected = false;
         }
 
-        public WebRegistryChangeItem(RegistryChangeItem parent) {
+        public WebRegistryChangeItem(RegistryChangeItemV2 parent) {
             super();
-            idOfRegistryChange = parent.getIdOfRegistryChange();
-            idOfOrg            = parent.getIdOfOrg();
-            firstName          = parent.getFirstName();
-            secondName         = parent.getSecondName();
-            surname            = parent.getSurname();
-            groupName          = parent.getGroupName();
+            idOfOrg            = Long.parseLong(parent.getList().get(0).getFieldValueParam());
+            idOfMigrateOrgTo   = Long.parseLong(parent.getList().get(1).getFieldValueParam());
+            idOfMigrateOrgFrom = Long.parseLong(parent.getList().get(2).getFieldValueParam());
+            createDate         = Long.parseLong(parent.getList().get(3).getFieldValueParam());
+            idOfRegistryChange = Long.parseLong(parent.getList().get(4).getFieldValueParam());
+            clientGUID         = parent.getList().get(5).getFieldValueParam();
+            firstName          = parent.getList().get(6).getFieldValueParam();
+            secondName         = parent.getList().get(7).getFieldValueParam();
+            surname            = parent.getList().get(8).getFieldValueParam();
+            groupName          = parent.getList().get(9).getFieldValueParam();
+            firstNameFrom      = parent.getList().get(10).getFieldValueParam();
+            secondNameFrom     = parent.getList().get(11).getFieldValueParam();
+            surnameFrom        = parent.getList().get(12).getFieldValueParam();
+            groupNameFrom      = parent.getList().get(13).getFieldValueParam();
+            idOfClient         = Long.parseLong(parent.getList().get(14).getFieldValueParam());
 
-            idOfMigrateOrgFrom = parent.getIdOfMigrateOrgFrom();
-            idOfMigrateOrgTo   = parent.getIdOfMigrateOrgTo();
-            firstNameFrom      = parent.getFirstNameFrom();
-            secondNameFrom     = parent.getSecondNameFrom();
-            surnameFrom        = parent.getSurnameFrom();
-            groupNameFrom      = parent.getGroupNameFrom();
-
-            idOfClient         = parent.getIdOfClient();
-            clientGUID         = parent.getClientGUID();
-            createDate         = parent.getCreateDate();
-            operation          = parent.getOperation();
-            applied            = parent.isApplied();
-            error              = parent.getError();
+            operation          = Integer.parseInt(parent.getList().get(15).getFieldValueParam());
+            applied            = Boolean.parseBoolean(parent.getList().get(16).getFieldValueParam());
+            error              = parent.getList().get(17).getFieldValueParam();
             selected           = false;
+
+            if (parent.getList().get(18).getFieldValueParam().equals("")) {
+                gender = "";
+            } else {
+                int genderInt = Integer.parseInt(parent.getList().get(18).getFieldValueParam());
+
+                if (genderInt == 1) {
+                    gender = "Мужской";
+                }
+
+                if (genderInt == 0) {
+                    gender = "Женский";
+                }
+            }
+
+            if (parent.getList().get(19).getFieldValueParam().equals("")) {
+                birthDate = "";
+            } else {
+                birthDate = CalendarUtils.dateShortToStringFullYear(
+                        new Date(Long.parseLong(parent.getList().get(19).getFieldValueParam())));
+            }
+
+            benefitOnAdmission = parent.getList().get(20).getFieldValueParam();
+
+            if (parent.getList().get(21).getFieldValueParam().equals("")) {
+                genderFrom = "";
+            } else {
+                int genderInt = Integer.parseInt(parent.getList().get(21).getFieldValueParam());
+
+                if (genderInt == 1) {
+                    genderFrom = "Мужской";
+                } else if (genderInt == 0) {
+                    genderFrom = "Женский";
+                }
+            }
+
+            if (parent.getList().get(22).getFieldValueParam().equals("")) {
+                birthDateFrom = "";
+            } else {
+                birthDateFrom = CalendarUtils.dateShortToStringFullYear(
+                        new Date(Long.parseLong(parent.getList().get(22).getFieldValueParam())));
+            }
+
+            benefitOnAdmissionFrom = parent.getList().get(23).getFieldValueParam();
+        }
+
+        public Long getIdOfMigrateOrgFrom() {
+            return idOfMigrateOrgFrom;
         }
 
         public boolean isSelected() {
@@ -580,6 +665,16 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                    (!firstName.equals(firstNameFrom) ||
                     !secondName.equals(secondNameFrom) ||
                     !surname.equals(surnameFrom));
+        }
+
+        public boolean getGenderFromChangeExists() {
+            return operation == ImportRegisterClientsService.MODIFY_OPERATION &&
+                    !gender.equals(genderFrom);
+        }
+
+        public boolean getBirthDateFromChangeExists() {
+            return operation == ImportRegisterClientsService.MODIFY_OPERATION &&
+                    !birthDate.equals(birthDateFrom);
         }
 
         public boolean getGroupChangeExists() {
@@ -613,6 +708,114 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         public String getMigrateFromOrgName() {
             return operation == ImportRegisterClientsService.MOVE_OPERATION ?
                         DAOService.getInstance().findOrById(getIdOfMigrateOrgFrom()).getOfficialName() : "";
+        }
+
+        public boolean isApplied() {
+            return applied;
+        }
+
+        public Integer getOperation() {
+            return operation;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public Long getCreateDate() {
+            return createDate;
+        }
+
+        public Long getIdOfRegistryChange() {
+            return idOfRegistryChange;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public Long getIdOfMigrateOrgTo() {
+            return idOfMigrateOrgTo;
+        }
+
+        public String getClientGUID() {
+            return clientGUID;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getSecondName() {
+            return secondName;
+        }
+
+        public String getSurname() {
+            return surname;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public String getFirstNameFrom() {
+            return firstNameFrom;
+        }
+
+        public String getSecondNameFrom() {
+            return secondNameFrom;
+        }
+
+        public String getSurnameFrom() {
+            return surnameFrom;
+        }
+
+        public String getGroupNameFrom() {
+            return groupNameFrom;
+        }
+
+        public Long getIdOfClient() {
+            return idOfClient;
+        }
+
+        public Boolean getApplied() {
+            return applied;
+        }
+
+        public String getGender() {
+            return gender;
+        }
+
+        public String getBirthDate() {
+            return birthDate;
+        }
+
+        public String getBenefitOnAdmission() {
+            return benefitOnAdmission;
+        }
+
+        public String getBirthDateFrom() {
+            return birthDateFrom;
+        }
+
+        public void setBirthDateFrom(String birthDateFrom) {
+            this.birthDateFrom = birthDateFrom;
+        }
+
+        public String getGenderFrom() {
+            return genderFrom;
+        }
+
+        public void setGenderFrom(String genderFrom) {
+            this.genderFrom = genderFrom;
+        }
+
+        public String getBenefitOnAdmissionFrom() {
+            return benefitOnAdmissionFrom;
+        }
+
+        public void setBenefitOnAdmissionFrom(String benefitOnAdmissionFrom) {
+            this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
         }
     }
 
