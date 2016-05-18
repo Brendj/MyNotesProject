@@ -234,7 +234,11 @@ public class OrganizationComplexesStructure {
             element.setAttribute(ATTR_APPLY_DISCOUNT,Integer.toString(complexInfo.getModeFree()));
             element.setAttribute(ATTR_APPLY_GRANT,Integer.toString(complexInfo.getModeGrant()));
             element.setAttribute(ATTR_APPLY_SUBSCRIPTION_FEEDING,Integer.toString(complexInfo.getUsedSubscriptionFeeding()));
-            element.setAttribute(ATTR_CENTRALIZE_VISIBLE,Integer.toString(complexInfo.getModeVisible()));
+            Integer mv = complexInfo.getModeVisible();
+            if (mv == null) {
+                mv = 0;
+            }
+            element.setAttribute(ATTR_CENTRALIZE_VISIBLE,Integer.toString(mv));
 
             Good good = complexInfo.getGood();
             if (good !=null) {
