@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.repository;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalReport;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 public class ReportRepositoryDownloadServlet extends HttpServlet {
 
@@ -23,10 +25,15 @@ public class ReportRepositoryDownloadServlet extends HttpServlet {
             throws ServletException, IOException {
         ReportRepositoryListPage reportRepositoryListPage = RuntimeContext.getAppContext().getBean(ReportRepositoryListPage.class);
         File f = reportRepositoryListPage.getFileToDownload();
+
+        SecurityJournalReport process = SecurityJournalReport.createJournalRecord(extractTemplateName(f.getName()), new Date());
+
         if (!f.exists()) {
+            process.saveWithSuccess(false);
             response.sendError(404, "Извините, данный файл уже удален");
             return;
         }
+        process.saveWithSuccess(true);
         response.setHeader("Content-Type", getServletContext().getMimeType(reportRepositoryListPage.getFileToDownload().getName()));
         response.setHeader("Content-disposition", "inline;filename="+ URLEncoder.encode(reportRepositoryListPage.getFileToDownload().getName(), "UTF-8"));
         ServletOutputStream out = response.getOutputStream();
@@ -45,5 +52,13 @@ public class ReportRepositoryDownloadServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doPost(request,  response);
+    }
+
+    private String extractTemplateName(String filename) {
+        try {
+            return filename.substring(0, filename.indexOf('-')).concat(filename.substring(filename.lastIndexOf('.')));
+        } catch (Exception e) {
+            return filename;
+        }
     }
 }

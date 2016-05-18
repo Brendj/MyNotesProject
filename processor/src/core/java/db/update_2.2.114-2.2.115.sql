@@ -32,3 +32,16 @@ CREATE TABLE cf_security_journal_processes
 
 --Версия для справочника организаций, передаваемого на клиент
 ALTER TABLE cf_orgs ADD COLUMN orgStructureVersion BIGINT NOT NULL DEFAULT 0;
+
+--Журнал регистрации событий сохранения файлов отчетов
+CREATE TABLE cf_security_journal_reports
+(
+  idofjournalreport bigserial not null,
+  eventtype character varying(256),
+  eventdate bigint not null,
+  idofuser bigint,
+  issuccess boolean not null,
+  CONSTRAINT cf_security_journal_reports_pk PRIMARY KEY (idofjournalreport),
+  CONSTRAINT cf_security_journal_reports_user_fk FOREIGN KEY (idofuser)
+  REFERENCES cf_users (idofuser) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);

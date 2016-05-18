@@ -4,12 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.jboss.as.web.security.SecurityContextAssociationValve;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,13 +93,7 @@ public class SecurityJournalProcess {
     }
 
     private static void setUserFromSession(SecurityJournalProcess process) {
-        try {
-            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
-            HttpSession httpSession = request.getSession(true);
-            Long idOfUser = (Long)httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
-            User user = DAOService.getInstance().findUserById(idOfUser);
-            process.setUser(user);
-        } catch (Exception ignore) { }
+        process.setUser(DAOReadonlyService.getInstance().getUserFromSession());
     }
 
     private static void writeServerAddress(SecurityJournalProcess process) {

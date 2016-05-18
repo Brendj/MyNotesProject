@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -15,6 +16,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -110,6 +114,24 @@ public class DAOReadonlyService {
         if (result == null)
             return new ArrayList<Long>();
         return result;
+    }
+
+    public User getUserFromSession() {
+        try {
+            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+            HttpSession httpSession = request.getSession(false);
+            Long idOfUser = (Long)httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
+            User user = findUserById(idOfUser);
+            return user;
+        } catch (Exception e) {
+            logger.error("Can't retrieve user from current Session", e);
+            return null;
+        }
+    }
+
+    public User findUserById(long idOfUser) throws Exception {
+        User user = entityManager.find(User.class, idOfUser);
+        return user;
     }
 
 }
