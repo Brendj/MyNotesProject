@@ -43,6 +43,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
@@ -378,6 +382,11 @@ public class Processor
                 case TYPE_SPECIAL_DATES:{
                     //обработка календаря учебных дней
                     response = buildSpecialDatesSyncResponse(request);
+                    break;
+                }
+                case TYPE_MIGRANTS:{
+                    //обработка временных посетителей (мигрантов)
+                    response = buildMigrantsSyncResponse(request);
                     break;
                 }
             }
@@ -964,6 +973,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1356,6 +1367,16 @@ public class Processor
             logger.error(message, e);
         }
 
+        try {
+            if (request.getMigrants() != null) {
+                migrantsData = processMigrantsData(request.getMigrants());
+                resMigrants = processMigrants(request.getMigrants());
+            }
+        } catch (Exception e) {
+            String message = String.format("processMigrants: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
 
         //Process GroupManagers
         try {
@@ -1385,7 +1406,7 @@ public class Processor
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, responseSections);
+                resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
 
@@ -1447,6 +1468,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1492,7 +1515,7 @@ public class Processor
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, responseSections);
+                resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1533,6 +1556,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1560,7 +1585,7 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -1601,6 +1626,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1628,7 +1655,7 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     private SyncResponse buildSpecialDatesSyncResponse(SyncRequest request) throws Exception {
@@ -1669,6 +1696,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1696,7 +1725,77 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+    }
+
+    private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
+        SyncHistory syncHistory = null;
+        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        ComplexRoles complexRoles = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
+        ZeroTransactionData zeroTransactionData = null;
+        ResZeroTransactions resZeroTransactions = null;
+        SpecialDatesData specialDatesData = null;
+        ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+        boolean bError = false;
+
+        try {
+            if (request.getMigrants() != null) {
+                migrantsData = processMigrantsData(request.getMigrants());
+                resMigrants = processMigrants(request.getMigrants());
+            }
+        } catch (Exception e) {
+            String message = String.format("processMigrants: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
+                resMenuExchange, resDiary, "", resEnterEvents, resTempCardsOperations, tempCardOperationData,
+                resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
+                questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
+                accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1741,6 +1840,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1858,7 +1959,7 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1903,6 +2004,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2008,7 +2111,7 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -2050,6 +2153,8 @@ public class Processor
         ResZeroTransactions resZeroTransactions = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2175,7 +2280,7 @@ public class Processor
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -2481,6 +2586,42 @@ public class Processor
             HibernateUtils.close(persistenceSession, logger);
         }
         return resSpecialDates;
+    }
+
+    private MigrantsData processMigrantsData(Migrants migrants) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        MigrantsData migrantsData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            MigrantsProcessor processor = new MigrantsProcessor(persistenceSession, migrants);
+            migrantsData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return migrantsData;
+    }
+
+    private ResMigrants processMigrants(Migrants migrants) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResMigrants resMigrants = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            MigrantsProcessor processor = new MigrantsProcessor(persistenceSession, migrants);
+            resMigrants = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resMigrants;
     }
 
     //responce
@@ -3353,11 +3494,20 @@ public class Processor
             enterEventCriteria.setProjection(Projections.max("compositeIdOfEnterEvent.idOfEnterEvent"));
             List enterEventMax = enterEventCriteria.list();
 
+            Criteria migrRequestCriteria = persistenceSession.createCriteria(Migrant.class);
+            migrRequestCriteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
+            migrRequestCriteria.setProjection(Projections.max("compositeIdOfMigrant.idOfRequest"));
+            List migrRequestMax = migrRequestCriteria.list();
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
             Long idOfOrderMax = (Long) orderMax.get(0),
                     idOfOrderDetail = (Long) orderDetailMax.get(0),
-                    idOfEnterEvent = (Long) enterEventMax.get(0);
+                    idOfEnterEvent = (Long) enterEventMax.get(0),
+                    idOfOutcomeMigrRequests = 0L;
+            if(migrRequestMax.size() > 0){
+                idOfOutcomeMigrRequests = (Long) migrRequestMax.get(0);
+            }
             if (idOfOrderMax == null) {
                 idOfOrderMax = 0L;
             }
@@ -3367,7 +3517,10 @@ public class Processor
             if (idOfEnterEvent == null) {
                 idOfEnterEvent = 0L;
             }
-            return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail, idOfEnterEvent);
+            if (idOfOutcomeMigrRequests == null) {
+                idOfOutcomeMigrRequests = 0L;
+            }
+            return new SyncResponse.CorrectingNumbersOrdersRegistry(idOfOrderMax, idOfOrderDetail, idOfEnterEvent, idOfOutcomeMigrRequests);
             //return null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3622,6 +3775,14 @@ public class Processor
                 }
             }
 
+            // Добавляем карты временных посетителей (мигрантов)
+            List<Client> migrantClients = DAOUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
+            for (Client client : migrantClients) {
+                for (Card card : client.getCards()) {
+                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+                }
+            }
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -3712,6 +3873,10 @@ public class Processor
             orgList.add(organization);
             List<Client> clients = findNewerClients(persistenceSession, orgList,
                     clientRegistryRequest.getCurrentVersion());
+            
+            // Добавляем временных посетителей (мигрантов)
+            clients.addAll(DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg));
+
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));

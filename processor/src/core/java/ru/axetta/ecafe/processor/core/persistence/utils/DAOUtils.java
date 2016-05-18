@@ -321,6 +321,14 @@ public class DAOUtils {
         return (SpecialDate) persistenceSession.get(SpecialDate.class, compositeIdOfSpecialDate);
     }
 
+    public static Migrant findMigrant(Session persistenceSession, CompositeIdOfMigrant compositeIdOfMigrant) throws Exception {
+        return (Migrant) persistenceSession.get(Migrant.class, compositeIdOfMigrant);
+    }
+
+    public static VisitReqResolutionHist findVisitReqResolutionHist(Session persistenceSession, CompositeIdOfVisitReqResolutionHist compositeId) throws Exception {
+        return (VisitReqResolutionHist) persistenceSession.get(VisitReqResolutionHist.class, compositeId);
+    }
+
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
@@ -2198,6 +2206,55 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<Migrant> getMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("syncState", 0));
+        return criteria.list();
+    }
+
+    public static List<VisitReqResolutionHist> getIncomeResolutionsForOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.createCriteria("migrant", "migrant", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.eqProperty("orgRegistry", "migrant.orgRegistry"));
+        criteria.add(Restrictions.eq("migrant.orgVisit.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.ne("orgResol.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("syncState", 0));
+        return criteria.list();
+    }
+
+    public static List<VisitReqResolutionHist> getOutcomeResolutionsForOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.add(Restrictions.ne("orgRegistry.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("syncState", 0));
+        return criteria.list();
+    }
+
+    public static List<Client> getActiveMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
+        Set<Client> clients = new HashSet<Client>();
+        List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
+        for(Migrant migrant : migrants){
+            Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
+            query.setParameter("migrant", migrant);
+            query.setMaxResults(1);
+            VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
+            if(res.getResolution().equals(1)){
+                clients.add(res.getClientResol());
+            }
+        }
+        return new ArrayList<Client>(clients);
+    }
+
+    public static List<Migrant> getCurrentMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.gt("visitStartDate", date));
+        criteria.add(Restrictions.lt("visitEndDate", date));
         return criteria.list();
     }
 

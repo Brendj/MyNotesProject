@@ -178,6 +178,19 @@ public class CalendarUtils {
         }
     }
 
+    public static Date parseDateWithDayTime(String s) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        if (StringUtils.isEmpty(s)) {
+            return null;
+        } else {
+            Date date = dateFormat.parse(s);
+            if (date.after(AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+            return date;
+        }
+    }
+
     public static String dateToString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         dateFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));

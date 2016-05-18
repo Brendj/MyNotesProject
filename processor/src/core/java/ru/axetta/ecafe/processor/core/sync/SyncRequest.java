@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientG
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -2177,6 +2179,7 @@ public class SyncRequest {
         private final InteractiveReportDataBuilder interactiveReportDataBuilder;
         private final ZeroTransactionsBuilder zeroTransactionsBuilder;
         private final SpecialDatesBuilder specialDatesBuilder;
+        private final MigrantsBuilder migrantsBuilder;
         private final ClientGroupManagerBuilder clientGroupManagerBuilder;
 
         public Builder() {
@@ -2211,6 +2214,7 @@ public class SyncRequest {
             this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
             this.zeroTransactionsBuilder = new ZeroTransactionsBuilder();
             this.specialDatesBuilder = new SpecialDatesBuilder();
+            this.migrantsBuilder = new MigrantsBuilder();
             this.clientGroupManagerBuilder = new ClientGroupManagerBuilder();
         }
 
@@ -2384,6 +2388,12 @@ public class SyncRequest {
                 specialDatesRequest = specialDatesBuilder.build(specialDatesNode, org.getIdOfOrg());
             }
 
+            Node migrantsNode = findFirstChildElement(envelopeNode, "Migrants");
+            Migrants migrantsRequest = null;
+            if (migrantsNode != null) {
+                migrantsRequest = migrantsBuilder.build(migrantsNode, org.getIdOfOrg());
+            }
+
             Node interactiveReportNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
             InteractiveReport interactiveReportRequest = null;
             if(interactiveReportNode != null) {
@@ -2416,7 +2426,7 @@ public class SyncRequest {
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
                     enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
                     clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
-                    interactiveReportRequest, zeroTransactionsRequest, specialDatesRequest, categoriesAndDiscountsRequest,
+                    interactiveReportRequest, zeroTransactionsRequest, specialDatesRequest, migrantsRequest, categoriesAndDiscountsRequest,
                     clientGroupManagerRequest);
         }
 
@@ -2460,6 +2470,7 @@ public class SyncRequest {
     private final InteractiveReport interactiveReport;
     private final ZeroTransactions zeroTransactions;
     private final SpecialDates specialDates;
+    private final Migrants migrants;
     ClientGroupManagerRequest clientGroupManagerRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
@@ -2470,7 +2481,7 @@ public class SyncRequest {
             ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
             AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
             ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions, SpecialDates specialDates,
-            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest, ClientGroupManagerRequest clientGroupManagerRequest) {
+            Migrants migrants, CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest, ClientGroupManagerRequest clientGroupManagerRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2504,6 +2515,7 @@ public class SyncRequest {
         this.interactiveReport = interactiveReport;
         this.zeroTransactions = zeroTransactions;
         this.specialDates = specialDates;
+        this.migrants = migrants;
         this.clientGroupManagerRequest = clientGroupManagerRequest;
     }
 
@@ -2630,6 +2642,10 @@ public class SyncRequest {
 
     public SpecialDates getSpecialDates() {
         return specialDates;
+    }
+
+    public Migrants getMigrants() {
+        return migrants;
     }
 
     @Override

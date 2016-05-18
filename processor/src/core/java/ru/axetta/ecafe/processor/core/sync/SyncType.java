@@ -23,7 +23,8 @@ public enum SyncType {
     TYPE_COMMODITY_ACCOUNTING(4,"CommodityAccounting"),
     TYPE_REESTR_TALOONS_APPROVAL(6,"ReestrTaloonsApproval"),
     TYPE_ZERO_TRANSACTIONS(7, "ZeroTransactions"),
-    TYPE_SPECIAL_DATES(8, "SpecialDates");
+    TYPE_SPECIAL_DATES(8, "SpecialDates"),
+    TYPE_MIGRANTS(9, "Migrants");
 
     private static Map<String,SyncType> map = new HashMap<String,SyncType>();
     static {

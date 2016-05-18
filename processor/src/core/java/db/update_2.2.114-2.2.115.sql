@@ -45,3 +45,47 @@ CREATE TABLE cf_security_journal_reports
   CONSTRAINT cf_security_journal_reports_user_fk FOREIGN KEY (idofuser)
   REFERENCES cf_users (idofuser) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Временные посетители (мигранты)
+CREATE TABLE cf_migrants
+(
+  idofrequest BIGINT NOT NULL,
+  idoforgregistry BIGINT NOT NULL,
+  idoforgregvendor BIGINT NOT NULL,
+  idofclientmigrate BIGINT NOT NULL,
+  idoforgvisit BIGINT NOT NULL,
+  visitstartdate BIGINT NOT NULL,
+  visitenddate BIGINT NOT NULL,
+  syncstate INTEGER NOT NULL,
+  CONSTRAINT cf_migrants_pk PRIMARY KEY (idofrequest, idoforgregistry),
+  CONSTRAINT cf_migrants_idoforgregistry_fk FOREIGN KEY (idoforgregistry)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_migrants_idoforgregvendor_fk FOREIGN KEY (idoforgregvendor)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_migrants_idofclientmigrate_fk FOREIGN KEY (idofclientmigrate)
+  REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_migrants_idoforgvisit_fk FOREIGN KEY (idoforgvisit)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+--История резолюций по запросам на посещение (по мигрантам)
+CREATE TABLE cf_visitreqresolutionhist
+(
+  idofrecord BIGINT NOT NULL,
+  idofrequest BIGINT NOT NULL,
+  idoforgresol BIGINT NOT NULL,
+  idoforgregistry BIGINT NOT NULL,
+  resolution INTEGER NOT NULL,
+  resolutiondatetime BIGINT NOT NULL,
+  resolutioncause CHARACTER VARYING(512),
+  idofclientresol BIGINT NOT NULL,
+  contactinfo CHARACTER VARYING(128),
+  syncstate INTEGER NOT NULL,
+  CONSTRAINT cf_visitreqresolutionhist_pk PRIMARY KEY (idofrecord, idofrequest, idoforgresol),
+  CONSTRAINT cf_visitreqresolutionhist_idoforgresol_fk FOREIGN KEY (idoforgresol)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_visitreqresolutionhist_idoforgregistry_fk FOREIGN KEY (idoforgregistry)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_visitreqresolutionhist_idofclientresol_fk FOREIGN KEY (idofclientresol)
+  REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);

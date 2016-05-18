@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCate
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
+import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
@@ -561,17 +563,20 @@ public class SyncResponse {
         private  Long IdOfOrder;
         private  Long IdOfOrderDetail;
         private  Long IdOfEnterEvent;
+        private  Long IdOfOutcomeMigrRequests;
 
         public CorrectingNumbersOrdersRegistry() {
             this.IdOfOrder = 0L;
             this.IdOfOrderDetail = 0L;
             this.IdOfEnterEvent = 0L;
+            this.IdOfOutcomeMigrRequests = 0L;
         }
 
-        public CorrectingNumbersOrdersRegistry(Long IdOfOrder, Long IdOfOrderDetail, Long IdOfEnterEvent) {
+        public CorrectingNumbersOrdersRegistry(Long IdOfOrder, Long IdOfOrderDetail, Long IdOfEnterEvent, Long IdOfOutcomeMigrRequests) {
             this.IdOfOrder = IdOfOrder;
             this.IdOfOrderDetail = IdOfOrderDetail;
             this.IdOfEnterEvent = IdOfEnterEvent;
+            this.IdOfOutcomeMigrRequests = IdOfOutcomeMigrRequests;
         }
 
         public Element toElement(Document document) throws Exception {
@@ -579,12 +584,14 @@ public class SyncResponse {
             element.setAttribute("IdOfOrder", Long.toString(this.IdOfOrder));
             element.setAttribute("IdOfOrderDetails", Long.toString(this.IdOfOrderDetail));
             element.setAttribute("IdOfEnterEvent", Long.toString(this.IdOfEnterEvent));
+            element.setAttribute("IdOfOutcomeMigrRequests", Long.toString(this.IdOfOutcomeMigrRequests));
             return element;
         }
 
         @Override
         public String toString() {
-            return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails=" + IdOfOrderDetail +", IdOfEnterEvent='"+IdOfEnterEvent + '}';
+            return "CorrectingNumbersOrdersRegistry{" + "IdOfOrder=" + IdOfOrder + ", IdOfOrderDetails=" + IdOfOrderDetail +", IdOfEnterEvent='"+IdOfEnterEvent +
+                    ", IdOfOutcomeMigrRequests=" + IdOfOutcomeMigrRequests + '}';
         }
     }
 
@@ -1046,6 +1053,8 @@ public class SyncResponse {
     private final ResZeroTransactions resZeroTransactions;
     private final SpecialDatesData specialDatesData;
     private final ResSpecialDates resSpecialDates;
+    private final MigrantsData migrantsData;
+    private final ResMigrants resMigrants;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1064,7 +1073,7 @@ public class SyncResponse {
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
-            ResSpecialDates resSpecialDates, List<AbstractToElement> responseSections) {
+            ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1109,6 +1118,8 @@ public class SyncResponse {
         this.resZeroTransactions = resZeroTransactions;
         this.specialDatesData = specialDatesData;
         this.resSpecialDates = resSpecialDates;
+        this.migrantsData = migrantsData;
+        this.resMigrants = resMigrants;
         this.responseSections = responseSections;
     }
 
@@ -1303,6 +1314,14 @@ public class SyncResponse {
 
         if (specialDatesData != null) {
             ecafeEnvelopeElement.appendChild(specialDatesData.toElement(document));
+        }
+
+        if (resMigrants != null) {
+            ecafeEnvelopeElement.appendChild(resMigrants.toElement(document));
+        }
+
+        if (migrantsData != null) {
+            ecafeEnvelopeElement.appendChild(migrantsData.toElement(document));
         }
 
         if (this.responseSections != null) {
