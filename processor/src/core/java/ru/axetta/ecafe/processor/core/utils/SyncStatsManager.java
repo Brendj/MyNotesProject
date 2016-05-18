@@ -155,7 +155,7 @@ public class SyncStatsManager {
             } else {
                 int errCode = 0;
                 try {
-                    errCode = Integer.parseInt(errorMessage.replaceAll("[^0-9]", ""));
+                    errCode = new Scanner(errorMessage).useDelimiter("[^\\d]+").nextInt();
                 } catch (NumberFormatException e) {
                     logger.error("Error message int parsing error: ", e);
                 }
