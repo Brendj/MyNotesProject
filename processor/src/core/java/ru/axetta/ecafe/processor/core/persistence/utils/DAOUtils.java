@@ -2252,8 +2252,8 @@ public class DAOUtils {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.gt("visitStartDate", date));
-        criteria.add(Restrictions.lt("visitEndDate", date));
+        criteria.add(Restrictions.lt("visitStartDate", date));
+        criteria.add(Restrictions.gt("visitEndDate", date));
         return criteria.list();
     }
 
