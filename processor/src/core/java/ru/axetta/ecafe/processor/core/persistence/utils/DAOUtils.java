@@ -2218,18 +2218,17 @@ public class DAOUtils {
     }
 
     public static List<VisitReqResolutionHist> getIncomeResolutionsForOrg(Session session, Long idOfOrg) throws Exception {
+        Org org = (Org) session.load(Org.class, idOfOrg);
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
-        criteria.createCriteria("migrant", "migrant", JoinType.INNER_JOIN);
-        criteria.add(Restrictions.eqProperty("orgRegistry", "migrant.orgRegistry"));
-        criteria.add(Restrictions.eq("migrant.orgVisit.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.ne("orgResol.idOfOrg", idOfOrg));
+        criteria.createAlias("migrant","migrant", JoinType.LEFT_OUTER_JOIN);
+        criteria.add(Restrictions.eq("migrant.orgVisit", org));
         criteria.add(Restrictions.eq("syncState", 0));
         return criteria.list();
     }
 
     public static List<VisitReqResolutionHist> getOutcomeResolutionsForOrg(Session session, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
-        criteria.add(Restrictions.ne("orgRegistry.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("syncState", 0));
         return criteria.list();
     }

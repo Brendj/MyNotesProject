@@ -30,7 +30,6 @@ public class OutcomeMigrationRequestsHistoryItem {
     private Long idOfRequest;
     private Long idOfOrgResol;
     private Long idOfOrgRegistry;
-    private Long idOfOrgVisit;
     private Integer resolution;
     private Date resolutionDateTime;
     private String resolutionCause;
@@ -43,7 +42,6 @@ public class OutcomeMigrationRequestsHistoryItem {
         Long idOfRecord = null;
         Long idOfRequest = null;
         Long idOfOrgResol = null;
-        Long idOfOrgVisit = null;
         Integer resolution = null;
         Date resolutionDateTime = null;
         String resolutionCause = null;
@@ -60,14 +58,6 @@ public class OutcomeMigrationRequestsHistoryItem {
             Org orgResol = DAOService.getInstance().getOrg(idOfOrgResol);
             if (orgResol == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgIssuer with id=%s not found", idOfOrgResol));
-            }
-        }
-
-        idOfOrgVisit = getLongValue(itemNode, "IdOfOrgVisit", emSetter, true);
-        if(idOfOrgVisit != null) {
-            Org orgVisit = DAOService.getInstance().getOrg(idOfOrgVisit);
-            if (orgVisit == null) {
-                emSetter.setCompositeErrorMessage(String.format("OrgVisit with id=%s not found", idOfOrgVisit));
             }
         }
 
@@ -111,7 +101,7 @@ public class OutcomeMigrationRequestsHistoryItem {
             }
         }
 
-        return new OutcomeMigrationRequestsHistoryItem(idOfRecord, idOfRequest, idOfOrgResol, idOfOrgRegistry, idOfOrgVisit, resolution,
+        return new OutcomeMigrationRequestsHistoryItem(idOfRecord, idOfRequest, idOfOrgResol, idOfOrgRegistry, resolution,
                 resolutionDateTime, resolutionCause, idOfClientResol, contactInfo, emSetter.getStr());
     }
 
@@ -163,13 +153,12 @@ public class OutcomeMigrationRequestsHistoryItem {
     }
 
     public OutcomeMigrationRequestsHistoryItem(Long idOfRecord, Long idOfRequest, Long idOfOrgResol, Long idOfOrgRegistry,
-            Long idOfOrgVisit, Integer resolution, Date resolutionDateTime, String resolutionCause, Long idOfClientResol,
+            Integer resolution, Date resolutionDateTime, String resolutionCause, Long idOfClientResol,
             String contactInfo, String errorMessage) {
         this.idOfRecord = idOfRecord;
         this.idOfRequest = idOfRequest;
         this.idOfOrgResol = idOfOrgResol;
         this.idOfOrgRegistry = idOfOrgRegistry;
-        this.idOfOrgVisit = idOfOrgVisit;
         this.resolution = resolution;
         this.resolutionDateTime = resolutionDateTime;
         this.resolutionCause = resolutionCause;
@@ -213,14 +202,6 @@ public class OutcomeMigrationRequestsHistoryItem {
 
     public void setIdOfOrgRegistry(Long idOfOrgRegistry) {
         this.idOfOrgRegistry = idOfOrgRegistry;
-    }
-
-    public Long getIdOfOrgVisit() {
-        return idOfOrgVisit;
-    }
-
-    public void setIdOfOrgVisit(Long idOfOrgVisit) {
-        this.idOfOrgVisit = idOfOrgVisit;
     }
 
     public Integer getResolution() {

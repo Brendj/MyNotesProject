@@ -8,8 +8,8 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Migrant" table="cf_migrants">
         <composite-id name="compositeIdOfMigrant" class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfMigrant">
-            <key-property name="idOfOrgRegistry" type="long" column="IdOfOrgRegistry"/>
             <key-property name="idOfRequest" type="long" column="IdOfRequest"/>
+            <key-property name="idOfOrgRegistry" type="long" column="IdOfOrgRegistry"/>
         </composite-id>
         <many-to-one name="orgRegistry" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgRegistry"
                      not-null="true" insert="false" update="false"/>

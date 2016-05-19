@@ -9,9 +9,9 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist" table="cf_visitreqresolutionhist">
         <composite-id name="compositeIdOfVisitReqResolutionHist"
                       class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfVisitReqResolutionHist">
-            <key-property name="idOfRecord" type="long" column="IdOfRecord"/>
             <key-property name="idOfRequest" type="long" column="IdOfRequest"/>
             <key-property name="idOfOrgResol" type="long" column="IdOfOrgResol"/>
+            <key-property name="idOfRecord" type="long" column="IdOfRecord"/>
         </composite-id>
         <many-to-one name="orgResol" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgResol"
                      not-null="true" insert="false" update="false"/>

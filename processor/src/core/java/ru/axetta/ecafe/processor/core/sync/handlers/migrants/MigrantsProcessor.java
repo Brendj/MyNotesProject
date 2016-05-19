@@ -230,6 +230,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         }
         session.flush();
 
+        List<Client> list1 = DAOUtils.getActiveMigrantsForOrg(session, 30L);
+        List<Client> list2 = DAOUtils.getActiveMigrantsForOrg(session, 17L);
+
         ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
         List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
         for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
