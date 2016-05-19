@@ -42,12 +42,13 @@ public class ResIncomeMigrationRequestsHistoryItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "IdOfRecord", idOfRecord);
-        XMLUtils.setAttributeIfNotNull(element, "idOfOrgIssuer", idOfOrgIssuer);
-        XMLUtils.setAttributeIfNotNull(element, "idOfRequest", idOfRequest);
-        XMLUtils.setAttributeIfNotNull(element, "resolutionDateTime", resolutionDateTime != null ? CalendarUtils.dateTimeToString(resolutionDateTime) : null);
-        XMLUtils.setAttributeIfNotNull(element, "resolutionCause", resolutionCause);
-        XMLUtils.setAttributeIfNotNull(element, "idOfClientResol", idOfClientResol);
-        XMLUtils.setAttributeIfNotNull(element, "contactInfo", contactInfo);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrgIssuer", idOfOrgIssuer);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfRequest", idOfRequest);
+        XMLUtils.setAttributeIfNotNull(element, "Resolution", resolution);
+        XMLUtils.setAttributeIfNotNull(element, "ResolutionDateTime", resolutionDateTime != null ? CalendarUtils.dateTimeToString(resolutionDateTime) : null);
+        XMLUtils.setAttributeIfNotNull(element, "ResolutionCause", resolutionCause);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfClientResol", idOfClientResol);
+        XMLUtils.setAttributeIfNotNull(element, "ContactInfo", contactInfo);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         if (resCode != null && resCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);

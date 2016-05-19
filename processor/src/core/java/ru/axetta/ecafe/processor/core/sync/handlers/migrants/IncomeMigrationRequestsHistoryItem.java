@@ -28,8 +28,8 @@ public class IncomeMigrationRequestsHistoryItem {
 
     private Long idOfRecord;
     private Long idOfRequest;
-    private Long idOfOrgResol;
     private Long idOfOrgRegistry;
+    private Long idOfOrgRequestIssuer; // из какой организации пришла заявка
     private Integer resolution;
     private Date resolutionDateTime;
     private String resolutionCause;
@@ -41,7 +41,7 @@ public class IncomeMigrationRequestsHistoryItem {
     public static IncomeMigrationRequestsHistoryItem build(Node itemNode, Long idOfOrgRegistry) {
         Long idOfRecord = null;
         Long idOfRequest = null;
-        Long idOfOrgResol = null;
+        Long idOfOrgRequestIssuer = null;
         Integer resolution = null;
         Date resolutionDateTime = null;
         String resolutionCause = null;
@@ -53,11 +53,11 @@ public class IncomeMigrationRequestsHistoryItem {
 
         idOfRequest = getLongValue(itemNode, "IdOfRequest", emSetter, true);
 
-        idOfOrgResol = getLongValue(itemNode, "IdOfOrgIssuer", emSetter, true);
-        if(idOfOrgResol != null) {
-            Org orgResol = DAOService.getInstance().getOrg(idOfOrgResol);
-            if (orgResol == null) {
-                emSetter.setCompositeErrorMessage(String.format("OrgIssuer with id=%s not found", idOfOrgResol));
+        idOfOrgRequestIssuer = getLongValue(itemNode, "IdOfOrgRequestIssuer", emSetter, true);
+        if(idOfOrgRequestIssuer != null) {
+            Org orgRequestIssuer = DAOService.getInstance().getOrg(idOfOrgRequestIssuer);
+            if (orgRequestIssuer == null) {
+                emSetter.setCompositeErrorMessage(String.format("OrgRequestIssuer with id=%s not found", idOfOrgRequestIssuer));
             }
         }
 
@@ -101,7 +101,7 @@ public class IncomeMigrationRequestsHistoryItem {
             }
         }
 
-        return new IncomeMigrationRequestsHistoryItem(idOfRecord, idOfRequest, idOfOrgResol, idOfOrgRegistry, resolution,
+        return new IncomeMigrationRequestsHistoryItem(idOfRecord, idOfRequest, idOfOrgRequestIssuer, idOfOrgRegistry, resolution,
                 resolutionDateTime, resolutionCause, idOfClientResol, contactInfo, emSetter.getStr());
     }
 
@@ -152,13 +152,13 @@ public class IncomeMigrationRequestsHistoryItem {
     public IncomeMigrationRequestsHistoryItem() {
     }
 
-    public IncomeMigrationRequestsHistoryItem(Long idOfRecord, Long idOfRequest, Long idOfOrgResol, Long idOfOrgRegistry,
+    public IncomeMigrationRequestsHistoryItem(Long idOfRecord, Long idOfRequest, Long idOfOrgRequestIssuer, Long idOfOrgRegistry,
             Integer resolution, Date resolutionDateTime, String resolutionCause, Long idOfClientResol,
             String contactInfo, String errorMessage) {
         this.idOfRecord = idOfRecord;
         this.idOfRequest = idOfRequest;
-        this.idOfOrgResol = idOfOrgResol;
         this.idOfOrgRegistry = idOfOrgRegistry;
+        this.idOfOrgRequestIssuer = idOfOrgRequestIssuer;
         this.resolution = resolution;
         this.resolutionDateTime = resolutionDateTime;
         this.resolutionCause = resolutionCause;
@@ -188,12 +188,12 @@ public class IncomeMigrationRequestsHistoryItem {
         this.idOfRequest = idOfRequest;
     }
 
-    public Long getIdOfOrgResol() {
-        return idOfOrgResol;
+    public Long getIdOfOrgRequestIssuer() {
+        return idOfOrgRequestIssuer;
     }
 
-    public void setIdOfOrgResol(Long idOfOrgResol) {
-        this.idOfOrgResol = idOfOrgResol;
+    public void setIdOfOrgRequestIssuer(Long idOfOrgRequestIssuer) {
+        this.idOfOrgRequestIssuer = idOfOrgRequestIssuer;
     }
 
     public Long getIdOfOrgRegistry() {

@@ -105,7 +105,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem.setResCode(120);
                             resOutcomeMigrationRequestsHistoryItem.setErrorMessage("OutcomeMigrationRequestsHistory with IdOfRecord="
-                                    + outMigReqHisItem.getIdOfRecord() + "but with other attributes already exists");
+                                    + outMigReqHisItem.getIdOfRecord() + " but with other attributes already exists");
                         }
                     } else {
                         Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(outMigReqHisItem.getIdOfRequest(), outMigReqHisItem.getIdOfOrgRegistry()));
@@ -122,7 +122,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             resOutcomeMigrationRequestsHistoryItem.setIdOfRecord(outMigReqHisItem.getIdOfRequest());
                             resOutcomeMigrationRequestsHistoryItem.setResCode(120);
                             resOutcomeMigrationRequestsHistoryItem.setErrorMessage("MigrationRequest for OutcomeMigrationRequestsHistory with IdOfRecord="
-                                    + outMigReqHisItem.getIdOfRecord() + "does not exists");
+                                    + outMigReqHisItem.getIdOfRecord() + " does not exists");
                         }
                     }
                     session.flush();
@@ -145,7 +145,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 if(inMigReqHisItem.getResCode().equals(IncomeMigrationRequestsHistoryItem.ERROR_CODE_ALL_OK)){
                     CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist
                             = new CompositeIdOfVisitReqResolutionHist(inMigReqHisItem.getIdOfRecord(), inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
-                            .getIdOfOrgResol());
+                            .getIdOfOrgRegistry());
                     VisitReqResolutionHist inMigReqHis = DAOUtils.findVisitReqResolutionHist(session,
                             compositeIdOfVisitReqResolutionHist);
                     if(inMigReqHis != null){
@@ -162,15 +162,15 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             resIncomeMigrationRequestsHistoryItem.setResCode(120);
                             resIncomeMigrationRequestsHistoryItem.setErrorMessage(
                                     "IncomeMigrationRequestsHistory with IdOfRecord=" + inMigReqHisItem.getIdOfRecord()
-                                            + "but with other attributes already exists");
+                                            + " but with other attributes already exists");
                         }
                     } else {
                         Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
-                                .getIdOfOrgRegistry()));
+                                .getIdOfOrgRequestIssuer()));
                         if(migrant != null){
-                            Org orgRegistry = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRegistry());
+                            Org orgReqIss = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRequestIssuer());
                             Client clientResol = (Client)session.load(Client.class, inMigReqHisItem.getIdOfClientResol());
-                            inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgRegistry,
+                            inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
                                     inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
                                     inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), 0);
                             session.save(inMigReqHis);
@@ -182,7 +182,8 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             resIncomeMigrationRequestsHistoryItem.setResCode(120);
                             resIncomeMigrationRequestsHistoryItem.setErrorMessage(
                                     "MigrationRequest for IncomeMigrationRequestsHistory with IdOfRecord="
-                                            + inMigReqHisItem.getIdOfRecord() + "does not exists");
+                                            + inMigReqHisItem.getIdOfRecord() + " and IdOfOrgRegistry=" +
+                                            inMigReqHisItem.getIdOfOrgRequestIssuer() +  " does not exists");
                         }
                     }
                     session.flush();
@@ -229,9 +230,6 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             session.save(migrant);
         }
         session.flush();
-
-        List<Client> list1 = DAOUtils.getActiveMigrantsForOrg(session, 30L);
-        List<Client> list2 = DAOUtils.getActiveMigrantsForOrg(session, 17L);
 
         ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
         List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
