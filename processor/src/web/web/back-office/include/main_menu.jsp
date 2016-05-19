@@ -1222,6 +1222,16 @@
 
 </rich:panelMenuGroup>
 
+<rich:panelMenuGroup id="journalGroupMenu" label="Журналы" binding="#{mainPage.journalGroupPage.mainMenuComponent}"
+                     rendered="#{mainPage.eligibleToViewUsers}" expanded="true">
+    <a4j:support event="onclick" action="#{mainPage.showJournalGroupPage}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="showJournalBalancesMenuItem"
+                        binding="#{journalBalancesReportPage.mainMenuComponent}"
+                        label="Изменения балансов л/с"
+                        action="#{journalBalancesReportPage.show}" reRender="workspaceForm" />
+</rich:panelMenuGroup>
+
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                      rendered="#{mainPage.eligibleToViewUsers}" expanded="true">
     <a4j:support event="onclick" action="#{mainPage.showUserGroupPage}" reRender="workspaceForm" />

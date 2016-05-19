@@ -49,6 +49,7 @@ import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
+import ru.axetta.ecafe.processor.web.ui.report.security.JournalBalancesReportPage;
 import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
@@ -135,6 +136,10 @@ public class MainPage implements Serializable {
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
+
+    //Journals
+    private final BasicWorkspacePage journalGroupPage = new BasicWorkspacePage();
+    private final JournalBalancesReportPage journalBalancesReportPage = new JournalBalancesReportPage();
 
     // User manipulation
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
@@ -600,6 +605,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showJournalGroupPage() {
+        currentWorkspacePage = journalGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
     }
@@ -616,6 +627,31 @@ public class MainPage implements Serializable {
 
     public UserListPage getUserListPage() {
         return userListPage;
+    }
+
+    public Object showJournalBalancesReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            //journalBalancesReportPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = journalBalancesReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill user list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы журнала изменений балансов клиентов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
     }
 
     public Object showUserListPage() {
@@ -8785,5 +8821,13 @@ public class MainPage implements Serializable {
 
     public void setNewPasswordConfirm(String newPasswordConfirm) {
         this.newPasswordConfirm = newPasswordConfirm;
+    }
+
+    public BasicWorkspacePage getJournalGroupPage() {
+        return journalGroupPage;
+    }
+
+    public JournalBalancesReportPage getJournalBalancesReportPage() {
+        return journalBalancesReportPage;
     }
 }
