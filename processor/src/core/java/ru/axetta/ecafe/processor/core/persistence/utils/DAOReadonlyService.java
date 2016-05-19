@@ -124,7 +124,7 @@ public class DAOReadonlyService {
             User user = findUserById(idOfUser);
             return user;
         } catch (Exception e) {
-            logger.error("Can't retrieve user from current Session", e);
+            //logger.error("Can't retrieve user from current Session", e);
             return null;
         }
     }
