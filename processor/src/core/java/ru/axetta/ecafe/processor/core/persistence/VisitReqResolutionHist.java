@@ -14,6 +14,16 @@ import java.util.Date;
  * Time: 11:20
  */
 public class VisitReqResolutionHist implements Serializable {
+    public static final int NOT_SYNCHRONIZED = 0;
+    public static final int SYNCHRONIZED = 1;
+
+    public static final int RES_CREATED = 0;
+    public static final int RES_CONFIRMED = 1;
+    public static final int RES_REJECTED = 2;
+    public static final int RES_CANCELED = 3;
+    public static final int RES_OVERDUE = 4;
+    public static final int RES_OVERDUE_SERVER = 5;
+
     private CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist;
     private Org orgResol; // Организация, в которой была вынесена резолюция
     private Org orgRegistry; // Организация регистрации, откуда пришёл запрос на посещение

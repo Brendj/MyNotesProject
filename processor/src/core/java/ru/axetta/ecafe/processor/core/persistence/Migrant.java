@@ -15,6 +15,10 @@ import java.util.Date;
  */
 
 public class Migrant implements Serializable{
+    public static final int NOT_SYNCHRONIZED = 0;
+    public static final int SYNCHRONIZED = 1;
+    public static final int CLOSED = 3;
+
     private CompositeIdOfMigrant compositeIdOfMigrant;
     private Org orgRegistry; // Организация регистрации
     private Contragent orgRegVendor; // Поставщик в организации регистрации

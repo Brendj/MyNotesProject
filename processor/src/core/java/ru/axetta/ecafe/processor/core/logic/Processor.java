@@ -988,6 +988,16 @@ public class Processor
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
 
+        try {
+            if (request.getMigrants() != null) {
+                migrantsData = processMigrantsData(request.getMigrants());
+                resMigrants = processMigrants(request.getMigrants());
+            }
+        } catch (Exception e) {
+            String message = String.format("processMigrants: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
 
         try {
             if (request.getAccountOperationsRegistry() != null) {
@@ -1363,17 +1373,6 @@ public class Processor
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());
-            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-
-        try {
-            if (request.getMigrants() != null) {
-                migrantsData = processMigrantsData(request.getMigrants());
-                resMigrants = processMigrants(request.getMigrants());
-            }
-        } catch (Exception e) {
-            String message = String.format("processMigrants: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
@@ -2622,6 +2621,29 @@ public class Processor
             HibernateUtils.close(persistenceSession, logger);
         }
         return resMigrants;
+    }
+
+
+    public static List<Client> getMigrants(Long idOfOrg) {
+        List<Client> clients = null;
+        try {
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                clients = DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        } catch (Exception e) {
+            String message = String.format("processMigrants: %s", e.getMessage());
+            logger.error(message, e);
+        }
+        return clients;
     }
 
     //responce
@@ -3875,7 +3897,9 @@ public class Processor
                     clientRegistryRequest.getCurrentVersion());
             
             // Добавляем временных посетителей (мигрантов)
-            clients.addAll(DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg));
+
+            List<Client> migrants = DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
+            clients.addAll(migrants);
 
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
@@ -3897,6 +3921,12 @@ public class Processor
                     activeClientsId.add(cl.getIdOfClient());
                 }
             }
+
+            // Добавляем временных посетителей (мигрантов)
+            for(Client migrant : migrants){
+                activeClientsId.add(migrant.getIdOfClient());
+            }
+
             // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
             // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"
             if (clientRegistryRequest.getCurrentCount() != null && activeClientsId.size() != clientRegistryRequest

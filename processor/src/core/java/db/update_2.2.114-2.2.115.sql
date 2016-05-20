@@ -78,7 +78,7 @@ CREATE TABLE cf_visitreqresolutionhist
   resolution INTEGER NOT NULL,
   resolutiondatetime BIGINT NOT NULL,
   resolutioncause CHARACTER VARYING(512),
-  idofclientresol BIGINT NOT NULL,
+  idofclientresol BIGINT,
   contactinfo CHARACTER VARYING(128),
   syncstate INTEGER NOT NULL,
   CONSTRAINT cf_visitreqresolutionhist_pk PRIMARY KEY (idofrecord, idofrequest, idoforgresol),

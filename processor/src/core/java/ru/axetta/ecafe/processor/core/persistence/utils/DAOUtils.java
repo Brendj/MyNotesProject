@@ -2215,7 +2215,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("syncState", 0));
+        criteria.add(Restrictions.eq("syncState", Migrant.NOT_SYNCHRONIZED));
         return criteria.list();
     }
 
@@ -2224,7 +2224,8 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
         criteria.createAlias("migrant","migrant", JoinType.LEFT_OUTER_JOIN);
         criteria.add(Restrictions.eq("migrant.orgVisit", org));
-        criteria.add(Restrictions.eq("syncState", 0));
+        criteria.add(Restrictions.ne("orgResol.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("syncState", VisitReqResolutionHist.NOT_SYNCHRONIZED));
         return criteria.list();
     }
 
@@ -2232,7 +2233,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
         criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
         criteria.add(Restrictions.ne("orgResol.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("syncState", 0));
+        criteria.add(Restrictions.eq("syncState", VisitReqResolutionHist.NOT_SYNCHRONIZED));
         return criteria.list();
     }
 
@@ -2247,7 +2248,7 @@ public class DAOUtils {
             if(res.getResolution().equals(1)){
                 clients.add(migrant.getClientMigrate());
             }
-        } 
+        }
         return new ArrayList<Client>(clients);
     }
 
@@ -2258,6 +2259,24 @@ public class DAOUtils {
         criteria.add(Restrictions.lt("visitStartDate", date));
         criteria.add(Restrictions.gt("visitEndDate", date));
         return criteria.list();
+    }
+
+    public static List<Migrant> getOverdueMigrants(Session session) throws Exception {
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.lt("visitEndDate", date));
+        criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
+        return criteria.list();
+    }
+
+    public static long nextIdOfProcessorMigrantResolutions(Session session){
+        long id = 0L;
+        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idoforgresol=-1 order by v.idofrecord desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            id = Long.valueOf(o.toString())+1;
+        }
+        return id;
     }
 
     public static List enterEventsSummary(){

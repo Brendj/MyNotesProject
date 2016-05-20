@@ -63,7 +63,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                         Contragent contragent = (Contragent)session.load(Contragent.class, orgRegistry.getDefaultSupplier().getIdOfContragent());
                         Client clientMigrate = (Client)session.load(Client.class, outMigReqItem.getIdOfClient());
                         migrant = new Migrant(compositeIdOfMigrant, orgRegistry.getDefaultSupplier(), clientMigrate,
-                                orgVisit, outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), 0);
+                                orgVisit, outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
                         migrant.setOrgRegVendor(contragent);
                         session.save(migrant);
                         resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
@@ -113,10 +113,15 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             Org orgRegistry = (Org)session.load(Org.class, outMigReqHisItem.getIdOfOrgRegistry());
                             Client clientResol = (Client)session.load(Client.class, outMigReqHisItem.getIdOfClientResol());
                             outMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgRegistry, outMigReqHisItem.getResolution(),
-                                    outMigReqHisItem.getResolutionDateTime(), outMigReqHisItem.getResolutionCause(), clientResol, outMigReqHisItem.getContactInfo(), 0);
+                                    outMigReqHisItem.getResolutionDateTime(), outMigReqHisItem.getResolutionCause(), clientResol, outMigReqHisItem.getContactInfo(),
+                                    VisitReqResolutionHist.NOT_SYNCHRONIZED);
                             session.save(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem.setResCode(outMigReqHisItem.getResCode());
+                            if(outMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)){
+                                migrant.setSyncState(Migrant.CLOSED);
+                                session.save(migrant);
+                            }
                         } else {
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem();
                             resOutcomeMigrationRequestsHistoryItem.setIdOfRecord(outMigReqHisItem.getIdOfRequest());
@@ -172,10 +177,14 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             Client clientResol = (Client)session.load(Client.class, inMigReqHisItem.getIdOfClientResol());
                             inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
                                     inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
-                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), 0);
+                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
                             session.save(inMigReqHis);
                             resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
                             resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
+                            if(inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_REJECTED) || inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_OVERDUE)){
+                                migrant.setSyncState(Migrant.CLOSED);
+                                session.save(migrant);
+                            }
                         } else {
                             resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem();
                             resIncomeMigrationRequestsHistoryItem.setIdOfRecord(inMigReqHisItem.getIdOfRequest());
@@ -199,8 +208,6 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             logger.error("Error saving IncomeMigrationRequestsHistory", e);
             return null;
         }
-
-        List<Client> list = DAOUtils.getActiveMigrantsForOrg(session, migrants.getIdOfOrg());
 
         result.setResOutcomeMigrationRequestsItems(outcomeMigrationRequestsItems);
         result.setResOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
@@ -228,7 +235,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
             inMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
             incomeMigrationRequestsItems.add(inMigReqItem);
-            migrant.setSyncState(1);
+            migrant.setSyncState(Migrant.SYNCHRONIZED);
             session.save(migrant);
         }
         session.flush();
@@ -237,16 +244,25 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
         for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
             inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
-            inMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
+                inMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+                inMigReqHisItem.setResolution(vReqHis.getResolution());
+            } else {
+                inMigReqHisItem.setIdOfOrgIssuer(-1L);
+                inMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
+            }
             inMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
             inMigReqHisItem.setIdOfOrgRegistry(vReqHis.getOrgRegistry().getIdOfOrg());
-            inMigReqHisItem.setResolution(vReqHis.getResolution());
             inMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
             inMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
-            inMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            if(vReqHis.getClientResol() != null) {
+                inMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            } else {
+                inMigReqHisItem.setIdOfClientResol(-1L);
+            }
             inMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
             incomeMigrationRequestsHistoryItems.add(inMigReqHisItem);
-            vReqHis.setSyncState(1);
+            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
             session.save(vReqHis);
         }
 
@@ -255,15 +271,24 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 migrants.getIdOfOrg());
         for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList1){
             outMigReqHisItem = new ResOutcomeMigrationRequestsHistoryItem();
-            outMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
+                outMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+                outMigReqHisItem.setResolution(vReqHis.getResolution());
+            } else {
+                outMigReqHisItem.setIdOfOrgIssuer(-1L);
+                outMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
+            }
             outMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
-            outMigReqHisItem.setResolution(vReqHis.getResolution());
             outMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
             outMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
-            outMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            if(vReqHis.getClientResol() != null) {
+                outMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            } else {
+                outMigReqHisItem.setIdOfClientResol(-1L);
+            }
             outMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
             outcomeMigrationRequestsHistoryItems.add(outMigReqHisItem);
-            vReqHis.setSyncState(1);
+            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
             session.save(vReqHis);
         }
 

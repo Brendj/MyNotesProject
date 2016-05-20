@@ -4,12 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts;
 
+import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncReadOnlyRepository;
@@ -18,9 +17,10 @@ import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsReg
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.CardsItem;
-import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.VisitorItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +41,8 @@ import java.util.List;
 @Scope("singleton")
 public class AccountsRegistryHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(AccountsRegistryHandler.class);
+
     @Transactional
     public AccountsRegistry handlerFull(SyncRequest request,long idOfOrg) {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
@@ -52,6 +54,10 @@ public class AccountsRegistryHandler {
 
         ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
         List<Client> clientList = clientDao.findAllActiveByOrg(idOfOrgs);
+
+        // Добавляем карты временных посетителей (мигрантов)
+        clientList.addAll(Processor.getMigrants(idOfOrg));
+
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
@@ -89,6 +95,10 @@ public class AccountsRegistryHandler {
 
         ClientReadOnlyRepository clientDao = ClientReadOnlyRepository.getInstance();
         List<Client> clientList = clientDao.findAllActiveByOrgAndUpdateDate(idOfOrgs,lastAccRegistrySyncDate);
+
+        // Добавляем карты временных посетителей (мигрантов)
+        clientList.addAll(Processor.getMigrants(idOfOrg));
+
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
