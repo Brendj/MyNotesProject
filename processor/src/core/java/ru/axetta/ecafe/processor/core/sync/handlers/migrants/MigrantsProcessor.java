@@ -115,13 +115,16 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             outMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgRegistry, outMigReqHisItem.getResolution(),
                                     outMigReqHisItem.getResolutionDateTime(), outMigReqHisItem.getResolutionCause(), clientResol, outMigReqHisItem.getContactInfo(),
                                     VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                            session.save(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem.setResCode(outMigReqHisItem.getResCode());
                             if(outMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)){
+                                if(migrant.getSyncState().equals(Migrant.NOT_SYNCHRONIZED)){
+                                    outMigReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
+                                }
                                 migrant.setSyncState(Migrant.CLOSED);
                                 session.save(migrant);
                             }
+                            session.save(outMigReqHis);
                         } else {
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem();
                             resOutcomeMigrationRequestsHistoryItem.setIdOfRecord(outMigReqHisItem.getIdOfRequest());
