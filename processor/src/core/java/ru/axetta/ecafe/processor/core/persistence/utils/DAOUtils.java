@@ -633,12 +633,13 @@ public class DAOUtils {
         criteria.add(Restrictions.in("idOfOrg", findFriendlyOrgIds(session, organization)));
         List<Org> result = criteria.list();
         return result !=null ? result : new ArrayList<Org>();
+
     }
 
     public static List<Org> getOrgsByStatusSinceVersion(Session session, OrganizationStatus status, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("status", status));
-        criteria.add(Restrictions.ne("type", 2));
+        criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();
     }
@@ -2230,6 +2231,7 @@ public class DAOUtils {
     public static List<VisitReqResolutionHist> getOutcomeResolutionsForOrg(Session session, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
         criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.ne("orgResol.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("syncState", 0));
         return criteria.list();
     }
@@ -2243,9 +2245,9 @@ public class DAOUtils {
             query.setMaxResults(1);
             VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
             if(res.getResolution().equals(1)){
-                clients.add(res.getClientResol());
+                clients.add(migrant.getClientMigrate());
             }
-        }
+        } 
         return new ArrayList<Client>(clients);
     }
 

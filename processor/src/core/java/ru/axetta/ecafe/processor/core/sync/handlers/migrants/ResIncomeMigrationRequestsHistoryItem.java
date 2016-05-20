@@ -24,6 +24,7 @@ public class ResIncomeMigrationRequestsHistoryItem {
     private Long idOfRecord;
     private Long idOfOrgIssuer;
     private Long idOfRequest;
+    private Long idOfOrgRegistry;
     private Integer resolution;
     private Date resolutionDateTime;
     private String resolutionCause;
@@ -44,6 +45,7 @@ public class ResIncomeMigrationRequestsHistoryItem {
         XMLUtils.setAttributeIfNotNull(element, "IdOfRecord", idOfRecord);
         XMLUtils.setAttributeIfNotNull(element, "IdOfOrgIssuer", idOfOrgIssuer);
         XMLUtils.setAttributeIfNotNull(element, "IdOfRequest", idOfRequest);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrgReg", idOfOrgRegistry);
         XMLUtils.setAttributeIfNotNull(element, "Resolution", resolution);
         XMLUtils.setAttributeIfNotNull(element, "ResolutionDateTime", resolutionDateTime != null ? CalendarUtils.dateTimeToString(resolutionDateTime) : null);
         XMLUtils.setAttributeIfNotNull(element, "ResolutionCause", resolutionCause);
@@ -78,6 +80,14 @@ public class ResIncomeMigrationRequestsHistoryItem {
 
     public void setIdOfRequest(Long idOfRequest) {
         this.idOfRequest = idOfRequest;
+    }
+
+    public Long getIdOfOrgRegistry() {
+        return idOfOrgRegistry;
+    }
+
+    public void setIdOfOrgRegistry(Long idOfOrgRegistry) {
+        this.idOfOrgRegistry = idOfOrgRegistry;
     }
 
     public Integer getResolution() {

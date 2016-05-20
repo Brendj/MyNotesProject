@@ -55,7 +55,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
                             resOutcomeMigrationRequestsItem.setResCode(110);
                             resOutcomeMigrationRequestsItem.setErrorMessage("OutcomeMigrationRequests with IdOfRequest=" + outMigReqItem.getIdOfRequest()
-                                    + "but with other attributes already exists");
+                                    + " but with other attributes already exists");
                         }
                     } else {
                         Org orgRegistry = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgRegistry());
@@ -200,6 +200,8 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             return null;
         }
 
+        List<Client> list = DAOUtils.getActiveMigrantsForOrg(session, migrants.getIdOfOrg());
+
         result.setResOutcomeMigrationRequestsItems(outcomeMigrationRequestsItems);
         result.setResOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
         result.setResIncomeMigrationRequestsHistoryItems(incomeMigrationRequestsHistoryItems);
@@ -237,6 +239,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
             inMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
             inMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
+            inMigReqHisItem.setIdOfOrgRegistry(vReqHis.getOrgRegistry().getIdOfOrg());
             inMigReqHisItem.setResolution(vReqHis.getResolution());
             inMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
             inMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
