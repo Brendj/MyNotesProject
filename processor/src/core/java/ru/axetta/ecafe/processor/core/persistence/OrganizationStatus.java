@@ -12,8 +12,8 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public enum OrganizationStatus {
-    /*0*/ ACTIVE("Обслуживается"),
-    /*1*/ INACTIVE("Не обслуживается"),
+    /*0*/ INACTIVE("Не обслуживается"),
+    /*1*/ ACTIVE("Обслуживается"),
     /*2*/ PLANNED("Не обслуживается - запланировано подключение"),
     /*3*/ REPAIR("Не обслуживается - на ремонте"),
     /*4*/ CLOSED("Не обслуживается - закрыто");
