@@ -120,6 +120,11 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             if(outMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)){
                                 if(migrant.getSyncState().equals(Migrant.NOT_SYNCHRONIZED)){
                                     outMigReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
+                                    List<VisitReqResolutionHist> list = DAOUtils.getNotSyncResolutionsForMigrant(session, migrant);
+                                    for(VisitReqResolutionHist v : list){
+                                        v.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
+                                        session.save(v);
+                                    }
                                 }
                                 migrant.setSyncState(Migrant.CLOSED);
                                 session.save(migrant);

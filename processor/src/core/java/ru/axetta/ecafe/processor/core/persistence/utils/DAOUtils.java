@@ -2237,6 +2237,13 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<VisitReqResolutionHist> getNotSyncResolutionsForMigrant(Session session, Migrant migrant) throws Exception {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.add(Restrictions.eq("migrant", migrant));
+        criteria.add(Restrictions.eq("syncState", VisitReqResolutionHist.NOT_SYNCHRONIZED));
+        return criteria.list();
+    }
+
     public static List<Client> getActiveMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Set<Client> clients = new HashSet<Client>();
         List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
@@ -2271,10 +2278,10 @@ public class DAOUtils {
 
     public static long nextIdOfProcessorMigrantResolutions(Session session){
         long id = 0L;
-        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idoforgresol=-1 order by v.idofrecord desc limit 1 for update");
+        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 0 order by v.idofrecord asc limit 1 for update");
         Object o = query.uniqueResult();
         if(o!=null){
-            id = Long.valueOf(o.toString())+1;
+            id = Long.valueOf(o.toString()) - 1;
         }
         return id;
     }
