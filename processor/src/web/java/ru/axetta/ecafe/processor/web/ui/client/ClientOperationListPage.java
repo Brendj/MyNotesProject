@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMig
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ClientSmsList;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
 
@@ -80,7 +81,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     }
 
     public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+        this.endTime = CalendarUtils.endOfDay(endTime);
     }
 
     public ClientPaymentList getClientPaymentList() {
