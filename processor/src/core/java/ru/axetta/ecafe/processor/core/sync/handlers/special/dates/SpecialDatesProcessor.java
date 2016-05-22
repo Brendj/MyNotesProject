@@ -50,6 +50,9 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     Boolean deleted = item.getDelete();
                     Org orgOwner = (Org)session.load(Org.class, item.getIdOfOrgOwner());
                     String comment = item.getComment();
+                    if (comment == null) {
+                        comment = "";
+                    }
 
                     if(specialDate == null){
                         specialDate = new SpecialDate(compositeId, isWeekend, comment);
