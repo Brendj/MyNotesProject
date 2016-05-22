@@ -263,10 +263,12 @@ public class RNIPLoadPaymentsService {
                 SecurityJournalProcess.EventType.RNIP, new Date());
         process.saveWithSuccess(true);
         boolean isSuccessEnd = true;
+        Boolean resultReceivePayments;
         RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean(); //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                isSuccessEnd = isSuccessEnd && rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
+                resultReceivePayments = rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
+                isSuccessEnd = isSuccessEnd && resultReceivePayments;
             } catch (Exception e) {
                 isSuccessEnd = false;
                 logger.error("Failed to receive or proceed payments", e);

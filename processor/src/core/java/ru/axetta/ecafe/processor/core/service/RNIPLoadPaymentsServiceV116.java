@@ -260,9 +260,13 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
                 result.add(map);
             } else {
                 //парсим по новому - 1.16
-                StringReader reader = new StringReader(paymentInfoStr);
-                PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
-                result.add(parsePayment(payment));
+                try {
+                    StringReader reader = new StringReader(paymentInfoStr);
+                    PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
+                    result.add(parsePayment(payment));
+                } catch (Exception e) {
+                    logger.error(String.format("Cant parse payment %s", paymentInfoStr));
+                }
             }
         }
 
