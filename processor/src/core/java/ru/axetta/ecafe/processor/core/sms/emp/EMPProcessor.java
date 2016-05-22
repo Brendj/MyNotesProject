@@ -167,6 +167,7 @@ public class EMPProcessor {
                 SecurityJournalProcess.EventType.EMP_BIND_CLIENTS, new Date());
         process.saveWithSuccess(true);
         boolean isSuccessEnd = true;
+        boolean resultProcess;
         //  Загружаем статистику
         //EMPStatistics statistics = loadEMPStatistics();
         //  Вспомогательные значения
@@ -189,7 +190,8 @@ public class EMPProcessor {
         }
         for (ru.axetta.ecafe.processor.core.persistence.Client c : notBindedClients) {
             try {
-                isSuccessEnd = isSuccessEnd && bindClient(storage, c, synchDate/*, statistics*/);
+                resultProcess = bindClient(storage, c, synchDate/*, statistics*/);
+                isSuccessEnd = isSuccessEnd && resultProcess;
             } catch (EMPException empe) {
                 isSuccessEnd = false;
                 logger.error(String.format("Failed to parse client: [code=%s] %s", empe.getCode(), empe.getError()),

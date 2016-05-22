@@ -69,8 +69,10 @@ public class SMSResendingService {
             process.saveWithSuccess(true);
         }
         boolean isSuccessEnd = true;
+        boolean resultProcess;
         for(ClientSmsResending resending : resendings) {
-            isSuccessEnd = isSuccessEnd && getInstance().processResendingMessage(resending);
+            resultProcess = getInstance().processResendingMessage(resending);
+            isSuccessEnd = isSuccessEnd && resultProcess;
         }
         if (resendings != null && resendings.size() > 0) {
             SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
