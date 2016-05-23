@@ -600,8 +600,11 @@ public class Processor
 
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
-        if (c != null && c.getClient() != null) {
-            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
+        if (c != null) {
+            if(c.getClient() != null){
+                throw new Exception(String.format("Карта с таким номером уже зарегистрирована на клиента: %s.", c.getClient().getIdOfClient()));
+            }
+            throw new Exception("Карта с таким номером уже зарегистрирована.");
         }
 
         logger.debug("check exist temp card");
@@ -617,6 +620,7 @@ public class Processor
                         "Карта с таким номером уже зарегистрирована как временная на посетителя: %s. Статус карты - %s.",
                         ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
             }
+            throw new Exception("Карта с таким номером уже зарегистрирована как временная.");
         }
 
         logger.debug("check exist newcard");
