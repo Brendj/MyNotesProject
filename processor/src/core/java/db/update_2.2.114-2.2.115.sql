@@ -90,6 +90,15 @@ CREATE TABLE cf_visitreqresolutionhist
   REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
-ALTER TABLE cf_registrychange ADD COLUMN genderFrom integer;
-ALTER TABLE cf_registrychange ADD COLUMN birthDateFrom bigint;
-ALTER TABLE cf_registrychange ADD COLUMN benefitOnAdmissionFrom character varying (3000);
+ALTER TABLE cf_registrychange ADD COLUMN genderFrom integer,
+ADD COLUMN birthDateFrom bigint,
+ADD COLUMN benefitOnAdmissionFrom character varying (3000);
+
+CREATE INDEX cf_security_journal_authenticate_eventdate_idx
+ON cf_security_journal_authenticate USING btree (eventdate);
+
+CREATE INDEX cf_security_journal_processes_eventdate_idx
+ON cf_security_journal_processes USING btree (eventdate);
+
+CREATE INDEX cf_security_journal_reports_eventdate_idx
+ON cf_security_journal_reports USING btree (eventdate);

@@ -49,7 +49,9 @@ import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
+import ru.axetta.ecafe.processor.web.ui.report.security.JournalAuthenticationReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.security.JournalBalancesReportPage;
+import ru.axetta.ecafe.processor.web.ui.report.security.UserSelectPage;
 import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
@@ -110,6 +112,7 @@ public class MainPage implements Serializable {
     private Long selectedIdOfSettlement;
     private Long selectedIdOfEventNotification;
     private Long removedIdOfEventNotification;
+    private Long idOfUser;
     private String removedReportTemplate;
     private String currentConfigurationProvider;
     /* Параметр фильтра по организациям в странице выбора списка оганизаций
@@ -140,6 +143,7 @@ public class MainPage implements Serializable {
     //Journals
     private final BasicWorkspacePage journalGroupPage = new BasicWorkspacePage();
     private final JournalBalancesReportPage journalBalancesReportPage = new JournalBalancesReportPage();
+    private final JournalAuthenticationReportPage journalAuthenticationReportPage = new JournalAuthenticationReportPage();
 
     // User manipulation
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
@@ -321,6 +325,7 @@ public class MainPage implements Serializable {
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
+    private final UserSelectPage userSelectPage = new UserSelectPage();
 
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
@@ -646,6 +651,30 @@ public class MainPage implements Serializable {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы журнала изменений балансов клиентов: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showJournalAuthenticationReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = journalAuthenticationReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill user list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы журнала аутентификации пользователей: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1809,6 +1838,31 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateUserSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            getUserSelectPage().fill(persistenceSession, getIdOfUser());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill org selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора пользователя: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
     public void setIdOfContragentOrgList(List<Long> idOfContragentOrgList) {
         this.idOfContragentOrgList = idOfContragentOrgList;
     }
@@ -1919,6 +1973,53 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
 
 
+        }
+        return null;
+    }
+
+    public Object completeUserSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userSelectPage.completeUserSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == userSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete user selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора пользователя: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object cancelUserSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            userSelectPage.cancelUserSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == userSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete user selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора пользователя: " + e.getMessage(), null));
         }
         return null;
     }
@@ -3178,6 +3279,36 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
         }
         //}
+        return null;
+    }
+
+    public Object showUserSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            userSelectPage.fill(persistenceSession, null);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (currentTopMostPage instanceof UserSelectPage.CompleteHandler) {
+                userSelectPage.pushCompleteHandler((UserSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(userSelectPage);
+            }
+
+        } catch (Exception e) {
+            logger.error("Failed to fill client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора пользователя: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
         return null;
     }
 
@@ -8829,5 +8960,17 @@ public class MainPage implements Serializable {
 
     public JournalBalancesReportPage getJournalBalancesReportPage() {
         return journalBalancesReportPage;
+    }
+
+    public Long getIdOfUser() {
+        return idOfUser;
+    }
+
+    public void setIdOfUser(Long idOfUser) {
+        this.idOfUser = idOfUser;
+    }
+
+    public UserSelectPage getUserSelectPage() {
+        return userSelectPage;
     }
 }

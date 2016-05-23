@@ -1228,8 +1228,13 @@
 
     <rich:panelMenuItem id="showJournalBalancesMenuItem"
                         binding="#{journalBalancesReportPage.mainMenuComponent}"
-                        label="Изменения балансов л/с"
+                        label="Журнал изменения балансов л/с"
                         action="#{journalBalancesReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="showJournalAuthenticationMenuItem"
+                        binding="#{journalAuthenticationReportPage.mainMenuComponent}"
+                        label="Журнал событий входа-выхода"
+                        action="#{journalAuthenticationReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"

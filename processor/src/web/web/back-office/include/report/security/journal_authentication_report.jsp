@@ -8,29 +8,27 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="journalBalancesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.security.JournalBalancesReportPage"--%>
-<h:panelGrid id="journalBalanceseportPanelGrid" binding="#{journalBalancesReportPage.pageComponent}" styleClass="borderless-grid">
+<%--@elvariable id="journalAuthenticationReportPage" type="ru.axetta.ecafe.processor.web.ui.report.security.JournalAuthenticationReportPage"--%>
+<h:panelGrid id="journalAuthenticationReportPanelGrid" binding="#{journalAuthenticationReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
 
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{journalBalancesReportPage.startDate}" datePattern="dd.MM.yyyy"
+        <rich:calendar value="#{journalAuthenticationReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{journalBalancesReportPage.endDate}" datePattern="dd.MM.yyyy"
+        <rich:calendar value="#{journalAuthenticationReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Клиент" />
-        <h:panelGroup id="clientFilter">
-            <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(journalBalancesReportPage.getClientList())}"
-                               reRender="modalClientListSelectorPanel,selectedClientList"
+        <h:outputText styleClass="output-text" escape="true" value="Пользователь" />
+        <h:panelGroup id="userFilter">
+            <a4j:commandButton value="..." action="#{mainPage.showUserSelectPage()}"
+                               reRender="modalUserSelectorPanel,userFilter"
                                oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                                        #{rich:component('modalUserSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                <f:setPropertyActionListener value="#{journalBalancesReportPage.getStringClientList}"
-                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.userSelectPage.filter}" target="#{mainPage.userSelectPage.filter}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                          value=" {#{journalBalancesReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true" id="selectedUser"
+                          value=" {#{journalAuthenticationReportPage.filter}}" />
         </h:panelGroup>
 
         <a4j:status id="reportGenerateStatus">
@@ -41,10 +39,10 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{journalBalancesReportPage.doGenerate}"
+        <a4j:commandButton value="Генерировать отчет" action="#{journalAuthenticationReportPage.doGenerate}"
                            reRender="workspaceTogglePanel, reportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{journalBalancesReportPage.doGenerateXLS()}" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{journalAuthenticationReportPage.doGenerateXLS()}" styleClass="command-button" />
     </h:panelGrid>
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
@@ -52,9 +50,9 @@
 
     <h:panelGrid styleClass="borderless-grid" id="reportPanel" columnClasses="center-aligned-column">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${not empty journalBalancesReportPage.htmlReport}" >
+        <c:if test="${not empty journalAuthenticationReportPage.htmlReport}" >
             <f:verbatim>
-                <div>${journalBalancesReportPage.htmlReport}</div>
+                <div>${journalAuthenticationReportPage.htmlReport}</div>
             </f:verbatim>
         </c:if>
     </h:panelGrid>
