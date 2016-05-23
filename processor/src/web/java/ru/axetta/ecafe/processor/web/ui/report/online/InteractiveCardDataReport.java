@@ -325,7 +325,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     fondGk += Long.valueOf(value);
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1",
                             Long.valueOf(value), "в рамках ГК на внедрение",
-                            "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
+                            "Количество сервисных карт, поступивших на этапе внедрения ИС ПП");
                     items.add(item);
                     existsTO = true;
                 }
@@ -334,7 +334,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     fondGk += Long.valueOf(value);
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2",
                             Long.valueOf(value), "в рамках ГК на сервис",
-                            "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
+                            "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП");
                     items.add(item);
                     existsTT = true;
                 }
@@ -343,7 +343,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                     fondGk += Long.valueOf(value);
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(7L, "2.3",
                             Long.valueOf(value), "Закуплено ОО",
-                            "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
+                            "Количество сервисных карт, поступивших в результате их закупки");
                     items.add(item);
                     existsTTH = true;
                 }
@@ -351,7 +351,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                 if (idOfRecord == 3L) {
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(12L, "6",
                             Long.valueOf(value), "Фонд резервных карт, доступных к использованию",
-                            "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
+                            "Количество карт, физически находящихся в резервном фонде");
                     items.add(item);
                     existsSix = true;
                 }
@@ -359,7 +359,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                 if (idOfRecord == 4L) {
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(11L, "5",
                             Long.valueOf(value), "Потери сервисных  карт",
-                            "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
+                            "Количество подтвержденных физических потерь сервисных карт");
                     items.add(item);
                     existsFive = true;
                 }
@@ -377,34 +377,34 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             if (existsTO == false) {
                 InteractiveCardDataReportItem itemTO = new InteractiveCardDataReportItem(5L, "2.1", 0L,
                         "в рамках ГК на внедрение",
-                        "Количество сервисных карт, поступивших на этапе внедрения ИС ПП (Форма учета, показатель 1)");
+                        "Количество сервисных карт, поступивших на этапе внедрения ИС ПП");
                 items.add(itemTO);
             }
 
             if (existsTT == false) {
                 InteractiveCardDataReportItem itemTT = new InteractiveCardDataReportItem(6L, "2.2", 0L,
                         "в рамках ГК на сервис",
-                        "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП (Форма учета, показатель 2)");
+                        "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП");
                 items.add(itemTT);
             }
 
             if (existsTTH == false) {
                 InteractiveCardDataReportItem itemTTH = new InteractiveCardDataReportItem(7L, "2.3", 0L, "Закуплено ОО",
-                        "Количество сервисных карт, поступивших в результате их закупки (Форма учета, показатель 3)");
+                        "Количество сервисных карт, поступивших в результате их закупки");
                 items.add(itemTTH);
             }
 
             if (existsFive == false) {
                 InteractiveCardDataReportItem itemFive = new InteractiveCardDataReportItem(11L, "5", 0L,
                         "Потери сервисных  карт",
-                        "Количество подтвержденных физических потерь сервисных карт (Форма учета, показатель 4)");
+                        "Количество подтвержденных физических потерь сервисных карт");
                 items.add(itemFive);
             }
 
             if (existsSix == false) {
                 InteractiveCardDataReportItem itemSix = new InteractiveCardDataReportItem(12L, "6", 0L,
                         "Фонд резервных карт, доступных к использованию",
-                        "Количество карт, физически находящихся в резервном фонде (Форма учета, показатель 5)");
+                        "Количество карт, физически находящихся в резервном фонде");
                 items.add(itemSix);
             }
 
