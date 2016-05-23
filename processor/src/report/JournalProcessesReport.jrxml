@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JournalProcessesReport" pageWidth="815" pageHeight="595" orientation="Landscape" columnWidth="775" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="ef1b814a-1ef5-4d07-9b7f-015204ea0c57">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Column header" forecolor="#666666" fill="Solid" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman">
+		<pen lineWidth="1.0" lineStyle="Solid"/>
+	</style>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date">
+		<parameterDescription><![CDATA[Конечная дата]]></parameterDescription>
+	</parameter>
+	<field name="eventType" class="java.lang.String"/>
+	<field name="eventDate" class="java.util.Date"/>
+	<field name="userName" class="java.lang.String"/>
+	<field name="isSuccess" class="java.lang.String"/>
+	<field name="eventClass" class="java.lang.String"/>
+	<field name="serverAddress" class="java.lang.String"/>
+	<variable name="startDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
+	</variable>
+	<variable name="endDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="59aa78f2-cf2f-4ff3-af69-832ed77972d0" x="0" y="0" width="774" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true" isItalic="false" isUnderline="false" pdfEncoding="Cp1251"/>
+				</textElement>
+				<text><![CDATA[Журнал запуска фоновых процессов]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="e80108c9-1fad-4c8f-aa71-d28d388f7809" x="0" y="30" width="774" height="16">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box bottomPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" pdfEncoding="Cp1251"/>
+				</textElement>
+				<textFieldExpression><![CDATA["За период: " + $V{startDate} + " - " + $V{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="9787c632-b7e9-4c7e-9418-0a1db2307979" style="Column header" mode="Transparent" x="677" y="52" width="97" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Выполнено успешно]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f81d2daf-e7c4-4799-af34-934970b9820d" style="Column header" mode="Transparent" x="448" y="52" width="129" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Пользователь]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8657f744-a0f5-4db5-af19-08ca3b8c060c" style="Column header" mode="Transparent" x="0" y="52" width="260" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Тип события]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f08464d6-55d3-4795-b19c-d498929e1d93" style="Column header" mode="Transparent" x="354" y="52" width="94" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Запуск / завершение]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb9eef5a-eed6-4bc5-88c1-0a9e1df4b010" style="Column header" mode="Transparent" x="577" y="52" width="100" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Сервер]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3e0086cf-e0a2-4b55-9313-3c365f6aff08" style="Column header" mode="Transparent" x="260" y="52" width="94" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Дата и время]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="da45b447-3996-42ce-b09d-8f700884e31f" positionType="Float" stretchType="RelativeToBandHeight" x="677" y="1" width="97" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{isSuccess}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="f97be0cd-fe79-4f0b-bbed-70a2419eea56" positionType="Float" stretchType="RelativeToBandHeight" x="448" y="1" width="129" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{userName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="09d9ae45-2be4-4f84-941f-3c916bb55992" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="1" width="260" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{eventType}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="c1b26d9e-a32d-43d8-8537-49eb875b6771" positionType="Float" stretchType="RelativeToBandHeight" x="354" y="1" width="94" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{eventClass}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="180dc85d-86f5-4ce3-9bfb-6b42c11923b7" positionType="Float" stretchType="RelativeToBandHeight" x="577" y="1" width="100" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{serverAddress}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="824c10e5-a298-4834-908d-82a80348f239" positionType="Float" stretchType="RelativeToBandHeight" x="260" y="1" width="94" height="20"/>
+				<box topPadding="1" leftPadding="2">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{eventDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
