@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
 public class Org implements Serializable {
 
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
+    public static final int INACTIVE_STATE = 0;
+    public static final int ACTIVE_STATE = 1;
     public static final String UNKNOWN_STATE_NAME = "Неизвестное состояние";
     public static final String[] REFECTORY_TYPE_NAMES = {
             "Сырьевая столовая", "Столовая-доготовочная", "Буфет-раздаточная", "Комбинат питания"};

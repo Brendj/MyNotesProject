@@ -10,7 +10,10 @@ import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
+import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
@@ -458,7 +461,7 @@ public class OrgMskNSIService extends MskNSIService {
                 if (found) break;
             }
 
-            if(found && o.getState() != OrganizationStatus.ACTIVE.ordinal()) {  //если организация не обслуживается - ее не включаем в список
+            if(found && o.getState() != Org.ACTIVE_STATE) {  //если организация не обслуживается - ее не включаем в список
                 continue;
             }
 

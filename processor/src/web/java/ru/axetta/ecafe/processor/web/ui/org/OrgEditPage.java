@@ -234,21 +234,30 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        long nextVersion = DAOUtils.nextVersionByOrgStucture(session);
+
         Set<Org> friendlyOrg = org.getFriendlyOrg();
         if(idOfOrgList!=null && !idOfOrgList.isEmpty()){
             HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
             if(!selectOrg.equals(friendlyOrg)){
+                // Если убрали или внесли организацию в список дружественных, то обновляем версию
+                Set<Org> orgsForVersionUpdate = new HashSet<Org>();
                 friendlyOrg.removeAll(selectOrg);
                 for (Org o: friendlyOrg){
                     int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
+                    orgsForVersionUpdate.add(o);
                 }
                 for (Org o : selectOrg) {
                     ClientManager.updateClientVersion(session, o.getClients());
                     o.setFriendlyOrg(selectOrg);
+                    orgsForVersionUpdate.add(o);
                     //session.evict(o); // убираем из кеша
                     //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
                     //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
-
+                }
+                for (Org o : orgsForVersionUpdate) {
+                    o.setOrgStructureVersion(nextVersion);
+                    session.update(o);
                 }
             }
         }
@@ -295,7 +304,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
-        org.setOrgStructureVersion(DAOUtils.nextVersionByOrgStucture(session));
+        org.setOrgStructureVersion(nextVersion);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);

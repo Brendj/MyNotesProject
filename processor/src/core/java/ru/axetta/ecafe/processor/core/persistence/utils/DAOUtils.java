@@ -636,9 +636,9 @@ public class DAOUtils {
 
     }
 
-    public static List<Org> getOrgsByStatusSinceVersion(Session session, OrganizationStatus status, long version) throws Exception {
+    public static List<Org> getOrgsByStatusSinceVersion(Session session, Integer state, long version) throws Exception {
         Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.eq("status", status));
+        criteria.add(Restrictions.eq("state", state));
         criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         criteria.add(Restrictions.gt("orgStructureVersion", version));
         return criteria.list();

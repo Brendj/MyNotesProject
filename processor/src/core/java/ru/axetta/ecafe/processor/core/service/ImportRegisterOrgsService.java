@@ -290,7 +290,7 @@ public class ImportRegisterOrgsService {
             if (orgRegistryChangeItem != null) {
                 Org item = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
                 if (item != null) {
-                    item.setState(OrganizationStatus.INACTIVE.ordinal());
+                    item.setState(Org.INACTIVE_STATE);
                     session.persist(item);
                 }
             }
