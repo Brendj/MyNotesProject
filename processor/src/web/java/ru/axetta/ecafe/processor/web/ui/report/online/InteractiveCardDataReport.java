@@ -324,7 +324,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                 if (idOfRecord == 0L) {
                     fondGk += Long.valueOf(value);
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(5L, "2.1",
-                            Long.valueOf(value), "в рамках ГК на внедрение",
+                            Long.valueOf(value), "В рамках ГК на внедрение",
                             "Количество сервисных карт, поступивших на этапе внедрения ИС ПП");
                     items.add(item);
                     existsTO = true;
@@ -333,7 +333,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
                 if (idOfRecord == 1L) {
                     fondGk += Long.valueOf(value);
                     InteractiveCardDataReportItem item = new InteractiveCardDataReportItem(6L, "2.2",
-                            Long.valueOf(value), "в рамках ГК на сервис",
+                            Long.valueOf(value), "В рамках ГК на сервис",
                             "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП");
                     items.add(item);
                     existsTT = true;
@@ -376,14 +376,14 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
 
             if (existsTO == false) {
                 InteractiveCardDataReportItem itemTO = new InteractiveCardDataReportItem(5L, "2.1", 0L,
-                        "в рамках ГК на внедрение",
+                        "В рамках ГК на внедрение",
                         "Количество сервисных карт, поступивших на этапе внедрения ИС ПП");
                 items.add(itemTO);
             }
 
             if (existsTT == false) {
                 InteractiveCardDataReportItem itemTT = new InteractiveCardDataReportItem(6L, "2.2", 0L,
-                        "в рамках ГК на сервис",
+                        "В рамках ГК на сервис",
                         "Количество сервисных карт, поступивших на этапе эксплуатации ИС ПП");
                 items.add(itemTT);
             }
