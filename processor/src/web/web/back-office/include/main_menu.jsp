@@ -1235,6 +1235,11 @@
                         binding="#{journalAuthenticationReportPage.mainMenuComponent}"
                         label="Журнал событий входа-выхода"
                         action="#{journalAuthenticationReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="showJournalProcessesMenuItem"
+                        binding="#{journalProcessesReportPage.mainMenuComponent}"
+                        label="Журнал запуска фоновых процессов"
+                        action="#{journalProcessesReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
