@@ -119,6 +119,13 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             String nameOrg = "";
+            /////
+            if (orgShortItemList == null && orgId != null) {
+                OrgShortItem item = new OrgShortItem(orgId);
+                orgShortItemList = new ArrayList<OrgShortItem>();
+                orgShortItemList.add(item);
+            }
+            /////
             if (orgShortItemList == null || orgShortItemList.isEmpty()) {
                 nameOrg = "                                                                   ";
             } else  {
