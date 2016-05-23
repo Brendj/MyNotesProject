@@ -25,13 +25,13 @@ import org.springframework.stereotype.Component;
 public class WayBillListPage extends AbstractListPage<WayBill, WayBillItem> implements OrgSelectPage.CompleteHandler {
 
     private WayBillFilter filter = new WayBillFilter();
-    private String shortName;
+
 
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
-            shortName = org.getShortName();
+            this.filter.setShortName(org.getShortName());
             this.filter.setIdOfOrg(idOfOrg);
         }
     }
@@ -60,9 +60,4 @@ public class WayBillListPage extends AbstractListPage<WayBill, WayBillItem> impl
     public WayBillFilter getFilter() {
         return filter;
     }
-
-    public String getShortName() {
-        return shortName;
-    }
-
 }
