@@ -1240,6 +1240,11 @@
                         binding="#{journalProcessesReportPage.mainMenuComponent}"
                         label="Журнал запуска фоновых процессов"
                         action="#{journalProcessesReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="showJournalReportsMenuItem"
+                        binding="#{journalReportsReportPage.mainMenuComponent}"
+                        label="Журнал сохранения файлов отчетов"
+                        action="#{journalReportsReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"

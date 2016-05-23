@@ -54,7 +54,7 @@ public class ReportRepositoryDownloadServlet extends HttpServlet {
         doPost(request,  response);
     }
 
-    private String extractTemplateName(String filename) {
+    public static String extractTemplateName(String filename) {
         try {
             return filename.substring(0, filename.indexOf('-')).concat(filename.substring(filename.lastIndexOf('.')));
         } catch (Exception e) {

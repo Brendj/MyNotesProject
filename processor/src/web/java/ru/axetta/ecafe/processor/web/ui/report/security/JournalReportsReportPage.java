@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.security.JournalProcessesReport;
+import ru.axetta.ecafe.processor.core.report.security.JournalReportsReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -42,9 +42,9 @@ import java.util.Date;
  */
 @Component
 @Scope(value = "session")
-public class JournalProcessesReportPage extends OnlineReportPage {
+public class JournalReportsReportPage extends OnlineReportPage {
 
-    private final static Logger logger = LoggerFactory.getLogger(JournalProcessesReportPage.class);
+    private final static Logger logger = LoggerFactory.getLogger(JournalReportsReportPage.class);
     BasicReportJob storedReport = null;
     private String htmlReport = null;
 
@@ -52,14 +52,14 @@ public class JournalProcessesReportPage extends OnlineReportPage {
     private EntityManager entityManager;
 
     public String getPageFilename() {
-        return "report/security/journal_processes_report";
+        return "report/security/journal_reports_report";
     }
 
     public Object doGenerate() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return null;
-        JournalProcessesReport.Builder builder = new JournalProcessesReport.Builder(templateFilename);
+        JournalReportsReport.Builder builder = new JournalReportsReport.Builder(templateFilename);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -109,7 +109,7 @@ public class JournalProcessesReportPage extends OnlineReportPage {
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return;
         Date generateTime = new Date();
-        JournalProcessesReport.Builder builder = new JournalProcessesReport.Builder(templateFilename);
+        JournalReportsReport.Builder builder = new JournalReportsReport.Builder(templateFilename);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -167,7 +167,7 @@ public class JournalProcessesReportPage extends OnlineReportPage {
 
     private String checkIsExistFile(String suffix) {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = JournalProcessesReport.class.getSimpleName() + suffix;
+        String templateShortFileName = JournalReportsReport.class.getSimpleName() + suffix;
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
@@ -184,7 +184,7 @@ public class JournalProcessesReportPage extends OnlineReportPage {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
         String reportDistinctText = basicReportJob.getReportDistinctText();
         String format = timeFormat.format(generateTime);
-        return String.format("%s-%s-%s", "JournalProcessesReport", reportDistinctText, format);
+        return String.format("%s-%s-%s", "JournalReportsReport", reportDistinctText, format);
     }
 
 }

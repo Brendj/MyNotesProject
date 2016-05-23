@@ -49,10 +49,7 @@ import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
-import ru.axetta.ecafe.processor.web.ui.report.security.JournalAuthenticationReportPage;
-import ru.axetta.ecafe.processor.web.ui.report.security.JournalBalancesReportPage;
-import ru.axetta.ecafe.processor.web.ui.report.security.JournalProcessesReportPage;
-import ru.axetta.ecafe.processor.web.ui.report.security.UserSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.security.*;
 import ru.axetta.ecafe.processor.web.ui.service.*;
 import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
@@ -146,6 +143,7 @@ public class MainPage implements Serializable {
     private final JournalBalancesReportPage journalBalancesReportPage = new JournalBalancesReportPage();
     private final JournalAuthenticationReportPage journalAuthenticationReportPage = new JournalAuthenticationReportPage();
     private final JournalProcessesReportPage journalProcessesReportPage = new JournalProcessesReportPage();
+    private final JournalReportsReportPage journalReportsReportPage = new JournalReportsReportPage();
 
     // User manipulation
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
@@ -8978,5 +8976,9 @@ public class MainPage implements Serializable {
 
     public JournalProcessesReportPage getJournalProcessesReportPage() {
         return journalProcessesReportPage;
+    }
+
+    public JournalReportsReportPage getJournalReportsReportPage() {
+        return journalReportsReportPage;
     }
 }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalReport;
+import ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryDownloadServlet;
 
 import org.apache.catalina.connector.ResponseFacade;
 
@@ -45,7 +46,7 @@ public class XLSReportsFilter implements Filter {
             int p = str.indexOf("filename=");
             if (p > 0) {
                 p = p + "filename=".length();
-                return str.substring(p);
+                return ReportRepositoryDownloadServlet.extractTemplateName(str.substring(p));
             }
             return null;
         } catch (Exception e) {
