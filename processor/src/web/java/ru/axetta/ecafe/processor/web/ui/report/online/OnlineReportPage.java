@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -17,7 +16,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -27,6 +25,7 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     protected List<Long> idOfOrgList = new ArrayList<Long>();
     protected Calendar localCalendar;
     protected Long idOfOrg;
+    public static final String NO_REPORT_DATA = "Нет данных по выбранным критериям";
 
     public OnlineReportPage() throws RuntimeContext.NotInitializedException {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
