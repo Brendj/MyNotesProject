@@ -31,7 +31,7 @@ public class ActOfWayBillDifferencePositionListPage extends AbstractListPage<Act
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
-            shortName = org.getShortName();
+            this.filter.setShortName(org.getShortName());
             this.filter.setIdOfOrg(idOfOrg);
         }
     }
@@ -60,9 +60,4 @@ public class ActOfWayBillDifferencePositionListPage extends AbstractListPage<Act
     public ActOfWayBillDifferencePositionFilter getFilter() {
         return filter;
     }
-
-    public String getShortName() {
-        return shortName;
-    }
-
 }

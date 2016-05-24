@@ -28,6 +28,7 @@ public class TradeMaterialGoodFilter extends AbstractFilter {
     private Date startDate;
     private Date endDate;
     private Boolean deletedState = true;
+    private String shortName;
 
     @Override
     public boolean isEmpty() {
@@ -39,6 +40,7 @@ public class TradeMaterialGoodFilter extends AbstractFilter {
         idOfOrg=null;
         startDate = endDate = null;
         deletedState = true;
+        shortName = null;
     }
 
     @Override
@@ -84,5 +86,13 @@ public class TradeMaterialGoodFilter extends AbstractFilter {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 }

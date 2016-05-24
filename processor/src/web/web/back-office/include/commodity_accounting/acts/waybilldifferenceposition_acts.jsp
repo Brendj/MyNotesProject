@@ -26,7 +26,7 @@
             <h:panelGrid columns="2" styleClass="borderless-grid">
                 <h:outputText escape="true" value="Организация" styleClass="output-text" />
                 <h:panelGroup styleClass="borderless-div">
-                    <h:inputText value="#{actOfWayBillDifferencePositionListPage.shortName}" readonly="true" styleClass="input-text long-field"
+                    <h:inputText value="#{actOfWayBillDifferencePositionListPage.filter.shortName}" readonly="true" styleClass="input-text long-field"
                                  style="margin-right: 2px;" />
                     <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"

@@ -25,13 +25,12 @@ import org.springframework.stereotype.Component;
 public class TradeMaterialGoodListPage extends AbstractListPage<TradeMaterialGood, TradeMaterialGoodItem> implements OrgSelectPage.CompleteHandler {
 
     private TradeMaterialGoodFilter filter = new TradeMaterialGoodFilter();
-    private String shortName;
 
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
-            shortName = org.getShortName();
+            this.filter.setShortName(org.getShortName());
             this.filter.setIdOfOrg(idOfOrg);
         }
     }
@@ -59,10 +58,6 @@ public class TradeMaterialGoodListPage extends AbstractListPage<TradeMaterialGoo
     @Override
     public TradeMaterialGoodFilter getFilter() {
         return filter;
-    }
-
-    public String getShortName() {
-        return shortName;
     }
 
 }
