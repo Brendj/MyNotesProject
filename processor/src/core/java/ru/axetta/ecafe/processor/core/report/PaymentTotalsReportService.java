@@ -239,7 +239,8 @@ public class PaymentTotalsReportService {
      */
 
     private Long getOrgClientsIncomeOnPeriod(Long idOfOrg, Date startTime, Date endTime) {
-        Object[] objects = {AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE};
+        Object[] objects = {AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
+        AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE};
         Criteria criteria = session.createCriteria(AccountTransaction.class);
         criteria.add(Restrictions.gt("transactionTime", startTime));
         criteria.add(Restrictions.lt("transactionTime", endTime));
