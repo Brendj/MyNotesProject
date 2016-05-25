@@ -971,6 +971,7 @@ public class ImportRegisterClientsService {
         switch (change.getOperation()) {
             case CREATE_OPERATION:
                 //  добавление нового клиента
+
                 String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                 FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
                 createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
@@ -984,8 +985,9 @@ public class ImportRegisterClientsService {
                 Date createDateBirth = new Date(change.getBirthDate());
                 createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                 createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
-                ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
+                long id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                         (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
+                change.setIdOfClient(id);
                 break;
             case DELETE_OPERATION:
                 ClientGroup deletedClientGroup = DAOUtils
