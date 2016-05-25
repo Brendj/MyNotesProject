@@ -239,8 +239,7 @@ public class PaymentTotalsReportService {
      */
 
     private Long getOrgClientsIncomeOnPeriod(Long idOfOrg, Date startTime, Date endTime) {
-        Object[] objects = {AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
-        AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE};
+        Object[] objects = {AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE, AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE};
         Criteria criteria = session.createCriteria(AccountTransaction.class);
         criteria.add(Restrictions.gt("transactionTime", startTime));
         criteria.add(Restrictions.lt("transactionTime", endTime));
@@ -391,7 +390,20 @@ public class PaymentTotalsReportService {
         if (repaymentSum == null) {
             repaymentSum = 0L;
         }
-        return repaymentSum * -1L;
+
+        Criteria criteria1 = session.createCriteria(AccountTransaction.class, "at");
+        criteria1.createAlias("org", "o");
+        criteria1.add(Restrictions.eq("at.sourceType", AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE));
+        criteria1.add(Restrictions.between("at.transactionTime", startTime, endTime));
+        criteria1.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        criteria1.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
+        Long transfer = (Long) criteria1.uniqueResult();
+        if (transfer == null) {
+            transfer = 0L;
+        }
+        return repaymentSum * -1L + transfer;
     }
 
     /**
