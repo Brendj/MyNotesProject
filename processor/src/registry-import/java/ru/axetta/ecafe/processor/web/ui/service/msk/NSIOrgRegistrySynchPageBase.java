@@ -616,8 +616,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             if (parent.getList().get(19).getFieldValueParam().equals("")) {
                 birthDate = "";
             } else {
-                birthDate = CalendarUtils.dateShortToStringFullYear(
-                        new Date(Long.parseLong(parent.getList().get(19).getFieldValueParam())));
+                birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
             }
 
             benefitOnAdmission = parent.getList().get(20).getFieldValueParam();

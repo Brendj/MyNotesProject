@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -146,7 +148,9 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r18 = new RegistryChangeItemParam("gender", c.getGender() == null ? "" : c.getGender().toString());
                 registryChangeItemParams.add(r18);
 
-                RegistryChangeItemParam r19 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? "" : c.getBirthDate().toString());
+                SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+                RegistryChangeItemParam r19 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? "" : dateTimeFormat.format(new Date(c.getBirthDate())));
                 registryChangeItemParams.add(r19);
 
                 RegistryChangeItemParam r20 = new RegistryChangeItemParam("benefitOnAdmission", c.getBenefitOnAdmission() == null ? "" : c.getBenefitOnAdmission());
