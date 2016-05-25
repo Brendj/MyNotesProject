@@ -3114,7 +3114,7 @@ public class Processor
                 persistenceSession.flush();
                 persistenceTransaction.commit();
 
-                SecurityJournalBalance.saveSecurityJournalBalanceFromOrder(journalBalance, true, "OK");
+                SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
 
                 persistenceTransaction = null;
 
@@ -3189,7 +3189,7 @@ public class Processor
                     persistenceSession.flush();
                     persistenceTransaction.commit();
 
-                    SecurityJournalBalance.saveSecurityJournalBalanceFromOrder(journalBalance, true, "OK");
+                    SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
 
                     persistenceTransaction = null;
                 } else {

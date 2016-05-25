@@ -435,9 +435,23 @@ public class FinancialOpsManager {
     //TODO: добавить изменение текущих позиций
     @Transactional
     public void createAccountTransfer(Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
+        SecurityJournalBalance journalFrom = SecurityJournalBalance.getSecurityJournalBalanceFromBalanceTransfer(
+                null, benefactor, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER);
+        SecurityJournalBalance journalTo = SecurityJournalBalance.getSecurityJournalBalanceFromBalanceTransfer(
+                null, beneficiary, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT);
         Session session = (Session)em.getDelegate();
-        if (sum<=0) throw new Exception("Сумма перевода должна быть больше нуля");
-        if (benefactor.getBalance()<sum) throw new Exception("Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(beneficiary.getBalance())+") для перевода");
+        String mess = null;
+        if (sum<=0) {
+            mess = "Сумма перевода должна быть больше нуля";
+        }
+        if (benefactor.getBalance()<sum) {
+            mess = "Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(beneficiary.getBalance())+") для перевода";
+        }
+        if (mess != null) {
+            SecurityJournalBalance.saveSecurityJournalBalance(journalFrom, false, mess);
+            SecurityJournalBalance.saveSecurityJournalBalance(journalTo, false, mess);
+            throw new Exception(mess);
+        }
         Date dt = new Date();
         // регистрируем транзакцию на плательщике
         AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, benefactor,
@@ -457,6 +471,9 @@ public class FinancialOpsManager {
         accountTransactionOnBeneficiary.updateSource(accountTransfer.getIdOfAccountTransfer() + "");
         session.update(accountTransactionOnBenefactor);
         session.update(accountTransactionOnBeneficiary);
+
+        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalFrom, true, "OK", accountTransfer);
+        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalTo, true, "OK", accountTransfer);
     }
 
     @Transactional

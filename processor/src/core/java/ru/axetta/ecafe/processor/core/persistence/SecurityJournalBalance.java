@@ -45,6 +45,7 @@ public class SecurityJournalBalance {
     private String serverAddress;
     private String certificate;
     private String message;
+    private AccountTransfer accountTransfer;
 
     public SecurityJournalBalance() {
 
@@ -74,6 +75,55 @@ public class SecurityJournalBalance {
         result.serverAddress = serverAddress;
         result.certificate = certificate;
         return result;
+    }
+
+    public static SecurityJournalBalance getSecurityJournalBalanceFromBalanceTransfer(AccountTransfer accountTransfer,
+            Client client, SJBalanceTypeEnum eventType) {
+        String serverAddress;
+        try {
+            serverAddress = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            serverAddress = null;
+        }
+        String terminal = null;
+        String cert = null;
+        Date eventDate = null;
+        if (accountTransfer != null) {
+            eventDate = accountTransfer.getCreateTime();
+        }
+        try {
+            HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes()).getRequest();
+            String protocol = httpServletRequest.getScheme();
+            String parameters = httpServletRequest.getQueryString();
+
+            String request = httpServletRequest.getScheme() + "://" +
+                httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort() +
+                httpServletRequest.getRequestURI() + (parameters != null ? "?" + parameters : "");
+            SecurityJournalBalance res = SecurityJournalBalance.createSecurityJournalBalance(
+                eventType,                                                                  //eventType
+                eventDate,                                                                  //eventdate
+                SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER,                      //eventSource
+                terminal,                                                                   //terminal
+                protocol,                                                                   //protocol
+                "Бэк-офис ИС ПП",                                                           //eventInterface
+                client,                                                                     //client
+                request,                                                                    //request
+                httpServletRequest.getRemoteAddr(),                                         //clientAddress
+                serverAddress == null ? httpServletRequest.getLocalAddr() : serverAddress,  //serverAddress
+                cert);                                                                      //certificate
+            res.setAccountTransfer(accountTransfer);
+            return res;
+        } catch (Exception e) {
+            SecurityJournalBalance res = new SecurityJournalBalance();
+            res.setEventType(eventType);
+            res.setEventDate(eventDate);
+            res.setClient(client);
+            res.setServerAddress(serverAddress);
+            res.setEventSource(SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
+            res.setAccountTransfer(accountTransfer);
+            return res;
+        }
     }
 
     public static SecurityJournalBalance getSecurityJournalBalanceDataFromOrder(Payment payment, Client client,
@@ -209,8 +259,16 @@ public class SecurityJournalBalance {
         DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
-    public static void saveSecurityJournalBalanceFromOrder(SecurityJournalBalance journal, boolean success,
-            String message) {
+    public static void saveSecurityJournalBalanceFromBalanceTransfer(SecurityJournalBalance journal, boolean success,
+            String message, AccountTransfer accountTransfer) {
+        journal.setIsSuccess(success);
+        journal.setMessage(message);
+        journal.setAccountTransfer(accountTransfer);
+        journal.setEventDate(accountTransfer.getCreateTime());
+        DAOService.getInstance().saveSecurityJournalBalance(journal);
+    }
+
+    public static void saveSecurityJournalBalance(SecurityJournalBalance journal, boolean success, String message) {
         journal.setIsSuccess(success);
         journal.setMessage(message);
         DAOService.getInstance().saveSecurityJournalBalance(journal);
@@ -358,5 +416,13 @@ public class SecurityJournalBalance {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public AccountTransfer getAccountTransfer() {
+        return accountTransfer;
+    }
+
+    public void setAccountTransfer(AccountTransfer accountTransfer) {
+        this.accountTransfer = accountTransfer;
     }
 }
