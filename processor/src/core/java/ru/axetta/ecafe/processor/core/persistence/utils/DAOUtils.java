@@ -2259,6 +2259,21 @@ public class DAOUtils {
         return new ArrayList<Client>(clients);
     }
 
+    public static List<Long> getActiveMigrantsIdsForOrg(Session session, Long idOfOrg) throws Exception {
+        Set<Long> clientsIds = new HashSet<Long>();
+        List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
+        for(Migrant migrant : migrants){
+            Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
+            query.setParameter("migrant", migrant);
+            query.setMaxResults(1);
+            VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
+            if(res.getResolution().equals(1)){
+                clientsIds.add(migrant.getClientMigrate().getIdOfClient());
+            }
+        }
+        return new ArrayList<Long>(clientsIds);
+    }
+
     public static List<Migrant> getCurrentMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);

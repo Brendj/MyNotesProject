@@ -224,7 +224,6 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     }
 
     public MigrantsData processData() throws Exception {
-        List<Client> clientList = DAOUtils.getActiveMigrantsForOrg(session, migrants.getIdOfOrg());
         MigrantsData result = new MigrantsData();
         List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems = new ArrayList<ResIncomeMigrationRequestsItem>();
         List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems = new ArrayList<ResIncomeMigrationRequestsHistoryItem>();
