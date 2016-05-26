@@ -378,9 +378,10 @@ public class PaymentTotalsReportService {
      */
 
     private Long getRepaymentSum(Long idOfOrg, Date startTime, Date endTime) {
+        Object[] objects = {AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE, AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE};
         Criteria criteria = session.createCriteria(AccountTransaction.class, "at");
         criteria.createAlias("org", "o");
-        criteria.add(Restrictions.eq("at.sourceType", AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE));
+        criteria.add(Restrictions.in("at.sourceType", objects));
         criteria.add(Restrictions.between("at.transactionTime", startTime, endTime));
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         criteria.setProjection(Projections.projectionList().add(Projections
@@ -390,20 +391,7 @@ public class PaymentTotalsReportService {
         if (repaymentSum == null) {
             repaymentSum = 0L;
         }
-
-        Criteria criteria1 = session.createCriteria(AccountTransaction.class, "at");
-        criteria1.createAlias("org", "o");
-        criteria1.add(Restrictions.eq("at.sourceType", AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE));
-        criteria1.add(Restrictions.between("at.transactionTime", startTime, endTime));
-        criteria1.add(Restrictions.eq("o.idOfOrg", idOfOrg));
-        criteria1.setProjection(Projections.projectionList().add(Projections
-                .sqlProjection("sum(this_.transactionsum) as sum", new String[]{"sum"},
-                        new Type[]{LongType.INSTANCE})));
-        Long transfer = (Long) criteria1.uniqueResult();
-        if (transfer == null) {
-            transfer = 0L;
-        }
-        return repaymentSum * -1L + transfer;
+        return repaymentSum;
     }
 
     /**
