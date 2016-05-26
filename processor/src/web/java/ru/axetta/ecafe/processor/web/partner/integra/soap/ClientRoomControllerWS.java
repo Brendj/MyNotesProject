@@ -2265,20 +2265,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void processMenuFirstDay(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
 
-        Menu menuByOneDay = getMenuByOneDay(session, startDate, org);
+        List<Menu> menuByOneDayList = getMenuByOneDay(session, startDate, org);
 
-        if (menuByOneDay != null) {
-            if (menuByOneDay.getMenuDetails().isEmpty() || menuByOneDay.getMenuDetails().size() < 30) {
-                processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
+        if (menuByOneDayList != null) {
+            if (menuByOneDayList.size() > 1) {
+                List<Menu> menuList = new ArrayList<Menu>();
+                for (Menu menuItem : menuByOneDayList) {
+                    if (menuItem.getMenuDetails().isEmpty() || menuItem.getMenuDetails().size() < 30) {
+                        menuList.add(menuItem);
+                    }
+                }
+                if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
+                    processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
+                } else {
+                    processMenuList(org, data, objectFactory, session, startDate, endDate);
+                }
             } else {
-                processMenuList(org, data, objectFactory, session, startDate, endDate);
+                if (menuByOneDayList.get(0).getMenuDetails().isEmpty()
+                        || menuByOneDayList.get(0).getMenuDetails().size() < 30) {
+                    processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
+                } else {
+                    processMenuList(org, data, objectFactory, session, startDate, endDate);
+                }
             }
         } else {
             processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
         }
     }
 
-    private Menu getMenuByOneDay(Session session, Date startDate, Org org) {
+    private List<Menu> getMenuByOneDay(Session session, Date startDate, Org org) {
         Date endDate = CalendarUtils.addOneDay(startDate);
 
         Criteria menuByDayCriteria = session.createCriteria(Menu.class);
@@ -2293,7 +2308,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
 
-        return (Menu) menuByDayCriteria.uniqueResult();
+        return (List<Menu>) menuByDayCriteria.list();
     }
 
     private void processMenuByMaxIdOfMenu(Session session, Date startDate, Date endDate, ObjectFactory objectFactory,
@@ -2529,13 +2544,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
             Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
-        Menu menuByOneDay = getMenuByOneDay(session, startDate, client.getOrg());
+        List<Menu> menuByOneDay = getMenuByOneDay(session, startDate, client.getOrg());
 
         if (menuByOneDay != null) {
-            if (menuByOneDay.getMenuDetails().isEmpty() || menuByOneDay.getMenuDetails().size() < 30) {
-                processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+            if (menuByOneDay.size() > 1) {
+                List<Menu> menuList = new ArrayList<Menu>();
+                for (Menu menuItem : menuByOneDay) {
+                    if (menuItem.getMenuDetails().isEmpty() || menuItem.getMenuDetails().size() < 30) {
+                        menuList.add(menuItem);
+                    }
+                }
+                if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
+                    processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                } else {
+                    processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                }
             } else {
-                processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                if (menuByOneDay.get(0).getMenuDetails().isEmpty()
+                        || menuByOneDay.get(0).getMenuDetails().size() < 30) {
+                    processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                } else {
+                    processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                }
             }
         } else {
             processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
