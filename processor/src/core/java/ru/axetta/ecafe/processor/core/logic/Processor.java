@@ -3978,7 +3978,7 @@ public class Processor
             persistenceTransaction = persistenceSession.beginTransaction();
             List<Org> list;
             if (isAllOrgs) {
-                list = DAOUtils.getOrgsByStatusSinceVersion(persistenceSession, Org.ACTIVE_STATE, version);
+                list = DAOUtils.getOrgsSinceVersion(persistenceSession, version);
             } else {
                 list = DAOUtils.findAllFriendlyOrgs(persistenceSession, org.getIdOfOrg());
             }

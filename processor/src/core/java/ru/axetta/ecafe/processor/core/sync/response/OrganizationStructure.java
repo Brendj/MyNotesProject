@@ -62,7 +62,7 @@ public class OrganizationStructure {
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     o.getConfigurationProvider() != null ? o.getConfigurationProvider()
-                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict(), o.getOrgStructureVersion());
+                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict(), o.getState(), o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
     }
@@ -80,9 +80,11 @@ public class OrganizationStructure {
         private final Boolean isFriendly;
         private final String nCounty;
         private final Long version;
+        private final Integer state;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly, String nCounty, Long version) {
+                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly,
+                String nCounty, Integer state, Long version) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -94,6 +96,7 @@ public class OrganizationStructure {
             this.configurationId = configurationId;
             this.isFriendly = isFriendly;
             this.nCounty = nCounty;
+            this.state = state;
             this.version = version;
         }
 
@@ -113,6 +116,7 @@ public class OrganizationStructure {
             }
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
+            element.setAttribute("State", Integer.toString(state));
             return element;
         }
 

@@ -644,6 +644,13 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<Org> getOrgsSinceVersion(Session session, long version) throws Exception {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
+        criteria.add(Restrictions.gt("orgStructureVersion", version));
+        return criteria.list();
+    }
+
     public static Boolean allOrgRegistryChangeItemsApplied(Session session, Long idOfOrgRegistryChange) {
         Query q = session.createQuery("from OrgRegistryChangeItem where mainRegistry=:idOfOrgRegistryChange and applied=false");
         q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
