@@ -25,7 +25,7 @@
 	<field name="clientAddress" class="java.lang.String"/>
 	<field name="serverAddress" class="java.lang.String"/>
 	<field name="message" class="java.lang.String"/>
-	<field name="idOfAccountTransfer" class="java.lang.Long"/>
+	<field name="idOfAccountTransaction" class="java.lang.Long"/>
 	<variable name="startDate" class="java.lang.String" calculation="First">
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
@@ -295,7 +295,7 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Перевод]]></text>
+				<text><![CDATA[Ид. транзакции]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -523,7 +523,7 @@
 				<textElement>
 					<font size="10"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{idOfAccountTransfer}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{idOfAccountTransaction}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
