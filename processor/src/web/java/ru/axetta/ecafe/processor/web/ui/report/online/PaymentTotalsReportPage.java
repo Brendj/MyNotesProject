@@ -36,9 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,7 +54,7 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private User currentUser;
-    private Boolean hideNullRows = true;
+    private Boolean hideNullRows = false;
 
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
 
@@ -318,6 +316,11 @@ public class PaymentTotalsReportPage extends OnlineReportPage implements Contrag
         Long idOfContragent = contragentFilter.getContragent().getIdOfContragent();
         String idOfContragentString = idOfContragent != null ? Long.toString(idOfContragent) : "";
         properties.setProperty(PaymentTotalsReport.P_CONTRAGENT, idOfContragentString);
+        List<Long> orgList = new ArrayList<Long>();
+        if (idOfOrg != null) {
+            orgList.add(idOfOrg);
+        }
+        idOfOrgList = orgList;
         properties.setProperty(PaymentTotalsReport.P_ORG_LIST,
                 idOfOrgList.size() <= 0 ? "" : StringUtils.join(idOfOrgList.iterator(), ","));
         properties.setProperty(PaymentTotalsReport.P_HIDE_NULL_ROWS, Boolean.toString(hideNullRows));

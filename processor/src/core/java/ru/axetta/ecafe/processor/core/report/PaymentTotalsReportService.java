@@ -297,7 +297,7 @@ public class PaymentTotalsReportService {
 
     private boolean zeroCash(Item item) {
         if (item.getIncome() != 0L || item.getPaid() != 0L || item.getPaidSnack() != 0L || item.getPaidTotal() != 0L
-                || item.getRepayment() != 0L || item.getCashMoved() != 0L) {
+                || item.getRepayment() != 0L || item.getCashMoved() != 0L || !item.getStartCash().equals(item.getEndCash())) {
             return false;
         } else {
             return true;
