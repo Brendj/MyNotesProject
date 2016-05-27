@@ -79,7 +79,7 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
             clientGuardianData = new ClientGuardianData(new ResultOperation(0, null));
             for (ClientGuardian clientGuardian : clientList) {
                 // Связь передается только если и опекун и опекаемый находятся в списке
-                if(clientIds.contains(clientGuardian.getIdOfChildren()) && clientIds.contains(clientGuardian.getIdOfClientGuardian())) {
+                if(clientIds.contains(clientGuardian.getIdOfChildren()) && clientIds.contains(clientGuardian.getIdOfGuardian())) {
                     clientGuardianData.addItem(clientGuardian);
                 }
             }
