@@ -22,7 +22,8 @@ public enum SJBalanceSourceEnum {
     /*4*/ SJBALANCE_SOURCE_ORDER("Заказ"),
     /*5*/ SJBALANCE_SOURCE_CANCEL_ORDER("Отмена заказа"),
     /*6*/ SJBALANCE_SOURCE_PAY("Платеж PAY"),
-    /*7*/ SJBALANCE_SOURCE_BALANCE_TRANSFER("Перевод между счетами");
+    /*7*/ SJBALANCE_SOURCE_BALANCE_TRANSFER("Перевод между счетами"),
+    /*8*/ SJBALANCE_SOURCE_REFUND("Возврат средств");
 
     private final String description;
     static Map<Integer,SJBalanceSourceEnum> map = new HashMap<Integer,SJBalanceSourceEnum>();

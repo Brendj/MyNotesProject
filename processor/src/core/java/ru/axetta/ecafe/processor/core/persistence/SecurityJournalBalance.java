@@ -27,6 +27,8 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class SecurityJournalBalance {
+    private static final String BACK_OFFICE_INTERFACE = "Бэк-офис процессинга ИС ПП";
+
     private Long idOfJournalBalance;
     private SJBalanceTypeEnum eventType;
     private Date eventDate;
@@ -45,7 +47,7 @@ public class SecurityJournalBalance {
     private String serverAddress;
     private String certificate;
     private String message;
-    private AccountTransfer accountTransfer;
+    private AccountTransaction accountTransaction;
 
     public SecurityJournalBalance() {
 
@@ -77,8 +79,8 @@ public class SecurityJournalBalance {
         return result;
     }
 
-    public static SecurityJournalBalance getSecurityJournalBalanceFromBalanceTransfer(AccountTransfer accountTransfer,
-            Client client, SJBalanceTypeEnum eventType) {
+    public static SecurityJournalBalance getSecurityJournalBalanceFromOperations(AccountTransaction accountTransaction,
+            Client client, SJBalanceTypeEnum eventType, SJBalanceSourceEnum eventSource) {
         String serverAddress;
         try {
             serverAddress = InetAddress.getLocalHost().getHostAddress();
@@ -88,8 +90,8 @@ public class SecurityJournalBalance {
         String terminal = null;
         String cert = null;
         Date eventDate = null;
-        if (accountTransfer != null) {
-            eventDate = accountTransfer.getCreateTime();
+        if (accountTransaction != null) {
+            eventDate = accountTransaction.getTransactionTime();
         }
         try {
             HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder
@@ -103,16 +105,16 @@ public class SecurityJournalBalance {
             SecurityJournalBalance res = SecurityJournalBalance.createSecurityJournalBalance(
                 eventType,                                                                  //eventType
                 eventDate,                                                                  //eventdate
-                SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER,                      //eventSource
+                eventSource,                                                                //eventSource
                 terminal,                                                                   //terminal
                 protocol,                                                                   //protocol
-                "Бэк-офис ИС ПП",                                                           //eventInterface
+                BACK_OFFICE_INTERFACE,                                                      //eventInterface
                 client,                                                                     //client
                 request,                                                                    //request
                 httpServletRequest.getRemoteAddr(),                                         //clientAddress
                 serverAddress == null ? httpServletRequest.getLocalAddr() : serverAddress,  //serverAddress
                 cert);                                                                      //certificate
-            res.setAccountTransfer(accountTransfer);
+            res.setAccountTransaction(accountTransaction);
             return res;
         } catch (Exception e) {
             SecurityJournalBalance res = new SecurityJournalBalance();
@@ -121,7 +123,7 @@ public class SecurityJournalBalance {
             res.setClient(client);
             res.setServerAddress(serverAddress);
             res.setEventSource(SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
-            res.setAccountTransfer(accountTransfer);
+            res.setAccountTransaction(accountTransaction);
             return res;
         }
     }
@@ -260,11 +262,20 @@ public class SecurityJournalBalance {
     }
 
     public static void saveSecurityJournalBalanceFromBalanceTransfer(SecurityJournalBalance journal, boolean success,
-            String message, AccountTransfer accountTransfer) {
+            String message, AccountTransaction accountTransaction) {
         journal.setIsSuccess(success);
         journal.setMessage(message);
-        journal.setAccountTransfer(accountTransfer);
-        journal.setEventDate(accountTransfer.getCreateTime());
+        journal.setAccountTransaction(accountTransaction);
+        journal.setEventDate(accountTransaction.getTransactionTime());
+        DAOService.getInstance().saveSecurityJournalBalance(journal);
+    }
+
+    public static void saveSecurityJournalBalanceWithTransaction(SecurityJournalBalance journal, boolean success,
+            String message, AccountTransaction accountTransaction) {
+        journal.setIsSuccess(success);
+        journal.setMessage(message);
+        journal.setAccountTransaction(accountTransaction);
+        journal.setEventDate(accountTransaction.getTransactionTime());
         DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
@@ -418,11 +429,11 @@ public class SecurityJournalBalance {
         this.idOfOrg = idOfOrg;
     }
 
-    public AccountTransfer getAccountTransfer() {
-        return accountTransfer;
+    public AccountTransaction getAccountTransaction() {
+        return accountTransaction;
     }
 
-    public void setAccountTransfer(AccountTransfer accountTransfer) {
-        this.accountTransfer = accountTransfer;
+    public void setAccountTransaction(AccountTransaction accountTransaction) {
+        this.accountTransaction = accountTransaction;
     }
 }

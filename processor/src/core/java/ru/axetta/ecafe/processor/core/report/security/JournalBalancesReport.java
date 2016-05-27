@@ -117,8 +117,8 @@ public class JournalBalancesReport extends BasicReportForAllOrgJob {
                 item.setClientAddress(balance.getClientAddress());
                 item.setServerAddress(balance.getServerAddress());
                 item.setMessage(balance.getMessage());
-                if (balance.getAccountTransfer() != null) {
-                    item.setIdOfAccountTransfer(balance.getAccountTransfer().getIdOfAccountTransfer());
+                if (balance.getAccountTransaction() != null) {
+                    item.setIdOfAccountTransaction(balance.getAccountTransaction().getIdOfTransaction());
                 }
                 list.add(item);
             }
@@ -146,7 +146,7 @@ public class JournalBalancesReport extends BasicReportForAllOrgJob {
         private String clientAddress;
         private String serverAddress;
         private String message;
-        private Long idOfAccountTransfer;
+        private Long idOfAccountTransaction;
 
         public Long getIdOfJournalBalance() {
             return idOfJournalBalance;
@@ -276,12 +276,12 @@ public class JournalBalancesReport extends BasicReportForAllOrgJob {
             this.message = message;
         }
 
-        public Long getIdOfAccountTransfer() {
-            return idOfAccountTransfer;
+        public Long getIdOfAccountTransaction() {
+            return idOfAccountTransaction;
         }
 
-        public void setIdOfAccountTransfer(Long idOfAccountTransfer) {
-            this.idOfAccountTransfer = idOfAccountTransfer;
+        public void setIdOfAccountTransaction(Long idOfAccountTransaction) {
+            this.idOfAccountTransaction = idOfAccountTransaction;
         }
     }
 

@@ -104,7 +104,7 @@ CREATE INDEX cf_security_journal_reports_eventdate_idx
 ON cf_security_journal_reports USING btree (eventdate);
 
 ALTER TABLE cf_security_journal_balances
-  ADD COLUMN idofaccounttransfer bigint,
-  ADD CONSTRAINT cf_security_journal_balances_account_transfer_fk FOREIGN KEY (idofaccounttransfer)
-  REFERENCES cf_account_transfers (idofaccounttransfer) MATCH SIMPLE
+  ADD COLUMN idoftransaction bigint,
+  ADD CONSTRAINT cf_security_journal_balances_transaction_fk FOREIGN KEY (idoftransaction)
+  REFERENCES cf_transactions (idoftransaction) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION;

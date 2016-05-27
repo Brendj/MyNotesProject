@@ -37,7 +37,7 @@
             <column name="IdOfOrg"/>
             <column name="IdOfOrder"/>
         </many-to-one>
-        <many-to-one name="accountTransfer" class="ru.axetta.ecafe.processor.core.persistence.AccountTransfer" column="IdOfAccountTransfer"
+        <many-to-one name="accountTransaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="IdOfTransaction"
                      update="false"/>
         <property name="request" column="Request" type="string"/>
         <property name="clientAddress" column="ClientAddress" type="string"/>

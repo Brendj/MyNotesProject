@@ -435,10 +435,10 @@ public class FinancialOpsManager {
     //TODO: добавить изменение текущих позиций
     @Transactional
     public void createAccountTransfer(Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
-        SecurityJournalBalance journalFrom = SecurityJournalBalance.getSecurityJournalBalanceFromBalanceTransfer(
-                null, benefactor, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER);
-        SecurityJournalBalance journalTo = SecurityJournalBalance.getSecurityJournalBalanceFromBalanceTransfer(
-                null, beneficiary, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT);
+        SecurityJournalBalance journalFrom = SecurityJournalBalance.getSecurityJournalBalanceFromOperations(
+                null, benefactor, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER, SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
+        SecurityJournalBalance journalTo = SecurityJournalBalance.getSecurityJournalBalanceFromOperations(
+                null, beneficiary, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT, SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
         Session session = (Session)em.getDelegate();
         String mess = null;
         if (sum<=0) {
@@ -472,8 +472,8 @@ public class FinancialOpsManager {
         session.update(accountTransactionOnBenefactor);
         session.update(accountTransactionOnBeneficiary);
 
-        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalFrom, true, "OK", accountTransfer);
-        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalTo, true, "OK", accountTransfer);
+        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalFrom, true, "OK", accountTransactionOnBenefactor);
+        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalTo, true, "OK", accountTransactionOnBeneficiary);
     }
 
     @Transactional
@@ -491,9 +491,22 @@ public class FinancialOpsManager {
     //TODO: добавить изменение текущих позиций
     @Transactional
     public void createAccountRefund(Client client, Long sum, String reason, User createdBy) throws Exception {
+        SecurityJournalBalance journal = SecurityJournalBalance.getSecurityJournalBalanceFromOperations(
+                null, client, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER, SJBalanceSourceEnum.SJBALANCE_SOURCE_REFUND);
         Session session = (Session)em.getDelegate();
-        if (sum<=0) throw new Exception("Сумма возврата должна быть больше нуля");
-        if (client.getBalance()<sum) throw new Exception("Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(client.getBalance())+") для возврата");
+        String mess = null;
+        if (sum<=0) {
+            mess = "Сумма возврата должна быть больше нуля";
+            //throw new Exception("Сумма возврата должна быть больше нуля");
+        }
+        if (client.getBalance()<sum) {
+            mess = "Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(client.getBalance())+") для возврата";
+            //throw new Exception("Недостаточно средств на лицевом счете ("+CurrencyStringUtils.copecksToRubles(client.getBalance())+") для возврата");
+        }
+        if (mess != null) {
+            SecurityJournalBalance.saveSecurityJournalBalance(journal, false, mess);
+            throw new Exception(mess);
+        }
         Date dt = new Date();
         // регистрируем транзакцию
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
@@ -505,6 +518,7 @@ public class FinancialOpsManager {
         session.flush();
         accountTransaction.updateSource(accountRefund.getIdOfAccountRefund() + "");
         session.update(accountTransaction);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journal, true, "OK", accountTransaction);
     }
 
     @Transactional
