@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -134,4 +131,8 @@ public class DAOReadonlyService {
         return user;
     }
 
+    public Order findOrder(Long idOfOrg, Long idOfOrder) {
+        Order order = entityManager.find(Order.class, new CompositeIdOfOrder(idOfOrg, idOfOrder));
+        return order;
+    }
 }

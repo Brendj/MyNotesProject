@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 
@@ -258,15 +259,9 @@ public class SecurityJournalBalance {
         journal.setIsSuccess(success);
         journal.setMessage(message);
         journal.setClientPayment(clientPayment);
-        DAOService.getInstance().saveSecurityJournalBalance(journal);
-    }
-
-    public static void saveSecurityJournalBalanceFromBalanceTransfer(SecurityJournalBalance journal, boolean success,
-            String message, AccountTransaction accountTransaction) {
-        journal.setIsSuccess(success);
-        journal.setMessage(message);
-        journal.setAccountTransaction(accountTransaction);
-        journal.setEventDate(accountTransaction.getTransactionTime());
+        if (clientPayment != null) {
+            journal.setAccountTransaction(clientPayment.getTransaction());
+        }
         DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
@@ -282,6 +277,12 @@ public class SecurityJournalBalance {
     public static void saveSecurityJournalBalance(SecurityJournalBalance journal, boolean success, String message) {
         journal.setIsSuccess(success);
         journal.setMessage(message);
+        if (journal.getIdOfOrder() != null && journal.getIdOfOrg() != null) {
+            Order order = DAOReadonlyService.getInstance().findOrder(journal.getIdOfOrg(), journal.getIdOfOrder());
+            if (order != null) {
+                journal.setAccountTransaction(order.getTransaction());
+            }
+        }
         DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 

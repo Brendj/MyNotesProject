@@ -472,8 +472,8 @@ public class FinancialOpsManager {
         session.update(accountTransactionOnBenefactor);
         session.update(accountTransactionOnBeneficiary);
 
-        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalFrom, true, "OK", accountTransactionOnBenefactor);
-        SecurityJournalBalance.saveSecurityJournalBalanceFromBalanceTransfer(journalTo, true, "OK", accountTransactionOnBeneficiary);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journalFrom, true, "OK", accountTransactionOnBenefactor);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journalTo, true, "OK", accountTransactionOnBeneficiary);
     }
 
     @Transactional
