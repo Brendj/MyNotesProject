@@ -116,12 +116,12 @@ public class DAOReadonlyService {
     public User getUserFromSession() {
         try {
             HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
-            HttpSession httpSession = request.getSession(false);
+            HttpSession httpSession = request.getSession(true);
             Long idOfUser = (Long)httpSession.getAttribute(User.USER_ID_ATTRIBUTE_NAME);
             User user = findUserById(idOfUser);
             return user;
         } catch (Exception e) {
-            //logger.error("Can't retrieve user from current Session", e);
+            logger.error(String.format("Can't retrieve user from current Session. Message: %s", e.getMessage()));
             return null;
         }
     }
