@@ -74,10 +74,10 @@ public class PaymentTotalsReportService {
             Long income = getOrgClientsIncomeOnPeriod(idOfOrg, startTime, endTime);
 
             Long paid = getPaidComplexOrdersSum(idOfOrg, startTime, endTime);
-
             Long paidSnack = getPaidSnackOrdersSum(idOfOrg, startTime, endTime);
-
             Long paidTotal = paid + paidSnack;
+            // Наличная оплата вычисляется отдельно, так как при ней не производится транзакция и баланс клиента не меняется
+            Long paidByCash = getPaidByCash(idOfOrg, startTime, endTime);
 
             Long repayment = getRepaymentSum(idOfOrg, startTime, endTime);
 
@@ -97,8 +97,8 @@ public class PaymentTotalsReportService {
             Long ordersSum = 0L;
 
 
-            Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack, paidTotal,
-                    repayment, cashMoved, endCash, endCash1, endCash2, comment);
+            Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack,
+                    paidTotal, paidByCash, repayment, cashMoved, endCash, endCash1, endCash2, comment);
             if (!zeroCash(item) || !hideNullRows) {
                 reportItems.add(item);
             }
@@ -475,6 +475,30 @@ public class PaymentTotalsReportService {
     }
 
     /**
+     * Сумма наличных оплат в ОО за период
+     *
+     * @param idOfOrg
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+
+    private Long getPaidByCash(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(Order.class, "o");
+        criteria.add(Restrictions.eq("o.state", 0));
+        criteria.add(Restrictions.eq("o.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.between("o.createTime", startTime, endTime));
+        criteria.setProjection(Projections.projectionList().add(Projections
+                .sqlProjection("sum(this_.sumbycash) as sum", new String[]{"sum"},
+                        new Type[]{LongType.INSTANCE})));
+        Long paidOrdersSum = (Long) criteria.uniqueResult();
+        if (paidOrdersSum == null) {
+            paidOrdersSum = 0L;
+        }
+        return paidOrdersSum;
+    }
+
+    /**
      * Дата последней синхронизации
      *
      * @param idOfSyncOrg
@@ -515,6 +539,7 @@ public class PaymentTotalsReportService {
         private Long paid;
         private Long paidSnack;
         private Long paidTotal;
+        private Long paidByCash;
         private Long repayment;
         private Long cashMoved;
         private Long endCash;
@@ -523,8 +548,8 @@ public class PaymentTotalsReportService {
         private String comment;
 
         protected Item(Long orgNum, Long orgID, String orgName, String lastSyncTime, Long startCash, Long income,
-                Long paid, Long paidSnack, Long paidTotal, Long repayment, Long cashMoved, Long endCash, Long endCash1,
-                Long endCash2, String comment) {
+                Long paid,  Long paidSnack, Long paidTotal, Long paidByCash, Long repayment, Long cashMoved,
+                Long endCash, Long endCash1, Long endCash2, String comment) {
             this.orgNum = orgNum;
             this.orgID = orgID;
             this.orgName = orgName;
@@ -534,6 +559,7 @@ public class PaymentTotalsReportService {
             this.paid = paid;
             this.paidSnack = paidSnack;
             this.paidTotal = paidTotal;
+            this.paidByCash = paidByCash;
             this.repayment = repayment;
             this.cashMoved = cashMoved;
             this.endCash = endCash;
@@ -621,6 +647,14 @@ public class PaymentTotalsReportService {
 
         public void setPaid(Long paid) {
             this.paid = paid;
+        }
+
+        public Long getPaidByCash() {
+            return paidByCash;
+        }
+
+        public void setPaidByCash(Long paidByCash) {
+            this.paidByCash = paidByCash;
         }
 
         public Long getPaidSnack() {

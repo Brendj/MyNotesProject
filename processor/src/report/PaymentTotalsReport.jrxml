@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry_Landscape" pageWidth="862" pageHeight="10000" orientation="Landscape" columnWidth="822" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry_Landscape" pageWidth="916" pageHeight="10000" orientation="Landscape" columnWidth="876" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
-	<property name="ireport.zoom" value="1.2100000000000009"/>
-	<property name="ireport.x" value="15"/>
+	<property name="ireport.zoom" value="1.2100000000000024"/>
+	<property name="ireport.x" value="66"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
@@ -49,6 +49,9 @@
 	</field>
 	<field name="paid" class="java.lang.Long">
 		<fieldDescription><![CDATA[paid]]></fieldDescription>
+	</field>
+	<field name="paidByCash" class="java.lang.Long">
+		<fieldDescription><![CDATA[paidByCash]]></fieldDescription>
 	</field>
 	<field name="paidSnack" class="java.lang.Long">
 		<fieldDescription><![CDATA[paidSnack]]></fieldDescription>
@@ -129,6 +132,10 @@
 		<variableExpression><![CDATA[$F{paid}]]></variableExpression>
 		<initialValueExpression><![CDATA[$F{paid}]]></initialValueExpression>
 	</variable>
+	<variable name="totalPaidByCash" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{paidByCash}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{paidByCash}]]></initialValueExpression>
+	</variable>
 	<variable name="totalPaidSnack" class="java.lang.Long" calculation="Sum">
 		<variableExpression><![CDATA[$F{paidSnack}]]></variableExpression>
 		<initialValueExpression><![CDATA[$F{paidSnack}]]></initialValueExpression>
@@ -164,7 +171,7 @@
 				<property name="local_mesure_unitheight" value="pixel"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<frame>
-					<reportElement uuid="de2c6e1b-81e5-417c-93b2-16a08bafe9d4" mode="Opaque" x="0" y="0" width="822" height="20" forecolor="#B89F7D" backcolor="#DDDDDD">
+					<reportElement uuid="de2c6e1b-81e5-417c-93b2-16a08bafe9d4" mode="Opaque" x="0" y="0" width="876" height="20" forecolor="#B89F7D" backcolor="#DDDDDD">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="local_mesure_unity" value="pixel"/>
@@ -195,151 +202,6 @@
 				</frame>
 			</band>
 		</groupHeader>
-		<groupFooter>
-			<band height="18">
-				<property name="local_mesure_unitheight" value="pixel"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<frame>
-					<reportElement uuid="3d34b907-94c4-4a48-a2ec-c5f95a6af37f" style="Row" mode="Opaque" x="0" y="0" width="822" height="18" backcolor="#F0F8FF"/>
-					<box>
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="cd23c827-fb1c-416b-8c7f-f5254b60d48a" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="318" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupIncome})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="b6f32fcb-2c3e-42fc-9315-2a71b75c9b4b" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="372" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupPaid})) / 100.0]]></textFieldExpression>
-					</textField>
-					<staticText>
-						<reportElement uuid="45076f3d-c1bd-4586-8e7b-7a8d15203779" stretchType="RelativeToBandHeight" x="0" y="0" width="200" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Center" verticalAlignment="Middle">
-							<font size="8" isBold="true"/>
-						</textElement>
-						<text><![CDATA[Итого]]></text>
-					</staticText>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="9e4cd5df-a640-452e-8fcb-d75306efe8e7" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Left" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($V{groupLastSyncTime})]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="597fd757-3e87-4a47-8f34-dfcafc3fb3c4" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="254" y="0" width="64" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupStartCash})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="ae04cdb3-9793-4e13-8d01-fe23f1a2a7c4" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupPaidSnack})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="5789e7d8-651e-4598-9341-978d070194a6" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupPaidTotal})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="7b97431b-35a8-4615-93a1-bc4e4cf165bf" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupRepayment})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="63c69016-55f8-422d-8514-859452eb9e84" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="588" y="0" width="54" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupCashMoved})) / 100.0]]></textFieldExpression>
-					</textField>
-					<textField isStretchWithOverflow="true">
-						<reportElement uuid="08374cf1-80f7-4720-9abd-52c296bfd46c" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="64" height="18"/>
-						<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-							<topPen lineWidth="0.5"/>
-							<leftPen lineWidth="0.5"/>
-							<bottomPen lineWidth="0.5"/>
-							<rightPen lineWidth="0.5"/>
-						</box>
-						<textElement textAlignment="Right" verticalAlignment="Middle">
-							<font fontName="SansSerif" size="8" isBold="true"/>
-						</textElement>
-						<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{groupEndCash})) / 100.0]]></textFieldExpression>
-					</textField>
-				</frame>
-			</band>
-		</groupFooter>
 	</group>
 	<background>
 		<band splitType="Stretch"/>
@@ -349,14 +211,14 @@
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement uuid="dbc5978f-e2bc-49b1-a464-5ed7b0c0be74" x="0" y="0" width="802" height="30"/>
+				<reportElement uuid="dbc5978f-e2bc-49b1-a464-5ed7b0c0be74" x="0" y="0" width="876" height="30"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Итоговые показатели по пополнениям]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="fb530a98-1113-4551-8db2-271791a893a6" x="0" y="30" width="802" height="16">
+				<reportElement uuid="fb530a98-1113-4551-8db2-271791a893a6" x="0" y="30" width="876" height="16">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -366,7 +228,22 @@
 				<textFieldExpression><![CDATA["За период: " + $V{startDate} + " - " + $V{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="c8cf0d14-2210-4420-98a3-8769feb2f1be" x="706" y="156" width="116" height="20">
+				<reportElement uuid="c8cf0d14-2210-4420-98a3-8769feb2f1be" x="760" y="156" width="116" height="20">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0e642264-db28-44ce-8b43-f7b65e6c18b9" x="696" y="156" width="64" height="20">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -381,7 +258,8 @@
 				<text><![CDATA[13]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0e642264-db28-44ce-8b43-f7b65e6c18b9" x="642" y="156" width="64" height="20">
+				<reportElement uuid="9d8ad7c0-eacf-4057-963a-139109ba09f7" x="642" y="156" width="54" height="20">
+					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -396,8 +274,7 @@
 				<text><![CDATA[12]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9d8ad7c0-eacf-4057-963a-139109ba09f7" x="588" y="156" width="54" height="20">
-					<property name="local_mesure_unitheight" value="pixel"/>
+				<reportElement uuid="1695ad11-b3c1-4cf4-b45a-16c8f6555a3c" x="588" y="156" width="54" height="20">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -412,7 +289,7 @@
 				<text><![CDATA[11]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1695ad11-b3c1-4cf4-b45a-16c8f6555a3c" x="534" y="156" width="54" height="20">
+				<reportElement uuid="aef6176f-6f3f-4cbe-af86-c929f623e2d9" x="534" y="156" width="54" height="20">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -425,21 +302,6 @@
 					<font fontName="SansSerif" size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[10]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="aef6176f-6f3f-4cbe-af86-c929f623e2d9" x="480" y="156" width="54" height="20">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="9" isBold="true"/>
-				</textElement>
-				<text><![CDATA[9]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="93d1e8da-00ec-4a6b-9999-0f9d2780fcfd" x="426" y="156" width="54" height="20">
@@ -562,7 +424,7 @@
 				<text><![CDATA[1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b28093ad-d455-4445-b4ca-fce1ea5757ba" style="Column header" x="372" y="85" width="162" height="36" forecolor="#000000">
+				<reportElement uuid="b28093ad-d455-4445-b4ca-fce1ea5757ba" style="Column header" x="372" y="80" width="216" height="20" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -579,13 +441,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="SansSerif" size="10" isBold="false"/>
+					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Объем реализованной продукции
-в ОО, руб.]]></text>
+				<text><![CDATA[Объем реализованной продукции в ОО, руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0475b4a5-89cc-4095-ae5d-b0763b9cd6ed" style="Column header" x="318" y="60" width="324" height="25" forecolor="#000000">
+				<reportElement uuid="0475b4a5-89cc-4095-ae5d-b0763b9cd6ed" style="Column header" x="318" y="60" width="378" height="20" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -626,7 +487,7 @@
 				<text><![CDATA[Наименование ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="943b5ef2-69b6-49cd-b310-8e79929cb42f" style="Column header" x="706" y="60" width="116" height="96" forecolor="#000000">
+				<reportElement uuid="943b5ef2-69b6-49cd-b310-8e79929cb42f" style="Column header" x="760" y="60" width="116" height="96" forecolor="#000000">
 					<property name="local_mesure_unitx" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
@@ -642,7 +503,7 @@
 				<text><![CDATA[Комментарий]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f78b3011-16f3-46f2-a84c-b69221cdc7d0" style="Column header" x="642" y="60" width="64" height="96" forecolor="#000000">
+				<reportElement uuid="f78b3011-16f3-46f2-a84c-b69221cdc7d0" style="Column header" x="696" y="60" width="64" height="96" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -663,7 +524,7 @@
 (конец периода)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2fb983cf-d0a1-40fe-b5f2-2dfdc0d0a4b5" style="Column header" x="588" y="85" width="54" height="71" forecolor="#000000">
+				<reportElement uuid="2fb983cf-d0a1-40fe-b5f2-2dfdc0d0a4b5" style="Column header" x="642" y="80" width="54" height="76" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -680,10 +541,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Перемещения остатков л/с клиентов, руб.]]></text>
+				<text><![CDATA[Перемещ-я остатков  л/с клиентов, руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c5c1da7c-c4be-4dce-b5e0-bedb44910f4b" style="Column header" x="534" y="85" width="54" height="71" forecolor="#000000">
+				<reportElement uuid="c5c1da7c-c4be-4dce-b5e0-bedb44910f4b" style="Column header" x="588" y="80" width="54" height="76" forecolor="#000000">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
@@ -703,7 +564,7 @@
 				<text><![CDATA[Возврат д/с по заяв. клиентов, руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c1a2012c-d604-4f3a-8f58-8b23ffe28719" style="Column header" x="480" y="121" width="54" height="35" forecolor="#000000">
+				<reportElement uuid="c1a2012c-d604-4f3a-8f58-8b23ffe28719" style="Column header" x="480" y="100" width="54" height="56" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -723,7 +584,7 @@
 				<text><![CDATA[Итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d17e9b75-9b7c-44ec-8825-5bf15eed6a79" style="Column header" x="426" y="121" width="54" height="35" forecolor="#000000">
+				<reportElement uuid="d17e9b75-9b7c-44ec-8825-5bf15eed6a79" style="Column header" x="534" y="100" width="54" height="56" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -740,10 +601,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="SansSerif" size="9" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Буфетная продукция]]></text>
+				<text><![CDATA[В том числе наличный расчет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4bb1b1fe-c99c-44f8-be24-b9c98d519696" style="Column header" x="372" y="121" width="54" height="35" forecolor="#000000">
+				<reportElement uuid="4bb1b1fe-c99c-44f8-be24-b9c98d519696" style="Column header" x="372" y="100" width="54" height="56" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -765,7 +626,7 @@
 				<text><![CDATA[Платные комплексы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fabaad81-cfe6-4df7-a5eb-fb6f5e8d0cbf" style="Column header" x="318" y="85" width="54" height="71" forecolor="#000000">
+				<reportElement uuid="fabaad81-cfe6-4df7-a5eb-fb6f5e8d0cbf" style="Column header" x="318" y="80" width="54" height="76" forecolor="#000000">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -892,6 +753,41 @@
 				<text><![CDATA[№
 п/п]]></text>
 			</staticText>
+			<staticText>
+				<reportElement uuid="4f8d93e3-79f9-41af-857d-f72fabfd9177" style="Column header" x="426" y="100" width="54" height="56" forecolor="#000000">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Буфетная продукция]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3f92931a-1fcc-4bbf-9fdc-21c70e752095" x="480" y="156" width="54" height="20">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[9]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -900,7 +796,7 @@
 	<detail>
 		<band height="18" splitType="Stretch">
 			<frame>
-				<reportElement uuid="94e5ff49-3b86-4ba9-91a6-fbf1d4df7654" style="Row" mode="Opaque" x="0" y="0" width="822" height="18"/>
+				<reportElement uuid="94e5ff49-3b86-4ba9-91a6-fbf1d4df7654" style="Row" mode="Opaque" x="0" y="0" width="876" height="18"/>
 				<box>
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -975,7 +871,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paid})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="706" y="0" width="116" height="18"/>
+					<reportElement uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="760" y="0" width="116" height="18"/>
 					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 						<topPen lineWidth="0.5"/>
 						<leftPen lineWidth="0.5"/>
@@ -1019,7 +915,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{startCash})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="611e88f2-554d-47f3-8b1f-98fcf9dc6768" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="18">
+					<reportElement uuid="611e88f2-554d-47f3-8b1f-98fcf9dc6768" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="54" height="18">
 						<property name="local_mesure_unity" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="local_mesure_unitx" value="pixel"/>
@@ -1034,28 +930,10 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="8"/>
 					</textElement>
-					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paidSnack})) / 100.0]]></textFieldExpression>
+					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paidByCash})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="04465fb2-ee56-4766-9ceb-afec57a87369" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="54" height="18">
-						<property name="local_mesure_unity" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.y" value="px"/>
-						<property name="local_mesure_unitx" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.x" value="px"/>
-					</reportElement>
-					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
-						<topPen lineWidth="0.5"/>
-						<leftPen lineWidth="0.5"/>
-						<bottomPen lineWidth="0.5"/>
-						<rightPen lineWidth="0.5"/>
-					</box>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font fontName="SansSerif" size="8"/>
-					</textElement>
-					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paidTotal})) / 100.0]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true">
-					<reportElement uuid="1d294cc1-a0e2-4231-9bfb-3d4aec9bddda" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="54" height="18">
+					<reportElement uuid="1d294cc1-a0e2-4231-9bfb-3d4aec9bddda" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="588" y="0" width="54" height="18">
 						<property name="local_mesure_unity" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="local_mesure_unitx" value="pixel"/>
@@ -1091,7 +969,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{cashMoved})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="64" height="18">
+					<reportElement uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="696" y="0" width="64" height="18">
 						<property name="local_mesure_unity" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="local_mesure_unitx" value="pixel"/>
@@ -1127,7 +1005,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{repayment})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="4cb483aa-f3d3-4f09-b8bd-82eed39400f9" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="588" y="0" width="54" height="18">
+					<reportElement uuid="4cb483aa-f3d3-4f09-b8bd-82eed39400f9" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="54" height="18">
 						<property name="local_mesure_unity" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.y" value="px"/>
 						<property name="local_mesure_unitx" value="pixel"/>
@@ -1159,13 +1037,49 @@
 					</textElement>
 					<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").parse($F{lastSyncTime}))]]></textFieldExpression>
 				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement uuid="04465fb2-ee56-4766-9ceb-afec57a87369" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="54" height="18">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paidTotal})) / 100.0]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement uuid="fd6ae10f-17b7-411f-b3bf-0dce24e2bb4d" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="18">
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($F{paidSnack})) / 100.0]]></textFieldExpression>
+				</textField>
 			</frame>
 		</band>
 	</detail>
 	<columnFooter>
 		<band height="7" splitType="Stretch">
 			<line>
-				<reportElement uuid="d4a2ea43-037e-4a32-8e1e-5ea94162dde7" positionType="FixRelativeToBottom" x="0" y="3" width="802" height="1">
+				<reportElement uuid="d4a2ea43-037e-4a32-8e1e-5ea94162dde7" positionType="FixRelativeToBottom" x="0" y="3" width="876" height="1">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -1180,7 +1094,7 @@
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<frame>
-				<reportElement uuid="1e63a02f-82e7-4460-a2b0-2d646bfcd5c0" style="Row" mode="Opaque" x="0" y="0" width="822" height="26" backcolor="#DDDDDD">
+				<reportElement uuid="1e63a02f-82e7-4460-a2b0-2d646bfcd5c0" style="Row" mode="Opaque" x="0" y="0" width="876" height="26" backcolor="#DDDDDD">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -1232,7 +1146,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font isBold="true"/>
 					</textElement>
-					<text><![CDATA[Всего]]></text>
+					<text><![CDATA[Итого]]></text>
 				</staticText>
 				<textField isStretchWithOverflow="true">
 					<reportElement uuid="54e70d90-898d-4eed-8b8d-90fe2c0e2d9c" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="254" y="0" width="64" height="26">
@@ -1250,7 +1164,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalStartCash})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="1566df3c-a206-4346-b91c-5983b217c1b1" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="26">
+					<reportElement uuid="1566df3c-a206-4346-b91c-5983b217c1b1" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="54" height="26">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -1262,7 +1176,7 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="SansSerif" size="10"/>
 					</textElement>
-					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalPaidSnack})) / 100.0]]></textFieldExpression>
+					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalPaidByCash})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement uuid="eb625448-6e7b-4872-ab0c-38971db980ce" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="54" height="26">
@@ -1280,7 +1194,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalPaidTotal})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="0ae9301c-e007-4492-a84d-17121184bb43" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="54" height="26">
+					<reportElement uuid="0ae9301c-e007-4492-a84d-17121184bb43" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="588" y="0" width="54" height="26">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -1295,7 +1209,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalRepayment})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="7fea8e7d-7087-49e5-9ba4-bad1c16bcd7b" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="588" y="0" width="54" height="26">
+					<reportElement uuid="7fea8e7d-7087-49e5-9ba4-bad1c16bcd7b" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="54" height="26">
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
 					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -1310,7 +1224,7 @@
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalCashMoved})) / 100.0]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement uuid="e31cc852-7d8a-4fb7-8ac6-84f929471fa7" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="64" height="26">
+					<reportElement uuid="e31cc852-7d8a-4fb7-8ac6-84f929471fa7" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="696" y="0" width="64" height="26">
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -1324,6 +1238,21 @@
 						<font fontName="SansSerif" size="10"/>
 					</textElement>
 					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalEndCash})) / 100.0]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement uuid="cdaa664e-6b9a-4a67-aaa0-5c04b0e5f69b" style="Detail" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="26">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					</reportElement>
+					<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{totalPaidSnack})) / 100.0]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
