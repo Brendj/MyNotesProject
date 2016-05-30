@@ -32,7 +32,7 @@
 
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup>
-                <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
                 <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
