@@ -103,7 +103,25 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
         }
     }
 
+    public void setOneDayPeriod() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+
+        localCalendar.setTime(new Date());
+        localCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        localCalendar.set(Calendar.MINUTE, 0);
+        localCalendar.set(Calendar.SECOND, 0);
+        localCalendar.set(Calendar.MILLISECOND, 0);
+        this.startDate = localCalendar.getTime();
+
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+    }
 
     public String getGetStringIdOfOrgList() {
         return idOfOrgList.toString().replaceAll("[^0-9,]","");

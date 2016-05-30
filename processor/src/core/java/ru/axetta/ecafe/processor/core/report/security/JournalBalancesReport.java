@@ -107,8 +107,10 @@ public class JournalBalancesReport extends BasicReportForAllOrgJob {
                 item.setTerminal(balance.getTerminal());
                 item.setProtocol(balance.getProtocol());
                 item.setEventInterface(balance.getEventInterface());
-                item.setContractId(balance.getClient().getContractId());
-                item.setFioOfClient(balance.getClient().getPerson().getFullName());
+                if (balance.getClient() != null) {
+                    item.setContractId(balance.getClient().getContractId());
+                    item.setFioOfClient(balance.getClient().getPerson().getFullName());
+                }
                 if (balance.getClientPayment() != null) {
                     item.setIdOfClientPayment(balance.getClientPayment().getIdOfClientPayment());
                 }

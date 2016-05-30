@@ -61,9 +61,9 @@ public class JournalBalancesReportPage extends OnlineReportPage implements Clien
         return "report/security/journal_balances_report";
     }
 
-    //public JournalBalancesReport getReport() {
-    //    return report;
-    //}
+    public JournalBalancesReportPage() {
+        setOneDayPeriod();
+    }
 
     public Object doGenerate() {
         BasicReportJob report = getReport();
@@ -150,7 +150,7 @@ public class JournalBalancesReportPage extends OnlineReportPage implements Clien
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        if (report.getPrint().getPages().size() == 0) {
+        if (report == null || report.getPrint().getPages().size() == 0) {
             printMessage(NO_REPORT_DATA);
             htmlReport = "";
             return null;

@@ -60,6 +60,10 @@ public class JournalAuthenticationReportPage extends OnlineReportPage implements
         return "report/security/journal_authentication_report";
     }
 
+    public JournalAuthenticationReportPage() {
+        setOneDayPeriod();
+    }
+
     public Object doGenerate() {
         BasicReportJob report = getReport();
 
@@ -145,7 +149,7 @@ public class JournalAuthenticationReportPage extends OnlineReportPage implements
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        if (report.getPrint().getPages().size() == 0) {
+        if (report == null || report.getPrint().getPages().size() == 0) {
             printMessage(NO_REPORT_DATA);
             htmlReport = "";
             return null;

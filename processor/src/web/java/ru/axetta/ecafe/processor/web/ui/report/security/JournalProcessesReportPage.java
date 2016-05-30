@@ -55,6 +55,10 @@ public class JournalProcessesReportPage extends OnlineReportPage {
         return "report/security/journal_processes_report";
     }
 
+    public JournalProcessesReportPage() {
+        setOneDayPeriod();
+    }
+
     public Object doGenerate() {
         BasicReportJob report = getReport();
 
@@ -140,7 +144,7 @@ public class JournalProcessesReportPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        if (report.getPrint().getPages().size() == 0) {
+        if (report == null || report.getPrint().getPages().size() == 0) {
             printMessage(NO_REPORT_DATA);
             htmlReport = "";
             return null;
