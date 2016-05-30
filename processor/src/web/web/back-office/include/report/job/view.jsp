@@ -30,7 +30,7 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:inputText readonly="true" value="#{mainPage.reportJobViewPage.cronExpression}" maxlength="128"
                          styleClass="input-text" style="width: 200px;" />
-            <h:outputLink target="_blank" value="http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html"
+            <h:outputLink target="_blank" value="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger.html"
                           styleClass="command-link">
                 <h:outputText escape="true" value="описание" styleClass="output-text" />
             </h:outputLink>
