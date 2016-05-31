@@ -196,7 +196,10 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             HTTPDataHandler handler = new HTTPDataHandler(data);
             Date date = new Date(System.currentTimeMillis());
             logRequest(handler);
-            Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+            Long idOfClient = null;
+            if (contractId != null) {
+                idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+            }
             handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                     idOfClient, handler.getData().getOperationType());
             result = !bs.isActive() || rpService.deactivateSubscription(regularPaymentSubscriptionID);
