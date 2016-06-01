@@ -10,8 +10,13 @@
 
 <%--@elvariable id="ServiceCheckSumsPage" type="ru.axetta.ecafe.processor.controllers.ServiceCheckSumsPage"--%>
 <h:panelGrid>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
     <h:panelGrid>
-        <a4j:commandButton value="Запустить подсчет" action="#{mainPage.serviceCheckSumsPage.run()}" reRender="serviceCheckSumsPageTable" />
+        <a4j:commandButton value="Запустить подсчет" action="#{mainPage.serviceCheckSumsPage.run()}"
+                           reRender="serviceCheckSumsPageTable" />
         <a4j:status id="updateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -21,8 +26,7 @@
 
     <h:panelGrid>
         <rich:dataTable id="serviceCheckSumsPageTable"
-                        value="#{mainPage.serviceCheckSumsPage.serviceCheckSumsPageItemsList}" var="item"
-                        rows="30"
+                        value="#{mainPage.serviceCheckSumsPage.serviceCheckSumsPageItemsList}" var="item" rows="30"
                         columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
                         footerClass="data-table-footer" rowKeyVar="row">
             <rich:column>

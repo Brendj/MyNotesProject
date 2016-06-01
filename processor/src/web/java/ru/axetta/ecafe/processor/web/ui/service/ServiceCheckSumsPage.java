@@ -33,6 +33,12 @@ public class ServiceCheckSumsPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceCheckSumsPage.class);
 
+    private String errorMessages;
+
+    public String getErrorMessages() {
+        return errorMessages;
+    }
+
     //Сервис для того чтобы можно было достать все записи из таблицы cf_checksums
     public CheckSumsDAOService checkSumsDaoService = new CheckSumsDAOService();
 
@@ -52,17 +58,22 @@ public class ServiceCheckSumsPage extends BasicWorkspacePage {
         Date currentDate = new Date();
         logger.error("Подсчет контрольной суммы ПО запущен: " + currentDate.toString());
 
-        if (f != null) {
+        if (f != null && f.exists()) {
             try {
                 String md5ForAllFiles = checkSumsMessageDigitsService.processFilesFromFolder(f, currentDate);
                 String version = String.valueOf(RuntimeContext.getInstance().getCurrentDBSchemaVersion());
                 CheckSums checkSums = new CheckSums(currentDate, version, md5ForAllFiles);
                 checkSumsDaoService.saveCheckSums(checkSums);
             } catch (Exception e2) {
-                logger.error(String.format("Ошибка работы сервиса (%s)", f.getAbsolutePath()), e2);
+                logger.error(String.format("Ошибка работы сервиса (%s)", f), e2);
+                errorMessages = String.format("Ошибка работы сервиса (%s)", f);
+                printError(String.format("Ошибка работы сервиса (%s)", f));
             }
         } else {
-            logger.error(String.format("Не удается найти файлы по этому пути (%s)", f.getAbsolutePath()));
+            logger.error(String.format("Не удается найти файлы по заданному пути (%s)", f));
+            errorMessages = String.format("Не удается найти файлы по заданному пути (%s)", f);
+            printError(String.format("Не удается найти файлы по заданному пути (%s)", f));
+            printError("Добавьте в \"Настройки / Настройки / Конфигурация\" строку вида, ecafe.processor.checksums.folder.path=\"Путь до WEB-INF\"");
         }
 
         //После вычисления и записи в БД
