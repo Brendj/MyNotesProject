@@ -108,3 +108,11 @@ ALTER TABLE cf_security_journal_balances
   ADD CONSTRAINT cf_security_journal_balances_transaction_fk FOREIGN KEY (idoftransaction)
   REFERENCES cf_transactions (idoftransaction) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+CREATE TABLE CF_CheckSums (
+  idOfCheckSums BIGSERIAL NOT NULL,
+  checkSumsDate BIGINT NOT NULL,
+  distributionVersion CHARACTER VARYING(20),
+  checkSumsMd5 CHARACTER VARYING(32),
+  CONSTRAINT cf_checksums_pk PRIMARY KEY (idOfCheckSums)
+);

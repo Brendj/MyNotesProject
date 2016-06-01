@@ -804,6 +804,9 @@
 
     <rich:panelMenuItem id="serviceRNIP" binding="#{mainPage.serviceRNIPPage.mainMenuComponent}"
                         label="РНИП" action="#{mainPage.serviceRNIPPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="serviceChecksums" binding="#{mainPage.serviceCheckSumsPage.mainMenuComponent}"
+                        label="Контрольные суммы" action="#{mainPage.serviceCheckSumsPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

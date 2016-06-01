@@ -205,6 +205,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage thinClientUserGroupPage = new BasicWorkspacePage();
     private final EmpInfoPage empInfoPage = new EmpInfoPage();
     private final ServiceRNIPPage serviceRNIPPage = new ServiceRNIPPage();
+    private final ServiceCheckSumsPage serviceCheckSumsPage = new ServiceCheckSumsPage();
 
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
@@ -8592,9 +8593,13 @@ public class MainPage implements Serializable {
         return serviceRNIPPage;
     }
 
+    public ServiceCheckSumsPage getServiceCheckSumsPage() {
+        return serviceCheckSumsPage;
+    }
+
     /*
-       Все комплексы
-    */
+           Все комплексы
+        */
     public AllComplexReportPage getAllComplexReportPage() {
         return allComplexReportPage;
     }
