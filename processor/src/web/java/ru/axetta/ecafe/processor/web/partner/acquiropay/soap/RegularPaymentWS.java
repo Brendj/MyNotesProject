@@ -199,6 +199,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             Long idOfClient = null;
             if (contractId != null) {
                 idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
+            } else if (bs.getClient() != null) {
+                idOfClient = bs.getClient().getIdOfClient();
             }
             handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                     idOfClient, handler.getData().getOperationType());
