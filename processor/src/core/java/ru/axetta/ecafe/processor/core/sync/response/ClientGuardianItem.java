@@ -22,11 +22,13 @@ public class ClientGuardianItem {
     private Long version;
     private Integer deleteState;
     private ResultOperation result;
+    private Boolean disabled;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
         this.idOfChildren = clientGuardian.getIdOfChildren();
         this.version = clientGuardian.getVersion();
+        this.disabled = clientGuardian.isDisabled();
         this.result = null;
     }
 
@@ -49,6 +51,7 @@ public class ClientGuardianItem {
     public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
         this.idOfChildren = clientGuardian.getIdOfChildren();
+        this.disabled = clientGuardian.isDisabled();
         this.version = clientGuardian.getVersion();
         this.result = new ResultOperation(resCode, resultMessage);
     }
@@ -57,6 +60,7 @@ public class ClientGuardianItem {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "IdOfGuardian", idOfGuardian);
         XMLUtils.setAttributeIfNotNull(element, "IdOfChildren", idOfChildren);
+        XMLUtils.setAttributeIfNotNull(element, "Disabled", disabled ? "1" : "0");
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deleteState);
         if(this.result!=null){
@@ -69,15 +73,24 @@ public class ClientGuardianItem {
     public static ClientGuardianItem build(Node itemNode){
         Long idOfGuardian = XMLUtils.getLongAttributeValue(itemNode, "IdOfGuardian");
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
+        Boolean disabled = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "Disabled"));
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
-        return new ClientGuardianItem(idOfGuardian, idOfChildren, delete);
+        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete);
     }
 
-    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Integer deleteSate) {
+    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
+        this.disabled = disabled;
         this.deleteState = deleteSate;
     }
 
 
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
 }

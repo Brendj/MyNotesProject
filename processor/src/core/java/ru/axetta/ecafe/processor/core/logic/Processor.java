@@ -2744,24 +2744,28 @@ public class Processor
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
+            clientGuardian.setDisabled(item.getDisabled());
             clientGuardian.setVersion(resultClientGuardianVersion);
             if (item.getDeleteState() == 0) {
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
-                    criteria.add(Example.create(clientGuardian));
+                    criteria.add(Example.create(clientGuardian).excludeProperty("disabled"));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian == null) {
                         clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
                     }
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
                     if (dbClientGuardian == null) {
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
-                        resultClientGuardian.addItem(dbClientGuardian, 0, "Client guardian exist");
+                        dbClientGuardian.setDisabled(item.getDisabled());
+                        dbClientGuardian.setVersion(resultClientGuardianVersion);
+                        persistenceSession.saveOrUpdate(dbClientGuardian);
+                        resultClientGuardian.addItem(dbClientGuardian, 0, null);
                     }
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
                 } catch (Exception ex) {
                     String message = String
                             .format("Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
