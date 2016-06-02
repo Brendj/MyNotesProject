@@ -1027,6 +1027,40 @@ public class ClientManager {
         return clients;
     }
 
+    /* получить список опекунов по опекаемому */
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren) throws Exception {
+        List<Client> clients = new ArrayList<Client>();
+        DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
+        idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
+        idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
+        Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
+        Integer countResult = subCriteria.list().size();
+        if(countResult>0){
+            Criteria clientCriteria = session.createCriteria(Client.class);
+            clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
+            clients = clientCriteria.list();
+        }
+        return clients;
+    }
+
+    /* получить список опекаемых по опекуну */
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+        List<Client> clients = new ArrayList<Client>();
+        DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
+        idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
+        idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
+        Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
+        Integer countResult = subCriteria.list().size();
+        if(countResult>0){
+            Criteria clientCriteria = session.createCriteria(Client.class);
+            clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
+            clients = clientCriteria.list();
+        }
+        return clients;
+    }
+
     /* Является ли опекунская связь Опекун-Клиент активной*/
     public static Boolean isGuardianshipDisabled(Session session, Long guardianId, Long clientId) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);

@@ -475,6 +475,93 @@ public class FrontController extends HttpServlet {
         }
     }
 
+    /* Метод возвращает данные опекуна и его опекаемых по номеру чипа карты, если владелец карты опекун
+    * Возвращает данные учащегося и его опекаемых по номеру чипа карты, если владелец карты учащийся
+    * */
+    @WebMethod(operationName = "getGuardiansAndChildsByCard")
+    public List<GuardianAndChildItem> getGuardiansAndChildsByCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo)
+            throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        List<GuardianAndChildItem> result = new ArrayList<GuardianAndChildItem>();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            if (c == null) {
+                CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+                if(ct != null){
+                    throw new FrontControllerException("Карта зарегистрирована как временная");
+                }
+                throw new FrontControllerException("Карта не найдена");
+            } else {
+                if(c.getClient() == null){
+                    throw new FrontControllerException("Карта не зарегистрирована на клиента");
+                }
+                if(!c.getState().equals(Card.ACTIVE_STATE)){
+                    throw new FrontControllerException("Карта заблокирована");
+                }
+                if(!c.getLifeState().equals(Card.READY_LIFE_STATE)){
+                    throw new FrontControllerException("Карта не активна");
+                }
+            }
+
+            // Находим опекуна, его опекаемых и опекунов опекаемых
+            Client clientByCard = c.getClient();
+            GuardianAndChildItem clientByCardItem = new GuardianAndChildItem(clientByCard.getIdOfClient(), clientByCard.getOrg().getIdOfOrg(),
+                    clientByCard.getPerson().getFullName());
+            result.add(clientByCardItem);
+
+            List<Client> childsList = ClientManager.findChildsByClient(persistenceSession, clientByCard.getIdOfClient());
+            if(childsList.size() > 0) {
+                List<GuardianAndChildItem> childItemList = new ArrayList<GuardianAndChildItem>();
+                List<GuardianAndChildItem> guardiansItemList = new ArrayList<GuardianAndChildItem>();
+                for (Client client : childsList) {
+                    GuardianAndChildItem clientItem = new GuardianAndChildItem(client.getIdOfClient(),
+                            client.getOrg().getIdOfOrg(), client.getPerson().getFullName());
+                    clientByCardItem.getIdOfChildren().add(client.getIdOfClient());
+                    List<Client> guardians = ClientManager
+                            .findGuardiansByClient(persistenceSession, client.getIdOfClient());
+                    childItemList.add(clientItem);
+                    if (guardians != null && guardians.size() > 0) {
+                        for (Client g : guardians) {
+                            GuardianAndChildItem gItem = new GuardianAndChildItem(g.getIdOfClient(),
+                                    g.getOrg().getIdOfOrg(), g.getPerson().getFullName());
+                            clientItem.getIdOfGuardian().add(g.getIdOfClient());
+                            guardiansItemList.add(gItem);
+                        }
+                    }
+                }
+                result.addAll(childItemList);
+                result.addAll(guardiansItemList);
+            } else {
+                List<Client> guardiansList = ClientManager.findGuardiansByClient(persistenceSession, clientByCard.getIdOfClient());
+                if(guardiansList.size() > 0) {
+                    List<GuardianAndChildItem> guardiansItemList = new ArrayList<GuardianAndChildItem>();
+                    for (Client g : guardiansList) {
+                        GuardianAndChildItem gItem = new GuardianAndChildItem(g.getIdOfClient(), g.getOrg().getIdOfOrg(), g.getPerson().getFullName());
+                        clientByCardItem.getIdOfGuardian().add(g.getIdOfClient());
+                        guardiansItemList.add(gItem);
+                    }
+                    result.addAll(guardiansItemList);
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return result;
+        } catch (Exception e) {
+            logger.error("Ошибка при запросе опекуна и опекаемых по номеру карты", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    
 
     @WebMethod(operationName = "registerVisitor")
     public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
