@@ -143,6 +143,14 @@ public class CalendarUtils {
         calendar.set(Calendar.HOUR_OF_DAY, 23);
     }
 
+    public static void startOfDay(Calendar calendar) {
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+    }
+
     public static Date truncateToDayOfMonth(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
@@ -156,6 +164,14 @@ public class CalendarUtils {
         endOfDay(c);
         return c.getTime();
     }
+
+    public static Date startOfDay(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTime(date);
+        startOfDay(c);
+        return c.getTime();
+    }
+
     public static Date truncateToDayOfMonthAndAddDay(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);

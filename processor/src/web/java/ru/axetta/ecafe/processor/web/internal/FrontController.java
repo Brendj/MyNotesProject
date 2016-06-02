@@ -560,8 +560,59 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-
     
+    /* Создание заявок на посещение */
+    @WebMethod(operationName = "createMigrateRequests")
+    public void createMigrateRequests(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "rqs") List<MigrateRequest> rqs)
+            throws FrontControllerException{
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org orgVisit = (Org)persistenceSession.load(Org.class, idOfOrg);
+            Long nextMigrantId = DAOUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
+            Long nextResolutionId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+
+            for(MigrateRequest migrateRequest : rqs) {
+                Client client = (Client)persistenceSession.load(Client.class, migrateRequest.getMigrateClientId());
+                if(client == null){
+                    throw new FrontControllerException("Клиент-посетитель не найден");
+                }
+                Client clientResol = (Client)persistenceSession.load(Client.class, migrateRequest.getIdOfClientResol());
+                if(clientResol == null){
+                    throw new FrontControllerException("Клиент-оператор не найден");
+                }
+                migrateRequest.validateMigrateRequest();
+                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(nextMigrantId, client.getOrg().getIdOfOrg());
+                nextMigrantId--;
+                Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(), client, orgVisit,
+                        migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
+                CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(nextResolutionId,
+                        migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
+                nextResolutionId--;
+                VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
+                        VisitReqResolutionHist.RES_CONFIRMED, new Date(), migrateRequest.getResolutionCause(), clientResol,
+                        migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                persistenceSession.save(migrant);
+                persistenceSession.save(visitReqResolutionHist);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при создании заявок на временное посещение", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+
+    }
+
 
     @WebMethod(operationName = "registerVisitor")
     public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
