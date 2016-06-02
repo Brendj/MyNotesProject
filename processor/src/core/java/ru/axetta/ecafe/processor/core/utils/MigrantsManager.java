@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,26 +57,28 @@ public class MigrantsManager {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             List<Migrant> migrants = DAOUtils.getOverdueMigrants(persistenceSession);
+            Map<Long, List<Migrant>> sortedMigrants = sortMigrantsByOrg(migrants);
 
-            Long nextId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession);
+            for(Long idOfOrg : sortedMigrants.keySet()) {
+                Long nextId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+                List<Migrant> migrantsForOrg = sortedMigrants.get(idOfOrg);
 
-            for(Migrant migrant : migrants){
-                migrant.setSyncState(Migrant.CLOSED);
-                persistenceSession.save(migrant);
-                VisitReqResolutionHist hist1 =
-                        new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
-                                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg()), migrant.getOrgRegistry(),
-                                VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(), "Закрыта на сервере по истечению срока.", null,
-                                null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                nextId = nextId - 1L;
-                VisitReqResolutionHist hist2 =
-                        new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
-                                migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg()), migrant.getOrgRegistry(),
-                                VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(), "Закрыта на сервере по истечению срока.", null,
-                                null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                nextId = nextId - 1L;
-                persistenceSession.save(hist1);
-                persistenceSession.save(hist2);
+                for (Migrant migrant : migrantsForOrg) {
+                    migrant.setSyncState(Migrant.CLOSED);
+                    persistenceSession.save(migrant);
+                    VisitReqResolutionHist hist1 = new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg()), migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                    nextId--;
+                    VisitReqResolutionHist hist2 = new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg()), migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                    nextId--;
+                    persistenceSession.save(hist1);
+                    persistenceSession.save(hist2);
+                }
             }
 
             logger.info(migrants.size() + " migrant requests closed due to the expiration of time.");
@@ -88,5 +89,20 @@ public class MigrantsManager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private static Map<Long, List<Migrant>> sortMigrantsByOrg(List<Migrant> migrants){
+        Map<Long, List<Migrant>> map = new HashMap<Long, List<Migrant>>();
+        for(Migrant migrant : migrants){
+            Long idOfOrg = migrant.getCompositeIdOfMigrant().getIdOfOrgRegistry();
+            if(!map.containsKey(idOfOrg)){
+                List<Migrant> migrantList = new ArrayList<Migrant>();
+                migrantList.add(migrant);
+                map.put(idOfOrg, migrantList);
+            } else {
+                map.get(idOfOrg).add(migrant);
+            }
+        }
+        return map;
     }
 }

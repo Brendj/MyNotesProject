@@ -2164,7 +2164,8 @@ public class DAOUtils {
 
     public static long nextVersionByOrgStucture(Session session){
         long version = 0L;
-        Query query = session.createSQLQuery("select o.orgStructureVersion from cf_orgs as o order by o.orgStructureVersion desc limit 1 for update");
+        Query query = session.createSQLQuery(
+                "select o.orgStructureVersion from cf_orgs as o order by o.orgStructureVersion desc limit 1 for update");
         Object o = query.uniqueResult();
         if(o!=null){
             version = Long.valueOf(o.toString())+1;
@@ -2298,9 +2299,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static long nextIdOfProcessorMigrantResolutions(Session session){
+    public static long nextIdOfProcessorMigrantResolutions(Session session, Long idOfOrg){
         long id = 0L;
-        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 0 order by v.idofrecord asc limit 1 for update");
+        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 0 and " +
+                "v.idoforgresol=:idoforgresol order by v.idofrecord asc limit 1 for update");
+        query.setParameter("idoforgresol", idOfOrg);
         Object o = query.uniqueResult();
         if(o!=null){
             id = Long.valueOf(o.toString()) - 1;
@@ -2308,8 +2311,17 @@ public class DAOUtils {
         return id;
     }
 
-    public static List enterEventsSummary(){
-                 return null;
+
+    public static long nextIdOfProcessorMigrantRequest(Session session, Long idOfOrg){
+        long id = 0L;
+        Query query = session.createSQLQuery("select m.idofrequest from cf_migrants as m where m.idofrequest < 0 and " +
+                "m.idoforgregistry=:idoforgregistry order by m.idofrequest asc limit 1 for update");
+        query.setParameter("idoforgregistry", idOfOrg);
+        Object o = query.uniqueResult();
+        if(o!=null){
+            id = Long.valueOf(o.toString()) - 1;
+        }
+        return id;
     }
 
     public static List<Accessory> getAccessories(Session session, Long idOfSourceOrg) {
