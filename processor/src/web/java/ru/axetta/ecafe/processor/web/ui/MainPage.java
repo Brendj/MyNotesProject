@@ -220,6 +220,7 @@ public class MainPage implements Serializable {
     private final CardExpireBatchEditPage cardExpireBatchEditPage = new CardExpireBatchEditPage();
 
     // Service pages
+    private final BasicWorkspacePage serviceNewGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage serviceGroupPage = new BasicWorkspacePage();
     private final SupportEmailPage supportEmailPage = new SupportEmailPage();
     private final TestLogPage testLogPage = new TestLogPage();
@@ -4615,6 +4616,10 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
                             null));
         }
+    }
+
+    public BasicWorkspacePage getServiceNewGroupPage() {
+        return serviceNewGroupPage;
     }
 
     public BasicWorkspacePage getServiceGroupPage() {

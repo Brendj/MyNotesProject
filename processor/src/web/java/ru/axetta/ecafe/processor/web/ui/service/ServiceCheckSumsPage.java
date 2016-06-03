@@ -73,7 +73,7 @@ public class ServiceCheckSumsPage extends BasicWorkspacePage {
             logger.error(String.format("Не удается найти файлы по заданному пути (%s)", f));
             errorMessages = String.format("Не удается найти файлы по заданному пути (%s)", f);
             printError(String.format("Не удается найти файлы по заданному пути (%s)", f));
-            printError("Добавьте в \"Настройки / Настройки / Конфигурация\" строку вида, ecafe.processor.checksums.folder.path=\"Путь до WEB-INF\"");
+            printError("Добавьте в \"Настройки / Настройки / Конфигурация\" строку вида, ecafe.processor.checksums.folder.path=\"Путь до ecafe_processor.war\"");
         }
 
         //После вычисления и записи в БД

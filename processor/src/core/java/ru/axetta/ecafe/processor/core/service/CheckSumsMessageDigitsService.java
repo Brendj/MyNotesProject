@@ -5,20 +5,17 @@
 package ru.axetta.ecafe.processor.core.service;
 
 
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.Base64;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,7 +31,7 @@ public class CheckSumsMessageDigitsService {
     private List<String> resultList = new ArrayList<String>();
 
     // Рекурсивный поиск путей к файлам проход по всем каталогам и по всем файлам.
-    public void getListResultFilesFromFolder(File folder) throws IOException {
+/*    public void getListResultFilesFromFolder(File folder) throws IOException {
         File[] folderEntries = folder.listFiles();
         for (File entry : folderEntries) {
             if (entry.isDirectory()) {
@@ -55,18 +52,18 @@ public class CheckSumsMessageDigitsService {
             String result = entry + " " + md5Counted;
             resultList.add(result);
         }
-    }
+    }*/
 
     public String processFilesFromFolder(File folder, Date currentDate) throws IOException {
-        getListResultFilesFromFolder(folder);
-        String dateString = CalendarUtils.dateTimeToString(currentDate).replaceAll(" ", "-").replaceAll(":", ".");
+        //getListResultFilesFromFolder(folder);
+        //String dateString = CalendarUtils.dateTimeToString(currentDate).replaceAll(" ", "-").replaceAll(":", ".");
 
-        File file = generateFile(dateString);
-        fileWrite(file, resultList);
-        resultList.clear();
+        //File file = generateFile(dateString);
+        //fileWrite(file, resultList);
+        //resultList.clear();
 
         // Считали файл в строку
-        String fileString = processFileRead(file);
+        String fileString = processFileRead(folder);
 
         String md5Counted = "";
         // Md5 в виде строки
@@ -104,28 +101,58 @@ public class CheckSumsMessageDigitsService {
     }
 
     // Читаем файл с помощью Scanner
-    private static String readUsingScanner(File file) throws IOException {
-        Scanner scanner = new Scanner(file);
+    private String readUsingScanner(File file) throws IOException {
         String data = "";
-        while (scanner.hasNext()) {
-            data = data + scanner.next() + " ";
+
+        File[] folderEntries = file.listFiles();
+
+        if (folderEntries.length > 0) {
+            if (folderEntries[0].getCanonicalPath().contains("ecafe_processor.war")) {
+
+       /*         ZipFile zf = new ZipFile(folderEntries[0]);
+                try {
+                    for (Enumeration<? extends ZipEntry> e = zf.entries();
+                            e.hasMoreElements();) {
+                        ZipEntry ze = e.nextElement();
+                        String name = ze.getName();
+                        if (name.endsWith(".txt")) {
+                            InputStream in = zf.getInputStream(ze);
+                            // read from 'in'
+                        }
+                    }
+                } finally {
+                    zf.close();
+                }*/
+
+                BufferedReader inputStream = new BufferedReader(new FileReader(folderEntries[0]));
+                char[] buffer = new char[1024];
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                int len;
+                while ((len = inputStream.read(buffer)) != -1) {
+
+                    stringBuilder.append(buffer, 0, len);
+                }
+
+                data = stringBuilder.toString();
+            }
         }
-        scanner.close();
         return data;
     }
 
     // Создает файл и папки если их нет
-    public File generateFile(String dateString) {
+/*    public File generateFile(String dateString) {
         String filePath = "/processor/md5file";
         File dir = new File(filePath);
         boolean bool = dir.mkdirs();
         File file = new File(filePath + "/checkSums" + dateString + ".txt");
 
         return file;
-    }
+    }*/
 
     // Запись итогов в Файл
-    public void fileWrite(File file, List<String> resultList) {
+/*    public void fileWrite(File file, List<String> resultList) {
         try {
             FileWriter writer = new FileWriter(file, false);
 
@@ -139,5 +166,5 @@ public class CheckSumsMessageDigitsService {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-    }
+    }*/
 }

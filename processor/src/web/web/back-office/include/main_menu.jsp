@@ -804,9 +804,6 @@
 
     <rich:panelMenuItem id="serviceRNIP" binding="#{mainPage.serviceRNIPPage.mainMenuComponent}"
                         label="РНИП" action="#{mainPage.serviceRNIPPage.show}" reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="serviceChecksums" binding="#{mainPage.serviceCheckSumsPage.mainMenuComponent}"
-                        label="Контрольные суммы" action="#{mainPage.serviceCheckSumsPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
@@ -1292,8 +1289,18 @@
 
 </rich:panelMenuGroup>
 
-    <rich:panelMenuItem id="showOptionsSecurityMenuItem" binding="#{mainPage.optionsSecurityPage.mainMenuComponent}" label="Настройки"
-                        action="#{mainPage.showOptionsSecurityPage}" reRender="workspaceForm" rendered="#{mainPage.eligibleToViewUsers}"/>
+<rich:panelMenuGroup id="serviceNewGroupMenu" label="Сервис" binding="#{mainPage.serviceNewGroupPage.mainMenuComponent}"
+                     rendered="#{mainPage.eligibleToViewUsers}" expanded="true">
+
+    <rich:panelMenuItem id="serviceChecksums" binding="#{mainPage.serviceCheckSumsPage.mainMenuComponent}"
+                        label="Контрольные суммы" action="#{mainPage.serviceCheckSumsPage.show}"
+                        reRender="workspaceForm" rendered="#{mainPage.eligibleToViewUsers}" />
+
+    <rich:panelMenuItem id="showOptionsSecurityMenuItem" binding="#{mainPage.optionsSecurityPage.mainMenuComponent}"
+                        label="Настройки" action="#{mainPage.showOptionsSecurityPage}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToViewUsers}" />
+
+</rich:panelMenuGroup>
 
 
 <%--@elvariable id="employeesGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesGroupPage"--%>
