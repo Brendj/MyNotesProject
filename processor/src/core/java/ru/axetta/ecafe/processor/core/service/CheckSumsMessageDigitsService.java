@@ -5,17 +5,18 @@
 package ru.axetta.ecafe.processor.core.service;
 
 
-import ru.axetta.ecafe.processor.core.utils.Base64;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -108,21 +109,6 @@ public class CheckSumsMessageDigitsService {
 
         if (folderEntries.length > 0) {
             if (folderEntries[0].getCanonicalPath().contains("ecafe_processor.war")) {
-
-       /*         ZipFile zf = new ZipFile(folderEntries[0]);
-                try {
-                    for (Enumeration<? extends ZipEntry> e = zf.entries();
-                            e.hasMoreElements();) {
-                        ZipEntry ze = e.nextElement();
-                        String name = ze.getName();
-                        if (name.endsWith(".txt")) {
-                            InputStream in = zf.getInputStream(ze);
-                            // read from 'in'
-                        }
-                    }
-                } finally {
-                    zf.close();
-                }*/
 
                 BufferedReader inputStream = new BufferedReader(new FileReader(folderEntries[0]));
                 char[] buffer = new char[1024];
