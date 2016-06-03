@@ -101,16 +101,18 @@ public class CheckSumsMessageDigitsService {
         return contents;
     }
 
-    // Читаем файл с помощью Scanner
     private String readUsingScanner(File file) throws IOException {
         String data = "";
 
         File[] folderEntries = file.listFiles();
 
-        if (folderEntries.length > 0) {
-            if (folderEntries[0].getCanonicalPath().contains("ecafe_processor.war")) {
+        for (File entry : folderEntries) {
+            if (entry.isDirectory()) {
+                continue;
+            }
 
-                BufferedReader inputStream = new BufferedReader(new FileReader(folderEntries[0]));
+            if (entry.getCanonicalPath().endsWith("ecafe_processor.war")) {
+                BufferedReader inputStream = new BufferedReader(new FileReader(entry));
                 char[] buffer = new char[1024];
 
                 StringBuilder stringBuilder = new StringBuilder();
@@ -122,9 +124,16 @@ public class CheckSumsMessageDigitsService {
                 }
                 data = stringBuilder.toString();
                 inputStream.close();
+                break;
             }
         }
-        return data;
+
+        if (data.equals("")) {
+            throw new IOException("Не найден файл ecafe_processor.war");
+        } else {
+
+            return data;
+        }
     }
 
     // Создает файл и папки если их нет

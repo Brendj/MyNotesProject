@@ -68,6 +68,7 @@ public class ServiceCheckSumsPage extends BasicWorkspacePage {
                 logger.error(String.format("Ошибка работы сервиса (%s)", f), e2);
                 errorMessages = String.format("Ошибка работы сервиса (%s)", f);
                 printError(String.format("Ошибка работы сервиса (%s)", f));
+                printError(String.format("Не найден файл (%s)", "ecafe_processor.war"));
             }
         } else {
             logger.error(String.format("Не удается найти файлы по заданному пути (%s)", f));
