@@ -120,8 +120,8 @@ public class CheckSumsMessageDigitsService {
 
                     stringBuilder.append(buffer, 0, len);
                 }
-
                 data = stringBuilder.toString();
+                inputStream.close();
             }
         }
         return data;
