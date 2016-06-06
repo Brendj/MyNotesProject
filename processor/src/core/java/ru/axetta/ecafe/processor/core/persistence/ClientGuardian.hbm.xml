@@ -11,7 +11,7 @@
         <id name="idOfClientGuardian" column="IdOfClientGuardian" type="long">
             <generator class="identity"/>
         </id>
-        <version name="version" column="Version" type="long"/>
+        <property name="version" column="Version" type="long"/>
         <property name="idOfChildren" column="IdOfChildren" type="long" not-null="true"/>
         <property name="idOfGuardian" column="IdOfGuardian" type="long" not-null="true"/>
         <property name="guardianType" column="GuardianType" type="integer"/>

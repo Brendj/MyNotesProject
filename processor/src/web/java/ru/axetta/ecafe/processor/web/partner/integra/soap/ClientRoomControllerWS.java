@@ -4665,7 +4665,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private Long getClientGuardiansResultVersion(Session session) {
-        Long version = 0L;
+        Long version;
         try {
             version = ClientManager.generateNewClientGuardianVersion(session);
         } catch (Exception ex) {
