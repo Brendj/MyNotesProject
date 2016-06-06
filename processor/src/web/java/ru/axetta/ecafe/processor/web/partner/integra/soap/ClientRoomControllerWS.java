@@ -4626,6 +4626,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     criteria.add(Restrictions.eq("idOfGuardian", item.getIdOfClient()));
                     ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
                     cg.setDisabled(value);
+                    cg.setVersion(getClientGuardiansResultVersion(session));
                     session.persist(cg);
                 }
             }
@@ -4661,6 +4662,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
+    }
+
+    private Long getClientGuardiansResultVersion(Session session) {
+        Long version = 0L;
+        try {
+            version = ClientManager.generateNewClientGuardianVersion(session);
+        } catch (Exception ex) {
+            logger.error("Failed get max client guardians version, ", ex);
+            version = 0L;
+        }
+        return version;
     }
 
     @Override
