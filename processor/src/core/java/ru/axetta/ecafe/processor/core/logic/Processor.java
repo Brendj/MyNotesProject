@@ -2751,7 +2751,9 @@ public class Processor
                     persistenceSession = persistenceSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
-                    criteria.add(Example.create(clientGuardian).excludeProperty("disabled"));
+                    criteria.add(Example.create(clientGuardian)
+                            .excludeProperty("disabled")
+                            .excludeProperty("version"));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian == null) {
                         clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
