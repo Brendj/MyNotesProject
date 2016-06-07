@@ -998,8 +998,6 @@
                             label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"
                             reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
-                            label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="zeroTransactionsReportMenuItem" binding="#{mainPage.zeroTransactionsReportPage.mainMenuComponent}"
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
@@ -1016,6 +1014,8 @@
         <rich:panelMenuItem id="balanceLeavingReportMenuItem" binding="#{mainPage.balanceLeavingReportPage.mainMenuComponent}"
                             label="Отчет ухода баланса в минус/большой плюс"
                             action="#{mainPage.showBalanceLeavingReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
+                            label="Статистика по балансам клиентов" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"

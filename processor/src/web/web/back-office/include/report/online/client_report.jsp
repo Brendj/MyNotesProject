@@ -10,23 +10,31 @@
 
 <h:panelGrid styleClass="borderless-grid">
     <a4j:outputPanel ajaxRendered="true">
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
-                               reRender="modalContragentListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
-                <f:setPropertyActionListener value="#{mainPage.clientReportPage.contragentIds}"
-                                             target="#{mainPage.contragentListSelectPage.selectedIds}" />
-            </a4j:commandButton>
-            <h:outputText value=" {#{mainPage.clientReportPage.contragentFilter}}" escape="true"
-                          styleClass="output-text" />
-        </h:panelGroup>
-    </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
+            <h:panelGroup styleClass="borderless-div">
+                <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+                                   reRender="modalContragentListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                    <f:setPropertyActionListener value="#{mainPage.clientReportPage.contragentIds}"
+                                                 target="#{mainPage.contragentListSelectPage.selectedIds}" />
+                </a4j:commandButton>
+                <h:outputText value=" {#{mainPage.clientReportPage.contragentFilter}}" escape="true"
+                              styleClass="output-text" />
+            </h:panelGroup>
+        </h:panelGrid>
     </a4j:outputPanel>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Группа" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.clientReportPage.clientFilter.clientGroupId}"
+                         styleClass="input-text">
+            <f:selectItems value="#{mainPage.clientReportPage.clientFilter.clientGroupItems}" />
+            <a4j:support event="onchange" reRender="clientBalanceByDayReportPanelGrid" />
+        </h:selectOneMenu>
+    </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientReport}"
                            reRender="workspaceTogglePanel, clientReportTable" styleClass="command-button"
@@ -54,7 +62,7 @@
                         <h:outputText escape="true" value="Название учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="4">
-                        <h:outputText escape="true" value="Количество учащихся" styleClass="column-header" />
+                        <h:outputText escape="true" value="Количество клиентов" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="3">
                         <h:outputText escape="true" value="Сумма балансов" styleClass="column-header" />

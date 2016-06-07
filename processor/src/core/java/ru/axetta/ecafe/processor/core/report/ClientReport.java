@@ -26,8 +26,21 @@ public class ClientReport extends BasicReport {
 
     public static class Builder {
 
-        public ClientReport build(String contragentIds, Session session) throws Exception {
+        public ClientReport build(String contragentIds, Long clientGroupId, Session session) throws Exception {
             Date generateTime = new Date();
+
+            String groupWhere = "";
+            if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
+                if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS)) {
+                    List<Long> www = ClientGroupMenu.getNotStudent();
+                    for (Long v : www) {
+                        groupWhere += v.toString() + ",";
+                    }
+                    groupWhere = groupWhere.substring(0, groupWhere.length()-1);
+                } else {
+                    groupWhere = String.format("%s", clientGroupId);
+                }
+            }
 
             /*Criteria clientCriteria = session.createCriteria(Client.class);
 

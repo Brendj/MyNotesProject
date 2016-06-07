@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.ClientReport;
+import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
@@ -23,6 +24,12 @@ import java.util.List;
  */
 public class ClientReportPage extends OnlineReportPage  implements ContragentListSelectPage.CompleteHandler{
     private ClientReport clientReport;
+
+    private final ClientFilter clientFilter = new ClientFilter();
+
+    public ClientFilter getClientFilter() {
+        return clientFilter;
+    }
 
     public String getPageFilename() {
         return "report/online/client_report";
@@ -60,7 +67,7 @@ public class ClientReportPage extends OnlineReportPage  implements ContragentLis
     public void buildReport(Session session) throws Exception {
         this.clientReport = new ClientReport();
         ClientReport.Builder reportBuilder = new ClientReport.Builder();
-        this.clientReport = reportBuilder.build(contragentIds, session);
+        this.clientReport = reportBuilder.build(contragentIds, clientFilter.getClientGroupId(), session);
     }
 
     @Override
