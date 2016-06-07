@@ -167,6 +167,8 @@ public class JBossLoginModule implements LoginModule {
     }
 
     public boolean login() throws LoginException {
+        // чтобы вызывалось при каждом логине нужно в standalone-ha.xml в секции
+        // <security-domain name="ecafe" cache-type="default"> удалить [cache-type="default"]
         loginSucceeded = false;
         Callback[] callbacks = new Callback[]{new NameCallback("Username"), new PasswordCallback("Password", false)};
         HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
