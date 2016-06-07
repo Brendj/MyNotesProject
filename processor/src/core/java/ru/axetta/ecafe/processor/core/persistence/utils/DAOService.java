@@ -1593,7 +1593,7 @@ public class DAOService {
             nameStatement = " and lower(surname||firstname||secondname) like lower('%" + filter + "%') ";
         }
         String actionStatement = "";
-        if (actionFilter != null) {
+        if (actionFilter != null && actionFilter > 0) {
             actionStatement = " and operation=:operation ";
         }
         String q = "from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement
@@ -1601,7 +1601,7 @@ public class DAOService {
         TypedQuery<RegistryChange> query = entityManager.createQuery(q, RegistryChange.class);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("lastUpdate", revisionDate);
-        if (actionFilter != null) {
+        if (actionFilter != null && actionFilter > 0) {
             query.setParameter("operation", actionFilter);
         }
         return query.getResultList();
