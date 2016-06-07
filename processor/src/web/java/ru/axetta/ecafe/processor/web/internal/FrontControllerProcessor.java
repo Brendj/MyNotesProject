@@ -165,7 +165,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r23 = new RegistryChangeItemParam("benefitOnAdmissionFrom", c.getBenefitOnAdmissionFrom() == null ? "" : c.getBenefitOnAdmissionFrom());
                 registryChangeItemParams.add(r23);
 
-                registryChangeItemV2.list = registryChangeItemParams;
+                registryChangeItemV2.setList(registryChangeItemParams);
 
                 itemParams.add(registryChangeItemV2);
             }

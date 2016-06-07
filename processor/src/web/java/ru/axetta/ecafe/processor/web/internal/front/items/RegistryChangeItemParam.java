@@ -13,14 +13,30 @@ package ru.axetta.ecafe.processor.web.internal.front.items;
  */
 public class RegistryChangeItemParam {
 
-    public String fieldNameParam;
-    public String fieldValueParam;
+    private String fieldNameParam;
+    private String fieldValueParam;
 
     public RegistryChangeItemParam() {
     }
 
     public RegistryChangeItemParam(String fieldNameParam, String fieldValueParam) {
+        this.setFieldNameParam(fieldNameParam);
+        this.setFieldValueParam(fieldValueParam);
+    }
+
+    public String getFieldNameParam() {
+        return fieldNameParam;
+    }
+
+    public void setFieldNameParam(String fieldNameParam) {
         this.fieldNameParam = fieldNameParam;
+    }
+
+    public String getFieldValueParam() {
+        return fieldValueParam;
+    }
+
+    public void setFieldValueParam(String fieldValueParam) {
         this.fieldValueParam = fieldValueParam;
     }
 }

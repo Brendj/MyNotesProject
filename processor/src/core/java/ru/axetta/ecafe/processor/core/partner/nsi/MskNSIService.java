@@ -30,6 +30,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -143,7 +144,11 @@ public class MskNSIService {
             request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT);
         }
         //request.getMessageData().getAppData().setQuery(queryText);
-
+        //Если нужно логирование запросов
+        final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+        final List<Handler> handlerChain = new ArrayList<Handler>();
+        handlerChain.add(soapLoggingHandler);
+        ((BindingProvider) nsiService).getBinding().setHandlerChain(handlerChain);
         NSIResponseType response = nsiService.searchItemsInCatalog(request); //.getQueryResults(request);
         if (response.getMessageData().getAppData() != null
                 && response.getMessageData().getAppData().getGeneralResponse() != null &&

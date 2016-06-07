@@ -6,11 +6,13 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import generated.registry.manual_synch.*;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.internal.FrontControllerProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -339,13 +341,17 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        List<RegistryChangeItemV2> changedItems = null;
+        List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> changedItems = null;
         if (!refresh) {
-            changedItems = controller
-                    .loadRegistryChangeItemsInternalV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
+            //changedItems = controller
+            //        .loadRegistryChangeItemsInternalV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
+            changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                    loadRegistryChangeItemsV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
         } else {
             try {
-                changedItems = controller.refreshRegistryChangeItemsInternalV2(getIdOfOrg());
+                //changedItems = controller.refreshRegistryChangeItemsInternalV2(getIdOfOrg());
+                changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeItemsV2(idOfOrg);
             } catch (Exception e) {
                 if (e instanceof SOAPFaultException) {
                     errorMessages = e.getMessage();
@@ -358,7 +364,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             }
         }
         items = new ArrayList<WebRegistryChangeItem>();
-        for (RegistryChangeItemV2 i : changedItems) {
+        for (ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2 i : changedItems) {
             if (showOnlyClientGoups) {
                 if (!i.getList().get(9).getFieldValueParam().matches("^[0-9].*")) {
                     continue;
@@ -576,7 +582,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             selected = false;
         }
 
-        public WebRegistryChangeItem(RegistryChangeItemV2 parent) {
+        public WebRegistryChangeItem(ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2 parent) {
             super();
             idOfOrg            = Long.parseLong(parent.getList().get(0).getFieldValueParam());
             idOfMigrateOrgTo   = Long.parseLong(parent.getList().get(1).getFieldValueParam());

@@ -15,5 +15,13 @@ import java.util.List;
  */
 public class RegistryChangeItemV2 {
 
-    public List<RegistryChangeItemParam> list;
+    private List<RegistryChangeItemParam> list;
+
+    public List<RegistryChangeItemParam> getList() {
+        return list;
+    }
+
+    public void setList(List<RegistryChangeItemParam> list) {
+        this.list = list;
+    }
 }
