@@ -560,7 +560,7 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-    
+
     /* Создание заявок на посещение */
     @WebMethod(operationName = "createMigrateRequests")
     public void createMigrateRequests(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "rqs") List<MigrateRequest> rqs)
@@ -572,32 +572,40 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org orgVisit = (Org)persistenceSession.load(Org.class, idOfOrg);
-            Long nextMigrantId = DAOUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
-            Long nextResolutionId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+            Map<Long, List<MigrateRequest>> map = MigrateRequest.sortMigrateRequestsByOrg(rqs);
 
-            for(MigrateRequest migrateRequest : rqs) {
-                Client client = (Client)persistenceSession.load(Client.class, migrateRequest.getMigrateClientId());
-                if(client == null){
-                    throw new FrontControllerException("Клиент-посетитель не найден");
+            for(Long idOfOrgVisit : map.keySet()) {
+
+                Org orgVisit = (Org) persistenceSession.load(Org.class, idOfOrgVisit);
+                if(!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgVisit)){
+                    throw new FrontControllerException("Организация с id=" + idOfOrgVisit + " не является дружественной");
                 }
-                Client clientResol = (Client)persistenceSession.load(Client.class, migrateRequest.getIdOfClientResol());
-                if(clientResol == null){
-                    throw new FrontControllerException("Клиент-оператор не найден");
+                Long nextMigrantId = DAOUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
+                Long nextResolutionId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+
+                for (MigrateRequest migrateRequest : rqs) {
+                    Client client = (Client) persistenceSession.load(Client.class, migrateRequest.getMigrateClientId());
+                    if (client == null) {
+                        throw new FrontControllerException("Клиент-посетитель не найден");
+                    }
+                    Client clientResol = (Client) persistenceSession.load(Client.class, migrateRequest.getIdOfClientResol());
+                    if (clientResol == null) {
+                        throw new FrontControllerException("Клиент-оператор не найден");
+                    }
+                    migrateRequest.validateMigrateRequest();
+                    CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(nextMigrantId, client.getOrg().getIdOfOrg());
+                    nextMigrantId--;
+                    Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(), client,
+                            orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
+                    CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(
+                            nextResolutionId, migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
+                    nextResolutionId--;
+                    VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
+                            VisitReqResolutionHist.RES_CONFIRMED, new Date(), migrateRequest.getResolutionCause(), clientResol,
+                            migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                    persistenceSession.save(migrant);
+                    persistenceSession.save(visitReqResolutionHist);
                 }
-                migrateRequest.validateMigrateRequest();
-                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(nextMigrantId, client.getOrg().getIdOfOrg());
-                nextMigrantId--;
-                Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(), client, orgVisit,
-                        migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
-                CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(nextResolutionId,
-                        migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
-                nextResolutionId--;
-                VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
-                        VisitReqResolutionHist.RES_CONFIRMED, new Date(), migrateRequest.getResolutionCause(), clientResol,
-                        migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                persistenceSession.save(migrant);
-                persistenceSession.save(visitReqResolutionHist);
             }
 
             persistenceTransaction.commit();

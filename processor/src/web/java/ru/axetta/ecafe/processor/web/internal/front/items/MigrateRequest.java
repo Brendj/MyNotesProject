@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.internal.front.items;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,6 +16,7 @@ import java.util.Date;
  * Time: 15:40
  */
 public class MigrateRequest {
+    private Long orgVisit;
     private Long migrateClientId;
     private Date startDate;
     private Date endDate;
@@ -26,8 +27,9 @@ public class MigrateRequest {
     public MigrateRequest() {
     }
 
-    public MigrateRequest(Long migrateClientId, Date startDate, Date endDate, String resolutionCause,
+    public MigrateRequest(Long orgVisit, Long migrateClientId, Date startDate, Date endDate, String resolutionCause,
             Long idOfClientResol, String contactInfo) {
+        this.orgVisit = orgVisit;
         this.migrateClientId = migrateClientId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -53,6 +55,29 @@ public class MigrateRequest {
         if(contactInfo.length() > 100){
             throw new FrontControllerException("Контактные данные клиента с ИД=" + migrateClientId + " превышают 100 символов");
         }
+    }
+
+    public static Map<Long, List<MigrateRequest>> sortMigrateRequestsByOrg(List<MigrateRequest> migrateRequests){
+        Map<Long, List<MigrateRequest>> map = new HashMap<Long, List<MigrateRequest>>();
+        for(MigrateRequest request : migrateRequests){
+            Long idOfOrg = request.getOrgVisit();
+            if(!map.containsKey(idOfOrg)){
+                List<MigrateRequest> requestList = new ArrayList<MigrateRequest>();
+                requestList.add(request);
+                map.put(idOfOrg, requestList);
+            } else {
+                map.get(idOfOrg).add(request);
+            }
+        }
+        return map;
+    }
+
+    public Long getOrgVisit() {
+        return orgVisit;
+    }
+
+    public void setOrgVisit(Long orgVisit) {
+        this.orgVisit = orgVisit;
     }
 
     public Long getMigrateClientId() {
