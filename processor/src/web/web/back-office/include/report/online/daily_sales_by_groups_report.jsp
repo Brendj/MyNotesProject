@@ -56,7 +56,7 @@
         <h:outputText escape="true" value="Группы меню" styleClass="output-text" rendered="false"/>
         <h:inputText value="#{dailySalesByGroupsReportPage.menuGroups}" styleClass="output-text" rendered="false"/>
 
-        <h:outputText escape="true" value="Включать дружественные организации" styleClass="output-text" />
+        <h:outputText escape="true" value="Показать дружественные организации" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{dailySalesByGroupsReportPage.includeFriendlyOrgs}"
                                      styleClass="output-text" />
 
