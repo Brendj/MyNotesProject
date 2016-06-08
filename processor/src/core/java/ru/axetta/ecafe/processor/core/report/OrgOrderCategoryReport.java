@@ -9,12 +9,15 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 
 import org.hibernate.Query;
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +33,23 @@ import java.util.regex.Pattern;
  * Отчет по реализации за месяц (для школ)
  */
 public class OrgOrderCategoryReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Отчет по реализации за месяц (для школ)";
+    public static final String[] TEMPLATE_FILE_NAMES = {"OrgOrderCategoryReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{28, 29, 3, 22, 23};
+
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }

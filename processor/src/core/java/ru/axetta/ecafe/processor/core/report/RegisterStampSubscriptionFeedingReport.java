@@ -29,6 +29,25 @@ import java.util.*;
  */
 
 public class RegisterStampSubscriptionFeedingReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Реестр талонов по абонементному  питанию "
+            + "услуг по организации питания и обеспечения питьевого режима обучающихся";
+    public static final String[] TEMPLATE_FILE_NAMES = {"RegisterStampSubscriptionFeedingReport.jasper",
+                                                        "RegisterStampSubscriptionFeedingReport_summary.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{};
+
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampSubscriptionFeedingReport.class);
 

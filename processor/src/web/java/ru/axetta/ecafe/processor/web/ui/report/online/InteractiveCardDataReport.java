@@ -40,7 +40,23 @@ import java.util.*;
  * Time: 18:30
  * To change this template use File | Settings | File Templates.
  */
-public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
+public class InteractiveCardDataReport extends BasicReportForAllOrgJob {/*
+   * Параметры отчета для добавления в правила и шаблоны
+   *
+   * При создании любого отчета необходимо добавить параметры:
+   * REPORT_NAME - название отчета на русском
+   * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+   * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+   * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+   * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+   *
+   * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+   */
+    public static final String REPORT_NAME = "Отчет по обороту электронных карт";
+    public static final String[] TEMPLATE_FILE_NAMES = {"InteractiveCardDataReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{};
+
 
     private final static Logger logger = LoggerFactory.getLogger(InteractiveCardDataReport.class);
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");

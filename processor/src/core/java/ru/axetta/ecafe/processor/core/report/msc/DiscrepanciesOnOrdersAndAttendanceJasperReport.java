@@ -4,32 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.report.msc;
 
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.SentSmsItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders.DiscrepanciesOnOrdersAndAttendanceBuilder;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,6 +23,24 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class DiscrepanciesOnOrdersAndAttendanceJasperReport extends BasicReportForAllOrgJob {
+    /*
+   * Параметры отчета для добавления в правила и шаблоны
+   *
+   * При создании любого отчета необходимо добавить параметры:
+   * REPORT_NAME - название отчета на русском
+   * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+   * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+   * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+   * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+   *
+   * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+   */
+    public static final String REPORT_NAME = "Статистика расхождения данных по заказам и оплате";
+    public static final String[] TEMPLATE_FILE_NAMES = {"DiscrepanciesOnOrdersAndAttendanceJasperReport.jasper",
+                                                        "DiscrepanciesOnOrdersAndAttendanceJasperReport_summary.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{};
+
 
     private final static Logger logger = LoggerFactory.getLogger(DiscrepanciesOnOrdersAndAttendanceJasperReport.class);
 

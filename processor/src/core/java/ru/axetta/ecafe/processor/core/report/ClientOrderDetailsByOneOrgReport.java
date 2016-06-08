@@ -11,9 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +27,23 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Отчет по реализации по организации";
+    public static final String[] TEMPLATE_FILE_NAMES = {"ClientOrderDetailsByOneOrgReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{3, 4, 5};
+
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }

@@ -9,20 +9,35 @@ import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
 import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingJasperReport;
+import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingReport;
+import ru.axetta.ecafe.processor.core.report.financialControlReports.AdjustmentPaymentReport;
+import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentDetailedReport;
+import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.BeneficiaryByAllOrgReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.*;
+import ru.axetta.ecafe.processor.core.report.security.JournalAuthenticationReport;
+import ru.axetta.ecafe.processor.core.report.security.JournalBalancesReport;
+import ru.axetta.ecafe.processor.core.report.security.JournalProcessesReport;
+import ru.axetta.ecafe.processor.core.report.security.JournalReportsReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discounts.OrgDiscountsReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.payment.DetailedDeviationsPaymentOrReducedPriceMealsJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsIntervalJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsNewIntervalJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.deviations.without.corps.DetailedDeviationsWithoutCorpsNewJasperReport;
+import ru.axetta.ecafe.processor.core.report.statistics.payment.preferential.supply.StatisticsPaymentPreferentialSupplyReport;
+import ru.axetta.ecafe.processor.core.report.statistics.telephone.number.TelephoneNumberCountReport;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.report.online.InteractiveCardDataReport;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,6 +51,105 @@ public class ReportRuleConstants {
     public static final String ELIDE_FILL = "...";
     public static final String UNKNOWN_REPORT_TYPE = "Неизвестный";
     public static final String DEFAULT_REPORT_TEMPLATE = "По умолчанию";
+
+    /*
+    * ВСЕ классы отчетов должны добавляться сюда, чтобы их параметры проинициализировались
+    */
+    public static final Class[] ALL_REPORT_CLASSES = {
+            ActiveClientsReport.class,
+            ActiveDiscountClientsReport.class,
+            AdjustmentPaymentReport.class,
+            AutoEnterEventByDaysReport.class,
+            AutoEnterEventReport.class,
+            AutoEnterEventV2Report.class,
+            BalanceLeavingReport.class,
+            BeneficiaryByAllOrgReport.class,
+            BeneficiarySummaryReport.class,
+            BudgetMealsShippingReport.class,
+            ClientBalanceByDayReport.class,
+            ClientBalanceByOrgReport.class,
+            ClientMigrationHistoryReport.class,
+            ClientOrderDetailsByAllOrgReport.class,
+            ClientOrderDetailsByOneOrgReport.class,
+            ClientPaymentsReport.class,
+            ClientSelectedAnswerResultByOrgReport.class,
+            ClientsReport.class,
+            ComplaintCausesReport.class,
+            ComplaintCountByGoodReport.class,
+            ComplaintIterationsReport.class,
+            ContragentCompletionReport.class,
+            ContragentOrderCategoryReport.class,
+            ContragentOrderReport.class,
+            ContragentPaymentReport.class,
+            CWOACReport.class,
+            DailyReferReport.class,
+            DailySalesByGroupsReport.class,
+            DashboardByAllOrgReport.class,
+            DeliveredServicesElectronicCollationReport.class,
+            DeliveredServicesReport.class,
+            DetailedDeviationsPaymentOrReducedPriceMealsIntervalJasperReport.class,
+            DetailedDeviationsPaymentOrReducedPriceMealsJasperReport.class,
+            DetailedDeviationsWithoutCorpsIntervalJasperReport.class,
+            DetailedDeviationsWithoutCorpsJasperReport.class,
+            DetailedDeviationsWithoutCorpsNewIntervalJasperReport.class,
+            DetailedDeviationsWithoutCorpsNewJasperReport.class,
+            DiscrepanciesDataOnOrdersAndPaymentJasperReport.class,
+            DiscrepanciesOnOrdersAndAttendanceJasperReport.class,
+            FeedingAndVisitReport.class,
+            FeedingAndVisitSReport.class,
+            GoodRequestsNewReport.class,
+            HalfYearSummaryReport.class,
+            InteractiveCardDataReport.class,
+            JournalAuthenticationReport.class,
+            JournalBalancesReport.class,
+            JournalProcessesReport.class,
+            JournalReportsReport.class,
+            LatePaymentDetailedReport.class,
+            LatePaymentReport.class,
+            MenuDetailsGroupByMenuOriginReport.class,
+            OrderDetailsGroupByMenuOriginReport.class,
+            OrgBalanceReport.class,
+            OrgBalanceJasperReport.class,
+            OrgDiscountsReport.class,
+            OrgOrderByDaysReport.class,
+            OrgOrderCategoryReport.class,
+            OrgSmsStatsReport.class,
+            OutOfSynchronizationReport.class,
+            PaymentTotalsReport.class,
+            ProductPopularityReport.class,
+            QuestionaryResultByOrgReport.class,
+            ReferReport.class,
+            RegisterReport.class,
+            RegisterStampPaidReport.class,
+            RegisterStampReport.class,
+            RegisterStampSubscriptionFeedingReport.class,
+            RegularPaymentsReport.class,
+            ReportOnNutritionByWeekReport.class,
+            RequestsAndOrdersReport.class,
+            SalesReport.class,
+            ru.axetta.ecafe.processor.core.report.SalesReport.class,
+            MscSalesReport.class,
+            SentSmsReport.class,
+            SmsAddressesReport.class,
+            SMSDeliveryReport.class,
+            SpecialDatesReport.class,
+            SSTSReport.class,
+            StatisticsPaymentPreferentialSupplyReport.class,
+            StatisticsPaymentPreferentialSupplyJasperReport.class,
+            SubscriptionFeedingReport.class,
+            SubscriptionFeedingJasperReport.class,
+            TelephoneNumberCountReport.class,
+            TelephoneNumberCountJasperReport.class,
+            TotalBenefFeedReport.class,
+            TotalSalesReport.class,
+            TransactionsReport.class,
+            TypesOfCardReport.class,
+            ZeroTransactionsReport.class
+    };
+
+    public static final ReportHint[] REPORT_HINTS = initReportHitns();
+    public static final Map<String, String> REPORT_NAME_MAP = initReportNameMap();
+    public static final Map<String, String> REPORT_NAME_CLASS_MAP = initReportNameClassMap();
 
     static public String createShortName(ReportHandleRule reportHandleRule, int maxLen) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
@@ -104,15 +218,21 @@ public class ReportRuleConstants {
     public static class ReportHint {
 
         private final String typeName;
+        private final String reportName;
         private final int[] paramHints;
 
-        public ReportHint(String typeName, int[] paramHints) {
+        public ReportHint(String typeName, String reportName, int[] paramHints) {
             this.typeName = typeName;
+            this.reportName = reportName;
             this.paramHints = paramHints;
         }
 
         public String getTypeName() {
             return typeName;
+        }
+
+        public String getReportName() {
+            return reportName;
         }
 
         public int[] getParamHints() {
@@ -121,46 +241,46 @@ public class ReportRuleConstants {
     }
 
     public static final ParamHint[] PARAM_HINTS = {
-            new ParamHint("generateDate", "Дата генерации отчета"),
-            new ParamHint("generateTime", "Дата и время генерации отчета"),
-            new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"),
-            new ParamHint("idOfOrg", "Организации").setDefaultRule("= org: "),
-            new ParamHint("shortName", "Краткое название организации"),
+            new ParamHint("generateDate", "Дата генерации отчета"), //0
+            new ParamHint("generateTime", "Дата и время генерации отчета"), //1
+            new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"), //2
+            new ParamHint("idOfOrg", "Организации").setDefaultRule("= org: "), //3
+            new ParamHint("shortName", "Краткое название организации"), //4
             new ParamHint("officialName", "Официальное название организации"),   //5
-            new ParamHint("groupName", "Название класса"),
-            new ParamHint("idOfClient", "Идентификатор клиента"),
-            new ParamHint("email", "Адрес электронной почты клиента"),
-            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),
+            new ParamHint("groupName", "Название класса"), //6
+            new ParamHint("idOfClient", "Идентификатор клиента"), //7
+            new ParamHint("email", "Адрес электронной почты клиента"), //8
+            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"), //9
             new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),   //10
-            new ParamHint("contractPerson.secondName", "Отчество физического лица, заключившего контракт"),
-            new ParamHint("contractPerson.abbreviation", "Фамилия И.О. физического лица, заключившего контракт"),
-            new ParamHint("person.surname", "Фамилия обслуживаемого физического лица"),
-            new ParamHint("person.firstName", "Имя обслуживаемого физического лица"),
-            new ParamHint("person.secondName", "Отчество обслуживаемого физического лица"),
-            new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
-            new ParamHint("phone", "Телефонный номер клиента"),
-            new ParamHint("mobile", "Номер мобильного телефона клиента"),
-            new ParamHint("address", "Адрес клиента"),
+            new ParamHint("contractPerson.secondName", "Отчество физического лица, заключившего контракт"), //11
+            new ParamHint("contractPerson.abbreviation", "Фамилия И.О. физического лица, заключившего контракт"), //12
+            new ParamHint("person.surname", "Фамилия обслуживаемого физического лица"), //13
+            new ParamHint("person.firstName", "Имя обслуживаемого физического лица"), //14
+            new ParamHint("person.secondName", "Отчество обслуживаемого физического лица"), //15
+            new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"), //16
+            new ParamHint("phone", "Телефонный номер клиента"), //17
+            new ParamHint("mobile", "Номер мобильного телефона клиента"), //18
+            new ParamHint("address", "Адрес клиента"), //19
             new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента")
                     .setDefaultRule("= contragent: "),    //20
             new ParamHint("contragentName", "Наименование контрагента"),  //21
-            new ParamHint("category", "Категория организации"),
-            new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),
+            new ParamHint("category", "Категория организации"), //22
+            new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"), //23
             new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule(
                     "= " + RuleProcessor.RADIO_EXPRESSION
-                            + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"),
+                            + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"), //24
             new ParamHint("groupByMenuGroup", "Группировка отчета").setDefaultRule(
                     "= " + RuleProcessor.COMBOBOX_EXPRESSION
-                            + "{false}По типам производства,{true}По товарным группам"),
+                            + "{false}По типам производства,{true}По товарным группам"), //25
             new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //26
-            new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),
+            new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"), //27
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true), //28
             //  Период отображать не надо, он устанавливается автоматически
-            new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
+            new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"), //29
             new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель")
                     .setDefaultRule("= contragent-receiver:"), //30,
             new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, "Агент по приему платежей")
-                    .setDefaultRule("= contragent-payagent:"),
+                    .setDefaultRule("= contragent-payagent:"), //31
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true)
                     .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                             "{" + BasicReportJob.REPORT_PERIOD_PREV_MONTH + "}прошлый месяц," +
@@ -170,19 +290,19 @@ public class ReportRuleConstants {
                             "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY + "}-3 дня," +
                             "{" + BasicReportJob.REPORT_PERIOD_PREV_WEEK + "}прошлая неделя," +
                             "{" + BasicReportJob.REPORT_PERIOD_CURRENT_MONTH + "}текущий месяц," +
-                            "{" + BasicReportJob.REPORT_PERIOD_LAST_WEEK + "}текущая неделя"),
+                            "{" + BasicReportJob.REPORT_PERIOD_LAST_WEEK + "}текущая неделя"), //32
             new ParamHint("referCategory", "Категория").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                     "{Шк Здоровья 1-4 кл.(завтрак+обед)}Шк Здоровья 1-4 кл.(завтрак+обед),"
                     + "{Шк Здоровья 5-11 кл.(завтрак+обед)}Шк Здоровья 5-11 кл.(завтрак+обед),"
                     + "{Многодетные 1-4 кл.(завтрак+обед)}Многодетные 1-4 кл.(завтрак+обед),"
                     + "{Многодетные 5-11 кл.(завтрак+обед)}Многодетные 5-11 кл.(завтрак+обед),"
                     + "{Соц./незащищ. 5-11 кл.(завтрак+обед)}Соц./незащищ. 5-11 кл.(завтрак+обед),"
-                    + "{Соц./незащищ. 1-4 кл.(завтрак+обед)}Соц./незащищ. 1-4 кл.(завтрак+обед)"),
-            new ParamHint("goodName", "Наименование товара").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION),
+                    + "{Соц./незащищ. 1-4 кл.(завтрак+обед)}Соц./незащищ. 1-4 кл.(завтрак+обед)"), //33
+            new ParamHint("goodName", "Наименование товара").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION), //34
             new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями")
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не скрывать,{true}Скрывать"), //35
             new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
-                    + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
+                    + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"), //36
             new ParamHint("dailySample", "Суточная проба")
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не выводить,{true}Выводить"), //37
             new ParamHint(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, "Показывать без расхождений")
@@ -201,15 +321,15 @@ public class ReportRuleConstants {
                             + "{Все}Все,"
                             + "{Платное питание}Платное питание,"
                             + "{Льготное питание}Льготное питание,"
-                            + "{Абонементное питание}Абонементное питание"),//43
+                            + "{Абонементное питание}Абонементное питание"), //43
             new ParamHint(RequestsAndOrdersReport.P_NO_NULL_REPORT, "При отстуствии данных для отчета:")
                     .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}ничего не создавать,{true}создать отчет с пустой строкой"), //44
-            new ParamHint(ClientBalanceByDayReport.P_CLIENT_BALANCE_CONDITION_TYPE, "Текущий баланс") //45
+            new ParamHint(ClientBalanceByDayReport.P_CLIENT_BALANCE_CONDITION_TYPE, "Текущий баланс")
                     .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
                             +"{Не задано}Не задано,"
                             +"{Меньше 0}Меньше 0,"
                             +"{Равен 0}Равен 0,"
-                            +"{Больше}Больше 0,")
+                            +"{Больше}Больше 0,") //45
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -220,7 +340,8 @@ public class ReportRuleConstants {
             new ParamHint("radioValues", "Какие-то значения из радио").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{100}сто,{200}двести,{300}триста"),
             new ParamHint("input", "Какие-то произольное значение").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),*/
 
-    public static final ReportHint[] REPORT_HINTS = {
+
+            /*
             new ReportHint(ReportOnNutritionByWeekReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(OrgBalanceReport.class.getCanonicalName(), new int[]{28, 29, 3, 4, 5, 22, 23}),
             new ReportHint(ClientGroupBalanceReport.class.getCanonicalName(), new int[]{28, 29, 3, 4, 5, 6, 22, 23}),
@@ -280,6 +401,49 @@ public class ReportRuleConstants {
             new ReportHint(BalanceLeavingReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OutOfSynchronizationReport.class.getCanonicalName(), new int[]{-3})
     };
+    */
+
+    private static ReportHint[] initReportHitns(){
+        List<ReportHint> list = new ArrayList<ReportHint>();
+        for(Class c : ALL_REPORT_CLASSES){
+            try {
+                String reportName = (String) c.getField("REPORT_NAME").get(null);
+                int[] paramHints = (int[]) c.getField("PARAM_HINTS").get(null);
+                Boolean isTemplateReport = (Boolean) c.getField("IS_TEMPLATE_REPORT").get(null);
+                if(isTemplateReport) {
+                    list.add(new ReportHint(c.getCanonicalName(), reportName, paramHints));
+                }
+            } catch (Exception ignore) {}
+        }
+        ReportHint[] result = new ReportHint[list.size()];
+        result = list.toArray(result);
+        return result;
+    }
+
+    private static Map<String, String> initReportNameMap(){
+        Map<String, String>  map = new HashMap<String, String>();
+        for(Class c : ALL_REPORT_CLASSES){
+            try {
+                String reportName = (String) c.getField("REPORT_NAME").get(null);
+                String[] templateFilenames = (String[]) c.getField("TEMPLATE_FILE_NAMES").get(null);
+                for(String template : templateFilenames){
+                    map.put(template, reportName);
+                }
+            } catch (Exception ignore) {}
+        }
+        return map;
+    }
+
+    private static Map<String, String> initReportNameClassMap(){
+        Map<String, String>  map = new HashMap<String, String>();
+        for(Class c : ALL_REPORT_CLASSES){
+            try {
+                String reportName = (String) c.getField("REPORT_NAME").get(null);
+                map.put(reportName, c.getCanonicalName());
+            } catch (Exception ignore) {}
+        }
+        return map;
+    }
 
     private ReportRuleConstants() {
 

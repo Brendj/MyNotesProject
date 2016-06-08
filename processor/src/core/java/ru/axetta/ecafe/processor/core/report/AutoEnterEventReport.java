@@ -10,10 +10,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -36,6 +36,22 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class AutoEnterEventReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Детализированный отчет по посещению";
+    public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{28, 29, -3, 22, 23, 24, 32};
 
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");

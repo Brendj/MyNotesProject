@@ -28,7 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -42,6 +41,23 @@ import java.util.regex.Pattern;
  * РАЗБИВКА ОТЧЕТА ПО БЕСПЛАТНОМУ ПИТАНИЮ
  */
 public class DailyReferReport extends BasicReportForAllOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Справка по предоставлению бесплатного питания";
+    public static final String[] TEMPLATE_FILE_NAMES = {"DailyReferReport_byAll.jasper", "DailyReferReport_byCat.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{-3, -33};
+
 
     private final static Logger logger = LoggerFactory.getLogger(DailyReferReport.class);
 

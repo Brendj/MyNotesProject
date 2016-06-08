@@ -16,7 +16,10 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,6 +29,23 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class RegularPaymentsReport extends BasicReportForAllOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Отчет по регулярным платежам";
+    public static final String[] TEMPLATE_FILE_NAMES = {"RegularPaymentsReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{};
+
     final private static Logger logger = LoggerFactory.getLogger(RegularPaymentsReport.class);
 
     public RegularPaymentsReport() {}

@@ -5,12 +5,9 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -20,8 +17,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -38,6 +33,22 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ActiveClientsReport extends BasicReportForAllOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Отчет по активным клиентам";
+    public static final String[] TEMPLATE_FILE_NAMES = {"ActiveClientsReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{32};
 
     public static final int TOTAL_COUNT_VALUE = 1;
     public static final int DISCOUNT_COUNT_VALUE = 2;

@@ -15,7 +15,6 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -28,7 +27,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -42,6 +40,23 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class ReferReport extends BasicReportForAllOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Справки расходования средств";
+    public static final String[] TEMPLATE_FILE_NAMES = {"ReferReport.jasper", "ReferReport_subreport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{-3};
+
 
     private final static Logger logger = LoggerFactory.getLogger(ReferReport.class);
 

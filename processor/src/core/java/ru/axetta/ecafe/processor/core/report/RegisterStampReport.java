@@ -27,6 +27,24 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class RegisterStampReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Реестр талонов "
+            + "услуг по организации питания и обеспечения питьевого режима обучающихся";
+    public static final String[] TEMPLATE_FILE_NAMES = {"RegisterStampReport.jasper", "RegisterStampReport_summary.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{3, 4, 5, 38};
+
 
     public static final String PARAM_WITH_OUT_ACT_DISCREPANCIES = "includeActDiscrepancies";
 

@@ -9,17 +9,11 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.daoservices.client.ClientDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.client.items.DayInfo;
 import ru.axetta.ecafe.processor.core.daoservices.client.items.ReportOnNutritionItem;
 import ru.axetta.ecafe.processor.core.daoservices.client.items.ReportOnNutritionResultItem;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +30,23 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ReportOnNutritionByWeekReport extends BasicReportForOrgJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Отчет по питанию за неделю для классных руководителей";
+    public static final String[] TEMPLATE_FILE_NAMES = {"ReportOnNutritionByWeekReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{3, 4, 5};
+
 
     public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");

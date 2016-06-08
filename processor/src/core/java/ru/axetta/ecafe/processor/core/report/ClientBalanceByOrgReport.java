@@ -12,20 +12,17 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
-import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
-import org.hibernate.sql.JoinType;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +40,23 @@ import java.util.*;
  * Отчет по балансам клиентов на дату
  */
 public class ClientBalanceByOrgReport extends BasicReportForContragentJob {
+    /*
+    * Параметры отчета для добавления в правила и шаблоны
+    *
+    * При создании любого отчета необходимо добавить параметры:
+    * REPORT_NAME - название отчета на русском
+    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+    *
+    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+    */
+    public static final String REPORT_NAME = "Остаток денежных средств по организациям на дату";
+    public static final String[] TEMPLATE_FILE_NAMES = {"ClientBalanceByOrgReport.jasper"};
+    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final int[] PARAM_HINTS = new int[]{};
+
 
     public static final int NO_CONDITION = 0;
     public static final int LT_ZERO = 1;
