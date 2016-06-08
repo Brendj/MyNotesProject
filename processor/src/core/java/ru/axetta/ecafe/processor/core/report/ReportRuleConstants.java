@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
+import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
@@ -328,7 +330,22 @@ public class ReportRuleConstants {
                             +"{Не задано}Не задано,"
                             +"{Меньше 0}Меньше 0,"
                             +"{Равен 0}Равен 0,"
-                            +"{Больше}Больше 0,") //45
+                            +"{Больше}Больше 0,"), //45
+            new ParamHint(TypesOfCardReport.PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS, "Итоговые данные по округу")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Нет,{true}Да"), //46
+            new ParamHint(TypesOfCardReport.PARAM_CLIENT_GROUP, "ИД группы"), //47
+            new ParamHint(TypesOfCardReport.PARAM_GROUP_NAME, "Название группы"), //48
+            new ParamHint("showReserve", "Показывать резервников")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Нет,{true}Да"), //49
+            new ParamHint(LatePaymentReport.LATE_PAYMENT_DAYS_COUNT_TYPE, "Количество дней несвоевременной оплаты")
+                    .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
+                    + "{" + LatePaymentDaysCountType.EMPTY.toString() +"}" + LatePaymentDaysCountType.EMPTY.toString() + ","
+                    + "{" + LatePaymentDaysCountType.MORE_TEN.toString() +"}" + LatePaymentDaysCountType.MORE_TEN.toString()), //50
+            new ParamHint(LatePaymentReport.LATE_PAYMENT_DAYS_COUNT_TYPE, "Количество дней несвоевременной оплаты")
+                    .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
+                    + "{" + LatePaymentByOneDayCountType.EMPTY.toString() +"}" + LatePaymentByOneDayCountType.EMPTY.toString() + ","
+                    + "{" + LatePaymentByOneDayCountType.MORE_FIVE.toString() +"}" + LatePaymentByOneDayCountType.MORE_FIVE.toString()), //51
+
     };
     // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),

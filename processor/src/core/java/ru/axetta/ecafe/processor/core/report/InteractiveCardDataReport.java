@@ -37,7 +37,8 @@ import java.util.*;
  * Time: 18:30
  * To change this template use File | Settings | File Templates.
  */
-public class InteractiveCardDataReport extends BasicReportForAllOrgJob {/*
+public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
+    /*
    * Параметры отчета для добавления в правила и шаблоны
    *
    * При создании любого отчета необходимо добавить параметры:
@@ -51,8 +52,8 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {/*
    */
     public static final String REPORT_NAME = "Отчет по обороту электронных карт";
     public static final String[] TEMPLATE_FILE_NAMES = {"InteractiveCardDataReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{-3};
 
 
     private final static Logger logger = LoggerFactory.getLogger(InteractiveCardDataReport.class);
@@ -60,6 +61,9 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {/*
 
     protected List<InteractiveCardDataReportItem> items;
     private String htmlReport;
+
+    public InteractiveCardDataReport() {
+    }
 
     public InteractiveCardDataReport(Date generateTime, long l, JasperPrint jasperPrint,
             List<InteractiveCardDataReportItem> items) {

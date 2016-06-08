@@ -46,10 +46,10 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     *
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
-    public static final String REPORT_NAME = "Сводный отчет по продажам";
+    public static final String REPORT_NAME = "Сводный отчет по продажам (итоговые показатели)";
     public static final String[] TEMPLATE_FILE_NAMES = {"TotalSalesReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{20};
+    public static final int[] PARAM_HINTS = new int[]{3};
 
 
     private static final String NAME_COMPLEX = "Платные комплексы";

@@ -47,8 +47,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
     */
     public static final String REPORT_NAME = "Отчет по типам карт";
     public static final String[] TEMPLATE_FILE_NAMES = {"TypesOfCardReport.jasper", "TypesOfCardReport_Subreport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
 
 
     public static final String PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS = "includeSummaryByDistrict";

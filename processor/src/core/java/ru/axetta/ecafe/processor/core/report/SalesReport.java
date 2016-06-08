@@ -33,7 +33,7 @@ public class SalesReport extends BasicReport {
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
     public static final String REPORT_NAME = "Отчет по реализации";
-    public static final String[] TEMPLATE_FILE_NAMES = {"SalesReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"kzn\\SalesReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 

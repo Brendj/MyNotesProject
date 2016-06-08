@@ -37,9 +37,8 @@ public class LatePaymentDetailedReport extends BasicReportForAllOrgJob {
    */
     public static final String REPORT_NAME = "Детализированный отчет по несвоевременной оплате питания";
     public static final String[] TEMPLATE_FILE_NAMES = {"LatePaymentDetailedReport.jasper", "LatePaymentDetailedSubReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
-
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{-3, -32, -49};
 
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReport.class);
 

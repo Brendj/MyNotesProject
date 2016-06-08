@@ -37,8 +37,8 @@ public class AdjustmentPaymentReport extends BasicReportForAllOrgJob {
     */
     public static final String REPORT_NAME = "Отчет по ручной корректировке оплаты льготного питания";
     public static final String[] TEMPLATE_FILE_NAMES = {"AdjustmentPaymentReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{-3, -32};
 
     private static final Logger logger = LoggerFactory.getLogger(AdjustmentPaymentReport.class);
 

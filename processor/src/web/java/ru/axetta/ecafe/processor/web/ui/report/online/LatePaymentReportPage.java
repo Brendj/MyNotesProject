@@ -180,8 +180,8 @@ public class LatePaymentReportPage extends OnlineReportPage {
         LatePaymentReportBuilder builder = new LatePaymentReportBuilder(templateFilename);
         String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-        builder.getReportProperties().setProperty("latePaymentDaysCountType", latePaymentDaysCountType.toString());
-        builder.getReportProperties().setProperty("latePaymentByOneDayCountType", latePaymentByOneDayCountType.toString());
+        builder.getReportProperties().setProperty(LatePaymentReport.LATE_PAYMENT_DAYS_COUNT_TYPE, latePaymentDaysCountType.toString());
+        builder.getReportProperties().setProperty(LatePaymentReport.LATE_PAYMENT_BY_ONE_DAY_COUNT_TYPE, latePaymentByOneDayCountType.toString());
         Session session = null;
         Transaction persistenceTransaction = null;
         try {

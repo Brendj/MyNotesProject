@@ -38,9 +38,11 @@ public class LatePaymentReport extends BasicReportForAllOrgJob {
    */
     public static final String REPORT_NAME = "Сводный отчет по несвоевременной оплате питания";
     public static final String[] TEMPLATE_FILE_NAMES = {"LatePaymentReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{-3, -32, -50, -51};
 
+    public static final String LATE_PAYMENT_DAYS_COUNT_TYPE = "latePaymentDaysCountType";
+    public static final String LATE_PAYMENT_BY_ONE_DAY_COUNT_TYPE = "latePaymentByOneDayCountType";
 
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentReport.class);
 

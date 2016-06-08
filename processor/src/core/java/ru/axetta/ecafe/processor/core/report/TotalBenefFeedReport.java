@@ -56,7 +56,7 @@ public class TotalBenefFeedReport extends BasicReportForAllOrgJob {
     */
     public static final String REPORT_NAME = "Сводный отчет по льготному питанию";
     public static final String[] TEMPLATE_FILE_NAMES = {"TotalBenefFeedReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
+    public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{};
 
 
