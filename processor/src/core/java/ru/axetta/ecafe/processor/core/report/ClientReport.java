@@ -57,15 +57,24 @@ public class ClientReport extends BasicReport {
             clientCriteria.addOrder(Order.asc("officialName"));
             List clientItems = clientCriteria.list();*/
 
+            String extraQuery;
+            if (groupWhere.equals("")) {
+                extraQuery = " group by org.idOfOrg, org.officialName order by org.idOfOrg";
+            } else {
+                extraQuery =
+                        " and clientGroup.compositeIdOfClientGroup.idOfOrg = org.idOfOrg and clientGroup.compositeIdOfClientGroup.idOfClientGroup in ( "
+                                + groupWhere + " ) group by org.idOfOrg, org.officialName order by org.idOfOrg";
+            }
+
             String preparedQuery = "select org.idOfOrg, org.officialName, count(idOfClient) as clientCount, "
                     + "       sum(case when balance > 0 then 1 else 0 end) as posbalCount, "
                     + "       sum(case when balance = 0 then 1 else 0 end) as nulbalCount, "
                     + "       sum(case when balance < 0 then 1 else 0 end) as negbalCount, "
                     + "       sum(balance) as balsum, "
                     + "       sum(case when balance > 0 then balance else 0 end) as posbalsum, "
-                    + "       sum(case when balance < 0 then balance else 0 end) as negbalsum " + "  from Client "
-                    + "where org.defaultSupplier.idOfContragent in ( " + contragentIds + " ) "
-                    + " group by org.idOfOrg, org.officialName " + " order by org.idOfOrg";
+                    + "       sum(case when balance < 0 then balance else 0 end) as negbalsum from Client "
+                    + "where org.defaultSupplier.idOfContragent in ( " + contragentIds + " ) " + extraQuery;
+
             List resultList = null;
             Query query = session.createQuery(preparedQuery);
 
