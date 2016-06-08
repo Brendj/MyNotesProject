@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport" language="groovy" pageWidth="600" pageHeight="595" orientation="Landscape" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f49c8ced-6f09-41b2-b4d8-04261304d63d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport" pageWidth="600" pageHeight="595" orientation="Landscape" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f49c8ced-6f09-41b2-b4d8-04261304d63d">
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -24,9 +24,12 @@
 		</box>
 	</style>
 	<subDataset name="Table Dataset 1" uuid="d504e101-a43d-4788-a331-b4e54465ce40">
-		<parameter name="shortName" class="java.lang.String"/>
+		<parameter name="shortName" class="java.lang.String">
+			<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+		</parameter>
 		<parameter name="isOneOrg" class="java.lang.Integer">
 			<parameterDescription><![CDATA[]]></parameterDescription>
+			<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
 		</parameter>
 		<field name="category" class="java.lang.String"/>
 		<field name="totalByCategory" class="java.lang.Integer"/>
@@ -47,7 +50,9 @@
 	</parameter>
 	<parameter name="generateTime" class="java.lang.String"/>
 	<parameter name="categoryItemAllOrg" class="java.util.List"/>
-	<parameter name="isOneOrg" class="java.lang.Integer"/>
+	<parameter name="isOneOrg" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
 	<field name="shortName" class="java.lang.String"/>
 	<field name="groupItemList" class="java.util.List"/>
 	<field name="categoryItemOrg" class="java.util.List"/>
@@ -112,7 +117,7 @@
 						</datasetParameter>
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{categoryItemOrg})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e" width="330">
+					<jr:column width="330" uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="1414e57c-70d0-4d4b-b968-4f21a504025f" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
@@ -134,7 +139,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0" width="270">
+					<jr:column width="270" uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true" evaluationTime="Report">
 								<reportElement uuid="ce48ea07-87af-4999-922d-920d5f1f2d0f" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
@@ -170,7 +175,7 @@
 					<datasetRun subDataset="Table Dataset 1" uuid="c3df62cb-0578-46ba-abae-33e0f4c5648e">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{categoryItemAllOrg})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e" width="330">
+					<jr:column width="330" uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="48c90670-2e52-4e33-a168-8b4a1190418b" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
@@ -192,7 +197,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0" width="270">
+					<jr:column width="270" uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true" evaluationTime="Report">
 								<reportElement uuid="ac8f9779-1103-4679-a15d-34746130c268" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>

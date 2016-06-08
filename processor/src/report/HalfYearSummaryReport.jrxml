@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MSR" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MSR" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fb675618-486f-41ab-ade3-347eed94e9ab">
 	<property name="ireport.zoom" value="1.0000000000000029"/>
-	<property name="ireport.x" value="718"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<style name="table" isDefault="false" fill="Solid">
+	<style name="table" fill="Solid">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="data" isDefault="false" fill="Solid">
+	<style name="data" fill="Solid">
 		<pen lineWidth="1.0" lineColor="#000000"/>
 	</style>
 	<parameter name="startDate" class="java.util.Date"/>
@@ -27,964 +27,964 @@
 	<title>
 		<band height="186" splitType="Stretch">
 			<textField>
-				<reportElement x="-21" y="0" width="802" height="20"/>
+				<reportElement uuid="2699ee8b-62ea-4db5-a70b-a3685a9f4d95" x="-21" y="0" width="802" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[String.format("Общий отчет за: %s", $P{generateDate})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[String.format("Общий отчет за: %s", $P{generateDate})]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement x="196" y="35" width="71" height="20"/>
+				<reportElement uuid="7aa9c296-b001-410c-9094-39836e47b041" x="196" y="35" width="71" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement x="102" y="35" width="81" height="20"/>
+				<reportElement uuid="71a33367-b6c9-4356-8340-3b7f6b750d16" x="102" y="35" width="81" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="183" y="35" width="13" height="20"/>
+				<reportElement uuid="15d7268a-ff45-46db-bd12-31efc14ae044" x="183" y="35" width="13" height="20"/>
 				<textElement textAlignment="Center">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[-]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-21" y="35" width="123" height="20"/>
+				<reportElement uuid="92f7b78d-b859-429b-abf6-d990637bb9c4" x="-21" y="35" width="123" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Период отчета:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="-21" y="76" width="164" height="88"/>
+				<reportElement uuid="e7279c0f-42fe-48a5-8256-3f214611e0b5" style="table" stretchType="RelativeToTallestObject" x="-21" y="76" width="164" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер образовательного учреждения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="143" y="76" width="79" height="88"/>
+				<reportElement uuid="717cff22-361c-4da6-842d-45b64762fa97" style="table" stretchType="RelativeToTallestObject" x="143" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Номер образовательного учреждения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="222" y="76" width="79" height="88"/>
+				<reportElement uuid="ec455d12-0316-4454-9d0f-4b779a1ab02f" style="table" stretchType="RelativeToTallestObject" x="222" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[тип пищеблока]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="301" y="76" width="79" height="88"/>
+				<reportElement uuid="11f87bb5-e824-4587-91e5-781fcc151eb4" style="table" stretchType="RelativeToTallestObject" x="301" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество обуч-ся, воспитанников ВСЕГО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="118" width="79" height="46"/>
+				<reportElement uuid="13484210-0ba3-436e-a822-81e39cb9931f" style="table" stretchType="RelativeToTallestObject" x="459" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество льготных завтраков]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="696" y="76" width="79" height="88"/>
+				<reportElement uuid="53b0917c-efcb-4ada-b7ef-7454bf37b06d" style="table" stretchType="RelativeToTallestObject" x="696" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество нельготников ВСЕГО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="76" width="237" height="16"/>
+				<reportElement uuid="79744e70-d3b4-4a81-b487-b99dd6c1ba39" style="table" stretchType="RelativeToTallestObject" x="459" y="76" width="237" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="118" width="79" height="46"/>
+				<reportElement uuid="89631171-8d87-4c60-b084-9f84268738f1" style="table" stretchType="RelativeToTallestObject" x="617" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество льготников ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="538" y="118" width="79" height="46"/>
+				<reportElement uuid="7fa06af2-881c-4397-8b73-098b9a399154" style="table" stretchType="RelativeToTallestObject" x="538" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Оплата услуги (руб)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="538" y="92" width="79" height="13"/>
+				<reportElement uuid="25f1c41e-4847-41b4-aced-4228dbb25f5e" style="table" stretchType="RelativeToTallestObject" x="538" y="92" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="92" width="79" height="13"/>
+				<reportElement uuid="ed09b65e-90a9-485e-be26-6360db9a7bb8" style="table" stretchType="RelativeToTallestObject" x="459" y="92" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="92" width="79" height="13"/>
+				<reportElement uuid="72cfa93f-2914-439a-ae3c-502fe708ce42" style="table" stretchType="RelativeToTallestObject" x="617" y="92" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="459" y="105" width="158" height="13"/>
+				<reportElement uuid="818e8b1d-bb15-4927-87df-e1c6bf5c7e49" style="table" stretchType="RelativeToTallestObject" x="459" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1 полугодие]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="617" y="105" width="79" height="13"/>
+				<reportElement uuid="d85c5e25-1084-456d-923e-f66a312d8e51" style="table" stretchType="RelativeToTallestObject" x="617" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="76" width="79" height="16"/>
+				<reportElement uuid="add7bc46-1685-4ff9-909c-962ee9b7b612" style="table" stretchType="RelativeToTallestObject" x="775" y="76" width="79" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платные обеды]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="92" width="158" height="13"/>
+				<reportElement uuid="bb8fb3d2-94d2-4e11-ad2f-d0f4c4c1bce6" style="table" stretchType="RelativeToTallestObject" x="775" y="92" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="105" width="158" height="13"/>
+				<reportElement uuid="0b4f12e7-018e-4a6a-a90f-98eeb64d271a" style="table" stretchType="RelativeToTallestObject" x="775" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="775" y="118" width="79" height="46"/>
+				<reportElement uuid="c49c66ad-f6f5-475c-8624-81434b7c1242" style="table" stretchType="RelativeToTallestObject" x="775" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество платных обедов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="380" y="76" width="79" height="88"/>
+				<reportElement uuid="31a61bbc-b1e8-466b-9763-4b83625e5e95" style="table" stretchType="RelativeToTallestObject" x="380" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Количество уч/дней в 1 полугодии]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="854" y="118" width="79" height="46"/>
+				<reportElement uuid="54aba35e-347e-48ee-9eae-4018a26f00e0" style="table" stretchType="RelativeToTallestObject" x="854" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="933" y="76" width="79" height="88"/>
+				<reportElement uuid="e929394f-661b-483c-8828-2656b8200ea7" style="table" stretchType="RelativeToTallestObject" x="933" y="76" width="79" height="88"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1012" y="92" width="79" height="72"/>
+				<reportElement uuid="b721e439-935d-475e-8e9a-30e1bec725fb" style="table" stretchType="RelativeToTallestObject" x="1012" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="105" width="237" height="13"/>
+				<reportElement uuid="eddf2822-947b-473c-8a86-48e48dc9320b" style="table" stretchType="RelativeToTallestObject" x="1091" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="118" width="79" height="46"/>
+				<reportElement uuid="46ba51c3-9968-45a3-8c78-954bacc104d5" style="table" stretchType="RelativeToTallestObject" x="1091" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1091" y="92" width="711" height="13"/>
+				<reportElement uuid="eeacf9ee-c00c-4699-a39a-0e05f4c1cd43" style="table" stretchType="RelativeToTallestObject" x="1091" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1170" y="118" width="79" height="46"/>
+				<reportElement uuid="394215c0-97fd-46b4-9203-742b33f58ecf" style="table" stretchType="RelativeToTallestObject" x="1170" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1249" y="118" width="79" height="46"/>
+				<reportElement uuid="e740cec9-ddc4-4968-9b4d-bab1059e5653" style="table" stretchType="RelativeToTallestObject" x="1249" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1328" y="118" width="79" height="46"/>
+				<reportElement uuid="42570a7b-fbbc-49bc-b550-4d5c96cee4e4" style="table" stretchType="RelativeToTallestObject" x="1328" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1407" y="118" width="79" height="46"/>
+				<reportElement uuid="e896a993-9b25-4a7e-8379-10a293d9aef0" style="table" stretchType="RelativeToTallestObject" x="1407" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1486" y="118" width="79" height="46"/>
+				<reportElement uuid="c2089fce-aad8-4808-a659-e184acab87b8" style="table" stretchType="RelativeToTallestObject" x="1486" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1565" y="118" width="79" height="46"/>
+				<reportElement uuid="94fe3693-c098-486a-b8bd-4f358adad12d" style="table" stretchType="RelativeToTallestObject" x="1565" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1644" y="118" width="79" height="46"/>
+				<reportElement uuid="8e72f9d2-951b-41f8-9d84-2c15022c4536" style="table" stretchType="RelativeToTallestObject" x="1644" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1723" y="118" width="79" height="46"/>
+				<reportElement uuid="02dd0f00-7e97-4988-a7c1-8ca32014118e" style="table" stretchType="RelativeToTallestObject" x="1723" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="118" width="79" height="46"/>
+				<reportElement uuid="7ebd6924-7d28-4acb-91a4-5efc508954c2" style="table" stretchType="RelativeToTallestObject" x="1802" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="105" width="158" height="13"/>
+				<reportElement uuid="8d9fde01-2881-402e-aa6a-27e6a059938e" style="table" stretchType="RelativeToTallestObject" x="1802" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1723" y="105" width="79" height="13"/>
+				<reportElement uuid="b8c013a0-dfb5-45d9-a16a-c2be2abeba2f" style="table" stretchType="RelativeToTallestObject" x="1723" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1565" y="105" width="158" height="13"/>
+				<reportElement uuid="cc0037be-5f68-4bf4-817d-c3285dc11d51" style="table" stretchType="RelativeToTallestObject" x="1565" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1328" y="105" width="237" height="13"/>
+				<reportElement uuid="92640ab1-5ee4-45a2-80e9-af6f743391e6" style="table" stretchType="RelativeToTallestObject" x="1328" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1802" y="92" width="553" height="13"/>
+				<reportElement uuid="164eb555-3d88-46f8-acc8-2a0e618b7c7d" style="table" stretchType="RelativeToTallestObject" x="1802" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1881" y="118" width="79" height="46"/>
+				<reportElement uuid="52156b89-2395-4ecf-b570-e029ddf67afc" style="table" stretchType="RelativeToTallestObject" x="1881" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2039" y="118" width="79" height="46"/>
+				<reportElement uuid="8c091da8-773c-49d3-8e7c-574a4842cfd3" style="table" stretchType="RelativeToTallestObject" x="2039" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2118" y="118" width="79" height="46"/>
+				<reportElement uuid="935ef318-247f-43c3-9e97-09c5d156afb4" style="table" stretchType="RelativeToTallestObject" x="2118" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2197" y="118" width="79" height="46"/>
+				<reportElement uuid="e23cee85-dc7d-45ee-92c2-e98f0292252f" style="table" stretchType="RelativeToTallestObject" x="2197" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2276" y="105" width="79" height="59"/>
+				<reportElement uuid="bd87b90d-5c1f-40e5-81b6-dab677a8cca6" style="table" stretchType="RelativeToTallestObject" x="2276" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1960" y="105" width="79" height="59"/>
+				<reportElement uuid="0d6c03c3-55da-418e-b8f0-0dfb2bc3c37f" style="table" stretchType="RelativeToTallestObject" x="1960" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2197" y="105" width="79" height="13"/>
+				<reportElement uuid="65e9f027-1ca2-47ca-90c1-f26bcaa305d0" style="table" stretchType="RelativeToTallestObject" x="2197" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2039" y="105" width="158" height="13"/>
+				<reportElement uuid="3f1b0c02-001a-4989-ba81-086355fd6000" style="table" stretchType="RelativeToTallestObject" x="2039" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="854" y="76" width="79" height="16"/>
+				<reportElement uuid="1a6f2e91-4e4a-4466-b917-5f4bd46782fa" style="table" stretchType="RelativeToTallestObject" x="854" y="76" width="79" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-21" y="55" width="83" height="21"/>
+				<reportElement uuid="eeb9c10b-de76-4d52-ac0f-13be9749db1b" x="-21" y="55" width="83" height="21"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3066" y="105" width="79" height="13"/>
+				<reportElement uuid="b4416b12-3343-4caa-8695-3727642a055f" style="table" stretchType="RelativeToTallestObject" x="3066" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3540" y="118" width="79" height="46"/>
+				<reportElement uuid="c2bd5f5f-fcad-40f1-a7c0-15b06f10d6f7" style="table" stretchType="RelativeToTallestObject" x="3540" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3540" y="105" width="79" height="13"/>
+				<reportElement uuid="d17131a5-bdeb-4751-a7fe-34a1ae33441e" style="table" stretchType="RelativeToTallestObject" x="3540" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="118" width="79" height="46"/>
+				<reportElement uuid="cfe836b1-f95a-4ac8-820e-91b587400fa2" style="table" stretchType="RelativeToTallestObject" x="2434" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2592" y="118" width="79" height="46"/>
+				<reportElement uuid="fd24b0d1-21b8-4f0c-a686-e85335fada06" style="table" stretchType="RelativeToTallestObject" x="2592" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3066" y="118" width="79" height="46"/>
+				<reportElement uuid="331203a8-4160-4bd1-9555-bf63c794a25f" style="table" stretchType="RelativeToTallestObject" x="3066" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3303" y="105" width="79" height="59"/>
+				<reportElement uuid="34f3b29e-9f97-4cc7-afd4-0355f5da628b" style="table" stretchType="RelativeToTallestObject" x="3303" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="105" width="237" height="13"/>
+				<reportElement uuid="be739fb9-1363-49b9-9073-9a4ad414bcd1" style="table" stretchType="RelativeToTallestObject" x="2434" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2908" y="118" width="79" height="46"/>
+				<reportElement uuid="39c055a8-8a8f-4ace-aa8d-1c11c6cb4c59" style="table" stretchType="RelativeToTallestObject" x="2908" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="118" width="79" height="46"/>
+				<reportElement uuid="ee9dc0fb-798a-406b-a77e-ba4e474dd993" style="table" stretchType="RelativeToTallestObject" x="3145" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2355" y="92" width="79" height="72"/>
+				<reportElement uuid="dc0a8b1b-b984-423c-aaa9-1e1daf25084b" style="table" stretchType="RelativeToTallestObject" x="2355" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="92" width="553" height="13"/>
+				<reportElement uuid="b2c46765-d87a-4e0d-aa26-09c108d4ea37" style="table" stretchType="RelativeToTallestObject" x="3145" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2513" y="118" width="79" height="46"/>
+				<reportElement uuid="d06604ac-7256-4667-bc74-770cd0a48c95" style="table" stretchType="RelativeToTallestObject" x="2513" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2671" y="118" width="79" height="46"/>
+				<reportElement uuid="7d57ae8a-c1f7-46cf-9326-e2a4d9cc8369" style="table" stretchType="RelativeToTallestObject" x="2671" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3382" y="105" width="158" height="13"/>
+				<reportElement uuid="a03dfe8b-c2e3-42ec-90e7-0aa079d2f5f6" style="table" stretchType="RelativeToTallestObject" x="3382" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3145" y="105" width="158" height="13"/>
+				<reportElement uuid="90dc5133-9d45-4aae-81f4-d1006ef23709" style="table" stretchType="RelativeToTallestObject" x="3145" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2829" y="118" width="79" height="46"/>
+				<reportElement uuid="fc3136d5-f77d-45ee-beb6-0e297fef6d5d" style="table" stretchType="RelativeToTallestObject" x="2829" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2671" y="105" width="237" height="13"/>
+				<reportElement uuid="78e6e730-4122-4de4-99fc-63e3682fdd2c" style="table" stretchType="RelativeToTallestObject" x="2671" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3224" y="118" width="79" height="46"/>
+				<reportElement uuid="849d2b2c-5720-49d3-bedf-520ef20c75a8" style="table" stretchType="RelativeToTallestObject" x="3224" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2908" y="105" width="158" height="13"/>
+				<reportElement uuid="340c2e0a-dd79-4541-a258-d19bb0570804" style="table" stretchType="RelativeToTallestObject" x="2908" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2434" y="92" width="711" height="13"/>
+				<reportElement uuid="1bb889e6-26de-4b80-a832-28d3a9410536" style="table" stretchType="RelativeToTallestObject" x="2434" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3382" y="118" width="79" height="46"/>
+				<reportElement uuid="6dd1dde3-c3f7-459d-84fc-67f8c9f14aff" style="table" stretchType="RelativeToTallestObject" x="3382" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2987" y="118" width="79" height="46"/>
+				<reportElement uuid="b29c0c78-2bbc-447e-836c-d3418acea060" style="table" stretchType="RelativeToTallestObject" x="2987" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3619" y="105" width="79" height="59"/>
+				<reportElement uuid="7bac7049-8005-4cac-a28e-84b23603ae06" style="table" stretchType="RelativeToTallestObject" x="3619" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2750" y="118" width="79" height="46"/>
+				<reportElement uuid="8e591e6b-9050-41d8-a423-44947b306bbe" style="table" stretchType="RelativeToTallestObject" x="2750" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3461" y="118" width="79" height="46"/>
+				<reportElement uuid="48c5e72a-04ac-48e6-af13-f5fab9f936a8" style="table" stretchType="RelativeToTallestObject" x="3461" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="1012" y="76" width="1343" height="16"/>
+				<reportElement uuid="48f1d62d-c7c5-482b-9403-b76aa093a9ac" style="table" stretchType="RelativeToBandHeight" x="1012" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month0}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month0}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="2355" y="76" width="1343" height="16"/>
+				<reportElement uuid="7885e334-76b5-4bb5-993d-715018cc55ee" style="table" stretchType="RelativeToBandHeight" x="2355" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month1}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month1}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="92" width="553" height="13"/>
+				<reportElement uuid="34c7076d-2d12-4095-97fe-06429b0f8843" style="table" stretchType="RelativeToTallestObject" x="4488" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="105" width="158" height="13"/>
+				<reportElement uuid="c9061613-fbcf-4190-a108-c6d3912bb84b" style="table" stretchType="RelativeToTallestObject" x="4488" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4409" y="105" width="79" height="13"/>
+				<reportElement uuid="ee55a8fd-e8ad-4e65-a583-86c20a6448f6" style="table" stretchType="RelativeToTallestObject" x="4409" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4330" y="118" width="79" height="46"/>
+				<reportElement uuid="cb0f8bbd-aa7e-4700-8f8f-e319812b8daa" style="table" stretchType="RelativeToTallestObject" x="4330" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4883" y="118" width="79" height="46"/>
+				<reportElement uuid="85bd5a98-3d0b-48a3-b2d8-e85d8cffab09" style="table" stretchType="RelativeToTallestObject" x="4883" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3856" y="118" width="79" height="46"/>
+				<reportElement uuid="bfaae25e-1c0f-408e-9650-399361164996" style="table" stretchType="RelativeToTallestObject" x="3856" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4646" y="105" width="79" height="59"/>
+				<reportElement uuid="cddf1edd-e059-4443-9511-546a83cd01f3" style="table" stretchType="RelativeToTallestObject" x="4646" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4567" y="118" width="79" height="46"/>
+				<reportElement uuid="23b301f0-6237-47db-9086-570ed8e9ea1c" style="table" stretchType="RelativeToTallestObject" x="4567" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="118" width="79" height="46"/>
+				<reportElement uuid="96712f19-e025-4d29-b90b-e0c13d37a29d" style="table" stretchType="RelativeToTallestObject" x="3777" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4804" y="118" width="79" height="46"/>
+				<reportElement uuid="c2fb9616-0c2a-496a-b458-38436f186842" style="table" stretchType="RelativeToTallestObject" x="4804" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4725" y="105" width="158" height="13"/>
+				<reportElement uuid="e4ccd1bd-ee95-41b1-98d2-5dd6bbe30f14" style="table" stretchType="RelativeToTallestObject" x="4725" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4172" y="118" width="79" height="46"/>
+				<reportElement uuid="53ffa052-1e3d-4e0c-8425-28324c3fa26e" style="table" stretchType="RelativeToTallestObject" x="4172" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="92" width="711" height="13"/>
+				<reportElement uuid="fb09e975-ecd3-4754-88d5-d65415e986c1" style="table" stretchType="RelativeToTallestObject" x="3777" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4093" y="118" width="79" height="46"/>
+				<reportElement uuid="65d6dbb3-8c01-4ab9-bc81-950092067537" style="table" stretchType="RelativeToTallestObject" x="4093" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4725" y="118" width="79" height="46"/>
+				<reportElement uuid="c9559410-87c0-4a79-9e82-4eb86c1a0449" style="table" stretchType="RelativeToTallestObject" x="4725" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4014" y="118" width="79" height="46"/>
+				<reportElement uuid="e92a908b-2bc7-4b45-a9a0-9aae5c8520e0" style="table" stretchType="RelativeToTallestObject" x="4014" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3935" y="118" width="79" height="46"/>
+				<reportElement uuid="446a6816-f9d6-4a52-bfe8-20320f50f870" style="table" stretchType="RelativeToTallestObject" x="3935" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3777" y="105" width="237" height="13"/>
+				<reportElement uuid="e6f26ed5-e86d-4eac-9ec7-cfd646ea5d83" style="table" stretchType="RelativeToTallestObject" x="3777" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4409" y="118" width="79" height="46"/>
+				<reportElement uuid="59975ba7-1cdb-4584-a50b-936f7e2655bb" style="table" stretchType="RelativeToTallestObject" x="4409" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4014" y="105" width="237" height="13"/>
+				<reportElement uuid="19964d61-d635-4785-b266-14a3282f83d0" style="table" stretchType="RelativeToTallestObject" x="4014" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4251" y="105" width="158" height="13"/>
+				<reportElement uuid="20ac78c1-685b-4c86-8cea-3a93b1f5ff13" style="table" stretchType="RelativeToTallestObject" x="4251" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="3698" y="76" width="1343" height="16"/>
+				<reportElement uuid="52f9eec9-4a28-4fbb-940e-1056cec37b91" style="table" stretchType="RelativeToBandHeight" x="3698" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month2}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month2}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4251" y="118" width="79" height="46"/>
+				<reportElement uuid="371986a3-5162-4353-a5e2-702594f62023" style="table" stretchType="RelativeToTallestObject" x="4251" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4962" y="105" width="79" height="59"/>
+				<reportElement uuid="eadfd54b-9adf-4201-b1c3-15ac697a9093" style="table" stretchType="RelativeToTallestObject" x="4962" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="3698" y="92" width="79" height="72"/>
+				<reportElement uuid="86d955bb-6c36-4c10-83d7-264f3329a282" style="table" stretchType="RelativeToTallestObject" x="3698" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4883" y="105" width="79" height="13"/>
+				<reportElement uuid="48de73e2-9502-42f2-a3f8-6a6d87720cd4" style="table" stretchType="RelativeToTallestObject" x="4883" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="4488" y="118" width="79" height="46"/>
+				<reportElement uuid="b8615051-0639-4ab9-95d0-7e4ace11e3f5" style="table" stretchType="RelativeToTallestObject" x="4488" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="92" width="553" height="13"/>
+				<reportElement uuid="5dec8547-d26d-4d7f-99b1-615bb0e8ff65" style="table" stretchType="RelativeToTallestObject" x="5831" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="105" width="158" height="13"/>
+				<reportElement uuid="1c440d09-cae5-4ef1-b33e-3808fb52f600" style="table" stretchType="RelativeToTallestObject" x="5831" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5752" y="105" width="79" height="13"/>
+				<reportElement uuid="355e25c4-962d-4c9b-8b26-659f5a98462e" style="table" stretchType="RelativeToTallestObject" x="5752" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5673" y="118" width="79" height="46"/>
+				<reportElement uuid="4233db7d-f000-4a2d-9453-e07234e9aff1" style="table" stretchType="RelativeToTallestObject" x="5673" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6226" y="118" width="79" height="46"/>
+				<reportElement uuid="b3e8a8eb-b665-4eda-b550-73d134cadb14" style="table" stretchType="RelativeToTallestObject" x="6226" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5199" y="118" width="79" height="46"/>
+				<reportElement uuid="c49cdcfd-4280-42a7-bf48-d55862113428" style="table" stretchType="RelativeToTallestObject" x="5199" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5989" y="105" width="79" height="59"/>
+				<reportElement uuid="6680e6ba-3a83-43ee-86e9-17c4274feecb" style="table" stretchType="RelativeToTallestObject" x="5989" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5910" y="118" width="79" height="46"/>
+				<reportElement uuid="2eddf5fd-a476-4eda-96fa-0c66034d0211" style="table" stretchType="RelativeToTallestObject" x="5910" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="118" width="79" height="46"/>
+				<reportElement uuid="f5144977-33f2-4d12-87f6-790f6daa3465" style="table" stretchType="RelativeToTallestObject" x="5120" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6147" y="118" width="79" height="46"/>
+				<reportElement uuid="44332657-92cc-482e-a216-5fa91df622a6" style="table" stretchType="RelativeToTallestObject" x="6147" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6068" y="105" width="158" height="13"/>
+				<reportElement uuid="0f372bf8-7dcb-4796-abda-4020202a3f0c" style="table" stretchType="RelativeToTallestObject" x="6068" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5515" y="118" width="79" height="46"/>
+				<reportElement uuid="e640993d-f539-49b3-94c3-a91f7b5b4012" style="table" stretchType="RelativeToTallestObject" x="5515" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="92" width="711" height="13"/>
+				<reportElement uuid="38d4bd8e-2914-4aa7-8ad1-f4de306428af" style="table" stretchType="RelativeToTallestObject" x="5120" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5436" y="118" width="79" height="46"/>
+				<reportElement uuid="a7e11bd7-fe44-4a87-b4c3-4c2f093c356f" style="table" stretchType="RelativeToTallestObject" x="5436" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6068" y="118" width="79" height="46"/>
+				<reportElement uuid="4deab211-ab2e-49dc-9b4d-220165b62f53" style="table" stretchType="RelativeToTallestObject" x="6068" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5357" y="118" width="79" height="46"/>
+				<reportElement uuid="ce5e6594-0b31-4fda-8bcd-43b12feca6bf" style="table" stretchType="RelativeToTallestObject" x="5357" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5278" y="118" width="79" height="46"/>
+				<reportElement uuid="827b8986-1052-42cb-bbc4-cf7220aaba7a" style="table" stretchType="RelativeToTallestObject" x="5278" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5120" y="105" width="237" height="13"/>
+				<reportElement uuid="48663402-2dd8-4067-86b9-0b153b10d172" style="table" stretchType="RelativeToTallestObject" x="5120" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5752" y="118" width="79" height="46"/>
+				<reportElement uuid="ea78ac30-ef08-4dfe-980e-d14dffe31a71" style="table" stretchType="RelativeToTallestObject" x="5752" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5357" y="105" width="237" height="13"/>
+				<reportElement uuid="148c27a7-eed8-4ded-93f4-f4c0af33b19a" style="table" stretchType="RelativeToTallestObject" x="5357" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5594" y="105" width="158" height="13"/>
+				<reportElement uuid="fbe2ce49-eb6c-4851-b149-074d8b242e1b" style="table" stretchType="RelativeToTallestObject" x="5594" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="5041" y="76" width="1343" height="16"/>
+				<reportElement uuid="8d541c2c-0dce-4a41-9b45-5b8aa445bdc4" style="table" stretchType="RelativeToBandHeight" x="5041" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month3}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month3}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5594" y="118" width="79" height="46"/>
+				<reportElement uuid="3379cefc-104c-4bbc-badb-ca26e1c5a22e" style="table" stretchType="RelativeToTallestObject" x="5594" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6305" y="105" width="79" height="59"/>
+				<reportElement uuid="4fcc97b4-ac9c-4ac4-a4db-c528b0f2944a" style="table" stretchType="RelativeToTallestObject" x="6305" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5041" y="92" width="79" height="72"/>
+				<reportElement uuid="f557d7b7-52a3-4a84-828b-29db782fea8d" style="table" stretchType="RelativeToTallestObject" x="5041" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6226" y="105" width="79" height="13"/>
+				<reportElement uuid="cdb76373-443a-4336-a385-a3c1133ae7f1" style="table" stretchType="RelativeToTallestObject" x="6226" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="5831" y="118" width="79" height="46"/>
+				<reportElement uuid="21a08dd5-8d5f-42cf-8dec-94da172e66d5" style="table" stretchType="RelativeToTallestObject" x="5831" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="92" width="553" height="13"/>
+				<reportElement uuid="c276796f-3413-44fa-9cc7-a6dcd2881219" style="table" stretchType="RelativeToTallestObject" x="7174" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="105" width="158" height="13"/>
+				<reportElement uuid="3fab728f-657a-4177-a130-5df0239820c3" style="table" stretchType="RelativeToTallestObject" x="7174" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7095" y="105" width="79" height="13"/>
+				<reportElement uuid="8b33aa49-ae8f-444e-80d7-28c351ebb94c" style="table" stretchType="RelativeToTallestObject" x="7095" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7016" y="118" width="79" height="46"/>
+				<reportElement uuid="4ea13412-12ab-4c17-82b4-2eb02af9c497" style="table" stretchType="RelativeToTallestObject" x="7016" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7569" y="118" width="79" height="46"/>
+				<reportElement uuid="c792a3ae-bfe1-4442-9d8e-f417c04f5973" style="table" stretchType="RelativeToTallestObject" x="7569" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6542" y="118" width="79" height="46"/>
+				<reportElement uuid="3a4609ab-c7a0-49d7-81f7-d1e39772449f" style="table" stretchType="RelativeToTallestObject" x="6542" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7332" y="105" width="79" height="59"/>
+				<reportElement uuid="e666a4fe-7618-415a-93fb-015de247f486" style="table" stretchType="RelativeToTallestObject" x="7332" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7253" y="118" width="79" height="46"/>
+				<reportElement uuid="10aec9bf-7134-49a0-822d-e528d885769a" style="table" stretchType="RelativeToTallestObject" x="7253" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="118" width="79" height="46"/>
+				<reportElement uuid="a079f080-58dd-427e-beef-581e3541c06b" style="table" stretchType="RelativeToTallestObject" x="6463" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7490" y="118" width="79" height="46"/>
+				<reportElement uuid="923eef32-d7ce-4ff7-92c3-11fceecb8d97" style="table" stretchType="RelativeToTallestObject" x="7490" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7411" y="105" width="158" height="13"/>
+				<reportElement uuid="bea13c8c-1129-4092-9d0c-83a7fc7e54a3" style="table" stretchType="RelativeToTallestObject" x="7411" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6858" y="118" width="79" height="46"/>
+				<reportElement uuid="30c9a6cf-c14a-44c8-9555-4a62caaadb79" style="table" stretchType="RelativeToTallestObject" x="6858" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="92" width="711" height="13"/>
+				<reportElement uuid="6ac1b849-1190-4e63-8f24-e47497d20407" style="table" stretchType="RelativeToTallestObject" x="6463" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6779" y="118" width="79" height="46"/>
+				<reportElement uuid="a2d1cd8b-9a40-40b0-8a12-1afbabe2542c" style="table" stretchType="RelativeToTallestObject" x="6779" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7411" y="118" width="79" height="46"/>
+				<reportElement uuid="bbe0a7bd-9578-4d05-8292-209103f5ed60" style="table" stretchType="RelativeToTallestObject" x="7411" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6700" y="118" width="79" height="46"/>
+				<reportElement uuid="6b07b78a-7de1-4afb-85f7-d427c663fd18" style="table" stretchType="RelativeToTallestObject" x="6700" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6621" y="118" width="79" height="46"/>
+				<reportElement uuid="7c2fdf6f-0f0e-42a2-99f9-3d9a92347d90" style="table" stretchType="RelativeToTallestObject" x="6621" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6463" y="105" width="237" height="13"/>
+				<reportElement uuid="0246f8c3-7731-4f18-a71f-1df23685d636" style="table" stretchType="RelativeToTallestObject" x="6463" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7095" y="118" width="79" height="46"/>
+				<reportElement uuid="9f797784-0e7d-41f8-93cc-4e5e2be3d0f9" style="table" stretchType="RelativeToTallestObject" x="7095" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6700" y="105" width="237" height="13"/>
+				<reportElement uuid="3be55e73-4228-4295-89ca-99a537253771" style="table" stretchType="RelativeToTallestObject" x="6700" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6937" y="105" width="158" height="13"/>
+				<reportElement uuid="eb7bde37-5ef8-4ed2-887a-e7de9ec90e54" style="table" stretchType="RelativeToTallestObject" x="6937" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="6384" y="76" width="1343" height="16"/>
+				<reportElement uuid="b581fc60-0a2f-4ee6-b754-d4196a5b8c3a" style="table" stretchType="RelativeToBandHeight" x="6384" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month4}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month4}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6937" y="118" width="79" height="46"/>
+				<reportElement uuid="a0dd3dd7-7f30-4dd4-992e-725f763cc0cb" style="table" stretchType="RelativeToTallestObject" x="6937" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7648" y="105" width="79" height="59"/>
+				<reportElement uuid="1d7ba5fe-9184-453e-b4e7-e9ed60914fad" style="table" stretchType="RelativeToTallestObject" x="7648" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="6384" y="92" width="79" height="72"/>
+				<reportElement uuid="6b18559b-a1aa-4f0c-95be-f8233980813e" style="table" stretchType="RelativeToTallestObject" x="6384" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7569" y="105" width="79" height="13"/>
+				<reportElement uuid="d40ef677-4717-4040-a9f4-0220cffaa8c3" style="table" stretchType="RelativeToTallestObject" x="7569" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7174" y="118" width="79" height="46"/>
+				<reportElement uuid="efe688bc-e09a-4a22-874b-70c97f55e298" style="table" stretchType="RelativeToTallestObject" x="7174" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="92" width="553" height="13"/>
+				<reportElement uuid="d5e090c7-2087-4d0f-8ae6-960ff84417a5" style="table" stretchType="RelativeToTallestObject" x="8517" y="92" width="553" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в день]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="105" width="158" height="13"/>
+				<reportElement uuid="6c4c5ecf-4e3a-4f8f-b810-74e77cbbf1e9" style="table" stretchType="RelativeToTallestObject" x="8517" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8438" y="105" width="79" height="13"/>
+				<reportElement uuid="a6082b9c-04da-468e-966c-bef96e653a94" style="table" stretchType="RelativeToTallestObject" x="8438" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8359" y="118" width="79" height="46"/>
+				<reportElement uuid="3a075add-62c2-4c91-a671-5cabf30f4d87" style="table" stretchType="RelativeToTallestObject" x="8359" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8912" y="118" width="79" height="46"/>
+				<reportElement uuid="e36b9782-d07c-4adb-b88f-3c31de7b3745" style="table" stretchType="RelativeToTallestObject" x="8912" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма/ср.обед  руб.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7885" y="118" width="79" height="46"/>
+				<reportElement uuid="07aa145f-5e23-4e4a-966b-ce8c3ad04ee8" style="table" stretchType="RelativeToTallestObject" x="7885" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8675" y="105" width="79" height="59"/>
+				<reportElement uuid="64b256ff-da22-4ae5-bae9-055b3adba037" style="table" stretchType="RelativeToTallestObject" x="8675" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕЛЬГОТНИКИ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8596" y="118" width="79" height="46"/>
+				<reportElement uuid="47212a42-a022-42be-8433-1128885f1b86" style="table" stretchType="RelativeToTallestObject" x="8596" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="118" width="79" height="46"/>
+				<reportElement uuid="4dd2cafe-fbb6-4e0d-8c42-969025cd55b3" style="table" stretchType="RelativeToTallestObject" x="7806" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8833" y="118" width="79" height="46"/>
+				<reportElement uuid="045499c4-933c-41e7-a7ec-b92aa653e13f" style="table" stretchType="RelativeToTallestObject" x="8833" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8754" y="105" width="158" height="13"/>
+				<reportElement uuid="e52a6914-de07-46da-82d6-116716dff197" style="table" stretchType="RelativeToTallestObject" x="8754" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8201" y="118" width="79" height="46"/>
+				<reportElement uuid="98f1525d-58c3-44cf-91fb-9d2b666021b9" style="table" stretchType="RelativeToTallestObject" x="8201" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="92" width="711" height="13"/>
+				<reportElement uuid="7a070b72-34d6-4a23-aa0c-30b702ab7e8a" style="table" stretchType="RelativeToTallestObject" x="7806" y="92" width="711" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[в месяц]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8122" y="118" width="79" height="46"/>
+				<reportElement uuid="ed3965df-dfd0-4b3e-941f-201b3441e62e" style="table" stretchType="RelativeToTallestObject" x="8122" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[ст-ть]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8754" y="118" width="79" height="46"/>
+				<reportElement uuid="2dd9e9d5-f6ab-4d05-a9e1-936b1a2fefd4" style="table" stretchType="RelativeToTallestObject" x="8754" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8043" y="118" width="79" height="46"/>
+				<reportElement uuid="f1d9d799-2ed0-485a-bb85-eb1f4505323f" style="table" stretchType="RelativeToTallestObject" x="8043" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7964" y="118" width="79" height="46"/>
+				<reportElement uuid="bdc35baa-c32b-41d5-ab2a-262867f7aac3" style="table" stretchType="RelativeToTallestObject" x="7964" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7806" y="105" width="237" height="13"/>
+				<reportElement uuid="e6df33c2-3bbc-4e02-9f5f-dbb51cec1595" style="table" stretchType="RelativeToTallestObject" x="7806" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[1-4 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8438" y="118" width="79" height="46"/>
+				<reportElement uuid="11ce6bfa-45f7-4334-97d5-6c799289077d" style="table" stretchType="RelativeToTallestObject" x="8438" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8043" y="105" width="237" height="13"/>
+				<reportElement uuid="77285045-51fa-4ba8-acad-192ea993689d" style="table" stretchType="RelativeToTallestObject" x="8043" y="105" width="237" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[5-11 классы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8280" y="105" width="158" height="13"/>
+				<reportElement uuid="46f7383f-f139-45e9-8b0f-66d929d288d8" style="table" stretchType="RelativeToTallestObject" x="8280" y="105" width="158" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платники]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToBandHeight" x="7727" y="76" width="1343" height="16"/>
+				<reportElement uuid="45ad8025-a32e-4986-9c18-e917e1ffaa92" style="table" stretchType="RelativeToBandHeight" x="7727" y="76" width="1343" height="16"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{Month5}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{Month5}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8280" y="118" width="79" height="46"/>
+				<reportElement uuid="1c3f5ead-bc1f-4744-b095-ca9deec61849" style="table" stretchType="RelativeToTallestObject" x="8280" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8991" y="105" width="79" height="59"/>
+				<reportElement uuid="86b08d05-4a68-4b00-899d-c6ac10a5aa22" style="table" stretchType="RelativeToTallestObject" x="8991" y="105" width="79" height="59"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[НЕ ПИТАЮТСЯ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="7727" y="92" width="79" height="72"/>
+				<reportElement uuid="688b31a7-7da1-4949-8127-6cfc59e3a9c4" style="table" stretchType="RelativeToTallestObject" x="7727" y="92" width="79" height="72"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Кол-во уч/дней]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8912" y="105" width="79" height="13"/>
+				<reportElement uuid="c191f01d-5c78-49a9-9036-814a086d2999" style="table" stretchType="RelativeToTallestObject" x="8912" y="105" width="79" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Буфет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="8517" y="118" width="79" height="46"/>
+				<reportElement uuid="e72001d7-7f64-43b9-8966-d16a33b13817" style="table" stretchType="RelativeToTallestObject" x="8517" y="118" width="79" height="46"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[кол-во]]></text>
 			</staticText>
@@ -999,574 +999,574 @@
 	<detail>
 		<band height="23" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1091" y="0" width="79" height="13"/>
+				<reportElement uuid="e75bc2ec-d734-4053-93ab-e2dd9f9b5884" style="data" stretchType="RelativeToBandHeight" x="1091" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1802" y="0" width="79" height="13"/>
+				<reportElement uuid="c20022cb-4071-4aed-8812-3b253e88d71c" style="data" stretchType="RelativeToBandHeight" x="1802" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="538" y="0" width="79" height="13"/>
+				<reportElement uuid="beb3e54e-686b-459e-84a5-01075e61c429" style="data" stretchType="RelativeToBandHeight" x="538" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitPaymentsSum")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("benefitPaymentsSum")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1644" y="0" width="79" height="13"/>
+				<reportElement uuid="799154d6-e3d3-41c9-8d88-206706c018c1" style="data" stretchType="RelativeToBandHeight" x="1644" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1249" y="0" width="79" height="13"/>
+				<reportElement uuid="d6060a43-6802-42b8-9a61-74302818e7ac" style="data" stretchType="RelativeToBandHeight" x="1249" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2197" y="0" width="79" height="13"/>
+				<reportElement uuid="886fa302-db20-49dc-ac1b-23f07d0fe835" style="data" stretchType="RelativeToBandHeight" x="2197" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="301" y="0" width="79" height="13"/>
+				<reportElement uuid="30556d04-ac76-4813-8db2-ddee60066623" style="data" stretchType="RelativeToBandHeight" x="301" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("studentsCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("studentsCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1960" y="0" width="79" height="13"/>
+				<reportElement uuid="2871f8bc-d0f9-471e-96b2-33fc0f47f6ff" style="data" stretchType="RelativeToBandHeight" x="1960" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="143" y="0" width="79" height="13"/>
+				<reportElement uuid="81515afa-cd81-4b79-a2ba-b908b0fbbaab" style="data" stretchType="RelativeToBandHeight" x="143" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("no")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("no")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2276" y="0" width="79" height="13"/>
+				<reportElement uuid="d2915094-a2fe-4dba-b459-b4f2cbcd5643" style="data" stretchType="RelativeToBandHeight" x="2276" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="854" y="0" width="79" height="13"/>
+				<reportElement uuid="e7cdca97-511a-448f-bb51-a46236578f1f" style="data" stretchType="RelativeToBandHeight" x="854" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("canteenDailySum")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("canteenDailySum")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1486" y="0" width="79" height="13"/>
+				<reportElement uuid="1036d4d7-7aaf-4cc1-a16a-b2dd7b325d96" style="data" stretchType="RelativeToBandHeight" x="1486" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="380" y="0" width="79" height="13"/>
+				<reportElement uuid="d09693c9-9d1f-42c2-aff3-d07a52513f05" style="data" stretchType="RelativeToBandHeight" x="380" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("studyDays")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("studyDays")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="696" y="0" width="79" height="13"/>
+				<reportElement uuid="cc888a05-2596-496e-a2db-a5dca092e273" style="data" stretchType="RelativeToBandHeight" x="696" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("payerTotalCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("payerTotalCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1565" y="0" width="79" height="13"/>
+				<reportElement uuid="681f17d5-5e0a-45bb-bf5b-b81b4c26f6aa" style="data" stretchType="RelativeToBandHeight" x="1565" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1012" y="0" width="79" height="13"/>
+				<reportElement uuid="a0324dbc-023e-415f-a10b-376589e60056" style="data" stretchType="RelativeToBandHeight" x="1012" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1881" y="0" width="79" height="13"/>
+				<reportElement uuid="acb55872-dc8c-416e-8a43-cfa33850adb7" style="data" stretchType="RelativeToBandHeight" x="1881" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="775" y="0" width="79" height="13"/>
+				<reportElement uuid="d5419cd8-1701-43ef-97b8-874737fb6efe" style="data" stretchType="RelativeToBandHeight" x="775" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("payerDailyLunchCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("payerDailyLunchCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="933" y="0" width="79" height="13"/>
+				<reportElement uuid="4d751750-4de3-4c00-8014-aa6263dc8761" style="data" stretchType="RelativeToBandHeight" x="933" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("doNotEatCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("doNotEatCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1407" y="0" width="79" height="13"/>
+				<reportElement uuid="e4173b9b-d8a3-4339-a92b-11ebf1450dff" style="data" stretchType="RelativeToBandHeight" x="1407" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="617" y="0" width="79" height="13"/>
+				<reportElement uuid="0143f6a6-4705-426c-b065-5bca49970550" style="data" stretchType="RelativeToBandHeight" x="617" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitDailyCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("benefitDailyCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2039" y="0" width="79" height="13"/>
+				<reportElement uuid="f44413f0-94b8-41b9-bf96-999625354c28" style="data" stretchType="RelativeToBandHeight" x="2039" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2118" y="0" width="79" height="13"/>
+				<reportElement uuid="7f2eb354-3f77-4c62-9ecb-ac6f6d9aec75" style="data" stretchType="RelativeToBandHeight" x="2118" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1170" y="0" width="79" height="13"/>
+				<reportElement uuid="37adcacb-a348-47fb-857f-5603840a6088" style="data" stretchType="RelativeToBandHeight" x="1170" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1328" y="0" width="79" height="13"/>
+				<reportElement uuid="72a5f130-7cb6-43a0-8e12-28ab769a4592" style="data" stretchType="RelativeToBandHeight" x="1328" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="222" y="0" width="79" height="13"/>
+				<reportElement uuid="0e371eae-5495-489b-8f97-c564e00c9309" style="data" stretchType="RelativeToBandHeight" x="222" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("type")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("type")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="1723" y="0" width="79" height="13"/>
+				<reportElement uuid="46272953-5bcd-4dcd-8073-6d8e733a7206" style="data" stretchType="RelativeToBandHeight" x="1723" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m0_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m0_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="459" y="0" width="79" height="13"/>
+				<reportElement uuid="8c7fc395-f19e-45dd-be60-82e1dbaf0a0d" style="data" stretchType="RelativeToBandHeight" x="459" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("benefitBreakfastsCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("benefitBreakfastsCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="-21" y="0" width="164" height="13"/>
+				<reportElement uuid="8764355b-1796-43be-b793-f294816f6bc5" style="data" stretchType="RelativeToBandHeight" x="-21" y="0" width="164" height="13"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("name")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("name")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3382" y="0" width="79" height="13"/>
+				<reportElement uuid="db0b6661-56a9-41ea-b647-0ed1ca7d3ee7" style="data" stretchType="RelativeToBandHeight" x="3382" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2513" y="0" width="79" height="13"/>
+				<reportElement uuid="2fa1207f-ee76-494d-80d3-ee2e12bac7eb" style="data" stretchType="RelativeToBandHeight" x="2513" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3303" y="0" width="79" height="13"/>
+				<reportElement uuid="c85c7924-46e5-414d-b5cb-0d594decb875" style="data" stretchType="RelativeToBandHeight" x="3303" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3461" y="0" width="79" height="13"/>
+				<reportElement uuid="ad90ab35-201c-4ae8-b770-ce6dda07dc1c" style="data" stretchType="RelativeToBandHeight" x="3461" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2355" y="0" width="79" height="13"/>
+				<reportElement uuid="d61254a9-6164-4ce1-89be-e3850f26e01e" style="data" stretchType="RelativeToBandHeight" x="2355" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2592" y="0" width="79" height="13"/>
+				<reportElement uuid="760a21bb-5dc5-478f-bd7d-f551f982ad6b" style="data" stretchType="RelativeToBandHeight" x="2592" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2829" y="0" width="79" height="13"/>
+				<reportElement uuid="670a1a1a-1792-4a81-917b-b02d3a54bedb" style="data" stretchType="RelativeToBandHeight" x="2829" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2671" y="0" width="79" height="13"/>
+				<reportElement uuid="1e3cf2a3-eeb6-4ed0-a462-79cf55ae6aec" style="data" stretchType="RelativeToBandHeight" x="2671" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3224" y="0" width="79" height="13"/>
+				<reportElement uuid="a3d1f4d7-703b-4606-9480-436ddc39c4a4" style="data" stretchType="RelativeToBandHeight" x="3224" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3619" y="0" width="79" height="13"/>
+				<reportElement uuid="6699d72e-5102-48c2-bb05-b2e5960426e3" style="data" stretchType="RelativeToBandHeight" x="3619" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3066" y="0" width="79" height="13"/>
+				<reportElement uuid="7cf2c895-0c7c-4d26-af9a-1b02934aa7ea" style="data" stretchType="RelativeToBandHeight" x="3066" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3145" y="0" width="79" height="13"/>
+				<reportElement uuid="f96df623-bf03-45cd-a1e0-d11ec3d23c34" style="data" stretchType="RelativeToBandHeight" x="3145" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2434" y="0" width="79" height="13"/>
+				<reportElement uuid="87c49970-66be-4d31-a872-c600fb7e51a9" style="data" stretchType="RelativeToBandHeight" x="2434" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2908" y="0" width="79" height="13"/>
+				<reportElement uuid="a02f42ca-ac25-4163-a29e-e1f4361a7d7c" style="data" stretchType="RelativeToBandHeight" x="2908" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2987" y="0" width="79" height="13"/>
+				<reportElement uuid="49dba79d-56f6-48f7-bdf1-6db5e4c0179b" style="data" stretchType="RelativeToBandHeight" x="2987" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="2750" y="0" width="79" height="13"/>
+				<reportElement uuid="24638f3e-c92a-4902-a7c4-8f4e2ae51338" style="data" stretchType="RelativeToBandHeight" x="2750" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3540" y="0" width="79" height="13"/>
+				<reportElement uuid="50102607-2562-4857-8c83-fa45cc5c6acf" style="data" stretchType="RelativeToBandHeight" x="3540" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m1_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m1_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4567" y="0" width="79" height="13"/>
+				<reportElement uuid="48ed9b8b-329f-4a7d-b127-6bea02e48173" style="data" stretchType="RelativeToBandHeight" x="4567" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4725" y="0" width="79" height="13"/>
+				<reportElement uuid="bfae1524-5734-4c91-af18-7706a5f72966" style="data" stretchType="RelativeToBandHeight" x="4725" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4488" y="0" width="79" height="13"/>
+				<reportElement uuid="3883b90b-106f-45e5-a046-b76609c4c675" style="data" stretchType="RelativeToBandHeight" x="4488" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3698" y="0" width="79" height="13"/>
+				<reportElement uuid="3463b34f-cdfe-48ea-ad23-7c2be750fda9" style="data" stretchType="RelativeToBandHeight" x="3698" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3777" y="0" width="79" height="13"/>
+				<reportElement uuid="36cde2b6-70f1-42e0-b16d-a59609af7111" style="data" stretchType="RelativeToBandHeight" x="3777" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4804" y="0" width="79" height="13"/>
+				<reportElement uuid="fd26e990-2202-42b8-9ea6-40c50a958515" style="data" stretchType="RelativeToBandHeight" x="4804" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4962" y="0" width="79" height="13"/>
+				<reportElement uuid="dd3e7a2d-94dc-4d70-896c-9b6863deade8" style="data" stretchType="RelativeToBandHeight" x="4962" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4251" y="0" width="79" height="13"/>
+				<reportElement uuid="f4babc59-2632-4237-a19f-9fe6c12da3fe" style="data" stretchType="RelativeToBandHeight" x="4251" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4014" y="0" width="79" height="13"/>
+				<reportElement uuid="80ce4096-b0eb-4a15-bcc9-67960438c465" style="data" stretchType="RelativeToBandHeight" x="4014" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4093" y="0" width="79" height="13"/>
+				<reportElement uuid="8bf84b14-0c05-40b5-a12f-dc94a3f063d1" style="data" stretchType="RelativeToBandHeight" x="4093" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4409" y="0" width="79" height="13"/>
+				<reportElement uuid="d85bbf96-5088-400d-8682-cd31cf71bdd3" style="data" stretchType="RelativeToBandHeight" x="4409" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3935" y="0" width="79" height="13"/>
+				<reportElement uuid="c94f245a-ddb3-4454-aa96-2fea6c6b8829" style="data" stretchType="RelativeToBandHeight" x="3935" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4330" y="0" width="79" height="13"/>
+				<reportElement uuid="ba3df5c1-609c-417b-8411-9aa7ae0e7a0e" style="data" stretchType="RelativeToBandHeight" x="4330" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="3856" y="0" width="79" height="13"/>
+				<reportElement uuid="b2639737-0e6d-45c8-b2fd-8658a74b2e1b" style="data" stretchType="RelativeToBandHeight" x="3856" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4646" y="0" width="79" height="13"/>
+				<reportElement uuid="50e1f7b8-c00b-46d5-b2f0-59eaa833aa7c" style="data" stretchType="RelativeToBandHeight" x="4646" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4172" y="0" width="79" height="13"/>
+				<reportElement uuid="5a9f5368-7e90-45b1-8bdf-8d6408b1bce8" style="data" stretchType="RelativeToBandHeight" x="4172" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="4883" y="0" width="79" height="13"/>
+				<reportElement uuid="09b757e0-264d-455c-b059-f080042d2285" style="data" stretchType="RelativeToBandHeight" x="4883" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m2_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m2_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5278" y="0" width="79" height="13"/>
+				<reportElement uuid="5bc32931-601c-4ab9-9713-1ea0186a9627" style="data" stretchType="RelativeToBandHeight" x="5278" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5357" y="0" width="79" height="13"/>
+				<reportElement uuid="46313e4b-c86a-4107-a8dd-7269b240a40b" style="data" stretchType="RelativeToBandHeight" x="5357" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6147" y="0" width="79" height="13"/>
+				<reportElement uuid="243b70c3-ac98-4ed0-8e45-b8e0c120fa95" style="data" stretchType="RelativeToBandHeight" x="6147" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5120" y="0" width="79" height="13"/>
+				<reportElement uuid="a5b1f720-5c37-4d1e-bdc2-fbf3a90c5492" style="data" stretchType="RelativeToBandHeight" x="5120" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5910" y="0" width="79" height="13"/>
+				<reportElement uuid="0e06147e-575e-4b4b-a910-aa427a04dc16" style="data" stretchType="RelativeToBandHeight" x="5910" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5989" y="0" width="79" height="13"/>
+				<reportElement uuid="242a0c08-60eb-4608-b7ef-36c7de2ae4c9" style="data" stretchType="RelativeToBandHeight" x="5989" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6068" y="0" width="79" height="13"/>
+				<reportElement uuid="67671381-9524-4a33-88f3-5ba1e41063a8" style="data" stretchType="RelativeToBandHeight" x="6068" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6226" y="0" width="79" height="13"/>
+				<reportElement uuid="3b88e1d6-d8e8-4064-85da-7bdb996e24d1" style="data" stretchType="RelativeToBandHeight" x="6226" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6305" y="0" width="79" height="13"/>
+				<reportElement uuid="f3d68e6a-4335-4585-915e-be258abbdddd" style="data" stretchType="RelativeToBandHeight" x="6305" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5199" y="0" width="79" height="13"/>
+				<reportElement uuid="f14977f2-d272-43e9-a806-408c8a8d0a4f" style="data" stretchType="RelativeToBandHeight" x="5199" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5436" y="0" width="79" height="13"/>
+				<reportElement uuid="777a9b16-0c28-4b2e-b3f4-c15fa0146957" style="data" stretchType="RelativeToBandHeight" x="5436" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5515" y="0" width="79" height="13"/>
+				<reportElement uuid="0e4cd2e7-83a6-4b42-829a-da86f06dfe1a" style="data" stretchType="RelativeToBandHeight" x="5515" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5673" y="0" width="79" height="13"/>
+				<reportElement uuid="6a3000d6-6fda-447d-a93f-f05e35124c2b" style="data" stretchType="RelativeToBandHeight" x="5673" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5752" y="0" width="79" height="13"/>
+				<reportElement uuid="b5d3349e-757d-47d3-b655-77200b54274d" style="data" stretchType="RelativeToBandHeight" x="5752" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5594" y="0" width="79" height="13"/>
+				<reportElement uuid="90f571af-7569-4aa7-8d51-746d5ab28cd2" style="data" stretchType="RelativeToBandHeight" x="5594" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5041" y="0" width="79" height="13"/>
+				<reportElement uuid="6454cf33-3b90-4308-8d47-cc3303586018" style="data" stretchType="RelativeToBandHeight" x="5041" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="5831" y="0" width="79" height="13"/>
+				<reportElement uuid="48e3f4be-8a5e-4f94-9a3e-bd7408490047" style="data" stretchType="RelativeToBandHeight" x="5831" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m3_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m3_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6542" y="0" width="79" height="13"/>
+				<reportElement uuid="1009eafd-a7b6-4c22-80db-3fcfbdd35eb7" style="data" stretchType="RelativeToBandHeight" x="6542" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7253" y="0" width="79" height="13"/>
+				<reportElement uuid="33669fa3-5f8c-40f2-b7b2-5284d1d9716a" style="data" stretchType="RelativeToBandHeight" x="7253" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7332" y="0" width="79" height="13"/>
+				<reportElement uuid="b5a205cf-49dd-4561-9bf7-996045f49b3f" style="data" stretchType="RelativeToBandHeight" x="7332" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7016" y="0" width="79" height="13"/>
+				<reportElement uuid="67ddfcd6-db23-46a6-95e8-d117c5bbb2ea" style="data" stretchType="RelativeToBandHeight" x="7016" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6858" y="0" width="79" height="13"/>
+				<reportElement uuid="678b07b7-b1d5-4480-8939-c8bab5800249" style="data" stretchType="RelativeToBandHeight" x="6858" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6700" y="0" width="79" height="13"/>
+				<reportElement uuid="a3cdcee8-4372-4a1a-9d46-349f70a7315e" style="data" stretchType="RelativeToBandHeight" x="6700" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6463" y="0" width="79" height="13"/>
+				<reportElement uuid="fdb6ead8-e591-4f0f-96aa-0b888a3d65cd" style="data" stretchType="RelativeToBandHeight" x="6463" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7411" y="0" width="79" height="13"/>
+				<reportElement uuid="29b6ddc1-5287-4b20-a87a-8db7cb4b17e0" style="data" stretchType="RelativeToBandHeight" x="7411" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6621" y="0" width="79" height="13"/>
+				<reportElement uuid="102ba5c6-5d16-432b-a2fc-c29006d35d3e" style="data" stretchType="RelativeToBandHeight" x="6621" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7174" y="0" width="79" height="13"/>
+				<reportElement uuid="f2987100-3f38-4dcf-9571-a62421e7a422" style="data" stretchType="RelativeToBandHeight" x="7174" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7095" y="0" width="79" height="13"/>
+				<reportElement uuid="922dbe49-2dc9-4868-8544-06289a775831" style="data" stretchType="RelativeToBandHeight" x="7095" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7490" y="0" width="79" height="13"/>
+				<reportElement uuid="57b11807-13ef-4883-aec8-83bc01f47679" style="data" stretchType="RelativeToBandHeight" x="7490" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6937" y="0" width="79" height="13"/>
+				<reportElement uuid="a7b72995-fe88-4eea-aa09-d256d0384c85" style="data" stretchType="RelativeToBandHeight" x="6937" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7648" y="0" width="79" height="13"/>
+				<reportElement uuid="af5374cd-967e-46b1-aa3f-eb714cf12e00" style="data" stretchType="RelativeToBandHeight" x="7648" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6779" y="0" width="79" height="13"/>
+				<reportElement uuid="3991559c-0bcb-431b-b6e9-70c0c30c48ec" style="data" stretchType="RelativeToBandHeight" x="6779" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7569" y="0" width="79" height="13"/>
+				<reportElement uuid="e54f6a95-c7f8-430f-ac7a-9c5be8206a5d" style="data" stretchType="RelativeToBandHeight" x="7569" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="6384" y="0" width="79" height="13"/>
+				<reportElement uuid="06c87494-beb3-4a5b-9159-42fa09ad5ab2" style="data" stretchType="RelativeToBandHeight" x="6384" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7806" y="0" width="79" height="13"/>
+				<reportElement uuid="3e776e80-e033-4f09-b64d-9f581e099894" style="data" stretchType="RelativeToBandHeight" x="7806" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_1-4CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8833" y="0" width="79" height="13"/>
+				<reportElement uuid="4b3cdb58-fdc7-4e9b-b43b-ba27799e81fa" style="data" stretchType="RelativeToBandHeight" x="8833" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payersSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_payersSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8122" y="0" width="79" height="13"/>
+				<reportElement uuid="16aa380b-c455-4d14-8b8f-673a3782d424" style="data" stretchType="RelativeToBandHeight" x="8122" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_5-11AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8596" y="0" width="79" height="13"/>
+				<reportElement uuid="81da3c4e-14cf-4fb5-a89f-16b5f9d2d940" style="data" stretchType="RelativeToBandHeight" x="8596" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_benefitSummDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_benefitSummDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7727" y="0" width="79" height="13"/>
+				<reportElement uuid="4cb6ccdd-3da5-4734-851f-bbff6c196eef" style="data" stretchType="RelativeToBandHeight" x="7727" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_daysCount")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_daysCount")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7964" y="0" width="79" height="13"/>
+				<reportElement uuid="dde362fb-79e8-412e-85a9-3dfa7f171f57" style="data" stretchType="RelativeToBandHeight" x="7964" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_1-4SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8280" y="0" width="79" height="13"/>
+				<reportElement uuid="2e4c25a7-a7f1-4279-a7b3-0ac38ca428ee" style="data" stretchType="RelativeToBandHeight" x="8280" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m4_payerCountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8201" y="0" width="79" height="13"/>
+				<reportElement uuid="f47b1c9b-ae02-4fa8-b348-f87f198ae89a" style="data" stretchType="RelativeToBandHeight" x="8201" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11SummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_5-11SummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8754" y="0" width="79" height="13"/>
+				<reportElement uuid="c74c387b-a491-4d25-9141-27456c47250d" style="data" stretchType="RelativeToBandHeight" x="8754" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payersCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_payersCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8991" y="0" width="79" height="13"/>
+				<reportElement uuid="50758ccc-d262-4c08-b8be-2efb138015ce" style="data" stretchType="RelativeToBandHeight" x="8991" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_doNotEatDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_doNotEatDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8438" y="0" width="79" height="13"/>
+				<reportElement uuid="75af361c-3ad1-4bcf-baa7-e3485db586c4" style="data" stretchType="RelativeToBandHeight" x="8438" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_canteenSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_canteenSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="7885" y="0" width="79" height="13"/>
+				<reportElement uuid="8b8327a2-f759-4ea5-86c3-e82cdcde3022" style="data" stretchType="RelativeToBandHeight" x="7885" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_1-4AvgMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_1-4AvgMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8517" y="0" width="79" height="13"/>
+				<reportElement uuid="e377970f-9f64-425a-ab5b-b4c95c2b071d" style="data" stretchType="RelativeToBandHeight" x="8517" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_benefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_benefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8043" y="0" width="79" height="13"/>
+				<reportElement uuid="ece628f8-e858-43bc-8ebb-1ae30e292215" style="data" stretchType="RelativeToBandHeight" x="8043" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_5-11CountMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_5-11CountMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8675" y="0" width="79" height="13"/>
+				<reportElement uuid="78c70c0f-846e-4fb3-bd43-2f598ff0e8fe" style="data" stretchType="RelativeToBandHeight" x="8675" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_noBenefitCountDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_noBenefitCountDaily")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8359" y="0" width="79" height="13"/>
+				<reportElement uuid="2528e50e-eb34-47b6-bb1f-82f1acce521a" style="data" stretchType="RelativeToBandHeight" x="8359" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_payerSummMonthly")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_payerSummMonthly")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="data" stretchType="RelativeToBandHeight" x="8912" y="0" width="79" height="13"/>
+				<reportElement uuid="cdbd1f96-aa70-48ab-b0e2-0dbc6c5b0f6c" style="data" stretchType="RelativeToBandHeight" x="8912" y="0" width="79" height="13"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[((java.util.Map) $F{props}).get("m5_canteenAvgDaily")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[((java.util.Map) $F{props}).get("m5_canteenAvgDaily")]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

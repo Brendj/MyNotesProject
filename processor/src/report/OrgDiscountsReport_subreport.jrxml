@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport_subreport" language="groovy" pageWidth="600" pageHeight="550" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6d9975e9-71de-477b-b056-b6d098216c93">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport_subreport" pageWidth="600" pageHeight="550" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6d9975e9-71de-477b-b056-b6d098216c93">
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -68,7 +68,7 @@
 		<band height="20">
 			<staticText>
 				<reportElement uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e" x="0" y="0" width="600" height="20">
-					<printWhenExpression><![CDATA[new Boolean($F{groupName}==null) ]]></printWhenExpression>
+					<printWhenExpression><![CDATA[new Boolean($F{groupName}==null)]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="15">
 					<pen lineWidth="1.0"/>
@@ -102,7 +102,7 @@
 					<datasetRun subDataset="Table Dataset 1" uuid="7bd649fc-1747-412b-9556-23028c1124b3">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{clientItemList})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf" width="330">
+					<jr:column width="330" uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="fd8e5678-372c-4957-b422-de71dbc9ab2f" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
@@ -124,7 +124,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98" width="270">
+					<jr:column width="270" uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
@@ -156,7 +156,7 @@
 					<datasetRun subDataset="Table Dataset 2" uuid="8e1de5e1-95cb-4ff0-84c5-0c65aae8dabb">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{categoryItemGroup})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19" width="330">
+					<jr:column width="330" uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="2cdc64ff-6320-4596-953f-a1a2718dd441" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
@@ -178,7 +178,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de" width="270">
+					<jr:column width="270" uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField evaluationTime="Report">
 								<reportElement uuid="a02e9c6a-f626-46c3-84e6-3c5283ea4a86" x="0" y="0" width="270" height="20"/>

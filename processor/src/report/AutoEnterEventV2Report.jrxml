@@ -142,7 +142,9 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="8f39eeda-8e0c-4ab9-b8b3-7ed23b72b2ad" style="Crosstab Data Text" x="0" y="0" width="204" height="50"/>
+								<reportElement uuid="8f39eeda-8e0c-4ab9-b8b3-7ed23b72b2ad" style="Crosstab Data Text" x="0" y="0" width="204" height="50">
+									<propertyExpression name="net.sf.jasperreports.export.xls.row.outline.level.1"><![CDATA["1"]]></propertyExpression>
+								</reportElement>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>

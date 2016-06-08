@@ -8,7 +8,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="0.6209213230591734"/>
+	<property name="ireport.zoom" value="1.1000000000000325"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -35,7 +35,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="9" isBold="true"/>
 					</textElement>
-					<text><![CDATA[ФИО]]></text>
+					<text><![CDATA[ФИО1]]></text>
 				</staticText>
 				<textField>
 					<reportElement uuid="3d1db738-6b77-4db7-b5f8-057d564ecf2a" style="table" stretchType="RelativeToTallestObject" x="167" y="56" width="2233" height="20"/>
@@ -293,7 +293,15 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band height="144"/>
+			<band height="144">
+				<textField>
+					<reportElement uuid="5a438bcb-c82c-43be-be3a-48509ead9ea3" x="36" y="0" width="131" height="0">
+						<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="end"/>
+					</reportElement>
+					<textElement/>
+					<textFieldExpression><![CDATA[""]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<background>
@@ -331,7 +339,9 @@
 	<detail>
 		<band height="20">
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="639b0f5c-b1a5-4f6f-9710-ab067fb94443" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="20"/>
+				<reportElement uuid="639b0f5c-b1a5-4f6f-9710-ab067fb94443" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 					<paragraph leftIndent="5" rightIndent="5"/>
@@ -339,7 +349,9 @@
 				<textFieldExpression><![CDATA[$V{origin_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="06a48bb3-f891-4e46-8b89-4ab0d76eae27" style="table" stretchType="RelativeToTallestObject" x="36" y="0" width="131" height="20"/>
+				<reportElement uuid="06a48bb3-f891-4e46-8b89-4ab0d76eae27" style="table" stretchType="RelativeToTallestObject" x="36" y="0" width="131" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement verticalAlignment="Middle" markup="none">
 					<font size="9"/>
 					<paragraph leftIndent="5" rightIndent="5"/>
@@ -347,224 +359,288 @@
 				<textFieldExpression><![CDATA[$F{fio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="288a162e-bfed-4a61-ad0b-efe0332b4496" style="table" stretchType="RelativeToTallestObject" x="167" y="0" width="68" height="20"/>
+				<reportElement uuid="288a162e-bfed-4a61-ad0b-efe0332b4496" style="table" stretchType="RelativeToTallestObject" x="167" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(0)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="b73da201-ea39-42b6-a1ea-ed045e895eb5" style="table" stretchType="RelativeToTallestObject" x="439" y="0" width="68" height="20"/>
+				<reportElement uuid="b73da201-ea39-42b6-a1ea-ed045e895eb5" style="table" stretchType="RelativeToTallestObject" x="439" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(4)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="84c179a7-646c-4c69-a2f1-acebe8198aed" style="table" stretchType="RelativeToTallestObject" x="371" y="0" width="68" height="20"/>
+				<reportElement uuid="84c179a7-646c-4c69-a2f1-acebe8198aed" style="table" stretchType="RelativeToTallestObject" x="371" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(3)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="97ace08d-c142-4b51-bb45-c796bea40fca" style="table" stretchType="RelativeToTallestObject" x="575" y="0" width="68" height="20"/>
+				<reportElement uuid="97ace08d-c142-4b51-bb45-c796bea40fca" style="table" stretchType="RelativeToTallestObject" x="575" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(6)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="f3a3b277-c6a2-459b-a698-af668d52d0b2" style="table" stretchType="RelativeToTallestObject" x="235" y="0" width="68" height="20"/>
+				<reportElement uuid="f3a3b277-c6a2-459b-a698-af668d52d0b2" style="table" stretchType="RelativeToTallestObject" x="235" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(1)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c94b1ff0-78c5-45ce-be1f-853eebe502d8" style="table" stretchType="RelativeToTallestObject" x="303" y="0" width="68" height="20"/>
+				<reportElement uuid="c94b1ff0-78c5-45ce-be1f-853eebe502d8" style="table" stretchType="RelativeToTallestObject" x="303" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c604c390-4fc9-41dc-b969-57012ec8db23" style="table" stretchType="RelativeToTallestObject" x="507" y="0" width="68" height="20"/>
+				<reportElement uuid="c604c390-4fc9-41dc-b969-57012ec8db23" style="table" stretchType="RelativeToTallestObject" x="507" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(5)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="e61937e1-daff-4fda-87e4-0bf12bd501e2" style="table" stretchType="RelativeToTallestObject" x="643" y="0" width="68" height="20"/>
+				<reportElement uuid="e61937e1-daff-4fda-87e4-0bf12bd501e2" style="table" stretchType="RelativeToTallestObject" x="643" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(7)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="50b92db6-6210-4896-a0a1-30f8720a481a" style="table" stretchType="RelativeToTallestObject" x="983" y="0" width="68" height="20"/>
+				<reportElement uuid="50b92db6-6210-4896-a0a1-30f8720a481a" style="table" stretchType="RelativeToTallestObject" x="983" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(12)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="4f11de66-c433-451b-b3e3-5288d992e7e8" style="table" stretchType="RelativeToTallestObject" x="847" y="0" width="68" height="20"/>
+				<reportElement uuid="4f11de66-c433-451b-b3e3-5288d992e7e8" style="table" stretchType="RelativeToTallestObject" x="847" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(10)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="6d61a6a8-d035-4117-baaa-33ecc021c037" style="table" stretchType="RelativeToTallestObject" x="1051" y="0" width="68" height="20"/>
+				<reportElement uuid="6d61a6a8-d035-4117-baaa-33ecc021c037" style="table" stretchType="RelativeToTallestObject" x="1051" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(13)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="95bab36e-2568-4da8-91bc-a0139ad5dae4" style="table" stretchType="RelativeToTallestObject" x="915" y="0" width="68" height="20"/>
+				<reportElement uuid="95bab36e-2568-4da8-91bc-a0139ad5dae4" style="table" stretchType="RelativeToTallestObject" x="915" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(11)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="0b969a4b-2e8e-4baa-9d59-bcc5bfe15eed" style="table" stretchType="RelativeToTallestObject" x="779" y="0" width="68" height="20"/>
+				<reportElement uuid="0b969a4b-2e8e-4baa-9d59-bcc5bfe15eed" style="table" stretchType="RelativeToTallestObject" x="779" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(9)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="9c03ec01-abdf-44a0-9ac5-64ef88806b1d" style="table" stretchType="RelativeToTallestObject" x="711" y="0" width="68" height="20"/>
+				<reportElement uuid="9c03ec01-abdf-44a0-9ac5-64ef88806b1d" style="table" stretchType="RelativeToTallestObject" x="711" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(8)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="eaabdee0-2120-4584-bc77-94e99f15bc14" style="table" stretchType="RelativeToTallestObject" x="1119" y="0" width="68" height="20"/>
+				<reportElement uuid="eaabdee0-2120-4584-bc77-94e99f15bc14" style="table" stretchType="RelativeToTallestObject" x="1119" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(14)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="abab2cea-d07d-4755-9b0e-8ec0bd515eb9" style="table" stretchType="RelativeToTallestObject" x="1459" y="0" width="68" height="20"/>
+				<reportElement uuid="abab2cea-d07d-4755-9b0e-8ec0bd515eb9" style="table" stretchType="RelativeToTallestObject" x="1459" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(19)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="43e56c86-f65b-4744-a14c-10d01c765197" style="table" stretchType="RelativeToTallestObject" x="1867" y="0" width="68" height="20"/>
+				<reportElement uuid="43e56c86-f65b-4744-a14c-10d01c765197" style="table" stretchType="RelativeToTallestObject" x="1867" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(25)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="af48d5f1-cff8-40b2-b219-c7bac09f2de7" style="table" stretchType="RelativeToTallestObject" x="1323" y="0" width="68" height="20"/>
+				<reportElement uuid="af48d5f1-cff8-40b2-b219-c7bac09f2de7" style="table" stretchType="RelativeToTallestObject" x="1323" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(17)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="33030376-fd19-42ae-bcf5-36cc015b9d6f" style="table" stretchType="RelativeToTallestObject" x="1731" y="0" width="68" height="20"/>
+				<reportElement uuid="33030376-fd19-42ae-bcf5-36cc015b9d6f" style="table" stretchType="RelativeToTallestObject" x="1731" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(23)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="598a6a10-8170-4577-923f-acec70de748a" style="table" stretchType="RelativeToTallestObject" x="1663" y="0" width="68" height="20"/>
+				<reportElement uuid="598a6a10-8170-4577-923f-acec70de748a" style="table" stretchType="RelativeToTallestObject" x="1663" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(22)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="0a65cf09-deb2-4372-bc7e-f1a2e60f0a00" style="table" stretchType="RelativeToTallestObject" x="1527" y="0" width="68" height="20"/>
+				<reportElement uuid="0a65cf09-deb2-4372-bc7e-f1a2e60f0a00" style="table" stretchType="RelativeToTallestObject" x="1527" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(20)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="9cb84a36-0eee-498e-80b9-95462309a7f5" style="table" stretchType="RelativeToTallestObject" x="1391" y="0" width="68" height="20"/>
+				<reportElement uuid="9cb84a36-0eee-498e-80b9-95462309a7f5" style="table" stretchType="RelativeToTallestObject" x="1391" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(18)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="fb80da5a-ea2f-4e12-b13e-415c1d2c54b5" style="table" stretchType="RelativeToTallestObject" x="1255" y="0" width="68" height="20"/>
+				<reportElement uuid="fb80da5a-ea2f-4e12-b13e-415c1d2c54b5" style="table" stretchType="RelativeToTallestObject" x="1255" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(16)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="280ee531-b1dc-4014-a56e-2719fb9b8b03" style="table" stretchType="RelativeToTallestObject" x="1799" y="0" width="68" height="20"/>
+				<reportElement uuid="280ee531-b1dc-4014-a56e-2719fb9b8b03" style="table" stretchType="RelativeToTallestObject" x="1799" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(24)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="0395ada0-3b63-49d1-b9fe-1321a007834b" style="table" stretchType="RelativeToTallestObject" x="1595" y="0" width="68" height="20"/>
+				<reportElement uuid="0395ada0-3b63-49d1-b9fe-1321a007834b" style="table" stretchType="RelativeToTallestObject" x="1595" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(21)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c42bf9f3-7bca-41cd-84d8-77061bffb2ce" style="table" stretchType="RelativeToTallestObject" x="1935" y="0" width="68" height="20"/>
+				<reportElement uuid="c42bf9f3-7bca-41cd-84d8-77061bffb2ce" style="table" stretchType="RelativeToTallestObject" x="1935" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(26)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="0ea20631-e925-4b34-9bef-9cf59eace668" style="table" stretchType="RelativeToTallestObject" x="1187" y="0" width="68" height="20"/>
+				<reportElement uuid="0ea20631-e925-4b34-9bef-9cf59eace668" style="table" stretchType="RelativeToTallestObject" x="1187" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(15)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="5cdb669f-005d-49b8-8355-ce15ae278c73" style="table" stretchType="RelativeToTallestObject" x="2003" y="0" width="68" height="20"/>
+				<reportElement uuid="5cdb669f-005d-49b8-8355-ce15ae278c73" style="table" stretchType="RelativeToTallestObject" x="2003" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(27)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="fa5b9cad-94c5-47d2-b12b-6254c2e59e71" style="table" stretchType="RelativeToTallestObject" x="2139" y="0" width="68" height="20"/>
+				<reportElement uuid="fa5b9cad-94c5-47d2-b12b-6254c2e59e71" style="table" stretchType="RelativeToTallestObject" x="2139" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(29)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="702b9a8f-0a93-487b-aeea-e0f08524fd17" style="table" stretchType="RelativeToTallestObject" x="2207" y="0" width="68" height="20"/>
+				<reportElement uuid="702b9a8f-0a93-487b-aeea-e0f08524fd17" style="table" stretchType="RelativeToTallestObject" x="2207" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(30)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="b840fb42-d220-4977-a44c-8d04408ed9e6" style="table" stretchType="RelativeToTallestObject" x="2071" y="0" width="68" height="20"/>
+				<reportElement uuid="b840fb42-d220-4977-a44c-8d04408ed9e6" style="table" stretchType="RelativeToTallestObject" x="2071" y="0" width="68" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{timeList}.get(28)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="298d7674-db78-4175-b12a-f56ebd4cb78c" style="table" stretchType="RelativeToTallestObject" x="2275" y="0" width="125" height="20"/>
+				<reportElement uuid="298d7674-db78-4175-b12a-f56ebd4cb78c" style="table" stretchType="RelativeToTallestObject" x="2275" y="0" width="125" height="20">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
