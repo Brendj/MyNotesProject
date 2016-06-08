@@ -5,24 +5,17 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTemplateFileNameMenu;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.ws.security.util.StringUtil;
 import org.richfaces.model.UploadItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,11 +44,13 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
     }
 
     public class Item implements Comparable{
+        private String reportName = "";
         private String name = "";
         private Date dateEdit;
         private long size;
 
-        public Item(String name, Date dateEdit, long size) {
+        public Item(String reportName, String name, Date dateEdit, long size) {
+            this.reportName = reportName;
             this.name = name;
             this.dateEdit = dateEdit;
             this.size = size;
@@ -64,6 +59,14 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
         public String getSizeInStr() {
             DecimalFormat f = new DecimalFormat("#####0.#");
             return f.format(size/1024.0);
+        }
+
+        public String getReportName() {
+            return reportName;
+        }
+
+        public void setReportName(String reportName) {
+            this.reportName = reportName;
         }
 
         public String getName() {
@@ -139,7 +142,12 @@ public class ReportTemplateManagerPage extends BasicWorkspacePage {
             SelectItem[] templateFilesNameList = reportTemplateFileNameMenu.getItemsWithForcedReload();
             for (SelectItem s : templateFilesNameList) {
                 File file = (File)s.getValue();
-                items.add(new Item(s.getLabel(), new Date(file.lastModified()), file.length()));
+                String name = s.getLabel();
+                String reportName = ReportRuleConstants.REPORT_NAME_MAP.get(name);
+                if (reportName == null) {
+                    reportName = "Неизвестно";
+                }
+                items.add(new Item(reportName, name, new Date(file.lastModified()), file.length()));
             }
         }
     }

@@ -16,33 +16,40 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid id="reportTemplateManagerGrid" binding="#{mainPage.reportTemplateManagerPage.pageComponent}" styleClass="borderless-grid" columns="1" width="700px">
+<h:panelGrid id="reportTemplateManagerGrid" binding="#{mainPage.reportTemplateManagerPage.pageComponent}" styleClass="borderless-grid" columns="1" width="1150">
 
     <rich:dataTable id="reportTemplateListTable" value="#{mainPage.reportTemplateManagerPage.items}" var="item"
-                    columnClasses="left-aligned-column, center-aligned-column, right-aligned-column, center-aligned-column"
-                    width="100%">
-        <rich:column headerClass="column-header">
+                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, right-aligned-column, center-aligned-column"
+                    width="1150">
+        <rich:column headerClass="column-header" width="350">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Название отчета" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.reportName}" styleClass="output-text" />
+        </rich:column>
+
+        <rich:column headerClass="column-header" width="350">
             <f:facet name="header">
                 <h:outputText escape="true" value="Имя файла" />
             </f:facet>
             <h:outputText escape="true" value="#{item.name}" styleClass="output-text" />
         </rich:column>
 
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="200">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.dateEdit}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
 
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
                 <h:outputText escape="true" value="Размер (Кб)" />
             </f:facet>
             <h:outputText escape="true" value="#{item.sizeInStr}" styleClass="output-text" />
         </rich:column>
 
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="100">
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
