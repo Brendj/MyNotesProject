@@ -33,7 +33,6 @@ import ru.axetta.ecafe.processor.core.report.statistics.payment.preferential.sup
 import ru.axetta.ecafe.processor.core.report.statistics.telephone.number.TelephoneNumberCountReport;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.report.online.InteractiveCardDataReport;
 
 import org.apache.commons.lang.StringUtils;
 

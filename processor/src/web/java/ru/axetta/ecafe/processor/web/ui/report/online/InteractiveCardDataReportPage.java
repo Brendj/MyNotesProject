@@ -12,8 +12,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.TransactionsReport;
+import ru.axetta.ecafe.processor.core.report.InteractiveCardDataReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.hibernate.Session;
@@ -25,11 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import javax.faces.event.ActionEvent;
 import java.io.FileNotFoundException;
 import java.util.GregorianCalendar;
 
