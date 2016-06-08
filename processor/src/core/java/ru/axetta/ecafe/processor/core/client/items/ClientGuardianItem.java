@@ -15,12 +15,15 @@ public class ClientGuardianItem {
     private String personName;
     private Boolean disabled;
     private String mobile;
+    private final boolean isNew;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.mobile = client.getMobile();
+        this.disabled = false;
+        isNew = true;
     }
 
     public ClientGuardianItem(Client client, Boolean disabled) {
@@ -29,6 +32,7 @@ public class ClientGuardianItem {
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
+        isNew = false;
     }
 
     public Long getIdOfClient() {
@@ -43,8 +47,24 @@ public class ClientGuardianItem {
         return personName;
     }
 
-    public Boolean isDisabled() {
+    public Boolean getDisabled() {
         return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public Boolean getEnabled() {
+        return !disabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.disabled = !enabled;
+    }
+
+    public boolean getIsNew() {
+        return isNew;
     }
 
     public String getMobile() {

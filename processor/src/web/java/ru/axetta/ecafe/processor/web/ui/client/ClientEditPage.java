@@ -194,6 +194,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.categoryDiscountList = categoryDiscountList;
     }
 
+    private String typeAddClient;
+
+    public String getTypeAddClient() {
+        return typeAddClient;
+    }
+
+    public void setTypeAddClient(String typeAddClient) {
+        this.typeAddClient = typeAddClient;
+    }
+
     private static final int CONTRACT_ID_MAX_LENGTH = ContractIdFormat.MAX_LENGTH;
 
     private Long idOfClient;
@@ -623,7 +633,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         //}
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
-
+        this.clientWardItems = loadWardsByClient(session, idOfClient);
 
         fill(client);
     }
@@ -635,7 +645,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public Object removeClientGuardian() {
         if (currentClientGuardian != null && !clientGuardianItems.isEmpty()) {
             clientGuardianItems.remove(currentClientGuardian);
-            removeListGuardianItems.add(currentClientGuardian);
+            //removeListGuardianItems.add(currentClientGuardian);
         }
         return null;
     }
@@ -650,11 +660,48 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.currentClientGuardian = currentClientGuardian;
     }
 
+    private ClientGuardianItem currentClientWard;
+
+    public ClientGuardianItem getCurrentClientWard() {
+        return currentClientWard;
+    }
+
+    public void setCurrentClientWard(ClientGuardianItem currentClientWard) {
+        this.currentClientWard = currentClientWard;
+    }
+
+    public Object removeClientWard() {
+        if (currentClientWard != null && !clientWardItems.isEmpty()) {
+            clientWardItems.remove(currentClientWard);
+        }
+        return null;
+    }
+
     private List<ClientGuardianItem> clientGuardianItems;
     private List<ClientGuardianItem> removeListGuardianItems = new ArrayList<ClientGuardianItem>();
 
     public List<ClientGuardianItem> getClientGuardianItems() {
         return clientGuardianItems;
+    }
+
+    private List<ClientGuardianItem> clientWardItems;
+
+    public List<ClientGuardianItem> getClientWardItems() {
+        return clientWardItems;
+    }
+
+    public boolean existAddedGuardians() {
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (item.getIsNew()) return true;
+        }
+        return false;
+    }
+
+    public boolean existAddedWards() {
+        for (ClientGuardianItem item : clientWardItems) {
+            if (item.getIsNew()) return true;
+        }
+        return false;
     }
 
     private boolean isParent(String groupName) {
@@ -664,7 +711,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public void completeClientSelection(Session session, Long idOfClient) throws Exception {
         if (null != idOfClient) {
             Client client = (Client) session.load(Client.class, idOfClient);
-            clientGuardianItems.add(new ClientGuardianItem(client));
+            if (typeAddClient == null) return;
+            if (typeAddClient.equals("guardian")) {
+                clientGuardianItems.add(new ClientGuardianItem(client));
+            }
+            if (typeAddClient.equals("ward")) {
+                clientWardItems.add(new ClientGuardianItem(client));
+            }
         }
     }
 
@@ -925,6 +978,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+        }
+
+        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
         }
 
         client.setGender(this.gender);

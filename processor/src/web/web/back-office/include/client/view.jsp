@@ -183,7 +183,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{!clientGuardian.isDisabled()}" disabled="true" readonly="true" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{!clientGuardian.disabled}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 
@@ -217,7 +217,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{!clientWard.isDisabled()}" disabled="true" readonly="true" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{!clientWard.disabled}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 
