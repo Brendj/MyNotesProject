@@ -233,6 +233,10 @@
         </f:facet>
     </rich:dataTable>
 
+    <h:outputText escape="true" value="" styleClass="output-text"/>
+    <rich:messages id="messages" styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
     <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
     <rich:dataTable id="clientWardEditTable" value="#{mainPage.clientEditPage.clientWardItems}" var="clientWard"
                     columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"

@@ -22,6 +22,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
@@ -40,7 +41,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         ClientGroupSelectPage.CompleteHandler,
         ClientSelectPage.CompleteHandler {
 
-
+    private final String MESSAGE_GUARDIAN_EXISTS = "Ошибка: выбранный клиент уже присутствует в списке";
+    private final String MESSAGE_GUARDIAN_SAME = "Ошибка: выбранный клиент редактируется в данный момент";
     private String fax;
 
     public void setFax(String fax) {
@@ -713,12 +715,54 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             Client client = (Client) session.load(Client.class, idOfClient);
             if (typeAddClient == null) return;
             if (typeAddClient.equals("guardian")) {
-                clientGuardianItems.add(new ClientGuardianItem(client));
+                if (!guardianExists(idOfClient))
+                    clientGuardianItems.add(new ClientGuardianItem(client));
             }
             if (typeAddClient.equals("ward")) {
-                clientWardItems.add(new ClientGuardianItem(client));
+                if (!wardExists(idOfClient))
+                    clientWardItems.add(new ClientGuardianItem(client));
             }
         }
+    }
+
+    private boolean guardianExists(Long idOfClient) {
+        if (this.idOfClient.equals(idOfClient)) {
+            printMessage(MESSAGE_GUARDIAN_SAME);
+            return true;
+        }
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (item.getIdOfClient().equals(idOfClient)) {
+                printMessage(MESSAGE_GUARDIAN_EXISTS);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean wardExists(Long idOfClient) {
+        if (this.idOfClient.equals(idOfClient)) {
+            printMessage(MESSAGE_GUARDIAN_SAME);
+            return true;
+        }
+        for (ClientGuardianItem item : clientWardItems) {
+            if (item.getIdOfClient().equals(idOfClient)) {
+                printMessage(MESSAGE_GUARDIAN_EXISTS);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void printMessage(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }
+
+    public void printMessage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, "NOT OK", null));
     }
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {

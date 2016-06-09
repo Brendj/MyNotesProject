@@ -124,7 +124,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Ok" action="#{mainPage.completeClientSelection}"
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.hide();"
+                                           oncomplete="#{rich:component('modalClientSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
                         <a4j:commandButton value="Отмена" action="#{mainPage.completeClientSelection}"
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
