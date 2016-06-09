@@ -4,10 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
 
@@ -20,6 +24,8 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
 
 public class Migrants {
     private final Long idOfOrg;
+    private final List<Long> currentActiveOutcome;
+    private final Map<Long, List<Long>> currentActiveIncome;
     private final List<OutcomeMigrationRequestsItem> outcomeMigrationRequestsItems;
     private final List<OutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems;
     private final List<IncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems;
@@ -29,6 +35,18 @@ public class Migrants {
 
         Node outcomeMigrationRequestsNode = findFirstChildElement(migrantsRequestNode, "OutcomeMigrationRequests");
         this.outcomeMigrationRequestsItems = new ArrayList<OutcomeMigrationRequestsItem>();
+
+        currentActiveOutcome = new ArrayList<Long>();
+        String outcomeCurrentActive = XMLUtils.getStringAttributeValue(outcomeMigrationRequestsNode, "CurrentActive", 10000);
+        if(outcomeCurrentActive != null) {
+            if(outcomeCurrentActive.length() > 0) {
+                String[] outcomeIds = outcomeCurrentActive.split(",");
+                for (String id : outcomeIds) {
+                    currentActiveOutcome.add(Long.parseLong(id));
+                }
+            }
+        }
+
         if(outcomeMigrationRequestsNode != null) {
             Node outMigReqItemNode = outcomeMigrationRequestsNode.getFirstChild();
             while (null != outMigReqItemNode) {
@@ -59,6 +77,24 @@ public class Migrants {
 
         Node incomeMigrationRequestsHistoryNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequestsHistory");
         this.incomeMigrationRequestsHistoryItems = new ArrayList<IncomeMigrationRequestsHistoryItem>();
+
+        currentActiveIncome = new HashMap<Long, List<Long>>();
+        String incomeCurrentActive = XMLUtils.getStringAttributeValue(incomeMigrationRequestsHistoryNode, "CurrentActive", 10000);
+        if(incomeCurrentActive != null) {
+            if(incomeCurrentActive.length() > 0) {
+                String[] incomeIdsForOrg = incomeCurrentActive.split(";");
+                for (String idForOrg : incomeIdsForOrg) {
+                    String[] orgAndId = idForOrg.split(":");
+                    Long idOfOrg = Long.parseLong(orgAndId[0]);
+                    List<Long> idsForOrg = new ArrayList<Long>();
+                    for(String id : orgAndId[1].split(",")){
+                        idsForOrg.add(Long.parseLong(id));
+                    }
+                    currentActiveIncome.put(idOfOrg, idsForOrg);
+                }
+            }
+        }
+
         if(incomeMigrationRequestsHistoryNode != null){
             Node inMigReqHisItemNode = incomeMigrationRequestsHistoryNode.getFirstChild();
             while (null != inMigReqHisItemNode) {
@@ -74,6 +110,14 @@ public class Migrants {
 
     public Long getIdOfOrg() {
         return idOfOrg;
+    }
+
+    public List<Long> getCurrentActiveOutcome() {
+        return currentActiveOutcome;
+    }
+
+    public Map<Long, List<Long>> getCurrentActiveIncome() {
+        return currentActiveIncome;
     }
 
     public List<OutcomeMigrationRequestsItem> getOutcomeMigrationRequestsItems() {

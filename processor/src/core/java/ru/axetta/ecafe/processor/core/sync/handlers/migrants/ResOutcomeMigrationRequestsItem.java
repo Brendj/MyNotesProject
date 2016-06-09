@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +22,10 @@ import org.w3c.dom.Element;
 
 public class ResOutcomeMigrationRequestsItem {
     private Long idOfRequest;
+    private Long idOfClient;
+    private Long idOfOrgVisit;
+    private Date visitStartDate;
+    private Date visitEndDate;
     private Integer resCode;
     private String errorMessage;
 
@@ -32,6 +39,10 @@ public class ResOutcomeMigrationRequestsItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "IdOfRequest", idOfRequest);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrgVisit", idOfOrgVisit);
+        XMLUtils.setAttributeIfNotNull(element, "VisitStartDate", visitStartDate != null ? CalendarUtils.dateTimeToString(visitStartDate): null);
+        XMLUtils.setAttributeIfNotNull(element, "VisitEndDate", visitEndDate != null ? CalendarUtils.dateTimeToString(visitEndDate) : null);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         if (resCode != null && resCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
@@ -45,6 +56,38 @@ public class ResOutcomeMigrationRequestsItem {
 
     public void setIdOfRequest(Long idOfRequest) {
         this.idOfRequest = idOfRequest;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
+    }
+
+    public Long getIdOfOrgVisit() {
+        return idOfOrgVisit;
+    }
+
+    public void setIdOfOrgVisit(Long idOfOrgVisit) {
+        this.idOfOrgVisit = idOfOrgVisit;
+    }
+
+    public Date getVisitStartDate() {
+        return visitStartDate;
+    }
+
+    public void setVisitStartDate(Date visitStartDate) {
+        this.visitStartDate = visitStartDate;
+    }
+
+    public Date getVisitEndDate() {
+        return visitEndDate;
+    }
+
+    public void setVisitEndDate(Date visitEndDate) {
+        this.visitEndDate = visitEndDate;
     }
 
     public Integer getResCode() {

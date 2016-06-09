@@ -2252,6 +2252,19 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<VisitReqResolutionHist> getSyncedResolutionsForMigrants(Session session, List<Migrant> migrants) throws Exception {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.add(Restrictions.in("migrant", migrants));
+        criteria.add(Restrictions.eq("syncState", VisitReqResolutionHist.SYNCHRONIZED));
+        return criteria.list();
+    }
+
+    public static List<VisitReqResolutionHist> getResolutionsForMigrants(Session session, List<Migrant> migrants) throws Exception {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.add(Restrictions.in("migrant", migrants));
+        return criteria.list();
+    }
+
     public static List<Client> getActiveMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Set<Client> clients = new HashSet<Client>();
         List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
@@ -2288,6 +2301,26 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
         criteria.add(Restrictions.lt("visitStartDate", date));
         criteria.add(Restrictions.gt("visitEndDate", date));
+        return criteria.list();
+    }
+
+    public static List<Migrant> getSyncedMigrantsForOrgVisit(Session session, Long idOfOrg) throws Exception {
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.lt("visitStartDate", date));
+        criteria.add(Restrictions.gt("visitEndDate", date));
+        criteria.add(Restrictions.eq("syncState", Migrant.SYNCHRONIZED));
+        return criteria.list();
+    }
+
+    public static List<Migrant> getMigrantsIdsForOrgReg(Session session, Long idOfOrg) throws Exception {
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.lt("visitStartDate", date));
+        criteria.add(Restrictions.gt("visitEndDate", date));
+        criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
         return criteria.list();
     }
 

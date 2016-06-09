@@ -21,6 +21,7 @@ import java.util.List;
 public class MigrantsData extends AbstractToElement {
     private List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems;
     private List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems;
+    private List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems;
     private List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems;
 
     @Override
@@ -38,6 +39,12 @@ public class MigrantsData extends AbstractToElement {
             inMigReqHis.appendChild(item.toElement(document, "IMRH"));
         }
         migrantsData.appendChild(inMigReqHis);
+
+        Element outMigReq = document.createElement("OutcomeMigrationRequests");
+        for (ResOutcomeMigrationRequestsItem item : this.getOutcomeMigrationRequestsItems()) {
+            outMigReq.appendChild(item.toElement(document, "OMR"));
+        }
+        migrantsData.appendChild(outMigReq);
 
         Element outMigReqHis = document.createElement("OutcomeMigrationRequestsHistory");
         for (ResOutcomeMigrationRequestsHistoryItem item : this.getOutcomeMigrationRequestsHistoryItems()) {
@@ -66,6 +73,14 @@ public class MigrantsData extends AbstractToElement {
     public void setIncomeMigrationRequestsHistoryItems(
             List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems) {
         this.incomeMigrationRequestsHistoryItems = incomeMigrationRequestsHistoryItems;
+    }
+
+    public List<ResOutcomeMigrationRequestsItem> getOutcomeMigrationRequestsItems() {
+        return outcomeMigrationRequestsItems;
+    }
+
+    public void setOutcomeMigrationRequestsItems(List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems) {
+        this.outcomeMigrationRequestsItems = outcomeMigrationRequestsItems;
     }
 
     public List<ResOutcomeMigrationRequestsHistoryItem> getOutcomeMigrationRequestsHistoryItems() {

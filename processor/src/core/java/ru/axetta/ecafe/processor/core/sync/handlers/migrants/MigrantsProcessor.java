@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -25,10 +26,12 @@ import java.util.List;
 public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private static final Logger logger = LoggerFactory.getLogger(MigrantsProcessor.class);
     private final Migrants migrants;
+    private List<Migrant> migrantsForOutRequests;
 
     public MigrantsProcessor(Session persistenceSession, Migrants migrants) {
         super(persistenceSession);
         this.migrants = migrants;
+        migrantsForOutRequests = new ArrayList<Migrant>();
     }
 
     @Override
@@ -38,52 +41,236 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems = new ArrayList<ResOutcomeMigrationRequestsHistoryItem>();
         List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems = new ArrayList<ResIncomeMigrationRequestsHistoryItem>();
 
-        try{
-            ResOutcomeMigrationRequestsItem resOutcomeMigrationRequestsItem;
-            for(OutcomeMigrationRequestsItem outMigReqItem : migrants.getOutcomeMigrationRequestsItems()){
-                if(outMigReqItem.getResCode().equals(OutcomeMigrationRequestsItem.ERROR_CODE_ALL_OK)){
-                    CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(outMigReqItem.getIdOfRequest(), outMigReqItem.getIdOfOrgRegistry());
-                    Migrant migrant = DAOUtils.findMigrant(session, compositeIdOfMigrant);
-                    if(migrant != null){
-                        if(migrant.getClientMigrate().getIdOfClient().equals(outMigReqItem.getIdOfClient())&&
-                                migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&
-                                migrant.getVisitStartDate().equals(outMigReqItem.getVisitStartDate())&&
-                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate())){
-                            resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
-                            resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
-                        } else {
-                            resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
-                            resOutcomeMigrationRequestsItem.setResCode(110);
-                            resOutcomeMigrationRequestsItem.setErrorMessage("OutcomeMigrationRequests with IdOfRequest=" + outMigReqItem.getIdOfRequest()
-                                    + " but with other attributes already exists");
-                        }
-                    } else {
-                        Org orgRegistry = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgRegistry());
-                        Org orgVisit = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgVisit());
-                        Contragent contragent = (Contragent)session.load(Contragent.class, orgRegistry.getDefaultSupplier().getIdOfContragent());
-                        Client clientMigrate = (Client)session.load(Client.class, outMigReqItem.getIdOfClient());
-                        migrant = new Migrant(compositeIdOfMigrant, orgRegistry.getDefaultSupplier(), clientMigrate,
-                                orgVisit, outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
-                        migrant.setOrgRegVendor(contragent);
-                        session.save(migrant);
-                        resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
-                        resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
-                    }
-                    session.flush();
-                } else {
-                    resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem();
-                    resOutcomeMigrationRequestsItem.setIdOfRequest(outMigReqItem.getIdOfRequest());
-                    resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
-                    resOutcomeMigrationRequestsItem.setErrorMessage(outMigReqItem.getErrorMessage());
-                }
-                outcomeMigrationRequestsItems.add(resOutcomeMigrationRequestsItem);
-            }
+        processCurrentActiveIncomeReqs();
 
-        } catch (Exception e) {
-            logger.error("Error saving OutcomeMigrationRequests", e);
+        if (processOutMigReqItems(outcomeMigrationRequestsItems)) {
+            return null;
+        }
+        if (processOutMigReqHisItems(outcomeMigrationRequestsHistoryItems)) {
+            return null;
+        }
+        if (processInMigReqHisItems(incomeMigrationRequestsHistoryItems)) {
             return null;
         }
 
+        result.setResOutcomeMigrationRequestsItems(outcomeMigrationRequestsItems);
+        result.setResOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
+        result.setResIncomeMigrationRequestsHistoryItems(incomeMigrationRequestsHistoryItems);
+        return result;
+    }
+
+    public MigrantsData processData() throws Exception {
+        MigrantsData result = new MigrantsData();
+        List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems = new ArrayList<ResIncomeMigrationRequestsItem>();
+        List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems = new ArrayList<ResIncomeMigrationRequestsHistoryItem>();
+        List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems = new ArrayList<ResOutcomeMigrationRequestsItem>();
+        List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems = new ArrayList<ResOutcomeMigrationRequestsHistoryItem>();
+
+        processResInMigReqItems(incomeMigrationRequestsItems);
+        processResInMigReqHisItems(incomeMigrationRequestsHistoryItems);
+        processResOutMigReqItems(outcomeMigrationRequestsItems);
+        processResOutMigReqHisItems(outcomeMigrationRequestsHistoryItems);
+
+        result.setIncomeMigrationRequestsItems(incomeMigrationRequestsItems);
+        result.setIncomeMigrationRequestsHistoryItems(incomeMigrationRequestsHistoryItems);
+        result.setOutcomeMigrationRequestsItems(outcomeMigrationRequestsItems);
+        result.setOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
+        return result;
+    }
+
+    private void processCurrentActiveIncomeReqs() throws Exception {
+        for(Long currentOrg : migrants.getCurrentActiveIncome().keySet()){
+            List<Migrant> currentMigrants = DAOUtils.getSyncedMigrantsForOrgVisit(session,currentOrg);
+            List<Long> currentActiveIncomeInOrg = migrants.getCurrentActiveIncome().get(currentOrg);
+            List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
+            for(Migrant m : currentMigrants) {
+                if (!currentActiveIncomeInOrg.contains(m.getCompositeIdOfMigrant().getIdOfRequest())) {
+                    m.setSyncState(Migrant.NOT_SYNCHRONIZED);
+                    session.save(m);
+                    currentMigrantsForSync.add(m);
+                }
+            }
+            List<VisitReqResolutionHist> resolutionHistList = DAOUtils.getSyncedResolutionsForMigrants(session, currentMigrantsForSync);
+            for(VisitReqResolutionHist v : resolutionHistList){
+                v.setSyncState(VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                session.save(v);
+            }
+        }
+        session.flush();
+    }
+
+    private void processResOutMigReqHisItems(
+            List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems) throws Exception {
+        ResOutcomeMigrationRequestsHistoryItem outMigReqHisItem;
+        List<VisitReqResolutionHist> visitReqResolutionHistList1 = DAOUtils.getOutcomeResolutionsForOrg(session,
+                migrants.getIdOfOrg());
+        visitReqResolutionHistList1.addAll(DAOUtils.getResolutionsForMigrants(session, migrantsForOutRequests));
+        // remove duplicates
+        visitReqResolutionHistList1 =
+                new ArrayList<VisitReqResolutionHist>(new LinkedHashSet<VisitReqResolutionHist>(visitReqResolutionHistList1));
+        for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList1){
+            outMigReqHisItem = new ResOutcomeMigrationRequestsHistoryItem();
+            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
+                outMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+                outMigReqHisItem.setResolution(vReqHis.getResolution());
+            } else {
+                outMigReqHisItem.setIdOfOrgIssuer(-1L);
+                outMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
+            }
+            outMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
+            outMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
+            outMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
+            if(vReqHis.getClientResol() != null) {
+                outMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            } else {
+                outMigReqHisItem.setIdOfClientResol(-1L);
+            }
+            outMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
+            outcomeMigrationRequestsHistoryItems.add(outMigReqHisItem);
+            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
+            session.save(vReqHis);
+        }
+    }
+
+    private void processResInMigReqHisItems(
+            List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems) throws Exception {
+        ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
+        List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
+        for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
+            inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
+            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
+                inMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
+                inMigReqHisItem.setResolution(vReqHis.getResolution());
+            } else {
+                inMigReqHisItem.setIdOfOrgIssuer(-1L);
+                inMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
+            }
+            inMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
+            inMigReqHisItem.setIdOfOrgRegistry(vReqHis.getOrgRegistry().getIdOfOrg());
+            inMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
+            inMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
+            if(vReqHis.getClientResol() != null) {
+                inMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
+            } else {
+                inMigReqHisItem.setIdOfClientResol(-1L);
+            }
+            inMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
+            incomeMigrationRequestsHistoryItems.add(inMigReqHisItem);
+            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
+            session.save(vReqHis);
+        }
+    }
+
+    private void processResInMigReqItems(List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems)
+            throws Exception {
+        ResIncomeMigrationRequestsItem inMigReqItem;
+        List<Migrant> migrantList = DAOUtils.getMigrantsForOrg(session, migrants.getIdOfOrg());
+        for(Migrant migrant : migrantList){
+            inMigReqItem = new ResIncomeMigrationRequestsItem(migrant);
+            inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
+            inMigReqItem.setIdOfVendorOrgReg(migrant.getOrgRegVendor().getIdOfContragent());
+            inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortName());
+            inMigReqItem.setIdOfMigrClient(migrant.getClientMigrate().getIdOfClient());
+            inMigReqItem.setNameOfMigrClient(migrant.getClientMigrate().getPerson().getFullName());
+            inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
+            inMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
+            inMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
+            incomeMigrationRequestsItems.add(inMigReqItem);
+            migrant.setSyncState(Migrant.SYNCHRONIZED);
+            session.save(migrant);
+        }
+        session.flush();
+    }
+
+    private void processResOutMigReqItems(List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems)
+            throws Exception {
+        ResOutcomeMigrationRequestsItem outMigReqItem;
+        List<Migrant> migrantList = DAOUtils.getMigrantsIdsForOrgReg(session, migrants.getIdOfOrg());
+        for(Migrant migrant : migrantList){
+            if(!migrants.getCurrentActiveOutcome().contains(migrant.getCompositeIdOfMigrant().getIdOfRequest())){
+                migrantsForOutRequests.add(migrant);
+                outMigReqItem = new ResOutcomeMigrationRequestsItem(migrant);
+                outMigReqItem.setIdOfClient(migrant.getClientMigrate().getIdOfClient());
+                outMigReqItem.setIdOfOrgVisit(migrant.getOrgVisit().getIdOfOrg());
+                outMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
+                outMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
+                outcomeMigrationRequestsItems.add(outMigReqItem);
+            }
+        }
+        session.flush();
+    }
+
+    private boolean processInMigReqHisItems(
+            List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems) {
+        try{
+            ResIncomeMigrationRequestsHistoryItem resIncomeMigrationRequestsHistoryItem;
+            for(IncomeMigrationRequestsHistoryItem inMigReqHisItem : migrants.getIncomeMigrationRequestsHistoryItems()){
+                if(inMigReqHisItem.getResCode().equals(IncomeMigrationRequestsHistoryItem.ERROR_CODE_ALL_OK)){
+                    CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist
+                            = new CompositeIdOfVisitReqResolutionHist(inMigReqHisItem.getIdOfRecord(), inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
+                            .getIdOfOrgRegistry());
+                    VisitReqResolutionHist inMigReqHis = DAOUtils.findVisitReqResolutionHist(session,
+                            compositeIdOfVisitReqResolutionHist);
+                    if(inMigReqHis != null){
+                        if(inMigReqHis.getOrgRegistry().getIdOfOrg().equals(inMigReqHisItem.getIdOfOrgRegistry())&&
+                                inMigReqHis.getResolution().equals(inMigReqHisItem.getResolution())&&
+                                inMigReqHis.getResolutionDateTime().equals(inMigReqHisItem.getResolutionDateTime())&&
+                                inMigReqHis.getResolutionCause().equals(inMigReqHisItem.getResolutionCause())&&
+                                inMigReqHis.getClientResol().getIdOfClient().equals(inMigReqHisItem.getIdOfClientResol())&&
+                                inMigReqHis.getContactInfo().equals(inMigReqHisItem.getContactInfo())){
+                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
+                            resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
+                        } else {
+                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
+                            resIncomeMigrationRequestsHistoryItem.setResCode(120);
+                            resIncomeMigrationRequestsHistoryItem.setErrorMessage(
+                                    "IncomeMigrationRequestsHistory with IdOfRecord=" + inMigReqHisItem.getIdOfRecord()
+                                            + " but with other attributes already exists");
+                        }
+                    } else {
+                        Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
+                                .getIdOfOrgRequestIssuer()));
+                        if(migrant != null){
+                            Org orgReqIss = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRequestIssuer());
+                            Client clientResol = (Client)session.load(Client.class, inMigReqHisItem.getIdOfClientResol());
+                            inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
+                                    inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
+                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                            session.save(inMigReqHis);
+                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
+                            resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
+                            if(inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_REJECTED) || inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_OVERDUE)){
+                                migrant.setSyncState(Migrant.CLOSED);
+                                session.save(migrant);
+                            }
+                        } else {
+                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem();
+                            resIncomeMigrationRequestsHistoryItem.setIdOfRecord(inMigReqHisItem.getIdOfRequest());
+                            resIncomeMigrationRequestsHistoryItem.setResCode(120);
+                            resIncomeMigrationRequestsHistoryItem.setErrorMessage(
+                                    "MigrationRequest for IncomeMigrationRequestsHistory with IdOfRecord="
+                                            + inMigReqHisItem.getIdOfRecord() + " and IdOfOrgRegistry=" +
+                                            inMigReqHisItem.getIdOfOrgRequestIssuer() +  " does not exists");
+                        }
+                    }
+                    session.flush();
+                } else {
+                    resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem();
+                    resIncomeMigrationRequestsHistoryItem.setIdOfRecord(inMigReqHisItem.getIdOfRequest());
+                    resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
+                    resIncomeMigrationRequestsHistoryItem.setErrorMessage(inMigReqHisItem.getErrorMessage());
+                }
+                incomeMigrationRequestsHistoryItems.add(resIncomeMigrationRequestsHistoryItem);
+            }
+        } catch (Exception e) {
+            logger.error("Error saving IncomeMigrationRequestsHistory", e);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean processOutMigReqHisItems(
+            List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems) {
         try{
             ResOutcomeMigrationRequestsHistoryItem resOutcomeMigrationRequestsHistoryItem;
             for(OutcomeMigrationRequestsHistoryItem outMigReqHisItem : migrants.getOutcomeMigrationRequestsHistoryItems()){
@@ -149,159 +336,58 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             }
         } catch (Exception e) {
             logger.error("Error saving OutcomeMigrationRequestsHistory", e);
-            return null;
+            return true;
         }
+        return false;
+    }
 
+    private boolean processOutMigReqItems(List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems) {
         try{
-            ResIncomeMigrationRequestsHistoryItem resIncomeMigrationRequestsHistoryItem;
-            for(IncomeMigrationRequestsHistoryItem inMigReqHisItem : migrants.getIncomeMigrationRequestsHistoryItems()){
-                if(inMigReqHisItem.getResCode().equals(IncomeMigrationRequestsHistoryItem.ERROR_CODE_ALL_OK)){
-                    CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist
-                            = new CompositeIdOfVisitReqResolutionHist(inMigReqHisItem.getIdOfRecord(), inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
-                            .getIdOfOrgRegistry());
-                    VisitReqResolutionHist inMigReqHis = DAOUtils.findVisitReqResolutionHist(session,
-                            compositeIdOfVisitReqResolutionHist);
-                    if(inMigReqHis != null){
-                        if(inMigReqHis.getOrgRegistry().getIdOfOrg().equals(inMigReqHisItem.getIdOfOrgRegistry())&&
-                                inMigReqHis.getResolution().equals(inMigReqHisItem.getResolution())&&
-                                inMigReqHis.getResolutionDateTime().equals(inMigReqHisItem.getResolutionDateTime())&&
-                                inMigReqHis.getResolutionCause().equals(inMigReqHisItem.getResolutionCause())&&
-                                inMigReqHis.getClientResol().getIdOfClient().equals(inMigReqHisItem.getIdOfClientResol())&&
-                                inMigReqHis.getContactInfo().equals(inMigReqHisItem.getContactInfo())){
-                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
-                            resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
+            ResOutcomeMigrationRequestsItem resOutcomeMigrationRequestsItem;
+            for(OutcomeMigrationRequestsItem outMigReqItem : migrants.getOutcomeMigrationRequestsItems()){
+                if(outMigReqItem.getResCode().equals(OutcomeMigrationRequestsItem.ERROR_CODE_ALL_OK)){
+                    CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(outMigReqItem.getIdOfRequest(), outMigReqItem.getIdOfOrgRegistry());
+                    Migrant migrant = DAOUtils.findMigrant(session, compositeIdOfMigrant);
+                    if(migrant != null){
+                        if(migrant.getClientMigrate().getIdOfClient().equals(outMigReqItem.getIdOfClient())&&
+                                migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&
+                                migrant.getVisitStartDate().equals(outMigReqItem.getVisitStartDate())&&
+                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate())){
+                            resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
+                            resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
                         } else {
-                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
-                            resIncomeMigrationRequestsHistoryItem.setResCode(120);
-                            resIncomeMigrationRequestsHistoryItem.setErrorMessage(
-                                    "IncomeMigrationRequestsHistory with IdOfRecord=" + inMigReqHisItem.getIdOfRecord()
-                                            + " but with other attributes already exists");
+                            resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
+                            resOutcomeMigrationRequestsItem.setResCode(110);
+                            resOutcomeMigrationRequestsItem.setErrorMessage("OutcomeMigrationRequests with IdOfRequest=" + outMigReqItem.getIdOfRequest()
+                                    + " but with other attributes already exists");
                         }
                     } else {
-                        Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
-                                .getIdOfOrgRequestIssuer()));
-                        if(migrant != null){
-                            Org orgReqIss = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRequestIssuer());
-                            Client clientResol = (Client)session.load(Client.class, inMigReqHisItem.getIdOfClientResol());
-                            inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
-                                    inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
-                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                            session.save(inMigReqHis);
-                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
-                            resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
-                            if(inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_REJECTED) || inMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_OVERDUE)){
-                                migrant.setSyncState(Migrant.CLOSED);
-                                session.save(migrant);
-                            }
-                        } else {
-                            resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem();
-                            resIncomeMigrationRequestsHistoryItem.setIdOfRecord(inMigReqHisItem.getIdOfRequest());
-                            resIncomeMigrationRequestsHistoryItem.setResCode(120);
-                            resIncomeMigrationRequestsHistoryItem.setErrorMessage(
-                                    "MigrationRequest for IncomeMigrationRequestsHistory with IdOfRecord="
-                                            + inMigReqHisItem.getIdOfRecord() + " and IdOfOrgRegistry=" +
-                                            inMigReqHisItem.getIdOfOrgRequestIssuer() +  " does not exists");
-                        }
+                        Org orgRegistry = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgRegistry());
+                        Org orgVisit = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgVisit());
+                        Contragent contragent = (Contragent)session.load(Contragent.class, orgRegistry.getDefaultSupplier().getIdOfContragent());
+                        Client clientMigrate = (Client)session.load(Client.class, outMigReqItem.getIdOfClient());
+                        migrant = new Migrant(compositeIdOfMigrant, orgRegistry.getDefaultSupplier(), clientMigrate,
+                                orgVisit, outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
+                        migrant.setOrgRegVendor(contragent);
+                        session.save(migrant);
+                        resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
+                        resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
                     }
                     session.flush();
                 } else {
-                    resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem();
-                    resIncomeMigrationRequestsHistoryItem.setIdOfRecord(inMigReqHisItem.getIdOfRequest());
-                    resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
-                    resIncomeMigrationRequestsHistoryItem.setErrorMessage(inMigReqHisItem.getErrorMessage());
+                    resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem();
+                    resOutcomeMigrationRequestsItem.setIdOfRequest(outMigReqItem.getIdOfRequest());
+                    resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
+                    resOutcomeMigrationRequestsItem.setErrorMessage(outMigReqItem.getErrorMessage());
                 }
-                incomeMigrationRequestsHistoryItems.add(resIncomeMigrationRequestsHistoryItem);
+                outcomeMigrationRequestsItems.add(resOutcomeMigrationRequestsItem);
             }
+
         } catch (Exception e) {
-            logger.error("Error saving IncomeMigrationRequestsHistory", e);
-            return null;
+            logger.error("Error saving OutcomeMigrationRequests", e);
+            return true;
         }
-
-        result.setResOutcomeMigrationRequestsItems(outcomeMigrationRequestsItems);
-        result.setResOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
-        result.setResIncomeMigrationRequestsHistoryItems(incomeMigrationRequestsHistoryItems);
-        return result;
+        return false;
     }
 
-    public MigrantsData processData() throws Exception {
-        MigrantsData result = new MigrantsData();
-        List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems = new ArrayList<ResIncomeMigrationRequestsItem>();
-        List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems = new ArrayList<ResIncomeMigrationRequestsHistoryItem>();
-        List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems = new ArrayList<ResOutcomeMigrationRequestsHistoryItem>();
-
-        ResIncomeMigrationRequestsItem inMigReqItem;
-        List<Migrant> migrantList = DAOUtils.getMigrantsForOrg(session, migrants.getIdOfOrg());
-        for(Migrant migrant : migrantList){
-            inMigReqItem = new ResIncomeMigrationRequestsItem(migrant);
-            inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
-            inMigReqItem.setIdOfVendorOrgReg(migrant.getOrgRegVendor().getIdOfContragent());
-            inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortName());
-            inMigReqItem.setIdOfMigrClient(migrant.getClientMigrate().getIdOfClient());
-            inMigReqItem.setNameOfMigrClient(migrant.getClientMigrate().getPerson().getFullName());
-            inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
-            inMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
-            inMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
-            incomeMigrationRequestsItems.add(inMigReqItem);
-            migrant.setSyncState(Migrant.SYNCHRONIZED);
-            session.save(migrant);
-        }
-        session.flush();
-
-        ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
-        List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
-        for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
-            inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
-            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
-                inMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
-                inMigReqHisItem.setResolution(vReqHis.getResolution());
-            } else {
-                inMigReqHisItem.setIdOfOrgIssuer(-1L);
-                inMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
-            }
-            inMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
-            inMigReqHisItem.setIdOfOrgRegistry(vReqHis.getOrgRegistry().getIdOfOrg());
-            inMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
-            inMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
-            if(vReqHis.getClientResol() != null) {
-                inMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
-            } else {
-                inMigReqHisItem.setIdOfClientResol(-1L);
-            }
-            inMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
-            incomeMigrationRequestsHistoryItems.add(inMigReqHisItem);
-            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
-            session.save(vReqHis);
-        }
-
-        ResOutcomeMigrationRequestsHistoryItem outMigReqHisItem;
-        List<VisitReqResolutionHist> visitReqResolutionHistList1 = DAOUtils.getOutcomeResolutionsForOrg(session,
-                migrants.getIdOfOrg());
-        for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList1){
-            outMigReqHisItem = new ResOutcomeMigrationRequestsHistoryItem();
-            if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
-                outMigReqHisItem.setIdOfOrgIssuer(vReqHis.getOrgResol().getIdOfOrg());
-                outMigReqHisItem.setResolution(vReqHis.getResolution());
-            } else {
-                outMigReqHisItem.setIdOfOrgIssuer(-1L);
-                outMigReqHisItem.setResolution(VisitReqResolutionHist.RES_OVERDUE);
-            }
-            outMigReqHisItem.setIdOfRequest(vReqHis.getCompositeIdOfVisitReqResolutionHist().getIdOfRequest());
-            outMigReqHisItem.setResolutionDateTime(vReqHis.getResolutionDateTime());
-            outMigReqHisItem.setResolutionCause(vReqHis.getResolutionCause());
-            if(vReqHis.getClientResol() != null) {
-                outMigReqHisItem.setIdOfClientResol(vReqHis.getClientResol().getIdOfClient());
-            } else {
-                outMigReqHisItem.setIdOfClientResol(-1L);
-            }
-            outMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
-            outcomeMigrationRequestsHistoryItems.add(outMigReqHisItem);
-            vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
-            session.save(vReqHis);
-        }
-
-        result.setIncomeMigrationRequestsItems(incomeMigrationRequestsItems);
-        result.setIncomeMigrationRequestsHistoryItems(incomeMigrationRequestsHistoryItems);
-        result.setOutcomeMigrationRequestsHistoryItems(outcomeMigrationRequestsHistoryItems);
-        return result;
-    }
 }
