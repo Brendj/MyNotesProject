@@ -1024,6 +1024,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
+        resetNewFlags();
+
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
             addWardsByClient(persistenceSession, idOfClient, clientWardItems);
         }
@@ -1039,6 +1041,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
+        }
+    }
+
+    private void resetNewFlags() {
+        for (ClientGuardianItem item : clientGuardianItems) {
+            item.setIsNew(false);
+        }
+        for (ClientGuardianItem item : clientWardItems) {
+            item.setIsNew(false);
         }
     }
 

@@ -15,7 +15,7 @@ public class ClientGuardianItem {
     private String personName;
     private Boolean disabled;
     private String mobile;
-    private final boolean isNew;
+    private boolean isNew;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -65,6 +65,10 @@ public class ClientGuardianItem {
 
     public boolean getIsNew() {
         return isNew;
+    }
+
+    public void setIsNew(boolean isNew) {
+        this.isNew = isNew;
     }
 
     public String getMobile() {
