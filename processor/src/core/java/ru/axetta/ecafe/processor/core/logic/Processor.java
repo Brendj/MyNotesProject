@@ -994,8 +994,8 @@ public class Processor
 
         try {
             if (request.getMigrants() != null) {
-                migrantsData = processMigrantsData(request.getMigrants());
                 resMigrants = processMigrants(request.getMigrants());
+                migrantsData = processMigrantsData(request.getMigrants());
             }
         } catch (Exception e) {
             String message = String.format("processMigrants: %s", e.getMessage());
@@ -1778,8 +1778,9 @@ public class Processor
 
         try {
             if (request.getMigrants() != null) {
-                migrantsData = processMigrantsData(request.getMigrants());
                 resMigrants = processMigrants(request.getMigrants());
+                migrantsData = processMigrantsData(request.getMigrants());
+
             }
         } catch (Exception e) {
             String message = String.format("processMigrants: %s", e.getMessage());

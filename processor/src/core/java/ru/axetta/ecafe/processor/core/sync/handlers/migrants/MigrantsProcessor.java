@@ -104,7 +104,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         ResOutcomeMigrationRequestsHistoryItem outMigReqHisItem;
         List<VisitReqResolutionHist> visitReqResolutionHistList1 = DAOUtils.getOutcomeResolutionsForOrg(session,
                 migrants.getIdOfOrg());
-        visitReqResolutionHistList1.addAll(DAOUtils.getResolutionsForMigrants(session, migrantsForOutRequests));
+        if(migrantsForOutRequests.size() > 0){
+            visitReqResolutionHistList1.addAll(DAOUtils.getResolutionsForMigrants(session, migrantsForOutRequests));
+        }
         // remove duplicates
         visitReqResolutionHistList1 =
                 new ArrayList<VisitReqResolutionHist>(new LinkedHashSet<VisitReqResolutionHist>(visitReqResolutionHistList1));
