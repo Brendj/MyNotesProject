@@ -238,31 +238,31 @@ public class OrgEditPage extends BasicWorkspacePage
 
         Set<Org> friendlyOrg = org.getFriendlyOrg();
         if(idOfOrgList!=null && !idOfOrgList.isEmpty()){
-            HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
-            if(!selectOrg.equals(friendlyOrg)){
-                // Если убрали или внесли организацию в список дружественных, то обновляем версию
-                Set<Org> orgsForVersionUpdate = new HashSet<Org>();
-                friendlyOrg.removeAll(selectOrg);
-                for (Org o: friendlyOrg){
-                    int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
-                    orgsForVersionUpdate.add(o);
-                }
-                for (Org o : selectOrg) {
-                    ClientManager.updateClientVersion(session, o.getClients());
-                    o.setFriendlyOrg(selectOrg);
-                    orgsForVersionUpdate.add(o);
-                    //session.evict(o); // убираем из кеша
-                    //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
-                    //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
-                }
-                for (Org o : orgsForVersionUpdate) {
-                    o.setOrgStructureVersion(nextVersion);
-                    session.update(o);
-                }
+            idOfOrgList = new ArrayList<Long>();
+            idOfOrgList.add(idOfOrg);
+        }
+        HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
+        if(!selectOrg.equals(friendlyOrg)){
+            // Если убрали или внесли организацию в список дружественных, то обновляем версию
+            Set<Org> orgsForVersionUpdate = new HashSet<Org>();
+            friendlyOrg.removeAll(selectOrg);
+            for (Org o: friendlyOrg){
+                int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
+                orgsForVersionUpdate.add(o);
+            }
+            for (Org o : selectOrg) {
+                ClientManager.updateClientVersion(session, o.getClients());
+                o.setFriendlyOrg(selectOrg);
+                orgsForVersionUpdate.add(o);
+                //session.evict(o); // убираем из кеша
+                //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
+                //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
+            }
+            for (Org o : orgsForVersionUpdate) {
+                o.setOrgStructureVersion(nextVersion);
+                session.update(o);
             }
         }
-
-
 
         org.setCommodityAccounting(changeCommodityAccounting);
         if(changeCommodityAccounting){
