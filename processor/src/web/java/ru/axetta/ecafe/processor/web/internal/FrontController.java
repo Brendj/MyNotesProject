@@ -578,7 +578,7 @@ public class FrontController extends HttpServlet {
 
                 Org orgVisit = (Org) persistenceSession.load(Org.class, idOfOrgVisit);
                 if(!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgVisit)){
-                    throw new FrontControllerException("Организация с id=" + idOfOrgVisit + " не является дружественной");
+                    throw new FrontControllerException("Организация с id=" + idOfOrgVisit + " не является корпусом организации");
                 }
                 Long nextMigrantId = DAOUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
                 Long nextResolutionId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
