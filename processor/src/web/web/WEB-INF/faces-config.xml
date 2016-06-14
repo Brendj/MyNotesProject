@@ -50,6 +50,18 @@
     </converter>
 
     <converter>
+        <description>Org type converter</description>
+        <converter-id>orgTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Org security level converter</description>
+        <converter-id>orgSecurityLevelConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgSecurityLevelConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Timestamp converter with second accuracy</description>
         <converter-id>timeConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.TimeConverter</converter-class>

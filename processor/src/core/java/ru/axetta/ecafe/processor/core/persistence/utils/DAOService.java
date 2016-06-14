@@ -2210,4 +2210,11 @@ public class DAOService {
         entityManager.persist(object);
         entityManager.flush();
     }
+
+    public void changeOrgSecurityLevel(Long idOfOrg, OrganizationSecurityLevel securityLevel) {
+        Org org = findOrById(idOfOrg);
+        org.setSecurityLevel(securityLevel);
+        entityManager.persist(org);
+        entityManager.flush();
+    }
 }

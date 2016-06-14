@@ -220,7 +220,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.oneActiveCard}"  styleClass="input-text"  />
 
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.orgEditPage.securityLevel}" styleClass="input-text" style="width: 250px;">
+    <h:selectOneMenu value="#{mainPage.orgEditPage.securityLevel}" styleClass="input-text" style="width: 250px;" readonly="true" disabled="true">
         <f:converter converterId="organizationSecurityLevelConverter"/>
         <f:selectItems value="#{mainPage.orgEditPage.securityLevels}" />
     </h:selectOneMenu>

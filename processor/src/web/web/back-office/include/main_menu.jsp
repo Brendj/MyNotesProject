@@ -1299,7 +1299,15 @@
                         reRender="workspaceForm" rendered="#{mainPage.eligibleToViewUsers}" />
 
     <rich:panelMenuItem id="showOptionsSecurityMenuItem" binding="#{mainPage.optionsSecurityPage.mainMenuComponent}"
-                        label="Настройки" action="#{mainPage.showOptionsSecurityPage}" reRender="workspaceForm"
+                        label="Настройки веб" action="#{mainPage.showOptionsSecurityPage}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToViewUsers}" />
+
+    <rich:panelMenuItem id="showOptionsSecurityClientMenuItem" binding="#{mainPage.optionsSecurityClientPage.mainMenuComponent}"
+                        label="Настройки ОО" action="#{mainPage.showOptionsSecurityClientPage}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToViewUsers}" />
+
+    <rich:panelMenuItem id="showOrgsSecurityMenuItem" binding="#{mainPage.orgsSecurityPage.mainMenuComponent}"
+                        label="Организации" action="#{mainPage.showOrgsSecurityPage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToViewUsers}" />
 
 </rich:panelMenuGroup>

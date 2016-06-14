@@ -39,7 +39,9 @@ import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSele
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategorySelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.security.OptionsSecurityClientPage;
 import ru.axetta.ecafe.processor.web.ui.option.security.OptionsSecurityPage;
+import ru.axetta.ecafe.processor.web.ui.option.security.OrgsSecurityPage;
 import ru.axetta.ecafe.processor.web.ui.option.user.*;
 import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
@@ -154,6 +156,8 @@ public class MainPage implements Serializable {
     private final UserCreatePage userCreatePage = new UserCreatePage();
 
     private final OptionsSecurityPage optionsSecurityPage = new OptionsSecurityPage();
+    private final OptionsSecurityClientPage optionsSecurityClientPage = new OptionsSecurityClientPage();
+    private final OrgsSecurityPage orgsSecurityPage = new OrgsSecurityPage();
 
     // Org manipulation
     private final BasicWorkspacePage orgGroupPage = new BasicWorkspacePage();
@@ -728,6 +732,56 @@ public class MainPage implements Serializable {
             logger.error("Failed to fill options security page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы настроек ИБ: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showOptionsSecurityClientPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            optionsSecurityClientPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = optionsSecurityClientPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill options security page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы настроек ИБ: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showOrgsSecurityPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            orgsSecurityPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = orgsSecurityPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill options security page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы управления флагами режимов ИБ организаций: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -8903,6 +8957,14 @@ public class MainPage implements Serializable {
 
     public OptionsSecurityPage getOptionsSecurityPage() {
         return optionsSecurityPage;
+    }
+
+    public OptionsSecurityClientPage getOptionsSecurityClientPage() {
+        return optionsSecurityClientPage;
+    }
+
+    public OrgsSecurityPage getOrgsSecurityPage() {
+        return orgsSecurityPage;
     }
 
     public Object checkUserSmsCode() throws Exception {
