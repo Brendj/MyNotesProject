@@ -59,19 +59,9 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
                     DNs += dn + ";";
                 }
             }
-            // try auth by login and password
+
             if (linkConfig == null) {
-                AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) httpRequest
-                        .getAttribute(PaymentControllerWS.AUTH_POLICY_KEY);
-                if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
-                    linkConfig = runtimeContext.getPartnerStdPayConfig()
-                            .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
-                                    authorizationPolicy.getPassword());
-                }
-            }
-            if (linkConfig == null) {
-                throw new Exception("PID parameter missing and invalid client certificatew: DNs: " + DNs
-                        + " and authentication by login and password failed");
+                throw new Exception("PID parameter missing and invalid client certificatew: DNs: " + DNs);
             }
 
         } else {
@@ -80,6 +70,16 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
         }
         if (linkConfig == null) {
             throw new Exception("Invalid PID");
+        } else {
+            if (linkConfig.authType == StdPayConfig.AUTH_TYPE_BASIC) {
+                // try auth by login and password
+                String username = (String) httpRequest.getAttribute(PaymentControllerWS.USERNAME_KEY);
+                String password = (String) httpRequest.getAttribute(PaymentControllerWS.PASSWORD_KEY);
+
+                if (username == null || password == null || !username.equals(linkConfig.username) || !password.equals(linkConfig.password)) {
+                    throw new Exception("Basic authentication failed");
+                }
+            }
         }
         ((StdOnlinePaymentRequestParser) requestParser).setLinkConfig(linkConfig);
         ///

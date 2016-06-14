@@ -25,12 +25,15 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.io.*;
+import java.util.List;
+import java.util.Map;
 
 @WebService()
 public class PaymentControllerWS extends HttpServlet implements PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentControllerWS.class);
     private static final int STD_PAYMENT = 1;
-    public static final String AUTH_POLICY_KEY = "paymentAuthPolicyKey";
+    public static final String USERNAME_KEY = "username";
+    public static final String PASSWORD_KEY = "password";
 
     StdPayConfig.LinkConfig linkConfig;
     public void setLinkConfig(StdPayConfig.LinkConfig linkConfig) {
@@ -67,10 +70,22 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             BufferResponseWrapper bufResponse = new BufferResponseWrapper(response);
             request.setAttribute(StdOnlinePaymentServlet.ATTR_SOAP_REQUEST, requestParams);
 
-            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) context.getMessageContext()
-                    .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
-            if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
-                request.setAttribute(AUTH_POLICY_KEY, authorizationPolicy);
+            Map httpHeaders = (Map) context.getMessageContext().get(MessageContext.HTTP_REQUEST_HEADERS);
+            List userList = (List)httpHeaders.get("Username");
+            List passList = (List)httpHeaders.get("Password");
+            String username = "";
+            String password = "";
+
+            if(userList != null) {
+                username = userList.get(0).toString();
+            }
+            if(passList != null) {
+                password = passList.get(0).toString();
+            }
+
+            if (!username.isEmpty()  && !password.isEmpty()) {
+                request.setAttribute(USERNAME_KEY, username);
+                request.setAttribute(PASSWORD_KEY, password);
             }
 
             servletContext.getRequestDispatcher("/"+path).include(request, bufResponse);

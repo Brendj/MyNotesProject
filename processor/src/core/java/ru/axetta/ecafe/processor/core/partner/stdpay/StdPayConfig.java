@@ -34,7 +34,7 @@ public class StdPayConfig {
     private static final String PARAM_PASSWORD= ".password";
 
 
-    private static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2, AUTH_TYPE_BASIC=3;
+    public static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2, AUTH_TYPE_BASIC=3;
 
     public static class LinkConfig {
         public String name;
