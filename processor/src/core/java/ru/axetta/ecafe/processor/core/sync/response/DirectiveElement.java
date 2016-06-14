@@ -76,6 +76,18 @@ public class DirectiveElement {
         Integer maxInactiveTime = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
         directiveItemList.add(new DirectiveItem("IS_MAX_INACTIVITY_TIME", maxInactiveTime.toString()));
+
+        Integer passwordChangePeriod = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE);
+        directiveItemList.add(new DirectiveItem("IS_PASSWORD_CHANGE_PERIOD", passwordChangePeriod.toString()));
+
+        Integer maxAuthFaultCount = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT);
+        directiveItemList.add(new DirectiveItem("IS_MAX_AUTH_FAULT_COUNT", maxAuthFaultCount.toString()));
+
+        Integer tmpBlockAccTime = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
+        directiveItemList.add(new DirectiveItem("IS_TMP_BLOCK_ACC_TIME", tmpBlockAccTime.toString()));
     }
 
     public Element toElement(Document document) throws Exception {
