@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.process;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
@@ -48,7 +48,7 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
         clientsCriteria.add(Restrictions.in("o.idOfOrg", getFriendlyOrgsId(idOfOrg)));
         clientsCriteria.setProjection(Property.forName("idOfClient"));
         List<Long> clientIds = clientsCriteria.list();
-        List<Long> migrantIds = DAOUtils.getActiveMigrantsIdsForOrg(session, idOfOrg);
+        List<Long> migrantIds = MigrantsUtils.getActiveMigrantsIdsForOrg(session, idOfOrg);
 
         ClientGuardianData clientGuardianData;
         if (clientIds.size() > 0 || migrantIds.size() > 0) {

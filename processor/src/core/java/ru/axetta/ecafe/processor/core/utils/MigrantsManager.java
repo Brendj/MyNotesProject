@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfVisitReqResolutionHist;
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
 import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -56,11 +56,11 @@ public class MigrantsManager {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            List<Migrant> migrants = DAOUtils.getOverdueMigrants(persistenceSession);
+            List<Migrant> migrants = MigrantsUtils.getOverdueMigrants(persistenceSession);
             Map<Long, List<Migrant>> sortedMigrants = sortMigrantsByOrg(migrants);
 
             for(Long idOfOrg : sortedMigrants.keySet()) {
-                Long nextId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+                Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
                 List<Migrant> migrantsForOrg = sortedMigrants.get(idOfOrg);
 
                 for (Migrant migrant : migrantsForOrg) {

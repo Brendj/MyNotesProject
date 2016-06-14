@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sync.*;
@@ -2637,7 +2638,7 @@ public class Processor
             try {
                 persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                clients = DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
+                clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } finally {
@@ -3809,7 +3810,7 @@ public class Processor
             }
 
             // Добавляем карты временных посетителей (мигрантов)
-            List<Client> migrantClients = DAOUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
+            List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
             for (Client client : migrantClients) {
                 for (Card card : client.getCards()) {
                     accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
@@ -3909,7 +3910,7 @@ public class Processor
             
             // Добавляем временных посетителей (мигрантов)
 
-            List<Client> migrants = DAOUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
+            List<Client> migrants = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
             clients.addAll(migrants);
 
             for (Client client : clients) {

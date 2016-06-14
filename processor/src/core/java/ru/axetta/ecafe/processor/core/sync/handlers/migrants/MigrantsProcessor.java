@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -80,7 +80,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
 
     private void processCurrentActiveIncomeReqs() throws Exception {
         for(Long currentOrg : migrants.getCurrentActiveIncome().keySet()){
-            List<Migrant> currentMigrants = DAOUtils.getSyncedMigrantsForOrgVisit(session,currentOrg);
+            List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrgVisit(session,currentOrg);
             List<Long> currentActiveIncomeInOrg = migrants.getCurrentActiveIncome().get(currentOrg);
             List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
             for(Migrant m : currentMigrants) {
@@ -90,7 +90,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                     currentMigrantsForSync.add(m);
                 }
             }
-            List<VisitReqResolutionHist> resolutionHistList = DAOUtils.getSyncedResolutionsForMigrants(session, currentMigrantsForSync);
+            List<VisitReqResolutionHist> resolutionHistList = MigrantsUtils.getSyncedResolutionsForMigrants(session, currentMigrantsForSync);
             for(VisitReqResolutionHist v : resolutionHistList){
                 v.setSyncState(VisitReqResolutionHist.NOT_SYNCHRONIZED);
                 session.save(v);
@@ -102,10 +102,10 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private void processResOutMigReqHisItems(
             List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems) throws Exception {
         ResOutcomeMigrationRequestsHistoryItem outMigReqHisItem;
-        List<VisitReqResolutionHist> visitReqResolutionHistList1 = DAOUtils.getOutcomeResolutionsForOrg(session,
+        List<VisitReqResolutionHist> visitReqResolutionHistList1 = MigrantsUtils.getOutcomeResolutionsForOrg(session,
                 migrants.getIdOfOrg());
         if(migrantsForOutRequests.size() > 0){
-            visitReqResolutionHistList1.addAll(DAOUtils.getResolutionsForMigrants(session, migrantsForOutRequests));
+            visitReqResolutionHistList1.addAll(MigrantsUtils.getResolutionsForMigrants(session, migrantsForOutRequests));
         }
         // remove duplicates
         visitReqResolutionHistList1 =
@@ -137,7 +137,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private void processResInMigReqHisItems(
             List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems) throws Exception {
         ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
-        List<VisitReqResolutionHist> visitReqResolutionHistList = DAOUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
+        List<VisitReqResolutionHist> visitReqResolutionHistList = MigrantsUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
         for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
             inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
             if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
@@ -166,7 +166,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private void processResInMigReqItems(List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems)
             throws Exception {
         ResIncomeMigrationRequestsItem inMigReqItem;
-        List<Migrant> migrantList = DAOUtils.getMigrantsForOrg(session, migrants.getIdOfOrg());
+        List<Migrant> migrantList = MigrantsUtils.getMigrantsForOrg(session, migrants.getIdOfOrg());
         for(Migrant migrant : migrantList){
             inMigReqItem = new ResIncomeMigrationRequestsItem(migrant);
             inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
@@ -187,7 +187,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private void processResOutMigReqItems(List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems)
             throws Exception {
         ResOutcomeMigrationRequestsItem outMigReqItem;
-        List<Migrant> migrantList = DAOUtils.getMigrantsIdsForOrgReg(session, migrants.getIdOfOrg());
+        List<Migrant> migrantList = MigrantsUtils.getMigrantsIdsForOrgReg(session, migrants.getIdOfOrg());
         for(Migrant migrant : migrantList){
             if(!migrants.getCurrentActiveOutcome().contains(migrant.getCompositeIdOfMigrant().getIdOfRequest())){
                 migrantsForOutRequests.add(migrant);
@@ -211,7 +211,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                     CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist
                             = new CompositeIdOfVisitReqResolutionHist(inMigReqHisItem.getIdOfRecord(), inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
                             .getIdOfOrgRegistry());
-                    VisitReqResolutionHist inMigReqHis = DAOUtils.findVisitReqResolutionHist(session,
+                    VisitReqResolutionHist inMigReqHis = MigrantsUtils.findVisitReqResolutionHist(session,
                             compositeIdOfVisitReqResolutionHist);
                     if(inMigReqHis != null){
                         if(inMigReqHis.getOrgRegistry().getIdOfOrg().equals(inMigReqHisItem.getIdOfOrgRegistry())&&
@@ -230,7 +230,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                                             + " but with other attributes already exists");
                         }
                     } else {
-                        Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
+                        Migrant migrant = MigrantsUtils.findMigrant(session, new CompositeIdOfMigrant(inMigReqHisItem.getIdOfRequest(), inMigReqHisItem
                                 .getIdOfOrgRequestIssuer()));
                         if(migrant != null){
                             Org orgReqIss = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRequestIssuer());
@@ -279,7 +279,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 if(outMigReqHisItem.getResCode().equals(OutcomeMigrationRequestsHistoryItem.ERROR_CODE_ALL_OK)){
                     CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist
                     = new CompositeIdOfVisitReqResolutionHist(outMigReqHisItem.getIdOfRecord(), outMigReqHisItem.getIdOfRequest(), outMigReqHisItem.getIdOfOrgResol());
-                    VisitReqResolutionHist outMigReqHis = DAOUtils.findVisitReqResolutionHist(session,
+                    VisitReqResolutionHist outMigReqHis = MigrantsUtils.findVisitReqResolutionHist(session,
                             compositeIdOfVisitReqResolutionHist);
                     if(outMigReqHis != null){
                         if(outMigReqHis.getOrgRegistry().getIdOfOrg().equals(outMigReqHisItem.getIdOfOrgRegistry())&&
@@ -297,7 +297,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                                     + outMigReqHisItem.getIdOfRecord() + " but with other attributes already exists");
                         }
                     } else {
-                        Migrant migrant = DAOUtils.findMigrant(session, new CompositeIdOfMigrant(outMigReqHisItem.getIdOfRequest(), outMigReqHisItem.getIdOfOrgRegistry()));
+                        Migrant migrant = MigrantsUtils.findMigrant(session, new CompositeIdOfMigrant(outMigReqHisItem.getIdOfRequest(), outMigReqHisItem.getIdOfOrgRegistry()));
                         if(migrant != null){
                             Org orgRegistry = (Org)session.load(Org.class, outMigReqHisItem.getIdOfOrgRegistry());
                             Client clientResol = (Client)session.load(Client.class, outMigReqHisItem.getIdOfClientResol());
@@ -309,7 +309,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             if(outMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)){
                                 if(migrant.getSyncState().equals(Migrant.NOT_SYNCHRONIZED)){
                                     outMigReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
-                                    List<VisitReqResolutionHist> list = DAOUtils.getNotSyncResolutionsForMigrant(session, migrant);
+                                    List<VisitReqResolutionHist> list = MigrantsUtils.getNotSyncResolutionsForMigrant(session, migrant);
                                     for(VisitReqResolutionHist v : list){
                                         v.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
                                         session.save(v);
@@ -349,7 +349,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             for(OutcomeMigrationRequestsItem outMigReqItem : migrants.getOutcomeMigrationRequestsItems()){
                 if(outMigReqItem.getResCode().equals(OutcomeMigrationRequestsItem.ERROR_CODE_ALL_OK)){
                     CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(outMigReqItem.getIdOfRequest(), outMigReqItem.getIdOfOrgRegistry());
-                    Migrant migrant = DAOUtils.findMigrant(session, compositeIdOfMigrant);
+                    Migrant migrant = MigrantsUtils.findMigrant(session, compositeIdOfMigrant);
                     if(migrant != null){
                         if(migrant.getClientMigrate().getIdOfClient().equals(outMigReqItem.getIdOfClient())&&
                                 migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&

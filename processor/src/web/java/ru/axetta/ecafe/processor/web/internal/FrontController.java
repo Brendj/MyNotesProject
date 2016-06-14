@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -580,8 +581,8 @@ public class FrontController extends HttpServlet {
                 if(!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgVisit)){
                     throw new FrontControllerException("Организация с id=" + idOfOrgVisit + " не является корпусом организации");
                 }
-                Long nextMigrantId = DAOUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
-                Long nextResolutionId = DAOUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
+                Long nextMigrantId = MigrantsUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
+                Long nextResolutionId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
 
                 for (MigrateRequest migrateRequest : rqs) {
                     Client client = (Client) persistenceSession.load(Client.class, migrateRequest.getMigrateClientId());

@@ -1002,6 +1002,8 @@
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="specialDatesReportMenuItem" binding="#{mainPage.specialDatesReportPage.mainMenuComponent}"
                             label="Отчет по учебным дням" action="#{mainPage.showSpecialDatesReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="migrantsReportMenuItem" binding="#{mainPage.migrantsReportPage.mainMenuComponent}"
+                            label="#{mainPage.migrantsReportPage.reportName}" action="#{mainPage.showMigrantsReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
