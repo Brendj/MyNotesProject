@@ -40,9 +40,6 @@ public class User {
     private static final String PASS_LETTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final String PASS_SPECIAL_SYMBOLS = "0123456789[]{},.<>;:|\\/?!`~@#$%^&*()-_=+";
     private static final int MIN_PASSWORD_LENGTH = 6;
-    public static final Integer PASSWORD_EXPIRED_AFTER_DAYS = 120; //Период действия пароля после последней смены, в днях
-    public static final Integer MAX_FAULT_LOGIN_ATTEMPTS = 10; //сколько попыток неудачного логина допустимо. После превышения блокируем пользователя
-    public static final Integer BLOCK_ON_FAULT_LOGIN_MINUTES = 5; //блокируем на сколько минут
 
     protected static Logger logger;
     static {
@@ -74,7 +71,8 @@ public class User {
     }
 
     public Boolean getNeedChangePassword() {
-        return needChangePassword || (CalendarUtils.getDifferenceInDays(passwordDate, new Date(System.currentTimeMillis())) > PASSWORD_EXPIRED_AFTER_DAYS);
+        return needChangePassword || (CalendarUtils.getDifferenceInDays(passwordDate, new Date(System.currentTimeMillis())) >
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_PASSWORD_CHANGE));
     }
 
     public void setNeedChangePassword(Boolean needChangePassword) {
@@ -107,9 +105,9 @@ public class User {
     public User incAttemptNumbersAndBlock() {
         Integer currentAttempts = attemptNumber == null ? 0 : attemptNumber;
         this.setAttemptNumber(currentAttempts + 1);
-        if (attemptNumber > MAX_FAULT_LOGIN_ATTEMPTS) {
+        if (attemptNumber > RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
             this.setBlocked(true);
-            this.setBlockedUntilDate(new Date(System.currentTimeMillis() + BLOCK_ON_FAULT_LOGIN_MINUTES * 60 * 1000));
+            this.setBlockedUntilDate(new Date(System.currentTimeMillis() + RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME) * 60 * 1000));
         }
         return DAOService.getInstance().setUserInfo(this);
     }

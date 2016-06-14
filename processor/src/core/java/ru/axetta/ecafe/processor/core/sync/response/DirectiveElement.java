@@ -70,11 +70,11 @@ public class DirectiveElement {
         directiveItemList.add(new DirectiveItem("IS_SECURITY_MODE_FLAG", securityModeFlag.toString()));
 
         Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE);
+                Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE);
         directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));
 
         Integer maxInactiveTime = RuntimeContext.getInstance().getOptionValueInt(
-                Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
+                Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
         directiveItemList.add(new DirectiveItem("IS_MAX_INACTIVITY_TIME", maxInactiveTime.toString()));
 
         Integer passwordChangePeriod = RuntimeContext.getInstance().getOptionValueInt(

@@ -51,9 +51,9 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     public void fill(Session session) {
         List<OrgSecurityItem> items = new LinkedList<OrgSecurityItem>();
 
-        if(filterIdOfOrg != null) {
+        //if(filterIdOfOrg != null) {
             items = retrieveOrgs(session);
-        }
+        //}
 
         this.orgsList = items;
     }
@@ -178,7 +178,12 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     }
 
     public void setFilterIdOfOrg(Long filterIdOfOrg) {
-        this.filterIdOfOrg = filterIdOfOrg;
+        //this.filterIdOfOrg = filterIdOfOrg;
+        if (filterIdOfOrg == null || filterIdOfOrg == 0) {
+            this.filterIdOfOrg = null;
+        } else {
+            this.filterIdOfOrg = filterIdOfOrg;
+        }
     }
 
     public String getFilterOfficialName() {

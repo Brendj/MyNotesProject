@@ -13,6 +13,10 @@
              styleClass="borderless-grid">
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Период смены пароля (в днях)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.optionsSecurityPage.clientPeriodPasswordChange}" maxlength="10"
+                     styleClass="input-text" style="margin-left: 10px;" />
+
         <h:outputText escape="true" value="Период блокировки повторного использования логина (в днях)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityPage.periodBlockLoginReUse}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
@@ -21,7 +25,15 @@
         <h:inputText value="#{mainPage.optionsSecurityPage.periodBlockUnusedLogin}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
 
-        <h:outputText escape="true" value="Период действия sms-кода" styleClass="output-text" />
+        <h:outputText escape="true" value="Максимальное число неудачных попыток ввода логина/пароля (кол-во)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.optionsSecurityPage.clientMaxAuthFaultCount}" maxlength="10"
+                     styleClass="input-text" style="margin-left: 10px;" />
+
+        <h:outputText escape="true" value="Период блокировки аккаунта после максимального числа неудачных попыток ввода логина/пароля (в минутах)" styleClass="output-text" />
+        <h:inputText value="#{mainPage.optionsSecurityPage.clientTmpBlockAccTime}" maxlength="10"
+                     styleClass="input-text" style="margin-left: 10px;" />
+
+        <h:outputText escape="true" value="Период действия sms-кода (в днях)" styleClass="output-text" />
         <h:inputText value="#{mainPage.optionsSecurityPage.periodSmsCodeAlive}" maxlength="10"
                      styleClass="input-text" style="margin-left: 10px;" />
     </h:panelGrid>

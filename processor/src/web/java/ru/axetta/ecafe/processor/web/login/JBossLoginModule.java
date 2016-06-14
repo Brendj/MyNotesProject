@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.login;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -285,11 +286,13 @@ public class JBossLoginModule implements LoginModule {
                 loginSucceeded = true;
             } else {
                 user = user.incAttemptNumbersAndBlock();
-                if (user.getAttemptNumber() > User.MAX_FAULT_LOGIN_ATTEMPTS) {
+                if (user.getAttemptNumber() > RuntimeContext.getInstance().getOptionValueInt(
+                        Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
                     request.setAttribute("errorMessage",
                             String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
-                                    username, User.BLOCK_ON_FAULT_LOGIN_MINUTES));
-                    String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username, User.MAX_FAULT_LOGIN_ATTEMPTS);
+                                    username, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME)));
+                    String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username,
+                            RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT));
                     logger.debug(mess);
                     SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                             .createLoginFaultRecord(request.getRemoteAddr(), username, user,
