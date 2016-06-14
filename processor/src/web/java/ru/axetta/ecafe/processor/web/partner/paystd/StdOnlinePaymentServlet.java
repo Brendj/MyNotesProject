@@ -59,7 +59,6 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
                     DNs += dn + ";";
                 }
             }
-
             if (linkConfig == null) {
                 throw new Exception("PID parameter missing and invalid client certificatew: DNs: " + DNs);
             }
@@ -70,16 +69,16 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
         }
         if (linkConfig == null) {
             throw new Exception("Invalid PID");
-        } else {
-            if (linkConfig.authType == StdPayConfig.AUTH_TYPE_BASIC) {
-                // try auth by login and password
-                String username = (String) httpRequest.getAttribute(PaymentControllerWS.USERNAME_KEY);
-                String password = (String) httpRequest.getAttribute(PaymentControllerWS.PASSWORD_KEY);
-
-                if (username == null || password == null || !username.equals(linkConfig.username) || !password.equals(linkConfig.password)) {
-                    throw new Exception("Basic authentication failed");
+        }else {
+            if(linkConfig.authType == StdPayConfig.AUTH_TYPE_BASIC) {
+                AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) httpRequest
+                        .getAttribute(PaymentControllerWS.AUTH_POLICY_KEY);
+                if ((authorizationPolicy == null) || (authorizationPolicy.getUserName()) == null || (authorizationPolicy.getPassword() == null) ||
+                        (!linkConfig.username.equals(authorizationPolicy.getUserName())) || (!linkConfig.password.equals(authorizationPolicy.getPassword()))) {
+                    throw new Exception("Basic authentication failed!");
                 }
             }
+
         }
         ((StdOnlinePaymentRequestParser) requestParser).setLinkConfig(linkConfig);
         ///
