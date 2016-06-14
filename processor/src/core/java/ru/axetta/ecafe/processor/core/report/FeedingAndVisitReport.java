@@ -142,10 +142,12 @@ public class FeedingAndVisitReport extends BasicReportForOrgJob {
                 if (currentData == null) {
                     ClientItem clientItem = subFeedingService.getClientItem(orgsIdsString, orderItem.idOfClient);
 
-                    currentData = dataMap.get( prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
-
-                    if(currentData == null){
-                        currentData = createGroup(dataMap,orgList, clientItem, startTime, endTime);
+                    if (clientItem != null) {
+                        currentData = dataMap
+                                .get(prepareGroupName(orgList, clientItem.getGroupName(), clientItem.getIdOfOrg()));
+                    }
+                    if (currentData == null) {
+                        currentData = createGroup(dataMap, orgList, clientItem, startTime, endTime);
                     }
 
                 }
