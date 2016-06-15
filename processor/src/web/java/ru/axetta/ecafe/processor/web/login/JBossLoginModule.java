@@ -192,6 +192,13 @@ public class JBossLoginModule implements LoginModule {
             throw new LoginException("Username missing");
         }
         if (StringUtils.isEmpty(plainPassword)) {
+            User user;
+            try {
+                user = getUserByName(username);
+            } catch (Exception e) {
+                throw new LoginException("User not found" + "\n" + e.getMessage());
+            }
+            processBadPassword(user, request);
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createLoginFaultRecord(request.getRemoteAddr(), username, null,
                             SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
@@ -216,10 +223,7 @@ public class JBossLoginModule implements LoginModule {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria userCriteria = persistenceSession.createCriteria(User.class);
-            userCriteria.add(Restrictions.eq("userName", username));
-            userCriteria.add(Restrictions.eq("deletedState", false));
-            User user = (User) userCriteria.uniqueResult();
+            User user = getUserByName(username);
             if (user == null) {
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createLoginFaultRecord(request.getRemoteAddr(), username, null,
@@ -285,21 +289,7 @@ public class JBossLoginModule implements LoginModule {
                 httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
                 loginSucceeded = true;
             } else {
-                user = user.incAttemptNumbersAndBlock();
-                if (user.getAttemptNumber() > RuntimeContext.getInstance().getOptionValueInt(
-                        Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
-                    request.setAttribute("errorMessage",
-                            String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
-                                    username, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME)));
-                    String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username,
-                            RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT));
-                    logger.debug(mess);
-                    SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                            .createLoginFaultRecord(request.getRemoteAddr(), username, user,
-                                    SecurityJournalAuthenticate.DenyCause.MAX_FAULT_LOGIN_ATTEMPTS.getIdentification());
-                    DAOService.getInstance().writeAuthJournalRecord(record);
-                    throw new LoginException(mess);
-                }
+                processBadPassword(user, request);
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createLoginFaultRecord(request.getRemoteAddr(), username, user,
                                 SecurityJournalAuthenticate.DenyCause.WRONG_PASSWORD.getIdentification());
@@ -312,6 +302,43 @@ public class JBossLoginModule implements LoginModule {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private User getUserByName(String username) throws Exception {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria userCriteria = persistenceSession.createCriteria(User.class);
+            userCriteria.add(Restrictions.eq("userName", username));
+            userCriteria.add(Restrictions.eq("deletedState", false));
+            return (User) userCriteria.uniqueResult();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void processBadPassword(User user, HttpServletRequest request) throws LoginException {
+        user = user.incAttemptNumbersAndBlock();
+        if (user.getAttemptNumber() > RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
+            request.setAttribute("errorMessage",
+                    String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
+                            username, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME)));
+            String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username,
+                    RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT));
+            logger.debug(mess);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createLoginFaultRecord(request.getRemoteAddr(), username, user,
+                            SecurityJournalAuthenticate.DenyCause.MAX_FAULT_LOGIN_ATTEMPTS.getIdentification());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw new LoginException(mess);
         }
     }
 

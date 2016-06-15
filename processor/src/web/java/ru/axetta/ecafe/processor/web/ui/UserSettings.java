@@ -176,6 +176,11 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         this.userName = userName;
     }
 
+    public boolean userIsSecurityAdmin() {
+        if (currUser == null) return false;
+        return (currUser.getIdOfRole() == User.DefaultRole.ADMIN_SECURITY.getIdentification());
+    }
+
     public boolean isChangePassword() {
         return changePassword;
     }
