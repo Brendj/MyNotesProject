@@ -111,6 +111,7 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
                 .add(Projections.property("district"),"district")
                 .add(Projections.property("type"),"type")
                 .add(Projections.property("state"),"state")
+                .add(Projections.property("statusDetailing"), "statusDetailing")
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(OrgSecurityItem.class));

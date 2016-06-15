@@ -111,6 +111,7 @@
                 <h:outputText escape="true" value="Статус" />
             </f:facet>
             <h:outputText escape="true" value="#{item.state}" converter="orgStateConverter" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.statusDetailing}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">

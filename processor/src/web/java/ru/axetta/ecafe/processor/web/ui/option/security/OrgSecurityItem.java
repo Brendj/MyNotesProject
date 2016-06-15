@@ -28,6 +28,7 @@ public class OrgSecurityItem {
     private String district;
     private OrganizationType type;
     private Integer state;
+    private String statusDetailing;
     private OrganizationSecurityLevel securityLevel;
 
     public OrgSecurityItem() {
@@ -46,6 +47,7 @@ public class OrgSecurityItem {
         this.setDistrict(org.getDistrict());
         this.setType(org.getType());
         this.setState(org.getState());
+        this.setStatusDetailing(org.getStatusDetailing());
         this.setSecurityLevel(org.getSecurityLevel());
     }
 
@@ -177,5 +179,21 @@ public class OrgSecurityItem {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public String getStatusDetailing() {
+        if (statusDetailing == null || statusDetailing.equals("''") || statusDetailing.equals("/")) {
+            return "";
+        }
+        int p = statusDetailing.indexOf("/");
+        if (p > 1) {
+            return " " + statusDetailing.substring(p);
+        } else {
+            return "";
+        }
+    }
+
+    public void setStatusDetailing(String statusDetailing) {
+        this.statusDetailing = statusDetailing;
     }
 }
