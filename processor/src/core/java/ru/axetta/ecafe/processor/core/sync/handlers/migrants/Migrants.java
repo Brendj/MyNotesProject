@@ -78,18 +78,21 @@ public class Migrants {
         Node incomeMigrationRequestsNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequests");
 
         currentActiveIncome = new HashMap<Long, List<Long>>();
-        String incomeCurrentActive = XMLUtils.getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 10000);
-        if(incomeCurrentActive != null) {
-            if(incomeCurrentActive.length() > 0) {
-                String[] incomeIdsForOrg = incomeCurrentActive.split(";");
-                for (String idForOrg : incomeIdsForOrg) {
-                    String[] orgAndId = idForOrg.split(":");
-                    Long idOfOrg = Long.parseLong(orgAndId[0]);
-                    List<Long> idsForOrg = new ArrayList<Long>();
-                    for(String id : orgAndId[1].split(",")){
-                        idsForOrg.add(Long.parseLong(id));
+        if(incomeMigrationRequestsNode != null) {
+            String incomeCurrentActive = XMLUtils
+                    .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 10000);
+            if (incomeCurrentActive != null) {
+                if (incomeCurrentActive.length() > 0) {
+                    String[] incomeIdsForOrg = incomeCurrentActive.split(";");
+                    for (String idForOrg : incomeIdsForOrg) {
+                        String[] orgAndId = idForOrg.split(":");
+                        Long idOfOrg = Long.parseLong(orgAndId[0]);
+                        List<Long> idsForOrg = new ArrayList<Long>();
+                        for (String id : orgAndId[1].split(",")) {
+                            idsForOrg.add(Long.parseLong(id));
+                        }
+                        currentActiveIncome.put(idOfOrg, idsForOrg);
                     }
-                    currentActiveIncome.put(idOfOrg, idsForOrg);
                 }
             }
         }
