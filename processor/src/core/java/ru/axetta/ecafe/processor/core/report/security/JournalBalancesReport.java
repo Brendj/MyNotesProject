@@ -119,7 +119,9 @@ public class JournalBalancesReport extends BasicReportForAllOrgJob {
                 item.setIdOfJournalBalance(balance.getIdOfJournalBalance());
                 item.setEventType(balance.getEventType().toString());
                 item.setEventDate(balance.getEventDate());
-                item.setEventSource(balance.getEventSource().toString());
+                if (balance.getEventSource() != null) {
+                    item.setEventSource(balance.getEventSource().toString());
+                }
                 item.setIsSuccess(balance.getIsSuccess() ? "Да" : "Нет");
                 item.setTerminal(balance.getTerminal());
                 item.setProtocol(balance.getProtocol());
