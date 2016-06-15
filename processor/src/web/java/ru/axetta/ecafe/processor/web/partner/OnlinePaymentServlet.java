@@ -19,6 +19,7 @@ import java.util.Map;
 abstract public class OnlinePaymentServlet extends HttpServlet {
 
     public static final String ATTR_SOAP_REQUEST = "soap";
+    public static final String ONLINE_PS_ERROR = "paymentError";
 
     protected abstract Logger getLogger();
 
@@ -33,10 +34,12 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
             try {
                 if (!authenticate(httpRequest, requestParser)) {
                     httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    httpRequest.setAttribute(ONLINE_PS_ERROR, "Remote address doesn't match.");
                     return;
                 }
                 if (!requestParser.checkRequestSignature(httpRequest)) {
                     httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    httpRequest.setAttribute(ONLINE_PS_ERROR, "Request signature wasn't verified.");
                     return;
                 }
             } catch (Exception e) {
@@ -44,6 +47,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                 getLogger().error("Request string",  httpRequest.getAttribute("javamelody.request"));
 
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
             OnlinePaymentProcessor.PayRequest payRequest=null;
@@ -53,11 +57,13 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                 payRequest = requestParser.parsePayRequest(contragentId, httpRequest);
             } catch (OnlinePaymentRequestParser.CardNotFoundException e) {
                 response = OnlinePaymentProcessor.generateErrorResponse(PaymentProcessResult.CARD_NOT_FOUND);
+                httpRequest.setAttribute(ONLINE_PS_ERROR, "Card not found for request");
                 getLogger().error("Card not found for request", e);
             } catch (Exception e) {
                 getLogger().error("Failed to parse request", e);
                 getLogger().error("Request string: " +  requestParser.getQueryString(httpRequest));
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
             if (response==null) {
@@ -68,6 +74,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
                     getLogger().error("Failed to process request", e);
                     getLogger().error("Request string: " +  requestParser.getQueryString(httpRequest));
                     httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                     return;
                 }
             }
@@ -78,11 +85,13 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
             } catch (Exception e) {
                 getLogger().error("Failed to serialize response", e);
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
         } catch (Exception e) {
             getLogger().error("Failed", e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
         }
     }
 

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.partner.OnlinePaymentServlet;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.PaymentResult;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
@@ -77,7 +78,11 @@ public class PaymentControllerWS extends HttpServlet implements PaymentControlle
             paymentResult.response = bufResponse.getBuffer("UTF-8");
             //checkSignature(paymentResult.response);
             OnlinePaymentProcessor.PayResponse payResponse = (OnlinePaymentProcessor.PayResponse)request.getAttribute(StdOnlinePaymentServlet.ATTR_PAY_RESPONSE);
-            if (payResponse==null) throw new Exception("authentication failed");
+            if (payResponse == null) {
+                final String paymentServletError = (String)request.getAttribute(OnlinePaymentServlet.ONLINE_PS_ERROR);
+                final String errorString = paymentServletError != null ? paymentServletError : "Internal server error.";
+                throw new Exception(errorString);
+            }
             paymentResult.clientId = payResponse.getClientId();
             paymentResult.opId = payResponse.getPaymentId();
             paymentResult.res = payResponse.getResultCode();
