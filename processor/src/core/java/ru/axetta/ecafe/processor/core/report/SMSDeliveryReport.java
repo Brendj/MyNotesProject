@@ -546,7 +546,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 reportItem.setShortNameInfoService(org.getShortNameInfoService());
                 reportItem.setShortAddress(org.getShortAddress());
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());
-                reportItem.setOrgStatus(org.getStatus().toString());
+                //reportItem.setOrgStatus(org.getStatus().toString());
+                reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
             }
         }
 
