@@ -326,6 +326,9 @@ public class JBossLoginModule implements LoginModule {
     }
 
     private void processBadPassword(User user, HttpServletRequest request) throws LoginException {
+        if ((user.isBlocked()) && (user.blockedDateExpired())) {
+            user.setAttemptNumber(0); //при успешном логине сбрасываем количество ошибочных попыток входа
+        }
         user = user.incAttemptNumbersAndBlock();
         if (user.getAttemptNumber() > RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
