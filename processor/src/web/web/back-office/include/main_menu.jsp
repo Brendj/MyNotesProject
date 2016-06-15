@@ -1271,7 +1271,7 @@
                         action="#{mainPage.showUserCreatePage}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="thinClientUsersGroupMenu" label="Тонкий клиент" binding="#{mainPage.thinClientUserGroupPage.mainMenuComponent}"
-                         rendered="#{mainPage.eligibleToViewUsers}">
+                         rendered="#{!mainPage.eligibleToViewUsers}">
         <a4j:support event="onclick" action="#{mainPage.showThinClientUsersGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="thinClientUserListPageMenuItem" binding="#{thinClientUserListPage.mainMenuComponent}" label="Список"

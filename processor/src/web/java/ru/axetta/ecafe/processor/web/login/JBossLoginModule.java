@@ -280,6 +280,7 @@ public class JBossLoginModule implements LoginModule {
                 user.setLastEntryIP(request.getRemoteAddr());
                 user.setLastEntryTime(new Date());
                 user.setAttemptNumber(0); //при успешном логине сбрасываем количество ошибочных попыток входа
+                user = DAOService.getInstance().setUserInfo(user);
                 logger.debug("User \"{}\": password validation successful", username);
                 SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                         .createSuccessAuthRecord(request.getRemoteAddr(), username, user);
