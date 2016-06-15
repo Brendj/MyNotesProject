@@ -80,7 +80,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
 
     private void processCurrentActiveIncomeReqs() throws Exception {
         for(Long currentOrg : migrants.getCurrentActiveIncome().keySet()){
-            List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrgVisit(session,currentOrg);
+            List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrgRegistry(session, currentOrg);
             List<Long> currentActiveIncomeInOrg = migrants.getCurrentActiveIncome().get(currentOrg);
             List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
             for(Migrant m : currentMigrants) {

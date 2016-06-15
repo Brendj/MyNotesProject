@@ -68,6 +68,9 @@ public class MigrantsUtils {
     }
 
     public static List<VisitReqResolutionHist> getSyncedResolutionsForMigrants(Session session, List<Migrant> migrants) throws Exception {
+        if(migrants.size() < 1){
+            return new ArrayList<VisitReqResolutionHist>();
+        }
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
         criteria.add(Restrictions.in("migrant", migrants));
         criteria.add(Restrictions.eq("syncState", VisitReqResolutionHist.SYNCHRONIZED));
@@ -114,16 +117,14 @@ public class MigrantsUtils {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.le("visitStartDate", date));
         criteria.add(Restrictions.ge("visitEndDate", date));
         return criteria.list();
     }
 
-    public static List<Migrant> getSyncedMigrantsForOrgVisit(Session session, Long idOfOrg) throws Exception {
+    public static List<Migrant> getSyncedMigrantsForOrgRegistry(Session session, Long idOfOrg) throws Exception {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);
-        criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.le("visitStartDate", date));
+        criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
         criteria.add(Restrictions.ge("visitEndDate", date));
         criteria.add(Restrictions.eq("syncState", Migrant.SYNCHRONIZED));
         return criteria.list();

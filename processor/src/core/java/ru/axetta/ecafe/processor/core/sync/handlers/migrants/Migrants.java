@@ -75,11 +75,10 @@ public class Migrants {
             }
         }
 
-        Node incomeMigrationRequestsHistoryNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequestsHistory");
-        this.incomeMigrationRequestsHistoryItems = new ArrayList<IncomeMigrationRequestsHistoryItem>();
+        Node incomeMigrationRequestsNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequests");
 
         currentActiveIncome = new HashMap<Long, List<Long>>();
-        String incomeCurrentActive = XMLUtils.getStringAttributeValue(incomeMigrationRequestsHistoryNode, "CurrentActive", 10000);
+        String incomeCurrentActive = XMLUtils.getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 10000);
         if(incomeCurrentActive != null) {
             if(incomeCurrentActive.length() > 0) {
                 String[] incomeIdsForOrg = incomeCurrentActive.split(";");
@@ -94,6 +93,9 @@ public class Migrants {
                 }
             }
         }
+
+        Node incomeMigrationRequestsHistoryNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequestsHistory");
+        this.incomeMigrationRequestsHistoryItems = new ArrayList<IncomeMigrationRequestsHistoryItem>();
 
         if(incomeMigrationRequestsHistoryNode != null){
             Node inMigReqHisItemNode = incomeMigrationRequestsHistoryNode.getFirstChild();
