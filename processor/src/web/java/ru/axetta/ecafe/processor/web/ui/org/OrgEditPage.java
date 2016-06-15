@@ -237,7 +237,7 @@ public class OrgEditPage extends BasicWorkspacePage
         long nextVersion = DAOUtils.nextVersionByOrgStucture(session);
 
         Set<Org> friendlyOrg = org.getFriendlyOrg();
-        if(idOfOrgList!=null && !idOfOrgList.isEmpty()){
+        if(idOfOrgList == null || idOfOrgList.isEmpty()){
             idOfOrgList = new ArrayList<Long>();
             idOfOrgList.add(idOfOrg);
         }
