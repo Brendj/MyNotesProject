@@ -32,6 +32,11 @@
             <h:inputText value="#{mainPage.orgsSecurityPage.filterDistrict}" maxlength="64"
                          styleClass="input-text" />
 
+            <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
+            <h:selectOneMenu value="#{mainPage.orgsSecurityPage.securityLevel}" styleClass="input-text" style="width: 250px;">
+                <f:selectItems value="#{mainPage.orgsSecurityPage.securityLevels}" />
+            </h:selectOneMenu>
+
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">

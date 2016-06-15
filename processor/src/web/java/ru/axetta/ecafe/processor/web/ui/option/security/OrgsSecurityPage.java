@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.option.security;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationSecurityLevel;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import java.util.LinkedList;
+import javax.faces.model.SelectItem;
 import java.util.List;
 
 /**
@@ -45,15 +46,23 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     private String filterGuid;
     private String filterDistrict;
     private String filterStatus;
+    private SelectItem[] securityLevels = readSecurityLevels();
+    private Integer securityLevel;
 
     private Long selectedIdOfOrg;
 
-    public void fill(Session session) {
-        List<OrgSecurityItem> items = new LinkedList<OrgSecurityItem>();
+    private SelectItem[] readSecurityLevels() {
+        SelectItem[] items = new SelectItem[3];
+        items[0] = new SelectItem(null, "Все");
+        items[1] = new SelectItem(OrganizationSecurityLevel.STANDARD.getCode()+1, OrganizationSecurityLevel.STANDARD.toString());
+        items[2] = new SelectItem(OrganizationSecurityLevel.EXTENDED.getCode()+1, OrganizationSecurityLevel.EXTENDED.toString());
+        return items;
+    }
 
-        //if(filterIdOfOrg != null) {
-            items = retrieveOrgs(session);
-        //}
+    public void fill(Session session) {
+        List<OrgSecurityItem> items;
+
+        items = retrieveOrgs(session);
 
         this.orgsList = items;
     }
@@ -85,6 +94,9 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
         }
         if (StringUtils.isNotEmpty(filterDistrict)) {
             criteria.add(Restrictions.like("district", filterDistrict, MatchMode.ANYWHERE).ignoreCase());
+        }
+        if (securityLevel != null) {
+            criteria.add(Restrictions.eq("securityLevel", OrganizationSecurityLevel.fromInteger(securityLevel-1)));
         }
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.distinct(Projections.property("idOfOrg")), "idOfOrg")
@@ -171,6 +183,7 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
         filterOfficialName = null;
         filterGuid = null;
         filterDistrict = null;
+        securityLevel = null;
     }
 
     public Long getFilterIdOfOrg() {
@@ -178,7 +191,6 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     }
 
     public void setFilterIdOfOrg(Long filterIdOfOrg) {
-        //this.filterIdOfOrg = filterIdOfOrg;
         if (filterIdOfOrg == null || filterIdOfOrg == 0) {
             this.filterIdOfOrg = null;
         } else {
@@ -191,7 +203,11 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     }
 
     public void setFilterOfficialName(String filterOfficialName) {
-        this.filterOfficialName = filterOfficialName;
+        if (StringUtils.isEmpty(filterOfficialName)) {
+            this.filterOfficialName = null;
+        } else {
+            this.filterOfficialName = filterOfficialName;
+        }
     }
 
     public String getFilterGuid() {
@@ -199,11 +215,15 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     }
 
     public void setFilterGuid(String filterGuid) {
-        this.filterGuid = filterGuid;
+        if (StringUtils.isEmpty(filterGuid)) {
+            this.filterGuid = null;
+        } else {
+            this.filterGuid = filterGuid;
+        }
     }
 
     public String getFilterStatus() {
-        if (filterIdOfOrg == null) {
+        if (filterIdOfOrg == null && filterOfficialName == null && filterGuid == null && filterDistrict == null && securityLevel == null) {
             return "нет";
         }
         return "установлен";
@@ -226,7 +246,11 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
     }
 
     public void setFilterDistrict(String filterDistrict) {
-        this.filterDistrict = filterDistrict;
+        if (StringUtils.isEmpty(filterDistrict)) {
+            this.filterDistrict = null;
+        } else {
+            this.filterDistrict = filterDistrict;
+        }
     }
 
     public Long getSelectedIdOfOrg() {
@@ -235,5 +259,25 @@ public class OrgsSecurityPage extends BasicWorkspacePage {
 
     public void setSelectedIdOfOrg(Long selectedIdOfOrg) {
         this.selectedIdOfOrg = selectedIdOfOrg;
+    }
+
+    public SelectItem[] getSecurityLevels() {
+        return securityLevels;
+    }
+
+    public void setSecurityLevels(SelectItem[] securityLevels) {
+        this.securityLevels = securityLevels;
+    }
+
+    public Integer getSecurityLevel() {
+        return securityLevel;
+    }
+
+    public void setSecurityLevel(Integer securityLevel) {
+        if (securityLevel == null || securityLevel == 0) {
+            this.securityLevel = null;
+        } else {
+            this.securityLevel = securityLevel;
+        }
     }
 }
