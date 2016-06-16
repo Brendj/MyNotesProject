@@ -1770,7 +1770,7 @@ public class MainPage implements Serializable {
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList);
+                                    idOfContragentList, this);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1813,7 +1813,7 @@ public class MainPage implements Serializable {
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList);
+                                    idOfContragentList, this);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1852,7 +1852,7 @@ public class MainPage implements Serializable {
                 } else {
                     orgListSelectPage
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList,
-                                    idOfContragentList);
+                                    idOfContragentList, this);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1950,7 +1950,7 @@ public class MainPage implements Serializable {
             } else {
                 orgListSelectPage
                         .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList,
-                                idOfContragentList);
+                                idOfContragentList, this);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
