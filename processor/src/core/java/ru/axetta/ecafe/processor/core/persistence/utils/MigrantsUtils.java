@@ -78,6 +78,9 @@ public class MigrantsUtils {
     }
 
     public static List<VisitReqResolutionHist> getResolutionsForMigrants(Session session, List<Migrant> migrants) throws Exception {
+        if(migrants.size() < 1){
+            return new ArrayList<VisitReqResolutionHist>();
+        }
         Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
         criteria.add(Restrictions.in("migrant", migrants));
         return criteria.list();

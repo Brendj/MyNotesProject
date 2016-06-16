@@ -27,11 +27,13 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     private static final Logger logger = LoggerFactory.getLogger(MigrantsProcessor.class);
     private final Migrants migrants;
     private List<Migrant> migrantsForOutRequests;
+    private List<VisitReqResolutionHist> resolutionsForInRequests;
 
     public MigrantsProcessor(Session persistenceSession, Migrants migrants) {
         super(persistenceSession);
         this.migrants = migrants;
         migrantsForOutRequests = new ArrayList<Migrant>();
+        resolutionsForInRequests = new ArrayList<VisitReqResolutionHist>();
     }
 
     @Override
@@ -40,8 +42,6 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems = new ArrayList<ResOutcomeMigrationRequestsItem>();
         List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems = new ArrayList<ResOutcomeMigrationRequestsHistoryItem>();
         List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems = new ArrayList<ResIncomeMigrationRequestsHistoryItem>();
-
-        processCurrentActiveIncomeReqs();
 
         if (processOutMigReqItems(outcomeMigrationRequestsItems)) {
             return null;
@@ -66,6 +66,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
         List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems = new ArrayList<ResOutcomeMigrationRequestsItem>();
         List<ResOutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems = new ArrayList<ResOutcomeMigrationRequestsHistoryItem>();
 
+        processCurrentActiveIncomeReqs();
         processResInMigReqItems(incomeMigrationRequestsItems);
         processResInMigReqHisItems(incomeMigrationRequestsHistoryItems);
         processResOutMigReqItems(outcomeMigrationRequestsItems);
@@ -90,11 +91,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                     currentMigrantsForSync.add(m);
                 }
             }
-            List<VisitReqResolutionHist> resolutionHistList = MigrantsUtils.getSyncedResolutionsForMigrants(session, currentMigrantsForSync);
-            for(VisitReqResolutionHist v : resolutionHistList){
-                v.setSyncState(VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                session.save(v);
-            }
+            resolutionsForInRequests.addAll(MigrantsUtils.getResolutionsForMigrants(session, currentMigrantsForSync));
         }
         session.flush();
     }
@@ -138,6 +135,11 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems) throws Exception {
         ResIncomeMigrationRequestsHistoryItem inMigReqHisItem;
         List<VisitReqResolutionHist> visitReqResolutionHistList = MigrantsUtils.getIncomeResolutionsForOrg(session, migrants.getIdOfOrg());
+        for(VisitReqResolutionHist v : resolutionsForInRequests){
+            if(!visitReqResolutionHistList.contains(v)){
+                visitReqResolutionHistList.add(v);
+            }
+        }
         for(VisitReqResolutionHist vReqHis : visitReqResolutionHistList){
             inMigReqHisItem = new ResIncomeMigrationRequestsHistoryItem();
             if(vReqHis.getResolution() != VisitReqResolutionHist.RES_OVERDUE_SERVER){
