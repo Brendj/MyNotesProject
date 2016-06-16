@@ -79,6 +79,7 @@ public class FeedingAndVisitSReport extends BasicReportForOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             OrgService orgService = OrgService.getInstance();
+            if (org == null) throw new NullPointerException("Не выбрана организация");
             Org mainBulding = orgService.getMainBulding(org.getIdOfOrg());
             parameterMap.put("orgName", mainBulding != null? mainBulding.getShortName() : org.getOfficialName());
             parameterMap.put("startDate", CalendarUtils.dateShortToString(startTime));
