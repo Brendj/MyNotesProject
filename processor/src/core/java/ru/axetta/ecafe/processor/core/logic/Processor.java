@@ -380,11 +380,6 @@ public class Processor
                     response = buildZeroTransactionsSyncResponse(request);
                     break;
                 }
-                case TYPE_SPECIAL_DATES:{
-                    //обработка календаря учебных дней
-                    response = buildSpecialDatesSyncResponse(request);
-                    break;
-                }
                 case TYPE_MIGRANTS:{
                     //обработка временных посетителей (мигрантов)
                     response = buildMigrantsSyncResponse(request);
