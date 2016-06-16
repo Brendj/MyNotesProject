@@ -1,13 +1,13 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -37,8 +37,8 @@ import java.util.List;
 public class DescriptionParametersType {
 
     @XmlElements({
-        @XmlElement(name = "DescriptionComplexParameter", type = DescriptionComplexParameter.class),
-        @XmlElement(name = "DescriptionSimpleParameter", type = DescriptionSimpleParameter.class)
+        @XmlElement(name = "DescriptionSimpleParameter", type = DescriptionSimpleParameter.class),
+        @XmlElement(name = "DescriptionComplexParameter", type = DescriptionComplexParameter.class)
     })
     protected List<DescriptionParameterType> descriptionSimpleParameterOrDescriptionComplexParameter;
 
@@ -60,8 +60,8 @@ public class DescriptionParametersType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link DescriptionComplexParameter }
      * {@link DescriptionSimpleParameter }
+     * {@link DescriptionComplexParameter }
      * 
      * 
      */

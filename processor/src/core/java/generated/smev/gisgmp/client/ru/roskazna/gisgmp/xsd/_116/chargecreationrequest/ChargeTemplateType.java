@@ -1,20 +1,20 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationrequest;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.budgetindex.BudgetIndexType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AdditionalDataType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.ChangeStatus;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.OrganizationType;
-
-import javax.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -60,8 +60,8 @@ import java.util.List;
  *           &lt;element name="UnifiedPayerIdentifier">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *                 &lt;pattern value="2\d{19}"/>
- *                 &lt;pattern value="3\d{19}|3\d{14}"/>
+ *                 &lt;pattern value="2\d{14}[A-Z0-9]{2}\d{3}"/>
+ *                 &lt;pattern value="3\d{14}[A-Z0-9]{2}\d{3}|3\d{14}"/>
  *                 &lt;pattern value="4\d{12}"/>
  *               &lt;/restriction>
  *             &lt;/simpleType>
@@ -69,7 +69,7 @@ import java.util.List;
  *           &lt;element name="AltPayerIdentifier">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *                 &lt;pattern value="((0[1-9])|(1[0-5])|(2[124]))[0-9a-zA-Z�-��-�]{23}"/>
+ *                 &lt;pattern value="((0[1-9])|(1[0-5])|(2[12456]))[0-9a-zA-Z�-��-�]{23}"/>
  *               &lt;/restriction>
  *             &lt;/simpleType>
  *           &lt;/element>
@@ -219,7 +219,7 @@ public class ChargeTemplateType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getValidUntil() {
@@ -231,7 +231,7 @@ public class ChargeTemplateType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setValidUntil(XMLGregorianCalendar value) {
@@ -291,7 +291,7 @@ public class ChargeTemplateType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getTotalAmount() {
@@ -303,7 +303,7 @@ public class ChargeTemplateType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setTotalAmount(BigInteger value) {
@@ -579,7 +579,7 @@ public class ChargeTemplateType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getAcptTerm() {
@@ -591,7 +591,7 @@ public class ChargeTemplateType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setAcptTerm(BigInteger value) {
@@ -603,7 +603,7 @@ public class ChargeTemplateType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getPaytCondition() {
@@ -615,7 +615,7 @@ public class ChargeTemplateType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setPaytCondition(BigInteger value) {

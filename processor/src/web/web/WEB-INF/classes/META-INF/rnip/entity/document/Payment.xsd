@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by test (test) -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:bdi="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" xmlns:org="http://roskazna.ru/gisgmp/xsd/116/Organization" xmlns:pi="http://roskazna.ru/gisgmp/xsd/116/PaymentInfo" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/PaymentInfo" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Organization" schemaLocation="../directory/Organization.xsd"/>
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../directory/Common.xsd"/>
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" schemaLocation="../directory/BudgetIndex.xsd"/>
 	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="../../request/xmldsig-core-schema.xsd"/>
 	<xsd:complexType name="PaymentIdentificationDataType">
+		<xsd:annotation>
+			<xsd:documentation>Данные для идентификации платежа</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="Bank" type="org:BankType">
+					<xsd:annotation>
+						<xsd:documentation>Данные банка плательщика</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Other">
+					<xsd:annotation>
+						<xsd:documentation>Признак, означающий иные способы проведения платежа (например, прием в кассу от плательщиков наличных денежных средств)</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="CASH">
+								<xsd:annotation>
+									<xsd:documentation>Прием в кассу наличных денежных средств</xsd:documentation>
+								</xsd:annotation>
+							</xsd:enumeration>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="UFK">
+					<xsd:annotation>
+						<xsd:documentation>УРН участника (не банка), проведшего платеж, присвоенный при регистрации в ГИС ГМП. Если платеж проведен ТОФК, то элемент должен быть заполнен значением четырехсимвольного кода ТОФК</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="36"/>
+							<xsd:whiteSpace value="preserve"/>
+							<xsd:pattern value="\d{4}"/>
+							<xsd:pattern value="[a-zA-Z0-9]{6}"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="SystemIdentifier" type="pi:SystemIdentifierType">
+				<xsd:annotation>
+					<xsd:documentation>УИП, присвоенный банком плательщика, ТОФК или иным участником, принявшим платеж.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ResponsePaymentIdentificationDataType">
 		<xsd:annotation>
 			<xsd:documentation>Данные для идентификации платежа</xsd:documentation>
 		</xsd:annotation>
@@ -48,383 +94,17 @@
 					<xsd:documentation>УИП, присвоенный банком плательщика, ТОФК или иным участником, принявшим платеж.</xsd:documentation>
 				</xsd:annotation>
 				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:pattern value="\P{S}{32}"/>
-						<xsd:pattern value="PaymentNotLoaded"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
-	<xsd:complexType name="IncomeInfoType">
-		<xsd:annotation>
-			<xsd:documentation>Информация по зачислению</xsd:documentation>
-		</xsd:annotation>
-	</xsd:complexType>
-	<xsd:complexType name="IncomeRowType">
-		<xsd:annotation>
-			<xsd:documentation>Тип, описывающий строку зачисления</xsd:documentation>
-		</xsd:annotation>
-		<xsd:sequence>
-			<xsd:element name="SupplierBillID">
-				<xsd:annotation>
-					<xsd:documentation>УИН</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:union memberTypes="com:SupplierBillIDType">
+					<xsd:union memberTypes="pi:SystemIdentifierType">
 						<xsd:simpleType>
 							<xsd:restriction base="xsd:string">
-								<xsd:pattern value="0"/>
+								<xsd:pattern value="PaymentNotLoaded"/>
 							</xsd:restriction>
 						</xsd:simpleType>
 					</xsd:union>
 				</xsd:simpleType>
 			</xsd:element>
-			<xsd:element name="Narrative">
-				<xsd:annotation>
-					<xsd:documentation>назначение платежа</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:maxLength value="210"/>
-						<xsd:minLength value="1"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="Amount">
-				<xsd:annotation>
-					<xsd:documentation>Сумма оплаты по платежу/зачислению (в копейках)</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:unsignedLong">
-						<xsd:minInclusive value="1"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="PaymentDate" type="xsd:dateTime">
-				<xsd:annotation>
-					<xsd:documentation>дата платежа</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="ReceiptDate" type="xsd:date" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Дата поступления распоряжения в банк плательщика</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="BudgetIndex" type="bdi:BudgetIndexType"/>
-			<xsd:element name="PaymentIdentificationData" type="pi:PaymentIdentificationDataType">
-				<xsd:annotation>
-					<xsd:documentation>Данные, необходимые для идентификации платежа</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element ref="pi:AccDoc" minOccurs="0"/>
-			<xsd:element name="Payer">
-				<xsd:annotation>
-					<xsd:documentation>Плательщик</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element ref="com:PayerIdentifier">
-							<xsd:annotation>
-								<xsd:documentation>Идентификатор плательщика</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="PayerName" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Наименование плательщика</xsd:documentation>
-							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:string">
-									<xsd:maxLength value="160"/>
-								</xsd:restriction>
-							</xsd:simpleType>
-						</xsd:element>
-						<xsd:element name="PayerAccount" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Номер счета плательщика</xsd:documentation>
-							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:string">
-									<xsd:maxLength value="20"/>
-								</xsd:restriction>
-							</xsd:simpleType>
-						</xsd:element>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="RecipientServicesIdentifier" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Идентификатор получателя услуги / плательщика, указанного в начислении. Алгоритм формирования идентификатора получателя услуги совпадает с алгоритмом формирования идентификатора плательщика</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:minLength value="1"/>
-						<xsd:maxLength value="25"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="PayerPA" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Дополнительный идентификатор получателя услуги в учетной системе получателя средств</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:minLength value="1"/>
-						<xsd:maxLength value="50"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element ref="com:TransKind" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Вид операции.
-Указывается шифр платежного документа. Возможные значения: 
-01 –платежное поручение; 
-06 - инкассовое поручение; 
-02 - платежное требование;
-16 - платежный ордер;
-ПД – платежный документ ФЛ</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="TransContent" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Содержание операции. Указывается при частичном исполнении</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:maxLength value="16"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="PaytCondition" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Условие оплаты. Возможные значения:
- 1 - заранее данный акцепт плательщика;
- 2 - требуется получение акцепта плательщика.</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:integer">
-						<xsd:totalDigits value="1"/>
-						<xsd:minInclusive value="1"/>
-						<xsd:enumeration value="1"/>
-						<xsd:enumeration value="2"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="AcptTerm" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Количество дней для получения акцепта плательщика</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:integer">
-						<xsd:totalDigits value="1"/>
-						<xsd:minInclusive value="1"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="MaturityDate" type="xsd:date" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Окончание срока акцепта</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="DocDispatchDate" type="xsd:date" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Дата отсылки (вручения) плательщику документов</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="PartialPayt" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Информация о частичном платеже</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="PaytNo" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Номер частичного платежа</xsd:documentation>
-							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:string">
-									<xsd:maxLength value="3"/>
-								</xsd:restriction>
-							</xsd:simpleType>
-						</xsd:element>
-						<xsd:element ref="com:TransKind">
-							<xsd:annotation>
-								<xsd:documentation>Вид операции</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="SumResidualPayt" minOccurs="0">
-							<xsd:annotation>
-								<xsd:documentation>Сумма остатка платежа</xsd:documentation>
-							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:integer">
-									<xsd:totalDigits value="18"/>
-									<xsd:minInclusive value="0"/>
-								</xsd:restriction>
-							</xsd:simpleType>
-						</xsd:element>
-						<xsd:element ref="pi:AccDoc"/>
-					</xsd:sequence>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="Priority" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Очередность платежа. Возможные значения: 0-6</xsd:documentation>
-				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string">
-						<xsd:maxLength value="1"/>
-						<xsd:pattern value="[0-6]"/>
-					</xsd:restriction>
-				</xsd:simpleType>
-			</xsd:element>
-			<xsd:element name="AdditionalData" type="com:AdditionalDataType" minOccurs="0" maxOccurs="unbounded">
-				<xsd:annotation>
-					<xsd:documentation>Дополнительные данные</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:element name="Income">
-		<xsd:annotation>
-			<xsd:documentation>Зачисление</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="pi:IncomeInfoType">
-					<xsd:sequence>
-						<xsd:element name="ChangeStatus">
-							<xsd:annotation>
-								<xsd:documentation>Сведения о статусе зачисления и основаниях его изменения</xsd:documentation>
-							</xsd:annotation>
-							<xsd:complexType>
-								<xsd:sequence minOccurs="0">
-									<xsd:element name="Reason">
-										<xsd:annotation>
-											<xsd:documentation>Основание изменения</xsd:documentation>
-										</xsd:annotation>
-										<xsd:simpleType>
-											<xsd:restriction base="xsd:string">
-												<xsd:maxLength value="512"/>
-											</xsd:restriction>
-										</xsd:simpleType>
-									</xsd:element>
-								</xsd:sequence>
-								<xsd:attribute name="meaning" use="required">
-									<xsd:annotation>
-										<xsd:documentation>1 - новый; 2 - уточнение;  3 - аннулирование (не используется)</xsd:documentation>
-									</xsd:annotation>
-									<xsd:simpleType>
-										<xsd:restriction base="xsd:string">
-											<xsd:length value="1"/>
-											<xsd:enumeration value="1">
-												<xsd:annotation>
-													<xsd:documentation>Новый</xsd:documentation>
-												</xsd:annotation>
-											</xsd:enumeration>
-											<xsd:enumeration value="2">
-												<xsd:annotation>
-													<xsd:documentation>Уточнение</xsd:documentation>
-												</xsd:annotation>
-											</xsd:enumeration>
-											<xsd:enumeration value="3">
-												<xsd:annotation>
-													<xsd:documentation>Аннулирование</xsd:documentation>
-												</xsd:annotation>
-											</xsd:enumeration>
-										</xsd:restriction>
-									</xsd:simpleType>
-								</xsd:attribute>
-							</xsd:complexType>
-						</xsd:element>
-						<xsd:element name="ConsDocNumber">
-							<xsd:annotation>
-								<xsd:documentation>Идентификатор зачисления</xsd:documentation>
-							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:string">
-									<xsd:maxLength value="36"/>
-									<xsd:minLength value="0"/>
-								</xsd:restriction>
-							</xsd:simpleType>
-						</xsd:element>
-						<xsd:element name="ConsDocDate" type="xsd:dateTime">
-							<xsd:annotation>
-								<xsd:documentation>Дата формирования зачисления</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="KBK" type="com:KBKType" nillable="true">
-							<xsd:annotation>
-								<xsd:documentation>Код бюджетной классификации</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="OKTMO" type="com:OKTMOType">
-							<xsd:annotation>
-								<xsd:documentation>Код ОКТМО, указанный в распоряжении о переводе денежных средств. В случае отсутствия следует указывать значение «0», а также  в случае формирования извещения при приеме наличных денежных средств в кассу получателя платежа, следует указывать значение «0»</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element name="Payee">
-							<xsd:annotation>
-								<xsd:documentation>Получатель средств</xsd:documentation>
-							</xsd:annotation>
-							<xsd:complexType>
-								<xsd:sequence>
-									<xsd:element name="PayeeName">
-										<xsd:annotation>
-											<xsd:documentation>Наименование получателя</xsd:documentation>
-										</xsd:annotation>
-										<xsd:simpleType>
-											<xsd:restriction base="xsd:string">
-												<xsd:maxLength value="500"/>
-											</xsd:restriction>
-										</xsd:simpleType>
-									</xsd:element>
-									<xsd:element name="payeeINN" type="com:INNType">
-										<xsd:annotation>
-											<xsd:documentation>ИНН получателя</xsd:documentation>
-										</xsd:annotation>
-									</xsd:element>
-									<xsd:element name="payeeKPP" type="com:KPPType">
-										<xsd:annotation>
-											<xsd:documentation>КПП получателя</xsd:documentation>
-										</xsd:annotation>
-									</xsd:element>
-									<xsd:element name="PayeeBankAcc" type="org:AccountType">
-										<xsd:annotation>
-											<xsd:documentation>Расчетный счет получателя средств</xsd:documentation>
-										</xsd:annotation>
-									</xsd:element>
-								</xsd:sequence>
-							</xsd:complexType>
-						</xsd:element>
-						<xsd:element name="IncomeRows">
-							<xsd:complexType>
-								<xsd:sequence>
-									<xsd:element name="IncomeRow" type="pi:IncomeRowType" maxOccurs="unbounded"/>
-								</xsd:sequence>
-							</xsd:complexType>
-						</xsd:element>
-						<xsd:element ref="com:AdditionalData" minOccurs="0" maxOccurs="unbounded">
-							<xsd:annotation>
-								<xsd:documentation>Дополнительные поля</xsd:documentation>
-							</xsd:annotation>
-						</xsd:element>
-						<xsd:element ref="ds:Signature" minOccurs="0"/>
-					</xsd:sequence>
-					<xsd:attribute name="Id" use="optional">
-						<xsd:annotation>
-							<xsd:documentation>Идентификатор, необходимый для наложения ЭП в формате XadES</xsd:documentation>
-						</xsd:annotation>
-						<xsd:simpleType>
-							<xsd:restriction base="xsd:ID">
-								<xsd:maxLength value="50"/>
-							</xsd:restriction>
-						</xsd:simpleType>
-					</xsd:attribute>
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
 	<xsd:complexType name="PaymentType">
 		<xsd:annotation>
 			<xsd:documentation>Базовый тип для платежа/строки зачисления</xsd:documentation>
@@ -458,7 +138,7 @@
 			</xsd:element>
 			<xsd:element name="Amount">
 				<xsd:annotation>
-					<xsd:documentation>Сумма оплаты по платежу/зачислению (в копейках)</xsd:documentation>
+					<xsd:documentation>Сумма платежа в копейках</xsd:documentation>
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:unsignedLong">
@@ -542,10 +222,19 @@
 								<xsd:documentation>ИНН получателя</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
-						<xsd:element name="payeeKPP" type="com:KPPType">
+						<xsd:element name="payeeKPP">
 							<xsd:annotation>
 								<xsd:documentation>КПП получателя</xsd:documentation>
 							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:union memberTypes="com:KPPType">
+									<xsd:simpleType>
+										<xsd:restriction base="xsd:string">
+											<xsd:pattern value="0"/>
+										</xsd:restriction>
+									</xsd:simpleType>
+								</xsd:union>
+							</xsd:simpleType>
 						</xsd:element>
 						<xsd:element name="PayeeBankAcc" type="org:AccountType">
 							<xsd:annotation>
@@ -789,4 +478,9 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+	<xsd:simpleType name="SystemIdentifierType">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="\P{S}{32}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 </xsd:schema>

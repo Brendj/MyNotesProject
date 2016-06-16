@@ -1,12 +1,5 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp._02000000.smevgisgmpservice;
-
-import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.MessageDataType;
-import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.MessageType;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -15,6 +8,8 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
+import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.MessageDataType;
+import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.MessageType;
 
 
 /**
@@ -63,9 +58,10 @@ public interface SmevGISGMPService {
     @WebMethod(operationName = "GISGMPTransferMsg", action = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/GISGMPTransferMsg")
     @RequestWrapper(localName = "GISGMPTransferMsg", targetNamespace = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/", className = "ru.gosuslugi.smev.rev120315.BaseMessageType")
     @ResponseWrapper(localName = "GISGMPTransferMsg", targetNamespace = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/", className = "ru.gosuslugi.smev.rev120315.BaseMessageType")
-    public void gisgmpTransferMsg(@WebParam(name = "Message", targetNamespace = "http://smev.gosuslugi.ru/rev120315",
-            mode = WebParam.Mode.INOUT) Holder<MessageType> message,
-            @WebParam(name = "MessageData", targetNamespace = "http://smev.gosuslugi.ru/rev120315",
-                    mode = WebParam.Mode.INOUT) Holder<MessageDataType> messageData);
+    public void gisgmpTransferMsg(
+        @WebParam(name = "Message", targetNamespace = "http://smev.gosuslugi.ru/rev120315", mode = WebParam.Mode.INOUT)
+        Holder<MessageType> message,
+        @WebParam(name = "MessageData", targetNamespace = "http://smev.gosuslugi.ru/rev120315", mode = WebParam.Mode.INOUT)
+        Holder<MessageDataType> messageData);
 
 }

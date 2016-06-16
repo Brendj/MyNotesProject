@@ -1,16 +1,11 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp._02000000.smevgisgmpservice;
-
-import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.BaseMessageType;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.BaseMessageType;
 
 
 /**
@@ -40,7 +35,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link BaseMessageType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link BaseMessageType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/", name = "GISGMPTransferMsg")

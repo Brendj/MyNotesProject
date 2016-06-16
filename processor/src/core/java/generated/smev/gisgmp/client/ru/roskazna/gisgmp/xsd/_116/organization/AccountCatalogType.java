@@ -1,14 +1,14 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization;
 
-import javax.xml.bind.annotation.*;
+import java.math.BigInteger;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.math.BigInteger;
 
 
 /**
@@ -110,7 +110,7 @@ public class AccountCatalogType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getKind() {
@@ -126,7 +126,7 @@ public class AccountCatalogType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setKind(BigInteger value) {

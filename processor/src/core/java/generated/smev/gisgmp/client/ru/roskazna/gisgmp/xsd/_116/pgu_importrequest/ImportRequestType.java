@@ -1,16 +1,15 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge.ChargeType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType;
-
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge.ChargeType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType;
 
 
 /**
@@ -63,17 +62,17 @@ import java.util.List;
 public class ImportRequestType {
 
     @XmlElement(name = "Package", required = true)
-    protected Package _package;
+    protected ImportRequestType.Package _package;
 
     /**
      * Gets the value of the package property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest.ImportRequestType.Package }
+     *     {@link ImportRequestType.Package }
      *     
      */
-    public Package getPackage() {
+    public ImportRequestType.Package getPackage() {
         return _package;
     }
 
@@ -82,10 +81,10 @@ public class ImportRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest.ImportRequestType.Package }
+     *     {@link ImportRequestType.Package }
      *     
      */
-    public void setPackage(Package value) {
+    public void setPackage(ImportRequestType.Package value) {
         this._package = value;
     }
 
@@ -128,7 +127,7 @@ public class ImportRequestType {
     public static class Package {
 
         @XmlElement(name = "Document", required = true)
-        protected List<Document> document;
+        protected List<ImportRequestType.Package.Document> document;
 
         /**
          * Gets the value of the document property.
@@ -148,13 +147,13 @@ public class ImportRequestType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest.ImportRequestType.Package.Document }
+         * {@link ImportRequestType.Package.Document }
          * 
          * 
          */
-        public List<Document> getDocument() {
+        public List<ImportRequestType.Package.Document> getDocument() {
             if (document == null) {
-                document = new ArrayList<Document>();
+                document = new ArrayList<ImportRequestType.Package.Document>();
             }
             return this.document;
         }

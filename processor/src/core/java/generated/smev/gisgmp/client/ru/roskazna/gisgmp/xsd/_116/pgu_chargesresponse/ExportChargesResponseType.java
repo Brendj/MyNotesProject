@@ -1,14 +1,16 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse;
 
-import javax.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -81,17 +83,17 @@ import java.util.List;
 public class ExportChargesResponseType {
 
     @XmlElement(name = "Charges", required = true)
-    protected Charges charges;
+    protected ExportChargesResponseType.Charges charges;
 
     /**
      * Gets the value of the charges property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType.Charges }
+     *     {@link ExportChargesResponseType.Charges }
      *     
      */
-    public Charges getCharges() {
+    public ExportChargesResponseType.Charges getCharges() {
         return charges;
     }
 
@@ -100,10 +102,10 @@ public class ExportChargesResponseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType.Charges }
+     *     {@link ExportChargesResponseType.Charges }
      *     
      */
-    public void setCharges(Charges value) {
+    public void setCharges(ExportChargesResponseType.Charges value) {
         this.charges = value;
     }
 
@@ -168,7 +170,7 @@ public class ExportChargesResponseType {
     public static class Charges {
 
         @XmlElement(name = "ChargeInfo")
-        protected List<ChargeInfo> chargeInfo;
+        protected List<ExportChargesResponseType.Charges.ChargeInfo> chargeInfo;
         @XmlAttribute(required = true)
         protected boolean hasMore;
         @XmlAttribute
@@ -192,13 +194,13 @@ public class ExportChargesResponseType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType.Charges.ChargeInfo }
+         * {@link ExportChargesResponseType.Charges.ChargeInfo }
          * 
          * 
          */
-        public List<ChargeInfo> getChargeInfo() {
+        public List<ExportChargesResponseType.Charges.ChargeInfo> getChargeInfo() {
             if (chargeInfo == null) {
-                chargeInfo = new ArrayList<ChargeInfo>();
+                chargeInfo = new ArrayList<ExportChargesResponseType.Charges.ChargeInfo>();
             }
             return this.chargeInfo;
         }
@@ -308,7 +310,7 @@ public class ExportChargesResponseType {
             @XmlElement(name = "QuittanceWithPaymentStatus")
             protected String quittanceWithPaymentStatus;
             @XmlElement(name = "IsRevoked")
-            protected IsRevoked isRevoked;
+            protected ExportChargesResponseType.Charges.ChargeInfo.IsRevoked isRevoked;
 
             /**
              * Gets the value of the chargeData property.
@@ -399,10 +401,10 @@ public class ExportChargesResponseType {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType.Charges.ChargeInfo.IsRevoked }
+             *     {@link ExportChargesResponseType.Charges.ChargeInfo.IsRevoked }
              *     
              */
-            public IsRevoked getIsRevoked() {
+            public ExportChargesResponseType.Charges.ChargeInfo.IsRevoked getIsRevoked() {
                 return isRevoked;
             }
 
@@ -411,10 +413,10 @@ public class ExportChargesResponseType {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType.Charges.ChargeInfo.IsRevoked }
+             *     {@link ExportChargesResponseType.Charges.ChargeInfo.IsRevoked }
              *     
              */
-            public void setIsRevoked(IsRevoked value) {
+            public void setIsRevoked(ExportChargesResponseType.Charges.ChargeInfo.IsRevoked value) {
                 this.isRevoked = value;
             }
 
@@ -469,7 +471,7 @@ public class ExportChargesResponseType {
                  * 
                  * @return
                  *     possible object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public XMLGregorianCalendar getDate() {
@@ -481,7 +483,7 @@ public class ExportChargesResponseType {
                  * 
                  * @param value
                  *     allowed object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public void setDate(XMLGregorianCalendar value) {

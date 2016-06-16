@@ -1,7 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://roskazna.ru/gisgmp/xsd/116/PGU_ChargesResponse" elementFormDefault="qualified"
-            attributeFormDefault="unqualified">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pcrs="http://roskazna.ru/gisgmp/xsd/116/PGU_ChargesResponse" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/PGU_ChargesResponse" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:complexType name="ExportChargesResponseType">
 		<xsd:sequence>
 			<xsd:element name="Charges">
@@ -23,7 +21,7 @@
 									</xsd:element>
 									<xsd:element name="ChargeSignature" type="xsd:base64Binary" minOccurs="0">
 										<xsd:annotation>
-											<xsd:documentation>Данные файла ЭП начисления, переданного от АН в ИС РНиП/ГИС ГМП</xsd:documentation>
+											<xsd:documentation>Данные файла ЭП начисления, загруженного от АН/ГАН в ГИС ГМП</xsd:documentation>
 										</xsd:annotation>
 									</xsd:element>
 									<xsd:element name="AmountToPay" type="xsd:long">
@@ -34,20 +32,6 @@
 									<xsd:element name="QuittanceWithPaymentStatus" minOccurs="0">
 										<xsd:annotation>
 											<xsd:documentation>Статус квитирования с платежами 1 - сквитировано 2 - предв. сквитировано 3 - не сквитировано 4 - сквитировано с отсутствующим в системе платежом </xsd:documentation>
-										</xsd:annotation>
-										<xsd:simpleType>
-											<xsd:restriction base="xsd:string">
-												<xsd:length value="1"/>
-												<xsd:enumeration value="1"/>
-												<xsd:enumeration value="2"/>
-												<xsd:enumeration value="3"/>
-												<xsd:enumeration value="4"/>
-											</xsd:restriction>
-										</xsd:simpleType>
-									</xsd:element>
-									<xsd:element name="QuittanceWithIncomeStatus" minOccurs="0">
-										<xsd:annotation>
-											<xsd:documentation>Статус квитирования с зачислениями 1 - сквитировано 2 - предв. сквитировано 3 - не сквитировано 4 - сквитировано с отсутствующим в системе платежом </xsd:documentation>
 										</xsd:annotation>
 										<xsd:simpleType>
 											<xsd:restriction base="xsd:string">

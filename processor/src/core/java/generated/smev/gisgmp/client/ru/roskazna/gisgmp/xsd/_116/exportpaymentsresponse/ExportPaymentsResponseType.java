@@ -1,13 +1,13 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -36,7 +36,7 @@ import java.util.List;
  *                               &lt;complexType>
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                                     &lt;attribute name=" name" use="required">
+ *                                     &lt;attribute name="name" use="required">
  *                                       &lt;simpleType>
  *                                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                                           &lt;minLength value="1"/>
@@ -44,7 +44,7 @@ import java.util.List;
  *                                         &lt;/restriction>
  *                                       &lt;/simpleType>
  *                                     &lt;/attribute>
- *                                     &lt;attribute name=" value">
+ *                                     &lt;attribute name="value">
  *                                       &lt;simpleType>
  *                                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                                           &lt;minLength value="0"/>
@@ -83,17 +83,17 @@ import java.util.List;
 public class ExportPaymentsResponseType {
 
     @XmlElement(name = "Payments", required = true)
-    protected Payments payments;
+    protected ExportPaymentsResponseType.Payments payments;
 
     /**
      * Gets the value of the payments property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType.Payments }
+     *     {@link ExportPaymentsResponseType.Payments }
      *     
      */
-    public Payments getPayments() {
+    public ExportPaymentsResponseType.Payments getPayments() {
         return payments;
     }
 
@@ -102,10 +102,10 @@ public class ExportPaymentsResponseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType.Payments }
+     *     {@link ExportPaymentsResponseType.Payments }
      *     
      */
-    public void setPayments(Payments value) {
+    public void setPayments(ExportPaymentsResponseType.Payments value) {
         this.payments = value;
     }
 
@@ -131,7 +131,7 @@ public class ExportPaymentsResponseType {
      *                     &lt;complexType>
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                           &lt;attribute name=" name" use="required">
+     *                           &lt;attribute name="name" use="required">
      *                             &lt;simpleType>
      *                               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                                 &lt;minLength value="1"/>
@@ -139,7 +139,7 @@ public class ExportPaymentsResponseType {
      *                               &lt;/restriction>
      *                             &lt;/simpleType>
      *                           &lt;/attribute>
-     *                           &lt;attribute name=" value">
+     *                           &lt;attribute name="value">
      *                             &lt;simpleType>
      *                               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                                 &lt;minLength value="0"/>
@@ -173,7 +173,7 @@ public class ExportPaymentsResponseType {
     public static class Payments {
 
         @XmlElement(name = "PaymentInfo")
-        protected List<PaymentInfo> paymentInfo;
+        protected List<ExportPaymentsResponseType.Payments.PaymentInfo> paymentInfo;
         @XmlAttribute(required = true)
         protected boolean hasMore;
         @XmlAttribute
@@ -197,13 +197,13 @@ public class ExportPaymentsResponseType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType.Payments.PaymentInfo }
+         * {@link ExportPaymentsResponseType.Payments.PaymentInfo }
          * 
          * 
          */
-        public List<PaymentInfo> getPaymentInfo() {
+        public List<ExportPaymentsResponseType.Payments.PaymentInfo> getPaymentInfo() {
             if (paymentInfo == null) {
-                paymentInfo = new ArrayList<PaymentInfo>();
+                paymentInfo = new ArrayList<ExportPaymentsResponseType.Payments.PaymentInfo>();
             }
             return this.paymentInfo;
         }
@@ -269,7 +269,7 @@ public class ExportPaymentsResponseType {
          *           &lt;complexType>
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *                 &lt;attribute name=" name" use="required">
+         *                 &lt;attribute name="name" use="required">
          *                   &lt;simpleType>
          *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
          *                       &lt;minLength value="1"/>
@@ -277,7 +277,7 @@ public class ExportPaymentsResponseType {
          *                     &lt;/restriction>
          *                   &lt;/simpleType>
          *                 &lt;/attribute>
-         *                 &lt;attribute name=" value">
+         *                 &lt;attribute name="value">
          *                   &lt;simpleType>
          *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
          *                       &lt;minLength value="0"/>
@@ -310,7 +310,7 @@ public class ExportPaymentsResponseType {
             @XmlElement(name = "PaymentSignature")
             protected byte[] paymentSignature;
             @XmlElement(name = "PaymentStatus")
-            protected List<PaymentStatus> paymentStatus;
+            protected List<ExportPaymentsResponseType.Payments.PaymentInfo.PaymentStatus> paymentStatus;
 
             /**
              * Gets the value of the paymentData property.
@@ -374,13 +374,13 @@ public class ExportPaymentsResponseType {
              * 
              * <p>
              * Objects of the following type(s) are allowed in the list
-             * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType.Payments.PaymentInfo.PaymentStatus }
+             * {@link ExportPaymentsResponseType.Payments.PaymentInfo.PaymentStatus }
              * 
              * 
              */
-            public List<PaymentStatus> getPaymentStatus() {
+            public List<ExportPaymentsResponseType.Payments.PaymentInfo.PaymentStatus> getPaymentStatus() {
                 if (paymentStatus == null) {
-                    paymentStatus = new ArrayList<PaymentStatus>();
+                    paymentStatus = new ArrayList<ExportPaymentsResponseType.Payments.PaymentInfo.PaymentStatus>();
                 }
                 return this.paymentStatus;
             }
@@ -395,7 +395,7 @@ public class ExportPaymentsResponseType {
              * &lt;complexType>
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-             *       &lt;attribute name=" name" use="required">
+             *       &lt;attribute name="name" use="required">
              *         &lt;simpleType>
              *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
              *             &lt;minLength value="1"/>
@@ -403,7 +403,7 @@ public class ExportPaymentsResponseType {
              *           &lt;/restriction>
              *         &lt;/simpleType>
              *       &lt;/attribute>
-             *       &lt;attribute name=" value">
+             *       &lt;attribute name="value">
              *         &lt;simpleType>
              *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
              *             &lt;minLength value="0"/>
@@ -422,57 +422,57 @@ public class ExportPaymentsResponseType {
             @XmlType(name = "")
             public static class PaymentStatus {
 
-                @XmlAttribute(name = " name", required = true)
-                protected String _0020Name;
-                @XmlAttribute(name = " value")
-                protected String _0020Value;
+                @XmlAttribute(required = true)
+                protected String name;
+                @XmlAttribute
+                protected String value;
 
                 /**
-                 * Gets the value of the 0020Name property.
+                 * Gets the value of the name property.
                  * 
                  * @return
                  *     possible object is
                  *     {@link String }
                  *     
                  */
-                public String get_0020Name() {
-                    return _0020Name;
+                public String getName() {
+                    return name;
                 }
 
                 /**
-                 * Sets the value of the 0020Name property.
+                 * Sets the value of the name property.
                  * 
                  * @param value
                  *     allowed object is
                  *     {@link String }
                  *     
                  */
-                public void set_0020Name(String value) {
-                    this._0020Name = value;
+                public void setName(String value) {
+                    this.name = value;
                 }
 
                 /**
-                 * Gets the value of the 0020Value property.
+                 * Gets the value of the value property.
                  * 
                  * @return
                  *     possible object is
                  *     {@link String }
                  *     
                  */
-                public String get_0020Value() {
-                    return _0020Value;
+                public String getValue() {
+                    return value;
                 }
 
                 /**
-                 * Sets the value of the 0020Value property.
+                 * Sets the value of the value property.
                  * 
                  * @param value
                  *     allowed object is
                  *     {@link String }
                  *     
                  */
-                public void set_0020Value(String value) {
-                    this._0020Value = value;
+                public void setValue(String value) {
+                    this.value = value;
                 }
 
             }

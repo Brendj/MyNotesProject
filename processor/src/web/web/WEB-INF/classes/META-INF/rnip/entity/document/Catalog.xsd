@@ -1,9 +1,5 @@
-﻿<xs:schema xmlns="http://roskazna.ru/gisgmp/xsd/116/Catalog" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
-           xmlns:org="http://roskazna.ru/gisgmp/xsd/116/Organization"
-           xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common"
-           targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Catalog" elementFormDefault="qualified"
-           attributeFormDefault="unqualified">
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://roskazna.ru/gisgmp/xsd/116/Catalog" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ns1="http://roskazna.ru/gisgmp/xsd/116/Common" xmlns:ns2="http://roskazna.ru/gisgmp/xsd/116/Organization" xmlns:org="http://roskazna.ru/gisgmp/xsd/116/Organization" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Catalog" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="../../request/xmldsig-core-schema.xsd"/>
 	<xs:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../directory/Common.xsd"/>
 	<xs:import namespace="http://roskazna.ru/gisgmp/xsd/116/Organization" schemaLocation="../directory/Organization.xsd"/>
@@ -278,10 +274,16 @@ false - не доступна</xs:documentation>
 		<xs:annotation>
 			<xs:documentation>Тип, описывающий категории услуг</xs:documentation>
 		</xs:annotation>
-		<xs:attribute name="code" type="xs:string" use="required">
+		<xs:attribute name="code" use="required">
 			<xs:annotation>
 				<xs:documentation>Код категории</xs:documentation>
 			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+					<xs:maxLength value="20"/>
+				</xs:restriction>
+			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="name" use="required">
 			<xs:annotation>

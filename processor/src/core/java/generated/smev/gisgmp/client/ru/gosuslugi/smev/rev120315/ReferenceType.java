@@ -1,17 +1,16 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315;
 
-import generated.smev.gisgmp.client.org.w3._2004._08.xop.include.Include;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlMixed;
+import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.org.w3._2004._08.xop.include.Include;
 
 
 /**
@@ -62,7 +61,7 @@ public class ReferenceType {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link String }
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link Include }{@code >}
+     * {@link JAXBElement }{@code <}{@link Include }{@code >}
      * 
      * 
      */

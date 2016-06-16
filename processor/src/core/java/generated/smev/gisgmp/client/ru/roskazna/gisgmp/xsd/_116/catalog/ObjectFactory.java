@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog;
 
 import javax.xml.bind.JAXBElement;
@@ -43,115 +39,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DescriptionSimpleParameter }
-     * 
-     */
-    public DescriptionSimpleParameter createDescriptionSimpleParameter() {
-        return new DescriptionSimpleParameter();
-    }
-
-    /**
-     * Create an instance of {@link CatalogFullInqMsgRs }
-     * 
-     */
-    public CatalogFullInqMsgRs createCatalogFullInqMsgRs() {
-        return new CatalogFullInqMsgRs();
-    }
-
-    /**
-     * Create an instance of {@link ServiceCategoryType }
-     * 
-     */
-    public ServiceCategoryType createServiceCategoryType() {
-        return new ServiceCategoryType();
-    }
-
-    /**
-     * Create an instance of {@link ServiceType }
-     * 
-     */
-    public ServiceType createServiceType() {
-        return new ServiceType();
-    }
-
-    /**
-     * Create an instance of {@link DescriptionComplexParameter }
-     * 
-     */
-    public DescriptionComplexParameter createDescriptionComplexParameter() {
-        return new DescriptionComplexParameter();
-    }
-
-    /**
-     * Create an instance of {@link DescriptionParameterType }
-     * 
-     */
-    public DescriptionParameterType createDescriptionParameterType() {
-        return new DescriptionParameterType();
-    }
-
-    /**
-     * Create an instance of {@link DescriptionFieldType }
-     * 
-     */
-    public DescriptionFieldType createDescriptionFieldType() {
-        return new DescriptionFieldType();
-    }
-
-    /**
-     * Create an instance of {@link DescriptionParametersType }
-     * 
-     */
-    public DescriptionParametersType createDescriptionParametersType() {
-        return new DescriptionParametersType();
-    }
-
-    /**
      * Create an instance of {@link ServiceType.CurrenciesServices }
      * 
      */
     public ServiceType.CurrenciesServices createServiceTypeCurrenciesServices() {
         return new ServiceType.CurrenciesServices();
-    }
-
-    /**
-     * Create an instance of {@link ErrorType }
-     * 
-     */
-    public ErrorType createErrorType() {
-        return new ErrorType();
-    }
-
-    /**
-     * Create an instance of {@link ServiceType.Subservices }
-     * 
-     */
-    public ServiceType.Subservices createServiceTypeSubservices() {
-        return new ServiceType.Subservices();
-    }
-
-    /**
-     * Create an instance of {@link ServiceCatalogType }
-     * 
-     */
-    public ServiceCatalogType createServiceCatalogType() {
-        return new ServiceCatalogType();
-    }
-
-    /**
-     * Create an instance of {@link ServiceType.Regions }
-     * 
-     */
-    public ServiceType.Regions createServiceTypeRegions() {
-        return new ServiceType.Regions();
-    }
-
-    /**
-     * Create an instance of {@link CatalogDeltaInqMsgRsType }
-     * 
-     */
-    public CatalogDeltaInqMsgRsType createCatalogDeltaInqMsgRsType() {
-        return new CatalogDeltaInqMsgRsType();
     }
 
     /**
@@ -163,6 +55,30 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ServiceCategoryType }
+     * 
+     */
+    public ServiceCategoryType createServiceCategoryType() {
+        return new ServiceCategoryType();
+    }
+
+    /**
+     * Create an instance of {@link ServiceType.Subservices }
+     * 
+     */
+    public ServiceType.Subservices createServiceTypeSubservices() {
+        return new ServiceType.Subservices();
+    }
+
+    /**
+     * Create an instance of {@link DescriptionFieldType }
+     * 
+     */
+    public DescriptionFieldType createDescriptionFieldType() {
+        return new DescriptionFieldType();
+    }
+
+    /**
      * Create an instance of {@link AllowedValuesType }
      * 
      */
@@ -171,7 +87,87 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ErrorType }{@code >}}
+     * Create an instance of {@link CatalogFullInqMsgRs }
+     * 
+     */
+    public CatalogFullInqMsgRs createCatalogFullInqMsgRs() {
+        return new CatalogFullInqMsgRs();
+    }
+
+    /**
+     * Create an instance of {@link DescriptionParametersType }
+     * 
+     */
+    public DescriptionParametersType createDescriptionParametersType() {
+        return new DescriptionParametersType();
+    }
+
+    /**
+     * Create an instance of {@link DescriptionComplexParameter }
+     * 
+     */
+    public DescriptionComplexParameter createDescriptionComplexParameter() {
+        return new DescriptionComplexParameter();
+    }
+
+    /**
+     * Create an instance of {@link DescriptionSimpleParameter }
+     * 
+     */
+    public DescriptionSimpleParameter createDescriptionSimpleParameter() {
+        return new DescriptionSimpleParameter();
+    }
+
+    /**
+     * Create an instance of {@link ServiceType.Regions }
+     * 
+     */
+    public ServiceType.Regions createServiceTypeRegions() {
+        return new ServiceType.Regions();
+    }
+
+    /**
+     * Create an instance of {@link ServiceCatalogType }
+     * 
+     */
+    public ServiceCatalogType createServiceCatalogType() {
+        return new ServiceCatalogType();
+    }
+
+    /**
+     * Create an instance of {@link DescriptionParameterType }
+     * 
+     */
+    public DescriptionParameterType createDescriptionParameterType() {
+        return new DescriptionParameterType();
+    }
+
+    /**
+     * Create an instance of {@link ErrorType }
+     * 
+     */
+    public ErrorType createErrorType() {
+        return new ErrorType();
+    }
+
+    /**
+     * Create an instance of {@link ServiceType }
+     * 
+     */
+    public ServiceType createServiceType() {
+        return new ServiceType();
+    }
+
+    /**
+     * Create an instance of {@link CatalogDeltaInqMsgRsType }
+     * 
+     */
+    public CatalogDeltaInqMsgRsType createCatalogDeltaInqMsgRsType() {
+        return new CatalogDeltaInqMsgRsType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ErrorType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "CatalogMsgError")
@@ -180,7 +176,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "ServiceCatalog")
@@ -189,7 +185,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link AllowedValuesType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link AllowedValuesType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "AllowedValues")
@@ -198,7 +194,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "ServiceCode")
@@ -207,7 +203,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link CatalogDeltaInqMsgRsType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link CatalogDeltaInqMsgRsType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "CatalogDeltaInqMsgRs")
@@ -216,7 +212,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ServiceType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Catalog", name = "Service")

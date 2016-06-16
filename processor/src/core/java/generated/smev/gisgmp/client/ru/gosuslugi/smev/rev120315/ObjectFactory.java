@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315;
 
 import javax.xml.bind.JAXBElement;
@@ -72,83 +68,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MessageType }
-     * 
-     */
-    public MessageType createMessageType() {
-        return new MessageType();
-    }
-
-    /**
-     * Create an instance of {@link AppDocumentType }
-     * 
-     */
-    public AppDocumentType createAppDocumentType() {
-        return new AppDocumentType();
-    }
-
-    /**
-     * Create an instance of {@link BaseMessageType }
-     * 
-     */
-    public BaseMessageType createBaseMessageType() {
-        return new BaseMessageType();
-    }
-
-    /**
-     * Create an instance of {@link HeaderType }
-     * 
-     */
-    public HeaderType createHeaderType() {
-        return new HeaderType();
-    }
-
-    /**
-     * Create an instance of {@link ServiceType }
-     * 
-     */
-    public ServiceType createServiceType() {
-        return new ServiceType();
-    }
-
-    /**
-     * Create an instance of {@link PacketIdsType }
-     * 
-     */
-    public PacketIdsType createPacketIdsType() {
-        return new PacketIdsType();
-    }
-
-    /**
-     * Create an instance of {@link MessageDataType }
-     * 
-     */
-    public MessageDataType createMessageDataType() {
-        return new MessageDataType();
-    }
-
-    /**
-     * Create an instance of {@link PacketIdType }
-     * 
-     */
-    public PacketIdType createPacketIdType() {
-        return new PacketIdType();
-    }
-
-    /**
      * Create an instance of {@link ReferenceType }
      * 
      */
     public ReferenceType createReferenceType() {
         return new ReferenceType();
-    }
-
-    /**
-     * Create an instance of {@link OrgExternalType }
-     * 
-     */
-    public OrgExternalType createOrgExternalType() {
-        return new OrgExternalType();
     }
 
     /**
@@ -160,11 +84,67 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link HeaderType }
+     * 
+     */
+    public HeaderType createHeaderType() {
+        return new HeaderType();
+    }
+
+    /**
+     * Create an instance of {@link PacketIdType }
+     * 
+     */
+    public PacketIdType createPacketIdType() {
+        return new PacketIdType();
+    }
+
+    /**
+     * Create an instance of {@link MessageDataType }
+     * 
+     */
+    public MessageDataType createMessageDataType() {
+        return new MessageDataType();
+    }
+
+    /**
+     * Create an instance of {@link PacketIdsType }
+     * 
+     */
+    public PacketIdsType createPacketIdsType() {
+        return new PacketIdsType();
+    }
+
+    /**
+     * Create an instance of {@link BaseMessageType }
+     * 
+     */
+    public BaseMessageType createBaseMessageType() {
+        return new BaseMessageType();
+    }
+
+    /**
+     * Create an instance of {@link AppDocumentType }
+     * 
+     */
+    public AppDocumentType createAppDocumentType() {
+        return new AppDocumentType();
+    }
+
+    /**
      * Create an instance of {@link SubMessagesType }
      * 
      */
     public SubMessagesType createSubMessagesType() {
         return new SubMessagesType();
+    }
+
+    /**
+     * Create an instance of {@link OrgExternalType }
+     * 
+     */
+    public OrgExternalType createOrgExternalType() {
+        return new OrgExternalType();
     }
 
     /**
@@ -176,7 +156,23 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link AppDataType }{@code >}}
+     * Create an instance of {@link ServiceType }
+     * 
+     */
+    public ServiceType createServiceType() {
+        return new ServiceType();
+    }
+
+    /**
+     * Create an instance of {@link MessageType }
+     * 
+     */
+    public MessageType createMessageType() {
+        return new MessageType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AppDataType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "AppData")
@@ -185,7 +181,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "SubRequestNumber")
@@ -194,7 +190,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link SubMessagesType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link SubMessagesType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "SubMessages")
@@ -203,7 +199,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link BaseMessageType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link BaseMessageType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "BaseMessage")
@@ -212,7 +208,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PacketIdType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PacketIdType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Id")
@@ -221,7 +217,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ReferenceType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ReferenceType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Reference")
@@ -230,7 +226,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "RequestCode")
@@ -239,7 +235,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link SubMessageType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link SubMessageType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "SubMessage")
@@ -248,7 +244,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ServiceType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Service")
@@ -257,7 +253,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link MessageClassType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link MessageClassType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "MessageClass")
@@ -266,7 +262,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "OKTMO")
@@ -275,7 +271,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "TestMsg")
@@ -284,7 +280,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "ExchangeType")
@@ -293,7 +289,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "RequestIdRef")
@@ -302,7 +298,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PacketIdsType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PacketIdsType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "PacketIds")
@@ -311,7 +307,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "MessageId")
@@ -320,7 +316,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link javax.xml.datatype.XMLGregorianCalendar }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Date")
@@ -329,7 +325,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link TypeCodeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link TypeCodeType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "TypeCode")
@@ -338,7 +334,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "ServiceCode")
@@ -347,7 +343,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "OriginRequestIdRef")
@@ -356,7 +352,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "CaseNumber")
@@ -365,7 +361,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Recipient")
@@ -374,7 +370,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "DigestValue")
@@ -383,7 +379,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link AppDocumentType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link AppDocumentType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "AppDocument")
@@ -392,7 +388,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Originator")
@@ -401,7 +397,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link MessageType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link MessageType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Message")
@@ -410,7 +406,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "BinaryData")
@@ -419,7 +415,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link javax.xml.datatype.XMLGregorianCalendar }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link XMLGregorianCalendar }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "TimeStamp")
@@ -428,7 +424,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link StatusType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StatusType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Status")
@@ -437,7 +433,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link MessageDataType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link MessageDataType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "MessageData")
@@ -446,7 +442,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link OrgExternalType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Sender")
@@ -455,7 +451,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "NodeId")
@@ -464,7 +460,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "ServiceName")
@@ -473,7 +469,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link HeaderType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link HeaderType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://smev.gosuslugi.ru/rev120315", name = "Header")

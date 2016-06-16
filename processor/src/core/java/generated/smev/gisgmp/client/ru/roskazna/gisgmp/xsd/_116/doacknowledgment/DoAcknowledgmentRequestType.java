@@ -1,17 +1,17 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment;
 
-import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
-
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
 
 
 /**
@@ -79,7 +79,7 @@ public class DoAcknowledgmentRequestType {
     @XmlElement(name = "SupplierBillID", required = true)
     protected String supplierBillID;
     @XmlElement(name = "Payments", required = true)
-    protected Payments payments;
+    protected DoAcknowledgmentRequestType.Payments payments;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
     protected SignatureType signature;
     @XmlAttribute(name = "Id")
@@ -118,10 +118,10 @@ public class DoAcknowledgmentRequestType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentRequestType.Payments }
+     *     {@link DoAcknowledgmentRequestType.Payments }
      *     
      */
-    public Payments getPayments() {
+    public DoAcknowledgmentRequestType.Payments getPayments() {
         return payments;
     }
 
@@ -130,10 +130,10 @@ public class DoAcknowledgmentRequestType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentRequestType.Payments }
+     *     {@link DoAcknowledgmentRequestType.Payments }
      *     
      */
-    public void setPayments(Payments value) {
+    public void setPayments(DoAcknowledgmentRequestType.Payments value) {
         this.payments = value;
     }
 

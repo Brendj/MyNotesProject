@@ -1,15 +1,12 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common"
-            targetNamespace="http://roskazna.ru/gisgmp/xsd/116/PGU_DataRequest" elementFormDefault="qualified"
-            attributeFormDefault="unqualified">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pdr="http://roskazna.ru/gisgmp/xsd/116/PGU_DataRequest" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/PGU_DataRequest" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../entity/directory/Common.xsd"/>
 	<xsd:complexType name="DataRequest">
 		<xsd:sequence>
 			<xsd:element name="Filter">
 				<xsd:annotation>
-					<xsd:documentation>Фильтр для получения сущностей РНиП и ГИС ГМП </xsd:documentation>
+					<xsd:documentation>Фильтр для получения сущностей ГИС ГМП</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
@@ -18,7 +15,7 @@
 						</xsd:annotation>
 						<xsd:element name="Conditions">
 							<xsd:annotation>
-								<xsd:documentation>Условие для получения сущностей из РНиП и ГИС ГМП</xsd:documentation>
+								<xsd:documentation>Условие для получения сущностей из ГИС ГМП</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
 								<xsd:sequence>
@@ -38,7 +35,7 @@
 																<xsd:minLength value="1"/>
 																<xsd:maxLength value="25"/>
 																<xsd:pattern value="\c{20}"/>
-																<xsd:pattern value="\d{25}"/>
+																<xsd:pattern value="\c{25}"/>
 															</xsd:restriction>
 														</xsd:simpleType>
 													</xsd:element>
@@ -58,6 +55,20 @@
 													</xsd:element>
 													<xsd:element ref="com:PayerIdentification" maxOccurs="100"/>
 												</xsd:choice>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="ServicesCodesList">
+											<xsd:annotation>
+												<xsd:documentation>Список кодов услуг</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="ServiceCode" type="xsd:string" maxOccurs="100">
+														<xsd:annotation>
+															<xsd:documentation>Код услуги из каталога</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
 											</xsd:complexType>
 										</xsd:element>
 									</xsd:choice>
@@ -81,10 +92,7 @@
 								</xsd:sequence>
 								<xsd:attribute name="AllDateCatalog" type="xsd:boolean">
 									<xsd:annotation>
-										<xsd:documentation>Признак выгрузки каталога.
-										true	Выгрузка полного каталога
-										false	Выгрузка изменений каталога									
-									</xsd:documentation>
+										<xsd:documentation>Признак выгрузки каталога: true - выгрузка полного каталога; false - выгрузка изменений каталога</xsd:documentation>
 									</xsd:annotation>
 								</xsd:attribute>
 							</xsd:complexType>
@@ -124,9 +132,9 @@
 													</xsd:annotation>
 													<xsd:simpleType>
 														<xsd:restriction base="xsd:string">
-															<xsd:minLength value="5"/>
+															<xsd:minLength value="6"/>
 															<xsd:whiteSpace value="collapse"/>
-															<xsd:maxLength value="5"/>
+															<xsd:maxLength value="32"/>
 														</xsd:restriction>
 													</xsd:simpleType>
 												</xsd:element>
@@ -248,11 +256,6 @@
 							<xsd:documentation>запрос платежей по связанным начислениям (используется только ФССП)</xsd:documentation>
 						</xsd:annotation>
 					</xsd:enumeration>
-					<xsd:enumeration value="INCOME">
-						<xsd:annotation>
-							<xsd:documentation>запрос по зачислениям</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
 					<xsd:enumeration value="CHARGE">
 						<xsd:annotation>
 							<xsd:documentation>запрос неоплаченных начислений</xsd:documentation>
@@ -275,11 +278,6 @@
 								аннулированные</xsd:documentation>
 						</xsd:annotation>
 					</xsd:enumeration>
-					<xsd:enumeration value="CATALOG">
-						<xsd:annotation>
-							<xsd:documentation>Каталог услуг поставщика</xsd:documentation>
-						</xsd:annotation>
-					</xsd:enumeration>
 					<xsd:enumeration value="CHARGESTATUS">
 						<xsd:annotation>
 							<xsd:documentation>начисления и статусы квитирования</xsd:documentation>
@@ -296,7 +294,7 @@
 								"сквитировано" и "сквитировано с отсутствующим платежом"</xsd:documentation>
 						</xsd:annotation>
 					</xsd:enumeration>
-					<xsd:enumeration value="CHARGEP-RIOR-STATUS">
+					<xsd:enumeration value="CHARGE-PRIOR-STATUS">
 						<xsd:annotation>
 							<xsd:documentation>предварительные начисления и их статусы</xsd:documentation>
 						</xsd:annotation>
@@ -317,12 +315,17 @@
 								"сквитировано" и "сквитировано с отсутствующим платежом"</xsd:documentation>
 						</xsd:annotation>
 					</xsd:enumeration>
+					<xsd:enumeration value="CATALOG">
+						<xsd:annotation>
+							<xsd:documentation>Каталог услуг поставщика</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
 				</xsd:restriction>
 			</xsd:simpleType>
 		</xsd:attribute>
 		<xsd:attribute name="originatorID" type="com:URNType">
 			<xsd:annotation>
-				<xsd:documentation>УРН участника косвенного взаимодейсвия, полученный при регистрации в ГИС ГМП</xsd:documentation>
+				<xsd:documentation>УРН участника косвенного взаимодействия, сформировавшего запрос</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>

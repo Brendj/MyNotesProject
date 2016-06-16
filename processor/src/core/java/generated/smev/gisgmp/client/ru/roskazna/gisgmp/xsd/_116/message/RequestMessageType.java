@@ -1,10 +1,11 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.datatype.XMLGregorianCalendar;
 import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationrequest.ChargeCreationRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentRequestType;
@@ -13,12 +14,6 @@ import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.packagestatusreq
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest.ImportRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.selfadministration.ImportCertificateRequestType;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -42,13 +37,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;/simpleType>
  *       &lt;/attribute>
  *       &lt;attribute name="timestamp" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *       &lt;attribute name="senderIdentifier" use="required">
- *         &lt;simpleType>
- *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *             &lt;length value="6"/>
- *           &lt;/restriction>
- *         &lt;/simpleType>
- *       &lt;/attribute>
+ *       &lt;attribute name="senderIdentifier" use="required" type="{http://roskazna.ru/gisgmp/xsd/116/Common}URNType" />
  *       &lt;attribute name="senderRole">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -96,14 +85,14 @@ public class RequestMessageType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DataRequest }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DataRequest }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}
      *     
      */
     public JAXBElement<?> getRequestMessageData() {
@@ -115,14 +104,14 @@ public class RequestMessageType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DataRequest }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DataRequest }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ImportRequestType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}
      *     
      */
     public void setRequestMessageData(JAXBElement<?> value) {
@@ -182,7 +171,7 @@ public class RequestMessageType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getTimestamp() {
@@ -194,7 +183,7 @@ public class RequestMessageType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setTimestamp(XMLGregorianCalendar value) {

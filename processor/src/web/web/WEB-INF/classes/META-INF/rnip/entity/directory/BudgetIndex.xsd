@@ -1,6 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex"
-            elementFormDefault="qualified" attributeFormDefault="unqualified">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bdi="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:complexType name="BudgetIndexType">
 		<xsd:annotation>
 			<xsd:documentation>Дополнительные реквизиты платежа, предусмотренные приказом Минфина России от 12 ноября 2013 г. №107н</xsd:documentation>
@@ -39,6 +38,7 @@
 						<xsd:enumeration value="24"/>
 						<xsd:enumeration value="25"/>
 						<xsd:enumeration value="26"/>
+						<xsd:enumeration value="0"/>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
@@ -70,8 +70,12 @@
 						<xsd:enumeration value="ИП"/>
 						<xsd:enumeration value="ТУ"/>
 						<xsd:enumeration value="БД"/>
-						<xsd:enumeration value="ИН"/>
 						<xsd:enumeration value="КП"/>
+						<xsd:enumeration value="ВУ"/>
+						<xsd:enumeration value="ДК"/>
+						<xsd:enumeration value="ПК"/>
+						<xsd:enumeration value="КК"/>
+						<xsd:enumeration value="ТК"/>
 						<xsd:enumeration value="00"/>
 						<xsd:enumeration value="0"/>
 					</xsd:restriction>
@@ -122,11 +126,8 @@
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
-						<xsd:enumeration value="ШТ"/>
-						<xsd:enumeration value="ЗД"/>
-						<xsd:enumeration value="ПЦ"/>
-						<xsd:enumeration value="ПЕ"/>
-						<xsd:enumeration value="0"/>
+						<xsd:pattern value="[А-Я]{2}"/>
+						<xsd:pattern value="0"/>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>

@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.budgetindex;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -55,6 +51,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *               &lt;enumeration value="24"/>
  *               &lt;enumeration value="25"/>
  *               &lt;enumeration value="26"/>
+ *               &lt;enumeration value="0"/>
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>
@@ -62,6 +59,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *               &lt;maxLength value="2"/>
+ *               &lt;enumeration value="��"/>
+ *               &lt;enumeration value="��"/>
+ *               &lt;enumeration value="��"/>
+ *               &lt;enumeration value="��"/>
  *               &lt;enumeration value="��"/>
  *               &lt;enumeration value="��"/>
  *               &lt;enumeration value="��"/>
@@ -123,11 +124,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="PaymentType" minOccurs="0">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *               &lt;enumeration value="��"/>
- *               &lt;enumeration value="��"/>
- *               &lt;enumeration value="��"/>
- *               &lt;enumeration value="��"/>
- *               &lt;enumeration value="0"/>
+ *               &lt;pattern value="[�-�]{2}"/>
+ *               &lt;pattern value="0"/>
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>

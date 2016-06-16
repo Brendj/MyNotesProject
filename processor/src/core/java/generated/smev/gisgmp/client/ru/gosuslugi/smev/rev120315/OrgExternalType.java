@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315;
 
 import javax.xml.bind.annotation.XmlAccessType;

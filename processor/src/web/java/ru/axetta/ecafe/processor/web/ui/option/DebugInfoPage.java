@@ -87,7 +87,8 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runTest2() throws Exception {
         //CardService cardService = CardService.getInstance();
         //System.out.println(DAOService.getInstance().runDebugTest2());
-        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsServiceV116.class).executeExportCatalog(DAOService.getInstance().getContragentById(16L), null, null);
+        //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsServiceV116.class).executeExportCatalog(DAOService.getInstance().getContragentById(16L), null, null);
+        System.out.println();
         /*SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         service.run(getStartDate(), getEndDate(),
                 ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());*/

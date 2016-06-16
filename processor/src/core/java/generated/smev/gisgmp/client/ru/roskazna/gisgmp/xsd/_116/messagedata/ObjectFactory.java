@@ -1,16 +1,15 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.namespace.QName;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceCatalogType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationrequest.ChargeCreationRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationresponse.ChargeCreationResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportincomesresponse.ExportIncomesResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse.ExportQuittanceResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.packagestatusrequest.PackageStatusRequestType;
@@ -19,11 +18,6 @@ import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest.ImportRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.selfadministration.ImportCertificateRequestType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket.TicketType;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -54,7 +48,6 @@ public class ObjectFactory {
     private final static QName _ImportRequest_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ImportRequest");
     private final static QName _ImportCertificateRequest_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ImportCertificateRequest");
     private final static QName _ExportRequest_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ExportRequest");
-    private final static QName _ExportIncomesResponse_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ExportIncomesResponse");
     private final static QName _ChargeCreationRequest_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ChargeCreationRequest");
     private final static QName _ExportCatalogResponse_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ExportCatalogResponse");
     private final static QName _ChargeCreationResponse_QNAME = new QName("http://roskazna.ru/gisgmp/xsd/116/MessageData", "ChargeCreationResponse");
@@ -67,6 +60,14 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link ExportCatalogResponse }
+     * 
+     */
+    public ExportCatalogResponse createExportCatalogResponse() {
+        return new ExportCatalogResponse();
     }
 
     /**
@@ -86,15 +87,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ExportCatalogResponse }
-     * 
-     */
-    public ExportCatalogResponse createExportCatalogResponse() {
-        return new ExportCatalogResponse();
-    }
-
-    /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PackageStatusRequestType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "PackageStatusRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -103,7 +96,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ResponseMessageData")
@@ -112,7 +105,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportChargesResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -121,7 +114,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportPaymentsResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -130,7 +123,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "DoAcknowledgmentResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -139,7 +132,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "RequestMessageData")
@@ -148,7 +141,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportQuittanceResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -157,7 +150,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DoAcknowledgmentRequestType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "DoAcknowledgmentRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -166,7 +159,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportRequestType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ImportRequestType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ImportRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -175,7 +168,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ImportCertificateRequestType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ImportCertificateRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -184,7 +177,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link DataRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataRequest }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -193,16 +186,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportIncomesResponseType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportIncomesResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
-    public JAXBElement<ExportIncomesResponseType> createExportIncomesResponse(ExportIncomesResponseType value) {
-        return new JAXBElement<ExportIncomesResponseType>(_ExportIncomesResponse_QNAME, ExportIncomesResponseType.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChargeCreationRequestType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ChargeCreationRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -211,7 +195,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ExportCatalogResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -220,7 +204,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ChargeCreationResponse", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -229,7 +213,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ImportCatalogRequest }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "ImportCatalogRequest", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "RequestMessageData")
@@ -238,7 +222,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link TicketType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link TicketType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "Ticket", substitutionHeadNamespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", substitutionHeadName = "ResponseMessageData")
@@ -247,7 +231,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", name = "Changes", scope = ImportCatalogRequest.class)

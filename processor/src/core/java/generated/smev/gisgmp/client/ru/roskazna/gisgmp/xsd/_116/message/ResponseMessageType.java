@@ -1,25 +1,26 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.datatype.XMLGregorianCalendar;
 import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationresponse.ChargeCreationResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportincomesresponse.ExportIncomesResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse.ExportPaymentsResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse.ExportQuittanceResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ExportCatalogResponse;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse.ExportChargesResponseType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket.TicketType;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -83,23 +84,24 @@ public class ResponseMessageType {
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String rqId;
     @XmlAttribute(required = true)
-    protected XMLGregorianCalendar timeStamp;
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar timestamp;
     @XmlAttribute(required = true)
     protected String senderIdentifier;
 
     /**
-     *
+     * ������ ������
+     * 
      * @return
      *     possible object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportIncomesResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link TicketType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}
+     *     {@link JAXBElement }{@code <}{@link TicketType }{@code >}
      *     
      */
     public JAXBElement<?> getResponseMessageData() {
@@ -111,15 +113,14 @@ public class ResponseMessageType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link Object }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ExportIncomesResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link TicketType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportQuittanceResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportChargesResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ChargeCreationResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportPaymentsResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
+     *     {@link JAXBElement }{@code <}{@link DoAcknowledgmentResponseType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ExportCatalogResponse }{@code >}
+     *     {@link JAXBElement }{@code <}{@link TicketType }{@code >}
      *     
      */
     public void setResponseMessageData(JAXBElement<?> value) {
@@ -127,7 +128,8 @@ public class ResponseMessageType {
     }
 
     /**
-     *
+     * ��
+     * 
      * @return
      *     possible object is
      *     {@link SignatureType }
@@ -202,11 +204,11 @@ public class ResponseMessageType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
-    public XMLGregorianCalendar getTimeStamp() {
-        return timeStamp;
+    public XMLGregorianCalendar getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -214,11 +216,11 @@ public class ResponseMessageType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
-    public void setTimeStamp(XMLGregorianCalendar value) {
-        this.timeStamp = value;
+    public void setTimestamp(XMLGregorianCalendar value) {
+        this.timestamp = value;
     }
 
     /**

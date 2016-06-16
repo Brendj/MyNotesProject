@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.chargecreationrequest;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -34,19 +30,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChargeCreationRequestType }
-     * 
-     */
-    public ChargeCreationRequestType createChargeCreationRequestType() {
-        return new ChargeCreationRequestType();
-    }
-
-    /**
      * Create an instance of {@link ChargeTemplateType }
      * 
      */
     public ChargeTemplateType createChargeTemplateType() {
         return new ChargeTemplateType();
+    }
+
+    /**
+     * Create an instance of {@link ChargeCreationRequestType }
+     * 
+     */
+    public ChargeCreationRequestType createChargeCreationRequestType() {
+        return new ChargeCreationRequestType();
     }
 
 }

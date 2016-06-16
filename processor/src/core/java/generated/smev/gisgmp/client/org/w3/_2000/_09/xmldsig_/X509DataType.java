@@ -1,14 +1,16 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlType;
+import org.w3c.dom.Element;
 
 
 /**
@@ -44,11 +46,11 @@ import java.util.List;
 public class X509DataType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "X509CRL", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509SubjectName", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509IssuerSerial", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
         @XmlElementRef(name = "X509SKI", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "X509Certificate", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
+        @XmlElementRef(name = "X509CRL", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "X509Certificate", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "X509SubjectName", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "X509IssuerSerial", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
     })
     @XmlAnyElement(lax = true)
     protected List<Object> x509IssuerSerialOrX509SKIOrX509SubjectName;
@@ -71,13 +73,13 @@ public class X509DataType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}
-     * {@link org.w3c.dom.Element }
+     * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
+     * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
+     * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
      * {@link Object }
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link X509IssuerSerialType }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}
+     * {@link Element }
+     * {@link JAXBElement }{@code <}{@link X509IssuerSerialType }{@code >}
      * 
      * 
      */

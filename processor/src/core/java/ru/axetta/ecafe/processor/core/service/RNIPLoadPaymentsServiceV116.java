@@ -186,7 +186,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
 
             final DataRequest dataRequest = dataOf.createDataRequest();
             dataRequest.setKind("PAYMENT");
-            dataRequest.setId("N_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
+            dataRequest.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
             final DataRequest.Filter filter = dataOf.createDataRequestFilter();
             final DataRequest.Filter.Conditions conditions = dataOf.createDataRequestFilterConditions();
 
@@ -248,7 +248,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         List<ExportPaymentsResponseType.Payments.PaymentInfo> piList = exportPaymentsResponseType.getPayments().getPaymentInfo();
         //exportPaymentsResponseType.getPayments().isHasMore() - есть вот такое еще. //todo вопрос - что такое hasMore=true в пакете с платежами ?
 
-        Date rnipDate = getRnipDate(responseMessageType.getTimeStamp());
+        Date rnipDate = getRnipDate(responseMessageType.getTimestamp());
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         for(ExportPaymentsResponseType.Payments.PaymentInfo pi : piList) {
             String paymentInfoStr = new String(pi.getPaymentData(), "utf8").replaceAll("(\\r|\\n)", "");
@@ -337,7 +337,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
                 new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message.ObjectFactory();
         final RequestMessageType requestMessageType = mesOf.createRequestMessageType();
         //requestMessageType.setId("N_4a0d84ca-1fc6-11e5-99c3-bcaec5d977ce");
-        requestMessageType.setId(String.format("N_%s", UUID.randomUUID()));
+        requestMessageType.setId(String.format("I_%s", UUID.randomUUID()));
         requestMessageType.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
         requestMessageType.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
 
@@ -347,13 +347,13 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ObjectFactory catOf =
                 new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ObjectFactory();
         final ServiceCatalogType serviceCatalogType = catOf.createServiceCatalogType();
-        serviceCatalogType.setId("N_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
+        serviceCatalogType.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
         serviceCatalogType.setName("Изменение");
         serviceCatalogType.setRevisionDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
                 RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime()));
 
         final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType serviceType = catOf.createServiceType();
-        serviceType.setCode("AAAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
+        serviceType.setCode("AAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
         serviceType.setDesc("Услуги по оплате питания учеников в образовательных учреждениях");
         serviceType.setIsActive(true);
         serviceType.setName("Услуга питания в ОУ");
@@ -375,7 +375,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter1.setReadonly(true);
         descriptionSimpleParameter1.setRequired(true);
         descriptionSimpleParameter1.setVisible(false);
-        descriptionSimpleParameter1.setDefaultValue("AAAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
+        descriptionSimpleParameter1.setDefaultValue("AAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
 
         DescriptionSimpleParameter descriptionSimpleParameter2 = catOf.createDescriptionSimpleParameter();
         descriptionSimpleParameter2.setForPayment(true);
@@ -405,7 +405,8 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter4.setReadonly(false);
         descriptionSimpleParameter4.setRequired(true);
         descriptionSimpleParameter4.setVisible(false);
-        descriptionSimpleParameter4.setDefaultValue("0");
+        //descriptionSimpleParameter4.setDefaultValue("0");
+        descriptionSimpleParameter4.setDefaultValue("13");
 
         DescriptionSimpleParameter descriptionSimpleParameter5 = catOf.createDescriptionSimpleParameter();
         descriptionSimpleParameter5.setForPayment(true);
@@ -495,7 +496,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter11.setReadonly(true);
         descriptionSimpleParameter11.setRequired(false);
         descriptionSimpleParameter11.setVisible(false);
-        descriptionSimpleParameter11.setDefaultValue("on");
+        descriptionSimpleParameter11.setDefaultValue("off");
 
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter1);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter2);
@@ -736,7 +737,8 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             return  formatString(contragent.getCorrAccount());
         }
         if (part.equals("KBK")) {
-            return "00000000000000000000";
+            //return "00000000000000000000";
+            return "0";
         }
         if (part.equals("INN")) {
             return formatString(contragent.getInn());
@@ -842,7 +844,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
 
         final DataRequest dataRequest = dataOf.createDataRequest();
         dataRequest.setKind("CATALOG");
-        dataRequest.setId("N_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
+        dataRequest.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
         final DataRequest.Filter filter = dataOf.createDataRequestFilter();
         final DataRequest.Filter.Conditions conditions = dataOf.createDataRequestFilterConditions();
 

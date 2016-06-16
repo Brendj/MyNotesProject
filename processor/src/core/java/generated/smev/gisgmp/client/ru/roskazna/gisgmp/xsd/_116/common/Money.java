@@ -1,12 +1,12 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common;
 
-import javax.xml.bind.annotation.*;
 import java.math.BigInteger;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 
 /**
@@ -95,7 +95,7 @@ public class Money {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getExponent() {
@@ -111,7 +111,7 @@ public class Money {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setExponent(BigInteger value) {

@@ -1,15 +1,14 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType;
-
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType;
 
 
 /**
@@ -29,7 +28,7 @@ import java.util.List;
  *                 &lt;sequence minOccurs="0">
  *                   &lt;element name="Service" type="{http://roskazna.ru/gisgmp/xsd/116/Catalog}Service_Type" maxOccurs="unbounded"/>
  *                 &lt;/sequence>
- *                 &lt;attribute name="hasMore" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *                 &lt;attribute name="hasMore" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -49,17 +48,17 @@ import java.util.List;
 public class ExportCatalogResponse {
 
     @XmlElement(name = "Catalog", namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData", required = true)
-    protected Catalog catalog;
+    protected ExportCatalogResponse.Catalog catalog;
 
     /**
      * Gets the value of the catalog property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ExportCatalogResponse.Catalog }
+     *     {@link ExportCatalogResponse.Catalog }
      *     
      */
-    public Catalog getCatalog() {
+    public ExportCatalogResponse.Catalog getCatalog() {
         return catalog;
     }
 
@@ -68,10 +67,10 @@ public class ExportCatalogResponse {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ExportCatalogResponse.Catalog }
+     *     {@link ExportCatalogResponse.Catalog }
      *     
      */
-    public void setCatalog(Catalog value) {
+    public void setCatalog(ExportCatalogResponse.Catalog value) {
         this.catalog = value;
     }
 
@@ -88,7 +87,7 @@ public class ExportCatalogResponse {
      *       &lt;sequence minOccurs="0">
      *         &lt;element name="Service" type="{http://roskazna.ru/gisgmp/xsd/116/Catalog}Service_Type" maxOccurs="unbounded"/>
      *       &lt;/sequence>
-     *       &lt;attribute name="hasMore" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+     *       &lt;attribute name="hasMore" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -104,8 +103,8 @@ public class ExportCatalogResponse {
 
         @XmlElement(name = "Service", namespace = "http://roskazna.ru/gisgmp/xsd/116/MessageData")
         protected List<ServiceType> service;
-        @XmlAttribute
-        protected Boolean hasMore;
+        @XmlAttribute(required = true)
+        protected boolean hasMore;
 
         /**
          * Gets the value of the service property.
@@ -139,24 +138,16 @@ public class ExportCatalogResponse {
         /**
          * Gets the value of the hasMore property.
          * 
-         * @return
-         *     possible object is
-         *     {@link Boolean }
-         *     
          */
-        public Boolean isHasMore() {
+        public boolean isHasMore() {
             return hasMore;
         }
 
         /**
          * Sets the value of the hasMore property.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link Boolean }
-         *     
          */
-        public void setHasMore(Boolean value) {
+        public void setHasMore(boolean value) {
             this.hasMore = value;
         }
 

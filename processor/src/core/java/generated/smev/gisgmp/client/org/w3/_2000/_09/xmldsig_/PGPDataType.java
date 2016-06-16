@@ -1,14 +1,16 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlType;
+import org.w3c.dom.Element;
 
 
 /**
@@ -45,8 +47,8 @@ import java.util.List;
 public class PGPDataType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "PGPKeyPacket", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "PGPKeyID", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
+        @XmlElementRef(name = "PGPKeyID", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "PGPKeyPacket", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
     })
     @XmlAnyElement(lax = true)
     protected List<Object> content;
@@ -57,8 +59,8 @@ public class PGPDataType {
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "PGPKeyPacket" is used by two different parts of a schema. See: 
-     * line 222 of file:/C:/Users/efremov/Documents/��%20�����/tmp/xsd/request/xmldsig-core-schema.xsd
-     * line 217 of file:/C:/Users/efremov/Documents/��%20�����/tmp/xsd/request/xmldsig-core-schema.xsd
+     * line 222 of file:/C:/Info/rnip162_xsd/request/xmldsig-core-schema.xsd
+     * line 217 of file:/C:/Info/rnip162_xsd/request/xmldsig-core-schema.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names: 
@@ -79,10 +81,10 @@ public class PGPDataType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link byte[]}{@code >}
-     * {@link org.w3c.dom.Element }
+     * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
+     * {@link JAXBElement }{@code <}{@link byte[]}{@code >}
      * {@link Object }
+     * {@link Element }
      * 
      * 
      */

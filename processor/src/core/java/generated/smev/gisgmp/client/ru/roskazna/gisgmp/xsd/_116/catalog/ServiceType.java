@@ -1,21 +1,21 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AdditionalDataType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.CommissionsType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.CurrencyCodeType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.Money;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.PayeeType;
-
-import javax.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -127,7 +127,7 @@ public class ServiceType {
     @XmlElement(name = "PaymentParameters")
     protected DescriptionParametersType paymentParameters;
     @XmlElement(name = "CurrenciesServices")
-    protected CurrenciesServices currenciesServices;
+    protected ServiceType.CurrenciesServices currenciesServices;
     @XmlElement(name = "Payee", namespace = "http://roskazna.ru/gisgmp/xsd/116/Organization", required = true)
     protected PayeeType payee;
     @XmlElement(name = "PaymentKind", required = true)
@@ -139,9 +139,9 @@ public class ServiceType {
     @XmlElement(name = "Commissions")
     protected CommissionsType commissions;
     @XmlElement(name = "Regions")
-    protected Regions regions;
+    protected ServiceType.Regions regions;
     @XmlElement(name = "Subservices")
-    protected Subservices subservices;
+    protected ServiceType.Subservices subservices;
     @XmlElement(name = "AdditionalData", namespace = "http://roskazna.ru/gisgmp/xsd/116/Common")
     protected AdditionalDataType additionalData;
     @XmlAttribute(required = true)
@@ -212,10 +212,10 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.CurrenciesServices }
+     *     {@link ServiceType.CurrenciesServices }
      *     
      */
-    public CurrenciesServices getCurrenciesServices() {
+    public ServiceType.CurrenciesServices getCurrenciesServices() {
         return currenciesServices;
     }
 
@@ -224,10 +224,10 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.CurrenciesServices }
+     *     {@link ServiceType.CurrenciesServices }
      *     
      */
-    public void setCurrenciesServices(CurrenciesServices value) {
+    public void setCurrenciesServices(ServiceType.CurrenciesServices value) {
         this.currenciesServices = value;
     }
 
@@ -260,7 +260,7 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getPaymentKind() {
@@ -272,7 +272,7 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setPaymentKind(BigInteger value) {
@@ -356,10 +356,10 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.Regions }
+     *     {@link ServiceType.Regions }
      *     
      */
-    public Regions getRegions() {
+    public ServiceType.Regions getRegions() {
         return regions;
     }
 
@@ -368,10 +368,10 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.Regions }
+     *     {@link ServiceType.Regions }
      *     
      */
-    public void setRegions(Regions value) {
+    public void setRegions(ServiceType.Regions value) {
         this.regions = value;
     }
 
@@ -380,10 +380,10 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.Subservices }
+     *     {@link ServiceType.Subservices }
      *     
      */
-    public Subservices getSubservices() {
+    public ServiceType.Subservices getSubservices() {
         return subservices;
     }
 
@@ -392,10 +392,10 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType.Subservices }
+     *     {@link ServiceType.Subservices }
      *     
      */
-    public void setSubservices(Subservices value) {
+    public void setSubservices(ServiceType.Subservices value) {
         this.subservices = value;
     }
 
@@ -500,7 +500,7 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getExpires() {
@@ -512,7 +512,7 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setExpires(XMLGregorianCalendar value) {
@@ -540,7 +540,7 @@ public class ServiceType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getRevisionDate() {
@@ -552,7 +552,7 @@ public class ServiceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setRevisionDate(XMLGregorianCalendar value) {
@@ -726,7 +726,7 @@ public class ServiceType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceType }
+         * {@link ServiceType }
          * 
          * 
          */

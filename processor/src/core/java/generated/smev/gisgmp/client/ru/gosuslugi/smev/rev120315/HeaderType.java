@@ -1,15 +1,17 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315;
 
-import javax.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -116,7 +118,7 @@ public class HeaderType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getTimeStamp() {
@@ -128,7 +130,7 @@ public class HeaderType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setTimeStamp(XMLGregorianCalendar value) {

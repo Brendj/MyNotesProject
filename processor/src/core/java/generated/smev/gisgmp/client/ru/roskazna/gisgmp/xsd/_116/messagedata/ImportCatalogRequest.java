@@ -1,14 +1,13 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceCatalogType;
-
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog.ServiceCatalogType;
 
 
 /**
@@ -48,7 +47,7 @@ public class ImportCatalogRequest {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}
      *     
      */
     public JAXBElement<ServiceCatalogType> getChanges() {
@@ -60,7 +59,7 @@ public class ImportCatalogRequest {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.bind.JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}
+     *     {@link JAXBElement }{@code <}{@link ServiceCatalogType }{@code >}
      *     
      */
     public void setChanges(JAXBElement<ServiceCatalogType> value) {

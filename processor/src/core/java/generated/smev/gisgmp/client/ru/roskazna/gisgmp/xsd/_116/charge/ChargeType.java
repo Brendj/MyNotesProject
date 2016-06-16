@@ -1,23 +1,24 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.datatype.XMLGregorianCalendar;
 import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.budgetindex.BudgetIndexType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AdditionalDataType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.ChangeStatus;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.OrganizationType;
-
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -63,15 +64,7 @@ import java.util.List;
  *         &lt;/element>
  *         &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}ChangeStatus"/>
  *         &lt;element name="KBK" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KBKType"/>
- *         &lt;element name="OKTMO">
- *           &lt;simpleType>
- *             &lt;restriction base="{http://roskazna.ru/gisgmp/xsd/116/Common}OKTMOType">
- *               &lt;pattern value="([^0^\D]\d{2}|\d{2}[^0^\D]|\d[^0^\D]\d)\d{8}"/>
- *               &lt;pattern value="([^0^\D]\d{2}|\d{2}[^0^\D]|\d[^0^\D]\d)\d{5}"/>
- *               &lt;pattern value="0"/>
- *             &lt;/restriction>
- *           &lt;/simpleType>
- *         &lt;/element>
+ *         &lt;element name="OKTMO" type="{http://roskazna.ru/gisgmp/xsd/116/Common}OKTMOType"/>
  *         &lt;element name="BudgetIndex" type="{http://roskazna.ru/gisgmp/xsd/116/BudgetIndex}BudgetIndexType"/>
  *         &lt;choice>
  *           &lt;element name="UnifiedPayerIdentifier">
@@ -86,7 +79,7 @@ import java.util.List;
  *           &lt;element name="AltPayerIdentifier">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *                 &lt;pattern value="((0[1-9])|(1[0-5])|(2[12456]))[0-9a-zA-Z�-��-�]{23}"/>
+ *                 &lt;pattern value="((0[1-9])|(1[0-5])|(2[12456]))[0-9a-zA-Z�-��-�]{20}\d{3}"/>
  *               &lt;/restriction>
  *             &lt;/simpleType>
  *           &lt;/element>
@@ -208,7 +201,7 @@ public class ChargeType {
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar docDispatchDate;
     @XmlElement(name = "MainSupplierBillIDList")
-    protected MainSupplierBillIDList mainSupplierBillIDList;
+    protected ChargeType.MainSupplierBillIDList mainSupplierBillIDList;
     @XmlElement(name = "SupplierOrgInfo", required = true)
     protected OrganizationType supplierOrgInfo;
     @XmlElement(name = "BillFor", required = true)
@@ -262,7 +255,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getValidUntil() {
@@ -274,7 +267,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setValidUntil(XMLGregorianCalendar value) {
@@ -286,7 +279,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getDocDispatchDate() {
@@ -298,7 +291,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setDocDispatchDate(XMLGregorianCalendar value) {
@@ -310,10 +303,10 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge.ChargeType.MainSupplierBillIDList }
+     *     {@link ChargeType.MainSupplierBillIDList }
      *     
      */
-    public MainSupplierBillIDList getMainSupplierBillIDList() {
+    public ChargeType.MainSupplierBillIDList getMainSupplierBillIDList() {
         return mainSupplierBillIDList;
     }
 
@@ -322,10 +315,10 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge.ChargeType.MainSupplierBillIDList }
+     *     {@link ChargeType.MainSupplierBillIDList }
      *     
      */
-    public void setMainSupplierBillIDList(MainSupplierBillIDList value) {
+    public void setMainSupplierBillIDList(ChargeType.MainSupplierBillIDList value) {
         this.mainSupplierBillIDList = value;
     }
 
@@ -382,7 +375,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getTotalAmount() {
@@ -394,7 +387,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setTotalAmount(BigInteger value) {
@@ -670,7 +663,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getAcptTerm() {
@@ -682,7 +675,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setAcptTerm(BigInteger value) {
@@ -694,7 +687,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getPaytCondition() {
@@ -706,7 +699,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setPaytCondition(BigInteger value) {
@@ -843,7 +836,7 @@ public class ChargeType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getBillDate() {
@@ -855,7 +848,7 @@ public class ChargeType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setBillDate(XMLGregorianCalendar value) {

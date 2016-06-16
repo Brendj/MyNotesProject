@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.*;
@@ -33,6 +34,9 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -69,6 +73,8 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
     private static final String SIGNATURE_METHOD = "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411";
 
     private static final String MESSAGE_NS = "http://smev.gosuslugi.ru/rev120315";
+    private static final String NS_SMEV = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/";
+    private static final String NS_INC = "http://www.w3.org/2004/08/xop/include";
 
     private IRNIPMessageToLog messageLogger;
     private String containerAlias;
@@ -135,7 +141,7 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
                 //org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(source_doc);
 
                 InputStream in = new ByteArrayInputStream(sss.getBytes("UTF-8"));
-                String elementId = "N_52d85fa5-18ae-11e5-b50b-bcaec5d977ce";
+                String elementId = "I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce";
                 IXAdESConfig xadesConfig = new XAdESConfig(
                         "JCP", RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME), new ISignatureContainer() {
                     @Override
@@ -153,9 +159,13 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
                         return null;
                     }
                 });
-                final Document signed_doc = Signer.sign(privateKey, cert, xadesConfig.getDefaultProvider(), in,
-                        elementId, MAP_DIGEST_OID_2_TSA_URL);
-                //System.out.println(toString(signed_doc));
+
+                // НИЖЕ ЗАКОММЕНТИРОВАНО ПОДПИСАНИЕ ПО ФОРМАТУ XADES-T
+
+                /*final Document signed_doc = Signer.sign(privateKey, cert, xadesConfig.getDefaultProvider(), in,
+                        elementId, MAP_DIGEST_OID_2_TSA_URL);*/
+                final Document signed_doc = newDocumentFromInputStream(in);
+                        //System.out.println(toString(signed_doc));
                 DOMSource domSource = new DOMSource(signed_doc);
                 soapPart.setContent(domSource);
 
@@ -163,6 +173,9 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
                 soapPart.getEnvelope().addNamespaceDeclaration("wsse", WS_SECURITY_SECEXT_URI);
                 soapPart.getEnvelope().addNamespaceDeclaration("wsu", WS_SECURITY_UTILITY_URI);
                 soapPart.getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#");
+                soapPart.getEnvelope().addNamespaceDeclaration("smev", NS_SMEV);
+                soapPart.getEnvelope().addNamespaceDeclaration("rev", MESSAGE_NS);
+                soapPart.getEnvelope().addNamespaceDeclaration("inc", NS_INC);
                 smc.getMessage().getSOAPBody().setAttributeNS(WS_SECURITY_UTILITY_URI, "wsu:Id", "body");
 
                 final WSSecHeader header = new WSSecHeader();
@@ -240,6 +253,26 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
         }
 
         return true;
+    }
+
+    private Document newDocumentFromInputStream(InputStream in) {
+        DocumentBuilderFactory factory = null;
+        DocumentBuilder builder = null;
+        Document ret = null;
+
+        try {
+            factory = DocumentBuilderFactory.newInstance();
+            builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            ret = builder.parse(new InputSource(in));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     public static String toString(Document doc) {

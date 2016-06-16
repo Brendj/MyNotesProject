@@ -1,18 +1,13 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.quittance.QuittanceType;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.util.ArrayList;
-import java.util.List;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.quittance.QuittanceType;
 
 
 /**
@@ -70,19 +65,19 @@ import java.util.List;
 public class DoAcknowledgmentResponseType {
 
     @XmlElement(name = "Quittances")
-    protected Quittances quittances;
+    protected DoAcknowledgmentResponseType.Quittances quittances;
     @XmlElement(name = "PaymentsNotFound")
-    protected PaymentsNotFound paymentsNotFound;
+    protected DoAcknowledgmentResponseType.PaymentsNotFound paymentsNotFound;
 
     /**
      * Gets the value of the quittances property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType.Quittances }
+     *     {@link DoAcknowledgmentResponseType.Quittances }
      *     
      */
-    public Quittances getQuittances() {
+    public DoAcknowledgmentResponseType.Quittances getQuittances() {
         return quittances;
     }
 
@@ -91,10 +86,10 @@ public class DoAcknowledgmentResponseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType.Quittances }
+     *     {@link DoAcknowledgmentResponseType.Quittances }
      *     
      */
-    public void setQuittances(Quittances value) {
+    public void setQuittances(DoAcknowledgmentResponseType.Quittances value) {
         this.quittances = value;
     }
 
@@ -103,10 +98,10 @@ public class DoAcknowledgmentResponseType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType.PaymentsNotFound }
+     *     {@link DoAcknowledgmentResponseType.PaymentsNotFound }
      *     
      */
-    public PaymentsNotFound getPaymentsNotFound() {
+    public DoAcknowledgmentResponseType.PaymentsNotFound getPaymentsNotFound() {
         return paymentsNotFound;
     }
 
@@ -115,10 +110,10 @@ public class DoAcknowledgmentResponseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType.PaymentsNotFound }
+     *     {@link DoAcknowledgmentResponseType.PaymentsNotFound }
      *     
      */
-    public void setPaymentsNotFound(PaymentsNotFound value) {
+    public void setPaymentsNotFound(DoAcknowledgmentResponseType.PaymentsNotFound value) {
         this.paymentsNotFound = value;
     }
 
@@ -216,7 +211,7 @@ public class DoAcknowledgmentResponseType {
     public static class Quittances {
 
         @XmlElement(name = "Quittance", required = true)
-        protected List<Quittance> quittance;
+        protected List<DoAcknowledgmentResponseType.Quittances.Quittance> quittance;
 
         /**
          * Gets the value of the quittance property.
@@ -236,13 +231,13 @@ public class DoAcknowledgmentResponseType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.doacknowledgment.DoAcknowledgmentResponseType.Quittances.Quittance }
+         * {@link DoAcknowledgmentResponseType.Quittances.Quittance }
          * 
          * 
          */
-        public List<Quittance> getQuittance() {
+        public List<DoAcknowledgmentResponseType.Quittances.Quittance> getQuittance() {
             if (quittance == null) {
-                quittance = new ArrayList<Quittance>();
+                quittance = new ArrayList<DoAcknowledgmentResponseType.Quittances.Quittance>();
             }
             return this.quittance;
         }

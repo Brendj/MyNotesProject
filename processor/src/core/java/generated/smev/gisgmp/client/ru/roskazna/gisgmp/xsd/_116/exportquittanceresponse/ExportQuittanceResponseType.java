@@ -1,15 +1,14 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.quittance.QuittanceType;
-
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.quittance.QuittanceType;
 
 
 /**
@@ -59,17 +58,17 @@ import java.util.List;
 public class ExportQuittanceResponseType {
 
     @XmlElement(name = "Quittances", required = true)
-    protected Quittances quittances;
+    protected ExportQuittanceResponseType.Quittances quittances;
 
     /**
      * Gets the value of the quittances property.
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse.ExportQuittanceResponseType.Quittances }
+     *     {@link ExportQuittanceResponseType.Quittances }
      *     
      */
-    public Quittances getQuittances() {
+    public ExportQuittanceResponseType.Quittances getQuittances() {
         return quittances;
     }
 
@@ -78,10 +77,10 @@ public class ExportQuittanceResponseType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse.ExportQuittanceResponseType.Quittances }
+     *     {@link ExportQuittanceResponseType.Quittances }
      *     
      */
-    public void setQuittances(Quittances value) {
+    public void setQuittances(ExportQuittanceResponseType.Quittances value) {
         this.quittances = value;
     }
 
@@ -123,7 +122,7 @@ public class ExportQuittanceResponseType {
     public static class Quittances {
 
         @XmlElement(name = "Quittance")
-        protected List<Quittance> quittance;
+        protected List<ExportQuittanceResponseType.Quittances.Quittance> quittance;
         @XmlAttribute(required = true)
         protected boolean hasMore;
 
@@ -145,13 +144,13 @@ public class ExportQuittanceResponseType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse.ExportQuittanceResponseType.Quittances.Quittance }
+         * {@link ExportQuittanceResponseType.Quittances.Quittance }
          * 
          * 
          */
-        public List<Quittance> getQuittance() {
+        public List<ExportQuittanceResponseType.Quittances.Quittance> getQuittance() {
             if (quittance == null) {
-                quittance = new ArrayList<Quittance>();
+                quittance = new ArrayList<ExportQuittanceResponseType.Quittances.Quittance>();
             }
             return this.quittance;
         }

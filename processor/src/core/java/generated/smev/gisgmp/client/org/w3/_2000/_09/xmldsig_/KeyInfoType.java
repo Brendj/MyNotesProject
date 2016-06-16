@@ -1,16 +1,22 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementRefs;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlMixed;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.w3c.dom.Element;
 
 
 /**
@@ -47,12 +53,12 @@ import java.util.List;
 public class KeyInfoType {
 
     @XmlElementRefs({
-        @XmlElementRef(name = "KeyValue", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "SPKIData", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
-        @XmlElementRef(name = "RetrievalMethod", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
         @XmlElementRef(name = "KeyName", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "RetrievalMethod", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
         @XmlElementRef(name = "X509Data", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "SPKIData", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
         @XmlElementRef(name = "MgmtData", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
+        @XmlElementRef(name = "KeyValue", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class),
         @XmlElementRef(name = "PGPData", namespace = "http://www.w3.org/2000/09/xmldsig#", type = JAXBElement.class)
     })
     @XmlMixed
@@ -82,16 +88,16 @@ public class KeyInfoType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link KeyValueType }{@code >}
-     * {@link String }
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link SPKIDataType }{@code >}
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
+     * {@link JAXBElement }{@code <}{@link RetrievalMethodType }{@code >}
      * {@link Object }
-     * {@link org.w3c.dom.Element }
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link RetrievalMethodType }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link X509DataType }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}
-     * {@link javax.xml.bind.JAXBElement }{@code <}{@link PGPDataType }{@code >}
+     * {@link JAXBElement }{@code <}{@link X509DataType }{@code >}
+     * {@link JAXBElement }{@code <}{@link SPKIDataType }{@code >}
+     * {@link Element }
+     * {@link JAXBElement }{@code <}{@link String }{@code >}
+     * {@link String }
+     * {@link JAXBElement }{@code <}{@link KeyValueType }{@code >}
+     * {@link JAXBElement }{@code <}{@link PGPDataType }{@code >}
      * 
      * 
      */

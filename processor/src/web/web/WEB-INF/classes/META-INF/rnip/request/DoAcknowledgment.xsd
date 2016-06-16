@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:da="http://roskazna.ru/gisgmp/xsd/116/DoAcknowledgment" xmlns:qt="http://roskazna.ru/gisgmp/xsd/116/Quittance" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/DoAcknowledgment" elementFormDefault="qualified">
 	<xs:import namespace="http://roskazna.ru/gisgmp/xsd/116/Quittance" schemaLocation="../entity/document/Quittance.xsd"/>
 	<xs:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../entity/directory/Common.xsd"/>
@@ -49,7 +49,7 @@
 		</xs:attribute>
 		<xs:attribute name="originatorID" type="com:URNType">
 			<xs:annotation>
-				<xs:documentation>УРН участника косвенного взаимодейсвия, полученный при регистрации в ГИС ГМП</xs:documentation>
+				<xs:documentation>УРН участника косвенного взаимодействия, сформировавшего запрос</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 	</xs:complexType>

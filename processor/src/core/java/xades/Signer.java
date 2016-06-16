@@ -195,7 +195,7 @@ public class Signer {
 
         final DataObjectDesc dataObj = new DataObjectReference(referenceURI);
         dataObj.withTransform(new EnvelopedSignatureTransform());
-        // dataObj.withTransform(new ExclusiveCanonicalXMLWithoutComments());
+        dataObj.withTransform(new ExclusiveCanonicalXMLWithoutComments());
 
         final SignedDataObjects dataObjects = new SignedDataObjects(dataObj);
 

@@ -1,17 +1,17 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.errinfo.ResultInfo;
-
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.errinfo.ResultInfo;
 
 
 /**
@@ -64,7 +64,7 @@ public class TicketType {
     @XmlElement(name = "RequestProcessResult")
     protected ResultInfo requestProcessResult;
     @XmlElement(name = "PackageProcessResult")
-    protected PackageProcessResult packageProcessResult;
+    protected TicketType.PackageProcessResult packageProcessResult;
 
     /**
      * Gets the value of the requestProcessResult property.
@@ -95,10 +95,10 @@ public class TicketType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket.TicketType.PackageProcessResult }
+     *     {@link TicketType.PackageProcessResult }
      *     
      */
-    public PackageProcessResult getPackageProcessResult() {
+    public TicketType.PackageProcessResult getPackageProcessResult() {
         return packageProcessResult;
     }
 
@@ -107,10 +107,10 @@ public class TicketType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket.TicketType.PackageProcessResult }
+     *     {@link TicketType.PackageProcessResult }
      *     
      */
-    public void setPackageProcessResult(PackageProcessResult value) {
+    public void setPackageProcessResult(TicketType.PackageProcessResult value) {
         this.packageProcessResult = value;
     }
 
@@ -149,7 +149,7 @@ public class TicketType {
     public static class PackageProcessResult {
 
         @XmlElement(name = "EntityProcessResult", required = true)
-        protected List<EntityProcessResult> entityProcessResult;
+        protected List<TicketType.PackageProcessResult.EntityProcessResult> entityProcessResult;
 
         /**
          * Gets the value of the entityProcessResult property.
@@ -169,13 +169,13 @@ public class TicketType {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket.TicketType.PackageProcessResult.EntityProcessResult }
+         * {@link TicketType.PackageProcessResult.EntityProcessResult }
          * 
          * 
          */
-        public List<EntityProcessResult> getEntityProcessResult() {
+        public List<TicketType.PackageProcessResult.EntityProcessResult> getEntityProcessResult() {
             if (entityProcessResult == null) {
-                entityProcessResult = new ArrayList<EntityProcessResult>();
+                entityProcessResult = new ArrayList<TicketType.PackageProcessResult.EntityProcessResult>();
             }
             return this.entityProcessResult;
         }

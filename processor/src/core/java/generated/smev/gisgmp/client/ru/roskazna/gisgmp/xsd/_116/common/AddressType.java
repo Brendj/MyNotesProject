@@ -1,13 +1,13 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common;
 
-import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -87,7 +87,7 @@ public class AddressType {
     @XmlElement(name = "Comment")
     protected String comment;
     @XmlElement(name = "AddressField")
-    protected List<AddressField> addressField;
+    protected List<AddressType.AddressField> addressField;
     @XmlAttribute
     protected String kind;
 
@@ -157,13 +157,13 @@ public class AddressType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AddressType.AddressField }
+     * {@link AddressType.AddressField }
      * 
      * 
      */
-    public List<AddressField> getAddressField() {
+    public List<AddressType.AddressField> getAddressField() {
         if (addressField == null) {
-            addressField = new ArrayList<AddressField>();
+            addressField = new ArrayList<AddressType.AddressField>();
         }
         return this.addressField;
     }

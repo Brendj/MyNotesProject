@@ -1,15 +1,11 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common;
 
+import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import java.math.BigDecimal;
 
 
 /**
@@ -93,7 +89,7 @@ public class CommissionType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigDecimal }
+     *     {@link BigDecimal }
      *     
      */
     public BigDecimal getPercent() {
@@ -105,7 +101,7 @@ public class CommissionType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigDecimal }
+     *     {@link BigDecimal }
      *     
      */
     public void setPercent(BigDecimal value) {

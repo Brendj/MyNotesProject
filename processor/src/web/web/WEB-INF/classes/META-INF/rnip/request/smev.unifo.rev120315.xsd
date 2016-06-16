@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:smev="http://smev.gosuslugi.ru/rev120315"
-           xmlns:xop="http://www.w3.org/2004/08/xop/include"
-           targetNamespace="http://smev.gosuslugi.ru/rev120315" elementFormDefault="qualified"
-           attributeFormDefault="unqualified" version="2.5.3">
+	xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:xop="http://www.w3.org/2004/08/xop/include"
+	targetNamespace="http://smev.gosuslugi.ru/rev120315" elementFormDefault="qualified"
+	attributeFormDefault="unqualified" version="2.5.3">
 	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
 		schemaLocation="xmldsig-core-schema.xsd"/>
 	<xs:import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="xop-include.xsd"/>

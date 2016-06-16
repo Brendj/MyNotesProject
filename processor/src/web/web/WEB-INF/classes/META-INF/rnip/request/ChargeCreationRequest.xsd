@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bdi="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" xmlns:org="http://roskazna.ru/gisgmp/xsd/116/Organization" xmlns:ccr="http://roskazna.ru/gisgmp/xsd/116/ChargeCreationRequest" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/ChargeCreationRequest" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../entity/directory/Common.xsd"/>
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/BudgetIndex" schemaLocation="../entity/directory/BudgetIndex.xsd"/>
@@ -11,7 +11,7 @@
 		<xsd:sequence>
 			<xsd:element name="ChargeTemplate" type="ccr:ChargeTemplateType">
 				<xsd:annotation>
-					<xsd:documentation>Шаблон начисления, на основании которого ИС РНиП будет сформировано предварительное начисление.</xsd:documentation>
+					<xsd:documentation>Шаблон начисления, на основании которого ГИС ГМП будет сформировано предварительное начисление.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="ds:Signature" minOccurs="0">
@@ -32,7 +32,7 @@
 		</xsd:attribute>
 		<xsd:attribute name="originatorID" type="com:URNType">
 			<xsd:annotation>
-				<xsd:documentation>УРН участника косвенного взаимодейсвия, полученный при регистрации в ГИС ГМП</xsd:documentation>
+				<xsd:documentation>УРН участника, сформировавшего шаблон начисления. Если запрос сформировал участник косвенного взаимодействия, то заполнение тега является обязательным.</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
@@ -40,12 +40,12 @@
 		<xsd:sequence>
 			<xsd:element name="ValidUntil" type="xsd:date">
 				<xsd:annotation>
-					<xsd:documentation>Дата, вплоть до которой актуально  предварительное начисление, сформированнное ИС РниП по запросу участника. Дату указывает участник, направивший запрос на формирование предварительного начисления.</xsd:documentation>
+					<xsd:documentation>Дата, вплоть до которой актуально начисление</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="SupplierOrgInfo" type="org:OrganizationType">
 				<xsd:annotation>
-					<xsd:documentation>Данные поставщика услуг, указанные в начислении.</xsd:documentation>
+					<xsd:documentation>Данные организации, являющейся получателем средств</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="BillFor">
@@ -70,14 +70,14 @@
 				</xsd:simpleType>
 			</xsd:element>
 			<xsd:element ref="com:ChangeStatus"/>
-			<xsd:element name="KBK" type="com:KBKType">
+			<xsd:element name="KBK" type="com:KBKType" minOccurs="1">
 				<xsd:annotation>
-					<xsd:documentation>КБК</xsd:documentation>
+					<xsd:documentation>КБК или код операции</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="OKTMO">
 				<xsd:annotation>
-					<xsd:documentation>Код ОКТМО получателя средств.</xsd:documentation>
+					<xsd:documentation>Код ОКТМО получателя средств</xsd:documentation>
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="com:OKTMOType">
@@ -89,37 +89,36 @@
 			</xsd:element>
 			<xsd:element name="BudgetIndex" type="bdi:BudgetIndexType">
 				<xsd:annotation>
-					<xsd:documentation>Дополнительные реквизиты платежа, заполняемые в платежном поручении при оплате государственной услуги.</xsd:documentation>
+					<xsd:documentation>Дополнительные реквизиты платежа, предусмотренные приказом Минфина России от 12 ноября 2013 г. №107н</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:choice>
-				<xsd:element name="AltPayerIdentifier">
+				<xsd:element name="UnifiedPayerIdentifier">
 					<xsd:annotation>
-						<xsd:documentation>Альтернативный идентификатор плательщика
-						</xsd:documentation>
+						<xsd:documentation>Идентификатор плательщика ЮЛ или ИП</xsd:documentation>
 					</xsd:annotation>
 					<xsd:simpleType>
 						<xsd:restriction base="xsd:string">
-							<xsd:minLength value="1"/>
-							<xsd:maxLength value="25"/>
+							<xsd:pattern value="2\d{14}[A-Z0-9]{2}\d{3}"/>
+							<xsd:pattern value="3\d{14}[A-Z0-9]{2}\d{3}|3\d{14}"/>
+							<xsd:pattern value="4\d{12}"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
-				<xsd:element name="UnifiedPayerIdentifier">
+				<xsd:element name="AltPayerIdentifier">
 					<xsd:annotation>
-						<xsd:documentation>Единый идентификатор плательщика </xsd:documentation>
+						<xsd:documentation>Идентификатор плательщика ФЛ</xsd:documentation>
 					</xsd:annotation>
 					<xsd:simpleType>
 						<xsd:restriction base="xsd:string">
-							<xsd:minLength value="1"/>
-							<xsd:maxLength value="25"/>
+							<xsd:pattern value="((0[1-9])|(1[0-5])|(2[12456]))[0-9a-zA-Zа-яА-Я]{23}"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
 			</xsd:choice>
-			<xsd:element name="TreasureBranch">
+			<xsd:element name="TreasureBranch" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Сокращенное наименование органа Федерального казначейства.</xsd:documentation>
+					<xsd:documentation>Сокращенное наименование ТОФК</xsd:documentation>
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
@@ -140,7 +139,7 @@
 			</xsd:element>
 			<xsd:element name="FOName" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Наименование финансового органа</xsd:documentation>
+					<xsd:documentation>Сокращенное наименование финансового органа</xsd:documentation>
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
@@ -155,8 +154,7 @@
 				</xsd:annotation>
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
-						<xsd:minLength value="1"/>
-						<xsd:maxLength value="20"/>
+						<xsd:pattern value="\w{11}"/>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
@@ -171,6 +169,51 @@
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
+			<xsd:element name="AcptTerm" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Количество дней для получения акцепта плательщика</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:integer">
+						<xsd:totalDigits value="1"/>
+						<xsd:minInclusive value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PaytCondition" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Условие оплаты. Возможные значения:
+ 1 - заранее данный акцепт плательщика;
+ 2 - требуется получение акцепта плательщика.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:integer">
+						<xsd:totalDigits value="1"/>
+						<xsd:minInclusive value="1"/>
+						<xsd:enumeration value="1"/>
+						<xsd:enumeration value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Origin" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Флаг происхождения предварительного начисления</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="PRIOR">
+							<xsd:annotation>
+								<xsd:documentation>Предварительное начисление, загруженное в ГИС ГМП участником (например, при направлении дела на рассмотрение в суд)</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+						<xsd:enumeration value="TEMP">
+							<xsd:annotation>
+								<xsd:documentation>Предварительное начисление, сформированное ГИС ГМП по запросу участника</xsd:documentation>
+							</xsd:annotation>
+						</xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
 			<xsd:element ref="com:AdditionalData" minOccurs="0" maxOccurs="unbounded">
 				<xsd:annotation>
 					<xsd:documentation>Дополнительные поля начисления.</xsd:documentation>
@@ -179,7 +222,7 @@
 		</xsd:sequence>
 		<xsd:attribute name="supplierBillID" type="com:SupplierBillIDType">
 			<xsd:annotation>
-				<xsd:documentation>УИН. Обязателен, если атрибут ChangeStatus@meaning принимает значения 2, 3, 4.</xsd:documentation>
+				<xsd:documentation>УИН</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>

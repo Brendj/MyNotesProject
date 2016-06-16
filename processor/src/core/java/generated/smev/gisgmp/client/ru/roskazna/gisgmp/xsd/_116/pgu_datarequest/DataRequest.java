@@ -1,18 +1,21 @@
-
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest;
 
-import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
-
-import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.List;
+
+import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.PayerIdentificationType;
 
 
 /**
@@ -60,8 +63,20 @@ import java.util.List;
  *                                 &lt;complexType>
  *                                   &lt;complexContent>
  *                                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                                       &lt;sequence>
+ *                                       &lt;choice>
  *                                         &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentifier" maxOccurs="100"/>
+ *                                         &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentification" maxOccurs="100"/>
+ *                                       &lt;/choice>
+ *                                     &lt;/restriction>
+ *                                   &lt;/complexContent>
+ *                                 &lt;/complexType>
+ *                               &lt;/element>
+ *                               &lt;element name="ServicesCodesList">
+ *                                 &lt;complexType>
+ *                                   &lt;complexContent>
+ *                                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                       &lt;sequence>
+ *                                         &lt;element name="ServiceCode" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="100"/>
  *                                       &lt;/sequence>
  *                                     &lt;/restriction>
  *                                   &lt;/complexContent>
@@ -79,6 +94,7 @@ import java.util.List;
  *                               &lt;/complexType>
  *                             &lt;/element>
  *                           &lt;/sequence>
+ *                           &lt;attribute name="AllDateCatalog" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
@@ -206,6 +222,7 @@ import java.util.List;
  *             &lt;enumeration value="TEMP-CHARGING"/>
  *             &lt;enumeration value="TEMP-CHARGING-STATUS"/>
  *             &lt;enumeration value="TEMP-CHARGING-NOTFULLMATCHED"/>
+ *             &lt;enumeration value="CATALOG"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
@@ -226,9 +243,9 @@ import java.util.List;
 public class DataRequest {
 
     @XmlElement(name = "Filter", required = true)
-    protected Filter filter;
+    protected DataRequest.Filter filter;
     @XmlElement(name = "Paging")
-    protected Paging paging;
+    protected DataRequest.Paging paging;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
     protected SignatureType signature;
     @XmlAttribute(name = "Id")
@@ -245,10 +262,10 @@ public class DataRequest {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter }
+     *     {@link DataRequest.Filter }
      *     
      */
-    public Filter getFilter() {
+    public DataRequest.Filter getFilter() {
         return filter;
     }
 
@@ -257,10 +274,10 @@ public class DataRequest {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter }
+     *     {@link DataRequest.Filter }
      *     
      */
-    public void setFilter(Filter value) {
+    public void setFilter(DataRequest.Filter value) {
         this.filter = value;
     }
 
@@ -269,10 +286,10 @@ public class DataRequest {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Paging }
+     *     {@link DataRequest.Paging }
      *     
      */
-    public Paging getPaging() {
+    public DataRequest.Paging getPaging() {
         return paging;
     }
 
@@ -281,10 +298,10 @@ public class DataRequest {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Paging }
+     *     {@link DataRequest.Paging }
      *     
      */
-    public void setPaging(Paging value) {
+    public void setPaging(DataRequest.Paging value) {
         this.paging = value;
     }
 
@@ -425,8 +442,20 @@ public class DataRequest {
      *                       &lt;complexType>
      *                         &lt;complexContent>
      *                           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                             &lt;sequence>
+     *                             &lt;choice>
      *                               &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentifier" maxOccurs="100"/>
+     *                               &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentification" maxOccurs="100"/>
+     *                             &lt;/choice>
+     *                           &lt;/restriction>
+     *                         &lt;/complexContent>
+     *                       &lt;/complexType>
+     *                     &lt;/element>
+     *                     &lt;element name="ServicesCodesList">
+     *                       &lt;complexType>
+     *                         &lt;complexContent>
+     *                           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                             &lt;sequence>
+     *                               &lt;element name="ServiceCode" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="100"/>
      *                             &lt;/sequence>
      *                           &lt;/restriction>
      *                         &lt;/complexContent>
@@ -444,6 +473,7 @@ public class DataRequest {
      *                     &lt;/complexType>
      *                   &lt;/element>
      *                 &lt;/sequence>
+     *                 &lt;attribute name="AllDateCatalog" type="{http://www.w3.org/2001/XMLSchema}boolean" />
      *               &lt;/restriction>
      *             &lt;/complexContent>
      *           &lt;/complexType>
@@ -532,19 +562,19 @@ public class DataRequest {
     public static class Filter {
 
         @XmlElement(name = "Conditions", required = true)
-        protected Conditions conditions;
+        protected DataRequest.Filter.Conditions conditions;
         @XmlElement(name = "AdditionRestrictions")
-        protected AdditionRestrictions additionRestrictions;
+        protected DataRequest.Filter.AdditionRestrictions additionRestrictions;
 
         /**
          * Gets the value of the conditions property.
          * 
          * @return
          *     possible object is
-         *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions }
+         *     {@link DataRequest.Filter.Conditions }
          *     
          */
-        public Conditions getConditions() {
+        public DataRequest.Filter.Conditions getConditions() {
             return conditions;
         }
 
@@ -553,10 +583,10 @@ public class DataRequest {
          * 
          * @param value
          *     allowed object is
-         *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions }
+         *     {@link DataRequest.Filter.Conditions }
          *     
          */
-        public void setConditions(Conditions value) {
+        public void setConditions(DataRequest.Filter.Conditions value) {
             this.conditions = value;
         }
 
@@ -565,10 +595,10 @@ public class DataRequest {
          * 
          * @return
          *     possible object is
-         *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions }
+         *     {@link DataRequest.Filter.AdditionRestrictions }
          *     
          */
-        public AdditionRestrictions getAdditionRestrictions() {
+        public DataRequest.Filter.AdditionRestrictions getAdditionRestrictions() {
             return additionRestrictions;
         }
 
@@ -577,10 +607,10 @@ public class DataRequest {
          * 
          * @param value
          *     allowed object is
-         *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions }
+         *     {@link DataRequest.Filter.AdditionRestrictions }
          *     
          */
-        public void setAdditionRestrictions(AdditionRestrictions value) {
+        public void setAdditionRestrictions(DataRequest.Filter.AdditionRestrictions value) {
             this.additionRestrictions = value;
         }
 
@@ -671,11 +701,11 @@ public class DataRequest {
         public static class AdditionRestrictions {
 
             @XmlElement(name = "SubordinateIdList")
-            protected SubordinateIdList subordinateIdList;
+            protected DataRequest.Filter.AdditionRestrictions.SubordinateIdList subordinateIdList;
             @XmlElement(name = "KBKClassifier")
-            protected KBKClassifier kbkClassifier;
+            protected DataRequest.Filter.AdditionRestrictions.KBKClassifier kbkClassifier;
             @XmlElement(name = "OKTMOClassifier")
-            protected OKTMOClassifier oktmoClassifier;
+            protected DataRequest.Filter.AdditionRestrictions.OKTMOClassifier oktmoClassifier;
             @XmlElement(name = "Exclude")
             protected String exclude;
 
@@ -684,10 +714,10 @@ public class DataRequest {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
+             *     {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
              *     
              */
-            public SubordinateIdList getSubordinateIdList() {
+            public DataRequest.Filter.AdditionRestrictions.SubordinateIdList getSubordinateIdList() {
                 return subordinateIdList;
             }
 
@@ -696,10 +726,10 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
+             *     {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
              *     
              */
-            public void setSubordinateIdList(SubordinateIdList value) {
+            public void setSubordinateIdList(DataRequest.Filter.AdditionRestrictions.SubordinateIdList value) {
                 this.subordinateIdList = value;
             }
 
@@ -708,10 +738,10 @@ public class DataRequest {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.KBKClassifier }
+             *     {@link DataRequest.Filter.AdditionRestrictions.KBKClassifier }
              *     
              */
-            public KBKClassifier getKBKClassifier() {
+            public DataRequest.Filter.AdditionRestrictions.KBKClassifier getKBKClassifier() {
                 return kbkClassifier;
             }
 
@@ -720,10 +750,10 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.KBKClassifier }
+             *     {@link DataRequest.Filter.AdditionRestrictions.KBKClassifier }
              *     
              */
-            public void setKBKClassifier(KBKClassifier value) {
+            public void setKBKClassifier(DataRequest.Filter.AdditionRestrictions.KBKClassifier value) {
                 this.kbkClassifier = value;
             }
 
@@ -732,10 +762,10 @@ public class DataRequest {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.OKTMOClassifier }
+             *     {@link DataRequest.Filter.AdditionRestrictions.OKTMOClassifier }
              *     
              */
-            public OKTMOClassifier getOKTMOClassifier() {
+            public DataRequest.Filter.AdditionRestrictions.OKTMOClassifier getOKTMOClassifier() {
                 return oktmoClassifier;
             }
 
@@ -744,10 +774,10 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.OKTMOClassifier }
+             *     {@link DataRequest.Filter.AdditionRestrictions.OKTMOClassifier }
              *     
              */
-            public void setOKTMOClassifier(OKTMOClassifier value) {
+            public void setOKTMOClassifier(DataRequest.Filter.AdditionRestrictions.OKTMOClassifier value) {
                 this.oktmoClassifier = value;
             }
 
@@ -940,7 +970,7 @@ public class DataRequest {
             public static class SubordinateIdList {
 
                 @XmlElements({
-                    @XmlElement(name = "TaxpayerIdentification", type = TaxpayerIdentification.class),
+                    @XmlElement(name = "TaxpayerIdentification", type = DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification.class),
                     @XmlElement(name = "PayeeID", type = String.class)
                 })
                 protected List<Object> taxpayerIdentificationOrPayeeID;
@@ -963,7 +993,7 @@ public class DataRequest {
                  * 
                  * <p>
                  * Objects of the following type(s) are allowed in the list
-                 * {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification }
+                 * {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification }
                  * {@link String }
                  * 
                  * 
@@ -1093,8 +1123,20 @@ public class DataRequest {
          *             &lt;complexType>
          *               &lt;complexContent>
          *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *                   &lt;sequence>
+         *                   &lt;choice>
          *                     &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentifier" maxOccurs="100"/>
+         *                     &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentification" maxOccurs="100"/>
+         *                   &lt;/choice>
+         *                 &lt;/restriction>
+         *               &lt;/complexContent>
+         *             &lt;/complexType>
+         *           &lt;/element>
+         *           &lt;element name="ServicesCodesList">
+         *             &lt;complexType>
+         *               &lt;complexContent>
+         *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                   &lt;sequence>
+         *                     &lt;element name="ServiceCode" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="100"/>
          *                   &lt;/sequence>
          *                 &lt;/restriction>
          *               &lt;/complexContent>
@@ -1112,6 +1154,7 @@ public class DataRequest {
          *           &lt;/complexType>
          *         &lt;/element>
          *       &lt;/sequence>
+         *       &lt;attribute name="AllDateCatalog" type="{http://www.w3.org/2001/XMLSchema}boolean" />
          *     &lt;/restriction>
          *   &lt;/complexContent>
          * &lt;/complexType>
@@ -1123,26 +1166,31 @@ public class DataRequest {
         @XmlType(name = "", propOrder = {
             "chargesIdentifiers",
             "payers",
+            "servicesCodesList",
             "timeslot"
         })
         public static class Conditions {
 
             @XmlElement(name = "ChargesIdentifiers")
-            protected ChargesIdentifiers chargesIdentifiers;
+            protected DataRequest.Filter.Conditions.ChargesIdentifiers chargesIdentifiers;
             @XmlElement(name = "Payers")
-            protected Payers payers;
+            protected DataRequest.Filter.Conditions.Payers payers;
+            @XmlElement(name = "ServicesCodesList")
+            protected DataRequest.Filter.Conditions.ServicesCodesList servicesCodesList;
             @XmlElement(name = "Timeslot")
-            protected Timeslot timeslot;
+            protected DataRequest.Filter.Conditions.Timeslot timeslot;
+            @XmlAttribute(name = "AllDateCatalog")
+            protected Boolean allDateCatalog;
 
             /**
              * Gets the value of the chargesIdentifiers property.
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.ChargesIdentifiers }
+             *     {@link DataRequest.Filter.Conditions.ChargesIdentifiers }
              *     
              */
-            public ChargesIdentifiers getChargesIdentifiers() {
+            public DataRequest.Filter.Conditions.ChargesIdentifiers getChargesIdentifiers() {
                 return chargesIdentifiers;
             }
 
@@ -1151,10 +1199,10 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.ChargesIdentifiers }
+             *     {@link DataRequest.Filter.Conditions.ChargesIdentifiers }
              *     
              */
-            public void setChargesIdentifiers(ChargesIdentifiers value) {
+            public void setChargesIdentifiers(DataRequest.Filter.Conditions.ChargesIdentifiers value) {
                 this.chargesIdentifiers = value;
             }
 
@@ -1163,10 +1211,10 @@ public class DataRequest {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.Payers }
+             *     {@link DataRequest.Filter.Conditions.Payers }
              *     
              */
-            public Payers getPayers() {
+            public DataRequest.Filter.Conditions.Payers getPayers() {
                 return payers;
             }
 
@@ -1175,11 +1223,35 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.Payers }
+             *     {@link DataRequest.Filter.Conditions.Payers }
              *     
              */
-            public void setPayers(Payers value) {
+            public void setPayers(DataRequest.Filter.Conditions.Payers value) {
                 this.payers = value;
+            }
+
+            /**
+             * Gets the value of the servicesCodesList property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link DataRequest.Filter.Conditions.ServicesCodesList }
+             *     
+             */
+            public DataRequest.Filter.Conditions.ServicesCodesList getServicesCodesList() {
+                return servicesCodesList;
+            }
+
+            /**
+             * Sets the value of the servicesCodesList property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link DataRequest.Filter.Conditions.ServicesCodesList }
+             *     
+             */
+            public void setServicesCodesList(DataRequest.Filter.Conditions.ServicesCodesList value) {
+                this.servicesCodesList = value;
             }
 
             /**
@@ -1187,10 +1259,10 @@ public class DataRequest {
              * 
              * @return
              *     possible object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.Timeslot }
+             *     {@link DataRequest.Filter.Conditions.Timeslot }
              *     
              */
-            public Timeslot getTimeslot() {
+            public DataRequest.Filter.Conditions.Timeslot getTimeslot() {
                 return timeslot;
             }
 
@@ -1199,11 +1271,35 @@ public class DataRequest {
              * 
              * @param value
              *     allowed object is
-             *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.DataRequest.Filter.Conditions.Timeslot }
+             *     {@link DataRequest.Filter.Conditions.Timeslot }
              *     
              */
-            public void setTimeslot(Timeslot value) {
+            public void setTimeslot(DataRequest.Filter.Conditions.Timeslot value) {
                 this.timeslot = value;
+            }
+
+            /**
+             * Gets the value of the allDateCatalog property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Boolean }
+             *     
+             */
+            public Boolean isAllDateCatalog() {
+                return allDateCatalog;
+            }
+
+            /**
+             * Sets the value of the allDateCatalog property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Boolean }
+             *     
+             */
+            public void setAllDateCatalog(Boolean value) {
+                this.allDateCatalog = value;
             }
 
 
@@ -1286,9 +1382,10 @@ public class DataRequest {
              * &lt;complexType>
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-             *       &lt;sequence>
+             *       &lt;choice>
              *         &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentifier" maxOccurs="100"/>
-             *       &lt;/sequence>
+             *         &lt;element ref="{http://roskazna.ru/gisgmp/xsd/116/Common}PayerIdentification" maxOccurs="100"/>
+             *       &lt;/choice>
              *     &lt;/restriction>
              *   &lt;/complexContent>
              * &lt;/complexType>
@@ -1298,12 +1395,15 @@ public class DataRequest {
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
-                "payerIdentifier"
+                "payerIdentifier",
+                "payerIdentification"
             })
             public static class Payers {
 
-                @XmlElement(name = "PayerIdentifier", namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", required = true)
+                @XmlElement(name = "PayerIdentifier", namespace = "http://roskazna.ru/gisgmp/xsd/116/Common")
                 protected List<String> payerIdentifier;
+                @XmlElement(name = "PayerIdentification", namespace = "http://roskazna.ru/gisgmp/xsd/116/Common")
+                protected List<PayerIdentificationType> payerIdentification;
 
                 /**
                  * ������������� ����������� Gets the value of the payerIdentifier property.
@@ -1332,6 +1432,95 @@ public class DataRequest {
                         payerIdentifier = new ArrayList<String>();
                     }
                     return this.payerIdentifier;
+                }
+
+                /**
+                 * Gets the value of the payerIdentification property.
+                 * 
+                 * <p>
+                 * This accessor method returns a reference to the live list,
+                 * not a snapshot. Therefore any modification you make to the
+                 * returned list will be present inside the JAXB object.
+                 * This is why there is not a <CODE>set</CODE> method for the payerIdentification property.
+                 * 
+                 * <p>
+                 * For example, to add a new item, do as follows:
+                 * <pre>
+                 *    getPayerIdentification().add(newItem);
+                 * </pre>
+                 * 
+                 * 
+                 * <p>
+                 * Objects of the following type(s) are allowed in the list
+                 * {@link PayerIdentificationType }
+                 * 
+                 * 
+                 */
+                public List<PayerIdentificationType> getPayerIdentification() {
+                    if (payerIdentification == null) {
+                        payerIdentification = new ArrayList<PayerIdentificationType>();
+                    }
+                    return this.payerIdentification;
+                }
+
+            }
+
+
+            /**
+             * <p>Java class for anonymous complex type.
+             * 
+             * <p>The following schema fragment specifies the expected content contained within this class.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="ServiceCode" type="{http://www.w3.org/2001/XMLSchema}string" maxOccurs="100"/>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "serviceCode"
+            })
+            public static class ServicesCodesList {
+
+                @XmlElement(name = "ServiceCode", required = true)
+                protected List<String> serviceCode;
+
+                /**
+                 * Gets the value of the serviceCode property.
+                 * 
+                 * <p>
+                 * This accessor method returns a reference to the live list,
+                 * not a snapshot. Therefore any modification you make to the
+                 * returned list will be present inside the JAXB object.
+                 * This is why there is not a <CODE>set</CODE> method for the serviceCode property.
+                 * 
+                 * <p>
+                 * For example, to add a new item, do as follows:
+                 * <pre>
+                 *    getServiceCode().add(newItem);
+                 * </pre>
+                 * 
+                 * 
+                 * <p>
+                 * Objects of the following type(s) are allowed in the list
+                 * {@link String }
+                 * 
+                 * 
+                 */
+                public List<String> getServiceCode() {
+                    if (serviceCode == null) {
+                        serviceCode = new ArrayList<String>();
+                    }
+                    return this.serviceCode;
                 }
 
             }
@@ -1371,7 +1560,7 @@ public class DataRequest {
                  * 
                  * @return
                  *     possible object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public XMLGregorianCalendar getStartDate() {
@@ -1383,7 +1572,7 @@ public class DataRequest {
                  * 
                  * @param value
                  *     allowed object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public void setStartDate(XMLGregorianCalendar value) {
@@ -1395,7 +1584,7 @@ public class DataRequest {
                  * 
                  * @return
                  *     possible object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public XMLGregorianCalendar getEndDate() {
@@ -1407,7 +1596,7 @@ public class DataRequest {
                  * 
                  * @param value
                  *     allowed object is
-                 *     {@link javax.xml.datatype.XMLGregorianCalendar }
+                 *     {@link XMLGregorianCalendar }
                  *     
                  */
                 public void setEndDate(XMLGregorianCalendar value) {

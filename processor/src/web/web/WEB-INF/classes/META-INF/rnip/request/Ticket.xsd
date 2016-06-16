@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xsd:schema
-        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:err="http://roskazna.ru/gisgmp/xsd/116/ErrInfo"
-        targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Ticket" elementFormDefault="qualified"
-        attributeFormDefault="unqualified">
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:ticket="http://roskazna.ru/gisgmp/xsd/116/Ticket"
+	xmlns:err="http://roskazna.ru/gisgmp/xsd/116/ErrInfo"
+	targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Ticket" elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
 	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/ErrInfo"
 		schemaLocation="../entity/directory/ErrInfo.xsd"/>
 	<xsd:complexType name="TicketType">

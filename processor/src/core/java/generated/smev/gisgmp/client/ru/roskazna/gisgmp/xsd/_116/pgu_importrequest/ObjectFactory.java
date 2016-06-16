@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_importrequest;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -42,19 +38,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ImportRequestType.Package }
-     * 
-     */
-    public ImportRequestType.Package createImportRequestTypePackage() {
-        return new ImportRequestType.Package();
-    }
-
-    /**
      * Create an instance of {@link ImportRequestType }
      * 
      */
     public ImportRequestType createImportRequestType() {
         return new ImportRequestType();
+    }
+
+    /**
+     * Create an instance of {@link ImportRequestType.Package }
+     * 
+     */
+    public ImportRequestType.Package createImportRequestTypePackage() {
+        return new ImportRequestType.Package();
     }
 
 }

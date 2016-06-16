@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -34,59 +30,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.KBKClassifier }
-     * 
-     */
-    public DataRequest.Filter.AdditionRestrictions.KBKClassifier createDataRequestFilterAdditionRestrictionsKBKClassifier() {
-        return new DataRequest.Filter.AdditionRestrictions.KBKClassifier();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest.Filter.Conditions.Timeslot }
-     * 
-     */
-    public DataRequest.Filter.Conditions.Timeslot createDataRequestFilterConditionsTimeslot() {
-        return new DataRequest.Filter.Conditions.Timeslot();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
-     * 
-     */
-    public DataRequest.Filter.AdditionRestrictions.SubordinateIdList createDataRequestFilterAdditionRestrictionsSubordinateIdList() {
-        return new DataRequest.Filter.AdditionRestrictions.SubordinateIdList();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest.Filter.Conditions }
-     * 
-     */
-    public DataRequest.Filter.Conditions createDataRequestFilterConditions() {
-        return new DataRequest.Filter.Conditions();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest }
-     * 
-     */
-    public DataRequest createDataRequest() {
-        return new DataRequest();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest.Paging }
-     * 
-     */
-    public DataRequest.Paging createDataRequestPaging() {
-        return new DataRequest.Paging();
-    }
-
-    /**
      * Create an instance of {@link DataRequest.Filter }
      * 
      */
     public DataRequest.Filter createDataRequestFilter() {
         return new DataRequest.Filter();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.Conditions.ServicesCodesList }
+     * 
+     */
+    public DataRequest.Filter.Conditions.ServicesCodesList createDataRequestFilterConditionsServicesCodesList() {
+        return new DataRequest.Filter.Conditions.ServicesCodesList();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions }
+     * 
+     */
+    public DataRequest.Filter.AdditionRestrictions createDataRequestFilterAdditionRestrictions() {
+        return new DataRequest.Filter.AdditionRestrictions();
     }
 
     /**
@@ -98,19 +62,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList }
+     * 
+     */
+    public DataRequest.Filter.AdditionRestrictions.SubordinateIdList createDataRequestFilterAdditionRestrictionsSubordinateIdList() {
+        return new DataRequest.Filter.AdditionRestrictions.SubordinateIdList();
+    }
+
+    /**
      * Create an instance of {@link DataRequest.Filter.Conditions.ChargesIdentifiers }
      * 
      */
     public DataRequest.Filter.Conditions.ChargesIdentifiers createDataRequestFilterConditionsChargesIdentifiers() {
         return new DataRequest.Filter.Conditions.ChargesIdentifiers();
-    }
-
-    /**
-     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification }
-     * 
-     */
-    public DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification createDataRequestFilterAdditionRestrictionsSubordinateIdListTaxpayerIdentification() {
-        return new DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification();
     }
 
     /**
@@ -122,11 +86,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions }
+     * Create an instance of {@link DataRequest }
      * 
      */
-    public DataRequest.Filter.AdditionRestrictions createDataRequestFilterAdditionRestrictions() {
-        return new DataRequest.Filter.AdditionRestrictions();
+    public DataRequest createDataRequest() {
+        return new DataRequest();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification }
+     * 
+     */
+    public DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification createDataRequestFilterAdditionRestrictionsSubordinateIdListTaxpayerIdentification() {
+        return new DataRequest.Filter.AdditionRestrictions.SubordinateIdList.TaxpayerIdentification();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.Conditions.Timeslot }
+     * 
+     */
+    public DataRequest.Filter.Conditions.Timeslot createDataRequestFilterConditionsTimeslot() {
+        return new DataRequest.Filter.Conditions.Timeslot();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Paging }
+     * 
+     */
+    public DataRequest.Paging createDataRequestPaging() {
+        return new DataRequest.Paging();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.AdditionRestrictions.KBKClassifier }
+     * 
+     */
+    public DataRequest.Filter.AdditionRestrictions.KBKClassifier createDataRequestFilterAdditionRestrictionsKBKClassifier() {
+        return new DataRequest.Filter.AdditionRestrictions.KBKClassifier();
+    }
+
+    /**
+     * Create an instance of {@link DataRequest.Filter.Conditions }
+     * 
+     */
+    public DataRequest.Filter.Conditions createDataRequestFilterConditions() {
+        return new DataRequest.Filter.Conditions();
     }
 
 }

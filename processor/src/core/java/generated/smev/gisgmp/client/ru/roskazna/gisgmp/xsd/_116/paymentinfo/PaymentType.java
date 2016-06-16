@@ -1,22 +1,17 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo;
 
-import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.budgetindex.BudgetIndexType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AdditionalDataType;
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.AccountType;
-
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.budgetindex.BudgetIndexType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AdditionalDataType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.AccountType;
 
 
 /**
@@ -101,7 +96,17 @@ import java.util.List;
  *                     &lt;/simpleType>
  *                   &lt;/element>
  *                   &lt;element name="payeeINN" type="{http://roskazna.ru/gisgmp/xsd/116/Common}INNType"/>
- *                   &lt;element name="payeeKPP" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KPPType"/>
+ *                   &lt;element name="payeeKPP">
+ *                     &lt;simpleType>
+ *                       &lt;union memberTypes=" {http://roskazna.ru/gisgmp/xsd/116/Common}KPPType">
+ *                         &lt;simpleType>
+ *                           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *                             &lt;pattern value="0"/>
+ *                           &lt;/restriction>
+ *                         &lt;/simpleType>
+ *                       &lt;/union>
+ *                     &lt;/simpleType>
+ *                   &lt;/element>
  *                   &lt;element name="PayeeBankAcc" type="{http://roskazna.ru/gisgmp/xsd/116/Organization}AccountType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
@@ -283,15 +288,15 @@ public class PaymentType {
     @XmlElement(name = "AccDoc")
     protected AccDoc accDoc;
     @XmlElement(name = "Payer", required = true)
-    protected Payer payer;
+    protected PaymentType.Payer payer;
     @XmlElement(name = "Payee", required = true)
-    protected Payee payee;
+    protected PaymentType.Payee payee;
     @XmlElement(name = "RecipientServicesIdentifier")
     protected String recipientServicesIdentifier;
     @XmlElement(name = "PayerPA")
     protected String payerPA;
     @XmlElement(name = "ChangeStatus", required = true)
-    protected ChangeStatus changeStatus;
+    protected PaymentType.ChangeStatus changeStatus;
     @XmlElement(name = "KBK", required = true)
     protected String kbk;
     @XmlElement(name = "TransKind", namespace = "http://roskazna.ru/gisgmp/xsd/116/Common")
@@ -309,7 +314,7 @@ public class PaymentType {
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar docDispatchDate;
     @XmlElement(name = "PartialPayt")
-    protected PartialPayt partialPayt;
+    protected PaymentType.PartialPayt partialPayt;
     @XmlElement(name = "Priority")
     protected String priority;
     @XmlElement(name = "OKTMO", required = true)
@@ -376,7 +381,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getAmount() {
@@ -388,7 +393,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setAmount(BigInteger value) {
@@ -400,7 +405,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getPaymentDate() {
@@ -412,7 +417,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setPaymentDate(XMLGregorianCalendar value) {
@@ -424,7 +429,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getReceiptDate() {
@@ -436,7 +441,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setReceiptDate(XMLGregorianCalendar value) {
@@ -520,10 +525,10 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.Payer }
+     *     {@link PaymentType.Payer }
      *     
      */
-    public Payer getPayer() {
+    public PaymentType.Payer getPayer() {
         return payer;
     }
 
@@ -532,10 +537,10 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.Payer }
+     *     {@link PaymentType.Payer }
      *     
      */
-    public void setPayer(Payer value) {
+    public void setPayer(PaymentType.Payer value) {
         this.payer = value;
     }
 
@@ -544,10 +549,10 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.Payee }
+     *     {@link PaymentType.Payee }
      *     
      */
-    public Payee getPayee() {
+    public PaymentType.Payee getPayee() {
         return payee;
     }
 
@@ -556,10 +561,10 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.Payee }
+     *     {@link PaymentType.Payee }
      *     
      */
-    public void setPayee(Payee value) {
+    public void setPayee(PaymentType.Payee value) {
         this.payee = value;
     }
 
@@ -616,10 +621,10 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.ChangeStatus }
+     *     {@link PaymentType.ChangeStatus }
      *     
      */
-    public ChangeStatus getChangeStatus() {
+    public PaymentType.ChangeStatus getChangeStatus() {
         return changeStatus;
     }
 
@@ -628,10 +633,10 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.ChangeStatus }
+     *     {@link PaymentType.ChangeStatus }
      *     
      */
-    public void setChangeStatus(ChangeStatus value) {
+    public void setChangeStatus(PaymentType.ChangeStatus value) {
         this.changeStatus = value;
     }
 
@@ -718,7 +723,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getPaytCondition() {
@@ -730,7 +735,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setPaytCondition(BigInteger value) {
@@ -742,7 +747,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public BigInteger getAcptTerm() {
@@ -754,7 +759,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link java.math.BigInteger }
+     *     {@link BigInteger }
      *     
      */
     public void setAcptTerm(BigInteger value) {
@@ -766,7 +771,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getMaturityDate() {
@@ -778,7 +783,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setMaturityDate(XMLGregorianCalendar value) {
@@ -790,7 +795,7 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getDocDispatchDate() {
@@ -802,7 +807,7 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setDocDispatchDate(XMLGregorianCalendar value) {
@@ -814,10 +819,10 @@ public class PaymentType {
      * 
      * @return
      *     possible object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.PartialPayt }
+     *     {@link PaymentType.PartialPayt }
      *     
      */
-    public PartialPayt getPartialPayt() {
+    public PaymentType.PartialPayt getPartialPayt() {
         return partialPayt;
     }
 
@@ -826,10 +831,10 @@ public class PaymentType {
      * 
      * @param value
      *     allowed object is
-     *     {@link generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentType.PartialPayt }
+     *     {@link PaymentType.PartialPayt }
      *     
      */
-    public void setPartialPayt(PartialPayt value) {
+    public void setPartialPayt(PaymentType.PartialPayt value) {
         this.partialPayt = value;
     }
 
@@ -1162,7 +1167,7 @@ public class PaymentType {
          * 
          * @return
          *     possible object is
-         *     {@link java.math.BigInteger }
+         *     {@link BigInteger }
          *     
          */
         public BigInteger getSumResidualPayt() {
@@ -1174,7 +1179,7 @@ public class PaymentType {
          * 
          * @param value
          *     allowed object is
-         *     {@link java.math.BigInteger }
+         *     {@link BigInteger }
          *     
          */
         public void setSumResidualPayt(BigInteger value) {
@@ -1226,7 +1231,17 @@ public class PaymentType {
      *           &lt;/simpleType>
      *         &lt;/element>
      *         &lt;element name="payeeINN" type="{http://roskazna.ru/gisgmp/xsd/116/Common}INNType"/>
-     *         &lt;element name="payeeKPP" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KPPType"/>
+     *         &lt;element name="payeeKPP">
+     *           &lt;simpleType>
+     *             &lt;union memberTypes=" {http://roskazna.ru/gisgmp/xsd/116/Common}KPPType">
+     *               &lt;simpleType>
+     *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+     *                   &lt;pattern value="0"/>
+     *                 &lt;/restriction>
+     *               &lt;/simpleType>
+     *             &lt;/union>
+     *           &lt;/simpleType>
+     *         &lt;/element>
      *         &lt;element name="PayeeBankAcc" type="{http://roskazna.ru/gisgmp/xsd/116/Organization}AccountType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>

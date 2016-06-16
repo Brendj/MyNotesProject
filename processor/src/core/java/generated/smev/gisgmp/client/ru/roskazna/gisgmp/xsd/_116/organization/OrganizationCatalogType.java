@@ -1,14 +1,14 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.AddressesType;
 import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common.ContactsType;
-
-import javax.xml.bind.annotation.*;
 
 
 /**

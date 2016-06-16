@@ -1,16 +1,17 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315;
 
-import javax.xml.bind.annotation.*;
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
+import org.w3c.dom.Element;
 
 
 /**
@@ -62,8 +63,8 @@ public class AppDataType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link org.w3c.dom.Element }
      * {@link Object }
+     * {@link Element }
      * 
      * 
      */

@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo;
 
 import javax.xml.bind.JAXBElement;
@@ -38,6 +34,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link PaymentType.PartialPayt }
+     * 
+     */
+    public PaymentType.PartialPayt createPaymentTypePartialPayt() {
+        return new PaymentType.PartialPayt();
+    }
+
+    /**
+     * Create an instance of {@link PaymentType.Payee }
+     * 
+     */
+    public PaymentType.Payee createPaymentTypePayee() {
+        return new PaymentType.Payee();
+    }
+
+    /**
      * Create an instance of {@link PaymentType.Payer }
      * 
      */
@@ -54,14 +66,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentType.Payee }
-     * 
-     */
-    public PaymentType.Payee createPaymentTypePayee() {
-        return new PaymentType.Payee();
-    }
-
-    /**
      * Create an instance of {@link PaymentIdentificationDataType }
      * 
      */
@@ -70,19 +74,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link PaymentType.ChangeStatus }
+     * Create an instance of {@link ResponsePaymentIdentificationDataType }
      * 
      */
-    public PaymentType.ChangeStatus createPaymentTypeChangeStatus() {
-        return new PaymentType.ChangeStatus();
-    }
-
-    /**
-     * Create an instance of {@link PaymentType.PartialPayt }
-     * 
-     */
-    public PaymentType.PartialPayt createPaymentTypePartialPayt() {
-        return new PaymentType.PartialPayt();
+    public ResponsePaymentIdentificationDataType createResponsePaymentIdentificationDataType() {
+        return new ResponsePaymentIdentificationDataType();
     }
 
     /**
@@ -94,7 +90,15 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PaymentType }{@code >}}
+     * Create an instance of {@link PaymentType.ChangeStatus }
+     * 
+     */
+    public PaymentType.ChangeStatus createPaymentTypeChangeStatus() {
+        return new PaymentType.ChangeStatus();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link PaymentType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/PaymentInfo", name = "FinalPayment")

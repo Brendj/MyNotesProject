@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<xsd:schema
-        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-        xmlns:qt="http://roskazna.ru/gisgmp/xsd/116/Quittance"
-        targetNamespace="http://roskazna.ru/gisgmp/xsd/116/ExportQuittanceResponse"
-        elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Quittance"
-		schemaLocation="../entity/document/Quittance.xsd"/>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:qt="http://roskazna.ru/gisgmp/xsd/116/Quittance" xmlns:eqrs="http://roskazna.ru/gisgmp/xsd/116/ExportQuittanceResponse" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/ExportQuittanceResponse" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Quittance" schemaLocation="../entity/document/Quittance.xsd"/>
 	<xsd:complexType name="ExportQuittanceResponseType">
 		<xsd:sequence>
 			<xsd:element name="Quittances">
@@ -23,10 +17,9 @@
 								<xsd:complexContent>
 									<xsd:extension base="qt:QuittanceType">
 										<xsd:sequence>
-											<xsd:element name="IsRevoked" type="xsd:boolean"
-												minOccurs="0">
+											<xsd:element name="IsRevoked" type="xsd:boolean" minOccurs="0">
 												<xsd:annotation>
-												<xsd:documentation>Признак аннулированной квитанции: true - квитанция аннулирована; false квитанция действующая</xsd:documentation>
+													<xsd:documentation>Признак аннулированной квитанции: true - квитанция аннулирована; false квитанция действующая</xsd:documentation>
 												</xsd:annotation>
 											</xsd:element>
 										</xsd:sequence>

@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.common;
 
 import javax.xml.bind.JAXBElement;
@@ -43,107 +39,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link FieldType }
+     * Create an instance of {@link Money }
      * 
      */
-    public FieldType createFieldType() {
-        return new FieldType();
-    }
-
-    /**
-     * Create an instance of {@link ParameterType }
-     * 
-     */
-    public ParameterType createParameterType() {
-        return new ParameterType();
-    }
-
-    /**
-     * Create an instance of {@link AddressType.AddressField }
-     * 
-     */
-    public AddressType.AddressField createAddressTypeAddressField() {
-        return new AddressType.AddressField();
-    }
-
-    /**
-     * Create an instance of {@link PayerIdentificationType }
-     * 
-     */
-    public PayerIdentificationType createPayerIdentificationType() {
-        return new PayerIdentificationType();
-    }
-
-    /**
-     * Create an instance of {@link AdditionalDataType }
-     * 
-     */
-    public AdditionalDataType createAdditionalDataType() {
-        return new AdditionalDataType();
-    }
-
-    /**
-     * Create an instance of {@link SimpleParameterType }
-     * 
-     */
-    public SimpleParameterType createSimpleParameterType() {
-        return new SimpleParameterType();
-    }
-
-    /**
-     * Create an instance of {@link ContactsType }
-     * 
-     */
-    public ContactsType createContactsType() {
-        return new ContactsType();
-    }
-
-    /**
-     * Create an instance of {@link ContactInfoType }
-     * 
-     */
-    public ContactInfoType createContactInfoType() {
-        return new ContactInfoType();
-    }
-
-    /**
-     * Create an instance of {@link CommissionsType }
-     * 
-     */
-    public CommissionsType createCommissionsType() {
-        return new CommissionsType();
-    }
-
-    /**
-     * Create an instance of {@link ComplexParameterType }
-     * 
-     */
-    public ComplexParameterType createComplexParameterType() {
-        return new ComplexParameterType();
-    }
-
-    /**
-     * Create an instance of {@link CommissionType }
-     * 
-     */
-    public CommissionType createCommissionType() {
-        return new CommissionType();
-    }
-
-    /**
-     * Create an instance of {@link AddressesType }
-     * 
-     */
-    public AddressesType createAddressesType() {
-        return new AddressesType();
-    }
-
-    /**
-     * Create an instance of {@link ParamValueType }
-     * 
-     */
-    public ParamValueType createParamValueType() {
-        return new ParamValueType();
+    public Money createMoney() {
+        return new Money();
     }
 
     /**
@@ -155,14 +55,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Money }
-     * 
-     */
-    public Money createMoney() {
-        return new Money();
-    }
-
-    /**
      * Create an instance of {@link AddressType }
      * 
      */
@@ -171,7 +63,111 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link AdditionalDataType }{@code >}}
+     * Create an instance of {@link ComplexParameterType }
+     * 
+     */
+    public ComplexParameterType createComplexParameterType() {
+        return new ComplexParameterType();
+    }
+
+    /**
+     * Create an instance of {@link SimpleParameterType }
+     * 
+     */
+    public SimpleParameterType createSimpleParameterType() {
+        return new SimpleParameterType();
+    }
+
+    /**
+     * Create an instance of {@link AdditionalDataType }
+     * 
+     */
+    public AdditionalDataType createAdditionalDataType() {
+        return new AdditionalDataType();
+    }
+
+    /**
+     * Create an instance of {@link ContactsType }
+     * 
+     */
+    public ContactsType createContactsType() {
+        return new ContactsType();
+    }
+
+    /**
+     * Create an instance of {@link ParamValueType }
+     * 
+     */
+    public ParamValueType createParamValueType() {
+        return new ParamValueType();
+    }
+
+    /**
+     * Create an instance of {@link PayerIdentificationType }
+     * 
+     */
+    public PayerIdentificationType createPayerIdentificationType() {
+        return new PayerIdentificationType();
+    }
+
+    /**
+     * Create an instance of {@link ContactInfoType }
+     * 
+     */
+    public ContactInfoType createContactInfoType() {
+        return new ContactInfoType();
+    }
+
+    /**
+     * Create an instance of {@link CommissionType }
+     * 
+     */
+    public CommissionType createCommissionType() {
+        return new CommissionType();
+    }
+
+    /**
+     * Create an instance of {@link CommissionsType }
+     * 
+     */
+    public CommissionsType createCommissionsType() {
+        return new CommissionsType();
+    }
+
+    /**
+     * Create an instance of {@link AddressType.AddressField }
+     * 
+     */
+    public AddressType.AddressField createAddressTypeAddressField() {
+        return new AddressType.AddressField();
+    }
+
+    /**
+     * Create an instance of {@link FieldType }
+     * 
+     */
+    public FieldType createFieldType() {
+        return new FieldType();
+    }
+
+    /**
+     * Create an instance of {@link AddressesType }
+     * 
+     */
+    public AddressesType createAddressesType() {
+        return new AddressesType();
+    }
+
+    /**
+     * Create an instance of {@link ParameterType }
+     * 
+     */
+    public ParameterType createParameterType() {
+        return new ParameterType();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AdditionalDataType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "AdditionalData")
@@ -180,7 +176,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "TransKind")
@@ -189,7 +185,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link SimpleParameterType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link SimpleParameterType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "SimpleParameter")
@@ -198,7 +194,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ComplexParameterType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ComplexParameterType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "ComplexParameter")
@@ -207,7 +203,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PayerIdentificationType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PayerIdentificationType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "PayerIdentification")
@@ -216,7 +212,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Common", name = "PayerIdentifier")

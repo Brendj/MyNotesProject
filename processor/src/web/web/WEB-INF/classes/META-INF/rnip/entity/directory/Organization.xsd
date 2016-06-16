@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:com="http://roskazna.ru/gisgmp/xsd/116/Common" xmlns:org="http://roskazna.ru/gisgmp/xsd/116/Organization" targetNamespace="http://roskazna.ru/gisgmp/xsd/116/Organization" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="../directory/Common.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/gisgmp/xsd/116/Common" schemaLocation="Common.xsd"/>
 	<xsd:complexType name="OrganizationType">
 		<xsd:annotation>
 			<xsd:documentation>Данные об организации</xsd:documentation>
@@ -17,13 +17,10 @@
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>
-			<xsd:element name="INN">
+			<xsd:element name="INN" type="com:INNType">
 				<xsd:annotation>
 					<xsd:documentation>ИНН организации</xsd:documentation>
 				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="com:INNType"/>
-				</xsd:simpleType>
 			</xsd:element>
 			<xsd:element name="KPP">
 				<xsd:annotation>
@@ -77,7 +74,7 @@
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:minLength value="1"/>
-						<xsd:maxLength value="160"/>
+						<xsd:maxLength value="200"/>
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:element>

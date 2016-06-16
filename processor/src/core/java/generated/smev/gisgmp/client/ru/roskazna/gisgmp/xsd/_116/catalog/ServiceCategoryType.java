@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -22,7 +18,14 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="ServiceCategory_Type">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="code" use="required">
+ *         &lt;simpleType>
+ *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *             &lt;minLength value="1"/>
+ *             &lt;maxLength value="20"/>
+ *           &lt;/restriction>
+ *         &lt;/simpleType>
+ *       &lt;/attribute>
  *       &lt;attribute name="name" use="required">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">

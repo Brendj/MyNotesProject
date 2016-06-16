@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.ticket;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -34,14 +30,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link TicketType.PackageProcessResult.EntityProcessResult }
-     * 
-     */
-    public TicketType.PackageProcessResult.EntityProcessResult createTicketTypePackageProcessResultEntityProcessResult() {
-        return new TicketType.PackageProcessResult.EntityProcessResult();
-    }
-
-    /**
      * Create an instance of {@link TicketType.PackageProcessResult }
      * 
      */
@@ -55,6 +43,14 @@ public class ObjectFactory {
      */
     public TicketType createTicketType() {
         return new TicketType();
+    }
+
+    /**
+     * Create an instance of {@link TicketType.PackageProcessResult.EntityProcessResult }
+     * 
+     */
+    public TicketType.PackageProcessResult.EntityProcessResult createTicketTypePackageProcessResultEntityProcessResult() {
+        return new TicketType.PackageProcessResult.EntityProcessResult();
     }
 
 }

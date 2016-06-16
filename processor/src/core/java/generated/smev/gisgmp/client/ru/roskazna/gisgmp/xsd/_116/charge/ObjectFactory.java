@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.charge;
 
 import javax.xml.bind.JAXBElement;
@@ -54,7 +50,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link ChargeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChargeType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Charge", name = "Charge")

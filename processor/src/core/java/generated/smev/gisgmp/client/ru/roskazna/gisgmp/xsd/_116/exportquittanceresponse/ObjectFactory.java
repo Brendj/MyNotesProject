@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportquittanceresponse;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -34,6 +30,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ExportQuittanceResponseType.Quittances.Quittance }
+     * 
+     */
+    public ExportQuittanceResponseType.Quittances.Quittance createExportQuittanceResponseTypeQuittancesQuittance() {
+        return new ExportQuittanceResponseType.Quittances.Quittance();
+    }
+
+    /**
      * Create an instance of {@link ExportQuittanceResponseType }
      * 
      */
@@ -47,14 +51,6 @@ public class ObjectFactory {
      */
     public ExportQuittanceResponseType.Quittances createExportQuittanceResponseTypeQuittances() {
         return new ExportQuittanceResponseType.Quittances();
-    }
-
-    /**
-     * Create an instance of {@link ExportQuittanceResponseType.Quittances.Quittance }
-     * 
-     */
-    public ExportQuittanceResponseType.Quittances.Quittance createExportQuittanceResponseTypeQuittancesQuittance() {
-        return new ExportQuittanceResponseType.Quittances.Quittance();
     }
 
 }

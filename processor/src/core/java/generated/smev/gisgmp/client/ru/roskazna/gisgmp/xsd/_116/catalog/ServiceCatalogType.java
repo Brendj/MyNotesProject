@@ -1,18 +1,19 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.catalog;
 
-import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
-
-import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.List;
+import generated.smev.gisgmp.client.org.w3._2000._09.xmldsig_.SignatureType;
 
 
 /**
@@ -173,7 +174,7 @@ public class ServiceCatalogType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getRevisionDate() {
@@ -185,7 +186,7 @@ public class ServiceCatalogType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setRevisionDate(XMLGregorianCalendar value) {

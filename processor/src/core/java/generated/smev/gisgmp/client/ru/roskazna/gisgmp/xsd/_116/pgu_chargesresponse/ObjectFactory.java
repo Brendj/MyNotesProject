@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_chargesresponse;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -34,11 +30,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ExportChargesResponseType }
+     * Create an instance of {@link ExportChargesResponseType.Charges }
      * 
      */
-    public ExportChargesResponseType createExportChargesResponseType() {
-        return new ExportChargesResponseType();
+    public ExportChargesResponseType.Charges createExportChargesResponseTypeCharges() {
+        return new ExportChargesResponseType.Charges();
     }
 
     /**
@@ -58,11 +54,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ExportChargesResponseType.Charges }
+     * Create an instance of {@link ExportChargesResponseType }
      * 
      */
-    public ExportChargesResponseType.Charges createExportChargesResponseTypeCharges() {
-        return new ExportChargesResponseType.Charges();
+    public ExportChargesResponseType createExportChargesResponseType() {
+        return new ExportChargesResponseType();
     }
 
 }

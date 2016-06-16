@@ -1,16 +1,11 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo;
-
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.BankType;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization.BankType;
 
 
 /**
@@ -40,18 +35,13 @@ import javax.xml.bind.annotation.XmlType;
  *                 &lt;minLength value="1"/>
  *                 &lt;maxLength value="36"/>
  *                 &lt;whiteSpace value="preserve"/>
+ *                 &lt;pattern value="\d{4}"/>
+ *                 &lt;pattern value="[a-zA-Z0-9]{6}"/>
  *               &lt;/restriction>
  *             &lt;/simpleType>
  *           &lt;/element>
  *         &lt;/choice>
- *         &lt;element name="SystemIdentifier">
- *           &lt;simpleType>
- *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *               &lt;pattern value="\P{S}{32}"/>
- *               &lt;pattern value="PaymentNotLoaded"/>
- *             &lt;/restriction>
- *           &lt;/simpleType>
- *         &lt;/element>
+ *         &lt;element name="SystemIdentifier" type="{http://roskazna.ru/gisgmp/xsd/116/PaymentInfo}SystemIdentifierType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

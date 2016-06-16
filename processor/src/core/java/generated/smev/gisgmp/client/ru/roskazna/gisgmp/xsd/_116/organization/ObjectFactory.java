@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization;
 
 import javax.xml.bind.JAXBElement;
@@ -38,22 +34,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AccountCatalogType }
-     * 
-     */
-    public AccountCatalogType createAccountCatalogType() {
-        return new AccountCatalogType();
-    }
-
-    /**
-     * Create an instance of {@link PayeeType }
-     * 
-     */
-    public PayeeType createPayeeType() {
-        return new PayeeType();
-    }
-
-    /**
      * Create an instance of {@link OrganizationCatalogType }
      * 
      */
@@ -70,11 +50,35 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link AccountType }
+     * 
+     */
+    public AccountType createAccountType() {
+        return new AccountType();
+    }
+
+    /**
+     * Create an instance of {@link AccountCatalogType }
+     * 
+     */
+    public AccountCatalogType createAccountCatalogType() {
+        return new AccountCatalogType();
+    }
+
+    /**
      * Create an instance of {@link AccountsType }
      * 
      */
     public AccountsType createAccountsType() {
         return new AccountsType();
+    }
+
+    /**
+     * Create an instance of {@link PayeeType }
+     * 
+     */
+    public PayeeType createPayeeType() {
+        return new PayeeType();
     }
 
     /**
@@ -86,15 +90,7 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link AccountType }
-     * 
-     */
-    public AccountType createAccountType() {
-        return new AccountType();
-    }
-
-    /**
-     * Create an instance of {@link javax.xml.bind.JAXBElement }{@code <}{@link PayeeType }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link PayeeType }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://roskazna.ru/gisgmp/xsd/116/Organization", name = "Payee")

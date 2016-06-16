@@ -1,16 +1,16 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.quittance;
 
-import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.PaymentIdentificationDataType;
-
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
+import generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.paymentinfo.ResponsePaymentIdentificationDataType;
 
 
 /**
@@ -27,9 +27,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;sequence>
  *         &lt;element name="SupplierBillID">
  *           &lt;simpleType>
- *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token">
- *               &lt;pattern value="\c{20}"/>
- *               &lt;pattern value="\c{25}"/>
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *               &lt;minLength value="1"/>
+ *               &lt;maxLength value="25"/>
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>
@@ -46,8 +46,18 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *           &lt;/simpleType>
  *         &lt;/element>
  *         &lt;element name="payeeINN" type="{http://roskazna.ru/gisgmp/xsd/116/Common}INNType" minOccurs="0"/>
- *         &lt;element name="payeeKPP" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KPPType" minOccurs="0"/>
- *         &lt;element name="KBK" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KBKType" minOccurs="0"/>
+ *         &lt;element name="payeeKPP" minOccurs="0">
+ *           &lt;simpleType>
+ *             &lt;union memberTypes=" {http://roskazna.ru/gisgmp/xsd/116/Common}KPPType">
+ *               &lt;simpleType>
+ *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
+ *                   &lt;pattern value="0"/>
+ *                 &lt;/restriction>
+ *               &lt;/simpleType>
+ *             &lt;/union>
+ *           &lt;/simpleType>
+ *         &lt;/element>
+ *         &lt;element name="KBK" type="{http://roskazna.ru/gisgmp/xsd/116/Common}KBKResponseType" minOccurs="0"/>
  *         &lt;element name="OKTMO" minOccurs="0">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -66,7 +76,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;/element>
  *         &lt;element name="AccountNumber" type="{http://roskazna.ru/gisgmp/xsd/116/Common}AccountNumType" minOccurs="0"/>
  *         &lt;element name="BIK" type="{http://roskazna.ru/gisgmp/xsd/116/Common}BIKType" minOccurs="0"/>
- *         &lt;element name="PaymentIdentificationData" type="{http://roskazna.ru/gisgmp/xsd/116/PaymentInfo}PaymentIdentificationDataType"/>
+ *         &lt;element name="PaymentIdentificationData" type="{http://roskazna.ru/gisgmp/xsd/116/PaymentInfo}ResponsePaymentIdentificationDataType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -97,7 +107,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 public class QuittanceType {
 
     @XmlElement(name = "SupplierBillID", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String supplierBillID;
     @XmlElement(name = "CreationDate", required = true)
     @XmlSchemaType(name = "date")
@@ -121,7 +130,7 @@ public class QuittanceType {
     @XmlElement(name = "BIK")
     protected String bik;
     @XmlElement(name = "PaymentIdentificationData", required = true)
-    protected PaymentIdentificationDataType paymentIdentificationData;
+    protected ResponsePaymentIdentificationDataType paymentIdentificationData;
 
     /**
      * Gets the value of the supplierBillID property.
@@ -152,7 +161,7 @@ public class QuittanceType {
      * 
      * @return
      *     possible object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public XMLGregorianCalendar getCreationDate() {
@@ -164,7 +173,7 @@ public class QuittanceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link javax.xml.datatype.XMLGregorianCalendar }
+     *     {@link XMLGregorianCalendar }
      *     
      */
     public void setCreationDate(XMLGregorianCalendar value) {
@@ -392,10 +401,10 @@ public class QuittanceType {
      * 
      * @return
      *     possible object is
-     *     {@link PaymentIdentificationDataType }
+     *     {@link ResponsePaymentIdentificationDataType }
      *     
      */
-    public PaymentIdentificationDataType getPaymentIdentificationData() {
+    public ResponsePaymentIdentificationDataType getPaymentIdentificationData() {
         return paymentIdentificationData;
     }
 
@@ -404,10 +413,10 @@ public class QuittanceType {
      * 
      * @param value
      *     allowed object is
-     *     {@link PaymentIdentificationDataType }
+     *     {@link ResponsePaymentIdentificationDataType }
      *     
      */
-    public void setPaymentIdentificationData(PaymentIdentificationDataType value) {
+    public void setPaymentIdentificationData(ResponsePaymentIdentificationDataType value) {
         this.paymentIdentificationData = value;
     }
 

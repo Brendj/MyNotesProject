@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.organization;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,12 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>
- *         &lt;element name="INN">
- *           &lt;simpleType>
- *             &lt;restriction base="{http://roskazna.ru/gisgmp/xsd/116/Common}INNType">
- *             &lt;/restriction>
- *           &lt;/simpleType>
- *         &lt;/element>
+ *         &lt;element name="INN" type="{http://roskazna.ru/gisgmp/xsd/116/Common}INNType"/>
  *         &lt;element name="KPP">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://roskazna.ru/gisgmp/xsd/116/Common}KPPType">

@@ -1,8 +1,4 @@
 
-/*
- * Copyright (c) 2015. Axetta LLC. All Rights Reserved.
- */
-
 package generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.exportpaymentsresponse;
 
 import javax.xml.bind.annotation.XmlRegistry;
@@ -50,19 +46,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ExportPaymentsResponseType.Payments.PaymentInfo }
-     * 
-     */
-    public ExportPaymentsResponseType.Payments.PaymentInfo createExportPaymentsResponseTypePaymentsPaymentInfo() {
-        return new ExportPaymentsResponseType.Payments.PaymentInfo();
-    }
-
-    /**
      * Create an instance of {@link ExportPaymentsResponseType.Payments }
      * 
      */
     public ExportPaymentsResponseType.Payments createExportPaymentsResponseTypePayments() {
         return new ExportPaymentsResponseType.Payments();
+    }
+
+    /**
+     * Create an instance of {@link ExportPaymentsResponseType.Payments.PaymentInfo }
+     * 
+     */
+    public ExportPaymentsResponseType.Payments.PaymentInfo createExportPaymentsResponseTypePaymentsPaymentInfo() {
+        return new ExportPaymentsResponseType.Payments.PaymentInfo();
     }
 
 }
