@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
@@ -56,9 +57,8 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public List<Card> findAllFreeByOrg(long idOfOrg){
         Query query = entityManager
-                .createQuery("from Card c where c.org.idOfOrg=:idOfOrg and c.client = null ", Card.class)
-                .setParameter("idOfOrg",idOfOrg);
-
+                .createQuery("from Card c where c.org.idOfOrg=:idOfOrg and c.state = :freeState ", Card.class)
+                .setParameter("idOfOrg",idOfOrg).setParameter("freeState", CardState.FREE.getValue());
         return query.getResultList();
     }
 
@@ -70,11 +70,13 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public List<Card> findAllFreeByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
         Query query = entityManager
-                .createQuery("select c from Card c , OrgSync os " + " where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and c.client = null  and c.org = os.org "
+                .createQuery("select c from Card c , OrgSync os "
+                        + " where c.org.idOfOrg in (:idOfOrgs) "
+                        + " and c.state = :freeState  and c.org = os.org "
                         + " and c.updateTime >  :lastAccRegistrySync "
                         , Card.class)
                 .setParameter("idOfOrgs", idOfOrgs)
+                .setParameter("freeState",CardState.FREE.getValue())
                 .setParameter("lastAccRegistrySync", lastAccRegistrySync);
 
         return query.getResultList();
