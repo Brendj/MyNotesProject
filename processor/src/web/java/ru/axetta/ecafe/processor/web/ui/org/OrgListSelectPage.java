@@ -61,22 +61,21 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         if (isUpdate) {
             updateSelectedOrgs();
             mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
-
         } else {
             selectedOrgs.clear();
-        }
-        String[] idOfOrgs = orgFilter.split(",");
-        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
-        ///
-        for (String sId : longSet) {
-            try {
-                Long id = Long.parseLong(sId.trim());
-                if (selectedOrgs.containsKey(id)) {
-                    continue;
+            String[] idOfOrgs = orgFilter.split(",");
+            Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+            ///
+            for (String sId : longSet) {
+                try {
+                    Long id = Long.parseLong(sId.trim());
+                    if (selectedOrgs.containsKey(id)) {
+                        continue;
+                    }
+                    Org org = (Org) session.get(Org.class, id);
+                    selectedOrgs.put(id, org.getShortName());
+                } catch (Exception ignored) {
                 }
-                Org org = (Org) session.get(Org.class, id);
-                selectedOrgs.put(id, org.getShortName());
-            } catch (Exception ignored) {
             }
         }
         ///
