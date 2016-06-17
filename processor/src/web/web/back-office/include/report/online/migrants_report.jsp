@@ -42,7 +42,7 @@
         <rich:calendar value="#{mainPage.migrantsReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text"
                        showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar,migrantsReportPanel"
+            <a4j:support event="onchanged" reRender="endDateCalendar,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onReportPeriodChanged}" />
         </rich:calendar>
 
@@ -52,14 +52,14 @@
                          styleClass="input-text" style="width: 250px;">
             <f:converter converterId="periodTypeConverter" />
             <f:selectItems value="#{mainPage.migrantsReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar,migrantsReportPanel"
+            <a4j:support event="onchange" reRender="endDateCalendar,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.migrantsReportPage.endDate}"
                        datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect,migrantsReportPanel"
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onEndDateSpecified}" />
         </rich:calendar>
 

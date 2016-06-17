@@ -116,6 +116,14 @@ public class MigrantsUtils {
         return new ArrayList<Long>(clientsIds);
     }
 
+    public static Integer getLastResolutionForMigrant(Session session, Migrant migrant){
+        Query query = session.createQuery("select resolution from VisitReqResolutionHist where migrant=:migrant and resolution <> 5 order by resolutionDateTime desc");
+        query.setParameter("migrant", migrant);
+        query.setMaxResults(1);
+        Object result = query.uniqueResult();
+        return result == null ? 0 : (Integer) result;
+    }
+
     public static List<Migrant> getCurrentMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);

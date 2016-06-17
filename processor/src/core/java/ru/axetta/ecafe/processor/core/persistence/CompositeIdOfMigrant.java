@@ -59,4 +59,12 @@ public class CompositeIdOfMigrant implements Serializable{
         result = 31 * result + idOfOrgRegistry.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "CompositeIdOfMigrant{" +
+                "idOfRequest=" + idOfRequest +
+                ", idOfOrgRegistry=" + idOfOrgRegistry +
+                '}';
+    }
 }

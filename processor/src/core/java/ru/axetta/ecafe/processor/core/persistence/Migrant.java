@@ -106,4 +106,17 @@ public class Migrant implements Serializable{
         this.syncState = syncState;
     }
 
+    @Override
+    public String toString() {
+        return "Migrant{" +
+                "compositeIdOfMigrant=" + compositeIdOfMigrant +
+                ", orgRegistry=" + orgRegistry.getIdOfOrg() +
+                ", orgRegVendor=" + orgRegVendor.getIdOfContragent() +
+                ", clientMigrate=" + clientMigrate.getIdOfClient() +
+                ", orgVisit=" + orgVisit.getIdOfOrg() +
+                ", visitStartDate=" + visitStartDate +
+                ", visitEndDate=" + visitEndDate +
+                ", syncState=" + syncState +
+                '}';
+    }
 }

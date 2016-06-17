@@ -51,6 +51,9 @@ public class MigrantsReportService {
         Map<Long,OrgItem> items = new HashMap<Long, OrgItem>();
         List<Migrant> outcomeMigrants = MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
         for(Migrant migrant : outcomeMigrants){
+            if(!MigrantsUtils.getLastResolutionForMigrant(session, migrant).equals(1)){
+                continue;
+            }
             Long idOfOrg = migrant.getOrgRegistry().getIdOfOrg();
             Date startDate = migrant.getVisitStartDate();
             Date endDate = migrant.getVisitEndDate();
@@ -79,6 +82,9 @@ public class MigrantsReportService {
         Map<Long,OrgItem> items = new HashMap<Long, OrgItem>();
         List<Migrant> incomeMigrants = MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
         for(Migrant migrant : incomeMigrants){
+            if(!MigrantsUtils.getLastResolutionForMigrant(session, migrant).equals(1)){
+                continue;
+            }
             Long idOfOrg = migrant.getOrgVisit().getIdOfOrg();
             Date startDate = migrant.getVisitStartDate();
             Date endDate = migrant.getVisitEndDate();
@@ -209,6 +215,16 @@ public class MigrantsReportService {
         @Override
         public int compareTo(MigrantItem o) {
             int result = idOfOrg.compareTo(o.getIdOfOrg());
+            if(result == 0) {
+                if (groupName.contains("-") && o.getGroupName().contains("-")) {
+                    result = groupName.split("-")[0].compareTo(o.getGroupName().split("-")[0]);
+                    if (result == 0) {
+                        result = groupName.split("-")[1].compareTo(o.getGroupName().split("-")[1]);
+                    }
+                } else {
+                    result = groupName.compareTo(o.getName());
+                }
+            }
             if(result == 0){
                 result = name.compareTo(o.getName());
             }
