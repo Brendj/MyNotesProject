@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -56,26 +55,26 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         MainPage.getSessionInstance().resetOrgFilterPageName();
     }
 
-    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
-            List<Long> idOfContragentList, MainPage mainPage) throws Exception {
+    public synchronized void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
+        List<Long> idOfContragentList, MainPage mainPage) throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
-            mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
+            // mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
         } else {
             selectedOrgs.clear();
-            String[] idOfOrgs = orgFilter.split(",");
-            Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
-            ///
-            for (String sId : longSet) {
-                try {
-                    Long id = Long.parseLong(sId.trim());
-                    if (selectedOrgs.containsKey(id)) {
-                        continue;
-                    }
-                    Org org = (Org) session.get(Org.class, id);
-                    selectedOrgs.put(id, org.getShortName());
-                } catch (Exception ignored) {
+        }
+        String[] idOfOrgs = orgFilter.split(",");
+        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+        ///
+        for (String sId : longSet) {
+            try {
+                Long id = Long.parseLong(sId.trim());
+                if (selectedOrgs.containsKey(id)) {
+                    continue;
                 }
+                Org org = (Org) session.get(Org.class, id);
+                selectedOrgs.put(id, org.getShortName());
+            } catch (Exception ignored) {
             }
         }
         ///
@@ -87,7 +86,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
     }
 
-    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
+    public synchronized void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
             throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
