@@ -16,12 +16,8 @@
         <version name="version" column="Version" type="long"/>
         <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" constrained="true"/>
 
-
-
         <property name="lastRNIPUpdate" column="LastRNIPUpdate" type="string" length="30" />
-
-
-
+        <property name="lastModifiesUpdate" column="LastModifiesUpdate" type="string" length="30" />
 
     </class>
 </hibernate-mapping>

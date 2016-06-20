@@ -20,6 +20,7 @@ public class ContragentSync implements Serializable {
     private Contragent contragent;
 
     private String lastRNIPUpdate;
+    private String lastModifiesUpdate;
 
     public ContragentSync() {
     }
@@ -58,5 +59,13 @@ public class ContragentSync implements Serializable {
 
     public void setLastRNIPUpdate(String lastRNIPUpdate) {
         this.lastRNIPUpdate = lastRNIPUpdate;
+    }
+
+    public String getLastModifiesUpdate() {
+        return lastModifiesUpdate;
+    }
+
+    public void setLastModifiesUpdate(String lastModifiesUpdate) {
+        this.lastModifiesUpdate = lastModifiesUpdate;
     }
 }

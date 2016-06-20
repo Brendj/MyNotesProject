@@ -87,6 +87,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             case REQUEST_CREATE_CATALOG:
                 return executeModifyCatalog(requestType, contragent, updateDate, startDate, endDate);
             case REQUEST_LOAD_PAYMENTS:
+            case REQUEST_LOAD_PAYMENTS_MODIFIED:
                 requests = new HashMap<Contragent, Integer>();
                 reqs = 1;
                 return executeLoadPayments(requestType, contragent, updateDate, startDate, endDate);
@@ -128,108 +129,116 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     }
 
     public MessageDataType executeLoadPayments(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
-            InitRNIP116Service();
+        InitRNIP116Service();
 
-            //logger.info(String.format("Запрос на получение платежей их РНИП,. Попытка № %s в серии", reqs));
-            logger.info("Запрос на получение платежей из РНИП");
+        //logger.info(String.format("Запрос на получение платежей их РНИП,. Попытка № %s в серии", reqs));
+        logger.info("Запрос на получение платежей из РНИП");
 
-            String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
-            String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
 
-            final RNIPSecuritySOAPHandler rnipSecuritySOAPHandler = new RNIPSecuritySOAPHandler(alias, pass, getPacketLogger(contragent));
-            final List<Handler> handlerChain = new ArrayList<Handler>();
-            handlerChain.add(rnipSecuritySOAPHandler);
-            bindingProvider116.getBinding().setHandlerChain(handlerChain);
+        final RNIPSecuritySOAPHandler rnipSecuritySOAPHandler = new RNIPSecuritySOAPHandler(alias, pass, getPacketLogger(contragent));
+        final List<Handler> handlerChain = new ArrayList<Handler>();
+        handlerChain.add(rnipSecuritySOAPHandler);
+        bindingProvider116.getBinding().setHandlerChain(handlerChain);
 
-            final generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.ObjectFactory messageObjectFactory = new generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.ObjectFactory();
+        final generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.ObjectFactory messageObjectFactory = new generated.smev.gisgmp.client.ru.gosuslugi.smev.rev120315.ObjectFactory();
 
-            final MessageType messageType = messageObjectFactory.createMessageType();
-            final MessageDataType messageDataType = messageObjectFactory.createMessageDataType();
-            final AppDataType appDataType = messageObjectFactory.createAppDataType();
+        final MessageType messageType = messageObjectFactory.createMessageType();
+        final MessageDataType messageDataType = messageObjectFactory.createMessageDataType();
+        final AppDataType appDataType = messageObjectFactory.createAppDataType();
 
-            final OrgExternalType sender = messageObjectFactory.createOrgExternalType();
-            sender.setCode(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE));
-            sender.setName(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME));
-            messageType.setSender(sender);
+        final OrgExternalType sender = messageObjectFactory.createOrgExternalType();
+        sender.setCode(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE));
+        sender.setName(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME));
+        messageType.setSender(sender);
 
-            final OrgExternalType recipient = messageObjectFactory.createOrgExternalType();
-            recipient.setCode("105805771");
-            recipient.setName("ИС_РНиП");
-            messageType.setRecipient(recipient);
+        final OrgExternalType recipient = messageObjectFactory.createOrgExternalType();
+        recipient.setCode("105805771");
+        recipient.setName("ИС_РНиП");
+        messageType.setRecipient(recipient);
 
-            //messageType.setServiceName("0");
-            messageType.setServiceName("105805771");
-            messageType.setTypeCode(TypeCodeType.GFNC);
-            messageType.setStatus(StatusType.REQUEST);
-            messageType.setDate(getXMLGregorianDate(new Date(System.currentTimeMillis())));
-            messageType.setExchangeType("6");
+        //messageType.setServiceName("0");
+        messageType.setServiceName("105805771");
+        messageType.setTypeCode(TypeCodeType.GFNC);
+        messageType.setStatus(StatusType.REQUEST);
+        messageType.setDate(getXMLGregorianDate(new Date(System.currentTimeMillis())));
+        messageType.setExchangeType("6");
 
-            final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message.ObjectFactory mesOf =
-                new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message.ObjectFactory();
+        final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message.ObjectFactory mesOf =
+            new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.message.ObjectFactory();
 
-            final RequestMessageType requestMessageType = mesOf.createRequestMessageType();
+        final RequestMessageType requestMessageType = mesOf.createRequestMessageType();
 
-            /*String ID = "N_4a0d84ca-1fc6-11e5-99c3-bcaec5d977ce";
-            if (idOfMessage != null) {
-                ID = idOfMessage;
-            }
-            //requestMessageType.setId(ID);*/
-            requestMessageType.setId(String.format("N_%s", UUID.randomUUID()));
-            requestMessageType.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
-            requestMessageType.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
+        /*String ID = "N_4a0d84ca-1fc6-11e5-99c3-bcaec5d977ce";
+        if (idOfMessage != null) {
+            ID = idOfMessage;
+        }
+        //requestMessageType.setId(ID);*/
+        requestMessageType.setId(String.format("N_%s", UUID.randomUUID()));
+        requestMessageType.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
+        requestMessageType.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
 
-            final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ObjectFactory mesDataOf =
-                new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ObjectFactory();
+        final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ObjectFactory mesDataOf =
+            new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.messagedata.ObjectFactory();
 
-            final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.ObjectFactory dataOf =
-                new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.ObjectFactory();
+        final generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.ObjectFactory dataOf =
+            new generated.smev.gisgmp.client.ru.roskazna.gisgmp.xsd._116.pgu_datarequest.ObjectFactory();
 
-            final DataRequest dataRequest = dataOf.createDataRequest();
-            dataRequest.setKind("PAYMENT");
-            dataRequest.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
-            final DataRequest.Filter filter = dataOf.createDataRequestFilter();
-            final DataRequest.Filter.Conditions conditions = dataOf.createDataRequestFilterConditions();
+        final DataRequest dataRequest = dataOf.createDataRequest();
+        switch (requestType) {
+            case REQUEST_LOAD_PAYMENTS_MODIFIED:
+                dataRequest.setKind("PAYMENTMODIFIED");
+                break;
+            case REQUEST_LOAD_PAYMENTS:
+            default:
+                dataRequest.setKind("PAYMENT");
+                break;
+        }
+        dataRequest.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
+        final DataRequest.Filter filter = dataOf.createDataRequestFilter();
+        final DataRequest.Filter.Conditions conditions = dataOf.createDataRequestFilterConditions();
 
-            DataRequest.Filter.Conditions.Timeslot timeslot = new DataRequest.Filter.Conditions.Timeslot();
+        DataRequest.Filter.Conditions.Timeslot timeslot = new DataRequest.Filter.Conditions.Timeslot();
 
-            Date sDate;
-            Date eDate;
-            if(startDate == null) {
-                logger.warn("Auto start time");
-                sDate = getStartDateByLastUpdateDate(updateDate);
-            } else {
-                logger.warn("Manual start: "+startDate);
-                sDate = startDate;
-            }
-            if (endDate == null) {
-                logger.warn("Auto end time");
-                eDate = getEndDateByStartDate(sDate);
-            } else {
-                logger.warn("Manual end time");
-                eDate = endDate;
-            }
-            timeslot.setStartDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(sDate));
-            timeslot.setEndDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(eDate));
+        Date sDate;
+        Date eDate;
+        if(startDate == null) {
+            logger.warn("Auto start time");
+            sDate = getStartDateByLastUpdateDate(updateDate);
+        } else {
+            logger.warn("Manual start: "+startDate);
+            sDate = startDate;
+        }
+        if (endDate == null) {
+            logger.warn("Auto end time");
+            eDate = getEndDateByStartDate(sDate);
+        } else {
+            logger.warn("Manual end time");
+            eDate = endDate;
+        }
+        timeslot.setStartDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(sDate));
+        timeslot.setEndDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(eDate));
 
-            conditions.setTimeslot(timeslot);
+        conditions.setTimeslot(timeslot);
 
-            filter.setConditions(conditions);
-            dataRequest.setFilter(filter);
-            requestMessageType.setRequestMessageData(mesDataOf.createExportRequest(dataRequest));
+        filter.setConditions(conditions);
+        dataRequest.setFilter(filter);
+        requestMessageType.setRequestMessageData(mesDataOf.createExportRequest(dataRequest));
 
-            appDataType.getAny().add(requestMessageType);
-            messageDataType.setAppData(appDataType);
+        appDataType.getAny().add(requestMessageType);
+        messageDataType.setAppData(appDataType);
 
-            final Holder<MessageType> messageTypeHolder = new Holder<MessageType>(messageType);
-            final Holder<MessageDataType> messageDataTypeHolder = new Holder<MessageDataType>(messageDataType);
+        final Holder<MessageType> messageTypeHolder = new Holder<MessageType>(messageType);
+        final Holder<MessageDataType> messageDataTypeHolder = new Holder<MessageDataType>(messageDataType);
 
-            try {
-                port116.gisgmpTransferMsg(messageTypeHolder, messageDataTypeHolder);
-                return messageDataTypeHolder.value;
-            } catch (Exception e) {
-                logger.error(String.format("Error call RNIP service: %s", e.getMessage()));
-                return null;
-            }
+        try {
+            port116.gisgmpTransferMsg(messageTypeHolder, messageDataTypeHolder);
+            return messageDataTypeHolder.value;
+        } catch (Exception e) {
+            logger.error(String.format("Error call RNIP service: %s", e.getMessage()));
+            return null;
+        }
     }
 
     @Override
@@ -272,6 +281,24 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
 
         RNIPLoadPaymentsService.RNIPPaymentsResponse res = new RNIPLoadPaymentsService.RNIPPaymentsResponse(result, rnipDate);
         return res;
+    }
+
+    @Override
+    public long getContragentByRNIPCode(String contragentKey, List<Contragent> contragents) {
+        contragentKey = contragentKey.substring(4, 10).trim();
+        boolean v15 = false;
+        if (contragentKey.startsWith("A")) {
+            v15 = true; //платеж по формату 1.15, будем сравнивать последние 4 символа
+        }
+        for (Contragent c : contragents) {
+            String cc = getRNIPIdFromRemarks (c.getRemarks());
+            if (!v15 && cc != null && cc.equals(contragentKey)) {
+                return c.getIdOfContragent();
+            } else if (v15 && cc != null && cc.substring(2).equals(contragentKey.substring(2))) {
+                return c.getIdOfContragent();
+            }
+        }
+        return 0L;
     }
 
     @Override

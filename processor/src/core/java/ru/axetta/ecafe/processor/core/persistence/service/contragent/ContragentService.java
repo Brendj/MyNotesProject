@@ -33,4 +33,11 @@ public class ContragentService {
         contragentSyncWritableRepository.saveEntity(contragentSync);
     }
 
+    @Transactional
+    public void setLastModifiesUpdate(Contragent contragent, Date date) {
+        ContragentSync contragentSync = contragentSyncWritableRepository.findOne(contragent.getIdOfContragent());
+        contragentSync.setLastModifiesUpdate(CalendarUtils.dateTimeToString(date));
+        contragentSyncWritableRepository.saveEntity(contragentSync);
+    }
+
 }

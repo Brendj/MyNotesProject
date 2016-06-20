@@ -88,7 +88,8 @@ public class RNIPLoadPaymentsService {
     //public final static String CREATE_CATALOG_TEMPLATE_V116 = "META-INF/rnip/createCatalog_v116.xml";
     //private final static String MODIFY_CATALOG_TEMPLATE_V116 = "META-INF/rnip/modifyCatalog_v116.xml";
     ////
-    public static final int REQUEST_CREATE_CATALOG=0, REQUEST_MODIFY_CATALOG=1, REQUEST_LOAD_PAYMENTS=2;
+    public static final int REQUEST_CREATE_CATALOG=0, REQUEST_MODIFY_CATALOG=1,
+            REQUEST_LOAD_PAYMENTS=2, REQUEST_LOAD_PAYMENTS_MODIFIED=3;
     ////
     private String URL_ADDR = null;//"http://193.47.154.2:7003/UnifoSecProxy_WAR/SmevUnifoService";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsService.class);
@@ -103,6 +104,7 @@ public class RNIPLoadPaymentsService {
 
     private static final String CHANGE_STATUS_NEW = "1";    //Поле ChangeStatus в ответе РНИП. 1 - новый платеж;
     private static final String CHANGE_STATUS_CHANGE = "2";                                  //2 - корректировка
+    private static final String CHANGE_STATUS_CANCEL = "3";                                  //3 - аннулирование
     //Константы, соответствующие данным пакета РНИП
     protected static final String SYSTEM_IDENTIFIER_KEY = "SystemIdentifier";
     protected static final String AMOUNT_KEY = "Amount";
@@ -112,6 +114,8 @@ public class RNIPLoadPaymentsService {
     protected static final String BIK_KEY = "BIK";
     protected static final String CHANGE_STATUS_KEY = "ChangeStatus";
 
+    public long paymentRunTotalIterator = 0;
+    public int valueToRunModifiedPayments = 60; //запуск запроса на корректировочные и аннулированные платежи - каждый 60-й запуск в импорте
 
     public static List<String> PAYMENT_PARAMS = new ArrayList<String>();
 
@@ -169,10 +173,21 @@ public class RNIPLoadPaymentsService {
                 .setOptionValueWithSave(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, "" + (on ? "1" : "0"));
     }
 
-    protected Date getLastUpdateDate(Contragent contragent) {
+    protected Date getLastUpdateDate(int requestType, Contragent contragent) {
         try {
             info("Получение даты последней выгрузки для контрагента %s..", contragent.getContragentName());
-            String d = contragent.getContragentSync().getLastRNIPUpdate();
+            String d;
+            switch (requestType) {
+                case REQUEST_LOAD_PAYMENTS_MODIFIED :
+                    d = contragent.getContragentSync().getLastModifiesUpdate();
+                    break;
+                case REQUEST_LOAD_PAYMENTS :
+                case REQUEST_CREATE_CATALOG :
+                case REQUEST_MODIFY_CATALOG :
+                default :
+                    d = contragent.getContragentSync().getLastRNIPUpdate();
+            }
+            //String d = contragent.getContragentSync().getLastRNIPUpdate();
             if(d == null || StringUtils.isBlank(d)) {
                 return new Date(0);
             }
@@ -203,7 +218,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         Object response = null;
         try {
-            Date lastUpdateDate = getLastUpdateDate(contragent);
+            Date lastUpdateDate = getLastUpdateDate(REQUEST_CREATE_CATALOG, contragent);
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent, lastUpdateDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
@@ -232,7 +247,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         Object response = null;
         try {
-            Date lastUpdateDate = getLastUpdateDate(contragent);
+            Date lastUpdateDate = getLastUpdateDate(REQUEST_MODIFY_CATALOG, contragent);
             response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent, lastUpdateDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
@@ -256,7 +271,8 @@ public class RNIPLoadPaymentsService {
         if (!isOn()) {
             return;
         }
-
+        boolean isAutoRun = (startDate == null);
+        paymentRunTotalIterator++;
         long l = System.currentTimeMillis();
         info("Загрузка платежей РНИП..");
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
@@ -267,8 +283,12 @@ public class RNIPLoadPaymentsService {
         RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean(); //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                resultReceivePayments = rnipLoadPaymentsService.receiveContragentPayments(contragent, startDate, endDate);
+                resultReceivePayments = rnipLoadPaymentsService.receiveContragentPayments(REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
                 isSuccessEnd = isSuccessEnd && resultReceivePayments;
+                if ((paymentRunTotalIterator % valueToRunModifiedPayments == 0 || !isAutoRun)
+                        && rnipLoadPaymentsService instanceof RNIPLoadPaymentsServiceV116) {
+                    rnipLoadPaymentsService.receiveContragentPayments(REQUEST_LOAD_PAYMENTS_MODIFIED, contragent, startDate, endDate);
+                }
             } catch (Exception e) {
                 isSuccessEnd = false;
                 logger.error("Failed to receive or proceed payments", e);
@@ -285,19 +305,19 @@ public class RNIPLoadPaymentsService {
     }
 
     //returns true если не было ошибок, иначе false
-    public Boolean receiveContragentPayments(Contragent contragent, Date startDate, Date endDate) throws Exception{
+    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception{
         //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
         String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
         if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
             return true; //ошибки нет, у контрагента нет ремарки рнипа
         }
-        Date lastUpdateDate = getLastUpdateDate(contragent);
+        Date lastUpdateDate = getLastUpdateDate(requestType, contragent);
 
         info("Попытка получения платежей для контрагента %s", contragent.getContragentName());
         //  Отправка запроса на получение платежей
         Object response = null;
         try {
-            response = executeRequest(REQUEST_LOAD_PAYMENTS, contragent, lastUpdateDate, startDate, endDate);
+            response = executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -336,25 +356,36 @@ public class RNIPLoadPaymentsService {
         //Если это автоматический запуск, то меняем дату последнего получения платежей контрагента
         //А если это ручной запуск за выбранный период времени, то дату последнего получения платежей не трогаем
         if (isAutoRun) {
-            Date edate = getEndDateByStartDate(getStartDateByLastUpdateDate(lastUpdateDate));
-            if (res.getRnipDate() != null && res.getRnipDate().before(edate)) {
-                edate = res.getRnipDate();
-            }
-            if (lastUpdateDate.before(edate)) {
-                info("Сохраняем новую дату последней загрузки платежей контрагента %s - %s. Версия записи перед сохранением - %s. " +
-                        "lastUpdateDate = %s, rnipDate = %s",
-                        contragent.getContragentName(),
-                        CalendarUtils.dateTimeToString(edate),
-                        contragent.getContragentSync().getVersion(),
-                        CalendarUtils.dateTimeToString(lastUpdateDate),
-                        CalendarUtils.dateTimeToString(res.getRnipDate()));
-                ContragentService.getInstance().setLastRNIPUpdate(contragent, edate);
-            }
+            saveEndDate(requestType, contragent, lastUpdateDate, res.getRnipDate());
         }
         //Сохранили
 
         info("Все новые платежи для контрагента %s обработаны", contragent.getContragentName());
         return true;
+    }
+
+    private void saveEndDate(int requestType, Contragent contragent, Date lastUpdateDate, Date dateFromRnip) {
+        Date edate = getEndDateByStartDate(getStartDateByLastUpdateDate(lastUpdateDate));
+        if (dateFromRnip != null && dateFromRnip.before(edate)) {
+            edate = dateFromRnip;
+        }
+        if (lastUpdateDate.before(edate)) {
+            info("Сохраняем новую дату последней загрузки платежей контрагента %s - %s. Версия записи перед сохранением - %s. " +
+                    "lastUpdateDate = %s, rnipDate = %s",
+                    contragent.getContragentName(),
+                    CalendarUtils.dateTimeToString(edate),
+                    contragent.getContragentSync().getVersion(),
+                    CalendarUtils.dateTimeToString(lastUpdateDate),
+                    CalendarUtils.dateTimeToString(dateFromRnip));
+            switch (requestType) {
+                case REQUEST_LOAD_PAYMENTS_MODIFIED :
+                    ContragentService.getInstance().setLastModifiesUpdate(contragent, edate);
+                    break;
+                case REQUEST_LOAD_PAYMENTS :
+                default :
+                    ContragentService.getInstance().setLastRNIPUpdate(contragent, edate);
+            }
+        }
     }
 
     private String getTemplateFileName(int requestType) throws Exception {
@@ -848,7 +879,8 @@ public class RNIPLoadPaymentsService {
         String paymentID             = p.get(SYSTEM_IDENTIFIER_KEY).trim();
 
         String changeStatus = p.get(CHANGE_STATUS_KEY);
-        if (changeStatus == null || changeStatus.isEmpty() || !(changeStatus.equals("1") || changeStatus.equals("2"))) {
+        if (changeStatus == null || changeStatus.isEmpty() || !(changeStatus.equals(CHANGE_STATUS_NEW)
+                || changeStatus.equals(CHANGE_STATUS_CHANGE) || changeStatus.equals(CHANGE_STATUS_CANCEL))) {
             String message = String.format("Неизвестный тип платежа %s", p.get(SYSTEM_IDENTIFIER_KEY));
             logger.info(message);
             errorWriter.write(workDate + ": " + message + "\r\n");
@@ -857,7 +889,7 @@ public class RNIPLoadPaymentsService {
         Boolean doRegiserPayment = true;
         Map sourceMap = copyMap(p);
 
-        if (changeStatus.equals(CHANGE_STATUS_CHANGE)) {
+        if (changeStatus.equals(CHANGE_STATUS_CHANGE) || changeStatus.equals(CHANGE_STATUS_CANCEL)) {
             doRegiserPayment = false;
             //Если этот платеж - изменение, пробуем зарегистрировать корректировку
             List<ClientPayment> exPayments = DAOService.getInstance().findClientPaymentsByPaymentId(null, paymentID);
@@ -867,6 +899,9 @@ public class RNIPLoadPaymentsService {
                 Integer corrNumber = getNextCorrIdByPayment(payment)[0];
 
                 doRegiserPayment = cancelPayment(p, payment, errorWriter, contragents);  /// ------!!!!!!--------///
+                if (changeStatus.equals(CHANGE_STATUS_CANCEL)) {
+                    doRegiserPayment = false;
+                }
 
                 if (corrNumber > -1) {
                     //Готовим новый idOfPayment = ид платежа + "/коррекция-<n>"
@@ -911,7 +946,7 @@ public class RNIPLoadPaymentsService {
             errorWriter.write(String.format("%s: %s\r\n", workDate, str));
             return false;
         }
-        contragentKey        = contragentKey.substring(5, 10).trim();
+        //contragentKey        = contragentKey.substring(5, 10).trim();
         String bic           = p.get(BIK_KEY);
         String amount        = p.get(AMOUNT_KEY);
         long idOfContragent  = getContragentByRNIPCode(contragentKey, contragents);
@@ -1064,6 +1099,7 @@ public class RNIPLoadPaymentsService {
     }
 
     public long getContragentByRNIPCode(String contragentKey, List<Contragent> contragents) {
+        contragentKey = contragentKey.substring(5, 10).trim();
         for (Contragent c : contragents) {
             String cc = getRNIPIdFromRemarks (c.getRemarks());
             if (cc != null && cc.equals(contragentKey)) {

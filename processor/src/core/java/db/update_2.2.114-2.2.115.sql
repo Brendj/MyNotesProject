@@ -116,3 +116,7 @@ CREATE TABLE CF_CheckSums (
   checkSumsMd5 CHARACTER VARYING(32),
   CONSTRAINT cf_checksums_pk PRIMARY KEY (idOfCheckSums)
 );
+
+--Дата синхронизации с рнип 1.16.2 для получения корректировочных и аннулированных платежей
+ALTER TABLE cf_contragents_sync ADD COLUMN lastModifiesUpdate character varying(30) DEFAULT ''::character varying;
+update cf_contragents_sync set lastModifiesUpdate = lastrnipupdate;
