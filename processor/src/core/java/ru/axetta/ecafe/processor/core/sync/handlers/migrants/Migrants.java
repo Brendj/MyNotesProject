@@ -4,14 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
+import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfMigrant;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
 
@@ -25,7 +24,7 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
 public class Migrants {
     private final Long idOfOrg;
     private final List<Long> currentActiveOutcome;
-    private final Map<Long, List<Long>> currentActiveIncome;
+    private final List<CompositeIdOfMigrant> currentActiveIncome;
     private final List<OutcomeMigrationRequestsItem> outcomeMigrationRequestsItems;
     private final List<OutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems;
     private final List<IncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems;
@@ -77,7 +76,7 @@ public class Migrants {
 
         Node incomeMigrationRequestsNode = findFirstChildElement(migrantsRequestNode, "IncomeMigrationRequests");
 
-        currentActiveIncome = new HashMap<Long, List<Long>>();
+        currentActiveIncome = new ArrayList<CompositeIdOfMigrant>();
         if(incomeMigrationRequestsNode != null) {
             String incomeCurrentActive = XMLUtils
                     .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 10000);
@@ -87,11 +86,10 @@ public class Migrants {
                     for (String idForOrg : incomeIdsForOrg) {
                         String[] orgAndId = idForOrg.split(":");
                         Long idOfOrg = Long.parseLong(orgAndId[0]);
-                        List<Long> idsForOrg = new ArrayList<Long>();
                         for (String id : orgAndId[1].split(",")) {
-                            idsForOrg.add(Long.parseLong(id));
+                            currentActiveIncome.add(new CompositeIdOfMigrant(Long.parseLong(id), idOfOrg));
                         }
-                        currentActiveIncome.put(idOfOrg, idsForOrg);
+
                     }
                 }
             }
@@ -121,7 +119,7 @@ public class Migrants {
         return currentActiveOutcome;
     }
 
-    public Map<Long, List<Long>> getCurrentActiveIncome() {
+    public List<CompositeIdOfMigrant> getCurrentActiveIncome() {
         return currentActiveIncome;
     }
 

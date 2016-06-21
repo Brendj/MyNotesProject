@@ -132,10 +132,10 @@ public class MigrantsUtils {
         return criteria.list();
     }
 
-    public static List<Migrant> getSyncedMigrantsForOrgRegistry(Session session, Long idOfOrg) throws Exception {
+    public static List<Migrant> getSyncedMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);
-        criteria.add(Restrictions.eq("orgRegistry.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
         criteria.add(Restrictions.ge("visitEndDate", date));
         criteria.add(Restrictions.eq("syncState", Migrant.SYNCHRONIZED));
         return criteria.list();

@@ -80,19 +80,17 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
     }
 
     private void processCurrentActiveIncomeReqs() throws Exception {
-        for(Long currentOrg : migrants.getCurrentActiveIncome().keySet()){
-            List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrgRegistry(session, currentOrg);
-            List<Long> currentActiveIncomeInOrg = migrants.getCurrentActiveIncome().get(currentOrg);
-            List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
-            for(Migrant m : currentMigrants) {
-                if (!currentActiveIncomeInOrg.contains(m.getCompositeIdOfMigrant().getIdOfRequest())) {
-                    m.setSyncState(Migrant.NOT_SYNCHRONIZED);
-                    session.save(m);
-                    currentMigrantsForSync.add(m);
-                }
+        List<Migrant> currentMigrants = MigrantsUtils.getSyncedMigrantsForOrg(session, migrants.getIdOfOrg());
+        List<Migrant> currentMigrantsForSync = new ArrayList<Migrant>();
+        for(Migrant m : currentMigrants){
+            if(!migrants.getCurrentActiveIncome().contains(m.getCompositeIdOfMigrant())){
+                m.setSyncState(Migrant.NOT_SYNCHRONIZED);
+                session.save(m);
+                currentMigrantsForSync.add(m);
             }
-            resolutionsForInRequests.addAll(MigrantsUtils.getResolutionsForMigrants(session, currentMigrantsForSync));
         }
+        resolutionsForInRequests.addAll(MigrantsUtils.getResolutionsForMigrants(session, currentMigrantsForSync));
+
         session.flush();
     }
 
