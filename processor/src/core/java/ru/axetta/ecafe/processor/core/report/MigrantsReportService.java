@@ -257,6 +257,7 @@ public class MigrantsReportService {
         public void setOrgAddress2(String orgAddress2) {
             this.orgAddress2 = orgAddress2;
         }
+
     }
 
 }
