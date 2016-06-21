@@ -5,12 +5,15 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,164 +32,70 @@ public class MigrantsReportService {
     public List<ReportItem> buildReportItems(Date startTime, Date endTime, String migrantsTypes, List<Long> idOfOrgList){
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
         if(migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())){
-            ReportItem reportItem = new ReportItem(new ArrayList<OrgItem>(), new ArrayList<OrgItem>());
-            reportItem.getOutcomeList().addAll(buildOutcomeOrgItems(startTime, endTime, idOfOrgList));
-            reportItem.getIncomeList().addAll(buildIncomeOrgItems(startTime, endTime, idOfOrgList));
+            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
+            reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
+            reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
-            ReportItem reportItem = new ReportItem(new ArrayList<OrgItem>(), new ArrayList<OrgItem>());
-            reportItem.getOutcomeList().addAll(buildOutcomeOrgItems(startTime, endTime, idOfOrgList));
+            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
+            reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())){
-            ReportItem reportItem = new ReportItem(new ArrayList<OrgItem>(), new ArrayList<OrgItem>());
-            reportItem.getIncomeList().addAll(buildIncomeOrgItems(startTime, endTime, idOfOrgList));
+            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
+            reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
             reportItemList.add(reportItem);
         }
         return reportItemList;
     }
 
-    private List<OrgItem> buildOutcomeOrgItems(Date startTime, Date endTime, List<Long> idOfOrgList){
-        Map<Long,OrgItem> items = new HashMap<Long, OrgItem>();
-        List<Migrant> outcomeMigrants = MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
-        for(Migrant migrant : outcomeMigrants){
+    private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants, boolean isOutcome){
+        List<MigrantItem> result = new ArrayList<MigrantItem>();
+        for(Migrant migrant : migrants){
             if(!MigrantsUtils.getLastResolutionForMigrant(session, migrant).equals(1)){
                 continue;
             }
-            Long idOfOrg = migrant.getOrgRegistry().getIdOfOrg();
-            Date startDate = migrant.getVisitStartDate();
-            Date endDate = migrant.getVisitEndDate();
-            MigrantItem migrantItem = new MigrantItem(migrant.getClientMigrate().getContractId(),
-                    migrant.getClientMigrate().getPerson().getFullName(), migrant.getClientMigrate().getClientGroup().getGroupName(),
-                    CalendarUtils.dateShortToStringFullYear(startDate), startTime.after(startDate),
-                    CalendarUtils.dateShortToStringFullYear(endDate), endDate.after(endTime),
-                    migrant.getOrgVisit().getIdOfOrg(), migrant.getOrgVisit().getShortName(),
-                    migrant.getOrgVisit().getAddress());
-            if(items.get(idOfOrg) != null){
-                items.get(idOfOrg).getMigrantItems().add(migrantItem);
-            } else {
-                items.put(idOfOrg, new OrgItem(idOfOrg, migrant.getOrgRegistry().getShortName(),
-                        migrant.getOrgRegistry().getAddress(), new ArrayList<MigrantItem>(Arrays.asList(migrantItem))));
-            }
-        }
-        List<OrgItem> result = new ArrayList<OrgItem>(items.values());
-        Collections.sort(result);
-        for(OrgItem o : result){
-            Collections.sort(o.getMigrantItems());
-        }
-        return result;
-    }
-
-    private List<OrgItem> buildIncomeOrgItems(Date startTime, Date endTime, List<Long> idOfOrgList){
-        Map<Long,OrgItem> items = new HashMap<Long, OrgItem>();
-        List<Migrant> incomeMigrants = MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
-        for(Migrant migrant : incomeMigrants){
-            if(!MigrantsUtils.getLastResolutionForMigrant(session, migrant).equals(1)){
-                continue;
-            }
-            Long idOfOrg = migrant.getOrgVisit().getIdOfOrg();
-            Date startDate = migrant.getVisitStartDate();
-            Date endDate = migrant.getVisitEndDate();
-            MigrantItem migrantItem = new MigrantItem(migrant.getClientMigrate().getContractId(),
-                    migrant.getClientMigrate().getPerson().getFullName(), migrant.getClientMigrate().getClientGroup().getGroupName(),
-                    CalendarUtils.dateShortToStringFullYear(startDate), startTime.after(startDate),
-                    CalendarUtils.dateShortToStringFullYear(endDate), endDate.after(endTime),
-                    migrant.getOrgRegistry().getIdOfOrg(), migrant.getOrgRegistry().getShortName(),
-                    migrant.getOrgRegistry().getAddress());
-            if(items.get(idOfOrg) != null){
-                items.get(idOfOrg).getMigrantItems().add(migrantItem);
-            } else {
-                items.put(idOfOrg, new OrgItem(idOfOrg, migrant.getOrgVisit().getShortName(),
-                        migrant.getOrgVisit().getAddress(), new ArrayList<MigrantItem>(Arrays.asList(migrantItem))));
-            }
-        }
-        List<OrgItem> result = new ArrayList<OrgItem>(items.values());
-        Collections.sort(result);
-        for(OrgItem o : result){
-            Collections.sort(o.getMigrantItems());
+            MigrantItem migrantItem = new MigrantItem(migrant, startTime, endTime, isOutcome);
+            result.add(migrantItem);
         }
         return result;
     }
 
     public static class ReportItem {
-        private List<OrgItem> outcomeList;
-        private List<OrgItem> incomeList;
+        private List<MigrantItem> outcomeList;
+        private List<MigrantItem> incomeList;
 
-        public ReportItem(List<OrgItem> outcomeList, List<OrgItem> incomeList) {
+        public ReportItem(List<MigrantItem> outcomeList, List<MigrantItem> incomeList) {
             this.outcomeList = outcomeList;
             this.incomeList = incomeList;
         }
 
-        public List<OrgItem> getOutcomeList() {
+        public List<MigrantItem> getOutcomeList() {
             return outcomeList;
         }
 
-        public void setOutcomeList(List<OrgItem> outcomeList) {
+        public void setOutcomeList(List<MigrantItem> outcomeList) {
             this.outcomeList = outcomeList;
         }
 
-        public List<OrgItem> getIncomeList() {
+        public List<MigrantItem> getIncomeList() {
             return incomeList;
         }
 
-        public void setIncomeList(List<OrgItem> incomeList) {
+        public void setIncomeList(List<MigrantItem> incomeList) {
             this.incomeList = incomeList;
-        }
-    }
-
-    public static class OrgItem implements Comparable<OrgItem> {
-        private Long id;
-        private String shortName;
-        private String address;
-        private List<MigrantItem> migrantItems;
-
-        public OrgItem(Long id, String shortName, String address, List<MigrantItem> migrantItems) {
-            this.id = id;
-            this.shortName = shortName;
-            this.address = address;
-            this.migrantItems = migrantItems;
-        }
-
-        @Override
-        public int compareTo(OrgItem o) {
-            return id.compareTo(o.getId());
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
-        }
-
-        public String getShortName() {
-            return shortName;
-        }
-
-        public void setShortName(String shortName) {
-            this.shortName = shortName;
-        }
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        public List<MigrantItem> getMigrantItems() {
-            return migrantItems;
-        }
-
-        public void setMigrantItems(List<MigrantItem> migrantItems) {
-            this.migrantItems = migrantItems;
         }
     }
 
     public static class MigrantItem implements Comparable<MigrantItem> {
+        private Long idOfOrg;
+        private String orgShortName;
+        private String orgAddress;
         private Long contractId;
         private String name;
         private String groupName;
@@ -194,27 +103,41 @@ public class MigrantsReportService {
         private Boolean gtStartDate;
         private String endDate;
         private Boolean gtEndDate;
-        private Long idOfOrg;
-        private String orgShortName;
-        private String orgAddress;
+        private Long idOfOrg2;
+        private String orgShortName2;
+        private String orgAddress2;
 
-        public MigrantItem(Long contractId, String name, String groupName, String startDate, Boolean gtStartDate,
-                String endDate, Boolean gtEndDate, Long idOfOrg, String orgShortName, String orgAddress) {
-            this.contractId = contractId;
-            this.name = name;
-            this.groupName = groupName;
-            this.startDate = startDate;
-            this.gtStartDate = gtStartDate;
-            this.endDate = endDate;
-            this.gtEndDate = gtEndDate;
-            this.idOfOrg = idOfOrg;
-            this.orgShortName = orgShortName;
-            this.orgAddress = orgAddress;
+        public MigrantItem(Migrant migrant, Date startTime, Date endTime, boolean isOutcome) {
+            Org org;
+            Org org2;
+            if(isOutcome){
+                org = migrant.getOrgRegistry();
+                org2 = migrant.getOrgVisit();
+            } else {
+                org = migrant.getOrgVisit();
+                org2 = migrant.getOrgRegistry();
+            }
+            idOfOrg = org.getIdOfOrg();
+            orgShortName = org.getShortName();
+            orgAddress = org.getAddress();
+            contractId = migrant.getClientMigrate().getContractId();
+            name = migrant.getClientMigrate().getPerson().getFullName();
+            groupName = migrant.getClientMigrate().getClientGroup().getGroupName();
+            startDate = CalendarUtils.dateShortToStringFullYear(migrant.getVisitStartDate());
+            gtStartDate = startTime.after(migrant.getVisitStartDate());
+            endDate = CalendarUtils.dateShortToStringFullYear(migrant.getVisitEndDate());
+            gtEndDate = migrant.getVisitEndDate().after(endTime);
+            idOfOrg2 = org2.getIdOfOrg();
+            orgShortName2 = org2.getShortName();
+            orgAddress2 = org2.getAddress();
         }
 
         @Override
         public int compareTo(MigrantItem o) {
             int result = idOfOrg.compareTo(o.getIdOfOrg());
+            if(result == 0){
+                result = idOfOrg2.compareTo(o.getIdOfOrg2());
+            }
             if(result == 0) {
                 if (groupName.contains("-") && o.getGroupName().contains("-")) {
                     result = groupName.split("-")[0].compareTo(o.getGroupName().split("-")[0]);
@@ -229,6 +152,30 @@ public class MigrantsReportService {
                 result = name.compareTo(o.getName());
             }
             return result;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public String getOrgShortName() {
+            return orgShortName;
+        }
+
+        public void setOrgShortName(String orgShortName) {
+            this.orgShortName = orgShortName;
+        }
+
+        public String getOrgAddress() {
+            return orgAddress;
+        }
+
+        public void setOrgAddress(String orgAddress) {
+            this.orgAddress = orgAddress;
         }
 
         public Long getContractId() {
@@ -287,28 +234,28 @@ public class MigrantsReportService {
             this.gtEndDate = gtEndDate;
         }
 
-        public Long getIdOfOrg() {
-            return idOfOrg;
+        public Long getIdOfOrg2() {
+            return idOfOrg2;
         }
 
-        public void setIdOfOrg(Long idOfOrg) {
-            this.idOfOrg = idOfOrg;
+        public void setIdOfOrg2(Long idOfOrg2) {
+            this.idOfOrg2 = idOfOrg2;
         }
 
-        public String getOrgShortName() {
-            return orgShortName;
+        public String getOrgShortName2() {
+            return orgShortName2;
         }
 
-        public void setOrgShortName(String orgShortName) {
-            this.orgShortName = orgShortName;
+        public void setOrgShortName2(String orgShortName2) {
+            this.orgShortName2 = orgShortName2;
         }
 
-        public String getOrgAddress() {
-            return orgAddress;
+        public String getOrgAddress2() {
+            return orgAddress2;
         }
 
-        public void setOrgAddress(String orgAddress) {
-            this.orgAddress = orgAddress;
+        public void setOrgAddress2(String orgAddress2) {
+            this.orgAddress2 = orgAddress2;
         }
     }
 

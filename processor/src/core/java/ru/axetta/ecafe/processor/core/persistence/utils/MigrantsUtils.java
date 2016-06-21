@@ -205,8 +205,8 @@ public class MigrantsUtils {
 
     public enum MigrantsEnumType {
         /*0*/ ALL("all", "По всем заявкам"),
-        /*1*/ OUTCOME("outcome", "По входящим заявкам"),
-        /*2*/ INCOME("income", "По исходящим заявкам");
+        /*1*/ OUTCOME("outcome", "По исходящим заявкам"),
+        /*2*/ INCOME("income", "По входящим заявкам");
 
         private final String name;
         private final String description;

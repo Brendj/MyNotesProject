@@ -71,6 +71,8 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
+            parameterMap.put("isOutcome", reportProperties.getProperty(P_MIGRANTS_TYPES,
+                    MigrantsUtils.MigrantsEnumType.OUTCOME.toString()).equals(MigrantsUtils.MigrantsEnumType.OUTCOME.toString()));
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
