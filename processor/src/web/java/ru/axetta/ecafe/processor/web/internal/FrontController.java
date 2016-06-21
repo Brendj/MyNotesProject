@@ -581,8 +581,6 @@ public class FrontController extends HttpServlet {
                 if(!DAOService.getInstance().isOrgFriendly(idOfOrg, idOfOrgVisit)){
                     throw new FrontControllerException("Организация с id=" + idOfOrgVisit + " не является корпусом организации");
                 }
-                Long nextMigrantId = MigrantsUtils.nextIdOfProcessorMigrantRequest(persistenceSession, idOfOrg);
-                Long nextResolutionId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg);
 
                 for (MigrateRequest migrateRequest : rqs) {
                     Client client = (Client) persistenceSession.load(Client.class, migrateRequest.getMigrateClientId());
@@ -594,18 +592,19 @@ public class FrontController extends HttpServlet {
                         throw new FrontControllerException("Клиент-оператор не найден");
                     }
                     migrateRequest.validateMigrateRequest();
-                    CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(nextMigrantId, client.getOrg().getIdOfOrg());
-                    nextMigrantId--;
+                    CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(
+                            MigrantsUtils.nextIdOfProcessorMigrantRequest(persistenceSession, client.getOrg().getIdOfOrg()), client.getOrg().getIdOfOrg());
                     Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(), client,
                             orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
                     CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(
-                            nextResolutionId, migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
-                    nextResolutionId--;
+                            MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, client.getOrg().getIdOfOrg()),
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
                     VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
                             VisitReqResolutionHist.RES_CONFIRMED, new Date(), migrateRequest.getResolutionCause(), clientResol,
                             migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
                     persistenceSession.save(migrant);
                     persistenceSession.save(visitReqResolutionHist);
+                    persistenceSession.flush();
                 }
             }
 
@@ -613,7 +612,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Ошибка при создании заявок на временное посещение", e);
-            throw new FrontControllerException("Ошибка: " + e.getMessage());
+            throw new FrontControllerException("Ошибка1: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
