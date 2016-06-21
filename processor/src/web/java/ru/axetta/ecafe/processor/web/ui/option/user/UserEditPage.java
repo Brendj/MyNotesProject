@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -14,15 +16,14 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -111,90 +112,166 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     }
 
     public void updateUser(Session session, Long idOfUser) throws Exception {
-        if (StringUtils.isEmpty(userName)) {
-            this.printError("Заполните имя пользователя");
-            throw new RuntimeException("Username field is null");
-        }
-        if (StringUtils.isEmpty(phone)) {
-            this.printError("Заполните поле контактного телефона");
-            throw new RuntimeException("Phone field is null");
-        } else {
-            String mobile = Client.checkAndConvertMobile(this.phone);
-            if (mobile == null) {
-                throw new Exception("Неверный формат контактного (мобильного) телефона");
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
+        String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
+
+        try {
+            if (StringUtils.isEmpty(userName)) {
+                this.printError("Заполните имя пользователя");
+                throw new RuntimeException("Username field is null");
             }
-            phone = mobile;
-        }
-        User user = (User) session.load(User.class, idOfUser);
-        user.setUserName(userName);
-        if (changePassword) {
-            user.setPassword(plainPassword);
-            user.setPasswordDate(new Date(System.currentTimeMillis()));
-        }
-        user.setPhone(phone);
-        user.setEmail(email);
-        user.setUpdateTime(new Date());
-        if (user.isBlocked() && !blocked) {
-            //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
-            user.setLastEntryTime(new Date());
-        }
-        user.setBlocked(blocked);
-        user.setBlockedUntilDate(blockedUntilDate);
-        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-        user.setIdOfRole(role.getIdentification());
-        if (User.DefaultRole.SUPPLIER.equals(role)) {
-            user.setFunctions(functionSelector.getSupplierFunctions(session));
-            user.setRoleName(role.toString());
-            if (contragentItems.isEmpty()) {
-                this.printError("Список контрагентов пуст.");
-                throw new RuntimeException("Contragent list is empty");
+            if (StringUtils.isEmpty(phone)) {
+                this.printError("Заполните поле контактного телефона");
+                throw new RuntimeException("Phone field is null");
+            } else {
+                String mobile = Client.checkAndConvertMobile(this.phone);
+                if (mobile == null) {
+                    throw new RuntimeException("Неверный формат контактного (мобильного) телефона");
+                }
+                phone = mobile;
             }
+
+            User user = (User) session.load(User.class, idOfUser);
+            user.setUserName(userName);
+            if (changePassword) {
+                if (!StringUtils.equals(plainPassword, plainPasswordConfirmation)) {
+                    throw new UserChangeGrantsException("Пароль и подтверждение пароля не совпадают");
+                } else if (!User.passwordIsEnoughComplex(plainPassword)) {
+                    this.printError("Пароль не удовлетворяет требованиям безопасности: ");
+                    this.printError("- минимальная длина - 6 символов");
+                    this.printError("- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
+                    throw new UserChangeGrantsException("Bad password");
+                }
+                user.setPassword(plainPassword);
+                user.setPasswordDate(new Date(System.currentTimeMillis()));
+            }
+            Boolean successChangeGrants = getChangeGrantsMode(session, user);
+            user.setPhone(phone);
+            user.setEmail(email);
+            user.setUpdateTime(new Date());
+            if (user.isBlocked() && !blocked) {
+                //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
+                user.setLastEntryTime(new Date());
+            }
+            user.setBlocked(blocked);
+            user.setBlockedUntilDate(blockedUntilDate);
+            User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+            user.setIdOfRole(role.getIdentification());
+            if (User.DefaultRole.SUPPLIER.equals(role)) {
+                user.setFunctions(functionSelector.getSupplierFunctions(session));
+                user.setRoleName(role.toString());
+                if (contragentItems.isEmpty()) {
+                    this.printError("Список контрагентов пуст.");
+                    throw new RuntimeException("Contragent list is empty");
+                }
+            }
+            user.getContragents().clear();
+            for (ContragentItem it : this.contragentItems) {
+                Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
+                user.getContragents().add(contragent);
+            }
+
+            if(role.equals(User.DefaultRole.MONITORING)){
+                user.setFunctions(functionSelector.getMonitoringFunctions(session));
+                user.setRoleName(role.toString());
+            }
+            if(role.equals(User.DefaultRole.ADMIN)){
+                user.setFunctions(functionSelector.getAdminFunctions(session));
+                user.setRoleName(role.toString());
+            }
+            if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
+                user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
+                user.setRoleName(role.toString());
+            }
+            if (User.DefaultRole.DEFAULT.equals(role)) {
+                if (StringUtils.isEmpty(roleName)) {
+                    this.printError("Заполните имя роли");
+                    throw new RuntimeException("Role name fields is null");
+                }
+                user.setFunctions(functionSelector.getSelected(session));
+                user.setRoleName(this.roleName);
+            }
+            if (region != null && region.length() > 0) {
+                user.setRegion(region);
+            } else {
+                user.setRegion(null);
+            }
+            user.setNeedChangePassword(needChangePassword);
+            user.getUserOrgses().clear();
+            session.update(user);
+            session.flush();
+            for (OrgItem orgItem : orgItems) {
+                Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+                UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
+                session.save(userOrgs);
+            }
+            for (OrgItem orgItem : orgItemsCanceled) {
+                Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+                UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+                session.save(userOrgs);
+            }
+            SecurityJournalAuthenticate.EventType eventType;
+            String comment;
+            if (successChangeGrants) {
+                eventType = SecurityJournalAuthenticate.EventType.CHANGE_GRANTS;
+                comment = String.format("Отредактированы данные пользователя %s", userName);
+            } else {
+                eventType = SecurityJournalAuthenticate.EventType.MODIFY_USER;
+                comment = String.format("Изменены права доступа пользователя %s", userName);
+            }
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(eventType, request.getRemoteAddr(), currentUserName,
+                            currentUser, true, null, comment);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+        } catch (RuntimeException e) {
+            String comment = String.format("Ошибка при изменении данных пользователя с именем %s", userName);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.MODIFY_USER, request.getRemoteAddr(),
+                            currentUserName, currentUser, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), comment);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw e;
+        } catch (UserChangeGrantsException e) {
+            String comment = String.format("Ошибка при изменении прав доступа пользователя с именем %s", userName);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
+                            currentUserName, currentUser, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), comment);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw e;
         }
-        user.getContragents().clear();
-        for (ContragentItem it : this.contragentItems) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
-            user.getContragents().add(contragent);
+    }
+
+    //Изменялся ли набор полей, по которым считается, что было не редактирование, а изменение прав доступа
+    private boolean getChangeGrantsMode(Session session, User user) {
+        if (!user.isBlocked().equals(blocked) || changePassword) {
+            return true;
         }
 
-        if(role.equals(User.DefaultRole.MONITORING)){
-            user.setFunctions(functionSelector.getMonitoringFunctions(session));
-            user.setRoleName(role.toString());
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        if(role.equals(User.DefaultRole.MONITORING) && !user.getFunctions().equals(functionSelector.getMonitoringFunctions(session))) {
+            return true;
         }
-        if(role.equals(User.DefaultRole.ADMIN)){
-            user.setFunctions(functionSelector.getAdminFunctions(session));
-            user.setRoleName(role.toString());
+        if(role.equals(User.DefaultRole.ADMIN) && !user.getFunctions().equals(functionSelector.getAdminFunctions(session))) {
+            return true;
         }
-        if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
-            user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
-            user.setRoleName(role.toString());
+        if(role.equals(User.DefaultRole.ADMIN_SECURITY) && !user.getFunctions().equals(functionSelector.getSecurityAdminFunctions(session))) {
+            return true;
         }
-        if (User.DefaultRole.DEFAULT.equals(role)) {
-            if (StringUtils.isEmpty(roleName)) {
-                this.printError("Заполните имя роли");
-                throw new RuntimeException("Role name fields is null");
-            }
-            user.setFunctions(functionSelector.getSelected(session));
-            user.setRoleName(this.roleName);
+        if (User.DefaultRole.DEFAULT.equals(role) && !user.getFunctions().equals(functionSelector.getSelected(session))) {
+            return true;
         }
-        if (region != null && region.length() > 0) {
-            user.setRegion(region);
-        } else {
-            user.setRegion(null);
+
+        Set<Contragent> contragents = new HashSet<Contragent>();
+        for (ContragentItem it : this.contragentItems) {
+            Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
+            contragents.add(contragent);
         }
-        user.setNeedChangePassword(needChangePassword);
-        user.getUserOrgses().clear();
-        session.update(user);
-        session.flush();
-        for (OrgItem orgItem : orgItems) {
-            Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
-            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
-            session.save(userOrgs);
+        if (user.getContragents().hashCode() != contragents.hashCode()) {
+            return true;
         }
-        for (OrgItem orgItem : orgItemsCanceled) {
-            Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
-            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
-            session.save(userOrgs);
-        }
+        return false;
     }
 
     public void blockedChange(ValueChangeEvent e){

@@ -1235,7 +1235,7 @@
 
     <rich:panelMenuItem id="showJournalAuthenticationMenuItem"
                         binding="#{journalAuthenticationReportPage.mainMenuComponent}"
-                        label="Журнал событий входа-выхода"
+                        label="Журнал активности пользователей"
                         action="#{journalAuthenticationReportPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="showJournalProcessesMenuItem"

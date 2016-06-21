@@ -6,17 +6,20 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,31 +103,46 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
     public boolean updateInfoCurrentUser() throws Exception{
         boolean success=false;
-        if(checkCurrentPassword(currPlainPassword)){
-            if(changePassword){
-                if(checkPasswordInfo(plainPassword, plainPasswordConfirmation)){
-                    currUser.setPassword(plainPassword);
+        SecurityJournalAuthenticate.EventType eventType =
+                changePassword ? SecurityJournalAuthenticate.EventType.CHANGE_GRANTS : SecurityJournalAuthenticate.EventType.MODIFY_USER;
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        try {
+            if(checkCurrentPassword(currPlainPassword)){
+                if(changePassword){
+                    if(checkPasswordInfo(plainPassword, plainPasswordConfirmation)){
+                        currUser.setPassword(plainPassword);
+                    } else {
+                        return false;
+                    }
+                }
+                if (StringUtils.isEmpty(phone)) {
+                    throw new Exception("Необходимо указать номер телефона");
                 } else {
-                    return false;
+                    String mobile = Client.checkAndConvertMobile(phone);
+                    if (mobile == null) {
+                        throw new Exception("Неверный формат контактного (мобильного) телефона");
+                    }
+                    phone = mobile;
                 }
-            }
-            if (StringUtils.isEmpty(phone)) {
-                printError("Необходимо указать номер телефона");
-                return false;
-            } else {
-                String mobile = Client.checkAndConvertMobile(phone);
-                if (mobile == null) {
-                    printError("Неверный формат контактного (мобильного) телефона");
-                }
-                phone = mobile;
-            }
-            currUser.setUserName(userName);
-            currUser.setPhone(phone);
-            currUser.setEmail(email);
-            currUser = daoService.setUserInfo(currUser);
+                currUser.setUserName(userName);
+                currUser.setPhone(phone);
+                currUser.setEmail(email);
+                currUser = daoService.setUserInfo(currUser);
 
-            daoService.updateInfoCurrentUser(this.orgItems, this.orgItemsCanceled, currUser);
-            success = true;
+                daoService.updateInfoCurrentUser(this.orgItems, this.orgItemsCanceled, currUser);
+                success = true;
+
+                SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                        .createUserEditRecord(eventType, request.getRemoteAddr(), userName, currUser, true, null, null);
+                DAOService.getInstance().writeAuthJournalRecord(record);
+            }
+        } catch (Exception e) {
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(eventType, request.getRemoteAddr(), userName, currUser, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            printError(e.getMessage());
+            return false;
         }
         return success;
     }
@@ -145,24 +163,20 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
     /* private method */
     private boolean checkCurrentPassword(String currPlainPassword) throws Exception{
         if(!currUser.hasPassword(currPlainPassword)) {
-            printError("Текущий пароль неверный");
-            return false;
+            throw new Exception("Текущий пароль неверный");
         }
         return true;
     }
 
     private boolean checkPasswordInfo(String plainPassword,String plainPasswordConfirmation) throws Exception{
         if (StringUtils.isEmpty(plainPassword)) {
-            printError("Недопустимое значение для нового пароля");
-            return false;
+            throw new Exception("Недопустимое значение для нового пароля");
         }
         if (!User.passwordIsEnoughComplex(plainPassword)) {
-            printError("Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
-            return false;
+            throw new Exception("Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол");
         }
         if(!StringUtils.equals(plainPassword,plainPasswordConfirmation)) {
-            printError("Новый пароль и подтверждение не совпадают");
-            return false;
+            throw new Exception("Новый пароль и подтверждение не совпадают");
         }
         return true;
     }

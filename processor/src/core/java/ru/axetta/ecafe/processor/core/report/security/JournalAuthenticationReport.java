@@ -119,6 +119,7 @@ public class JournalAuthenticationReport extends BasicReportForAllOrgJob {/*
                 item.setEventDate(balance.getEventDate());
                 item.setUserName(balance.getLogin());
                 item.setIsSuccess(balance.getSuccess() ? "Да" : "Нет");
+                item.setComment(balance.getComment());
                 if (balance.getIdOfArmType() != null) {
                     item.setArmType(SecurityJournalAuthenticate.ArmType.parse(balance.getIdOfArmType()).toString());
                 }
@@ -144,7 +145,7 @@ public class JournalAuthenticationReport extends BasicReportForAllOrgJob {/*
         private String armType;
         private String ipAddress;
         private String denyCause;
-
+        private String comment;
 
         public Long getIdOfJournalAuthenticate() {
             return idOfJournalAuthenticate;
@@ -208,6 +209,14 @@ public class JournalAuthenticationReport extends BasicReportForAllOrgJob {/*
 
         public void setDenyCause(String denyCause) {
             this.denyCause = denyCause;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
         }
     }
 

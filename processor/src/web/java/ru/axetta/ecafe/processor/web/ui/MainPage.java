@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
 import ru.axetta.ecafe.processor.core.persistence.Function;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -63,6 +64,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.richfaces.component.html.HtmlPanelMenu;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -969,42 +971,28 @@ public class MainPage implements Serializable {
 
     public Object updateUser() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if (userEditPage.isChangePassword() && !StringUtils
-                .equals(userEditPage.getPlainPassword(), userEditPage.getPlainPasswordConfirmation())) {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userEditPage.updateUser(persistenceSession, selectedIdOfUser);
+            selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-        } else if (!User.passwordIsEnoughComplex(userEditPage.getPlainPassword())) {
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные пользователя обновлены успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to update user", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Пароль не удовлетворяет требованиям безопасности:", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- минимальная длина - 6 символов", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
-        }
-        else {
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                userEditPage.updateUser(persistenceSession, selectedIdOfUser);
-                selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные пользователя обновлены успешно", null));
-            } catch (Exception e) {
-                logger.error("Failed to update user", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при изменении данных пользователя: " + e.getMessage(), null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+                    "Ошибка при изменении данных пользователя: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
 
 
-            }
         }
         return null;
     }
@@ -1042,38 +1030,26 @@ public class MainPage implements Serializable {
 
     public Object createUser() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if (!StringUtils.equals(userCreatePage.getPlainPassword(), userCreatePage.getPlainPasswordConfirmation())) {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userCreatePage.createUser(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-        } else if (!User.passwordIsEnoughComplex(userCreatePage.getPlainPassword())) {
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to create user", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Пароль не удовлетворяет требованиям безопасности:", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- минимальная длина - 6 символов", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
-        } else {
-                RuntimeContext runtimeContext = null;
-                Session persistenceSession = null;
-                Transaction persistenceTransaction = null;
-                try {
-                    runtimeContext = RuntimeContext.getInstance();
-                    persistenceSession = runtimeContext.createPersistenceSession();
-                    persistenceTransaction = persistenceSession.beginTransaction();
-                    userCreatePage.createUser(persistenceSession);
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
-                    facesContext.addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO, "Пользователь создан успешно", null));
-                } catch (Exception e) {
-                    logger.error("Failed to create user", e);
-                    facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Ошибка при создании пользователя: " + e.getMessage(), null));
-                } finally {
-                    HibernateUtils.rollback(persistenceTransaction, logger);
-                    HibernateUtils.close(persistenceSession, logger);
-                }
-            }
+                    "Ошибка при создании пользователя: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
         return null;
     }
 
@@ -8989,33 +8965,42 @@ public class MainPage implements Serializable {
         String userName = context.getRemoteUser();
         User user = DAOService.getInstance().findUserByUserName(userName);
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        if (!newPassword.equals(newPasswordConfirm)) {
-            newPassword = "";
-            newPasswordConfirm = "";
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ОШИБКА: введенные значения не совпадают", null));
-            return null;
-        }
-        if (!User.passwordIsEnoughComplex(newPassword)) {
-            /*facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Пароль не удовлетворяет требованиям безопасности: минимальная длина - 6 символов, должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));*/
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Пароль не удовлетворяет требованиям безопасности:", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- минимальная длина - 6 символов", null));
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
-            return false;
-        }
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
         try {
+            if (!newPassword.equals(newPasswordConfirm)) {
+                newPassword = "";
+                newPasswordConfirm = "";
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ОШИБКА: введенные значения не совпадают", null));
+                throw new CredentialException("Неверный ввод пароля");
+            }
+            if (!User.passwordIsEnoughComplex(newPassword)) {
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Пароль не удовлетворяет требованиям безопасности:", null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "- минимальная длина - 6 символов", null));
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "- должны присутствовать прописные и заглавные латинские буквы + хотя бы одна цифра или спецсимвол", null));
+                throw new CredentialException("Пароль не удовлетворяет требованиям безопасности");
+            }
+
             user.doChangePassword(newPassword);
             user.setNeedChangePassword(false);
             user.setPasswordDate(new Date(System.currentTimeMillis()));
             DAOService.getInstance().setUserInfo(user);
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
+                            userName, user, true, null, null);
+            DAOService.getInstance().writeAuthJournalRecord(record);
             context.redirect(context.getRequestContextPath() + "/back-office/index.faces");
         } catch (CredentialException e) {
             newPassword = "";
             newPasswordConfirm = "";
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
+                            userName, user, false,
+                            SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), e.getMessage());
+            DAOService.getInstance().writeAuthJournalRecord(record);
         }
         return null;
     }

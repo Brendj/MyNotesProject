@@ -120,3 +120,5 @@ CREATE TABLE CF_CheckSums (
 --Дата синхронизации с рнип 1.16.2 для получения корректировочных и аннулированных платежей
 ALTER TABLE cf_contragents_sync ADD COLUMN lastModifiesUpdate character varying(30) DEFAULT ''::character varying;
 update cf_contragents_sync set lastModifiesUpdate = lastrnipupdate;
+
+ALTER TABLE cf_security_journal_authenticate ADD COLUMN comment character varying(128);

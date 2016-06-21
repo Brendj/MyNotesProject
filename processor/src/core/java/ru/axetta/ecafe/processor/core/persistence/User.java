@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -14,10 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.CredentialException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -522,6 +525,11 @@ public class User {
     }
 
     private static String sendServiceSMSRequest(final User user, String code) throws Exception {
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                .createUserEditRecord(SecurityJournalAuthenticate.EventType.GENERATE_SMS, request.getRemoteAddr(),
+                        user.getUserName(), user, true, null, null);
+        DAOService.getInstance().writeAuthJournalRecord(record);
         return "0";
         /*NameValuePair[] parameters = new NameValuePair[] {
             new NameValuePair("login", "i-teco"),
@@ -581,18 +589,33 @@ public class User {
         }
         Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER);
         if (lastEntryTime == null && CalendarUtils.getDifferenceInDays(getUpdateTime(), new Date(System.currentTimeMillis())) > days) {
+            block();
             return false; //пользователь никогда не выполнял вход и создан более days дней назад, блокируем его
         }
         if (lastEntryTime == null) {
             return true; //новый пользователь, создан менее days назад
         }
         if (CalendarUtils.getDifferenceInDays(lastEntryTime, new Date(System.currentTimeMillis())) > days) {
-            this.setBlocked(true);
-            this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
-            DAOService.getInstance().setUserInfo(this);
+            block();
             return false;
         }
         return true;
+    }
+
+    private void block() {
+        this.setBlocked(true);
+        this.setBlockedUntilDate(new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS));
+        DAOService.getInstance().setUserInfo(this);
+
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
+        String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
+        String comment = String.format("Пользователь %s заблокирован", userName);
+        SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                .createUserEditRecord(SecurityJournalAuthenticate.EventType.BLOCK_USER, request.getRemoteAddr(),
+                        currentUserName, currentUser, true,
+                        SecurityJournalAuthenticate.DenyCause.USER_EDIT_BAD_PARAMETERS.getIdentification(), comment);
+        DAOService.getInstance().writeAuthJournalRecord(record);
     }
 
     public boolean blockedDateExpired() {

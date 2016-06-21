@@ -332,15 +332,19 @@ public class JBossLoginModule implements LoginModule {
         user = user.incAttemptNumbersAndBlock();
         if (user.getAttemptNumber() > RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT)) {
-            request.setAttribute("errorMessage",
-                    String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
-                            username, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME)));
+            String message = String.format("Пользователь %s заблокирован на %s минут по причине превышения максимально допустимого количества неудачных попыток входа",
+                    username, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME));
+            request.setAttribute("errorMessage", message);
             String mess = String.format("User \"%s\" is blocked after maximum fault login attempts (%s). Access denied.", username,
                     RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT));
             logger.debug(mess);
-            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+            /*SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createLoginFaultRecord(request.getRemoteAddr(), username, user,
                             SecurityJournalAuthenticate.DenyCause.MAX_FAULT_LOGIN_ATTEMPTS.getIdentification());
+            DAOService.getInstance().writeAuthJournalRecord(record);*/
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.BLOCK_USER, request.getRemoteAddr(),
+                            username, user, true, null, message);
             DAOService.getInstance().writeAuthJournalRecord(record);
             throw new LoginException(mess);
         }

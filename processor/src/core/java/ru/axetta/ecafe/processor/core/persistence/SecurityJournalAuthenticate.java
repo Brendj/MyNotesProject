@@ -29,6 +29,7 @@ public class SecurityJournalAuthenticate implements Serializable {
     private String login;
     private User user;
     private Integer denyCause;
+    private String comment;
 
     public SecurityJournalAuthenticate() {
         //for Hibernate
@@ -43,6 +44,7 @@ public class SecurityJournalAuthenticate implements Serializable {
         this.login = builder.login;
         this.user = builder.user;
         this.denyCause = builder.denyCause;
+        this.comment = builder.comment;
     }
 
     public Long getIdOfJournalAuthenticate() {
@@ -140,9 +142,24 @@ public class SecurityJournalAuthenticate implements Serializable {
         return idOfJournalAuthenticate.hashCode();
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public enum EventType {
         LOGIN(0, "вход"),
-        LOGOUT(1, "выход");
+        LOGOUT(1, "выход"),
+        CREATE_USER(2, "создание пользователя"),
+        MODIFY_USER(3, "редактирование пользователя"),
+        DELETE_USER(4, "удаление пользователя"),
+        CHANGE_GRANTS(5, "изменение прав доступа пользователя"),
+        BLOCK_USER(6, "блокировка пользователя"),
+        PASSWORD_CHANGE(7, "смена пароля"),
+        GENERATE_SMS(8, "новый код активации по СМС");
 
         private Integer identification;
         private String description;
@@ -219,7 +236,9 @@ public class SecurityJournalAuthenticate implements Serializable {
         LONG_INACTIVITY(4, "Длительное неиспользование учетной записи"),
         WRONG_AUTH_URL(5, "Неверный адрес аутентификации"),
         WRONG_PASSWORD(6, "Неверный пароль"),
-        MAX_FAULT_LOGIN_ATTEMPTS(7, "Превышено максимально возможное количество неудачных попыток входа");
+        MAX_FAULT_LOGIN_ATTEMPTS(7, "Превышено максимально возможное количество неудачных попыток входа"),
+        USER_EDIT_BAD_PARAMETERS(8, "Некорректный ввод данных"),
+        BAD_OPERATION(9, "Операция запрещена в текущем контексте");
 
         private Integer identification;
         private String description;
@@ -258,6 +277,7 @@ public class SecurityJournalAuthenticate implements Serializable {
         private String login;
         private User user;
         private Integer denyCause;
+        private String comment;
 
         public Builder(Integer eventType, Date eventDate, Boolean success) {
             this.eventType = eventType;
@@ -290,6 +310,14 @@ public class SecurityJournalAuthenticate implements Serializable {
             return this;
         }
 
+        public Builder withComment(String comment) {
+            if (comment != null && comment.length() > 128) {
+                comment = comment.substring(0, 127);
+            }
+            this.comment = comment;
+            return this;
+        }
+
         public SecurityJournalAuthenticate build() {
             return new SecurityJournalAuthenticate(this);
         }
@@ -297,6 +325,10 @@ public class SecurityJournalAuthenticate implements Serializable {
 
     public static Builder createLoginFaultBuilder() {
         return new Builder(EventType.LOGIN.getIdentification(), new Date(), false);
+    }
+
+    public static Builder createBuilder(EventType eventType, Boolean success) {
+        return new Builder(eventType.getIdentification(), new Date(), success);
     }
 
     public static SecurityJournalAuthenticate createLoginFaultRecord(String ipAddress, String login, User user, Integer denyCause) {
@@ -315,6 +347,14 @@ public class SecurityJournalAuthenticate implements Serializable {
     public static SecurityJournalAuthenticate createSuccessLogout(String ipAddress, String login, User user) {
         Builder builder = new Builder(EventType.LOGOUT.getIdentification(), new Date(), true).withIpAddress(ipAddress);
         builder.withLogin(login).withUser(user).withIdOfArmType(user.getIdOfRole());
+        return builder.build();
+    }
+
+    public static SecurityJournalAuthenticate createUserEditRecord(EventType eventType, String ipAddress, String login,
+            User user, Boolean success, Integer denyCause, String comment) {
+        Builder builder = createBuilder(eventType, success);
+        builder.withIpAddress(ipAddress).withLogin(login).withUser(user).withDenyCause(denyCause).withComment(comment);
+        if (user != null) builder.withIdOfArmType(user.getIdOfRole());
         return builder.build();
     }
 }

@@ -7,15 +7,20 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
+import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -123,14 +128,28 @@ public class UserListPage extends BasicWorkspacePage {
     }
 
     public void removeUser(Session session, Long idOfUser) throws Exception {
+        HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
+        String currentUserName = (currentUser == null) ? null : currentUser.getUserName();
+
         User user = (User) session.load(User.class, idOfUser);
         if (FacesContext.getCurrentInstance().getExternalContext().getRemoteUser().equals(user.getUserName())) {
-            throw new Exception("Невозможно удалить пользователя, под которым осуществлен вход в систему");
+            String comment = "Невозможно удалить пользователя, под которым осуществлен вход в систему";
+            SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                    .createUserEditRecord(SecurityJournalAuthenticate.EventType.DELETE_USER, request.getRemoteAddr(),
+                            currentUserName, currentUser, false,
+                            SecurityJournalAuthenticate.DenyCause.BAD_OPERATION.getIdentification(), comment);
+            DAOService.getInstance().writeAuthJournalRecord(record);
+            throw new Exception(comment);
         }
         user.setDeletedState(true);
         user.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
         session.save(user);
         fill(session);
+        SecurityJournalAuthenticate record = SecurityJournalAuthenticate
+                .createUserEditRecord(SecurityJournalAuthenticate.EventType.DELETE_USER, request.getRemoteAddr(), currentUserName,
+                        currentUser, true, null, String.format("Удален пользователь %s", user.getUserName()));
+        DAOService.getInstance().writeAuthJournalRecord(record);
     }
 
     public UserFilter getUserFilter() {
