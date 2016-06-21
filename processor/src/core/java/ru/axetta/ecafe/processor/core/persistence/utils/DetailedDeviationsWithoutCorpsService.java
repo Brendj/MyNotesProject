@@ -39,7 +39,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     //Вернет список клиентов которые были оплачены (по всем дружественным организациям)
-    // в зависимости от параметра orderType - строковое, по интервалу от startDate до endTime
+    // в зависимости от параметра orderType - строковое, по интервалу от startTime до endTime
     public static List<PlanOrderItem> loadPaidPlanOrderInfo(Session session, String orderType, List<Long> idOfOrgList,
             Date startTime, Date endTime) {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
@@ -445,4 +445,36 @@ public class DetailedDeviationsWithoutCorpsService {
         String result = (String) query.uniqueResult();
         return result;
     }
+
+    //Начальные классы у кого нет льгот, возвращает информацию о клиенте
+    public List<ClientInfo> findOrdersByClientIds(Session session, List<Long> idOfOrgList, Date startTime, Date endTime) {
+
+        List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
+
+        Query query = session.createSQLQuery("SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_orders o INNER JOIN cf_orderdetails od "
+                + " ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg INNER JOIN cf_clients c "
+                + " ON c.idofclient = o.idofclient AND o.idoforg IN ( :idOfOrgList) INNER JOIN cf_persons p "
+                + " ON p.idofperson = c.idofperson  INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup "
+                + " AND g.idoforg = c.idoforg INNER JOIN cf_orgs og ON o.idoforg = og.idoforg "
+                + " INNER JOIN cf_orgs cog ON c.idoforg = cog.idoforg WHERE o.idoforg IN ( :idOfOrgList ) "
+                + " AND od.menutype >= 50 AND od.menutype <= 99 AND o.socdiscount > 0 AND o.createddate BETWEEN :startTime AND :endTime AND o.state = 0 AND o.ordertype IN (4, 6, 8)"
+                + " AND c.idofclientgroup< 1100000000 ORDER BY g.groupname, c.idofclient, o.createddate, o.ordertype, od.menudetailname");
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameterList("idOfOrgList", idOfOrgList);
+
+        List result = query.list();
+
+        for (Object resultClient : result) {
+            Object[] resultClientItem = (Object[]) resultClient;
+            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
+                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
+                    ((BigInteger) resultClientItem[3]).longValue(), (String) resultClientItem[4],
+                    (String) resultClientItem[5]);
+            clientInfoList.add(clientInfo);
+        }
+        return clientInfoList;
+    }
+
+
 }
