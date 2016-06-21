@@ -34,6 +34,27 @@ public class MigrantsUtils {
         return (VisitReqResolutionHist) persistenceSession.get(VisitReqResolutionHist.class, compositeId);
     }
 
+    public static List<Migrant> getActiveMigrantsByIdOfClient(Session session, Long idOfClient) throws Exception {
+        List<Migrant> result = new ArrayList<Migrant>();
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", idOfClient));
+        criteria.add(Restrictions.le("visitStartDate", date));
+        criteria.add(Restrictions.ge("visitEndDate", date));
+        List<Migrant> migrants = criteria.list();
+        for(Migrant migrant : migrants){
+            Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
+            query.setParameter("migrant", migrant);
+            query.setMaxResults(1);
+            VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
+            if(res.getResolution().equals(1)){
+                result.add(migrant);
+            }
+        }
+        return result;
+    }
+
+
     public static List<Migrant> getMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);

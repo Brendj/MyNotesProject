@@ -3323,21 +3323,125 @@ public class Processor
 
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
-                errorClientIds.add(client.getIdOfClient());
-                throw new IllegalArgumentException("Client from another organization. idOfClient=" +
-                        client.getIdOfClient().toString() + ", idOfOrg=" + idOfOrg.toString() + ", clientParamItem=" +
-                        clientParamItem.toString());
-            }
+                if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient()).size() > 0)){
+                    errorClientIds.add(client.getIdOfClient());
+                    throw new IllegalArgumentException("Client from another organization. idOfClient=" +
+                            client.getIdOfClient().toString() + ", idOfOrg=" + idOfOrg.toString() + ", clientParamItem=" +
+                            clientParamItem.toString());
+                }
+            } else {
             /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
                 throw new IllegalArgumentException("Client from another organization");
             }*/
-            client.setFreePayCount(clientParamItem.getFreePayCount());
-            client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
-            client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
-            if (clientParamItem.getExpenditureLimit() != null) {
-                client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
+                client.setFreePayCount(clientParamItem.getFreePayCount());
+                client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
+                client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
+                if (clientParamItem.getExpenditureLimit() != null) {
+                    client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
+                }
+
+                if (clientParamItem.getAddress() != null) {
+                    client.setAddress(clientParamItem.getAddress());
+                }
+                if (clientParamItem.getEmail() != null) {
+                    String email = clientParamItem.getEmail();
+                    //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                    if (client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
+                        client.setSsoid("");
+                    }
+                    client.setEmail(email);
+                    if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
+                        client.setNotifyViaEmail(true);
+                    }
+                }
+                if (clientParamItem.getMobilePhone() != null) {
+                    String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
+                    //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
+                    if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
+                        client.setSsoid("");
+                    }
+                    client.setMobile(mobile);
+                    if (!StringUtils.isEmpty(mobile)) {
+                        if (clientParamItem.getNotifyViaSMS() == null) {
+                            client.setNotifyViaSMS(true);
+                        }
+                        //if (clientParamItem.getNotifyViaPUSH() == null) {
+                        //    client.setNotifyViaPUSH(false);
+                        //}
+                    }
+                }
+                if (clientParamItem.getMiddleGroup() != null) {
+                    client.setMiddleGroup(clientParamItem.getMiddleGroup());
+                }
+
+                if (clientParamItem.getName() != null) {
+                    client.getPerson().setFirstName(clientParamItem.getName());
+                }
+                if (clientParamItem.getPhone() != null) {
+                    client.setPhone(clientParamItem.getPhone());
+                }
+                if (clientParamItem.getSecondName() != null) {
+                    client.getPerson().setSecondName(clientParamItem.getSecondName());
+                }
+                if (clientParamItem.getSurname() != null) {
+                    client.getPerson().setSurname(clientParamItem.getSurname());
+                }
+                if (clientParamItem.getRemarks() != null) {
+                    client.setRemarks(clientParamItem.getRemarks());
+                }
+                if (clientParamItem.getNotifyViaEmail() != null) {
+                    client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
+                }
+                if (clientParamItem.getNotifyViaSMS() != null) {
+                    client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+                }
+                //if (clientParamItem.getNotifyViaPUSH() != null) {
+                //    client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
+                //}
+            /* FAX клиента */
+                if (clientParamItem.getFax() != null) {
+                    client.setFax(clientParamItem.getFax());
+                }
+            /* разрешает клиенту подтверждать оплату групового питания */
+                if (clientParamItem.getCanConfirmGroupPayment() != null) {
+                    client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
+                }
+
+            /* заносим клиента в группу */
+                if (clientParamItem.getGroupName() != null) {
+                    ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
+                    //если группы нет то создаем
+                    if (clientGroup == null) {
+                        clientGroup = createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                                clientParamItem.getGroupName());
+                        // заносим в хэш - карту
+                        orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
+                    }
+
+                    if ((clientGroup != null) && (client.getClientGroup() != null) && (clientGroup.getCompositeIdOfClientGroup() != null)) {
+                        if (!clientGroup.getCompositeIdOfClientGroup().equals(client.getClientGroup().getCompositeIdOfClientGroup())) {
+                            ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
+                                    client);
+                            migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);
+                            migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                            migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+
+                            migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                            migrationHistory.setNewGroupName(clientGroup.getGroupName());
+
+                            persistenceSession.save(migrationHistory);
+                        }
+
+                    }
+                    client.setClientGroup(clientGroup);
+                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                }
+
+                if (clientParamItem.getIsUseLastEEModeForPlan() != null) {
+                    client.setUseLastEEModeForPlan(clientParamItem.getIsUseLastEEModeForPlan());
+                }
             }
-            /**/
+
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
             String categoriesFromClient = getCanonicalDiscounts(client.getCategoriesDiscounts());
 
@@ -3374,118 +3478,13 @@ public class Processor
             }
 
             // Если льготы изменились, то сохраняем историю
-            if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
-                    .equals(categoryDiscountOfClient))) {
-                DiscountChange discountChange = new DiscountChange(client, newClientDiscountMode, oldClientDiscountMode,
-                        categoriesFromPacket, categoriesFromClient);
+            if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet.equals(categoryDiscountOfClient))) {
+                DiscountChange discountChange = new DiscountChange(client, newClientDiscountMode,
+                        oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
 
                 persistenceSession.save(discountChange);
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
-
-            if (clientParamItem.getAddress() != null) {
-                client.setAddress(clientParamItem.getAddress());
-            }
-            if (clientParamItem.getEmail() != null) {
-                String email = clientParamItem.getEmail();
-                //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if (client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
-                    client.setSsoid("");
-                }
-                client.setEmail(email);
-                if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
-                    client.setNotifyViaEmail(true);
-                }
-            }
-            if (clientParamItem.getMobilePhone() != null) {
-                String mobile = Client.checkAndConvertMobile(clientParamItem.getMobilePhone());
-                //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
-                if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
-                    client.setSsoid("");
-                }
-                client.setMobile(mobile);
-                if (!StringUtils.isEmpty(mobile)) {
-                    if (clientParamItem.getNotifyViaSMS() == null) {
-                        client.setNotifyViaSMS(true);
-                    }
-                    //if (clientParamItem.getNotifyViaPUSH() == null) {
-                    //    client.setNotifyViaPUSH(false);
-                    //}
-                }
-            }
-            if (clientParamItem.getMiddleGroup() != null) {
-                client.setMiddleGroup(clientParamItem.getMiddleGroup());
-            }
-
-            if (clientParamItem.getName() != null) {
-                client.getPerson().setFirstName(clientParamItem.getName());
-            }
-            if (clientParamItem.getPhone() != null) {
-                client.setPhone(clientParamItem.getPhone());
-            }
-            if (clientParamItem.getSecondName() != null) {
-                client.getPerson().setSecondName(clientParamItem.getSecondName());
-            }
-            if (clientParamItem.getSurname() != null) {
-                client.getPerson().setSurname(clientParamItem.getSurname());
-            }
-            if (clientParamItem.getRemarks() != null) {
-                client.setRemarks(clientParamItem.getRemarks());
-            }
-            if (clientParamItem.getNotifyViaEmail() != null) {
-                client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
-            }
-            if (clientParamItem.getNotifyViaSMS() != null) {
-                client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
-            }
-            //if (clientParamItem.getNotifyViaPUSH() != null) {
-            //    client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
-            //}
-            /* FAX клиента */
-            if (clientParamItem.getFax() != null) {
-                client.setFax(clientParamItem.getFax());
-            }
-            /* разрешает клиенту подтверждать оплату групового питания */
-            if (clientParamItem.getCanConfirmGroupPayment() != null) {
-                client.setCanConfirmGroupPayment(clientParamItem.getCanConfirmGroupPayment());
-            }
-
-            /* заносим клиента в группу */
-            if (clientParamItem.getGroupName() != null) {
-                ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
-                //если группы нет то создаем
-                if (clientGroup == null) {
-                    clientGroup = createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
-                            clientParamItem.getGroupName());
-                    // заносим в хэш - карту
-                    orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
-                }
-
-                if ((clientGroup != null) && (client.getClientGroup() != null) && (
-                        clientGroup.getCompositeIdOfClientGroup() != null)) {
-                    if (!clientGroup.getCompositeIdOfClientGroup()
-                            .equals(client.getClientGroup().getCompositeIdOfClientGroup())) {
-                        ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
-                                client);
-                        migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);
-                        migrationHistory.setOldGroupId(
-                                client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-
-                        migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        migrationHistory.setNewGroupName(clientGroup.getGroupName());
-
-                        persistenceSession.save(migrationHistory);
-                    }
-
-                }
-                client.setClientGroup(clientGroup);
-                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            }
-
-            if (clientParamItem.getIsUseLastEEModeForPlan() != null) {
-                client.setUseLastEEModeForPlan(clientParamItem.getIsUseLastEEModeForPlan());
-            }
 
             client.setClientRegistryVersion(version);
 
