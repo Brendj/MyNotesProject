@@ -291,6 +291,9 @@
                     <h:inputText value="#{optionPage.RNIPSenderName}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="Адрес сервиса TSA" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPTSAServer}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Использовать подпись формата XadES-T"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.useXadesT}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
 

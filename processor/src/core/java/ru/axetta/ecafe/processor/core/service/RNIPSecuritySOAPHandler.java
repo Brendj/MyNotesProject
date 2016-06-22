@@ -160,12 +160,15 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
                     }
                 });
 
-                // НИЖЕ ЗАКОММЕНТИРОВАНО ПОДПИСАНИЕ ПО ФОРМАТУ XADES-T
+                boolean useXadesT = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_IMPORT_RNIP_USE_XADEST_ON);
+                Document signed_doc;
+                if (useXadesT) {
+                    signed_doc = Signer.sign(privateKey, cert, xadesConfig.getDefaultProvider(), in,
+                        elementId, MAP_DIGEST_OID_2_TSA_URL);
+                } else {
+                    signed_doc = newDocumentFromInputStream(in);
+                }
 
-                /*final Document signed_doc = Signer.sign(privateKey, cert, xadesConfig.getDefaultProvider(), in,
-                        elementId, MAP_DIGEST_OID_2_TSA_URL);*/
-                final Document signed_doc = newDocumentFromInputStream(in);
-                        //System.out.println(toString(signed_doc));
                 DOMSource domSource = new DOMSource(signed_doc);
                 soapPart.setContent(domSource);
 

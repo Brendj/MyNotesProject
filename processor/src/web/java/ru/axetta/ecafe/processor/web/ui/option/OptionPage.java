@@ -118,6 +118,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPSenderCode;
     private String RNIPSenderName;
     private String RNIPTSAServer;
+    private Boolean useXadesT;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -394,6 +395,14 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setImportRNIPPayments(Boolean importRNIPPayments) {
         this.importRNIPPayments = importRNIPPayments;
+    }
+
+    public Boolean getUseXadesT() {
+        return useXadesT;
+    }
+
+    public void setUseXadesT(Boolean useXadesT) {
+        this.useXadesT = useXadesT;
     }
 
     public Boolean getSendSMSPaymentNotification() {
@@ -814,6 +823,7 @@ public class OptionPage extends BasicWorkspacePage {
         disableSMSNotifyEditInClientRoom = runtimeContext.getOptionValueBool(
                 Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM);
         importRNIPPayments = runtimeContext.getOptionValueBool(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON);
+        useXadesT = runtimeContext.getOptionValueBool(Option.OPTION_IMPORT_RNIP_USE_XADEST_ON);
         sendSMSPaymentNotification = runtimeContext.getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON);
         RNIPPaymentsURL = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
         RNIPPaymentsAlias = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
@@ -955,6 +965,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_MAX_ATTEMPTS, syncRegisterMaxAttempts);
             runtimeContext.setOptionValue(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM, disableSMSNotifyEditInClientRoom);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, importRNIPPayments);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_USE_XADEST_ON, useXadesT);
             runtimeContext.setOptionValue(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, sendSMSPaymentNotification);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL, RNIPPaymentsURL);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, RNIPPaymentsAlias);
