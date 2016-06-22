@@ -224,6 +224,10 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         List<PlanOrderItem> planOrderItemsReserveByOneDay = DetailedDeviationsWithoutCorpsService.
                 loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, addOneDayEndTime);
 
+        // План начальные классы без льгот, но которые питаются как льготники
+        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefits = DetailedDeviationsWithoutCorpsService
+                .loadPlanOrderItemsPrimaryClassesWithoutBenefits(session, startTime, addOneDayEndTime, idOfOrgList);
+
         List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByOneDay;
 
         List<Long> idOfClientsList = new ArrayList<Long>();
@@ -265,6 +269,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultIntersection);
         Collections.sort(resultSubtraction);
         Collections.sort(planOrderItemsReserveByOneDay);
+        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefits);
 
         if (!resultSubtraction.isEmpty()) {
             fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -276,6 +281,10 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
         if (!planOrderItemsReserveByOneDay.isEmpty()) {
             fill(planOrderItemsReserveByOneDay, conditionReserve, deviationPaymentSubReportItemList);
+        }
+
+        if (!planOrderItemsPrimaryClassesWithoutBenefits.isEmpty()) {
+            fill(planOrderItemsPrimaryClassesWithoutBenefits, conditionNotDetectedEat, deviationPaymentSubReportItemList);
         }
     }
 

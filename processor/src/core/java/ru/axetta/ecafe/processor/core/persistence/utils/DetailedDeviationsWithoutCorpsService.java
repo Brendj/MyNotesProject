@@ -447,11 +447,12 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     //Начальные классы у кого нет льгот, возвращает информацию о клиенте
-    public List<ClientInfo> findOrdersByClientIds(Session session, List<Long> idOfOrgList, Date startTime, Date endTime) {
+    public static List<PlanOrderItem> findPrimaryClassesWithoutBenefits(Session session, List<Long> idOfOrgList, Date startTime, Date endTime) {
 
-        List<ClientInfo> clientInfoList = new ArrayList<ClientInfo>();
+        List<PlanOrderItem> planOrderItemList = new ArrayList<PlanOrderItem>();
 
-        Query query = session.createSQLQuery("SELECT cl.idofclient, cl.idoforg, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, gr.idofclientgroup, gr.groupName, cl.categoriesDiscounts FROM cf_orders o INNER JOIN cf_orderdetails od "
+        Query query = session.createSQLQuery("SELECT o.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (od.menutype -50) AS complexid, od.idofrule, o.createddate, g.groupname, od.menudetailname "
+                + "FROM cf_orders o INNER JOIN cf_orderdetails od "
                 + " ON o.idoforder = od.idoforder AND o.idoforg = od.idoforg INNER JOIN cf_clients c "
                 + " ON c.idofclient = o.idofclient AND o.idoforg IN ( :idOfOrgList) INNER JOIN cf_persons p "
                 + " ON p.idofperson = c.idofperson  INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup "
@@ -465,15 +466,90 @@ public class DetailedDeviationsWithoutCorpsService {
 
         List result = query.list();
 
-        for (Object resultClient : result) {
-            Object[] resultClientItem = (Object[]) resultClient;
-            ClientInfo clientInfo = new ClientInfo(((BigInteger) resultClientItem[0]).longValue(),
-                    ((BigInteger) resultClientItem[1]).longValue(), (String) resultClientItem[2],
-                    ((BigInteger) resultClientItem[3]).longValue(), (String) resultClientItem[4],
-                    (String) resultClientItem[5]);
-            clientInfoList.add(clientInfo);
+        //Парсим данные
+        for (Object o : result) {
+            Object[] resultPlanOrderItem = (Object[]) o;
+
+            String clientName;
+            String groupName;
+
+            if (resultPlanOrderItem[1] == null) {
+                clientName = DetailedDeviationsWithoutCorpsService
+                        .getClientNameByClientId(session, ((BigInteger) resultPlanOrderItem[0]).longValue());
+            } else {
+                clientName = (String) resultPlanOrderItem[1];
+            }
+
+            if (resultPlanOrderItem[5] == null) {
+                groupName = DetailedDeviationsWithoutCorpsService
+                        .getClientGroupNameByClientId(session, ((BigInteger) resultPlanOrderItem[0]).longValue());
+            } else {
+                groupName = (String) resultPlanOrderItem[5];
+            }
+
+            PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultPlanOrderItem[0]).longValue(),
+                    clientName, (Integer) resultPlanOrderItem[2], ((BigInteger) resultPlanOrderItem[3]).longValue(),
+                    CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
+                    groupName, (String) resultPlanOrderItem[6]);
+            planOrderItemList.add(planOrderItem);
         }
-        return clientInfoList;
+        return planOrderItemList;
+    }
+
+    //Начальные классы у кого нет льгот, возвращает список клиентов тех кто не был в школах
+    public static List<PlanOrderItem> loadPlanOrderItemsPrimaryClassesWithoutBenefits(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
+
+        List<PlanOrderItem> resultPrimaryClassesWithoutBenefits = findPrimaryClassesWithoutBenefits(session, idOfOrgList, startTime, endTime);
+
+        List<Long> clientIds = new ArrayList<Long>();
+
+        for (PlanOrderItem planOrderItem: resultPrimaryClassesWithoutBenefits) {
+            clientIds.add(planOrderItem.getIdOfClient());
+        }
+
+        List<Long> clientIdsList = loadClientsInfoPrimaryClassesWithoutBenefits(session, startTime, endTime, idOfOrgList, clientIds);
+
+        List<PlanOrderItem> result = new ArrayList<PlanOrderItem>();
+
+        for (PlanOrderItem pl: resultPrimaryClassesWithoutBenefits) {
+            if (clientIdsList.contains(pl.getIdOfClient())) {
+                result.add(pl);
+            }
+        }
+
+        return result;
+    }
+
+    //Проход по карте не зафиксирован (Начальные классы у кого нет льгот, возвращает список клиентов тех кто не был в школах)
+    private static List<Long> loadClientsInfoPrimaryClassesWithoutBenefits(Session session, Date startTime, Date endTime,
+            List<Long> idOfOrgList, List<Long> idOfClientsList) {
+
+        List<Long> clientInfoListNot = new ArrayList<Long>();
+
+        if (idOfClientsList.size() > 0) {
+            Query query = session.createSQLQuery(
+                    "SELECT cl.idofclient FROM cf_clients cl "
+                            + "LEFT JOIN cf_clientgroups gr "
+                            + "ON gr.idofclientgroup = cl.idofclientgroup AND gr.idoforg = cl.idoforg "
+                            + "LEFT JOIN cf_persons p ON cl.idofperson = p.idofperson WHERE cl.idoforg IN (:idOfOrgList) "
+                            + "AND cl.idOfClientGroup < 1100000000 AND cl.idofclient NOT IN (SELECT cl.idofclient "
+                            + "FROM cf_enterevents e INNER JOIN cf_clients cl ON cl.idOfClient = e.idOfClient "
+                            + "LEFT JOIN cf_clientgroups gr ON gr.idofclientgroup = cl.idofclientgroup "
+                            + "AND gr.idoforg = cl.idoforg WHERE e.evtdatetime BETWEEN  :startTime AND :endTime "
+                            + "AND e.idoforg IN ( :idOfOrgList) AND e.idofclient IS NOT null AND e.idofclient IN ( :idOfClientsList ) "
+                            + "AND e.passdirection NOT IN (2, 5, 8, 9) AND gr.idOfClientGroup < 1100000000) and cl.idofclient in (:idOfClientsList)");
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameterList("idOfClientsList", idOfClientsList);
+            query.setParameter("startTime", startTime.getTime());
+            query.setParameter("endTime", endTime.getTime());
+
+            List result = query.list();
+
+            for (Object resultClient : result) {
+                clientInfoListNot.add((((BigInteger) resultClient).longValue()));
+            }
+        }
+        return clientInfoListNot;
     }
 
 
