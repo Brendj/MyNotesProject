@@ -526,9 +526,11 @@ public class User {
 
     private static String sendServiceSMSRequest(final User user, String code) throws Exception {
         HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+        Integer days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE);
+        String comment = String.format("Период действия кода - %s дней", days);
         SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                 .createUserEditRecord(SecurityJournalAuthenticate.EventType.GENERATE_SMS, request.getRemoteAddr(),
-                        user.getUserName(), user, true, null, null);
+                        user.getUserName(), user, true, null, comment);
         DAOService.getInstance().writeAuthJournalRecord(record);
         return "0";
         /*NameValuePair[] parameters = new NameValuePair[] {

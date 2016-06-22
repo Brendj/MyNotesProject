@@ -215,10 +215,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             String comment;
             if (successChangeGrants) {
                 eventType = SecurityJournalAuthenticate.EventType.CHANGE_GRANTS;
-                comment = String.format("Отредактированы данные пользователя %s", userName);
+                comment = String.format("Изменены права доступа пользователя %s", userName);
             } else {
                 eventType = SecurityJournalAuthenticate.EventType.MODIFY_USER;
-                comment = String.format("Изменены права доступа пользователя %s", userName);
+                comment = String.format("Отредактированы данные пользователя %s", userName);
             }
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(eventType, request.getRemoteAddr(), currentUserName,
