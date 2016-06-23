@@ -121,4 +121,4 @@ CREATE TABLE CF_CheckSums (
 ALTER TABLE cf_contragents_sync ADD COLUMN lastModifiesUpdate character varying(30) DEFAULT ''::character varying;
 update cf_contragents_sync set lastModifiesUpdate = lastrnipupdate;
 
-ALTER TABLE cf_security_journal_authenticate ADD COLUMN comment character varying(128);
+ALTER TABLE cf_security_journal_authenticate ADD COLUMN comment character varying(256);
