@@ -226,7 +226,8 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
         // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
         List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefitsNotDetected = DetailedDeviationsWithoutCorpsService
-                .loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(session, startTime, addOneDayEndTime, idOfOrgList);
+                .loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(session, startTime, addOneDayEndTime,
+                        idOfOrgList);
 
         List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByOneDay;
 
@@ -274,17 +275,24 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         if (!resultSubtraction.isEmpty()) {
             fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
         }
-
         if (!resultIntersection.isEmpty()) {
             fill(resultIntersection, conditionNotDetectedEat, deviationPaymentSubReportItemList);
         }
-
         if (!planOrderItemsReserveByOneDay.isEmpty()) {
             fill(planOrderItemsReserveByOneDay, conditionReserve, deviationPaymentSubReportItemList);
         }
-
         if (!planOrderItemsPrimaryClassesWithoutBenefitsNotDetected.isEmpty()) {
-            fill(planOrderItemsPrimaryClassesWithoutBenefitsNotDetected, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+            List<PlanOrderItem> planOrderItemsContains = new ArrayList<PlanOrderItem>();
+
+            for (PlanOrderItem planOrderItem: planOrderItemsPrimaryClassesWithoutBenefitsNotDetected) {
+                if (!resultIntersection.contains(planOrderItem)) {
+                    planOrderItemsContains.add(planOrderItem);
+                }
+            }
+
+            if (!planOrderItemsContains.isEmpty()) {
+                fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+            }
         }
     }
 
@@ -311,7 +319,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, endTime);
 
         // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
-        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefits = DetailedDeviationsWithoutCorpsService
+        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval = DetailedDeviationsWithoutCorpsService
                 .loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(session, startTime, endTime, idOfOrgList);
 
         List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByInterval;
@@ -383,7 +391,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultSubtractionInterval);
         Collections.sort(resultIntersectionInterval);
         Collections.sort(planOrderItemsReserveByInterval);
-        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefits);
+        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval);
 
         if (!resultSubtractionInterval.isEmpty()) {
             fill(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -394,8 +402,18 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         if (!planOrderItemsReserveByInterval.isEmpty()) {
             fill(planOrderItemsReserveByInterval, conditionReserve, deviationPaymentSubReportItemList);
         }
-        if (!planOrderItemsPrimaryClassesWithoutBenefits.isEmpty()) {
-            fill(planOrderItemsPrimaryClassesWithoutBenefits, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+        if (!planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval.isEmpty()) {
+            List<PlanOrderItem> planOrderItemsContains = new ArrayList<PlanOrderItem>();
+
+            for (PlanOrderItem planOrderItem: planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval) {
+                if (!resultIntersectionInterval.contains(planOrderItem)) {
+                    planOrderItemsContains.add(planOrderItem);
+                }
+            }
+
+            if (!planOrderItemsContains.isEmpty()) {
+                fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+            }
         }
     }
 
