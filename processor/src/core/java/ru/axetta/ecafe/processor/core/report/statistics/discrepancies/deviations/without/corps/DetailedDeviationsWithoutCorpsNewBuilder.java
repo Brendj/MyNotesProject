@@ -224,9 +224,9 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         List<PlanOrderItem> planOrderItemsReserveByOneDay = DetailedDeviationsWithoutCorpsService.
                 loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, addOneDayEndTime);
 
-        // План начальные классы без льгот, но которые питаются как льготники
-        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefits = DetailedDeviationsWithoutCorpsService
-                .loadPlanOrderItemsPrimaryClassesWithoutBenefits(session, startTime, addOneDayEndTime, idOfOrgList);
+        // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
+        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefitsNotDetected = DetailedDeviationsWithoutCorpsService
+                .loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(session, startTime, addOneDayEndTime, idOfOrgList);
 
         List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByOneDay;
 
@@ -269,7 +269,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultIntersection);
         Collections.sort(resultSubtraction);
         Collections.sort(planOrderItemsReserveByOneDay);
-        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefits);
+        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetected);
 
         if (!resultSubtraction.isEmpty()) {
             fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -283,8 +283,8 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
             fill(planOrderItemsReserveByOneDay, conditionReserve, deviationPaymentSubReportItemList);
         }
 
-        if (!planOrderItemsPrimaryClassesWithoutBenefits.isEmpty()) {
-            fill(planOrderItemsPrimaryClassesWithoutBenefits, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+        if (!planOrderItemsPrimaryClassesWithoutBenefitsNotDetected.isEmpty()) {
+            fill(planOrderItemsPrimaryClassesWithoutBenefitsNotDetected, conditionNotDetectedEat, deviationPaymentSubReportItemList);
         }
     }
 
@@ -309,6 +309,10 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         // План льготного питания, резерв - ordertype = 6
         List<PlanOrderItem> planOrderItemsReserveByInterval = DetailedDeviationsWithoutCorpsService.
                 loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, endTime);
+
+        // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
+        List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefits = DetailedDeviationsWithoutCorpsService
+                .loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(session, startTime, endTime, idOfOrgList);
 
         List<PlanOrderItem> planOrderItemList = planOrderItemsPaidByInterval;
 
@@ -379,6 +383,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultSubtractionInterval);
         Collections.sort(resultIntersectionInterval);
         Collections.sort(planOrderItemsReserveByInterval);
+        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefits);
 
         if (!resultSubtractionInterval.isEmpty()) {
             fill(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -388,6 +393,9 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         }
         if (!planOrderItemsReserveByInterval.isEmpty()) {
             fill(planOrderItemsReserveByInterval, conditionReserve, deviationPaymentSubReportItemList);
+        }
+        if (!planOrderItemsPrimaryClassesWithoutBenefits.isEmpty()) {
+            fill(planOrderItemsPrimaryClassesWithoutBenefits, conditionNotDetectedEat, deviationPaymentSubReportItemList);
         }
     }
 

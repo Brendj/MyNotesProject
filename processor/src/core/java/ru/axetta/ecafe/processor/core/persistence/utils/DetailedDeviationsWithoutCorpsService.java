@@ -497,7 +497,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     //Начальные классы у кого нет льгот, возвращает список клиентов тех кто не был в школах
-    public static List<PlanOrderItem> loadPlanOrderItemsPrimaryClassesWithoutBenefits(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
+    public static List<PlanOrderItem> loadPlanOrderItemsPrimaryClassesWithoutBenefitsNotDetected(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
 
         List<PlanOrderItem> resultPrimaryClassesWithoutBenefits = findPrimaryClassesWithoutBenefits(session, idOfOrgList, startTime, endTime);
 
@@ -507,7 +507,7 @@ public class DetailedDeviationsWithoutCorpsService {
             clientIds.add(planOrderItem.getIdOfClient());
         }
 
-        List<Long> clientIdsList = loadClientsInfoPrimaryClassesWithoutBenefits(session, startTime, endTime, idOfOrgList, clientIds);
+        List<Long> clientIdsList = loadClientsInfoPrimaryClassesWithoutBenefitsNotDetected(session, startTime, endTime, idOfOrgList, clientIds);
 
         List<PlanOrderItem> result = new ArrayList<PlanOrderItem>();
 
@@ -521,7 +521,7 @@ public class DetailedDeviationsWithoutCorpsService {
     }
 
     //Проход по карте не зафиксирован (Начальные классы у кого нет льгот, возвращает список клиентов тех кто не был в школах)
-    private static List<Long> loadClientsInfoPrimaryClassesWithoutBenefits(Session session, Date startTime, Date endTime,
+    private static List<Long> loadClientsInfoPrimaryClassesWithoutBenefitsNotDetected(Session session, Date startTime, Date endTime,
             List<Long> idOfOrgList, List<Long> idOfClientsList) {
 
         List<Long> clientInfoListNot = new ArrayList<Long>();
@@ -551,6 +551,4 @@ public class DetailedDeviationsWithoutCorpsService {
         }
         return clientInfoListNot;
     }
-
-
 }
