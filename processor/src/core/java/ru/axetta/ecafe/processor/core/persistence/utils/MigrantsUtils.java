@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
@@ -60,6 +61,13 @@ public class MigrantsUtils {
         criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("syncState", Migrant.NOT_SYNCHRONIZED));
+        return criteria.list();
+    }
+
+    public static List<VisitReqResolutionHist> getResolutionsForMigrant(Session session, Migrant migrant) {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.add(Restrictions.eq("migrant", migrant));
+        criteria.addOrder(Order.asc("resolutionDateTime"));
         return criteria.list();
     }
 
