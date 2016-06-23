@@ -318,7 +318,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                             currentUser, true, null, String.format("Создан пользователь %s", userName));
             DAOService.getInstance().writeAuthJournalRecord(record);
         } catch (Exception e) {
-            String comment = String.format("Ошибка при создании пользователя с именем %s", userName);
+            String comment = String.format("Ошибка при создании пользователя с именем %s. Текст ошибки: %s", userName, e.getMessage());
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(SecurityJournalAuthenticate.EventType.CREATE_USER, request.getRemoteAddr(),
                             currentUserName, currentUser, false,

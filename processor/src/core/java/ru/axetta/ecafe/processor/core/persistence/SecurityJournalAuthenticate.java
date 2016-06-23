@@ -311,8 +311,8 @@ public class SecurityJournalAuthenticate implements Serializable {
         }
 
         public Builder withComment(String comment) {
-            if (comment != null && comment.length() > 128) {
-                comment = comment.substring(0, 127);
+            if (comment != null && comment.length() > 256) {
+                comment = comment.substring(0, 255);
             }
             this.comment = comment;
             return this;
