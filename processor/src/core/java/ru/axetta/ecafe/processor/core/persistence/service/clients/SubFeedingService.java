@@ -75,7 +75,11 @@ public class SubFeedingService {
                     addClientItems(result, subFeedingRepository.getClientAllClientsInOrgReserve(orgId));
                     return new ArrayList<ClientItem>(result);
                 default:
-                    new Exception("У организации не поддерживаемая категория");
+                    addClientItems(result, subFeedingRepository.getPrimarySchoolClients(orgId));
+                    addClientItems(result, subFeedingRepository.getClientInPlan(orgId));
+                    addClientItems(result, subFeedingRepository.getClientInReserve(orgId));
+
+                    //new Exception("У организации не поддерживаемая категория");
             }
         } else {
             addClientItems(result, subFeedingRepository.getPrimarySchoolClients(orgId));
