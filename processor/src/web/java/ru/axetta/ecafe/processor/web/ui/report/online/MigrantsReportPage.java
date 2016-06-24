@@ -45,6 +45,7 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(MigrantsReportPage.class);
     private final String reportName = MigrantsReport.REPORT_NAME;
+    private final String reportNameForMenu = MigrantsReport.REPORT_NAME_FOR_MENU;
 
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
@@ -293,5 +294,9 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     public String getReportName() {
         return reportName;
+    }
+
+    public String getReportNameForMenu() {
+        return reportNameForMenu;
     }
 }

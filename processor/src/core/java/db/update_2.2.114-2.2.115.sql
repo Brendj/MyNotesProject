@@ -52,6 +52,7 @@ CREATE TABLE cf_migrants
   idofrequest BIGINT NOT NULL,
   idoforgregistry BIGINT NOT NULL,
   idoforgregvendor BIGINT NOT NULL,
+  requestNumber CHARACTER VARYING(128) NOT NULL DEFAULT '',
   idofclientmigrate BIGINT NOT NULL,
   idoforgvisit BIGINT NOT NULL,
   visitstartdate BIGINT NOT NULL,

@@ -22,6 +22,7 @@ public class Migrant implements Serializable{
     private CompositeIdOfMigrant compositeIdOfMigrant;
     private Org orgRegistry; // Организация регистрации
     private Contragent orgRegVendor; // Поставщик в организации регистрации
+    private String requestNumber;
     private Client clientMigrate;
     private Org orgVisit; // Организация посещения
     private Date visitStartDate;
@@ -31,10 +32,11 @@ public class Migrant implements Serializable{
     public Migrant() {
     }
 
-    public Migrant(CompositeIdOfMigrant compositeIdOfMigrant, Contragent orgRegVendor, Client clientMigrate,
-            Org orgVisit, Date visitStartDate, Date visitEndDate, Integer syncState) {
+    public Migrant(CompositeIdOfMigrant compositeIdOfMigrant, Contragent orgRegVendor, String requestNumber,
+            Client clientMigrate, Org orgVisit, Date visitStartDate, Date visitEndDate, Integer syncState) {
         this.compositeIdOfMigrant = compositeIdOfMigrant;
         this.orgRegVendor = orgRegVendor;
+        this.requestNumber = requestNumber;
         this.clientMigrate = clientMigrate;
         this.orgVisit = orgVisit;
         this.visitStartDate = visitStartDate;
@@ -64,6 +66,14 @@ public class Migrant implements Serializable{
 
     public void setOrgRegVendor(Contragent orgRegVendor) {
         this.orgRegVendor = orgRegVendor;
+    }
+
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
     }
 
     public Client getClientMigrate() {

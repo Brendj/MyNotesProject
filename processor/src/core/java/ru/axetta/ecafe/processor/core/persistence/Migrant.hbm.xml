@@ -15,6 +15,7 @@
                      not-null="true" insert="false" update="false"/>
         <many-to-one name="orgRegVendor" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfOrgRegVendor"
                      not-null="true"/>
+        <property name="requestNumber" column="RequestNumber" type="string" not-null="true"/>
         <many-to-one name="clientMigrate" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClientMigrate"
                      not-null="true"/>
         <many-to-one name="orgVisit" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgVisit"

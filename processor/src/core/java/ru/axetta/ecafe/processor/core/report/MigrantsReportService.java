@@ -23,6 +23,7 @@ import java.util.List;
 
 public class MigrantsReportService {
     private final Session session;
+    private static final String NO_DATA = "-";
     private static final String[] resolutionNames = {"Создана",                                 //0
                                               "Подтверждена",                                   //1
                                               "Отклонена и сдана в архив",                      //2
@@ -34,8 +35,7 @@ public class MigrantsReportService {
                                                           "Родители обучающихся других ОО",     //1
                                                           "Сотрудники других ОО",               //2
                                                           "Выбывшие",                           //3
-                                                          "Неизвестно",                         //4
-                                                          "-"};                                 //5
+                                                          "Неизвестно"};                        //4
 
     public MigrantsReportService(Session session) {
         this.session = session;
@@ -139,9 +139,9 @@ public class MigrantsReportService {
             orgShortName2 = org2.getShortName();
             orgAddress2 = org2.getAddress();
             Long numberLong = migrant.getCompositeIdOfMigrant().getIdOfRequest()/10L;
-            number = numberLong.toString();
-            resolutionCause = resolutions.get(0).getResolutionCause();
-            contactInfo = resolutions.get(0).getContactInfo();
+            number = migrant.getRequestNumber();
+            resolutionCause = resolutions.get(0).getResolutionCause() != null ? resolutions.get(0).getResolutionCause() : NO_DATA;
+            contactInfo = resolutions.get(0).getContactInfo() != null ? resolutions.get(0).getContactInfo() : NO_DATA;
             contractId = migrant.getClientMigrate().getContractId();
             name = migrant.getClientMigrate().getPerson().getFullName();
             groupName = getGroupNameByClient(migrant.getClientMigrate());
@@ -179,7 +179,7 @@ public class MigrantsReportService {
             if(resolInts.contains(VisitReqResolutionHist.RES_CONFIRMED)){
                 return MigrantsReportService.groupNamesInOrgVisit[3];
             }
-            return MigrantsReportService.groupNamesInOrgVisit[5];
+            return NO_DATA;
         }
 
         private static String getGroupNameByClient(Client client){
