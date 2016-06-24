@@ -57,6 +57,10 @@ public class MigrateRequest {
         }
     }
 
+    public static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate){
+        return String.format("C:%s/%s-%s-%s", idOfOrg, idOfOrgVisit, (idOfFirstRequest * -1L), CalendarUtils.dateShortToString(startDate));
+    }
+
     public static Map<Long, List<MigrateRequest>> sortMigrateRequestsByOrg(List<MigrateRequest> migrateRequests){
         Map<Long, List<MigrateRequest>> map = new HashMap<Long, List<MigrateRequest>>();
         for(MigrateRequest request : migrateRequests){
