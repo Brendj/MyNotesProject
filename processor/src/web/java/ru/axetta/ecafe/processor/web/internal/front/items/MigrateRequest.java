@@ -4,8 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.internal.front.items;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException;
+
+import org.hibernate.Session;
 
 import java.util.*;
 
@@ -61,16 +64,25 @@ public class MigrateRequest {
         return String.format("C:%s/%s-%s-%s", idOfOrg, idOfOrgVisit, (idOfFirstRequest * -1L), CalendarUtils.dateShortToString(startDate));
     }
 
-    public static Map<Long, List<MigrateRequest>> sortMigrateRequestsByOrg(List<MigrateRequest> migrateRequests){
-        Map<Long, List<MigrateRequest>> map = new HashMap<Long, List<MigrateRequest>>();
+    public static Map<Long, Map<Long, List<MigrateRequest>>> sortMigrateRequestsByOrg(Session session, List<MigrateRequest> migrateRequests)
+            throws FrontControllerException{
+        Map<Long, Map<Long, List<MigrateRequest>>> map = new HashMap<Long, Map<Long, List<MigrateRequest>>>();
         for(MigrateRequest request : migrateRequests){
-            Long idOfOrg = request.getOrgVisit();
-            if(!map.containsKey(idOfOrg)){
+            Long idOfOrgVisit = request.getOrgVisit();
+            Client client = (Client) session.load(Client.class, request.getMigrateClientId());
+            if (client == null) {
+                throw new FrontControllerException("Клиент-посетитель с id=" + request.getMigrateClientId() + " не найден");
+            }
+            Long idOfOrgRegistry = client.getOrg().getIdOfOrg();
+            if(!map.containsKey(idOfOrgVisit)) {
+                map.put(idOfOrgVisit, new HashMap<Long, List<MigrateRequest>>());
+            }
+            if(!map.get(idOfOrgVisit).containsKey(idOfOrgRegistry)){
                 List<MigrateRequest> requestList = new ArrayList<MigrateRequest>();
                 requestList.add(request);
-                map.put(idOfOrg, requestList);
+                map.get(idOfOrgVisit).put(idOfOrgRegistry, requestList);
             } else {
-                map.get(idOfOrg).add(request);
+                map.get(idOfOrgVisit).get(idOfOrgRegistry).add(request);
             }
         }
         return map;

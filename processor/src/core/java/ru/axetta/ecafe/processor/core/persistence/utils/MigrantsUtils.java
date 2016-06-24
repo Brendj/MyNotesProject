@@ -190,7 +190,7 @@ public class MigrantsUtils {
 
     public static long nextIdOfProcessorMigrantResolutions(Session session, Long idOfOrg){
         long id = 0L;
-        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 0 and " +
+        Query query = session.createSQLQuery("select v.idofrecord from cf_visitreqresolutionhist as v where v.idofrecord < 1 and " +
                 "v.idoforgresol=:idoforgresol order by v.idofrecord asc limit 1 for update");
         query.setParameter("idoforgresol", idOfOrg);
         Object o = query.uniqueResult();
@@ -202,7 +202,7 @@ public class MigrantsUtils {
 
     public static long nextIdOfProcessorMigrantRequest(Session session, Long idOfOrg){
         long id = 0L;
-        Query query = session.createSQLQuery("select m.idofrequest from cf_migrants as m where m.idofrequest < 0 and " +
+        Query query = session.createSQLQuery("select m.idofrequest from cf_migrants as m where m.idofrequest < 1 and " +
                 "m.idoforgregistry=:idoforgregistry order by m.idofrequest asc limit 1 for update");
         query.setParameter("idoforgregistry", idOfOrg);
         Object o = query.uniqueResult();
