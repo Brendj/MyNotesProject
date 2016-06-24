@@ -25,6 +25,7 @@ public class ResIncomeMigrationRequestsItem {
     private Long idOfOrgReg;
     private Long idOfVendorOrgReg;
     private String nameOrgReg;
+    private String requestNumber;
     private Long idOfMigrClient;
     private String nameOfMigrClient;
     private String groupOfMigrClient;
@@ -46,6 +47,7 @@ public class ResIncomeMigrationRequestsItem {
         XMLUtils.setAttributeIfNotNull(element, "IdOfOrgReg", idOfOrgReg);
         XMLUtils.setAttributeIfNotNull(element, "IdOfVendorOrgReg", idOfVendorOrgReg);
         XMLUtils.setAttributeIfNotNull(element, "NameOrgReg", nameOrgReg);
+        XMLUtils.setAttributeIfNotNull(element, "RequestNumber", requestNumber);
         XMLUtils.setAttributeIfNotNull(element, "IdOfMigrClient", idOfMigrClient);
         XMLUtils.setAttributeIfNotNull(element, "NameOfMigrClient", nameOfMigrClient);
         XMLUtils.setAttributeIfNotNull(element, "GroupOfMigrClient", groupOfMigrClient);
@@ -88,6 +90,14 @@ public class ResIncomeMigrationRequestsItem {
 
     public void setNameOrgReg(String nameOrgReg) {
         this.nameOrgReg = nameOrgReg;
+    }
+
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
     }
 
     public Long getIdOfMigrClient() {

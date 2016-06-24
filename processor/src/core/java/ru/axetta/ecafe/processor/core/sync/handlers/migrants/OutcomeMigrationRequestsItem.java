@@ -28,6 +28,7 @@ public class OutcomeMigrationRequestsItem {
 
     private Long idOfRequest;
     private Long idOfOrgRegistry;
+    private String requestNumber;
     private Long idOfClient;
     private Long idOfOrgVisit;
     private Date visitStartDate;
@@ -37,6 +38,7 @@ public class OutcomeMigrationRequestsItem {
 
     public static OutcomeMigrationRequestsItem build(Node itemNode, Long idOfOrgRegistry) {
         Long idOfRequest = null;
+        String requestNumber = null;
         Long idOfClient = null;
         Long idOfOrgVisit = null;
         Date visitStartDate = null;
@@ -49,6 +51,19 @@ public class OutcomeMigrationRequestsItem {
             if (orgRequest == null) {
                 emSetter.setCompositeErrorMessage(String.format("OrgRegistry with id=%s not found", idOfOrgRegistry));
             }
+        } else {
+            emSetter.setCompositeErrorMessage("Attribute IdOfRequest not found");
+        }
+
+
+        requestNumber = XMLUtils.getAttributeValue(itemNode, "RequestNumber");
+        if(StringUtils.isEmpty(requestNumber)){
+            //emSetter.setCompositeErrorMessage("Attribute RequestNumber not found");
+            Long l = idOfRequest / 10L;
+            requestNumber = l.toString();
+        }
+        if(requestNumber.length() > 128){
+            emSetter.setCompositeErrorMessage("Attribute RequestNumber is longer than 128 characters");
         }
 
         idOfClient = getLongValue(itemNode, "IdOfClient", emSetter, true);
@@ -89,7 +104,8 @@ public class OutcomeMigrationRequestsItem {
             emSetter.setCompositeErrorMessage("Attribute VisitEndDate not found");
         }
 
-        return new OutcomeMigrationRequestsItem(idOfRequest, idOfOrgRegistry, idOfClient, idOfOrgVisit, visitStartDate, visitEndDate, emSetter.getStr());
+        return new OutcomeMigrationRequestsItem(idOfRequest, idOfOrgRegistry, requestNumber, idOfClient, idOfOrgVisit,
+                visitStartDate, visitEndDate, emSetter.getStr());
     }
 
     private static Long getLongValue(Node itemNode, String nodeName, ISetErrorMessage www, boolean checkExists) {
@@ -139,10 +155,11 @@ public class OutcomeMigrationRequestsItem {
     public OutcomeMigrationRequestsItem() {
     }
 
-    public OutcomeMigrationRequestsItem(Long idOfRequest, Long idOfOrgRegistry, Long idOfClient, Long idOfOrgVisit,
-            Date visitStartDate, Date visitEndDate, String errorMessage) {
+    public OutcomeMigrationRequestsItem(Long idOfRequest, Long idOfOrgRegistry, String requestNumber,
+            Long idOfClient, Long idOfOrgVisit, Date visitStartDate, Date visitEndDate, String errorMessage) {
         this.idOfRequest = idOfRequest;
         this.idOfOrgRegistry = idOfOrgRegistry;
+        this.requestNumber = requestNumber;
         this.idOfClient = idOfClient;
         this.idOfOrgVisit = idOfOrgVisit;
         this.visitStartDate = visitStartDate;
@@ -169,6 +186,14 @@ public class OutcomeMigrationRequestsItem {
 
     public void setIdOfOrgRegistry(Long idOfOrgRegistry) {
         this.idOfOrgRegistry = idOfOrgRegistry;
+    }
+
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
     }
 
     public Long getIdOfClient() {

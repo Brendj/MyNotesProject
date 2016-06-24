@@ -172,6 +172,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
             inMigReqItem.setIdOfVendorOrgReg(migrant.getOrgRegVendor().getIdOfContragent());
             inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortName());
+            inMigReqItem.setRequestNumber(migrant.getRequestNumber());
             inMigReqItem.setIdOfMigrClient(migrant.getClientMigrate().getIdOfClient());
             inMigReqItem.setNameOfMigrClient(migrant.getClientMigrate().getPerson().getFullName());
             inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
@@ -352,6 +353,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                     Migrant migrant = MigrantsUtils.findMigrant(session, compositeIdOfMigrant);
                     if(migrant != null){
                         if(migrant.getClientMigrate().getIdOfClient().equals(outMigReqItem.getIdOfClient())&&
+                                migrant.getRequestNumber().equals(outMigReqItem.getRequestNumber()) &&
                                 migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&
                                 migrant.getVisitStartDate().equals(outMigReqItem.getVisitStartDate())&&
                                 migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate())){
@@ -368,8 +370,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                         Org orgVisit = (Org)session.load(Org.class, outMigReqItem.getIdOfOrgVisit());
                         Contragent contragent = (Contragent)session.load(Contragent.class, orgRegistry.getDefaultSupplier().getIdOfContragent());
                         Client clientMigrate = (Client)session.load(Client.class, outMigReqItem.getIdOfClient());
-                        migrant = new Migrant(compositeIdOfMigrant, orgRegistry.getDefaultSupplier(), clientMigrate,
-                                orgVisit, outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
+                        migrant = new Migrant(compositeIdOfMigrant, orgRegistry.getDefaultSupplier(),
+                                outMigReqItem.getRequestNumber(), clientMigrate, orgVisit,
+                                outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
                         migrant.setOrgRegVendor(contragent);
                         session.save(migrant);
                         resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
