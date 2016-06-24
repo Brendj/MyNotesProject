@@ -259,7 +259,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             if (User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
                     this.printError("Заполните имя роли");
-                    throw new Exception("Role name fields is null");
+                    throw new Exception("Не заполнено имя роли");
                 }
                 user.setRoleName(this.roleName);
                 user.setFunctions(functionSelector.getSelected(session));

@@ -187,7 +187,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             if (User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
                     this.printError("Заполните имя роли");
-                    throw new RuntimeException("Role name fields is null");
+                    throw new RuntimeException("Не заполнено имя роли");
                 }
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(this.roleName);
@@ -225,7 +225,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                             currentUser, true, null, comment);
             DAOService.getInstance().writeAuthJournalRecord(record);
         } catch (RuntimeException e) {
-            String comment = String.format("Ошибка при изменении данных пользователя с именем %s", userName);
+            String comment = String.format("Ошибка при изменении данных пользователя с именем %s. Текст ошибки: %s", userName, e.getMessage());
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(SecurityJournalAuthenticate.EventType.MODIFY_USER, request.getRemoteAddr(),
                             currentUserName, currentUser, false,
@@ -233,7 +233,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             DAOService.getInstance().writeAuthJournalRecord(record);
             throw e;
         } catch (UserChangeGrantsException e) {
-            String comment = String.format("Ошибка при изменении прав доступа пользователя с именем %s", userName);
+            String comment = String.format("Ошибка при изменении прав доступа пользователя с именем %s. Текст ошибки: %s", userName, e.getMessage());
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(SecurityJournalAuthenticate.EventType.CHANGE_GRANTS, request.getRemoteAddr(),
                             currentUserName, currentUser, false,
