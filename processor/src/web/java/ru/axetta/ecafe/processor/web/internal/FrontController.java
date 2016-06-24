@@ -568,6 +568,7 @@ public class FrontController extends HttpServlet {
             throws FrontControllerException{
         checkRequestValidity(idOfOrg);
         Date date = new Date();
+        Date after5Seconds = CalendarUtils.addSeconds(date, 5);
         String resolConfirmed = "Заявка одобрена в организации посещения";
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -617,7 +618,7 @@ public class FrontController extends HttpServlet {
                         CompositeIdOfVisitReqResolutionHist comIdOfHist1 = new CompositeIdOfVisitReqResolutionHist(idOfResol1,
                                 migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgVisit);
                         VisitReqResolutionHist visitReqResolutionHist1 = new VisitReqResolutionHist(comIdOfHist1, client.getOrg(),
-                                VisitReqResolutionHist.RES_CONFIRMED, new Date(), resolConfirmed, null,
+                                VisitReqResolutionHist.RES_CONFIRMED, after5Seconds, resolConfirmed, null,
                                null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
                         persistenceSession.save(migrant);
                         persistenceSession.save(visitReqResolutionHist);
