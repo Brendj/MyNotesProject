@@ -123,7 +123,7 @@ public class MigrantsUtils {
             query.setParameter("migrant", migrant);
             query.setMaxResults(1);
             VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
-            if(res.getResolution().equals(1)){
+            if(res != null && res.getResolution().equals(1)){
                 clients.add(migrant.getClientMigrate());
             }
         }
