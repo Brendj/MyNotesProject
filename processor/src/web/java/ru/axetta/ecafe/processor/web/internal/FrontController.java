@@ -605,7 +605,7 @@ public class FrontController extends HttpServlet {
                                     idOfProcessorMigrantRequest, migrateRequest.getStartDate());
                         }
                         Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
-                                requestNumber, client, orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
+                                requestNumber, client, orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.SYNCHRONIZED);
 
                         Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrgRegistry);
                         CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
