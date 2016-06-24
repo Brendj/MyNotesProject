@@ -567,6 +567,8 @@ public class FrontController extends HttpServlet {
     public void createMigrateRequests(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "rqs") List<MigrateRequest> rqs)
             throws FrontControllerException{
         checkRequestValidity(idOfOrg);
+        Date date = new Date();
+        String resolConfirmed = "Заявка одобрена в организации посещения";
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -603,19 +605,27 @@ public class FrontController extends HttpServlet {
                         }
                         Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
                                 requestNumber, client, orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.NOT_SYNCHRONIZED);
-                        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(
-                                MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrgRegistry),
+
+                        Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrgRegistry);
+                        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
                                 migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgRegistry);
                         VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
-                                VisitReqResolutionHist.RES_CONFIRMED, new Date(), migrateRequest.getResolutionCause(), clientResol,
+                                VisitReqResolutionHist.RES_CREATED, date, migrateRequest.getResolutionCause(), clientResol,
                                 migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+
+                        Long idOfResol1 = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrgVisit);
+                        CompositeIdOfVisitReqResolutionHist comIdOfHist1 = new CompositeIdOfVisitReqResolutionHist(idOfResol1,
+                                migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgRegistry);
+                        VisitReqResolutionHist visitReqResolutionHist1 = new VisitReqResolutionHist(comIdOfHist1, client.getOrg(),
+                                VisitReqResolutionHist.RES_CONFIRMED, new Date(), resolConfirmed, null,
+                               null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
                         persistenceSession.save(migrant);
                         persistenceSession.save(visitReqResolutionHist);
+                        persistenceSession.save(visitReqResolutionHist1);
                         persistenceSession.flush();
                     }
                 }
             }
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
