@@ -63,11 +63,10 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
             }
 
             List<ClientGuardian> migrantList = new ArrayList<ClientGuardian>();
-            if(migrantList.size() > 0) {
+            if(migrantIds.size() > 0) {
                 Criteria migrantsCriteria = session.createCriteria(ClientGuardian.class);
                 migrantsCriteria.add(Restrictions
                         .or(Restrictions.in("idOfGuardian", migrantIds), Restrictions.in("idOfChildren", migrantIds)));
-                migrantsCriteria.add(Restrictions.gt("version", maxVersion));
                 migrantList = migrantsCriteria.list();
             }
 
