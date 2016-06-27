@@ -123,3 +123,5 @@ ALTER TABLE cf_contragents_sync ADD COLUMN lastModifiesUpdate character varying(
 update cf_contragents_sync set lastModifiesUpdate = lastrnipupdate;
 
 ALTER TABLE cf_security_journal_authenticate ADD COLUMN comment character varying(256);
+
+ALTER TABLE cf_checksums ADD COLUMN checkSumOnSettings CHARACTER VARYING(32);

@@ -49,9 +49,17 @@
             </rich:column>
             <rich:column>
                 <f:facet name="header">
-                    <h:outputText value="Контрольная сумма" styleClass="output-text" />
+                    <h:outputText value="Контрольная сумма по классам" styleClass="output-text" />
                 </f:facet>
-                <h:outputText value="#{item.checkSumsMd5}" styleClass="output-text" />
+                <h:outputText value="#{item.checkSumsMd5}" styleClass="output-text" rendered="#{!item.redMd5}"/>
+                <h:outputText value="#{item.checkSumsMd5}" styleClass="error-output-text" rendered="#{item.redMd5}"/>
+            </rich:column>
+            <rich:column>
+                <f:facet name="header">
+                    <h:outputText value="Контрольная сумма по настройкам ИБ" styleClass="output-text" />
+                </f:facet>
+                <h:outputText value="#{item.checkSumsOnSettings}" styleClass="output-text" rendered="#{!item.redSettings}"/>
+                <h:outputText value="#{item.checkSumsOnSettings}" styleClass="error-output-text" rendered="#{item.redSettings}"/>
             </rich:column>
             <f:facet name="footer">
                 <rich:datascroller for="serviceCheckSumsPageTable" renderIfSinglePage="false" maxPages="5"

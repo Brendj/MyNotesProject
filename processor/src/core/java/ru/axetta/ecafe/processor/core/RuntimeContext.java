@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
+import ru.axetta.ecafe.processor.core.service.CheckSumsMessageDigitsService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
@@ -617,12 +618,26 @@ public class RuntimeContext implements ApplicationContextAware {
             if (!isTestRunning()) {
                 initWSCrypto();
             }
+
+            runCheckSums();
+
         } catch (Exception e) {
             destroy(executorService, scheduler);
             throw e;
         }
         if (logger.isInfoEnabled()) {
             logger.info("Runtime context created.");
+        }
+    }
+
+    private void runCheckSums() {
+        logger.info("Compute checksum started");
+        try {
+            CheckSumsMessageDigitsService checkSumsMessageDigitsService = new CheckSumsMessageDigitsService();
+            String[] md5s = checkSumsMessageDigitsService.getCheckSum();
+            checkSumsMessageDigitsService.saveCheckSumToDB(md5s[0], md5s[1]);
+        } catch (Exception e) {
+            logger.error("Error getting checksum", e);
         }
     }
 

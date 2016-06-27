@@ -19,14 +19,16 @@ public class CheckSums {
     private Date checkSumsDate;
     private String distributionVersion;
     private String checkSumsMd5;
+    private String checkSumOnSettings;
 
     public CheckSums() {
     }
 
-    public CheckSums( Date checkSumsDate, String distributionVersion, String checkSumsMd5) {
+    public CheckSums( Date checkSumsDate, String distributionVersion, String checkSumsMd5, String checkSumOnSettings) {
         this.checkSumsDate = checkSumsDate;
         this.distributionVersion = distributionVersion;
         this.checkSumsMd5 = checkSumsMd5;
+        this.checkSumOnSettings = checkSumOnSettings;
     }
 
     public Long getIdOfCheckSums() {
@@ -59,5 +61,13 @@ public class CheckSums {
 
     public void setCheckSumsMd5(String checkSumsMd5) {
         this.checkSumsMd5 = checkSumsMd5;
+    }
+
+    public String getCheckSumOnSettings() {
+        return checkSumOnSettings;
+    }
+
+    public void setCheckSumOnSettings(String checkSumOnSettings) {
+        this.checkSumOnSettings = checkSumOnSettings;
     }
 }

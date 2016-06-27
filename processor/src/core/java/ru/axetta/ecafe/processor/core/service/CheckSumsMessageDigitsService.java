@@ -5,18 +5,23 @@
 package ru.axetta.ecafe.processor.core.service;
 
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CheckSums;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+
+import org.apache.commons.lang.StringUtils;
+import org.jboss.vfs.VFS;
+import org.jboss.vfs.VirtualFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,41 +34,140 @@ import java.util.List;
 @Scope("singleton")
 public class CheckSumsMessageDigitsService {
 
-    private List<String> resultList = new ArrayList<String>();
+    //private List<String> resultList = new ArrayList<String>();
 
-    // Рекурсивный поиск путей к файлам проход по всем каталогам и по всем файлам.
-/*    public void getListResultFilesFromFolder(File folder) throws IOException {
-        File[] folderEntries = folder.listFiles();
-        for (File entry : folderEntries) {
-            if (entry.isDirectory()) {
-                getListResultFilesFromFolder(entry);
-                continue;
-            }
-            // иначе вам попался файл, обрабатывайте его!
+    private static final String configString = "ecafe.processor.checkSumDir";
+    private String baseDir = RuntimeContext.getInstance().getConfigProperties()
+            .getProperty(configString, "");
 
-            // Считали файл в строку
-            String fileString = processFileRead(entry);
-
-            String md5Counted = "";
-            // Md5 в виде строки
-            if (fileString != null) {
-                md5Counted = processFilesMd5Count(fileString);
-            }
-
-            String result = entry + " " + md5Counted;
-            resultList.add(result);
+    public String[] getCheckSum() throws Exception {
+        File fBaseDir = new File(baseDir);
+        if (StringUtils.isEmpty(baseDir)) {
+            throw new Exception(String.format("В конфигурации не найдена настройка %s", configString));
         }
-    }*/
+        if (!fBaseDir.exists()) {
+            if (!tryDirCreate(fBaseDir)) {
+                throw new Exception(String.format("Не удается найти или создать каталог %s для хранения файлов с контрольными суммами приложения", baseDir));
+            }
+        }
+        List<String> sb = new ArrayList<String>();
+        List<String> files = getClassFiles();
+        String checkSum = "";
+        for (String file : files) {
+            checkSum = getCheckSumOfFile(file);
+            file = file.replace("\\", "/");
+            sb.add(file.substring(file.indexOf("/WEB-INF/")) + " = " + checkSum);
+        }
+        Collections.sort(sb);
+        String resultClasses = "";
+        for (String sss : sb) {
+            resultClasses += sss + "\n";
+        }
+        String resultSettings = getSecuritySettings();
+        saveToLog(resultClasses + resultSettings);
 
-    public String processFilesFromFolder(File folder, Date currentDate) throws IOException {
-        //getListResultFilesFromFolder(folder);
-        //String dateString = CalendarUtils.dateTimeToString(currentDate).replaceAll(" ", "-").replaceAll(":", ".");
+        String classesCheckSum = processFilesMd5Count(resultClasses);
+        String settingsCheckSum = processFilesMd5Count(resultSettings);
 
-        //File file = generateFile(dateString);
-        //fileWrite(file, resultList);
-        //resultList.clear();
+        return new String[] {classesCheckSum, settingsCheckSum};
+    }
 
-        // Считали файл в строку
+    private String getSecuritySettings() {
+        String result = "";
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        result += "periodBlockLoginReUse = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_LOGIN_REUSE) + "\n";
+        result += "periodBlockUnusedLogin = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_BLOCK_UNUSED_LOGIN_AFTER) + "\n";
+        result += "periodSmsCodeAlive = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_SMS_CODE_ALIVE) + "\n";
+        result += "periodPasswordChange = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_PERIOD_PASSWORD_CHANGE) + "\n";
+        result += "maxAuthFaultCount = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_MAX_AUTH_FAULT_COUNT) + "\n";
+        result += "tmpBlockAccTime = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_TMP_BLOCK_ACC_TIME) + "\n";
+        result += "clientPeriodBlockLoginReUse = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE) + "\n";
+        result += "clientPeriodBlockUnusedLogin = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_UNUSED_LOGIN_AFTER) + "\n";
+        result += "clientPeriodPasswordChange = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_PERIOD_PASSWORD_CHANGE) + "\n";
+        result += "clientMaxAuthFaultCount = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_MAX_AUTH_FAULT_COUNT) + "\n";
+        result += "clientTmpBlockAccTime = " + runtimeContext.getOptionValueInt(Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
+        return result;
+    }
+
+    private boolean tryDirCreate(File dir) {
+        try {
+            return dir.mkdirs();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void saveCheckSumToDB(String checkSumClasses, String checkSumSettings) {
+        String version = String.valueOf(RuntimeContext.getInstance().getCurrentDBSchemaVersion());
+        CheckSums checkSumDB = new CheckSums(new Date(), version, checkSumClasses, checkSumSettings);
+        CheckSumsDAOService checkSumsDaoService = new CheckSumsDAOService();
+        checkSumsDaoService.saveCheckSums(checkSumDB);
+    }
+
+    private void saveToLog(String str) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh_mm_ss");
+        StringBuilder sb = new StringBuilder();
+        Date date = new Date(System.currentTimeMillis());
+        sb.append(baseDir).append("/").append(dateFormat.format(date)).append(".log");
+        String fileName = sb.toString();
+        File file = new File(fileName);
+        if (file.createNewFile()) {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            try {
+                outputStream.write(str.getBytes());
+            } finally {
+                outputStream.close();
+            }
+        } else {
+            throw new Exception(String.format("Не удается создать файл %s для сохранения лога расчета контрольной суммы", fileName));
+        }
+
+    }
+
+    private String getCheckSumOfFile(String file) throws Exception {
+        String fileAsString = getFileAsString(file);
+        return processFilesMd5Count(fileAsString);
+    }
+
+    private String getFileAsString(String strFile) throws Exception {
+        File file = new File(strFile);
+        if (!file.exists()) {
+            throw new FileNotFoundException(String.format("Can't find class file %s", strFile));
+        }
+        BufferedReader inputStream = new BufferedReader(new FileReader(file));
+        char[] buffer = new char[1024];
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        int len;
+        while ((len = inputStream.read(buffer)) != -1) {
+            stringBuilder.append(buffer, 0, len);
+        }
+        String data = stringBuilder.toString();
+        inputStream.close();
+        return data;
+    }
+
+    private List<String> getClassFiles() throws IOException {
+        List<String> res = new ArrayList<String>();
+        Enumeration<URL> en = getClass().getClassLoader().getResources(".");
+        while (en.hasMoreElements()) {
+            URL url = en.nextElement();
+            String surl = url.toString();
+            if (surl.startsWith("vfs:/") && surl.endsWith("/WEB-INF/classes/")) {
+                VirtualFile classFolder = VFS.getChild(surl.substring(5));
+                List<VirtualFile> virtualFiles = classFolder.getChildrenRecursively();
+                for (VirtualFile vf : virtualFiles) {
+                    if (vf.isFile()) {
+                        res.add(vf.getPhysicalFile().getAbsolutePath());
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    /*public String processFilesFromFolder(File folder) throws IOException {
         String fileString = processFileRead(folder);
 
         String md5Counted = "";
@@ -73,7 +177,7 @@ public class CheckSumsMessageDigitsService {
         }
 
         return md5Counted;
-    }
+    }*/
 
     // Подсчет Md5 - для файла
     public String processFilesMd5Count(String fileString) {
@@ -95,7 +199,7 @@ public class CheckSumsMessageDigitsService {
         return hexString.toString();
     }
 
-    // Считать файл в строку
+    /*// Считать файл в строку
     public String processFileRead(File file) throws IOException {
         String contents = readUsingScanner(file);
         return contents;
@@ -134,32 +238,6 @@ public class CheckSumsMessageDigitsService {
 
             return data;
         }
-    }
+    } */
 
-    // Создает файл и папки если их нет
-/*    public File generateFile(String dateString) {
-        String filePath = "/processor/md5file";
-        File dir = new File(filePath);
-        boolean bool = dir.mkdirs();
-        File file = new File(filePath + "/checkSums" + dateString + ".txt");
-
-        return file;
-    }*/
-
-    // Запись итогов в Файл
-/*    public void fileWrite(File file, List<String> resultList) {
-        try {
-            FileWriter writer = new FileWriter(file, false);
-
-            for (String res : resultList) {
-                writer.write(res);
-                // запись по символам
-                writer.append('\n');
-            }
-            writer.flush();
-            writer.close();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }*/
 }

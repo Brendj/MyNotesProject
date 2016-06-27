@@ -14,5 +14,6 @@
                   not-null="true" update="false"/>
         <property name="distributionVersion" column="DistributionVersion" type="string" length="20"/>
         <property name="checkSumsMd5" column="CheckSumsMd5" type="string" length="32"/>
+        <property name="checkSumOnSettings" column="CheckSumOnSettings" type="string" length="32"/>
     </class>
 </hibernate-mapping>
