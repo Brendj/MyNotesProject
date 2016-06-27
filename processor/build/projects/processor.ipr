@@ -1909,6 +1909,13 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="jboss-vfs-3.1.0.Final">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jboss-vfs-3.1.0.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="jboss_J2EE">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-annotations-api_1.1_spec-1.0.0.Final.jar!/" />
