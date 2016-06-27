@@ -19,7 +19,6 @@ import java.util.*;
  * Time: 15:40
  */
 public class MigrateRequest {
-    private Long orgVisit;
     private Long migrateClientId;
     private Date startDate;
     private Date endDate;
@@ -32,7 +31,6 @@ public class MigrateRequest {
 
     public MigrateRequest(Long orgVisit, Long migrateClientId, Date startDate, Date endDate, String resolutionCause,
             Long idOfClientResol, String contactInfo) {
-        this.orgVisit = orgVisit;
         this.migrateClientId = migrateClientId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -64,36 +62,24 @@ public class MigrateRequest {
         return String.format("C-%s-%s/%s-%s", idOfOrg, idOfOrgVisit, (idOfFirstRequest * -1L), CalendarUtils.dateShortToString(startDate));
     }
 
-    public static Map<Long, Map<Long, List<MigrateRequest>>> sortMigrateRequestsByOrg(Session session, List<MigrateRequest> migrateRequests)
+    public static Map<Long, List<MigrateRequest>> sortMigrateRequestsByOrg(Session session, List<MigrateRequest> migrateRequests)
             throws FrontControllerException{
-        Map<Long, Map<Long, List<MigrateRequest>>> map = new HashMap<Long, Map<Long, List<MigrateRequest>>>();
+        Map<Long, List<MigrateRequest>> map = new HashMap<Long, List<MigrateRequest>>();
         for(MigrateRequest request : migrateRequests){
-            Long idOfOrgVisit = request.getOrgVisit();
             Client client = (Client) session.load(Client.class, request.getMigrateClientId());
             if (client == null) {
                 throw new FrontControllerException("Клиент-посетитель с id=" + request.getMigrateClientId() + " не найден");
             }
             Long idOfOrgRegistry = client.getOrg().getIdOfOrg();
-            if(!map.containsKey(idOfOrgVisit)) {
-                map.put(idOfOrgVisit, new HashMap<Long, List<MigrateRequest>>());
-            }
-            if(!map.get(idOfOrgVisit).containsKey(idOfOrgRegistry)){
+            if(!map.containsKey(idOfOrgRegistry)){
                 List<MigrateRequest> requestList = new ArrayList<MigrateRequest>();
                 requestList.add(request);
-                map.get(idOfOrgVisit).put(idOfOrgRegistry, requestList);
+                map.put(idOfOrgRegistry, requestList);
             } else {
-                map.get(idOfOrgVisit).get(idOfOrgRegistry).add(request);
+                map.get(idOfOrgRegistry).add(request);
             }
         }
         return map;
-    }
-
-    public Long getOrgVisit() {
-        return orgVisit;
-    }
-
-    public void setOrgVisit(Long orgVisit) {
-        this.orgVisit = orgVisit;
     }
 
     public Long getMigrateClientId() {
