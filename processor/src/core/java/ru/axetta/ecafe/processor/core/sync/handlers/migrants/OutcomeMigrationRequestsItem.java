@@ -58,11 +58,9 @@ public class OutcomeMigrationRequestsItem {
 
         requestNumber = XMLUtils.getAttributeValue(itemNode, "RequestNumber");
         if(StringUtils.isEmpty(requestNumber)){
-            //emSetter.setCompositeErrorMessage("Attribute RequestNumber not found");
-            Long l = idOfRequest / 10L;
-            requestNumber = l.toString();
+            emSetter.setCompositeErrorMessage("Attribute RequestNumber not found");
         }
-        if(requestNumber.length() > 128){
+        if(requestNumber != null && requestNumber.length() > 128){
             emSetter.setCompositeErrorMessage("Attribute RequestNumber is longer than 128 characters");
         }
 
