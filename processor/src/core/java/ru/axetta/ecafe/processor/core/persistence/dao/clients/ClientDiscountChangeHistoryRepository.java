@@ -27,7 +27,7 @@ public class ClientDiscountChangeHistoryRepository extends AbstractJpaDao<Discou
 
     public List<DiscountChange> findAll(Client client) {
         return entityManager.createQuery(
-                "from DiscountChange d " + "left join fetch d.client " + " where d.client=:client "
+                "from DiscountChange d " + "left join fetch d.org " + "left join fetch d.client " + " where d.client=:client "
                         + "order by d.registrationDate desc", DiscountChange.class).setParameter("client", client)
                 .getResultList();
     }
