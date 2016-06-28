@@ -194,6 +194,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 migrantsForOutRequests.add(migrant);
                 outMigReqItem = new ResOutcomeMigrationRequestsItem(migrant);
                 outMigReqItem.setIdOfClient(migrant.getClientMigrate().getIdOfClient());
+                outMigReqItem.setRequestNumber(migrant.getRequestNumber());
                 outMigReqItem.setIdOfOrgVisit(migrant.getOrgVisit().getIdOfOrg());
                 outMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
                 outMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
