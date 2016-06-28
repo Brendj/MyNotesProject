@@ -22,6 +22,7 @@ import java.util.Date;
 
 public class ResOutcomeMigrationRequestsItem {
     private Long idOfRequest;
+    private String requestNumber;
     private Long idOfClient;
     private Long idOfOrgVisit;
     private Date visitStartDate;
@@ -39,6 +40,7 @@ public class ResOutcomeMigrationRequestsItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "IdOfRequest", idOfRequest);
+        XMLUtils.setAttributeIfNotNull(element, "RequestNumber", requestNumber);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
         XMLUtils.setAttributeIfNotNull(element, "IdOfOrgVisit", idOfOrgVisit);
         XMLUtils.setAttributeIfNotNull(element, "VisitStartDate", visitStartDate != null ? CalendarUtils.dateTimeToString(visitStartDate): null);
@@ -56,6 +58,14 @@ public class ResOutcomeMigrationRequestsItem {
 
     public void setIdOfRequest(Long idOfRequest) {
         this.idOfRequest = idOfRequest;
+    }
+
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
     }
 
     public Long getIdOfClient() {
