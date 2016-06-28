@@ -22,13 +22,19 @@ import java.util.List;
  */
 public class DiscountChange {
 
+    public static final String MODIFY_IN_WEBAPP = "Изменено в веб.приложении. Пользователь: ";
+    public static final String MODIFY_IN_ARM = "Изменено в АРМ.";
+    public static final String MODIFY_IN_SERVICE = "Изменено в Сервисе.";
+
     private Long idOfDiscountChange;
     private Date registrationDate;
     private Client client;
+    private Org org;
     private Integer discountMode;
     private Integer oldDiscountMode;
     private String categoriesDiscounts;
     private String oldCategoriesDiscounts;
+    private String comment;
 
     public DiscountChange() {
     }
@@ -38,10 +44,11 @@ public class DiscountChange {
         this.client = client;
     }
 
-    public DiscountChange(Client client, Integer discountMode, Integer oldDiscountMode, String categoriesDiscounts,
+    public DiscountChange(Client client, Org org, Integer discountMode, Integer oldDiscountMode, String categoriesDiscounts,
             String oldCategoriesDiscounts) {
         this.registrationDate = new Date();
         this.client = client;
+        this.org = org;
         this.discountMode = discountMode;
         this.oldDiscountMode = oldDiscountMode;
         this.categoriesDiscounts = categoriesDiscounts;
@@ -118,6 +125,14 @@ public class DiscountChange {
         this.client = client;
     }
 
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
+    }
+
     public Integer getDiscountMode() {
         return discountMode;
     }
@@ -148,6 +163,14 @@ public class DiscountChange {
 
     public void setOldCategoriesDiscounts(String oldCategoriesDiscounts) {
         this.oldCategoriesDiscounts = oldCategoriesDiscounts;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     @Override

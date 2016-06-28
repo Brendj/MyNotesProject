@@ -857,8 +857,16 @@
                 <h:outputText value="Прежние данные" />
             </rich:column>
 
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText value="Данные ОО" />
+            </rich:column>
+
             <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText value="Дата изменения" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rowspan="2">
+                <h:outputText value="Комментарий" />
             </rich:column>
 
             <rich:column headerClass="column-header" breakBefore="true">
@@ -873,6 +881,13 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <h:outputText value="Категории" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <h:outputText value="ИД" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText value="Наименование" />
             </rich:column>
 
         </rich:columnGroup>
@@ -894,9 +909,22 @@
     </rich:column>
 
     <rich:column>
+        <h:outputText value="#{dis.org.idOfOrg}" styleClass="output-text" />
+    </rich:column>
+    <rich:column>
+        <h:outputText value="#{dis.org.shortName}"
+                      styleClass="output-text" />
+    </rich:column>
+
+    <rich:column>
         <h:outputText value="#{dis.registrationDate}" styleClass="output-text">
             <f:convertDateTime pattern="dd.MM.yyyy" />
         </h:outputText>
+    </rich:column>
+
+    <rich:column>
+        <h:outputText value="#{dis.comment}"
+                      styleClass="output-text" />
     </rich:column>
 
     <f:facet name="footer">

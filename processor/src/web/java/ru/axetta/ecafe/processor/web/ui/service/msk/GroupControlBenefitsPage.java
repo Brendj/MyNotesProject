@@ -277,8 +277,9 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
 
     public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
             String categoriesDiscount) {
-        DiscountChange discountChange = new DiscountChange(client, discountMode, client.getDiscountMode(),
+        DiscountChange discountChange = new DiscountChange(client, null, discountMode, client.getDiscountMode(),
                 categoriesDiscount, client.getCategoriesDiscounts());
+        discountChange.setComment(DiscountChange.MODIFY_IN_SERVICE);
         session.save(discountChange);
     }
 }

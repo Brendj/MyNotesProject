@@ -3537,9 +3537,10 @@ public class Processor
 
             // Если льготы изменились, то сохраняем историю
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet.equals(categoryDiscountOfClient))) {
-                DiscountChange discountChange = new DiscountChange(client, newClientDiscountMode,
+                Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+                DiscountChange discountChange = new DiscountChange(client, org, newClientDiscountMode,
                         oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
-
+                discountChange.setComment(DiscountChange.MODIFY_IN_ARM);
                 persistenceSession.save(discountChange);
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
