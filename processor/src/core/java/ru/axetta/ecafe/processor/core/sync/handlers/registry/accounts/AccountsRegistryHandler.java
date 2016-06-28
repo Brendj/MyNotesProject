@@ -76,6 +76,18 @@ public class AccountsRegistryHandler {
     }
 
     @Transactional
+    public AccountsRegistry handlerMigrants(long idOfOrg) {
+        AccountsRegistry accountsRegistry = new AccountsRegistry();
+
+        List<Client> clientList = Processor.getMigrants(idOfOrg);
+        for (Client client : clientList) {
+            accountsRegistry.getAccountItems().add(new AccountItem(client));
+        }
+
+        return accountsRegistry;
+    }
+
+    @Transactional
     public AccountsRegistry accRegistryHandler(SyncRequest request,long idOfOrg) {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;

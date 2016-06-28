@@ -1784,6 +1784,40 @@ public class Processor
             logger.error(message, e);
         }
 
+        try {
+            clientRegistry = processSyncClientRegistryForMigrants(request.getIdOfOrg());
+        } catch (Exception e) {
+            String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            accRegistry = getAccRegistryForMigrants(request.getIdOfOrg());
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+
+        }
+
+        try {
+            accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
+                    .handlerMigrants(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+
+        try {
+            clientGuardianData = processClientGuardianDataForMigrants(request.getIdOfOrg(), syncHistory, null);
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2716,6 +2750,30 @@ public class Processor
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
                     maxVersion);
             clientGuardianData = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception ex) {
+            String message = String.format("Load Client Guardian to database error, IdOfOrg == %s :", idOfOrg);
+            logger.error(message, ex);
+            clientGuardianData = new ClientGuardianData(new ResultOperation(100, ex.getMessage()));
+            createSyncHistoryException(idOfOrg, syncHistory, message);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientGuardianData;
+    }
+
+    private ClientGuardianData processClientGuardianDataForMigrants(Long idOfOrg, SyncHistory syncHistory, Long maxVersion) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ClientGuardianData clientGuardianData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
+                    maxVersion);
+            clientGuardianData = processor.processForMigrants();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception ex) {
@@ -3820,6 +3878,34 @@ public class Processor
         return accRegistry;
     }
 
+    private SyncResponse.AccRegistry getAccRegistryForMigrants(Long idOfOrg)
+            throws Exception {
+        SyncResponse.AccRegistry accRegistry = new SyncResponse.AccRegistry();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+
+            // Добавляем карты временных посетителей (мигрантов)
+            List<Client> migrantClients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, org.getIdOfOrg());
+            for (Client client : migrantClients) {
+                for (Card card : client.getCards()) {
+                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return accRegistry;
+    }
+
     private AccRegistryUpdate getAccRegistryUpdate(Org org, Date fromDateTime) throws Exception {
         AccRegistryUpdate accRegistryUpdate = new AccRegistryUpdate();
         Session persistenceSession = null;
@@ -3960,6 +4046,29 @@ public class Processor
                         clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                     }
                 }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientRegistry;
+    }
+
+    private SyncResponse.ClientRegistry processSyncClientRegistryForMigrants(Long idOfOrg) throws Exception {
+        SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            List<Client> clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
+
+            for (Client client : clients) {
+                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
             }
 
             persistenceTransaction.commit();

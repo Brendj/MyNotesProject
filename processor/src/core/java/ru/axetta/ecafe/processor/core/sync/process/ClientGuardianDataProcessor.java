@@ -88,6 +88,31 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
         return clientGuardianData;
     }
 
+    public ClientGuardianData processForMigrants() throws Exception {
+        List<Long> migrantIds = MigrantsUtils.getActiveMigrantsIdsForOrg(session, idOfOrg);
+
+        ClientGuardianData clientGuardianData;
+        if (migrantIds.size() > 0) {
+
+            List<ClientGuardian> migrantList = new ArrayList<ClientGuardian>();
+            Criteria migrantsCriteria = session.createCriteria(ClientGuardian.class);
+            migrantsCriteria.add(Restrictions
+                    .or(Restrictions.in("idOfGuardian", migrantIds), Restrictions.in("idOfChildren", migrantIds)));
+            migrantList = migrantsCriteria.list();
+
+            clientGuardianData = new ClientGuardianData(new ResultOperation(0, null));
+            for (ClientGuardian clientGuardian : migrantList) {
+                // Связь передается только если и опекун и опекаемый находятся в списке
+                if(migrantIds.contains(clientGuardian.getIdOfChildren()) && migrantIds.contains(clientGuardian.getIdOfGuardian())) {
+                    clientGuardianData.addItem(clientGuardian);
+                }
+            }
+        } else {
+            clientGuardianData = new ClientGuardianData(new ResultOperation(400, "Client not found by this org"));
+        }
+        return clientGuardianData;
+    }
+
     private Collection<Long> getFriendlyOrgsId(Long idOfOrg) {
         Org org = (Org) session.load(Org.class, idOfOrg);
         return OrgUtils.getFriendlyOrgIds(org);
