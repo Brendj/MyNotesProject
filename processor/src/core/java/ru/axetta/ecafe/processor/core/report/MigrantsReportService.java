@@ -46,30 +46,30 @@ public class MigrantsReportService {
         if(migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())){
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())){
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
             reportItemList.add(reportItem);
         }
         return reportItemList;
     }
 
-    private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants, boolean isOutcome){
+    private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants){
         List<MigrantItem> result = new ArrayList<MigrantItem>();
         for(Migrant migrant : migrants){
-            MigrantItem migrantItem = new MigrantItem(migrant, startTime, endTime, isOutcome,
+            MigrantItem migrantItem = new MigrantItem(migrant, startTime, endTime,
                     MigrantsUtils.getResolutionsForMigrant(session, migrant));
             result.add(migrantItem);
         }
@@ -122,16 +122,9 @@ public class MigrantsReportService {
         private Boolean gtEndDate;
         private String resolution;
 
-        public MigrantItem(Migrant migrant, Date startTime, Date endTime, boolean isOutcome, List<VisitReqResolutionHist> resolutions) {
-            Org org;
-            Org org2;
-            if(isOutcome){
-                org = migrant.getOrgRegistry();
-                org2 = migrant.getOrgVisit();
-            } else {
-                org = migrant.getOrgVisit();
-                org2 = migrant.getOrgRegistry();
-            }
+        public MigrantItem(Migrant migrant, Date startTime, Date endTime, List<VisitReqResolutionHist> resolutions) {
+            Org org = migrant.getOrgRegistry();
+            Org org2 = migrant.getOrgVisit();
             idOfOrg = org.getIdOfOrg();
             orgShortName = org.getShortName();
             orgAddress = org.getAddress();
@@ -166,11 +159,11 @@ public class MigrantsReportService {
                             && idOfClientGroup < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                         return MigrantsReportService.groupNamesInOrgVisit[0];
                     }
-                    if (idOfClientGroup >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            && idOfClientGroup < ClientGroup.Predefined.CLIENT_PARENTS.getValue()) {
+                    if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
                         return MigrantsReportService.groupNamesInOrgVisit[1];
                     }
-                    if (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue())) {
+                    if (idOfClientGroup >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            && idOfClientGroup < ClientGroup.Predefined.CLIENT_PARENTS.getValue()) {
                         return MigrantsReportService.groupNamesInOrgVisit[2];
                     }
                 }
