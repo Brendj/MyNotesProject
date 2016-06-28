@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="1499"/>
+	<property name="ireport.x" value="458"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -446,7 +446,7 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="number" width="520">
+				<rowGroup name="number" width="320">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{number}]]></bucketExpression>
 					</bucket>
@@ -480,8 +480,20 @@
 								</textElement>
 								<textFieldExpression><![CDATA[$V{resolutionCause}]]></textFieldExpression>
 							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="contractId" width="930" headerPosition="Middle">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{contractId}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque">
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="9d7e0231-c2b8-4ca8-bdd6-cb1ebc2b0662" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="9d7e0231-c2b8-4ca8-bdd6-cb1ebc2b0662" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="200" height="30" isPrintWhenDetailOverflows="true"/>
 								<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -494,20 +506,8 @@
 								</textElement>
 								<textFieldExpression><![CDATA[$V{contactInfo}]]></textFieldExpression>
 							</textField>
-						</cellContents>
-					</crosstabRowHeader>
-					<crosstabTotalRowHeader>
-						<cellContents/>
-					</crosstabTotalRowHeader>
-				</rowGroup>
-				<rowGroup name="contractId" width="730" headerPosition="Middle">
-					<bucket class="java.lang.Long">
-						<bucketExpression><![CDATA[$F{contractId}]]></bucketExpression>
-					</bucket>
-					<crosstabRowHeader>
-						<cellContents mode="Opaque">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="30" isPrintWhenDetailOverflows="true"/>
 								<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -521,7 +521,7 @@
 								<textFieldExpression><![CDATA[$V{contractId}]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="460" y="0" width="120" height="30" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="660" y="0" width="120" height="30" isPrintWhenDetailOverflows="true"/>
 								<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -535,7 +535,7 @@
 								<textFieldExpression><![CDATA[$V{groupName}]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="580" y="0" width="150" height="30" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="780" y="0" width="150" height="30" isPrintWhenDetailOverflows="true"/>
 								<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -546,10 +546,10 @@
 								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="false"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$V{groupName}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{groupNameInOrgVisit}]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="0" width="360" height="30" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="360" height="30" isPrintWhenDetailOverflows="true"/>
 								<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>

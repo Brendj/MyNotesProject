@@ -46,7 +46,7 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
-    public static final String REPORT_NAME_FOR_MENU = "Отчет по посещению здания образовательной организации клиентами других образовательных организаций";
+    public static final String REPORT_NAME_FOR_MENU = "Отчет по посещению здания ОО клиентами других ОО";
 
     final private static Logger logger = LoggerFactory.getLogger(MigrantsReport.class);
     final public static String P_MIGRANTS_TYPES = "migrantsTypes";
