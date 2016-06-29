@@ -1049,8 +1049,10 @@ public class ImportRegisterClientsService {
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
         ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
         migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY);
-        migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-        migration.setOldGroupName(client.getClientGroup().getGroupName());
+        if (client.getClientGroup() != null) {
+            migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+            migration.setOldGroupName(client.getClientGroup().getGroupName());
+        }
         migration.setNewGroupName(change.getGroupName());
         session.save(migration);
     }
