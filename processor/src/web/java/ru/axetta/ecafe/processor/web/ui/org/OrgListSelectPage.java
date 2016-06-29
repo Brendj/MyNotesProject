@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -59,7 +60,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         List<Long> idOfContragentList, MainPage mainPage) throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
-            // mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
+            mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
         } else {
             selectedOrgs.clear();
         }
