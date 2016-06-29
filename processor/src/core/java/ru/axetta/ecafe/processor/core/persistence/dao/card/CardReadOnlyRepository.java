@@ -70,9 +70,9 @@ public class CardReadOnlyRepository extends BaseJpaDao {
 
     public List<Card> findAllFreeByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
         Query query = entityManager
-                .createQuery("select c from Card c , OrgSync os "
+                .createQuery("select c from Card c "
                         + " where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and c.state = :freeState  and c.org = os.org "
+                        + " and c.state = :freeState "
                         + " and c.updateTime >  :lastAccRegistrySync "
                         , Card.class)
                 .setParameter("idOfOrgs", idOfOrgs)
