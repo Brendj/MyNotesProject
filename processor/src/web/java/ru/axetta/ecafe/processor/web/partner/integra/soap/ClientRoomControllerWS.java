@@ -2281,12 +2281,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     processMenuList(org, data, objectFactory, session, startDate, endDate);
                 }
             } else {
-                if (menuByOneDayList.get(0).getMenuDetails().isEmpty()
-                        || menuByOneDayList.get(0).getMenuDetails().size() < 30) {
-                    processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
-                } else {
-                    processMenuList(org, data, objectFactory, session, startDate, endDate);
-                }
+                processMenuList(org, data, objectFactory, session, startDate, endDate);
             }
         } else {
             processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
