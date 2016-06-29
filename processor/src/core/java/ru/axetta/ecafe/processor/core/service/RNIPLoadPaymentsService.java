@@ -1299,7 +1299,7 @@ public class RNIPLoadPaymentsService {
     }
 
 
-    public static final String getRNIPIdFromRemarks (String remark) {
+    public String getRNIPIdFromRemarks (String remark) {
         return getValueByNameFromRemars(remark, "RNIP");
     }
 
@@ -1322,7 +1322,7 @@ public class RNIPLoadPaymentsService {
 
 
 
-    public static final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
+    public final String getRNIPIdFromRemarks (Session session, Long idOfContragent) {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         return getRNIPIdFromRemarks(contragent.getRemarks());
     }

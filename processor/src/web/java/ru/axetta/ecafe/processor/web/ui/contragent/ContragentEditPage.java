@@ -443,7 +443,8 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
         Contragent contragent = (Contragent) session.load(Contragent.class, this.idOfContragent);
         // Получаем id в РНИП, который был там до изменения (если он изменится или отсутствует,
         // то необходимо пересоздаваить каталог в самом РНИП)
-        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        String id = rnipLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (isEmpty (id)) {
             return null;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
@@ -485,13 +486,9 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
 
         try {
             if (isEmpty(prevId)) {
-                //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
-                RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
                 rnipLoadPaymentsService.createCatalogForContragent(contragent);
             }
             else {
-                //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).modifyCatalogForContragent(contragent);
-                RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
                 rnipLoadPaymentsService.modifyCatalogForContragent(contragent);
             }
             return Boolean.TRUE;
@@ -506,7 +503,8 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
 
 
     public String getRNIPButtonLabel () {
-        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        String id = rnipLoadPaymentsService.getRNIPIdFromRemarks (this.remarks);
         if (id == null) {
             return "Создать каталог в РНИП";
         }

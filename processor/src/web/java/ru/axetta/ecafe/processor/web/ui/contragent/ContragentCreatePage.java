@@ -354,7 +354,8 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     }
 
     public void updateContragentRNIP (Session session, Contragent contragent) throws Exception {
-        String id = RNIPLoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        String id = rnipLoadPaymentsService.getRNIPIdFromRemarks (contragent.getRemarks());
         if (isEmpty (id)) {
             return;
             //throw new IllegalStateException("Необходимо указать РНИП идентификатор в примечаниях контрагента. Формат: {RNIP=идентификатор_в_РНИП}");
@@ -393,7 +394,6 @@ public class ContragentCreatePage extends BasicWorkspacePage {
 
     try {
         //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).createCatalogForContragent(contragent);
-        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
         rnipLoadPaymentsService.createCatalogForContragent(contragent);
     } catch (IllegalStateException ise) {
         //throw ise;

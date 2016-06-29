@@ -287,7 +287,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     public long getContragentByRNIPCode(String contragentKey, List<Contragent> contragents) {
         contragentKey = contragentKey.substring(4, 10).trim();
         boolean v15 = false;
-        if (contragentKey.startsWith("A")) {
+        if (contragentKey.startsWith("A") || contragentKey.startsWith("А")) {
             v15 = true; //платеж по формату 1.15, будем сравнивать последние 4 символа
         }
         for (Contragent c : contragents) {
@@ -816,6 +816,11 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     @Override
     protected String formatString(String str) {
         return str;
+    }
+
+    @Override
+    public String getRNIPIdFromRemarks (String remark) {
+        return getValueByNameFromRemars(remark, "RNIP_1_16_2");
     }
 
     @Deprecated   //тестовый метод, нет прав на экспорт каталога
