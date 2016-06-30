@@ -597,7 +597,7 @@ public class FrontController extends HttpServlet {
                     CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest, idOfOrgRegistry);
                     if (requestNumber == null) {
                         requestNumber = MigrateRequest.formRequestNumber(client.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(),
-                                idOfProcessorMigrantRequest, migrateRequest.getStartDate());
+                                idOfProcessorMigrantRequest, date);
                     }
                     Migrant migrant = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
                             requestNumber, client, orgVisit, migrateRequest.getStartDate(), migrateRequest.getEndDate(), Migrant.SYNCHRONIZED);
