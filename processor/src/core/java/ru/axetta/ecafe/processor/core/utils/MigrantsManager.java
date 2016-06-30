@@ -47,6 +47,7 @@ public class MigrantsManager {
         if(isOn()){
             closeOverdueMigrants();
         }
+        closeOverdueMigrants();
     }
 
     private void closeOverdueMigrants() throws Exception{
@@ -65,17 +66,19 @@ public class MigrantsManager {
 
                 for (Migrant migrant : migrantsForOrg) {
                     migrant.setSyncState(Migrant.CLOSED);
+                    CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+                    VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                    nextId--;
+                    CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+                    VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                    nextId--;
                     persistenceSession.save(migrant);
-                    VisitReqResolutionHist hist1 = new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
-                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg()), migrant.getOrgRegistry(),
-                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
-                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                    nextId--;
-                    VisitReqResolutionHist hist2 = new VisitReqResolutionHist(new CompositeIdOfVisitReqResolutionHist(nextId,
-                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg()), migrant.getOrgRegistry(),
-                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
-                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                    nextId--;
                     persistenceSession.save(hist1);
                     persistenceSession.save(hist2);
                 }
