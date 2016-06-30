@@ -157,6 +157,7 @@ public class MigrantsUtils {
         Date date = new Date();
         Criteria criteria = session.createCriteria(Migrant.class);
         criteria.add(Restrictions.eq("orgVisit.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.le("visitStartDate", date));
         criteria.add(Restrictions.ge("visitEndDate", date));
         return criteria.list();
     }
