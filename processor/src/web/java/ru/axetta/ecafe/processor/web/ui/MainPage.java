@@ -276,6 +276,7 @@ public class MainPage implements Serializable {
     private final ZeroTransactionsReportPage zeroTransactionsReportPage = new ZeroTransactionsReportPage();
     private final SpecialDatesReportPage specialDatesReportPage = new SpecialDatesReportPage();
     private final MigrantsReportPage migrantsReportPage = new MigrantsReportPage();
+    //private final BasicBasketReportPage basicBasketReportPage = new BasicBasketReportPage();
 
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
@@ -2261,8 +2262,8 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            String prevRNIPId = RNIPLoadPaymentsService
-                    .getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+            String prevRNIPId = rnipLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
@@ -2270,7 +2271,7 @@ public class MainPage implements Serializable {
             GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItems();
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
-            String newRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            String newRNIPId = rnipLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             Boolean upd = contragentEditPage
                     .updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
             if (upd != null && upd == true) {
@@ -6820,6 +6821,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    /*public Object showBasicBasketReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = basicBasketReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set BasicBasketReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }*/
+
     public SpecialDatesReportPage getSpecialDatesReportPage() {
         return specialDatesReportPage;
     }
@@ -9056,4 +9070,8 @@ public class MainPage implements Serializable {
     public JournalReportsReportPage getJournalReportsReportPage() {
         return journalReportsReportPage;
     }
+
+    /*public BasicBasketReportPage getBasicBasketReportPage() {
+        return basicBasketReportPage;
+    }*/
 }
