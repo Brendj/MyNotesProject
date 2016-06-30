@@ -46,31 +46,31 @@ public class MigrantsReportService {
         if(migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())){
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
+                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())){
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime)));
+                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
             reportItemList.add(reportItem);
         }
         return reportItemList;
     }
 
-    private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants){
+    private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants, boolean isOutcome){
         List<MigrantItem> result = new ArrayList<MigrantItem>();
         for(Migrant migrant : migrants){
             MigrantItem migrantItem = new MigrantItem(migrant, startTime, endTime,
-                    MigrantsUtils.getResolutionsForMigrant(session, migrant));
+                    MigrantsUtils.getResolutionsForMigrant(session, migrant), isOutcome);
             result.add(migrantItem);
         }
         return result;
@@ -122,9 +122,17 @@ public class MigrantsReportService {
         private Boolean gtEndDate;
         private String resolution;
 
-        public MigrantItem(Migrant migrant, Date startTime, Date endTime, List<VisitReqResolutionHist> resolutions) {
-            Org org = migrant.getOrgRegistry();
-            Org org2 = migrant.getOrgVisit();
+        public MigrantItem(Migrant migrant, Date startTime, Date endTime,
+                List<VisitReqResolutionHist> resolutions, boolean isOutcome) {
+            Org org;
+            Org org2;
+            if(isOutcome){
+                org = migrant.getOrgRegistry();
+                org2 = migrant.getOrgVisit();
+            } else {
+                org = migrant.getOrgVisit();
+                org2 = migrant.getOrgRegistry();
+            }
             idOfOrg = org.getIdOfOrg();
             orgShortName = org.getShortName();
             orgAddress = org.getAddress();

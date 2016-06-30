@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="458"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -74,7 +74,12 @@
 	<summary>
 		<band height="50" splitType="Stretch">
 			<crosstab ignoreWidth="false">
-				<reportElement uuid="18809f71-24bf-4060-8dce-ccdfd7bab269" x="0" y="0" width="2520" height="50" isPrintWhenDetailOverflows="true" forecolor="#FFFFFF"/>
+				<reportElement uuid="18809f71-24bf-4060-8dce-ccdfd7bab269" x="0" y="0" width="2520" height="50" isPrintWhenDetailOverflows="true" forecolor="#FFFFFF">
+					<property name="isOutcome" value="$P{isOutcome}"/>
+				</reportElement>
+				<crosstabParameter name="isOutcome" class="java.lang.Boolean">
+					<parameterValueExpression><![CDATA[$P{isOutcome}]]></parameterValueExpression>
+				</crosstabParameter>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -92,7 +97,9 @@
 							<text><![CDATA[ИД]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="0" y="0" width="450" height="25"/>
+							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="0" y="0" width="450" height="25">
+								<printWhenExpression><![CDATA[$P{isOutcome}]]></printWhenExpression>
+							</reportElement>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -104,6 +111,22 @@
 								<font size="14" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Организация заявки]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="0" y="0" width="450" height="25">
+								<printWhenExpression><![CDATA[!$P{isOutcome}]]></printWhenExpression>
+							</reportElement>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="14" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Организация посещения]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="1420" y="0" width="730" height="25"/>
@@ -120,7 +143,9 @@
 							<text><![CDATA[Список клиентов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="450" y="0" width="450" height="25"/>
+							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="450" y="0" width="450" height="25">
+								<printWhenExpression><![CDATA[$P{isOutcome}]]></printWhenExpression>
+							</reportElement>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -132,6 +157,22 @@
 								<font size="14" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Организация посещения]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="450" y="0" width="450" height="25">
+								<printWhenExpression><![CDATA[!$P{isOutcome}]]></printWhenExpression>
+							</reportElement>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="14" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Организация заявки]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="6ed668d2-b99d-4603-8f1c-db19210018f6" style="Crosstab Data Text" x="1520" y="25" width="360" height="50"/>
