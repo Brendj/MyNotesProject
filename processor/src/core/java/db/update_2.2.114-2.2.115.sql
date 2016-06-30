@@ -126,4 +126,6 @@ ALTER TABLE cf_security_journal_authenticate ADD COLUMN comment character varyin
 
 ALTER TABLE cf_checksums ADD COLUMN checkSumOnSettings CHARACTER VARYING(32);
 
+CREATE INDEX cf_cards_lastupdate_idx ON cf_cards USING btree (lastupdate);
+
 --! ФИНАЛИЗИРОВАН (Семенов, 270616) НЕ МЕНЯТЬ
