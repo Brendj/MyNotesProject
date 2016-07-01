@@ -716,7 +716,12 @@ public class ClientManager {
 
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
-                client.setGender(Integer.valueOf(fieldConfig.getValue(FieldId.GENDER)));
+                if (fieldConfig.getValue(FieldId.GENDER).equals("m")) {
+                    client.setGender(1);
+                }
+                if (fieldConfig.getValue(FieldId.GENDER).equals("f")) {
+                    client.setGender(0);
+                }
             }
 
             //token[33])

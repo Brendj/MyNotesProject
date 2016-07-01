@@ -936,19 +936,8 @@ public class FrontController extends HttpServlet {
                 if (cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, CalendarUtils.parseDate(cardExpiry));
                 if (cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, CalendarUtils.parseDate(cardIssued));
                 if (snils!=null) fc.setValue(ClientManager.FieldId.SAN, snils);
-
                 if (birthDate!=null) fc.setValue(ClientManager.FieldId.BIRTH_DATE, birthDate);
-
-                if (gender != null) {
-                    String genderConvert = "";
-                    if (gender.equals("Женский")) {
-                        genderConvert = "f";
-                    }
-                    if (gender.equals("Мужской")) {
-                        genderConvert = "m";
-                    }
-                    fc.setValue(ClientManager.FieldId.GENDER, genderConvert);
-                }
+                if (gender!=null) fc.setValue(ClientManager.FieldId.GENDER, gender);
 
                 logger.debug("register client v2");
                 long idOfClient = ClientManager.registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness);
