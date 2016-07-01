@@ -3401,7 +3401,7 @@ public class Processor
                 if (clientParamItem.getAddress() != null) {
                     client.setAddress(clientParamItem.getAddress());
                 }
-                if (clientParamItem.getEmail() != null) {
+                if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT) && clientParamItem.getEmail() != null) {
                     String email = clientParamItem.getEmail();
                     //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
                     if (client != null && client.getEmail() != null && !client.getEmail().equals(email)) {

@@ -357,7 +357,7 @@ public class ClientManager {
             }
             //tokens[15]);
             String email = fieldConfig.getValue(ClientManager.FieldId.EMAIL);
-            if (email != null && StringUtils.isNotEmpty(email)) {
+            if (email != null && StringUtils.isNotEmpty(email) && !RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT)) {
                 //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
                 if(client != null && client.getEmail() != null && !client.getEmail().equals(email)) {
                     client.setSsoid("");
