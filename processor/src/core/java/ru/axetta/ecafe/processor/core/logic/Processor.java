@@ -3423,9 +3423,9 @@ public class Processor
                         if (clientParamItem.getNotifyViaSMS() == null) {
                             client.setNotifyViaSMS(true);
                         }
-                        //if (clientParamItem.getNotifyViaPUSH() == null) {
-                        //    client.setNotifyViaPUSH(false);
-                        //}
+                        if (clientParamItem.getNotifyViaPUSH() == null) {
+                            client.setNotifyViaPUSH(false);
+                        }
                     }
                 }
                 if (clientParamItem.getMiddleGroup() != null) {
@@ -3453,9 +3453,9 @@ public class Processor
                 if (clientParamItem.getNotifyViaSMS() != null) {
                     client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
                 }
-                //if (clientParamItem.getNotifyViaPUSH() != null) {
-                //    client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
-                //}
+                if (clientParamItem.getNotifyViaPUSH() != null) {
+                    client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
+                }
             /* FAX клиента */
                 if (clientParamItem.getFax() != null) {
                     client.setFax(clientParamItem.getFax());

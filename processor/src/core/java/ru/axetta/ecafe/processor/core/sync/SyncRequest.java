@@ -102,25 +102,25 @@ public class SyncRequest {
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
                     String notifyViaEmail = getStringValueNullSafe(namedNodeMap, "NotifyViaEmail");
                     String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
-                    //String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPUSH");
+                    String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPUSH");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap,"CanConfirmGroupPayment");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
-                    //return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
-                    //        categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
-                    //        fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
-                    //        notifyViaSMS == null ? null : notifyViaSMS.equals("1"),
-                    //        notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
-                    //        canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
-                    //        expenditureLimit);
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
+                            categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
+                            fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
+                            notifyViaSMS == null ? null : notifyViaSMS.equals("1"),
+                            notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
+                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
+                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));
+                    /*return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
                             notifyViaSMS == null ? null : notifyViaSMS.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
-                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));
+                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));*/
                 }
 
             }
@@ -133,22 +133,22 @@ public class SyncRequest {
             private final int discountMode;
             private final String groupName;
             private final String categoriesDiscounts;
-            private final Boolean notifyViaEmail, notifyViaSMS; //, notifyViaPUSH;
+            private final Boolean notifyViaEmail, notifyViaSMS, notifyViaPUSH;
             private final Boolean canConfirmGroupPayment;
             private final String guid;
             private final Long expenditureLimit;
             private final Boolean isUseLastEEModeForPlan;
 
-            //public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
-            //        int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
-            //        String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
-            //        Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-            //        String guid, Long expenditureLimit) {
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
-                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment,
+                    Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {
+            /*public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
+                    int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
+                    String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
+                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment,
+                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {*/
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -167,7 +167,7 @@ public class SyncRequest {
                 this.remarks = remarks;
                 this.notifyViaEmail = notifyViaEmail;
                 this.notifyViaSMS = notifyViaSMS;
-                //this.notifyViaPUSH = notifyViaPUSH;
+                this.notifyViaPUSH = notifyViaPUSH;
                 this.groupName = groupName;
                 this.canConfirmGroupPayment = canConfirmGroupPayment;
                 this.guid = guid;
@@ -247,9 +247,9 @@ public class SyncRequest {
                 return notifyViaSMS;
             }
 
-            //public Boolean getNotifyViaPUSH() {
-            //    return notifyViaPUSH;
-            //}
+            public Boolean getNotifyViaPUSH() {
+                return notifyViaPUSH;
+            }
             //
             public String getGroupName() {
                 return groupName;
