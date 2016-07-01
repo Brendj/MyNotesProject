@@ -119,6 +119,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPSenderName;
     private String RNIPTSAServer;
     private Boolean useXadesT;
+    private Boolean disableEmailEdit;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -403,6 +404,12 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setUseXadesT(Boolean useXadesT) {
         this.useXadesT = useXadesT;
+    }
+
+    public Boolean getDisableEmailEdit() { return disableEmailEdit; }
+
+    public void setDisableEmailEdit(Boolean disableEmailEdit) {
+        this.disableEmailEdit = disableEmailEdit;
     }
 
     public Boolean getSendSMSPaymentNotification() {
@@ -845,6 +852,7 @@ public class OptionPage extends BasicWorkspacePage {
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
         syncRestrictFullSyncPeriods = runtimeContext.getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS);
         reportOn = runtimeContext.getOptionValueBool(Option.OPTION_SAVE_SYNC_CALC);
+        disableEmailEdit = runtimeContext.getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT);
 
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
@@ -1005,6 +1013,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_CODE, RNIPSenderCode);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_NAME, RNIPSenderName);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_TSA_SERVER, RNIPTSAServer);
+            runtimeContext.setOptionValue(Option.OPTION_DISABLE_EMAIL_EDIT, disableEmailEdit);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

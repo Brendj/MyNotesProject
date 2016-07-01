@@ -405,6 +405,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         return email;
     }
 
+    public Boolean isEmailReadOnly() {
+        return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_DISABLE_EMAIL_EDIT);
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }

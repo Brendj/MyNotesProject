@@ -108,6 +108,10 @@
                 <a4j:support event="onclick" ajaxSingle="true"/>
             </h:selectBooleanCheckbox>
         </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Запрет редактирования поля e-mail клиента" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.disableEmailEdit}" styleClass="output-text" />
+        </h:panelGrid>
 
     </rich:tab>
     <rich:tab label="Платежные системы">
