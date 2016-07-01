@@ -939,7 +939,7 @@ public class FrontController extends HttpServlet {
 
                 if (birthDate!=null) fc.setValue(ClientManager.FieldId.BIRTH_DATE, birthDate);
 
-                if (gender!=null) {
+                if (gender != null) {
                     String genderConvert = "";
                     if (gender.equals("Женский")) {
                         genderConvert = "f";
