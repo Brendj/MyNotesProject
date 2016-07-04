@@ -208,7 +208,7 @@ public class NSIDeltaProcessor {
 
             try {
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig(), cl);
-                if(!StringUtils.isBlank(item.getOrgGuid()) && !cl.getOrg().getGuid().equals(item.getOrgGuid())) {
+                if(!StringUtils.isBlank(emptyIfNull(item.getOrgGuid())) && !cl.getOrg().getGuid().equals(emptyIfNull(item.getOrgGuid()))) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
                     if(newOrg == null) {
                         ImportRegisterClientsService.log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
