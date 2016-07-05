@@ -251,6 +251,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 stateCondition = " o.state = " + Org.ACTIVE_STATE;
                 if(orgCondition.length() > 1){
                     stateCondition = " and " + stateCondition;
+                } else {
+                    stateCondition = " where " + stateCondition;
                 }
             }
 
@@ -278,13 +280,16 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 items.add(it);
             }
 
+            if(isActiveState){
+                stateCondition =  " and " + " o.state = " + Org.ACTIVE_STATE;
+            }
 
             sql =
                     "select o.idoforg, calctype, round(avg(sync.calcValue)) "
                     + "from cf_synchistory_calc sync "
                     + "join cf_orgs o on o.idoforg=sync.idoforg "
                     + "where sync.calcDateAt>=:start and sync.calcDateAt<:end " + orgCondition + stateCondition
-                    + "group by o.idoforg, calctype "
+                    + " group by o.idoforg, calctype "
                     + "order by o.idoforg";
             query = session.createSQLQuery(sql);
             query.setParameter("start", start.getTime());

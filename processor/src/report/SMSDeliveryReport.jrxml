@@ -102,6 +102,7 @@
 	<field name="orgStatus" class="java.lang.String"/>
 	<field name="introductionQueue" class="java.lang.String"/>
 	<field name="district" class="java.lang.String"/>
+	<field name="isEmptyValues" class="java.lang.Boolean"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -211,32 +212,86 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063025" style="Crosstab Data Text" x="0" y="0" width="30" height="15"/>
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063025" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="30" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f175-8b48-4a4a-8939-029c9a063022" style="Crosstab Data Text" x="30" y="0" width="30" height="15"/>
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063025" style="Crosstab Data Text" x="0" y="0" width="30" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{uniqueId}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="dea8f175-8b48-4a4a-8939-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="30" y="0" width="30" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgId}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063021" style="Crosstab Data Text" x="180" y="0" width="250" height="15"/>
+								<reportElement uuid="dea8f175-8b48-4a4a-8939-029c9a063022" style="Crosstab Data Text" x="30" y="0" width="30" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{orgId}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063021" style="Crosstab Data Text" mode="Opaque" x="180" y="0" width="250" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgName}]]></textFieldExpression>
 							</textField>
-							<textField>
-								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="430" y="0" width="250" height="15"/>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063021" style="Crosstab Data Text" x="180" y="0" width="250" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{orgName}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" mode="Opaque" x="430" y="0" width="250" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{shortNameInfoService}]]></textFieldExpression>
 							</textField>
-							<textField>
-								<reportElement uuid="dea8f111-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="680" y="0" width="250" height="15"/>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="430" y="0" width="250" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{shortNameInfoService}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f111-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" mode="Opaque" x="680" y="0" width="250" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{shortAddress}]]></textFieldExpression>
 							</textField>
-							<textField>
-								<reportElement uuid="e7039376-1c25-4ae8-949d-9435f4d2f9cc" style="Crosstab Data Text" x="60" y="0" width="120" height="15"/>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="dea8f111-8b48-4a4a-8959-029c9a069721" style="Crosstab Data Text" x="680" y="0" width="250" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{shortAddress}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e7039376-1c25-4ae8-949d-9435f4d2f9cc" style="Crosstab Data Text" mode="Opaque" x="60" y="0" width="120" height="15" backcolor="#CCCCCC">
+									<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e7039376-1c25-4ae8-949d-9435f4d2f9cc" style="Crosstab Data Text" x="60" y="0" width="120" height="15">
+									<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+								</reportElement>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
 							</textField>
@@ -401,104 +456,261 @@
 				<measure name="district" class="java.lang.String" calculation="Count">
 					<measureExpression><![CDATA[$F{district}]]></measureExpression>
 				</measure>
+				<measure name="isEmptyValues" class="java.lang.Boolean">
+					<measureExpression><![CDATA[$F{isEmptyValues}]]></measureExpression>
+				</measure>
 				<crosstabCell width="1160" height="30">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a3a-8871-029c9a333022" style="Crosstab Data Text" x="0" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a3a-8871-029c9a333022" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayMorning").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a333022" style="Crosstab Data Text" x="70" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a3a-8871-029c9a333022" style="Crosstab Data Text" x="0" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayMorning").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a333022" style="Crosstab Data Text" mode="Opaque" x="70" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayMorning").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="140" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a333022" style="Crosstab Data Text" x="70" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayMorning").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="140" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayMidday").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="210" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="140" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayMidday").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="210" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayMidday").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="280" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="210" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayMidday").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="280" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayNight").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="350" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="280" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_maxDelayNight").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="350" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayNight").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea2f075-8b48-4a4a-8959-029c9a637024" style="Crosstab Data Text" x="420" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="350" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_sumDelayNight").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea2f075-8b48-4a4a-8959-029c9a637024" style="Crosstab Data Text" mode="Opaque" x="420" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("commonSum").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="490" y="0" width="100" height="15"/>
+							<reportElement uuid="dea2f075-8b48-4a4a-8959-029c9a637024" style="Crosstab Data Text" x="420" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("commonSum").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="490" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_lastSync").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="590" y="0" width="70" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="490" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_lastSync").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="590" y="0" width="70" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_eventsCount").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="660" y="0" width="100" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="590" y="0" width="70" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_eventsCount").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="660" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_minTimeout").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="760" y="0" width="100" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="660" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_minTimeout").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="760" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_avgTimeout").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="860" y="0" width="100" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="760" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_avgTimeout").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" mode="Opaque" x="860" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_maxTimeout").toString()]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f175-8b18-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="960" y="0" width="100" height="15"/>
+							<reportElement uuid="dea8f075-8b48-4a4a-8959-029c9a063022" style="Crosstab Data Text" x="860" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("1_maxTimeout").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f175-8b18-1a1a-8959-029c9a036022" style="Crosstab Data Text" mode="Opaque" x="960" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{orgStatus}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dea8f571-8b81-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="1060" y="0" width="100" height="15"/>
+							<reportElement uuid="dea8f175-8b18-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="960" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{orgStatus}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f571-8b81-1a1a-8959-029c9a036022" style="Crosstab Data Text" mode="Opaque" x="1060" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement>
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{introductionQueue}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f571-8b81-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="1060" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
 							<textElement>
 								<font size="9"/>
 							</textElement>
