@@ -14,8 +14,8 @@ import org.w3c.dom.Element;
  * Time: 12:37
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractToElement {
+public interface AbstractToElement {
 
-    public abstract Element toElement(Document document) throws Exception;
+    Element toElement(Document document) throws Exception;
 
 }

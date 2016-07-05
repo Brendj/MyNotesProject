@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +25,7 @@ import java.util.*;
  * User: akmukov
  * Date: 01.03.2016
  */
-public class OrganizationComplexesStructure {
+public class OrganizationComplexesStructure implements AbstractToElement{
     private static final String SECTION_NAME="OrganizationComplexesStructure";
     private static final String CODE_ATTRIBUTE="Code";
     private static final String DESCRIPTION_ATTRIBUTE="Descr";

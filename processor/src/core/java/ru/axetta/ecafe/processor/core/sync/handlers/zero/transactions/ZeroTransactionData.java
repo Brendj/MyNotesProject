@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 12:56
  * To change this template use File | Settings | File Templates.
  */
-public class ZeroTransactionData extends AbstractToElement {
+public class ZeroTransactionData implements AbstractToElement {
     private List<ResZeroTransactionItem> items;
 
     public ZeroTransactionData() {

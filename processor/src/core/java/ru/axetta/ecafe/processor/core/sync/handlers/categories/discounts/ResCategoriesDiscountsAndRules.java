@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -15,13 +16,16 @@ import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * User: akmukov
  * Date: 30.03.2016
  */
-public class ResCategoriesDiscountsAndRules {
+public class ResCategoriesDiscountsAndRules implements AbstractToElement{
     private final List<DiscountCategoryItem> dcis = new LinkedList<DiscountCategoryItem>();
     private final List<DiscountCategoryRuleItem> dcris = new LinkedList<DiscountCategoryRuleItem>();
     private boolean existOrgWithEmptyCategoryOrgSet;

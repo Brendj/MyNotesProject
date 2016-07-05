@@ -5,17 +5,14 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
-import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,7 +22,7 @@ import java.util.List;
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class GoodsBasicBasketData {
+public class GoodsBasicBasketData implements AbstractToElement{
 
     private List<GoodsBasicBasketDataElement> basicBasketDataElementList;
 

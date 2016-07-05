@@ -15,7 +15,7 @@ import java.util.List;
  * Time: 18:23
  * To change this template use File | Settings | File Templates.
  */
-public class ResTempCardsOperations extends AbstractToElement {
+public class ResTempCardsOperations implements AbstractToElement {
 
     private final List<ResTempCardOperation> resTempCardOperationList;
 

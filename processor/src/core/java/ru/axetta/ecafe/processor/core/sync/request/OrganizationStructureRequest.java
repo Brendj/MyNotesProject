@@ -15,7 +15,8 @@ import org.w3c.dom.Node;
  * Time: 15:42
  * To change this template use File | Settings | File Templates.
  */
-public class OrganizationStructureRequest {
+public class OrganizationStructureRequest implements SectionRequest {
+    public static final String SECTION_NAME="OrganizationStructureRequest";
     private final Long maxVersion;
     private final boolean isAllOrgs;
 
@@ -42,4 +43,8 @@ public class OrganizationStructureRequest {
         return new OrganizationStructureRequest(maxVersion, isAllOrgs);
     }
 
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
+    }
 }

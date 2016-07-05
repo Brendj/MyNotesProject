@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
  * Time: 18:23
  * To change this template use File | Settings | File Templates.
  */
-public class ResTempCardOperation extends AbstractToElement {
+public class ResTempCardOperation implements AbstractToElement {
 
     private final long idOfTempCardOperation;
     private final int resOperation;

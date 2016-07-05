@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
@@ -17,7 +18,9 @@ import java.util.List;
  * Date: 13.04.16
  * Time: 10:27
  */
-public class SpecialDates {
+public class SpecialDates implements SectionRequest{
+    public static final String SECTION_NAME="SpecialDates";
+
     private final List<SpecialDatesItem> items;
     private final Long maxVersion;
     private final Long idOfOrgOwner;
@@ -47,5 +50,10 @@ public class SpecialDates {
 
     public Long getMaxVersion() {
         return maxVersion;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

@@ -4,15 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.org.owners;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
-import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,7 +18,7 @@ import java.util.List;
  * Time: 10:56
  * To change this template use File | Settings | File Templates.
  */
-public class OrgOwnerData extends AbstractToElement {
+public class OrgOwnerData implements AbstractToElement {
 
     private final List<OrgOwner> orgOwnerList;
 

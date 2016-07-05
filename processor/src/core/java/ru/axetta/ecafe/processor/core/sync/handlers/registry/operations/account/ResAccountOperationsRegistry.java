@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account;
 
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -15,7 +17,7 @@ import java.util.List;
  * User: Shamil
  * Date: 19.02.15
  */
-public class ResAccountOperationsRegistry {
+public class ResAccountOperationsRegistry implements AbstractToElement{
     public static final String SYNC_NAME = "ResAccountOperationsRegistry";
 
 

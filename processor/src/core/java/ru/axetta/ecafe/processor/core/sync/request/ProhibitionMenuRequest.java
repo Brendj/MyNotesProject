@@ -15,7 +15,8 @@ import org.w3c.dom.Node;
  * Time: 13:00
  * To change this template use File | Settings | File Templates.
  */
-public class ProhibitionMenuRequest {
+public class ProhibitionMenuRequest implements SectionRequest{
+    public static final String SECTION_NAME="ProhibitionsMenuRequest";
     private final Long maxVersion;
 
     private ProhibitionMenuRequest(Long maxVersion) {
@@ -29,5 +30,10 @@ public class ProhibitionMenuRequest {
     static ProhibitionMenuRequest build(Node clientGuardianRequestNode) throws Exception {
         final Long maxVersion = XMLUtils.getLongAttributeValue(clientGuardianRequestNode, "V");
         return new ProhibitionMenuRequest(maxVersion);
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

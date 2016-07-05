@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDist
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
 import ru.axetta.ecafe.processor.core.sync.doGroups.IDOGroup;
@@ -44,7 +45,7 @@ import java.util.*;
  * Time: 17:27
  */
 
-public class Manager {
+public class Manager implements AbstractToElement {
 
     /**
      * Логгер

@@ -16,7 +16,7 @@ import java.util.List;
  * User: akmukov
  * Date: 04.04.2016
  */
-public class ResClientgroupManagers extends AbstractToElement {
+public class ResClientgroupManagers implements AbstractToElement {
     private List<ResClientgroupManagerItem> items = new ArrayList<ResClientgroupManagerItem>();
 
     @Override

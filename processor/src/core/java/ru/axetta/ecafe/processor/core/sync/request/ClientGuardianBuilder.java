@@ -4,8 +4,6 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
-
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -13,24 +11,19 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class ClientGuardianBuilder {
+public class ClientGuardianBuilder implements SectionRequestBuilder {
 
-    private Node mainNode;
-
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "ClientsGuardians");
+    public ClientGuardianRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest!=null?(ClientGuardianRequest)sectionRequest:null;
     }
 
-    public ClientGuardianRequest build() throws Exception {
-        if (mainNode != null){
-            return ClientGuardianRequest.build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientGuardianRequest.SECTION_NAME);
+        if (sectionElement != null) {
+            return ClientGuardianRequest.build(sectionElement);
+        } else
             return null;
-        }
     }
-
-    public ClientGuardianRequest build(Node accRegistryUpdateRequest) throws Exception {
-        return ClientGuardianRequest.build(accRegistryUpdateRequest);
-    }
-
 }

@@ -4,32 +4,30 @@
 
 package ru.axetta.ecafe.processor.core.sync.request.registry.accounts;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * User: shamil
  * Date: 21.05.15
  * Time: 10:07
  */
-public class AccountsRegistryRequestBuilder {
-    private Node mainNode;
+public class AccountsRegistryRequestBuilder implements SectionRequestBuilder{
 
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, AccountsRegistryRequest.SYNC_NAME);
+    public AccountsRegistryRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest!=null? (AccountsRegistryRequest) sectionRequest :null;
     }
 
-    public AccountsRegistryRequest build() throws Exception {
-        if (mainNode != null){
-            return AccountsRegistryRequest.build(mainNode);
-        } else {
+@Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, AccountsRegistryRequest.SYNC_NAME);
+        if (sectionElement != null) {
+            return AccountsRegistryRequest.build(sectionElement);
+        } else
             return null;
-        }
     }
-
-    public AccountsRegistryRequest build(Node node) throws Exception {
-        return AccountsRegistryRequest.build(node);
-    }
-
 }

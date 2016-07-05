@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,15 +17,24 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 11:48
  */
 
-public class MigrantsBuilder {
-    private Node mainNode;
+public class MigrantsBuilder implements SectionRequestBuilder {
+    private final long idOfOrg;
 
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "Migrants");
+    public MigrantsBuilder(long idOfOrg){
+
+        this.idOfOrg = idOfOrg;
+    }
+    public Migrants build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (Migrants) sectionRequest : null;
     }
 
-    public Migrants build(Node migrantsNode, Long idOfOrgRegistry) throws Exception {
-        Migrants result = new Migrants(migrantsNode, idOfOrgRegistry);
-        return result;
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, Migrants.SECTION_NAME);
+        if (sectionElement != null) {
+            return new Migrants(sectionElement, idOfOrg);
+        } else
+            return null;
     }
 }

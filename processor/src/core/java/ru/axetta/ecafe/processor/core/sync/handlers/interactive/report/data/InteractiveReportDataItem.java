@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 10:57
  */
 
-public class InteractiveReportDataItem extends AbstractToElement {
+public class InteractiveReportDataItem implements AbstractToElement {
 
     private List<InteractiveReportDataItem> items;
 

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 import java.util.LinkedList;
@@ -13,8 +14,8 @@ import java.util.List;
  * User: akmukov
  * Date: 04.04.2016
  */
-public class ClientGroupManagerRequest {
-
+public class ClientGroupManagerRequest  implements SectionRequest{
+    public static final String SECTION_NAME="GroupManagers";
     private final Long maxVersion;
     private final List<ClientgroupManagerItem> items;
 
@@ -43,5 +44,10 @@ public class ClientGroupManagerRequest {
             itemNode = itemNode.getNextSibling();
         }
         return new ClientGroupManagerRequest(maxVersion,items);
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

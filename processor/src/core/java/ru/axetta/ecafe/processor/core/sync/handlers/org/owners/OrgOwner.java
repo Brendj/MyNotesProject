@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * Time: 11:02
  * To change this template use File | Settings | File Templates.
  */
-public class OrgOwner extends AbstractToElement {
+public class OrgOwner implements AbstractToElement {
 
     private final Long idOfOrg;
 

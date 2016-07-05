@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
@@ -18,7 +19,8 @@ import java.util.List;
  * Time: 12:27
  * To change this template use File | Settings | File Templates.
  */
-public class ReestrTaloonApproval {
+public class ReestrTaloonApproval implements SectionRequest{
+    public static final String SECTION_NAME="ReestrTaloonApproval";
 
     private final List<TaloonApprovalItem> items;
     private final Long maxVersion;
@@ -49,5 +51,10 @@ public class ReestrTaloonApproval {
 
     public Long getIdOfOrgOwner() {
         return idOfOrgOwner;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

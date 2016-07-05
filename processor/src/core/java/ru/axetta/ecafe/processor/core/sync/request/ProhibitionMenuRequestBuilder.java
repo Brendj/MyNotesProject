@@ -4,15 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sync.request;
 
-import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,24 +15,19 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class ProhibitionMenuRequestBuilder {
+public class ProhibitionMenuRequestBuilder implements SectionRequestBuilder {
 
-    private Node mainNode;
-
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "ProhibitionsMenuRequest");
+    public ProhibitionMenuRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (ProhibitionMenuRequest) sectionRequest : null;
     }
 
-    public ProhibitionMenuRequest build() throws Exception {
-        if (mainNode != null){
-            return ProhibitionMenuRequest.build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ProhibitionMenuRequest.SECTION_NAME);
+        if (sectionElement != null) {
+            return ProhibitionMenuRequest.build(sectionElement);
+        } else
             return null;
-        }
     }
-
-    public ProhibitionMenuRequest build(Node accRegistryUpdateRequest) throws Exception {
-        return ProhibitionMenuRequest.build(accRegistryUpdateRequest);
-    }
-
 }

@@ -1,13 +1,10 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,7 +14,8 @@ import java.util.List;
  * Time: 18:00
  * To change this template use File | Settings | File Templates.
  */
-public class EnterEvents {
+public class EnterEvents implements SectionRequest {
+    public static final String SECTION_NAME="EnterEvents";
 
     private final List<EnterEventItem> events;
 
@@ -40,5 +38,10 @@ public class EnterEvents {
 
     public List<EnterEventItem> getEvents() {
         return events;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+         return SECTION_NAME;
     }
 }

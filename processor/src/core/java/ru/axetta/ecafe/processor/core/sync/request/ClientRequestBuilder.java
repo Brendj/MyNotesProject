@@ -1,8 +1,8 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,24 +11,19 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 18:29
  * To change this template use File | Settings | File Templates.
  */
-public class ClientRequestBuilder {
+public class ClientRequestBuilder implements SectionRequestBuilder{
 
-    private Node mainNode;
-
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "ClientRequests");
+    public ClientRequests build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest!=null?(ClientRequests)sectionRequest:null;
     }
 
-    public ClientRequests build() throws Exception {
-        if (mainNode != null){
-            return build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientRequests.SECTION_NAME);
+        if (sectionElement != null) {
+            return new ClientRequests(sectionElement);
+        } else
             return null;
-        }
     }
-
-    public ClientRequests build(Node clientRequestNode) throws Exception {
-        return new ClientRequests(clientRequestNode);
-    }
-
 }

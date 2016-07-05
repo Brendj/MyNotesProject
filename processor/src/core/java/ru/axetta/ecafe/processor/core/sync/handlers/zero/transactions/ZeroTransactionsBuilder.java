@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,15 +17,24 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 17:43
  * To change this template use File | Settings | File Templates.
  */
-public class ZeroTransactionsBuilder {
-    private Node mainNode;
+public class ZeroTransactionsBuilder implements SectionRequestBuilder{
+    private final long idOfOrg;
 
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "ZeroTransactions");
+    public ZeroTransactionsBuilder(long idOfOrg){
+        this.idOfOrg = idOfOrg;
     }
 
-    public ZeroTransactions build(Node zeroTransactionsNode, Long orgOwner) throws Exception {
-        ZeroTransactions result = new ZeroTransactions(zeroTransactionsNode, orgOwner);
-        return result;
+    public ZeroTransactions build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest!=null? (ZeroTransactions) sectionRequest :null;
+    }
+
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ZeroTransactions.SECTION_NAME);
+        if (sectionElement != null) {
+            return new ZeroTransactions(sectionElement, idOfOrg);
+        } else
+            return null;
     }
 }

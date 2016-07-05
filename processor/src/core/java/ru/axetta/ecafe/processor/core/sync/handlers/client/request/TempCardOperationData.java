@@ -1,17 +1,11 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.client.request;
 
-import ru.axetta.ecafe.processor.core.persistence.CardTempOperation;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardOperation;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +14,7 @@ import java.util.TimeZone;
  * Time: 15:02
  * To change this template use File | Settings | File Templates.
  */
-public class TempCardOperationData extends AbstractToElement {
+public class TempCardOperationData implements AbstractToElement {
 
     private final List<TempCardOperationElement> tempCardOperationElementList;
 

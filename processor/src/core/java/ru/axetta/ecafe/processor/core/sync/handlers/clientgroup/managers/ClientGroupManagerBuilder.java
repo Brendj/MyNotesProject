@@ -4,26 +4,29 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.w3c.dom.Node;
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
 
 /**
  * User: akmukov
  * Date: 04.04.2016
  */
-public class ClientGroupManagerBuilder {
-    private Node mainNode;
+public class ClientGroupManagerBuilder implements SectionRequestBuilder{
 
-    public void createMainNode(Node envelopeNode) {
-        mainNode = findFirstChildElement(envelopeNode, "GroupManagers");
+    public ClientGroupManagerRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (ClientGroupManagerRequest) sectionRequest : null;
     }
 
-    public ClientGroupManagerRequest build() throws Exception {
-        return mainNode != null ? ClientGroupManagerRequest.build(mainNode) : null;
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientGroupManagerRequest.SECTION_NAME);
+        if (sectionElement != null) {
+            return ClientGroupManagerRequest.build(sectionElement);
+        } else
+            return null;
     }
-
-    public ClientGroupManagerRequest build(Node sectionNode) throws Exception {
-        return ClientGroupManagerRequest.build(sectionNode);
-    }
-
 }

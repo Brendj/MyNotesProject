@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 12:13
  * To change this template use File | Settings | File Templates.
  */
-public class ResReestrTaloonApproval extends AbstractToElement {
+public class ResReestrTaloonApproval implements AbstractToElement {
     private List<ResTaloonApprovalItem> items;
 
     public ResReestrTaloonApproval() {

@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class ClientGuardianData extends AbstractToElement {
+public class ClientGuardianData implements AbstractToElement {
 
     private final List<ClientGuardianItem> clientGuardianResponseItems;
     private final ResultOperation result;

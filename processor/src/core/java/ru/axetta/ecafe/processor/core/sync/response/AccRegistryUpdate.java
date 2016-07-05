@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.response;
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
 import ru.axetta.ecafe.processor.core.utils.*;
 
@@ -23,7 +24,7 @@ import java.util.*;
  * Time: 17:17
  * To change this template use File | Settings | File Templates.
  */
-public class AccRegistryUpdate {
+public class AccRegistryUpdate implements AbstractToElement{
     private Map<Long, AccItem> accItemMap = new HashMap<Long, AccItem>();
     private Date maxTransactionDate; //Дата конечной выборки транзакций на процессинге
     private ResultOperation result = new ResultOperation();
@@ -43,6 +44,12 @@ public class AccRegistryUpdate {
     public void setResult(ResultOperation result) {
         this.result = result;
     }
+
+    @Override
+    public Element toElement(Document document) throws Exception {
+        return toElement(document,CalendarUtils.getDateTimeFormatLocal());
+    }
+
 
     public Element toElement(Document document, DateFormat timeFormat) throws Exception {
         Element element = document.createElement("AccRegistryUpdate");
@@ -114,6 +121,7 @@ public class AccRegistryUpdate {
             maxTransactionDate = accountTransaction.getTransactionTime();
         }
     }
+
 
     private static class AccItem{
         private long idOfClient; //Идентификатор клиента

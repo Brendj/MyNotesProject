@@ -17,7 +17,7 @@ import java.util.List;
  * User: akmukov
  * Date: 04.04.2016
  */
-public class ClientgroupManagerData extends AbstractToElement {
+public class ClientgroupManagerData implements AbstractToElement {
     private final ResultOperation resultOperation;
     private List<ResClientgroupManagerItem> items = new ArrayList<ResClientgroupManagerItem>();
 

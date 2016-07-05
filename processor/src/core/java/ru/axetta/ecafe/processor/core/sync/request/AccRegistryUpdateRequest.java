@@ -20,8 +20,8 @@ import java.util.List;
  * Time: 18:43
  * To change this template use File | Settings | File Templates.
  */
-public class AccRegistryUpdateRequest {
-
+public class AccRegistryUpdateRequest implements SectionRequest{
+    public static final String SECTION_NAME="AccRegistryUpdateRequest";
     private static final Logger LOGGER = LoggerFactory.getLogger(AccRegistryUpdateRequest.class);
     private final List<Long> clientIds;
 
@@ -48,4 +48,8 @@ public class AccRegistryUpdateRequest {
     }
 
 
+    @Override
+    public String getRequestSectionName() {
+        return AccRegistryUpdateRequest.SECTION_NAME;
+    }
 }

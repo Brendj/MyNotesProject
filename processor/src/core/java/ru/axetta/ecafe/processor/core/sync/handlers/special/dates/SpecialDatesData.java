@@ -17,7 +17,7 @@ import java.util.List;
  * Date: 13.04.16
  * Time: 12:05
  */
-public class SpecialDatesData  extends AbstractToElement {
+public class SpecialDatesData implements AbstractToElement {
     private List<ResSpecialDatesItem> items;
 
     @Override

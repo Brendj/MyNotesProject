@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.hibernate.Session;
 import org.w3c.dom.Document;
@@ -23,7 +24,7 @@ import java.util.Map;
  * Time: 16:08
  * To change this template use File | Settings | File Templates.
  */
-public class OrganizationStructure {
+public class OrganizationStructure implements AbstractToElement{
     private Map<Long, OrganizationStructureItem> organizationItemMap = new HashMap<Long, OrganizationStructureItem>();
     private final long resultCode;
     private final String resultDescription;

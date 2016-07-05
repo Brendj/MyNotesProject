@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Node;
 
@@ -14,7 +15,8 @@ import java.util.*;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-public class PaymentRegistry {
+public class PaymentRegistry implements SectionRequest {
+    public final static String SECTION_NAME="PaymentRegistry";
 
     private final List<Payment> POSPayments;
 
@@ -41,5 +43,10 @@ public class PaymentRegistry {
     @Override
     public String toString() {
         return "PaymentRegistry{" + "payments=" + POSPayments + '}';
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

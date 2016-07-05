@@ -458,6 +458,12 @@ public class CalendarUtils {
         return df;
     }
 
+    public static DateFormat getDateTimeFormatLocal() {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        timeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+        return timeFormat;
+    }
+
     public static boolean isWorkDate(SubscriberFeedingSettingSettingValue parser, Date date) {
         int day = getDayOfWeek(date);
         return (parser.isSixWorkWeek() ? (day != Calendar.SUNDAY) : (day != Calendar.SUNDAY && day != Calendar.SATURDAY));

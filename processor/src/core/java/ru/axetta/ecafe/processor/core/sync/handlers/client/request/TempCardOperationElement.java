@@ -7,10 +7,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +16,7 @@ import java.util.TimeZone;
  * Time: 15:02
  * To change this template use File | Settings | File Templates.
  */
-public class TempCardOperationElement extends AbstractToElement {
+public class TempCardOperationElement implements AbstractToElement {
 
     private Long idOfOperation;
     private Long idOfClient;

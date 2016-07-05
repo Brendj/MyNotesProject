@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 12:42
  * To change this template use File | Settings | File Templates.
  */
-public class ComplexRoles extends AbstractToElement {
+public class ComplexRoles implements AbstractToElement {
 
     private final List<ComplexRoleItem> complexRoleItemList;
 

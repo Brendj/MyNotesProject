@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.response.registry;
 
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * Date: 30.04.15
  * Time: 11:02
  */
-public class ResCardsOperationsRegistry {
+public class ResCardsOperationsRegistry implements AbstractToElement{
     public static final String SYNC_NAME = "ResCardsOperationsRegistry";
 
     private List<ResCardsOperationsRegistryItem> itemList = new LinkedList<ResCardsOperationsRegistryItem>();

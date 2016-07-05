@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,16 +16,24 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Date: 13.04.16
  * Time: 11:37
  */
-public class SpecialDatesBuilder {
-    private Node mainNode;
+public class SpecialDatesBuilder implements SectionRequestBuilder{
+    private final long idOfOrg;
 
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "SpecialDates");
+    public SpecialDatesBuilder(long idOfOrg){
+
+        this.idOfOrg = idOfOrg;
+    }
+    public SpecialDates build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (SpecialDates) sectionRequest : null;
     }
 
-    public SpecialDates build(Node specialDatesNode, Long orgOwner) throws Exception {
-        SpecialDates result = new SpecialDates(specialDatesNode, orgOwner);
-        return result;
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SpecialDates.SECTION_NAME);
+        if (sectionElement != null) {
+            return new SpecialDates(sectionElement, idOfOrg);
+        } else
+            return null;
     }
-
 }

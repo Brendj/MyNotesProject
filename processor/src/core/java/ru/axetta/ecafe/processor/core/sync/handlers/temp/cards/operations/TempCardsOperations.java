@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+
 import java.util.List;
 
 /**
@@ -9,7 +11,8 @@ import java.util.List;
  * Time: 18:23
  * To change this template use File | Settings | File Templates.
  */
-public class TempCardsOperations {
+public class TempCardsOperations implements SectionRequest{
+    public static final String SECTION_NAME="TempCardsOperations";
 
     private final List<TempCardOperation> tempCardOperationList;
 
@@ -19,5 +22,10 @@ public class TempCardsOperations {
 
     public List<TempCardOperation> getTempCardOperationList() {
         return tempCardOperationList;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

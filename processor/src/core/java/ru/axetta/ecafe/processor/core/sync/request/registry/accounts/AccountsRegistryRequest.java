@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.request.registry.accounts;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+
 import org.w3c.dom.Node;
 
 import java.util.LinkedList;
@@ -14,7 +16,7 @@ import java.util.List;
  * Date: 21.05.15
  * Time: 9:45
  */
-public class AccountsRegistryRequest {
+public class AccountsRegistryRequest implements SectionRequest{
     public static final String SYNC_NAME = "AccountsRegistryRequest";
 
     private List<AccountsRegistryRequestItem> items = new LinkedList<AccountsRegistryRequestItem>();
@@ -38,5 +40,10 @@ public class AccountsRegistryRequest {
 
     public List<AccountsRegistryRequestItem> getItems() {
         return items;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SYNC_NAME;
     }
 }

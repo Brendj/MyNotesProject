@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -14,7 +16,7 @@ import java.util.List;
  * Time: 14:00
  * To change this template use File | Settings | File Templates.
  */
-public class ResPaymentRegistry {
+public class ResPaymentRegistry implements AbstractToElement{
 
     private final List<ResPaymentRegistryItem> items;
 

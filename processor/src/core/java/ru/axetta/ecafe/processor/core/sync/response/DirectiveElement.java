@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.hibernate.Session;
 import org.w3c.dom.Document;
@@ -25,7 +26,7 @@ import java.util.List;
  * Time: 15:47
  * To change this template use File | Settings | File Templates.
  */
-public class DirectiveElement {
+public class DirectiveElement implements AbstractToElement{
 
     private List<DirectiveItem> directiveItemList;
 

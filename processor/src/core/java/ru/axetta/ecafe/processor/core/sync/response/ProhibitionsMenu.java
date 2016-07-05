@@ -4,15 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ProhibitionMenu;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.text.DateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +23,7 @@ import java.util.*;
  * Time: 17:17
  * To change this template use File | Settings | File Templates.
  */
-public class ProhibitionsMenu {
+public class ProhibitionsMenu implements AbstractToElement{
 
     private Map<Long, ProhibitionMenuItem> prohibitionItemMap = new HashMap<Long, ProhibitionMenuItem>();
     private final long resultCode;

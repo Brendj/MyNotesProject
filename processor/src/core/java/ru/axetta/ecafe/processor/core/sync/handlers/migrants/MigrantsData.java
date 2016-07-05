@@ -18,7 +18,7 @@ import java.util.List;
  * Time: 15:52
  */
 
-public class MigrantsData extends AbstractToElement {
+public class MigrantsData implements AbstractToElement {
     private List<ResIncomeMigrationRequestsItem> incomeMigrationRequestsItems;
     private List<ResIncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems;
     private List<ResOutcomeMigrationRequestsItem> outcomeMigrationRequestsItems;

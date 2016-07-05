@@ -4,31 +4,29 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * User: akmukov
  * Date: 29.03.2016
  */
-public class CategoriesDiscountsAndRulesBuilder {
-    public static final String CATEGORIES_DISCOUNTS_AND_RULES_SECTION="CategoriesDiscountsAndRules";
-    private Node mainNode;
+public class CategoriesDiscountsAndRulesBuilder implements SectionRequestBuilder{
 
-    public void createMainNode(Node envelopeNode) {
-        mainNode = findFirstChildElement(envelopeNode, CATEGORIES_DISCOUNTS_AND_RULES_SECTION);
+    public CategoriesDiscountsAndRulesRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (CategoriesDiscountsAndRulesRequest) sectionRequest : null;
     }
 
-    public CategoriesDiscountsAndRulesRequest build() {
-        if (mainNode != null) {
-            return CategoriesDiscountsAndRulesRequest.build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, CategoriesDiscountsAndRulesRequest.SECTION_NAME);
+        if (sectionElement != null) {
+            return CategoriesDiscountsAndRulesRequest.build(sectionElement);
+        } else
             return null;
-        }
-    }
-
-    public CategoriesDiscountsAndRulesRequest build(Node sectionNode) {
-        return CategoriesDiscountsAndRulesRequest.build(sectionNode);
     }
 }

@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data;
 
-import org.w3c.dom.Node;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
+import org.w3c.dom.Node;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,29 +17,19 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 11:24
  */
 
-public class InteractiveReportDataBuilder {
+public class InteractiveReportDataBuilder implements SectionRequestBuilder {
 
-
-    private Node mainNode;
-
-    public void createMainNode(Node envelopeNode) {
-        mainNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
+    public InteractiveReport build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (InteractiveReport) sectionRequest : null;
     }
 
-    public InteractiveReportDataRequest build() throws Exception {
-        if (mainNode != null) {
-            return InteractiveReportDataRequest.build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, InteractiveReport.SECTION_NAME);
+        if (sectionElement != null) {
+            return new InteractiveReport(sectionElement);
+        } else
             return null;
-        }
-    }
-
-    public InteractiveReportDataRequest build(Node interactiveReportDataNode) throws Exception {
-        return InteractiveReportDataRequest.build(interactiveReportDataNode);
-    }
-
-    public InteractiveReport buildInteractiveReport(Node interactiveReportDataNode) throws Exception {
-        InteractiveReport result = new InteractiveReport(interactiveReportDataNode);
-        return result;
     }
 }

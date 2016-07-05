@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.request;
 
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.w3c.dom.Node;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
@@ -15,23 +17,19 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 15:54
  * To change this template use File | Settings | File Templates.
  */
-public class OrganizationStructureRequestBuilder {
-    private Node mainNode;
+public class OrganizationStructureRequestBuilder implements SectionRequestBuilder {
 
-    public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "OrganizationStructureRequest");
+    public OrganizationStructureRequest build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (OrganizationStructureRequest) sectionRequest : null;
     }
 
-    public OrganizationStructureRequest build() throws Exception {
-        if (mainNode != null){
-            return OrganizationStructureRequest.build(mainNode);
-        } else {
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, OrganizationStructureRequest.SECTION_NAME);
+        if (sectionElement != null) {
+            return OrganizationStructureRequest.build(sectionElement);
+        } else
             return null;
-        }
     }
-
-    public OrganizationStructureRequest build(Node organizationStructureRequest) throws Exception {
-        return OrganizationStructureRequest.build(organizationStructureRequest);
-    }
-
 }

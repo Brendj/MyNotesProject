@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfMigrant;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
@@ -21,7 +22,8 @@ import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElemen
  * Time: 10:25
  */
 
-public class Migrants {
+public class Migrants implements SectionRequest{
+    public static final String SECTION_NAME="Migrants";
     private final Long idOfOrg;
     private final List<Long> currentActiveOutcome;
     private final List<CompositeIdOfMigrant> currentActiveIncome;
@@ -133,5 +135,10 @@ public class Migrants {
 
     public List<IncomeMigrationRequestsHistoryItem> getIncomeMigrationRequestsHistoryItems() {
         return incomeMigrationRequestsHistoryItems;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

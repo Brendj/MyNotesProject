@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -21,7 +21,8 @@ import java.util.List;
  * Time: 12:15
  */
 
-public class InteractiveReport extends AbstractToElement {
+public class InteractiveReport implements AbstractToElement, SectionRequest {
+    public static final String SECTION_NAME="InteractiveReportData";
 
     private List<InteractiveReportItem> items;
 
@@ -56,5 +57,10 @@ public class InteractiveReport extends AbstractToElement {
     @Override
     public Element toElement(Document document) throws Exception {
         return null;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

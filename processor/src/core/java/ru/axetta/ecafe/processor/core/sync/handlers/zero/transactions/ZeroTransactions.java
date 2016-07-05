@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions;
 
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
@@ -18,7 +19,8 @@ import java.util.List;
  * Time: 13:44
  * To change this template use File | Settings | File Templates.
  */
-public class ZeroTransactions {
+public class ZeroTransactions implements SectionRequest{
+    public static final String SECTION_NAME="ZeroTransactions";
     private final List<ZeroTransactionItem> items;
     private final Long maxVersion;
     private final Long idOfOrgOwner;
@@ -48,5 +50,10 @@ public class ZeroTransactions {
 
     public Long getIdOfOrgOwner() {
         return idOfOrgOwner;
+    }
+
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
     }
 }

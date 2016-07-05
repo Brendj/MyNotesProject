@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -24,7 +25,7 @@ import java.util.List;
  * Time: 12:27
  * To change this template use File | Settings | File Templates.
  */
-public class QuestionaryData {
+public class QuestionaryData implements AbstractToElement{
 
     private List<QuestionaryElement> questionaryElementList;
     private HashMap<Long, QuestionaryElement> questionaryElementHashMap = new HashMap<Long, QuestionaryElement>();

@@ -17,7 +17,7 @@ import org.w3c.dom.Element;
  * Time: 12:42
  * To change this template use File | Settings | File Templates.
  */
-public class ComplexRoleItem extends AbstractToElement {
+public class ComplexRoleItem implements AbstractToElement {
 
     private final Long id;
     private final String name;

@@ -1,7 +1,9 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
+import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
@@ -15,9 +17,28 @@ import java.util.List;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-public class PaymentRegistryBuilder {
+public class PaymentRegistryBuilder implements SectionRequestBuilder {
+    private LoadContext loadContext;
 
-    public PaymentRegistry build(Node paymentRegistryNode, LoadContext loadContext) throws Exception {
+    public PaymentRegistryBuilder(LoadContext loadContext){
+        this.loadContext = loadContext;
+    }
+
+    public PaymentRegistry build(Node envelopeNode) throws Exception {
+        SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+        return sectionRequest != null ? (PaymentRegistry) sectionRequest : null;
+    }
+
+    @Override
+    public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, PaymentRegistry.SECTION_NAME);
+        if (sectionElement != null) {
+            return buildFromCorrectSection(sectionElement);
+        }
+        return null;
+    }
+
+    private PaymentRegistry buildFromCorrectSection(Node paymentRegistryNode) throws Exception {
         List<Payment> POSPayments = new LinkedList<Payment>();
         Node itemNode = paymentRegistryNode.getFirstChild();
         while (null != itemNode) {
@@ -28,5 +49,4 @@ public class PaymentRegistryBuilder {
         }
         return new PaymentRegistry(POSPayments);
     }
-
 }

@@ -11,8 +11,8 @@ import org.w3c.dom.Node;
  * Time: 12:24
  * To change this template use File | Settings | File Templates.
  */
-public class ClientRequests {
-
+public class ClientRequests implements SectionRequest {
+    public static  final String SECTION_NAME="ClientRequests";
     private final Boolean responseTempCardOperation;
     //private final Long responseClientGuardian;
 
@@ -24,4 +24,8 @@ public class ClientRequests {
         return responseTempCardOperation;
     }
 
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
+    }
 }

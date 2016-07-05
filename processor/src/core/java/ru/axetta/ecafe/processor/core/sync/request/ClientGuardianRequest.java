@@ -14,8 +14,8 @@ import java.util.*;
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class ClientGuardianRequest {
-
+public class ClientGuardianRequest implements SectionRequest{
+    public static final String SECTION_NAME="ClientsGuardians";
     private final List<ClientGuardianItem> clientGuardianResponseElement;
     private final Long maxVersion;
 
@@ -45,4 +45,8 @@ public class ClientGuardianRequest {
         return new ClientGuardianRequest(maxVersion, items);
     }
 
+    @Override
+    public String getRequestSectionName() {
+        return SECTION_NAME;
+    }
 }
