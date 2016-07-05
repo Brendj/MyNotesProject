@@ -524,9 +524,15 @@ public class SyncRequest {
                 this.groupBuilder = new MenuGroup.Builder();
             }
 
-            public MenuGroups build(Node envelopeNode) throws Exception {
-                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
-                return sectionRequest!=null? (MenuGroups) sectionRequest :null;
+            public MenuGroups build(Node envelopeNode) {
+                try {
+                    SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                    if (sectionRequest != null)
+                        return (MenuGroups) sectionRequest;
+                } catch (Exception ex) {
+                    logger.error("Failed to build section request, MenuGroups");
+                }
+                return new MenuGroups(new LinkedList<MenuGroup>());
             }
 
             private MenuGroups buildFromCorrectSection(Node node) throws Exception {
@@ -2381,12 +2387,8 @@ public class SyncRequest {
             String clientVersion = getClientVersion(namedNodeMap);
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
-
-            MenuGroups menuGroups = new MenuGroups.Builder().build(envelopeNode);
-            LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
-
             List<SectionRequest> result = new ArrayList<SectionRequest>();
-            List<SectionRequestBuilder> builders = createSectionRequestBuilders(loadContext, org.getIdOfOrg());
+            List<SectionRequestBuilder> builders = createSectionRequestBuilders(version, org.getIdOfOrg(), envelopeNode);
             for (SectionRequestBuilder builder : builders) {
                 SectionRequest sectionRequest = buildSeactionRequest(envelopeNode, builder);
                 if (sectionRequest != null) {
@@ -2399,7 +2401,7 @@ public class SyncRequest {
                     result, manager);
         }
 
-        private SectionRequest buildSeactionRequest(Node envelopeNode, SectionRequestBuilder builder) throws Exception {
+        private SectionRequest buildSeactionRequest(Node envelopeNode, SectionRequestBuilder builder) {
             SectionRequest request = null;
             try {
                 request = builder.searchSectionNodeAndBuild(envelopeNode);
@@ -2410,8 +2412,10 @@ public class SyncRequest {
             return request;
         }
 
+        private List<SectionRequestBuilder> createSectionRequestBuilders(long version, long idOfOrg, Node envelopeNode) {
+            MenuGroups menuGroups = new MenuGroups.Builder().build(envelopeNode);
+            LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
 
-        private List<SectionRequestBuilder> createSectionRequestBuilders(LoadContext loadContext,long idOfOrg) {
             ArrayList<SectionRequestBuilder> builders = new ArrayList<SectionRequestBuilder>();
             builders.add(new PaymentRegistryBuilder(loadContext));
             builders.add(new AccountOperationsRegistry.Builder(loadContext));
@@ -2446,10 +2450,14 @@ public class SyncRequest {
             return builders;
         }
 
-        private Manager createManagerSyncRO(Node envelopeNode, SyncType syncType, Org org) throws Exception {
+        private Manager createManagerSyncRO(Node envelopeNode, SyncType syncType, Org org) {
             Manager manager = null;
-            Node roNode = findFirstChildElement(envelopeNode, "RO");
-            if (roNode != null) {
+            try {
+                Node roNode = findFirstChildElement(envelopeNode, "RO");
+                if (roNode == null) {
+                    return manager;
+                }
+
                 Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
                 List<String> groups = new ArrayList<String>();
                 groups.add("SettingsGroup");
@@ -2465,6 +2473,9 @@ public class SyncRequest {
                 }
                 manager = new Manager(org.getIdOfOrg(), groups);
                 manager.buildRO(roNode);
+            } catch (Exception ex) {
+                manager = null;
+                logger.error("Failed to build section request, RO");
             }
             return manager;
         }
