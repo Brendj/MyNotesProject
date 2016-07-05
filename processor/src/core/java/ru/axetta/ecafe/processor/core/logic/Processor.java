@@ -73,9 +73,11 @@ import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransa
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.process.ClientGuardianDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.request.*;
+import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
+import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -385,6 +387,10 @@ public class Processor
                     response = buildMigrantsSyncResponse(request);
                     break;
                 }
+                case TYPE_CONSTRUCTED:{
+                    response = buildUnivercalConstructedSectionsSyncResponse(request,syncStartTime,syncResult);
+                    break;
+                }
             }
 
         } catch (Exception e) {
@@ -398,6 +404,8 @@ public class Processor
         }
         return response;
     }
+
+
 
     @Override
     public PaymentResponse processPayRequest(PaymentRequest request) throws Exception {
@@ -1408,6 +1416,758 @@ public class Processor
                 resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
+    private SyncResponse buildUnivercalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
+            int syncResult) throws Exception {
+        Long idOfPacket = null;
+        SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+        List<Long> errorClientIds = new ArrayList<Long>();
+
+        if (request.isFullSync()) {
+            idOfPacket = generateIdOfPacket(request.getIdOfOrg());
+            // Register sync history
+            syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+                    request.getRemoteAddr());
+            addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
+                    request.getRemoteAddr());
+        }
+
+        // мигранты
+        fullProcessingMigrants(request, syncHistory, responseSections);
+
+        // операции со счетами
+        fullProcessingAccountOperationsRegistry(request, responseSections);
+
+        // Process paymentRegistry
+        boolean wasErrorProcessedPaymentRegistry = fullProcessingPaymentRegistry(request, syncHistory, responseSections, errorClientIds,idOfPacket);
+
+        //AccIncRegistry or AccIncUpdate
+        boolean wasErrorProcessedAccInc = fullProcessingAccIncRegistryOrAccIncUpdate(request, responseSections);
+
+        // Process ClientParamRegistry
+        fullProcessingClientParamsRegistry(request, syncHistory, errorClientIds);
+
+        // Process ClientGuardianRequest
+        fullProcessingClientGuardians(request, syncHistory, responseSections);
+
+        // Process OrgStructure
+        fullProcessingOrgStructure(request, syncHistory, responseSections);
+
+        // Build client registry
+        fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds);
+
+        // базовая корзина (товарный учет)
+        fullProcessingGoodsBasicBaskerData(request, syncHistory, responseSections);
+
+        // Process menu from Org
+        fullProcessingMenuFromOrg(request, syncStartTime, syncHistory, responseSections);
+
+        // Process prohibitions menu from Org
+        fullProcessingProhibitionsMenu(request, syncHistory, responseSections);
+
+        //Process organization structure
+        fullProcessingOrganizationStructure(request, syncHistory, responseSections);
+
+        // обработка структуры комплексов в организации
+        fullProcessingOrganizationComplexesStructure(request, syncHistory, responseSections);
+
+        // обработка интерактивного отчета
+        fullProcessingInteractiveReport(request, syncHistory, responseSections);
+
+        // Build AccRegistry
+        fullProcessingAccRegistry(request, syncHistory, responseSections);
+
+        // обработка операций по картам
+        fullProcessingCardsOperationsRegistry(request, responseSections);
+
+        // Process ReqDiary
+        fullProcessingResDiary(request, syncHistory, responseSections);
+
+        // Process enterEvents
+        fullProcessingEnterEvents(request, syncHistory, responseSections);
+
+        // обработка временных карт
+        fullProcessingTempCardsOperationsAndData(request, syncHistory, responseSections);
+
+        // Process ResCategoriesDiscountsAndRules
+        fullProcessingCategoriesDiscountaAndRules(request, syncHistory, responseSections);
+
+        // Process CorrectingNumbersOrdersRegistry
+        fullProcessingCorrectingNumbersSection(request, syncHistory, responseSections);
+
+        // обработка OrgOwnerData
+        fullProcessingOrgOwnerData(request, syncHistory, responseSections);
+
+        // обработка анкет
+        fullProcessingQuestionaryData(request, syncHistory, responseSections);
+
+        // RO (товарный учет)
+        fullProcessingRO(request, syncHistory, responseSections);
+
+        if (request.isFullSync() || request.isAccIncSync()) {
+            if (wasErrorProcessedPaymentRegistry || wasErrorProcessedAccInc) {
+                DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+            } else {
+                DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
+            }
+            if (RuntimeContext.getInstance().isMainNode() && RuntimeContext.getInstance().getSettingsConfig()
+                    .isEcafeAutopaymentBkEnabled()) {
+                runRegularPayments(request);
+            }
+        }
+
+        // обработка директив
+        fullProcessingDirectives(request, responseSections);
+
+        // AccountRegistry
+        fullProcessingAccountsRegistry(request, responseSections);
+
+        // обработка реестра TallonApproval
+        fullProcessingReestTaloonApproval(request, syncHistory, responseSections);
+
+        // обработка нулевых транзакций
+        fullProcessingZeroTransactions(request, syncHistory, responseSections);
+
+        // обработка SpecialDates
+        fullProcessingSpecialDates(request, syncHistory, responseSections);
+
+        //Process GroupManagers (классных руководителей)
+        fullProcessingClientGroupManagers(request, syncHistory, responseSections);
+
+        // время окончания обработки
+        Date syncEndTime = new Date();
+
+        if (request.isFullSync() && syncHistory!=null) {
+            updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
+            updateFullSyncParam(request.getIdOfOrg());
+        }
+
+        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime,
+                responseSections);
+    }
+
+
+    private void fullProcessingRO(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            if (request.getManager() != null) {
+                Manager manager = request.getManager();
+                manager.setSyncHistory(syncHistory);
+                manager.process(persistenceSessionFactory);
+                addToResponseSections(manager,responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(
+                    String.format("Failed to process of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+    }
+
+    private void fullProcessingAccountsRegistry(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest requestSection = request.findSection(AccountsRegistryRequest.class);
+            if (requestSection != null) {
+                AccountsRegistry accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class).handlerFull(request, request.getIdOfOrg());
+                addToResponseSections(accountsRegistry, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+    }
+
+    private void fullProcessingClientGroupManagers(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ClientGroupManagerRequest clientGroupManagerRequest = request.getClientGroupManagerRequest();
+            if (clientGroupManagerRequest != null) {
+                ClientgroupManagersProcessor processor = new ClientgroupManagersProcessor(persistenceSessionFactory,
+                        clientGroupManagerRequest);
+                ResClientgroupManagers resClientgroupManagers = processor.process();
+                addToResponseSections(resClientgroupManagers, responseSections);
+                ClientgroupManagerData clientgroupManagerData = processor.processData(request.getIdOfOrg());
+                addToResponseSections(clientgroupManagerData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to process GroupManagers, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingSpecialDates(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            SpecialDates specialDatesRequest = request.getSpecialDates();
+            if (specialDatesRequest != null) {
+                SpecialDatesData specialDatesData = processSpecialDatesData(specialDatesRequest);
+                addToResponseSections(specialDatesData, responseSections);
+
+                ResSpecialDates resSpecialDates = processSpecialDates(specialDatesRequest);
+                addToResponseSections(resSpecialDates, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processSpecialDates: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingZeroTransactions(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ZeroTransactions zeroTransactionsRequest = request.findSection(ZeroTransactions.class);
+            if (zeroTransactionsRequest != null) {
+                ZeroTransactionData zeroTransactionData = processZeroTransactionsData(zeroTransactionsRequest);
+                addToResponseSections(zeroTransactionData, responseSections);
+
+                ResZeroTransactions resZeroTransactions = processZeroTransactions(zeroTransactionsRequest);
+                addToResponseSections(resZeroTransactions, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processZeroTransactions: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingReestTaloonApproval(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ReestrTaloonApproval reestrTaloonApprovalRequest = request.getReestrTaloonApproval();
+            if (reestrTaloonApprovalRequest != null) {
+                ReestrTaloonApprovalData reestrTaloonApprovalData = processReestrTaloonApprovalData(
+                        reestrTaloonApprovalRequest);
+                addToResponseSections(reestrTaloonApprovalData, responseSections);
+
+                ResReestrTaloonApproval resReestrTaloonApproval = processReestrTaloonApproval(
+                        reestrTaloonApprovalRequest);
+                addToResponseSections(resReestrTaloonApproval, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingDirectives(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest section = request.findSection(DirectivesRequest.class);
+            if (section != null) {
+                DirectiveElement directiveElement = processFullSyncDirective(request.getOrg());
+                addToResponseSections(directiveElement, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+    }
+
+    private void fullProcessingQuestionaryData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest sectionRequest = request.findSection(QuestionaryClientsRequest.class);
+            if (sectionRequest != null) {
+                QuestionaryData questionaryData = processQuestionaryData(request.getIdOfOrg());
+                addToResponseSections(questionaryData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to process questionary data, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingOrgOwnerData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest requestSection = request.findSection(OrgOwnerDataRequest.class);
+            if (requestSection != null) {
+                OrgOwnerData orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
+                addToResponseSections(orgOwnerData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingCorrectingNumbersSection(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest section = request.findSection(CorrectingNumbersOrdersRegistryRequest.class);
+            if (section != null) {
+                SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(
+                        request.getIdOfOrg());
+                addToResponseSections(correctingNumbersOrdersRegistry, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process numbers of Orders and EnterEvent, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingComplexRoles(List<AbstractToElement> responseSections) {
+        try {
+            ComplexRoles complexRoles = processComplexRoles();
+            addToResponseSections(complexRoles, responseSections);
+        } catch (Exception e) {
+            String message = String.format("processComplexRoles: %s", e.getMessage());
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingCategoriesDiscountaAndRules(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            CategoriesDiscountsAndRulesRequest categoriesDiscountsAndRulesRequest = request.findSection(CategoriesDiscountsAndRulesRequest.class);
+            if (categoriesDiscountsAndRulesRequest != null) {
+                ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(
+                        request.getIdOfOrg(), categoriesDiscountsAndRulesRequest);
+                addToResponseSections(resCategoriesDiscountsAndRules, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process categories and rules, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingTempCardsOperationsAndData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        TempCardsOperations cardsOperations = request.getTempCardsOperations();
+        if (cardsOperations == null) return;
+
+        try {
+            ResTempCardsOperations tempCardsOperations = processTempCardsOperations(cardsOperations);
+            addToResponseSections(tempCardsOperations, responseSections);
+        } catch (Exception e) {
+            String message = String.format("processTempCardsOperations: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            if (request.getClientRequests() != null) {
+                ClientRequests clientRequests = request.getClientRequests();
+                if (clientRequests.getResponseTempCardOperation()) {
+                    TempCardOperationData tempCardOperationData = processClientRequestsOperations(request.getIdOfOrg());
+                    addToResponseSections(tempCardOperationData, responseSections);
+                }
+            }
+        } catch (Exception e) {
+            String message = String.format("processClientRequestsOperations: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    void fullProcessingEnterEvents(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            if (request.getEnterEvents() != null) {
+                if (request.getEnterEvents().getEvents().size() > 0) {
+                    if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_S)) {
+                        createSyncHistoryException(request.getIdOfOrg(), syncHistory, "no license slots available");
+                        throw new Exception("no license slots available");
+                    }
+                }
+                SyncResponse.ResEnterEvents resEnterEvents = processSyncEnterEvents(request.getEnterEvents(),
+                        request.getOrg());
+                addToResponseSections(resEnterEvents, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+    }
+
+    private void fullProcessingResDiary(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        SyncRequest.ReqDiary reqDiary = request.findSection(SyncRequest.ReqDiary.class);
+        if (reqDiary == null) return;
+
+        SyncResponse.ResDiary resultDiary = null;
+        try {
+            resultDiary = processSyncDiary(request.getIdOfOrg(), reqDiary);
+        } catch (Exception e) {
+            resultDiary = new SyncResponse.ResDiary(1, "Unexpected error");
+            String message = "SyncResponse.ResDiary: Unexpected error";
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        addToResponseSections(resultDiary, responseSections);
+    }
+
+    private void fullProcessingCardsOperationsRegistry(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest sectionRequest = request.findSection(CardsOperationsRegistry.class);
+            if (sectionRequest != null) {
+                ResCardsOperationsRegistry resCardsOperationsRegistry = new CardsOperationsRegistryHandler()
+                        .handler(request, request.getIdOfOrg());
+                addToResponseSections(resCardsOperationsRegistry, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),e);
+        }
+    }
+
+    private void fullProcessingAccRegistry(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        SyncResponse.AccRegistry accRegistry=null;
+        try {
+            accRegistry = getAccRegistry(request.getIdOfOrg(), null,
+                    request.getClientVersion());
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        addToResponseSections(accRegistry, responseSections);
+    }
+
+    private boolean fullProcessingAccIncRegistryOrAccIncUpdate(SyncRequest request,
+            List<AbstractToElement> responseSections) {
+        SyncRequest.AccIncRegistryRequest accIncRegistryRequest = request.getAccIncRegistryRequest();
+        if (accIncRegistryRequest == null) return false;
+
+        boolean wasError = false;
+        try {
+            if (request.getProtoVersion() < 6) {
+                SyncResponse.AccIncRegistry accIncRegistry = getAccIncRegistry(request.getOrg(), accIncRegistryRequest.dateTime);
+                addToResponseSections(accIncRegistry, responseSections);
+            } else {
+                AccRegistryUpdate accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), accIncRegistryRequest.dateTime);
+                addToResponseSections(accRegistryUpdate, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+            if (request.getProtoVersion() < 6) {
+                SyncResponse.AccIncRegistry accIncRegistry = new SyncResponse.AccIncRegistry();
+                accIncRegistry.setDate(accIncRegistryRequest.dateTime);
+                addToResponseSections(accIncRegistry, responseSections);
+            } else {
+                AccRegistryUpdate accRegistryUpdate = new AccRegistryUpdate();
+                addToResponseSections(accRegistryUpdate, responseSections);
+            }
+            wasError = true;
+        }
+        return wasError;
+    }
+
+    private void fullProcessingInteractiveReport(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        InteractiveReport interactiveReport = request.getInteractiveReport();
+        if (interactiveReport == null) return;
+
+        try {
+            InteractiveReport resultInteractiveReport = processInteractiveReport(request.getIdOfOrg(), interactiveReport);
+            addToResponseSections(resultInteractiveReport, responseSections);
+        } catch (Exception e) {
+            String message = String.format("processInteractiveReport: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        try {
+            InteractiveReportData interactiveReportData = processInteractiveReportData(request.getIdOfOrg());
+            addToResponseSections(interactiveReportData, responseSections);
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to build interactive report data, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingOrganizationComplexesStructure(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        SectionRequest sectionRequest = request.findSection(OrganizationComplexesStructureRequest.class);
+        if (sectionRequest == null) return;
+
+        OrganizationComplexesStructure organizationComplexesStructure=null;
+        try {
+            organizationComplexesStructure = getOrganizationComplexesStructureData(
+                    request.getOrg());
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            organizationComplexesStructure = new OrganizationComplexesStructure(100,
+                    String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
+        addToResponseSections(organizationComplexesStructure, responseSections);
+    }
+
+    private void fullProcessingOrganizationStructure(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        final OrganizationStructureRequest organizationStructureRequest = request.findSection(OrganizationStructureRequest.class);
+        if (organizationStructureRequest == null) return;
+
+        OrganizationStructure organizationStructureData = null;
+        try {
+            organizationStructureData = getOrganizationStructureData(request.getOrg(),
+                    organizationStructureRequest.getMaxVersion(), organizationStructureRequest.isAllOrgs());
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to build organization structure, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            organizationStructureData = new OrganizationStructure(100, String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
+        addToResponseSections(organizationStructureData, responseSections);
+    }
+
+    private void fullProcessingProhibitionsMenu(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        final ProhibitionMenuRequest prohibitionsMenuRequest = request.findSection(ProhibitionMenuRequest.class);
+        if (prohibitionsMenuRequest == null) return;
+
+        ProhibitionsMenu prohibitionsMenuData = null;
+        try {
+            prohibitionsMenuData = getProhibitionsMenuData(request.getOrg(), prohibitionsMenuRequest.getMaxVersion());
+        } catch (Exception e) {
+            String message = String.format("Failed to build prohibitions menu, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            prohibitionsMenuData = new ProhibitionsMenu(100, String.format("Internal error: %s", e.getMessage()));
+            logger.error(message, e);
+        }
+        addToResponseSections(prohibitionsMenuData, responseSections);
+    }
+
+    private void fullProcessingMenuFromOrg(SyncRequest request, Date syncStartTime, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        SyncRequest.ReqMenu requestMenu = request.getReqMenu();
+        if (requestMenu == null) return;
+
+        try {
+            processSyncMenu(request.getIdOfOrg(), requestMenu);
+        } catch (Exception e) {
+            String message = String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        try {
+            SyncResponse.ResMenuExchangeData menuExchangeData = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
+                    DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
+            addToResponseSections(menuExchangeData, responseSections);
+        } catch (Exception e) {
+            String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        // Process ComplexRoles
+        fullProcessingComplexRoles(responseSections);
+    }
+
+    private void fullProcessingGoodsBasicBaskerData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            SectionRequest goodsBasicBasketRequest = request.findSection(GoodsBasicBasketRequest.class);
+            if (goodsBasicBasketRequest!=null) {
+                GoodsBasicBasketData goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
+                addToResponseSections(goodsBasicBasketData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process goods basic basket data , IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingClientsRegistry(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections, List<Long> errorClientIds) {
+        try {
+            SyncRequest.ClientRegistryRequest clientRegistryRequest = request.getClientRegistryRequest();
+            if (clientRegistryRequest != null) {
+                SyncResponse.ClientRegistry clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
+                        clientRegistryRequest, errorClientIds);
+                addToResponseSections(clientRegistry, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private boolean fullProcessingPaymentRegistry(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections, List<Long> errorClientIds, Long idOfPacket) {
+        boolean wasError = false;
+        try {
+            PaymentRegistry paymentRegistryRequest = request.getPaymentRegistry();
+            if (paymentRegistryRequest == null)
+                return wasError;
+
+            if (paymentRegistryRequest.getPayments() != null && paymentRegistryRequest.getPayments().hasNext()) {
+                if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
+                    SyncHistory localSyncHistory = syncHistory;
+                    if (localSyncHistory == null) {
+                        String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
+                        Long packet = (idOfPacket == null ? -1L : idOfPacket);
+                        localSyncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
+                                request.getRemoteAddr());
+                    }
+                    final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available",
+                            request.getIdOfOrg());
+                    createSyncHistoryException(request.getIdOfOrg(), localSyncHistory, s);
+                    throw new Exception("no license slots available");
+                }
+            }
+            ResPaymentRegistry resPaymentRegistry = processSyncPaymentRegistry(
+                    syncHistory != null ? syncHistory.getIdOfSync() : null, request.getIdOfOrg(), paymentRegistryRequest, errorClientIds);
+            addToResponseSections(resPaymentRegistry, responseSections);
+        } catch (Exception e) {
+            wasError = true;
+            String message = String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        return wasError;
+    }
+
+    private void fullProcessingClientParamsRegistry(SyncRequest request, SyncHistory syncHistory,
+            List<Long> errorClientIds) {
+        try {
+            SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
+            if (clientParamRegistry != null) {
+                processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds);
+            }
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingOrgStructure(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        SyncRequest.OrgStructure orgStructureRequest = request.getOrgStructure();
+        if (orgStructureRequest == null) return;
+        SyncResponse.ResOrgStructure resOrgStructure=null;
+        try {
+            resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), orgStructureRequest, syncHistory);
+            if (resOrgStructure != null && resOrgStructure.getResult() > 0) {
+                createSyncHistoryException(request.getIdOfOrg(), syncHistory, resOrgStructure.getError());
+            }
+        } catch (Exception e) {
+            resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
+            String message = String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        addToResponseSections(resOrgStructure, responseSections);
+    }
+
+    private void fullProcessingClientGuardians(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ClientGuardianRequest clientGuardianRequest = request.getClientGuardianRequest();
+            if (clientGuardianRequest != null) {
+                final List<ClientGuardianItem> clientGuardianResponseElement = clientGuardianRequest
+                        .getClientGuardianResponseElement();
+                if (clientGuardianResponseElement != null) {
+                    ResultClientGuardian resultClientGuardian = processClientGuardian(clientGuardianResponseElement,
+                            request.getIdOfOrg(), syncHistory);
+                    addToResponseSections(resultClientGuardian, responseSections);
+                }
+                final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
+                if (responseClientGuardian != null) {
+                    ClientGuardianData clientGuardianData = processClientGuardianData(request.getIdOfOrg(), syncHistory,
+                            responseClientGuardian);
+                    addToResponseSections(clientGuardianData, responseSections);
+                }
+            }
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingAccountOperationsRegistry(SyncRequest request,
+            List<AbstractToElement> responseSections) {
+        try {
+            if (request.getAccountOperationsRegistry() != null) {
+                AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
+                ResAccountOperationsRegistry resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
+                addToResponseSections(resAccountOperationsRegistry, responseSections);
+            }
+        } catch (Exception e) {
+            logger.error("Ошибка при обработке AccountOperationsRegistry: ", e);
+        }
+    }
+
+    private void fullProcessingMigrants(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        Migrants migrantsRequest = request.getMigrants();
+        if (migrantsRequest == null) return;
+
+        try {
+            ResMigrants resMigrants = processMigrants(request.getMigrants());
+            MigrantsData migrantsData = processMigrantsData(request.getMigrants());
+            addToResponseSections(resMigrants, responseSections);
+            addToResponseSections(migrantsData, responseSections);
+        } catch (Exception e) {
+            String message = String.format("processMigrants: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            SyncResponse.ClientRegistry clientRegistry = processSyncClientRegistryForMigrants(request.getIdOfOrg());
+            addToResponseSections(clientRegistry, responseSections);
+        } catch (Exception e) {
+            String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        SyncResponse.AccRegistry accRegistryForMigrants;
+        try {
+            accRegistryForMigrants = getAccRegistryForMigrants(request.getIdOfOrg());
+        } catch (Exception e) {
+            accRegistryForMigrants = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        addToResponseSections(accRegistryForMigrants, responseSections);
+
+        try {
+            AccountsRegistry accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
+                    .handlerMigrants(request.getIdOfOrg());
+            addToResponseSections(accountsRegistry, responseSections);
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+        }
+
+        try {
+            ClientGuardianData clientGuardianData = processClientGuardianDataForMigrants(request.getIdOfOrg(),
+                    syncHistory, null);
+            addToResponseSections(clientGuardianData, responseSections);
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to process ClientGuardianRequest, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+
+
+    private void addToResponseSections(AbstractToElement section,List<AbstractToElement> responseSections) {
+        if (section != null) {
+            responseSections.add(section);
+        }
+    }
 
     /*
     * Запуск авто пополнения
