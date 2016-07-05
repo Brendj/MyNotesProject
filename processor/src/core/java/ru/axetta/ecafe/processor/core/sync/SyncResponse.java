@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.accounts.AccountsRegistry;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -47,7 +48,7 @@ import java.util.*;
  */
 public class SyncResponse {
 
-    public static class AccRegistry {
+    public static class AccRegistry implements AbstractToElement{
 
         public static class Item {
 
@@ -193,6 +194,14 @@ public class SyncResponse {
             return items.size();
         }
 
+        @Override
+        public Element toElement(Document document) throws Exception {
+            DateFormat dateFormat = CalendarUtils.getDateFormatLocal();
+            DateFormat timeFormat = CalendarUtils.getDateTimeFormatLocal();
+            return toElement(document,dateFormat,timeFormat);
+        }
+
+
         public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
             Element element = document.createElement("AccRegistry");
             for (Item item : this.items) {
@@ -207,7 +216,9 @@ public class SyncResponse {
         }
     }
 
-    public static class AccIncRegistry {
+    public static class AccIncRegistry implements AbstractToElement{
+
+
 
         public static class Item {
 
@@ -284,6 +295,13 @@ public class SyncResponse {
             return items.iterator();
         }
 
+        @Override
+        public Element toElement(Document document) throws Exception {
+            DateFormat dateFormat = CalendarUtils.getDateFormatLocal();
+            DateFormat timeFormat = CalendarUtils.getDateTimeFormatLocal();
+            return toElement(document,dateFormat,timeFormat);
+        }
+
         public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
             Element element = document.createElement("AccIncRegistry");
             element.setAttribute("Date", timeFormat.format(date));
@@ -299,7 +317,7 @@ public class SyncResponse {
         }
     }
 
-    public static class ClientRegistry {
+    public static class ClientRegistry implements AbstractToElement{
 
         public static class Item {
 
@@ -558,7 +576,7 @@ public class SyncResponse {
         }
     }
 
-    public static class CorrectingNumbersOrdersRegistry {
+    public static class CorrectingNumbersOrdersRegistry implements AbstractToElement{
 
         private  Long IdOfOrder;
         private  Long IdOfOrderDetail;
@@ -595,7 +613,7 @@ public class SyncResponse {
         }
     }
 
-    public static class ResOrgStructure {
+    public static class ResOrgStructure implements AbstractToElement {
 
         private final int result;
         private final String error;
@@ -633,7 +651,7 @@ public class SyncResponse {
         }
     }
 
-    public static class ResMenuExchangeData {
+    public static class ResMenuExchangeData implements AbstractToElement{
 
         public static class Item {
 
@@ -900,7 +918,7 @@ public class SyncResponse {
         }
     }
 
-    public static class ResDiary {
+    public static class ResDiary implements AbstractToElement{
 
         private final int result;
         private final String error;
@@ -938,7 +956,7 @@ public class SyncResponse {
         }
     }
 
-    public static class ResEnterEvents {
+    public static class ResEnterEvents implements AbstractToElement{
 
         public static class Item {
 
@@ -1018,43 +1036,43 @@ public class SyncResponse {
     private final Long protoVersion;
     private final Date time;
     private final String options;
-    private final AccRegistry accRegistry;
-    private final ResPaymentRegistry resPaymentRegistry;
-    private final ResAccountOperationsRegistry resAccountOperationsRegistry;
-    private final AccIncRegistry accIncRegistry;
-    private final ClientRegistry clientRegistry;
-    private final ResOrgStructure resOrgStructure;
-    private final ResMenuExchangeData resMenuExchangeData;
-    private final ResDiary resDiary;
-    private final String message;
-    private final ResEnterEvents resEnterEvents;
-    private final ResTempCardsOperations resTempCardsOperations;
-    private final TempCardOperationData tempCardOperationData;
-    private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
-    private final ComplexRoles complexRoles;
-    private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
-    private final OrgOwnerData orgOwnerData;
-    private final QuestionaryData questionaryData;
-    private final GoodsBasicBasketData goodsBasicBasketData;
-    private final Manager manager;
-    private final DirectiveElement directiveElement;
-    private final ResultClientGuardian resultClientGuardian;
-    private final ClientGuardianData clientGuardians;
-    private final AccRegistryUpdate accRegistryUpdate;
-    private final ProhibitionsMenu prohibitionsMenu;
-    private final ResCardsOperationsRegistry resCardsOperationsRegistry;
-    private final AccountsRegistry accountsRegistry;
-    private final OrganizationStructure organizationStructure;
-    private final ResReestrTaloonApproval resReestrTaloonApproval;
-    private final ReestrTaloonApprovalData reestrTaloonApprovalData;
-    private final OrganizationComplexesStructure organizationComplexesStructure;
-    private final ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
-    private final ZeroTransactionData zeroTransactionData;
-    private final ResZeroTransactions resZeroTransactions;
-    private final SpecialDatesData specialDatesData;
-    private final ResSpecialDates resSpecialDates;
-    private final MigrantsData migrantsData;
-    private final ResMigrants resMigrants;
+    private AccRegistry accRegistry;
+    private ResPaymentRegistry resPaymentRegistry;
+    private  ResAccountOperationsRegistry resAccountOperationsRegistry;
+    private  AccIncRegistry accIncRegistry;
+    private  ClientRegistry clientRegistry;
+    private  ResOrgStructure resOrgStructure;
+    private  ResMenuExchangeData resMenuExchangeData;
+    private  ResDiary resDiary;
+    private  String message;
+    private  ResEnterEvents resEnterEvents;
+    private  ResTempCardsOperations resTempCardsOperations;
+    private  TempCardOperationData tempCardOperationData;
+    private  ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
+    private  ComplexRoles complexRoles;
+    private  CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
+    private  OrgOwnerData orgOwnerData;
+    private  QuestionaryData questionaryData;
+    private  GoodsBasicBasketData goodsBasicBasketData;
+    private  Manager manager;
+    private  DirectiveElement directiveElement;
+    private  ResultClientGuardian resultClientGuardian;
+    private  ClientGuardianData clientGuardians;
+    private  AccRegistryUpdate accRegistryUpdate;
+    private  ProhibitionsMenu prohibitionsMenu;
+    private  ResCardsOperationsRegistry resCardsOperationsRegistry;
+    private  AccountsRegistry accountsRegistry;
+    private  OrganizationStructure organizationStructure;
+    private  ResReestrTaloonApproval resReestrTaloonApproval;
+    private  ReestrTaloonApprovalData reestrTaloonApprovalData;
+    private  OrganizationComplexesStructure organizationComplexesStructure;
+    private  ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
+    private  ZeroTransactionData zeroTransactionData;
+    private  ResZeroTransactions resZeroTransactions;
+    private  SpecialDatesData specialDatesData;
+    private  ResSpecialDates resSpecialDates;
+    private  MigrantsData migrantsData;
+    private  ResMigrants resMigrants;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1123,6 +1141,20 @@ public class SyncResponse {
         this.responseSections = responseSections;
     }
 
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
+            String directorName, Long idOfPacket, Long protoVersion, Date time, List<AbstractToElement> responseSections) {
+        this.syncType = syncType;
+        this.idOfOrg = idOfOrg;
+        this.orgName = orgName;
+        this.organizationType = organizationType;
+        this.directorName = directorName;
+        this.idOfPacket = idOfPacket;
+        this.protoVersion = protoVersion;
+        this.time = time;
+        this.options = "";
+        this.responseSections = responseSections;
+    }
+
     public Document toDocument() throws Exception {
         TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
         DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -1139,200 +1171,208 @@ public class SyncResponse {
         Document document = documentBuilder.newDocument();
         Element dataElement = document.createElement("Data");
         Element bodyElement = document.createElement("Body");
-
-
         Element ecafeEnvelopeElement = document.createElement("CafeteriaExchange");
-        ecafeEnvelopeElement.setAttribute("IdOfOrg", this.idOfOrg.toString());
-        ecafeEnvelopeElement.setAttribute("Org", this.orgName);
-        if (this.idOfPacket != null) {
-            ecafeEnvelopeElement.setAttribute("IdOfPacket", this.idOfPacket.toString());
-        }
-        ecafeEnvelopeElement.setAttribute("Version", this.protoVersion.toString());
-        ecafeEnvelopeElement.setAttribute("Date", timeFormat.format(this.time));
-        ecafeEnvelopeElement.setAttribute("Options", this.options);
-        ecafeEnvelopeElement.setAttribute("Type",syncType.toString());
-        ecafeEnvelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
-        ecafeEnvelopeElement.setAttribute("ReportService", (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.report.service"));
 
-        if (directorName != null) {
-            ecafeEnvelopeElement.setAttribute("DirectorName", this.directorName);
-        }
+        writeEnvelopeElementAttributes(timeFormat, ecafeEnvelopeElement);
+        writeResponseSections(dateFormat, timeFormat, document, ecafeEnvelopeElement);
 
-        // ResPaymentRegistry
-        if (null != resPaymentRegistry) {
-            ecafeEnvelopeElement.appendChild(resPaymentRegistry.toElement(document));
-        }
-
-        // ResAccountOperationsRegistry
-        if (null != resAccountOperationsRegistry) {
-            ecafeEnvelopeElement.appendChild(resAccountOperationsRegistry.toElement(document));
-        }
-
-        // AccIncRegistry
-        if (null != accIncRegistry) {
-            ecafeEnvelopeElement.appendChild(accIncRegistry.toElement(document, dateFormat, timeFormat));
-        }
-
-        // AccRegistryUpdate
-        if (null != accRegistryUpdate) {
-            ecafeEnvelopeElement.appendChild(accRegistryUpdate.toElement(document, timeFormat));
-        }
-
-        // AccRegistry
-        if (null != accRegistry) {
-            ecafeEnvelopeElement.appendChild(accRegistry.toElement(document, dateFormat, timeFormat));
-        }
-
-        // ClientRegistry
-        if (null != clientRegistry) {
-            ecafeEnvelopeElement.appendChild(clientRegistry.toElement(document));
-        }
-
-        if(resultClientGuardian != null){
-            ecafeEnvelopeElement.appendChild(resultClientGuardian.toElement(document));
-        }
-
-        if(clientGuardians != null){
-            ecafeEnvelopeElement.appendChild(clientGuardians.toElement(document));
-        }
-
-        // ResOrgStructure
-        if (null != resOrgStructure) {
-            ecafeEnvelopeElement.appendChild(resOrgStructure.toElement(document));
-        }
-
-        // Menu
-        if (null != resMenuExchangeData) {
-            ecafeEnvelopeElement.appendChild(resMenuExchangeData.toElement(document));
-        }
-
-        // ProhibitionsMenu
-        if (null != prohibitionsMenu) {
-            ecafeEnvelopeElement.appendChild(prohibitionsMenu.toElement(document));
-        }
-
-        //OrganizationStructure
-        if (null != organizationStructure) {
-            ecafeEnvelopeElement.appendChild(organizationStructure.toElement(document));
-        }
-
-        if (resDiary != null) {
-            ecafeEnvelopeElement.appendChild(resDiary.toElement(document));
-        }
-
-        if (StringUtils.isNotEmpty(this.message)) {
-            Element messageElement = document.createElement("Message");
-            messageElement.appendChild(document.createTextNode(this.message));
-            ecafeEnvelopeElement.appendChild(messageElement);
-        }
-
-        // ResEnterEvents
-        if (resEnterEvents != null) {
-            ecafeEnvelopeElement.appendChild(resEnterEvents.toElement(document));
-        }
-
-        // ResTempCardsOperations
-        if (resTempCardsOperations != null) {
-            ecafeEnvelopeElement.appendChild(resTempCardsOperations.toElement(document));
-        }
-
-        // TempCardOperationData
-        if (tempCardOperationData != null) {
-            ecafeEnvelopeElement.appendChild(tempCardOperationData.toElement(document));
-        }
-
-        // ResCategoriesDiscountsAndRules
-        if (resCategoriesDiscountsAndRules != null) {
-            ecafeEnvelopeElement.appendChild(resCategoriesDiscountsAndRules.toElement(document));
-        }
-
-        // ComplexRoles
-        if (complexRoles != null) {
-            ecafeEnvelopeElement.appendChild(complexRoles.toElement(document));
-        }
-
-        // CorrectingNumbersOrdersRegistry
-        if (correctingNumbersOrdersRegistry != null){
-            ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
-        }
-
-        if (interactiveReportData != null) {
-            ecafeEnvelopeElement.appendChild(interactiveReportData.toElement(document));
-        }
-
-        if(manager != null){
-            ecafeEnvelopeElement.appendChild(manager.toElement(document));
-        }
-
-        if(orgOwnerData != null){
-            ecafeEnvelopeElement.appendChild(orgOwnerData.toElement(document));
-        }
-
-        if(questionaryData != null) {
-            ecafeEnvelopeElement.appendChild(questionaryData.toElement(document));
-        }
-
-        if(goodsBasicBasketData != null) {
-            ecafeEnvelopeElement.appendChild(goodsBasicBasketData.toElement(document));
-        }
-
-        if(accountsRegistry != null) {
-            ecafeEnvelopeElement.appendChild(accountsRegistry.toElement(document));
-        }
-
-        if(resCardsOperationsRegistry != null) {
-            ecafeEnvelopeElement.appendChild(resCardsOperationsRegistry.toElement(document));
-        }
-
-        if(directiveElement != null) {
-            ecafeEnvelopeElement.appendChild(directiveElement.toElement(document));
-        }
-
-        if (resReestrTaloonApproval != null) {
-            ecafeEnvelopeElement.appendChild(resReestrTaloonApproval.toElement(document));
-        }
-
-        if (reestrTaloonApprovalData != null) {
-            ecafeEnvelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
-        }
-
-        if (organizationComplexesStructure != null) {
-            ecafeEnvelopeElement.appendChild(organizationComplexesStructure.toElement(document));
-        }
-
-        if (resZeroTransactions != null) {
-            ecafeEnvelopeElement.appendChild(resZeroTransactions.toElement(document));
-        }
-
-        if (zeroTransactionData != null) {
-            ecafeEnvelopeElement.appendChild(zeroTransactionData.toElement(document));
-        }
-
-        if (resSpecialDates != null) {
-            ecafeEnvelopeElement.appendChild(resSpecialDates.toElement(document));
-        }
-
-        if (specialDatesData != null) {
-            ecafeEnvelopeElement.appendChild(specialDatesData.toElement(document));
-        }
-
-        if (resMigrants != null) {
-            ecafeEnvelopeElement.appendChild(resMigrants.toElement(document));
-        }
-
-        if (migrantsData != null) {
-            ecafeEnvelopeElement.appendChild(migrantsData.toElement(document));
-        }
-
-        if (this.responseSections != null) {
-            for (AbstractToElement section : this.responseSections) {
-                ecafeEnvelopeElement.appendChild(section.toElement(document));
-            }
-        }
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);
         document.appendChild(dataElement);
         return document;
+    }
+
+    private void writeEnvelopeElementAttributes(DateFormat timeFormat, Element envelopeElement) {
+        envelopeElement.setAttribute("IdOfOrg", this.idOfOrg.toString());
+        envelopeElement.setAttribute("Org", this.orgName);
+        if (this.idOfPacket != null) {
+            envelopeElement.setAttribute("IdOfPacket", this.idOfPacket.toString());
+        }
+        envelopeElement.setAttribute("Version", this.protoVersion.toString());
+        envelopeElement.setAttribute("Date", timeFormat.format(this.time));
+        envelopeElement.setAttribute("Options", this.options);
+        envelopeElement.setAttribute("Type",syncType.toString());
+        envelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
+        envelopeElement.setAttribute("ReportService", (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.report.service"));
+        if (directorName != null) {
+            envelopeElement.setAttribute("DirectorName", this.directorName);
+        }
+    }
+
+    private void writeResponseSections(DateFormat dateFormat, DateFormat timeFormat, Document document,
+            Element envelopeElement) throws Exception {
+
+        if (StringUtils.isNotEmpty(this.message)) {
+            Element messageElement = document.createElement("Message");
+            messageElement.appendChild(document.createTextNode(this.message));
+            envelopeElement.appendChild(messageElement);
+        }
+
+        // ResPaymentRegistry
+        if (null != resPaymentRegistry) {
+            envelopeElement.appendChild(resPaymentRegistry.toElement(document));
+        }
+
+        // ResAccountOperationsRegistry
+        if (null != resAccountOperationsRegistry) {
+            envelopeElement.appendChild(resAccountOperationsRegistry.toElement(document));
+        }
+
+        // AccIncRegistry
+        if (null != accIncRegistry) {
+            envelopeElement.appendChild(accIncRegistry.toElement(document, dateFormat, timeFormat));
+        }
+
+        // AccRegistryUpdate
+        if (null != accRegistryUpdate) {
+            envelopeElement.appendChild(accRegistryUpdate.toElement(document, timeFormat));
+        }
+
+        // AccRegistry
+        if (null != accRegistry) {
+            envelopeElement.appendChild(accRegistry.toElement(document, dateFormat, timeFormat));
+        }
+
+        // ClientRegistry
+        if (null != clientRegistry) {
+            envelopeElement.appendChild(clientRegistry.toElement(document));
+        }
+
+        if(resultClientGuardian != null){
+            envelopeElement.appendChild(resultClientGuardian.toElement(document));
+        }
+
+        if(clientGuardians != null){
+            envelopeElement.appendChild(clientGuardians.toElement(document));
+        }
+
+        // ResOrgStructure
+        if (null != resOrgStructure) {
+            envelopeElement.appendChild(resOrgStructure.toElement(document));
+        }
+
+        // Menu
+        if (null != resMenuExchangeData) {
+            envelopeElement.appendChild(resMenuExchangeData.toElement(document));
+        }
+
+        // ProhibitionsMenu
+        if (null != prohibitionsMenu) {
+            envelopeElement.appendChild(prohibitionsMenu.toElement(document));
+        }
+
+        //OrganizationStructure
+        if (null != organizationStructure) {
+            envelopeElement.appendChild(organizationStructure.toElement(document));
+        }
+
+        if (resDiary != null) {
+            envelopeElement.appendChild(resDiary.toElement(document));
+        }
+
+        // ResEnterEvents
+        if (resEnterEvents != null) {
+            envelopeElement.appendChild(resEnterEvents.toElement(document));
+        }
+
+        // ResTempCardsOperations
+        if (resTempCardsOperations != null) {
+            envelopeElement.appendChild(resTempCardsOperations.toElement(document));
+        }
+
+        // TempCardOperationData
+        if (tempCardOperationData != null) {
+            envelopeElement.appendChild(tempCardOperationData.toElement(document));
+        }
+
+        // ResCategoriesDiscountsAndRules
+        if (resCategoriesDiscountsAndRules != null) {
+            envelopeElement.appendChild(resCategoriesDiscountsAndRules.toElement(document));
+        }
+
+        // ComplexRoles
+        if (complexRoles != null) {
+            envelopeElement.appendChild(complexRoles.toElement(document));
+        }
+
+        // CorrectingNumbersOrdersRegistry
+        if (correctingNumbersOrdersRegistry != null){
+            envelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));
+        }
+
+        if (interactiveReportData != null) {
+            envelopeElement.appendChild(interactiveReportData.toElement(document));
+        }
+
+        if(manager != null){
+            envelopeElement.appendChild(manager.toElement(document));
+        }
+
+        if(orgOwnerData != null){
+            envelopeElement.appendChild(orgOwnerData.toElement(document));
+        }
+
+        if(questionaryData != null) {
+            envelopeElement.appendChild(questionaryData.toElement(document));
+        }
+
+        if(goodsBasicBasketData != null) {
+            envelopeElement.appendChild(goodsBasicBasketData.toElement(document));
+        }
+
+        if(accountsRegistry != null) {
+            envelopeElement.appendChild(accountsRegistry.toElement(document));
+        }
+
+        if(resCardsOperationsRegistry != null) {
+            envelopeElement.appendChild(resCardsOperationsRegistry.toElement(document));
+        }
+
+        if(directiveElement != null) {
+            envelopeElement.appendChild(directiveElement.toElement(document));
+        }
+
+        if (resReestrTaloonApproval != null) {
+            envelopeElement.appendChild(resReestrTaloonApproval.toElement(document));
+        }
+
+        if (reestrTaloonApprovalData != null) {
+            envelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
+
+        if (organizationComplexesStructure != null) {
+            envelopeElement.appendChild(organizationComplexesStructure.toElement(document));
+        }
+
+        if (resZeroTransactions != null) {
+            envelopeElement.appendChild(resZeroTransactions.toElement(document));
+        }
+
+        if (zeroTransactionData != null) {
+            envelopeElement.appendChild(zeroTransactionData.toElement(document));
+        }
+
+        if (resSpecialDates != null) {
+            envelopeElement.appendChild(resSpecialDates.toElement(document));
+        }
+
+        if (specialDatesData != null) {
+            envelopeElement.appendChild(specialDatesData.toElement(document));
+        }
+
+        if (resMigrants != null) {
+            envelopeElement.appendChild(resMigrants.toElement(document));
+        }
+
+        if (migrantsData != null) {
+            envelopeElement.appendChild(migrantsData.toElement(document));
+        }
+
+        if (this.responseSections != null) {
+            for (AbstractToElement section : this.responseSections) {
+                envelopeElement.appendChild(section.toElement(document));
+            }
+        }
     }
 
     public Long getIdOfOrg() {

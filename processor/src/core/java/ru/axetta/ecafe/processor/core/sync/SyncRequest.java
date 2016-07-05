@@ -60,11 +60,14 @@ public class SyncRequest {
 
     private static Logger logger = LoggerFactory.getLogger(SyncRequest.class);
 
-    public ZeroTransactions getZeroTransactions() {
-        return zeroTransactions;
-    }
+    public static class ClientParamRegistry implements SectionRequest {
 
-    public static class ClientParamRegistry {
+        public static final String SECTION_NAME = "ClientParams";
+
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
 
         public static class ClientParamItem {
 
@@ -104,7 +107,7 @@ public class SyncRequest {
                     String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
                     String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPUSH");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
-                    String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap,"CanConfirmGroupPayment");
+                    String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap, "CanConfirmGroupPayment");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
@@ -122,6 +125,7 @@ public class SyncRequest {
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));*/
                 }
+
 
             }
 
@@ -141,8 +145,8 @@ public class SyncRequest {
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
-                    String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
-                    Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
+                    String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
+                    String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {
             /*public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
@@ -250,7 +254,7 @@ public class SyncRequest {
             public Boolean getNotifyViaPUSH() {
                 return notifyViaPUSH;
             }
-            //
+
             public String getGroupName() {
                 return groupName;
             }
@@ -277,23 +281,40 @@ public class SyncRequest {
                         + surname + '\'' + ", secondName='" + secondName + '\'' + ", address='" + address + '\''
                         + ", phone='" + phone + '\'' + ", mobilePhone='" + mobilePhone + '\'' + ", middleGroup='" + middleGroup + '\'' + ", fax='" + fax + '\''
                         + ", email='" + email + '\'' + ", remarks='" + remarks + '\'' + ", freePayCount=" + freePayCount
-                        + ", freePayMaxCount=" + freePayMaxCount + ", lastFreePayTime=" + lastFreePayTime
-                        + ", discountMode=" + discountMode + ", categoriesDiscounts='" + categoriesDiscounts + '\''
-                        + ", expenditureLimit=" + expenditureLimit +
-                        + '}';
+                        + ", freePayMaxCount=" + freePayMaxCount + ", lastFreePayTime=" + lastFreePayTime + ", discountMode=" + discountMode
+                        + ", categoriesDiscounts='" + categoriesDiscounts + '\'' + ", expenditureLimit=" + expenditureLimit +
+                        +'}';
             }
         }
 
-        public static class Builder {
+        public static class Builder implements SectionRequestBuilder {
 
             private final ClientParamItem.Builder itemBuilder;
+            private final LoadContext loadContext;
 
-            public Builder() {
+            public Builder(LoadContext loadContext) {
+                this.loadContext = loadContext;
                 this.itemBuilder = new ClientParamItem.Builder();
             }
 
-            public ClientParamRegistry build(Node paymentRegistryNode, LoadContext loadContext) throws Exception {
+            public ClientParamRegistry build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest != null ? (ClientParamRegistry) sectionRequest : null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement);
+                } else
+                    return null;
+            }
+
+            private ClientParamRegistry buildFromCorrectSection(Node paymentRegistryNode) throws Exception {
                 List<ClientParamItem> items = new LinkedList<ClientParamItem>();
+                if (paymentRegistryNode == null) return new ClientParamRegistry();
+
                 Node itemNode = paymentRegistryNode.getFirstChild();
                 while (null != itemNode) {
                     if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("CP")) {
@@ -302,10 +323,6 @@ public class SyncRequest {
                     itemNode = itemNode.getNextSibling();
                 }
                 return new ClientParamRegistry(items);
-            }
-
-            public ClientParamRegistry build() throws Exception {
-                return new ClientParamRegistry();
             }
         }
 
@@ -329,7 +346,14 @@ public class SyncRequest {
         }
     }
 
-    public static class OrgStructure {
+    public static class OrgStructure implements SectionRequest {
+
+        public static final String SECTION_NAME = "OrgStructure";
+
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
 
         public static class Group {
 
@@ -379,7 +403,7 @@ public class SyncRequest {
             }
         }
 
-        public static class Builder {
+        public static class Builder implements SectionRequestBuilder {
 
             private final Group.Builder groupBuilder;
 
@@ -387,7 +411,21 @@ public class SyncRequest {
                 this.groupBuilder = new Group.Builder();
             }
 
-            public OrgStructure build(Node orgStructureNode) throws Exception {
+            public OrgStructure build (Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest!=null? (OrgStructure) sectionRequest :null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, OrgStructure.SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement);
+                } else
+                    return null;
+            }
+
+            private OrgStructure buildFromCorrectSection(Node orgStructureNode) throws Exception {
                 List<Group> groups = new LinkedList<Group>();
                 Node itemNode = orgStructureNode.getFirstChild();
                 while (null != itemNode) {
@@ -398,6 +436,7 @@ public class SyncRequest {
                 }
                 return new OrgStructure(groups);
             }
+
         }
 
         private final List<Group> groups;
@@ -416,7 +455,8 @@ public class SyncRequest {
         }
     }
 
-    public static class MenuGroups {
+    public static class MenuGroups implements SectionRequest {
+        public static final String SECTION_NAME="MenuGroups";
 
         public String findMenuGroup(long idOfMenuGroup) {
             for (MenuGroup menuGroup : menuGroups) {
@@ -425,6 +465,11 @@ public class SyncRequest {
                 }
             }
             return null;
+        }
+
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
         }
 
 
@@ -471,7 +516,7 @@ public class SyncRequest {
             }
         }
 
-        public static class Builder {
+        public static class Builder implements SectionRequestBuilder {
 
             private final MenuGroup.Builder groupBuilder;
 
@@ -479,20 +524,41 @@ public class SyncRequest {
                 this.groupBuilder = new MenuGroup.Builder();
             }
 
-            public MenuGroups build(Node node) throws Exception {
-                List<MenuGroup> groups = new LinkedList<MenuGroup>();
-                Node itemNode = node.getFirstChild();
-                while (null != itemNode) {
-                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("MGI")) {
-                        groups.add(groupBuilder.build(itemNode));
-                    }
-                    itemNode = itemNode.getNextSibling();
-                }
-                return new MenuGroups(groups);
+            public MenuGroups build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest!=null? (MenuGroups) sectionRequest :null;
             }
 
-            public static MenuGroups buildEmpty() {
-                return new MenuGroups(new LinkedList<MenuGroup>());
+            private MenuGroups buildFromCorrectSection(Node node) throws Exception {
+                List<MenuGroup> groups = new LinkedList<MenuGroup>();
+                if (node != null) {
+                    Node itemNode = node.getFirstChild();
+                    while (null != itemNode) {
+                        if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("MGI")) {
+                            groups.add(groupBuilder.build(itemNode));
+                        }
+                        itemNode = itemNode.getNextSibling();
+                    }
+                    return new MenuGroups(groups);
+                } else {
+                    return new MenuGroups(groups);
+                }
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node menuNode = findFirstChildElement(envelopeNode,ReqMenu.SECTION_NAME);
+                Node menuGroupsNode = findFirstChildElement(envelopeNode, MenuGroups.SECTION_NAME);
+                if (menuGroupsNode == null) {
+                    // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
+                    if (menuNode != null) {
+                        Node settingsNode = findFirstChildElement(menuNode, "Settings");
+                        if (settingsNode != null) {
+                            menuGroupsNode = findFirstChildElement(settingsNode, MenuGroups.SECTION_NAME);
+                        }
+                    }
+                }
+                return buildFromCorrectSection(menuGroupsNode);
             }
         }
 
@@ -508,25 +574,59 @@ public class SyncRequest {
 
     }
 
-    public static class AccIncRegistryRequest {
+    public static class AccIncRegistryRequest implements SectionRequest {
 
+        public final static String SECTION_NAME = "AccIncRegistryRequest";
         public final Date dateTime;
 
         public AccIncRegistryRequest(Date dateTime) {
             this.dateTime = dateTime;
         }
 
-        public static class Builder {
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
 
-            public AccIncRegistryRequest build(Node node, LoadContext loadContext) throws Exception {
+        public static class Builder implements SectionRequestBuilder {
+
+            private LoadContext loadContext;
+
+            public Builder(LoadContext loadContext) {
+                this.loadContext = loadContext;
+            }
+
+            public AccIncRegistryRequest build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest != null ? (AccIncRegistryRequest) sectionRequest : null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement, loadContext);
+                } else
+                    return null;
+            }
+
+            private AccIncRegistryRequest buildFromCorrectSection(Node node, LoadContext loadContext) throws Exception {
                 NamedNodeMap namedNodeMap = node.getAttributes();
                 Date dateTime = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("Date").getTextContent());
                 return new AccIncRegistryRequest(dateTime);
             }
+
         }
     }
 
-    public static class ReqMenu {
+    public static class ReqMenu implements SectionRequest {
+
+        private static final String SECTION_NAME = "Menu";
+
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
 
         public static class Item {
 
@@ -564,7 +664,8 @@ public class SyncRequest {
                                 try {
                                     menuItemCount = Integer.parseInt(menuItemCountNode.getTextContent());
                                 } catch (NumberFormatException e) {
-                                    throw new Exception("Attribute MenuItemCount contains value of type different from Integer");
+                                    throw new Exception(
+                                            "Attribute MenuItemCount contains value of type different from Integer");
                                 }
                             }
                             return new ReqComplexInfoDetail(reqMenuDetail, idOfItem, menuItemCount);
@@ -647,7 +748,7 @@ public class SyncRequest {
                             return new ReqComplexInfoDiscountDetail(size, isAllGroups, maxCount, idOfClientGroup);
                         }
 
-                        private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
+                        private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception {
                             Node node = namedNodeMap.getNamedItem(name);
                             if (null == node) {
                                 return null;
@@ -827,7 +928,8 @@ public class SyncRequest {
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         int usedSubscriptionFeeding, List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
-                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid, Integer modeVisible) {
+                        ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid,
+                        Integer modeVisible) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -947,8 +1049,7 @@ public class SyncRequest {
                             : that.useTrDiscount != null) {
                         return false;
                     }
-                    if (modeVisible != null ? !modeVisible.equals(that.modeVisible)
-                            : that.modeVisible != null) {
+                    if (modeVisible != null ? !modeVisible.equals(that.modeVisible) : that.modeVisible != null) {
                         return false;
                     }
 
@@ -970,7 +1071,7 @@ public class SyncRequest {
                     builder.append(reqMenuDetail);
                     builder.append(complexInfoDiscountDetail);
                     builder.append(modeVisible);
-                    if(complexInfoDetails != null){
+                    if (complexInfoDetails != null) {
                         for (ReqComplexInfoDetail obj : complexInfoDetails) {
                             builder.append(obj);
                         }
@@ -1006,8 +1107,7 @@ public class SyncRequest {
                         String output = null;
                         Node outputNode = namedNodeMap.getNamedItem("Output");
                         if (outputNode != null) {
-                            output = StringUtils
-                                    .substring(getTextContent(outputNode), 0, 32);
+                            output = StringUtils.substring(getTextContent(outputNode), 0, 32);
                         }
                         String idOfMenuStr = getTextContent(namedNodeMap.getNamedItem("IdOfMenu"));
                         Long idOfMenu = null;
@@ -1065,8 +1165,8 @@ public class SyncRequest {
                         Double vitB2 = getDoubleValue(namedNodeMap, "VitB2");
                         Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
-                                flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE,
-                                minCa, minP, minMg, minFe, vitB2, vitPp, gBasket);
+                                flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa,
+                                minP, minMg, minFe, vitB2, vitPp, gBasket);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1076,7 +1176,7 @@ public class SyncRequest {
                         return node.getTextContent();
                     }
 
-                    private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception{
+                    private static Double getDoubleValue(NamedNodeMap namedNodeMap, String name) throws Exception {
                         Node node = namedNodeMap.getNamedItem(name);
                         if (null == node) {
                             return null;
@@ -1091,22 +1191,21 @@ public class SyncRequest {
                         String[] parts = replacedString.split("\\.");
 
                         if (parts[0].length() > 8) {
-                            logger.error("Ошибка при сохранении в базу элемента меню "
-                                    + "IdOfMenu = " + getTextContent(namedNodeMap.getNamedItem("IdOfMenu")) + ", "
-                                    + "Patch = " + getTextContent(namedNodeMap.getNamedItem("Path")) + ", "
-                                    + "FullName = " + getTextContent(namedNodeMap.getNamedItem("FullName"))
-                                    + ", не верно задана размерность, параметра " + name + " = " + calString);
+                            logger.error("Ошибка при сохранении в базу элемента меню " + "IdOfMenu = " + getTextContent(
+                                    namedNodeMap.getNamedItem("IdOfMenu")) + ", " + "Patch = " + getTextContent(
+                                    namedNodeMap.getNamedItem("Path")) + ", " + "FullName = " + getTextContent(
+                                    namedNodeMap.getNamedItem("FullName")) + ", не верно задана размерность, параметра "
+                                    + name + " = " + calString);
                             return null;
                         }
 
 
-
                         if (Double.parseDouble(replacedString) < 0) {
-                            logger.error("Ошибка при сохранении в базу элемента меню "
-                                    + "IdOfMenu = " + getTextContent(namedNodeMap.getNamedItem("IdOfMenu")) + ", "
-                                    + "Patch = " + getTextContent(namedNodeMap.getNamedItem("Path")) + ", "
-                                    + "FullName = " + getTextContent(namedNodeMap.getNamedItem("FullName"))
-                                    + " задано отрицательное число, в параметре " + name + " = " + calString);
+                            logger.error("Ошибка при сохранении в базу элемента меню " + "IdOfMenu = " + getTextContent(
+                                    namedNodeMap.getNamedItem("IdOfMenu")) + ", " + "Patch = " + getTextContent(
+                                    namedNodeMap.getNamedItem("Path")) + ", " + "FullName = " + getTextContent(
+                                    namedNodeMap.getNamedItem("FullName")) + " задано отрицательное число, в параметре "
+                                    + name + " = " + calString);
                             return null;
                         }
 
@@ -1433,7 +1532,7 @@ public class SyncRequest {
                         Double protein = getMinorComponent(namedNodeMap, "Protein");
                         Double fat = getMinorComponent(namedNodeMap, "Fat");
                         Double carbohydrates = getMinorComponent(namedNodeMap, "Carbohydrates");
-                        Double calories = SyncRequest.getCalories(namedNodeMap, "Calories");
+                        Double calories = getCalories(namedNodeMap, "Calories");
                         Double vitB1 = getMinorComponent(namedNodeMap, "VitB1");
                         Double vitC = getMinorComponent(namedNodeMap, "VitC");
                         Double vitA = getMinorComponent(namedNodeMap, "VitA");
@@ -1445,7 +1544,8 @@ public class SyncRequest {
                         Double vitB2 = getMinorComponent(namedNodeMap, "VitB2");
                         Double vitPp = getMinorComponent(namedNodeMap, "VitPP");
                         return new ReqAssortment(name, fullName, group, output, price, menuOrigin, protein, fat,
-                                carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg, minFe, vitB2, vitPp);
+                                carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa, minP, minMg, minFe, vitB2,
+                                vitPp);
                     }
 
                     private static Double getMinorComponent(NamedNodeMap namedNodeMap, String name) throws Exception {
@@ -1454,6 +1554,19 @@ public class SyncRequest {
                             return null;
                         }
                         return ((double) Long.parseLong(node.getTextContent())) / 100;
+                    }
+
+                    private static Double getCalories(NamedNodeMap namedNodeMap, String name) {
+                        Node node = namedNodeMap.getNamedItem(name);
+                        if (null == node) {
+                            return null;
+                        }
+                        String calString = node.getTextContent();
+                        if (calString.equals("")) {
+                            return null;
+                        }
+                        String replacedString = calString.replaceAll(",", ".");
+                        return Double.parseDouble(replacedString);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1487,7 +1600,8 @@ public class SyncRequest {
 
                 public ReqAssortment(String name, String fullName, String group, String menuOutput, long price,
                         int menuOrigin, Double protein, Double fat, Double carbohydrates, Double calories, Double vitB1,
-                        Double vitC, Double vitA, Double vitE, Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp) {
+                        Double vitC, Double vitA, Double vitE, Double minCa, Double minP, Double minMg, Double minFe,
+                        Double vitB2, Double vitPp) {
                     this.name = name;
                     this.fullName = fullName;
                     this.group = group;
@@ -1603,7 +1717,7 @@ public class SyncRequest {
                 public boolean equals(Object o) {
                     if (this == o) {
                         return true;
-            }
+                    }
                     if (o == null || getClass() != o.getClass()) {
                         return false;
                     }
@@ -1742,8 +1856,7 @@ public class SyncRequest {
                         childNode = itemNode.getFirstChild();
                         while (null != childNode) {
                             if (Node.ELEMENT_NODE == childNode.getNodeType() && (childNode.getNodeName().equals("CML")
-                                    || childNode.getNodeName().equals("CML2")
-                                    || childNode.getNodeName().equals("DCML") )) {
+                                    || childNode.getNodeName().equals("CML2") || childNode.getNodeName().equals("DCML"))) {
                                 ReqComplexInfo reqComplexInfo = reqComplexInfoBuilder
                                         .build(childNode, reqMenuDetailMap);
                                 reqComplexInfos.add(reqComplexInfo);
@@ -1834,17 +1947,17 @@ public class SyncRequest {
             @Override
             public int hashCode() {
                 HashCodeBuilder builder = new HashCodeBuilder();
-                if(reqMenuDetails != null){
+                if (reqMenuDetails != null) {
                     for (ReqMenuDetail obj : reqMenuDetails) {
                         builder.append(obj);
                     }
                 }
-                if(reqAssortments != null){
+                if (reqAssortments != null) {
                     for (ReqAssortment obj : reqAssortments) {
                         builder.append(obj);
                     }
                 }
-                if(reqComplexInfos != null){
+                if (reqComplexInfos != null) {
                     for (ReqComplexInfo obj : reqComplexInfos) {
                         builder.append(obj);
                     }
@@ -1862,15 +1975,31 @@ public class SyncRequest {
 
         }
 
-        public static class Builder {
+        public static class Builder implements SectionRequestBuilder {
 
             private final Item.Builder itemBuilder;
+            private final LoadContext loadContext;
 
-            public Builder() {
+            public Builder(LoadContext loadContext) {
+                this.loadContext = loadContext;
                 this.itemBuilder = new Item.Builder();
             }
 
-            public ReqMenu build(Node menuNode, LoadContext loadContext) throws Exception {
+            public ReqMenu build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest!=null? (ReqMenu) sectionRequest :null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ReqMenu.SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement);
+                } else
+                    return null;
+            }
+
+            private ReqMenu buildFromCorrectSection(Node menuNode) throws Exception {
                 List<Item> items = new LinkedList<Item>();
                 Node itemNode = menuNode.getFirstChild();
                 String settingsSectionRawXML = null;
@@ -1894,8 +2023,8 @@ public class SyncRequest {
             this.settingsSectionRawXML = settingsSectionRawXML;
         }
 
-        public Iterator<Item> getItems(){
-           return items.iterator();
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public String getSettingsSectionRawXML() {
@@ -1908,16 +2037,38 @@ public class SyncRequest {
         }
     }
 
-    public static class ClientRegistryRequest {
+    public static class ClientRegistryRequest implements SectionRequest {
 
-        public static class Builder {
+        public static final String SECTION_NAME = "ClientRegistryRequest";
 
-            public ClientRegistryRequest build(Node clientRegistryRequestNode) throws Exception {
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
+
+        public static class Builder implements SectionRequestBuilder {
+
+            public ClientRegistryRequest build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest != null ? (ClientRegistryRequest) sectionRequest : null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientRegistryRequest.SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement);
+                } else
+                    return null;
+            }
+
+            private ClientRegistryRequest buildFromCorrectSection(Node clientRegistryRequestNode) throws Exception {
                 long currentVersion = Long.parseLong(
                         clientRegistryRequestNode.getAttributes().getNamedItem("CurrentVersion").getTextContent());
                 Long currentCount = XMLUtils.getLongAttributeValue(clientRegistryRequestNode, "CurrentCount");
                 return new ClientRegistryRequest(currentVersion, currentCount);
             }
+
         }
 
         private final long currentVersion;
@@ -1942,7 +2093,14 @@ public class SyncRequest {
         }
     }
 
-    public static class ReqDiary {
+    public static class ReqDiary implements SectionRequest {
+
+        public static final String SECTION_NAME = "Diary";
+
+        @Override
+        public String getRequestSectionName() {
+            return SECTION_NAME;
+        }
 
         public static class ReqDiaryClass {
 
@@ -2100,17 +2258,33 @@ public class SyncRequest {
             }
         }
 
-        public static class Builder {
+        public static class Builder implements SectionRequestBuilder {
 
             private final ReqDiaryClass.Builder reqDiaryClassBuilder;
             private final ReqDiaryTimesheet.Builder reqDiaryTimesheetBuilder;
+            private final LoadContext loadContext;
 
-            public Builder() {
+            public Builder(LoadContext loadContext) {
+                this.loadContext = loadContext;
                 this.reqDiaryClassBuilder = new ReqDiaryClass.Builder();
                 this.reqDiaryTimesheetBuilder = new ReqDiaryTimesheet.Builder();
             }
 
-            public ReqDiary build(Node diaryNode, LoadContext loadContext) throws Exception {
+            public ReqDiary build(Node envelopeNode) throws Exception {
+                SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
+                return sectionRequest != null ? (ReqDiary) sectionRequest : null;
+            }
+
+            @Override
+            public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
+                Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ReqDiary.SECTION_NAME);
+                if (sectionElement != null) {
+                    return buildFromCorrectSection(sectionElement);
+                } else
+                    return null;
+            }
+
+            private ReqDiary buildFromCorrectSection(Node diaryNode) throws Exception {
                 List<ReqDiaryClass> reqDiaryClasses = new LinkedList<ReqDiaryClass>();
                 List<ReqDiaryTimesheet> reqDiaryTimesheets = new LinkedList<ReqDiaryTimesheet>();
                 Node currNode = diaryNode.getFirstChild();
@@ -2127,6 +2301,8 @@ public class SyncRequest {
                 }
                 return new ReqDiary(reqDiaryClasses, reqDiaryTimesheets);
             }
+
+
         }
 
         private final List<ReqDiaryClass> reqDiaryClasses;
@@ -2153,69 +2329,16 @@ public class SyncRequest {
     }
 
     public static class Builder {
-
         private final DateFormat dateOnlyFormat;
         private final DateFormat timeFormat;
-        private final PaymentRegistryBuilder paymentRegistryBuilder;
-        private final AccIncRegistryRequest.Builder accIncRegistryRequestBuilder;
-        private final ClientParamRegistry.Builder clientParamRegistryBuilder;
-        private final ClientRegistryRequest.Builder clientRegistryRequestBuilder;
-        private final OrgStructure.Builder orgStructureBuilder;
-        private final ReqMenu.Builder reqMenuBuilder;
-        private final ReqDiary.Builder reqDiaryBuilder;
-        private final MenuGroups.Builder menuGroupsBuilder;
-        //private final EnterEvents.Builder enterEventsBuilder;
-        private final TempCardsOperationBuilder tempCardsOperationBuilder;
-        private Manager manager;
-        private final ClientRequestBuilder clientRequestBuilder;
-        private final EnterEventsBuilder enterEventsBuilder;
-        private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder;
-        private final ClientGuardianBuilder clientGuardianBuilder;
-        private final ProhibitionMenuRequestBuilder prohibitionMenuRequestBuilder;
-        private final OrganizationStructureRequestBuilder organizationStructureRequestBuilder;
-        private final CategoriesDiscountsAndRulesBuilder categoriesAndDiscountsBuilder;
-        private final AccountsRegistryRequestBuilder accountsRegistryRequestBuilder;
-        private final ReestrTaloonApprovalBuilder reestrTaloonApprovalBuilder;
-        private final InteractiveReportDataBuilder interactiveReportDataBuilder;
-        private final ZeroTransactionsBuilder zeroTransactionsBuilder;
-        private final SpecialDatesBuilder specialDatesBuilder;
-        private final MigrantsBuilder migrantsBuilder;
-        private final ClientGroupManagerBuilder clientGroupManagerBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
             this.dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
             this.dateOnlyFormat.setTimeZone(utcTimeZone);
-
-            //TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
             TimeZone localTimeZone = RuntimeContext.getInstance().getDefaultLocalTimeZone(null);
             this.timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             this.timeFormat.setTimeZone(localTimeZone);
-
-            this.paymentRegistryBuilder = new PaymentRegistryBuilder();
-            this.accIncRegistryRequestBuilder = new AccIncRegistryRequest.Builder();
-            this.clientParamRegistryBuilder = new ClientParamRegistry.Builder();
-            this.clientRegistryRequestBuilder = new ClientRegistryRequest.Builder();
-            this.orgStructureBuilder = new OrgStructure.Builder();
-            this.reqMenuBuilder = new ReqMenu.Builder();
-            this.reqDiaryBuilder = new ReqDiary.Builder();
-            this.menuGroupsBuilder = new MenuGroups.Builder();
-            //this.enterEventsBuilder = new EnterEvents.Builder();
-            this.enterEventsBuilder = new EnterEventsBuilder();
-            this.tempCardsOperationBuilder = new TempCardsOperationBuilder();
-            this.clientRequestBuilder = new ClientRequestBuilder();
-            this.accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
-            this.clientGuardianBuilder = new ClientGuardianBuilder();
-            this.prohibitionMenuRequestBuilder = new ProhibitionMenuRequestBuilder();
-            this.organizationStructureRequestBuilder = new OrganizationStructureRequestBuilder();
-            this.categoriesAndDiscountsBuilder = new CategoriesDiscountsAndRulesBuilder();
-            this.accountsRegistryRequestBuilder = new AccountsRegistryRequestBuilder();
-            this.reestrTaloonApprovalBuilder = new ReestrTaloonApprovalBuilder();
-            this.interactiveReportDataBuilder = new InteractiveReportDataBuilder();
-            this.zeroTransactionsBuilder = new ZeroTransactionsBuilder();
-            this.specialDatesBuilder = new SpecialDatesBuilder();
-            this.migrantsBuilder = new MigrantsBuilder();
-            this.clientGroupManagerBuilder = new ClientGroupManagerBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2232,204 +2355,134 @@ public class SyncRequest {
             return namedNodeMap.getNamedItem("Date").getTextContent();
         }
 
+        public static Long getIdOfPacket(NamedNodeMap namedNodeMap) throws Exception {
+            return getLongValueNullSafe(namedNodeMap, "IdOfPacket");
+        }
+
         public static String getClientVersion(NamedNodeMap namedNodeMap) throws Exception {
-            if(namedNodeMap.getNamedItem("ClientVersion")==null) return null;
+            if (namedNodeMap.getNamedItem("ClientVersion") == null)
+                return null;
             return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
+        }
+
+        public static long getVersion(NamedNodeMap namedNodeMap) throws Exception {
+            return getLongValue(namedNodeMap, "Version");
         }
 
         public static SyncType getSyncType(NamedNodeMap namedNodeMap) throws Exception {
             return SyncType.parse(getStringValueNullSafe(namedNodeMap, "Type"));
         }
 
-        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
-                throws Exception {
-            long version = getLongValue(namedNodeMap, "Version");
-            if (3L != version && 4L != version && 5L != version && 6L != version) {
-                throw new Exception(String.format("Unsupported protoVersion: %d", version));
-            }
-            String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
-
-            SyncType syncType = SyncType.parse(sSyncType);
-
+        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync,
+                String remoteAddr) throws Exception {
+            long version = getVersion(namedNodeMap);
+            checkClientVersion(version);
+            SyncType syncType = getSyncType(namedNodeMap);
             String clientVersion = getClientVersion(namedNodeMap);
-
             Date syncTime = timeFormat.parse(idOfSync);
-            Long idOfPacket = getLongValueNullSafe(namedNodeMap, "IdOfPacket");
+            Long idOfPacket = getIdOfPacket(namedNodeMap);
 
-            Node menuNode = findFirstChildElement(envelopeNode, "Menu");
-
-            MenuGroups menuGroups = null;
-            Node menuGroupsNode = findFirstChildElement(envelopeNode, "MenuGroups");
-            if (menuGroupsNode == null) {
-                // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
-                if (menuNode != null) {
-                    Node settingsNode = findFirstChildElement(menuNode, "Settings");
-                    if (settingsNode != null) {
-                        menuGroupsNode = findFirstChildElement(settingsNode, "MenuGroups");
-                    }
-                }
-            }
-            if (menuGroupsNode != null) {
-                menuGroups = menuGroupsBuilder.build(menuGroupsNode);
-            } else {
-                menuGroups = MenuGroups.Builder.buildEmpty();
-            }
-
+            MenuGroups menuGroups = new MenuGroups.Builder().build(envelopeNode);
             LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
 
-            Node paymentRegistryNode = findFirstChildElement(envelopeNode, "PaymentRegistry");
-            PaymentRegistry paymentRegistry = null;
-            if (paymentRegistryNode != null) {
-                paymentRegistry = paymentRegistryBuilder.build(paymentRegistryNode, loadContext);
+            List<SectionRequest> result = new ArrayList<SectionRequest>();
+            List<SectionRequestBuilder> builders = createSectionRequestBuilders(loadContext, org.getIdOfOrg());
+            for (SectionRequestBuilder builder : builders) {
+                SectionRequest sectionRequest = buildSeactionRequest(envelopeNode, builder);
+                if (sectionRequest != null) {
+                    result.add(sectionRequest);
+                }
             }
+            Manager manager = createManagerSyncRO(envelopeNode, syncType, org);
+            String message = getMessage(envelopeNode);
+            return new SyncRequest(remoteAddr, version, syncType, clientVersion, org, syncTime, idOfPacket, message,
+                    result, manager);
+        }
 
-            Node accountOperationsRegistryNode = findFirstChildElement(envelopeNode, AccountOperationsRegistry.SYNC_NAME);
-            AccountOperationsRegistry accountOperationsRegistry = null;
-            if (accountOperationsRegistryNode != null) {
-                accountOperationsRegistry = AccountOperationsRegistry.build(accountOperationsRegistryNode, loadContext);
+        private SectionRequest buildSeactionRequest(Node envelopeNode, SectionRequestBuilder builder) throws Exception {
+            SectionRequest request = null;
+            try {
+                request = builder.searchSectionNodeAndBuild(envelopeNode);
+            } catch (Exception ex) {
+                request = null;
+                logger.error("Failed to build section request, " + builder.toString());
             }
-
-            Node accIncRegistryRequestNode = findFirstChildElement(envelopeNode, "AccIncRegistryRequest");
-            AccIncRegistryRequest accIncRegistryRequest = null;
-            if (accIncRegistryRequestNode != null) {
-                accIncRegistryRequest = accIncRegistryRequestBuilder.build(accIncRegistryRequestNode, loadContext);
-            }
-
-            Node clientParamRegistryNode = findFirstChildElement(envelopeNode, "ClientParams");
-            ClientParamRegistry clientParamRegistry;
-            if (null == clientParamRegistryNode) {
-                clientParamRegistry = clientParamRegistryBuilder.build();
-            } else {
-                clientParamRegistry = clientParamRegistryBuilder.build(clientParamRegistryNode, loadContext);
-            }
-
-            Node clientRegistryRequestNode = findFirstChildElement(envelopeNode, "ClientRegistryRequest");
-            ClientRegistryRequest clientRegistryRequest = null;
-            if (clientRegistryRequestNode != null) {
-                clientRegistryRequest = clientRegistryRequestBuilder.build(clientRegistryRequestNode);
-            }
-
-            Node accRegistryUpdateRequestParseRequestNode = findFirstChildElement(envelopeNode, "AccRegistryUpdateRequest");
-            AccRegistryUpdateRequest accRegistryUpdateRequest = null;
-            if (accRegistryUpdateRequestParseRequestNode != null) {
-               accRegistryUpdateRequest=accRegistryUpdateRequestBuilder.build(accRegistryUpdateRequestParseRequestNode);
-            }
-
-            Node orgStructureNode = findFirstChildElement(envelopeNode, "OrgStructure");
-            OrgStructure orgStructure = null;
-            if (orgStructureNode != null) {
-                orgStructure = orgStructureBuilder.build(orgStructureNode);
-            }
+            return request;
+        }
 
 
-            ReqMenu reqMenu = null;
-            if (menuNode != null) {
-                reqMenu = reqMenuBuilder.build(menuNode, loadContext);
-            }
+        private List<SectionRequestBuilder> createSectionRequestBuilders(LoadContext loadContext,long idOfOrg) {
+            ArrayList<SectionRequestBuilder> builders = new ArrayList<SectionRequestBuilder>();
+            builders.add(new PaymentRegistryBuilder(loadContext));
+            builders.add(new AccountOperationsRegistry.Builder(loadContext));
+            builders.add(new AccIncRegistryRequest.Builder(loadContext));
+            builders.add(new ClientParamRegistry.Builder(loadContext));
+            builders.add(new ClientRegistryRequest.Builder());
+            builders.add(new AccRegistryUpdateRequestBuilder());
+            builders.add(new OrgStructure.Builder());
+            builders.add(new ReqMenu.Builder(loadContext));
+            builders.add(new ReqDiary.Builder(loadContext));
+            builders.add(new EnterEventsBuilder(loadContext));
+            builders.add(new TempCardsOperationBuilder(idOfOrg));
+            builders.add(new ClientRequestBuilder());
+            builders.add(new ClientGuardianBuilder());
+            builders.add(new ProhibitionMenuRequestBuilder());
+            builders.add(new OrganizationStructureRequestBuilder());
+            builders.add(new CategoriesDiscountsAndRulesBuilder());
+            builders.add(new ClientGroupManagerBuilder());
+            builders.add(new AccountsRegistryRequestBuilder());
+            builders.add(new ReestrTaloonApprovalBuilder(idOfOrg));
+            builders.add(new ZeroTransactionsBuilder(idOfOrg));
+            builders.add(new SpecialDatesBuilder(idOfOrg));
+            builders.add(new MigrantsBuilder(idOfOrg));
+            builders.add(new CardsOperationsRegistry.Builder(loadContext));
+            builders.add(new InteractiveReportDataBuilder());
+            builders.add(new GoodsBasicBasketRequest.Builder());
+            builders.add(new OrganizationComplexesStructureRequest.Builder());
+            builders.add(new OrgOwnerDataRequest.Builder());
+            builders.add(new CorrectingNumbersOrdersRegistryRequest.Builder());
+            builders.add(new DirectivesRequest.Builder());
+            builders.add(new QuestionaryClientsRequest.Builder());
+            return builders;
+        }
 
-            Node messageNode = findFirstChildElement(envelopeNode, "Message");
-            Node reqDiaryNode = findFirstChildElement(envelopeNode, "Diary");
-
-            ReqDiary reqDiary = null;
-            if (reqDiaryNode != null) {
-                reqDiary = reqDiaryBuilder.build(reqDiaryNode, loadContext);
-            }
-
-            String message = null;
-            if (null != messageNode) {
-                message = findFirstChildTextNode(messageNode).getTextContent();
-            }
-
-            enterEventsBuilder.createMainNode(envelopeNode);
-            EnterEvents enterEvents = enterEventsBuilder.build(loadContext);
-
-            TempCardsOperations tempCardsOperations = null;
-            Node tempCardsOperationsNode = findFirstChildElement(envelopeNode, "TempCardsOperations");
-            if (tempCardsOperationsNode != null) {
-                tempCardsOperations = tempCardsOperationBuilder.build(tempCardsOperationsNode, org.getIdOfOrg());
-            }
-
-            clientRequestBuilder.createMainNode(envelopeNode);
-            ClientRequests clientRequests = clientRequestBuilder.build();
-
-            clientGuardianBuilder.createMainNode(envelopeNode);
-            ClientGuardianRequest clientGuardianRequest = clientGuardianBuilder.build();
-
-            prohibitionMenuRequestBuilder.createMainNode(envelopeNode);
-            ProhibitionMenuRequest prohibitionMenuRequest = prohibitionMenuRequestBuilder.build();
-
-            organizationStructureRequestBuilder.createMainNode(envelopeNode);
-            OrganizationStructureRequest organizationStructureRequest = organizationStructureRequestBuilder.build();
-
-            categoriesAndDiscountsBuilder.createMainNode(envelopeNode);
-            CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest = categoriesAndDiscountsBuilder.build();
-
-            clientGroupManagerBuilder.createMainNode(envelopeNode);
-            ClientGroupManagerRequest clientGroupManagerRequest = clientGroupManagerBuilder.build();
-
-            accountsRegistryRequestBuilder.createMainNode(envelopeNode);
-            AccountsRegistryRequest accountsRegistryRequest = accountsRegistryRequestBuilder.build();
-
-            Node reestrTaloonApprovalNode = findFirstChildElement(envelopeNode, "ReestrTaloonApproval");
-            ReestrTaloonApproval reestrTaloonApprovalRequest = null;
-            if (reestrTaloonApprovalNode != null) {
-                reestrTaloonApprovalRequest = reestrTaloonApprovalBuilder.build(reestrTaloonApprovalNode, org.getIdOfOrg());
-            }
-
-            Node zeroTransactionsNode = findFirstChildElement(envelopeNode, "ZeroTransactions");
-            ZeroTransactions zeroTransactionsRequest = null;
-            if (zeroTransactionsNode != null) {
-                zeroTransactionsRequest = zeroTransactionsBuilder.build(zeroTransactionsNode, org.getIdOfOrg());
-            }
-
-            Node specialDatesNode = findFirstChildElement(envelopeNode, "SpecialDates");
-            SpecialDates specialDatesRequest = null;
-            if (specialDatesNode != null) {
-                specialDatesRequest = specialDatesBuilder.build(specialDatesNode, org.getIdOfOrg());
-            }
-
-            Node migrantsNode = findFirstChildElement(envelopeNode, "Migrants");
-            Migrants migrantsRequest = null;
-            if (migrantsNode != null) {
-                migrantsRequest = migrantsBuilder.build(migrantsNode, org.getIdOfOrg());
-            }
-
-            Node interactiveReportNode = findFirstChildElement(envelopeNode, "InteractiveReportData");
-            InteractiveReport interactiveReportRequest = null;
-            if(interactiveReportNode != null) {
-                interactiveReportRequest = interactiveReportDataBuilder.buildInteractiveReport(interactiveReportNode);
-            }
-
-            /*  Модуль распределенной синхронизации объектов */
+        private Manager createManagerSyncRO(Node envelopeNode, SyncType syncType, Org org) throws Exception {
+            Manager manager = null;
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            if (roNode != null){
-                String[] doGroupNames;
+            if (roNode != null) {
                 Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
                 List<String> groups = new ArrayList<String>();
                 groups.add("SettingsGroup");
                 /* В короткой синхронизации не участвует библиотека */
-                if(!syncType.equals(SyncType.TYPE_COMMODITY_ACCOUNTING)) groups.add("LibraryGroup");
-
+                if (!syncType.equals(SyncType.TYPE_COMMODITY_ACCOUNTING))
+                    groups.add("LibraryGroup");
                 /* Если включена опция товарного учета у организации */
-                if(org.getCommodityAccounting()) {
+                if (org.getCommodityAccounting()) {
                     groups.addAll(Arrays.asList("ProductsGroup", "DocumentGroup"));
                     /* В обработка абонентного питания*/
-                    if(enableSubscriptionFeeding) groups.add("SubscriptionGroup");
+                    if (enableSubscriptionFeeding)
+                        groups.add("SubscriptionGroup");
                 }
                 manager = new Manager(org.getIdOfOrg(), groups);
                 manager.buildRO(roNode);
             }
-
-            CardsOperationsRegistry cardsOperationsRegistry = CardsOperationsRegistry.find(envelopeNode,loadContext);
-
-            return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accountOperationsRegistry, accIncRegistryRequest,
-                    clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
-                    clientGuardianRequest, prohibitionMenuRequest,cardsOperationsRegistry, accountsRegistryRequest, organizationStructureRequest, reestrTaloonApprovalRequest,
-                    interactiveReportRequest, zeroTransactionsRequest, specialDatesRequest, migrantsRequest, categoriesAndDiscountsRequest,
-                    clientGroupManagerRequest);
+            return manager;
         }
 
+        private void checkClientVersion(long version) throws Exception {
+            if (3L != version && 4L != version && 5L != version && 6L != version) {
+                throw new Exception(String.format("Unsupported protoVersion: %d", version));
+            }
+        }
+
+        private String getMessage(Node envelopeNode) throws Exception {
+            String message = null;
+            Node messageNode = findFirstChildElement(envelopeNode, "Message");
+            if (null != messageNode) {
+                message = findFirstChildTextNode(messageNode).getTextContent();
+            }
+            return message;
+        }
 
     }
 
@@ -2444,81 +2497,25 @@ public class SyncRequest {
     private final Org org;
     private final Date syncTime;
     private final Long idOfPacket;
-    private final MenuGroups menuGroups;
-    private final PaymentRegistry paymentRegistry;
-    private final AccountOperationsRegistry accountOperationsRegistry;
-    private final ClientParamRegistry clientParamRegistry;
-    private final ClientRegistryRequest clientRegistryRequest;
-    private final AccIncRegistryRequest accIncRegistryRequest;
-    private final OrgStructure orgStructure;
-    private final ReqMenu reqMenu;
-    private final ReqDiary reqDiary;
-    private final String message;
-    private final String clientVersion;
-    private final EnterEvents enterEvents;
-    private final TempCardsOperations tempCardsOperations;
-    private final ClientRequests clientRequests;
-    private final Manager manager;
-    private final AccRegistryUpdateRequest accRegistryUpdateRequest;
-    private final ClientGuardianRequest clientGuardianRequest;
-    private final ProhibitionMenuRequest prohibitionMenuRequest;
-    private final OrganizationStructureRequest organizationStructureRequest;
-    private final CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest;
-    private final CardsOperationsRegistry cardsOperationsRegistry;
-    private final AccountsRegistryRequest accountsRegistryRequest;
-    private final ReestrTaloonApproval reestrTaloonApprovalRequest;
-    private final InteractiveReport interactiveReport;
-    private final ZeroTransactions zeroTransactions;
-    private final SpecialDates specialDates;
-    private final Migrants migrants;
-    ClientGroupManagerRequest clientGroupManagerRequest;
+    private  String message;
+    private  String clientVersion;
+    private  Manager manager;
+    private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
 
-    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket, PaymentRegistry paymentRegistry,
-            AccountOperationsRegistry accountOperationsRegistry, AccIncRegistryRequest accIncRegistryRequest,
-            ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
-            AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest,
-            ProhibitionMenuRequest prohibitionMenuRequest, CardsOperationsRegistry cardsOperationsRegistry,
-            AccountsRegistryRequest accountsRegistryRequest, OrganizationStructureRequest organizationStructureRequest,
-            ReestrTaloonApproval reestrTaloonApprovalRequest, InteractiveReport interactiveReport, ZeroTransactions zeroTransactions, SpecialDates specialDates,
-            Migrants migrants, CategoriesDiscountsAndRulesRequest categoriesAndDiscountsRequest, ClientGroupManagerRequest clientGroupManagerRequest) {
+    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
+            String message,List<SectionRequest> sectionRequests, Manager manager) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
         this.clientVersion = clientVersion;
-        this.tempCardsOperations = tempCardsOperations;
-        this.clientRequests = clientRequests;
-        this.manager = manager;
-        this.accRegistryUpdateRequest = accRegistryUpdateRequest;
-        this.clientGuardianRequest = clientGuardianRequest;
-        this.prohibitionMenuRequest = prohibitionMenuRequest;
-        this.organizationStructureRequest = organizationStructureRequest;
-        this.categoriesAndDiscountsRequest = categoriesAndDiscountsRequest;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
         this.idOfPacket = idOfPacket;
-        this.paymentRegistry = paymentRegistry;
-        this.accountOperationsRegistry = accountOperationsRegistry;
-        this.accIncRegistryRequest = accIncRegistryRequest;
-        this.clientParamRegistry = clientParamRegistry;
-        this.clientRegistryRequest = clientRegistryRequest;
-        this.orgStructure = orgStructure;
-        this.menuGroups = menuGroups;
-        this.reqMenu = reqMenu;
-        this.reqDiary = reqDiary;
         this.message = message;
-        this.enterEvents = enterEvents;
-        this.cardsOperationsRegistry = cardsOperationsRegistry;
-        this.accountsRegistryRequest = accountsRegistryRequest;
-        this.reestrTaloonApprovalRequest = reestrTaloonApprovalRequest;
-        this.interactiveReport = interactiveReport;
-        this.zeroTransactions = zeroTransactions;
-        this.specialDates = specialDates;
-        this.migrants = migrants;
-        this.clientGroupManagerRequest = clientGroupManagerRequest;
+        this.manager = manager;
+        this.sectionRequests.addAll(sectionRequests);
     }
-
 
     public String getClientVersion() {
         return clientVersion;
@@ -2548,36 +2545,44 @@ public class SyncRequest {
         return idOfPacket;
     }
 
+    public boolean isFullSync() {
+        return getSyncType() == SyncType.TYPE_FULL;
+    }
+
+    public boolean isAccIncSync() {
+        return getSyncType() == SyncType.TYPE_GET_ACC_INC;
+    }
+
     public PaymentRegistry getPaymentRegistry() {
-        return paymentRegistry;
+        return this.<PaymentRegistry>findSection(PaymentRegistry.class);
     }
 
     public AccountOperationsRegistry getAccountOperationsRegistry() {
-        return accountOperationsRegistry;
+        return this.<AccountOperationsRegistry>findSection(AccountOperationsRegistry.class);
     }
 
     public AccIncRegistryRequest getAccIncRegistryRequest() {
-        return accIncRegistryRequest;
+        return this.<AccIncRegistryRequest>findSection(AccIncRegistryRequest.class);
     }
 
     public ClientParamRegistry getClientParamRegistry() {
-        return clientParamRegistry;
+        return this.<ClientParamRegistry>findSection(ClientParamRegistry.class);
     }
 
     public ClientRegistryRequest getClientRegistryRequest() {
-        return clientRegistryRequest;
+        return this.<ClientRegistryRequest>findSection(ClientRegistryRequest.class);
     }
 
     public OrgStructure getOrgStructure() {
-        return orgStructure;
+        return this.<OrgStructure>findSection(OrgStructure.class);
     }
 
     public ReqMenu getReqMenu() {
-        return reqMenu;
+        return this.<ReqMenu>findSection(ReqMenu.class);
     }
 
     public ReqDiary getReqDiary() {
-        return reqDiary;
+        return this.<ReqDiary>findSection(ReqDiary.class);
     }
 
     public String getMessage() {
@@ -2585,7 +2590,7 @@ public class SyncRequest {
     }
 
     public EnterEvents getEnterEvents() {
-        return enterEvents;
+        return this.<EnterEvents>findSection(EnterEvents.class);
     }
 
     public Manager getManager() {
@@ -2593,93 +2598,87 @@ public class SyncRequest {
     }
 
     public TempCardsOperations getTempCardsOperations() {
-        return tempCardsOperations;
+        return this.<TempCardsOperations>findSection(TempCardsOperations.class);
     }
 
     public ClientRequests getClientRequests() {
-        return clientRequests;
+        return this.<ClientRequests>findSection(ClientRequests.class);
     }
 
     public AccRegistryUpdateRequest getAccRegistryUpdateRequest() {
-        return accRegistryUpdateRequest;
+        return this.<AccRegistryUpdateRequest>findSection(AccRegistryUpdateRequest.class);
     }
 
     public ClientGuardianRequest getClientGuardianRequest() {
-        return clientGuardianRequest;
+        return this.<ClientGuardianRequest>findSection(ClientGuardianRequest.class);
     }
 
     public ClientGroupManagerRequest getClientGroupManagerRequest() {
-        return clientGroupManagerRequest;
+        return this.<ClientGroupManagerRequest>findSection(ClientGroupManagerRequest.class);
     }
 
     public ProhibitionMenuRequest getProhibitionMenuRequest() {
-        return prohibitionMenuRequest;
+        return this.<ProhibitionMenuRequest>findSection(ProhibitionMenuRequest.class);
     }
 
     public OrganizationStructureRequest getOrganizationStructureRequest() {
-        return organizationStructureRequest;
+        return this.<OrganizationStructureRequest>findSection(OrganizationStructureRequest.class);
     }
 
     public CategoriesDiscountsAndRulesRequest getCategoriesAndDiscountsRequest() {
-        return categoriesAndDiscountsRequest;
+        return this.<CategoriesDiscountsAndRulesRequest>findSection(CategoriesDiscountsAndRulesRequest.class);
     }
 
     public CardsOperationsRegistry getCardsOperationsRegistry() {
-        return cardsOperationsRegistry;
+        return this.<CardsOperationsRegistry>findSection(CardsOperationsRegistry.class);
+    }
+
+    public ZeroTransactions getZeroTransactions() {
+        return this.<ZeroTransactions>findSection(ZeroTransactions.class);
     }
 
     public AccountsRegistryRequest getAccountsRegistryRequest() {
-        return accountsRegistryRequest;
+        return  this.<AccountsRegistryRequest>findSection(AccountsRegistryRequest.class);
     }
 
     public ReestrTaloonApproval getReestrTaloonApproval() {
-        return reestrTaloonApprovalRequest;
+        return this.<ReestrTaloonApproval>findSection(ReestrTaloonApproval.class);
     }
 
     public InteractiveReport getInteractiveReport() {
-        return interactiveReport;
+        return  this.<InteractiveReport>findSection(InteractiveReport.class);
     }
 
     public SpecialDates getSpecialDates() {
-        return specialDates;
+        return  this.<SpecialDates>findSection(SpecialDates.class);
     }
 
     public Migrants getMigrants() {
-        return migrants;
+        return this.<Migrants>findSection(Migrants.class);
+    }
+
+    public <T extends SectionRequest> T findSection(Class classT) {
+        for (SectionRequest sectionRequest : sectionRequests) {
+            if (sectionRequest.getClass() == classT) {
+                return (T) sectionRequest;
+            }
+        }
+        return null;
     }
 
     @Override
     public String toString() {
         return "SyncRequest{" + "protoVersion=" + protoVersion + ", idOfOrg=" + idOfOrg + ", syncTime=" + syncTime
-                + ", idOfPacket=" + idOfPacket + ", paymentRegistry=" + paymentRegistry
-                + ", accountOperationsRegistry=" + accountOperationsRegistry + ", clientParamRegistry="
-                + clientParamRegistry + ", clientRegistryRequest=" + clientRegistryRequest + ", orgStructure="
-                + orgStructure + ", reqMenu=" + reqMenu + ", reqDiary=" + reqDiary + ", message='" + message + '\''
-                + ", enterEvents=" + enterEvents + '}';
+                + ", idOfPacket=" + idOfPacket + ", message='" + message + '\'' + '}';
     }
 
-    private static Double getCalories(NamedNodeMap namedNodeMap, String name) {
-        Node node = namedNodeMap.getNamedItem(name);
-        if (null == node) {
-            return null;
-        }
-        String calString = node.getTextContent();
-        if (calString.equals("")) {
-            return null;
-        }
-        String replacedString = calString.replaceAll(",", ".");
-        return Double.parseDouble(replacedString);
-    }
-
-
-
-    public static boolean versionIsAfter(String clientVersion, String expectedVersion){
-        List<String> cVL =  Arrays.asList(clientVersion.split("\\."));
-        List<String> eVL =  Arrays.asList(expectedVersion.split("\\."));
-        for (int i = 0; i< eVL.size(); i++){
-            if(Integer.valueOf(cVL.get(i)) > Integer.valueOf(eVL.get(i))){
+    public static boolean versionIsAfter(String clientVersion, String expectedVersion) {
+        List<String> cVL = Arrays.asList(clientVersion.split("\\."));
+        List<String> eVL = Arrays.asList(expectedVersion.split("\\."));
+        for (int i = 0; i < eVL.size(); i++) {
+            if (Integer.valueOf(cVL.get(i)) > Integer.valueOf(eVL.get(i))) {
                 return true;
-            }else if(Integer.valueOf(cVL.get(i)) < Integer.valueOf(eVL.get(i))){
+            } else if (Integer.valueOf(cVL.get(i)) < Integer.valueOf(eVL.get(i))) {
                 return false;
             }
         }
