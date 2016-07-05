@@ -67,6 +67,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
     private Date startDate;
     private Date endDate;
     private String htmlReport;
+    public static final String IS_ACTIVE_STATE = "isActiveState";
 
     private static final String ORG_NUM = "Номер ОУ";
     private static final String ORG_NAME = "Наименование ОУ";
@@ -98,6 +99,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
         private final String templateFilename;
         private boolean exportToHTML = false;
         private IPrintWarn printer;
+        private static boolean isActiveState = false;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -182,15 +184,25 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 cal.setTimeInMillis(System.currentTimeMillis());
                 CalendarUtils.truncateToDayOfMonth(cal);
 
+                isActiveState = Boolean.valueOf(reportProperties.getProperty(IS_ACTIVE_STATE, "false"));
+
                 findConsolidated(items, session, start, end);
                 findExternal(items, session, start, end);
                 findOrgData(items, session);
+                findEmptyRows(items);
 
                 return items;
             } catch (Exception e) {
                 logger.error("Failed to build SMSDelivery report", e);
                 throw new RuntimeException("Failed to build report: " + e.getMessage());
             }
+        }
+
+        private List<SMSDeliveryReportItem> findEmptyRows(List<SMSDeliveryReportItem> items) {
+            for(SMSDeliveryReportItem item : items){
+                item.setIsEmptyValues();
+            }
+            return items;
         }
 
         public List<SMSDeliveryReportItem> findDaily(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
@@ -226,49 +238,82 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
                     StringBuilder builder = new StringBuilder();
                     for(String id : stringOrgList) {
-                        builder.append(builder.length() > 0 ? " or " : "").append("sync.idoforg=").append(id);
+                        builder.append(builder.length() > 0 ? " or " : "").append("o.idoforg=").append(id);
                     }
-                    orgCondition = "            and (" + builder.toString() + ") ";
+                    orgCondition = " and (" + builder.toString() + ") ";
+                }
+            }
+
+            String orgConditionForOrgData = orgCondition.length() > 1 ? "where " + orgCondition.substring(4) : orgCondition;
+            String stateCondition = "";
+
+            if(isActiveState){
+                stateCondition = " o.state = " + Org.ACTIVE_STATE;
+                if(orgCondition.length() > 1){
+                    stateCondition = " and " + stateCondition;
                 }
             }
 
             String sql =
-                    "select o.idoforg, o.shortname, calctype, round(avg(sync.calcValue)) "
-                    + "from cf_synchistory_calc sync "
-                    + "join cf_orgs o on o.idoforg=sync.idoforg "
-                    + "where sync.calcDateAt>=:start and sync.calcDateAt<:end " + orgCondition
-                    + "group by o.idoforg, calctype "
-                    + "order by o.idoforg";
+                    "select o.idoforg, o.shortname "
+                    + "from cf_orgs o "
+                    + orgConditionForOrgData + stateCondition
+                    + " order by o.idoforg";
             Query query = session.createSQLQuery(sql);
-            query.setParameter("start", start.getTime());
-            query.setParameter("end", end.getTime());
             List res = query.list();
 
             SMSDeliveryReportItem it = null;
-            long commonSum = 0;
-            long prevOrgId = -1L;
             int i = 0;
 
             for(Object entry : res) {
                 Object e[] = (Object[]) entry;
                 long idoforg = ((BigInteger) e[0]).longValue();
                 String officialname = (String) e[1];
-                int dataType = ((Integer) e[2]).intValue();
-                long ts = ((BigDecimal) e[3]).longValue();
 
-                if(it == null || idoforg != prevOrgId) {
-                    if(it != null) {
-                        it.addValue("commonSum", calcTimeout(commonSum));
-                        items.add(it);
+                it = new SMSDeliveryReportItem();
+                it.setUniqueId(++i);
+                it.setOrgName(officialname);
+                it.setOrgId(idoforg);
+                it.setColumnId(1);
+                items.add(it);
+            }
+
+
+            sql =
+                    "select o.idoforg, calctype, round(avg(sync.calcValue)) "
+                    + "from cf_synchistory_calc sync "
+                    + "join cf_orgs o on o.idoforg=sync.idoforg "
+                    + "where sync.calcDateAt>=:start and sync.calcDateAt<:end " + orgCondition + stateCondition
+                    + "group by o.idoforg, calctype "
+                    + "order by o.idoforg";
+            query = session.createSQLQuery(sql);
+            query.setParameter("start", start.getTime());
+            query.setParameter("end", end.getTime());
+            res = query.list();
+
+            it = null;
+            long commonSum = 0;
+
+            for(Object entry : res) {
+                Object e[] = (Object[]) entry;
+                long idoforg = ((BigInteger) e[0]).longValue();
+                int dataType = (Integer) e[1];
+                long ts = ((BigDecimal) e[2]).longValue();
+
+                for(SMSDeliveryReportItem it2 : items) {
+                    if(it2.getOrgId() == idoforg) {
+                        it = it2;
+                        break;
                     }
-                    it = new SMSDeliveryReportItem();
-                    it.setUniqueId(++i);
-                    it.setOrgName(officialname);
-                    it.setOrgId(idoforg);
-                    it.setColumnId(1);
-                    prevOrgId = idoforg;
-                    commonSum = 0;
                 }
+
+                if(it == null) {
+                    continue;
+                }
+
+                it.addValue("commonSum", calcTimeout(commonSum));
+                items.add(it);
+                commonSum = 0;
 
                 if (SmsDeliveryCalculationService.isSumType(dataType)) {
                     commonSum += ts;
@@ -277,12 +322,11 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 String k = getDataTypeNameForReport(dataType);
                 String v = calcTimeout(ts);
                 it.addValue(k, v);
-            }
-            if(it != null) {
-                it.addValue("commonSum", calcTimeout(commonSum));
-                items.add(it);
-            }
 
+                if(it != null) {
+                    it.addValue("commonSum", calcTimeout(commonSum));
+                }
+            }
 
             //  get max sync latest sync date
             sql = "select o.idoforg, o.shortname, calctype, max(sync.calcValue) "
@@ -290,7 +334,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                   + "join cf_orgs o on o.idoforg=sync.idoforg "
                   + "where sync.calcDateAt>=:start and sync.calcDateAt<:end "
                   + "      and calctype=:calctype "
-                  + orgCondition
+                  + orgCondition + stateCondition
                   + "group by o.idoforg, calctype "
                   + "order by o.idoforg";
             query = session.createSQLQuery(sql);
@@ -337,6 +381,12 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 }
             }
 
+            String stateCondition = "";
+
+            if(isActiveState){
+                stateCondition = " and " + " o.state = " + Org.ACTIVE_STATE;
+            }
+
             String sql =
                     "select o.idoforg, o.shortname, t1, t2 "
                     + "from (select sync1.idoforg as idoforg, "
@@ -346,7 +396,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     + "              where sync2.syncdate<sync1.syncdate and sync1.idoforg=sync2.idoforg "
                     + "              order by syncdate desc limit 1) t2 "
                     + "      from cf_synchistory_daily sync1 "
-                    + "      where sync1.syncdate>=:start and sync1.syncdate<:end " + orgCondition + " ) as history "
+                    + "      where sync1.syncdate>=:start and sync1.syncdate<:end " + orgCondition + stateCondition + " ) as history "
                     + "join cf_orgs o on history.idoforg=o.idoforg "
                     + " where t2 is not null "
                     + "order by idoforg, t1 asc";
@@ -403,15 +453,21 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
                 StringBuilder builder = new StringBuilder();
                 for(String id : stringOrgList) {
-                    builder.append(builder.length() > 0 ? " or " : "").append("org.idoforg=").append(id);
+                    builder.append(builder.length() > 0 ? " or " : "").append("o.idoforg=").append(id);
                 }
                 orgCondition = "            (" + builder.toString() + ") and ";
             }
 
+            String stateCondition = "";
+
+            if(isActiveState){
+                stateCondition = " o.state = " + Org.ACTIVE_STATE + " and ";
+            }
+
             String sql =
-                    "select org.idoforg, org.shortname, sms.servicesenddate, sms.evtdate "
-                            + "from cf_clientsms sms inner join cf_orgs org on sms.idoforg=org.idoforg "
-                            + "where " + orgCondition
+                    "select o.idoforg, o.shortname, sms.servicesenddate, sms.evtdate "
+                            + "from cf_clientsms sms inner join cf_orgs o on sms.idoforg=o.idoforg "
+                            + "where " + orgCondition + stateCondition
                             + "            (sms.servicesenddate>=:start and sms.servicesenddate<:end) and "
                             + "            (sms.contentstype=" + ClientSms.TYPE_ENTER_EVENT_NOTIFY + " or sms.contentstype=" + ClientSms.TYPE_PAYMENT_NOTIFY + ") and "
                             + "            sms.evtdate is not null "

@@ -16,6 +16,41 @@
 <%--@elvariable id="ruleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListPage"--%>
 <%--@elvariable id="ruleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleEditPage"--%>
 <h:panelGrid id="ruleListPanel" binding="#{ruleListPage.pageComponent}" styleClass="borderless-grid">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+
+        <h:outputText escape="true" value="Агент по приему платежей" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <a4j:commandButton value="..."
+                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(false)}"
+                               reRender="modalContragentListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="1" target="#{mainPage.contragentListSelectPage.classTypesString}" />
+                <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.contragentPaymentReceiverIds}" target="#{mainPage.contragentListSelectPage.selectedIds}" />
+            </a4j:commandButton>
+            <h:outputText value=" {#{mainPage.contragentPaymentReportPage.contragentPaymentReceiverFilter}}" escape="true" styleClass="output-text" />
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <a4j:commandButton value="..."
+                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(true)}"
+                               reRender="modalContragentListSelectorPanel, orgPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="2" target="#{mainPage.contragentListSelectPage.classTypesString}" />
+                <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.contragentReceiverIds}" target="#{mainPage.contragentListSelectPage.selectedIds}" />
+            </a4j:commandButton>
+            <h:outputText value=" {#{mainPage.contragentPaymentReportPage.contragentReceiverFilter}}" escape="true" styleClass="output-text" />
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:selectOneMenu id="regionsList" value="#{mainPage.allOrgsDiscountsReportPage.region}" style="width:100px;" >
+            <f:selectItems value="#{mainPage.allOrgsDiscountsReportPage.regions}"/>
+        </h:selectOneMenu>
+    </h:panelGrid>
+
+
     <rich:dataTable id="ruleTable" width="700" var="item" value="#{ruleListPage.items}" rows="15"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer">

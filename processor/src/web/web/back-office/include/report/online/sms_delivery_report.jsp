@@ -43,6 +43,10 @@
                           value=" {#{smsDeliveryReportPage.filter}}" />
         </h:panelGroup>
 
+        <h:outputText escape="false" value="Показать только ОО со статусом \"Обслуживается\"" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{smsDeliveryReportPage.isActiveState}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
         <a4j:commandButton value="Генерировать отчет" action="#{smsDeliveryReportPage.buildReport}"
                            reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />

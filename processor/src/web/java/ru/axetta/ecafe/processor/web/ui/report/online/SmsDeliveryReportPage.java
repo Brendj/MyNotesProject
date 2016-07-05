@@ -11,14 +11,14 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.IPrintWarn;import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
+import ru.axetta.ecafe.processor.core.report.IPrintWarn;
+import ru.axetta.ecafe.processor.core.report.SMSDeliveryReport;
 import ru.axetta.ecafe.processor.core.service.SmsDeliveryCalculationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -34,9 +34,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
@@ -54,6 +52,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     public EntityManager entityManager;
     private final static Logger logger = LoggerFactory.getLogger(SmsDeliveryReportPage.class);
     private SMSDeliveryReport report;
+    private Boolean isActiveState = true;
 
     public SmsDeliveryReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -104,6 +103,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
         }
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder(printer);
+        addStateFilter(reportBuilder);
         addOrgFilter(reportBuilder);
 
         try {
@@ -126,6 +126,11 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             }
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         }
+    }
+
+    protected void addStateFilter(SMSDeliveryReport.Builder builder) {
+        Properties properties = builder.getReportProperties();
+        properties.setProperty(SMSDeliveryReport.IS_ACTIVE_STATE, Boolean.toString(isActiveState));
     }
 
 
@@ -206,5 +211,13 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     private void complainWrongPeriod(FacesContext facesContext) {
         facesContext.addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Начальная дата больше конечной.", null));
+    }
+
+    public Boolean getIsActiveState() {
+        return isActiveState;
+    }
+
+    public void setIsActiveState(Boolean activeState) {
+        isActiveState = activeState;
     }
 }

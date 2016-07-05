@@ -1037,7 +1037,6 @@ public class ClientManager {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
-        idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1055,7 +1054,6 @@ public class ClientManager {
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
-        idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
         if(countResult>0){

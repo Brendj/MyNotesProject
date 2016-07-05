@@ -27,6 +27,7 @@ public class SMSDeliveryReportItem implements Serializable {
     private String introductionQueue;
     private String orgStatus;
     public Map<String, String> values;
+    public Boolean isEmptyValues;
 
     public SMSDeliveryReportItem() {
     }
@@ -114,6 +115,22 @@ public class SMSDeliveryReportItem implements Serializable {
 
     public void setOrgStatus(String orgStatus) {
         this.orgStatus = orgStatus;
+    }
+
+    public Boolean getIsEmptyValues() {
+        return isEmptyValues;
+    }
+
+    public void setIsEmptyValues(Boolean emptyValues) {
+        isEmptyValues = emptyValues;
+    }
+
+    public void setIsEmptyValues() {
+        if(values == null || values.isEmpty()){
+            setIsEmptyValues(true);
+        } else {
+            setIsEmptyValues(false);
+        }
     }
 
     public Map<String, String> getValues() {
