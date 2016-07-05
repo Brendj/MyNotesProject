@@ -548,7 +548,7 @@ public class SyncRequest {
             @Override
             public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
                 Node menuNode = findFirstChildElement(envelopeNode,ReqMenu.SECTION_NAME);
-                Node menuGroupsNode = findFirstChildElement(menuNode, MenuGroups.SECTION_NAME);
+                Node menuGroupsNode = findFirstChildElement(envelopeNode, MenuGroups.SECTION_NAME);
                 if (menuGroupsNode == null) {
                     // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
                     if (menuNode != null) {
