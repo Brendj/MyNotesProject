@@ -103,32 +103,13 @@ public class MenuLoadPage extends BasicWorkspacePage {
         }
     }
 
-    private SyncRequest.MenuGroups.Builder menuGroupsBuilder = new SyncRequest.MenuGroups.Builder();
-    private SyncRequest.ReqMenu.Builder reqMenuBuilder = new SyncRequest.ReqMenu.Builder();
-
     public void loadMenu(InputStream inputStream, long dataSize) throws Exception {
         lineResults = new ArrayList<LineResult>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(inputStream);
-        Node menuNode = findFirstChildElement(document, "Menu");
-        SyncRequest.MenuGroups menuGroups = null;
-        Node menuGroupsNode = findFirstChildElement(menuNode, "MenuGroups");
-        if (menuGroupsNode == null) {
-            // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
-            if (menuNode != null) {
-                Node settingsNode = findFirstChildElement(menuNode, "Settings");
-                if (settingsNode != null) {
-                    menuGroupsNode = findFirstChildElement(settingsNode, "MenuGroups");
-                }
-            }
-        }
-        if (menuGroupsNode != null) {
-            menuGroups = menuGroupsBuilder.build(menuGroupsNode);
-        } else {
-            menuGroups = SyncRequest.MenuGroups.Builder.buildEmpty();
-        }
+
 
         TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
         DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -138,11 +119,10 @@ public class MenuLoadPage extends BasicWorkspacePage {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         timeFormat.setTimeZone(localTimeZone);
 
+        SyncRequest.MenuGroups menuGroups = new SyncRequest.MenuGroups.Builder().build(document);
         LoadContext loadContext = new LoadContext(menuGroups, 5L, timeFormat, dateOnlyFormat);
-        SyncRequest.ReqMenu reqMenu = null;
-        if (menuNode != null) {
-            reqMenu = reqMenuBuilder.build(menuNode, loadContext);
-        }
+        SyncRequest.ReqMenu reqMenu = new SyncRequest.ReqMenu.Builder(loadContext).build(document);
+
         processSyncMenu(idOfOrg, reqMenu);
 
     }
