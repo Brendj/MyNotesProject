@@ -89,6 +89,10 @@ public class DirectiveElement implements AbstractToElement{
         Integer tmpBlockAccTime = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_CLIENT_TMP_BLOCK_ACC_TIME);
         directiveItemList.add(new DirectiveItem("IS_TMP_BLOCK_ACC_TIME", tmpBlockAccTime.toString()));
+
+        Integer disableEmailEdit = RuntimeContext.getInstance().getOptionValueInt(
+                Option.OPTION_DISABLE_EMAIL_EDIT);
+        directiveItemList.add(new DirectiveItem("DISABLE_EMAIL_EDIT", disableEmailEdit.toString()));
     }
 
     public Element toElement(Document document) throws Exception {
