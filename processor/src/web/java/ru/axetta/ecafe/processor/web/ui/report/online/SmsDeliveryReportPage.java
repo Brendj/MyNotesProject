@@ -168,6 +168,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
             SMSDeliveryReport.Builder builder = new SMSDeliveryReport.Builder(templateFilename);
             addOrgFilter(builder);
+            addStateFilter(builder);
             /*if(idOfOrg != null) {
                 builder.setOrg(new BasicReportJob.OrgShortItem(idOfOrg, filter, filter));
             }*/
