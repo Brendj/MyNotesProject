@@ -127,7 +127,7 @@ public class CategoryListSelectPage extends BasicPage {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
         criteria.addOrder(Order.asc("idOfCategoryDiscount"));
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE).ignoreCase());
         }
         if(!flag) criteria.add(Restrictions.ge("idOfCategoryDiscount",Long.parseLong("0")));
         return criteria.list();

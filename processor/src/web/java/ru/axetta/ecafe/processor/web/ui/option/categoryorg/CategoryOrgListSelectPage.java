@@ -117,7 +117,7 @@ public class CategoryOrgListSelectPage extends BasicPage {
         Criteria criteria = session.createCriteria(CategoryOrg.class);
         criteria.addOrder(Order.asc("idOfCategoryOrg"));
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE).ignoreCase());
         }
         return criteria.list();
     }
