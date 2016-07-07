@@ -16,40 +16,55 @@
 <%--@elvariable id="ruleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListPage"--%>
 <%--@elvariable id="ruleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleEditPage"--%>
 <h:panelGrid id="ruleListPanel" binding="#{ruleListPage.pageComponent}" styleClass="borderless-grid">
+
     <h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Категории клиентов" styleClass="output-text" />
+    <h:panelGroup>
+        <a4j:commandButton id="categoryAjaxButton" value="..." action="#{mainPage.showCategoryListSelectPage}"
+                           reRender="modalCategoryListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="#{ruleListPage.idOfCategoryListString}"
+                                         target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" id="categoryListFilter1" escape="true"
+                      value=" {#{ruleListPage.filter}}" />
+    </h:panelGroup>
 
-        <h:outputText escape="true" value="Агент по приему платежей" styleClass="output-text required-field" />
-        <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..."
-                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(false)}"
-                               reRender="modalContragentListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="1" target="#{mainPage.contragentListSelectPage.classTypesString}" />
-                <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.contragentPaymentReceiverIds}" target="#{mainPage.contragentListSelectPage.selectedIds}" />
-            </a4j:commandButton>
-            <h:outputText value=" {#{mainPage.contragentPaymentReportPage.contragentPaymentReceiverFilter}}" escape="true" styleClass="output-text" />
-        </h:panelGroup>
+    <h:outputText escape="true" value="Категории организаций" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text required-field" />
-        <h:panelGroup styleClass="borderless-div">
-            <a4j:commandButton value="..."
-                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(true)}"
-                               reRender="modalContragentListSelectorPanel, orgPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="2" target="#{mainPage.contragentListSelectPage.classTypesString}" />
-                <f:setPropertyActionListener value="#{mainPage.contragentPaymentReportPage.contragentReceiverIds}" target="#{mainPage.contragentListSelectPage.selectedIds}" />
-            </a4j:commandButton>
-            <h:outputText value=" {#{mainPage.contragentPaymentReportPage.contragentReceiverFilter}}" escape="true" styleClass="output-text" />
-        </h:panelGroup>
+    <h:panelGroup>
+        <a4j:commandButton id="categoryOrgAjaxButton" value="..." action="#{mainPage.showCategoryOrgListSelectPage}"
+                           reRender="modalCategoryOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="#{ruleListPage.idOfCategoryOrgListString}"
+                                         target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}" />
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" id="categoryOrgListFilter1" escape="true"
+                      value=" {#{ruleListPage.filterOrg}}" />
+    </h:panelGroup>
 
-        <h:outputText escape="true" value="Округ" styleClass="output-text" />
-        <h:selectOneMenu id="regionsList" value="#{mainPage.allOrgsDiscountsReportPage.region}" style="width:100px;" >
-            <f:selectItems value="#{mainPage.allOrgsDiscountsReportPage.regions}"/>
-        </h:selectOneMenu>
+    <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field" />
+    <h:selectOneMenu id="group1" value="#{ruleListPage.subCategory}" style="width:300px;" styleClass="groupSelect">
+        <f:selectItems value="#{ruleListPage.subCategories}"/>
+    </h:selectOneMenu>
+
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+
+            <a4j:commandButton value="Применить" action="#{ruleListPage.updatePage}"
+                               reRender="workspaceTogglePanel, ruleListPanel" styleClass="command-button" />
+
+            <a4j:commandButton value="Очистить" action="#{ruleListPage.clearPageFilter}"
+                               reRender="workspaceTogglePanel, ruleListPanel" ajaxSingle="true" styleClass="command-button" />
+        </h:panelGrid>
+
+        <a4j:status id="sStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+            </f:facet>
+        </a4j:status>
     </h:panelGrid>
-
 
     <rich:dataTable id="ruleTable" width="700" var="item" value="#{ruleListPage.items}" rows="15"
                     columnClasses="center-aligned-column"

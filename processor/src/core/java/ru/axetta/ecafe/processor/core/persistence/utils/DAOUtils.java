@@ -1351,7 +1351,7 @@ public class DAOUtils {
         return (Long)(q.getSingleResult());
     }
 
-    public static List listDiscountRules(EntityManager em) {
+    public static List<DiscountRule> listDiscountRules(EntityManager em) {
         javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
         return q.getResultList();
     }

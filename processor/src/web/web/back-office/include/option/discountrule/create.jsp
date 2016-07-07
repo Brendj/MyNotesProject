@@ -16,7 +16,7 @@
 <h:panelGrid id="ruleCreatePanel" binding="#{ruleCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
 
-    <h:outputText escape="true" value="Категории" styleClass="output-text" />
+    <h:outputText escape="true" value="Категории клиентов" styleClass="output-text" />
 
     <h:panelGroup>
     <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
