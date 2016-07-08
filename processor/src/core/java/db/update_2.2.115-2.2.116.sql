@@ -10,3 +10,16 @@ ALTER TABLE cf_discountchangehistory
   ADD CONSTRAINT cf_discountchangehistory_idoforg_fk FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+CREATE TABLE cf_groupnames_to_orgs
+  (
+  idofgroupnametoorg bigserial,
+  idoforg bigint,
+  idofmainorg bigint,
+  mainbuilding integer,
+  check (mainbuilding = 1),
+  groupname character varying(36),
+  constraint cf_groupnames_to_orgs_pk primary key (idofgroupnametoorg),
+  constraint cf_groupnames_to_orgs_fk foreign key (idoforg)
+    references cf_orgs (idoforg)
+);
