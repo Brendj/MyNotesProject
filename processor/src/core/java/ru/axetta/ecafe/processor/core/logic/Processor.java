@@ -4191,7 +4191,12 @@ public class Processor
                 if (clientParamItem.getMiddleGroup() != null) {
                     client.setMiddleGroup(clientParamItem.getMiddleGroup());
                 }
-
+                if (clientParamItem.getGender() != null) {
+                    client.setGender(clientParamItem.getGender());
+                }
+                if (clientParamItem.getBirthDate() != null) {
+                    client.setBirthDate(clientParamItem.getBirthDate());
+                }
                 if (clientParamItem.getName() != null) {
                     client.getPerson().setFirstName(clientParamItem.getName());
                 }

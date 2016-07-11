@@ -111,13 +111,16 @@ public class SyncRequest {
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
+                    Integer gender = getIntegerValueNullSafe(namedNodeMap, "Gender");
+                    Date birthDate = getDateValueNullSafe(namedNodeMap,"BirthDate");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
                             notifyViaSMS == null ? null : notifyViaSMS.equals("1"),
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
-                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));
+                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
+                            gender,birthDate);
                     /*return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -142,12 +145,15 @@ public class SyncRequest {
             private final String guid;
             private final Long expenditureLimit;
             private final Boolean isUseLastEEModeForPlan;
+            private final Date birthDate;
+            private final Integer gender;
+
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {
+                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate) {
             /*public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
@@ -177,6 +183,8 @@ public class SyncRequest {
                 this.guid = guid;
                 this.expenditureLimit = expenditureLimit;
                 this.isUseLastEEModeForPlan = isUseLastEEModeForPlan;
+                this.gender = gender;
+                this.birthDate = birthDate;
             }
 
             public long getIdOfClient() {
@@ -275,6 +283,14 @@ public class SyncRequest {
                 return isUseLastEEModeForPlan;
             }
 
+            public Date getBirthDate() {
+                return birthDate;
+            }
+
+            public Integer getGender() {
+                return gender;
+            }
+
             @Override
             public String toString() {
                 return "ClientParamItem{" + "idOfClient=" + idOfClient + ", name='" + name + '\'' + ", surname='"
@@ -313,7 +329,8 @@ public class SyncRequest {
 
             private ClientParamRegistry buildFromCorrectSection(Node paymentRegistryNode) throws Exception {
                 List<ClientParamItem> items = new LinkedList<ClientParamItem>();
-                if (paymentRegistryNode == null) return new ClientParamRegistry();
+                if (paymentRegistryNode == null)
+                    return new ClientParamRegistry();
 
                 Node itemNode = paymentRegistryNode.getFirstChild();
                 while (null != itemNode) {
@@ -411,9 +428,9 @@ public class SyncRequest {
                 this.groupBuilder = new Group.Builder();
             }
 
-            public OrgStructure build (Node envelopeNode) throws Exception {
+            public OrgStructure build(Node envelopeNode) throws Exception {
                 SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
-                return sectionRequest!=null? (OrgStructure) sectionRequest :null;
+                return sectionRequest != null ? (OrgStructure) sectionRequest : null;
             }
 
             @Override
@@ -456,7 +473,8 @@ public class SyncRequest {
     }
 
     public static class MenuGroups implements SectionRequest {
-        public static final String SECTION_NAME="MenuGroups";
+
+        public static final String SECTION_NAME = "MenuGroups";
 
         public String findMenuGroup(long idOfMenuGroup) {
             for (MenuGroup menuGroup : menuGroups) {
@@ -553,7 +571,7 @@ public class SyncRequest {
 
             @Override
             public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
-                Node menuNode = findFirstChildElement(envelopeNode,ReqMenu.SECTION_NAME);
+                Node menuNode = findFirstChildElement(envelopeNode, ReqMenu.SECTION_NAME);
                 Node menuGroupsNode = findFirstChildElement(envelopeNode, MenuGroups.SECTION_NAME);
                 if (menuGroupsNode == null) {
                     // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
@@ -1993,7 +2011,7 @@ public class SyncRequest {
 
             public ReqMenu build(Node envelopeNode) throws Exception {
                 SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
-                return sectionRequest!=null? (ReqMenu) sectionRequest :null;
+                return sectionRequest != null ? (ReqMenu) sectionRequest : null;
             }
 
             @Override
@@ -2335,6 +2353,7 @@ public class SyncRequest {
     }
 
     public static class Builder {
+
         private final DateFormat dateOnlyFormat;
         private final DateFormat timeFormat;
 
@@ -2508,13 +2527,13 @@ public class SyncRequest {
     private final Org org;
     private final Date syncTime;
     private final Long idOfPacket;
-    private  String message;
-    private  String clientVersion;
-    private  Manager manager;
+    private String message;
+    private String clientVersion;
+    private Manager manager;
     private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            String message,List<SectionRequest> sectionRequests, Manager manager) {
+            String message, List<SectionRequest> sectionRequests, Manager manager) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2649,7 +2668,7 @@ public class SyncRequest {
     }
 
     public AccountsRegistryRequest getAccountsRegistryRequest() {
-        return  this.<AccountsRegistryRequest>findSection(AccountsRegistryRequest.class);
+        return this.<AccountsRegistryRequest>findSection(AccountsRegistryRequest.class);
     }
 
     public ReestrTaloonApproval getReestrTaloonApproval() {
@@ -2657,11 +2676,11 @@ public class SyncRequest {
     }
 
     public InteractiveReport getInteractiveReport() {
-        return  this.<InteractiveReport>findSection(InteractiveReport.class);
+        return this.<InteractiveReport>findSection(InteractiveReport.class);
     }
 
     public SpecialDates getSpecialDates() {
-        return  this.<SpecialDates>findSection(SpecialDates.class);
+        return this.<SpecialDates>findSection(SpecialDates.class);
     }
 
     public Migrants getMigrants() {

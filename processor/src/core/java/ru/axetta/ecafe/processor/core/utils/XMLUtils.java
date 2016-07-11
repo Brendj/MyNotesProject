@@ -199,6 +199,17 @@ public class XMLUtils {
         return Integer.parseInt(namedNodeMap.getNamedItem(name).getTextContent());
     }
 
+    public static Integer getIntegerValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            node = namedNodeMap.getNamedItem(name.toUpperCase());
+            if (node == null) {
+                return null;
+            }
+        }
+        return Integer.parseInt(node.getTextContent());
+    }
+
     public static long getLongValue(NamedNodeMap namedNodeMap, String name) throws Exception {
         Node n = namedNodeMap.getNamedItem(name);
         return Long.parseLong(n.getTextContent());
@@ -231,6 +242,18 @@ public class XMLUtils {
         String result = node.getTextContent();
         if(result.length()>length) return result.substring(0, length);
         return result;
+    }
+
+    public static Date getDateValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
+        String stringValue = getStringValueNullSafe(namedNodeMap, name);
+        if (stringValue != null) {
+            try {
+                return CalendarUtils.parseDate(stringValue);
+            } catch (Exception e) {
+                throw new Exception(e.getMessage());
+            }
+        }
+        return null;
     }
 
     public static void setAttributeIfNotNull(Element element, String attrName, Object value) {
