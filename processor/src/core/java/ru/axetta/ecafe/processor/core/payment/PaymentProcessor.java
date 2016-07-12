@@ -14,4 +14,7 @@ package ru.axetta.ecafe.processor.core.payment;
 public interface PaymentProcessor {
 
     PaymentResponse processPayRequest(PaymentRequest request) throws Exception;
+
+    PaymentResponse.ResPaymentRegistry.Item processPayPaymentRegistryPayment(Long idOfContragent,
+            PaymentRequest.PaymentRegistry.Payment payment) throws Exception;
 }

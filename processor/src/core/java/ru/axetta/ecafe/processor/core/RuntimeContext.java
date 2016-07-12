@@ -10,8 +10,7 @@ import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.EventProcessor;
-import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
-import ru.axetta.ecafe.processor.core.logic.Processor;
+import ru.axetta.ecafe.processor.core.logic.*;
 import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.partner.acquiropay.AcquiropaySystemConfig;
@@ -568,11 +567,11 @@ public class RuntimeContext implements ApplicationContextAware {
             eventNotificator = createEventNotificator(properties, executorService, sessionFactory, ruleProcessor);
 
             processor = createProcessor(properties, sessionFactory, eventNotificator);
-            this.cardManager = processor;
             this.syncProcessor = processor;
-            this.paymentProcessor = processor;
-            this.clientPaymentOrderProcessor = processor;
-            this.orderCancelProcessor = processor;
+            this.cardManager = createCardManagerProcessor(properties, sessionFactory, eventNotificator);
+            paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
+            clientPaymentOrderProcessor = createClientPaymentOrderProcessor(properties, sessionFactory, eventNotificator);
+            orderCancelProcessor = createOrderCancelProcessor(properties, sessionFactory, eventNotificator);
 
             this.onlinePaymentProcessor = new OnlinePaymentProcessor(processor);
 
@@ -944,6 +943,54 @@ public class RuntimeContext implements ApplicationContextAware {
         Processor processor = new Processor(sessionFactory, eventNotificator);
         if (logger.isDebugEnabled()) {
             logger.debug("Processor created.");
+        }
+        return processor;
+    }
+
+    private static CardManager createCardManagerProcessor(Properties properties, SessionFactory sessionFactory,
+            EventNotificator eventNotificator) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating CardManagerProcessor.");
+        }
+        CardManager processor = new CardManagerProcessor(sessionFactory, eventNotificator);
+        if (logger.isDebugEnabled()) {
+            logger.debug("CardManagerProcessor created.");
+        }
+        return processor;
+    }
+
+    private static OrderCancelProcessor createOrderCancelProcessor(Properties properties, SessionFactory sessionFactory,
+            EventNotificator eventNotificator) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating OrderCancelProcessor.");
+        }
+        OrderCancelProcessor processor = new OrderCancelProcessorImpl(sessionFactory, eventNotificator);
+        if (logger.isDebugEnabled()) {
+            logger.debug("OrderCancelProcessor created.");
+        }
+        return processor;
+    }
+
+    private static PaymentProcessor createPaymentProcessor(Properties properties, SessionFactory sessionFactory,
+            EventNotificator eventNotificator) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating PaymentProcessor.");
+        }
+        PaymentProcessor processor = new PaymentProcessorImpl(sessionFactory, eventNotificator);
+        if (logger.isDebugEnabled()) {
+            logger.debug("PaymentProcessor created.");
+        }
+        return processor;
+    }
+
+    private static ClientPaymentOrderProcessor createClientPaymentOrderProcessor(Properties properties,
+            SessionFactory sessionFactory, EventNotificator eventNotificator) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating ClientPaymentOrderProcessor.");
+        }
+        ClientPaymentOrderProcessor processor = new ClientPaymentOrderProcessorImpl(sessionFactory, eventNotificator);
+        if (logger.isDebugEnabled()) {
+            logger.debug("ClientPaymentOrderProcessor created.");
         }
         return processor;
     }

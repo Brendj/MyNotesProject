@@ -48,7 +48,7 @@ public class OnlinePaymentProcessor {
                     request.getPaymentAdditionalId(),
                     false);
             //// обработать платеж
-            PaymentResponse.ResPaymentRegistry.Item processResult = processor.processPayPaymentRegistryPayment(
+            PaymentResponse.ResPaymentRegistry.Item processResult = RuntimeContext.getInstance().getPaymentProcessor().processPayPaymentRegistryPayment(
                     request.getContragentId(), payment);
             ////
             PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
