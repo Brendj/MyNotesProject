@@ -1236,7 +1236,7 @@ public class FrontController extends HttpServlet {
             List<Org> list = criteria.list();
             for (Org org : list) {
                 OrgIstkSummaryItem item = new OrgIstkSummaryItem(org.getShortName(), org.getIdOfOrg(), org.getAddress(),
-                        org.getVersion(), org.getGuid());
+                        org.getVersion(), org.getGuid(), org.getDistrict());
                 listResult.add(item);
             }
             persistenceTransaction.commit();

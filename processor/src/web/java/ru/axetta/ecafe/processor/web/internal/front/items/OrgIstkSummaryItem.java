@@ -13,16 +13,18 @@ public class OrgIstkSummaryItem {
     private String address;
     private Long version;
     private String guid;
+    private String strDistrict;
 
     public OrgIstkSummaryItem() {
     }
 
-    public OrgIstkSummaryItem(String schoolName, Long isppId, String address, Long version, String guid) {
+    public OrgIstkSummaryItem(String schoolName, Long isppId, String address, Long version, String guid, String strDistrict) {
         this.schoolName = schoolName;
         this.isppId = isppId;
         this.address = address;
         this.version = version;
         this.guid = guid;
+        this.strDistrict = strDistrict;
     }
 
     public String getSchoolName() {
@@ -63,5 +65,13 @@ public class OrgIstkSummaryItem {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public String getStrDistrict() {
+        return strDistrict;
+    }
+
+    public void setStrDistrict(String strDistrict) {
+        this.strDistrict = strDistrict;
     }
 }
